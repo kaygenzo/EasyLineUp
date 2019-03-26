@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="60dp"
+    android:layout_width="match_parent">
+
+    <ImageView
+        android:id="@+id/reorderImage"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_reorder_black_24dp"
+        android:padding="8dp"/>
+
+    <TextView
+        android:id="@+id/playerName"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/fieldPosition"
+        app:layout_constraintStart_toEndOf="@+id/reorderImage"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Player Name" />
+
+    <TextView
+        android:id="@+id/fieldPosition"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/shortNumber"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="9"
+        android:gravity="center"
+        android:textSize="25sp"/>
+
+    <TextView
+        android:id="@+id/shortNumber"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="20"
+        android:textSize="25sp"
+        android:gravity="center"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

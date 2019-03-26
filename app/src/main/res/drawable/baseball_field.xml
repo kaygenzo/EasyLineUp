@@ -1,0 +1,173 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="350dp"
+    android:height="350dp"
+    android:viewportWidth="550.0"
+    android:viewportHeight="550.0">
+    <path
+        android:fillColor="#00a831"
+        android:pathData="M0,0 h 550 v 550 h -550z" />
+
+
+    <!--<path-->
+        <!--android:fillColor="#a18e3c"-->
+        <!--android:strokeWidth="4"-->
+        <!--android:strokeColor="#85881b"-->
+        <!--android:pathData="-->
+        <!--M 275,450-->
+        <!--L 137.5,325-->
+        <!--C 170,200 379,200 412.5,325-->
+        <!--Z" />-->
+
+    <!--<path-->
+        <!--android:fillColor="#a18e3c"-->
+        <!--android:strokeWidth="4"-->
+        <!--android:strokeColor="#85881b"-->
+        <!--android:pathData="-->
+        <!--M 100,350-->
+        <!--a 175,175 0 1,0 350,0-->
+        <!--a 175,175 0 1,0 -350,0"/>-->
+
+    <path
+        android:fillColor="#a18e3c"
+        android:strokeWidth="4"
+        android:strokeColor="#85881b"
+        android:pathData="
+        M 475,325
+        a 200,200 0 1,0 -400,0"/>
+
+    <path
+        android:fillColor="#00a831"
+        android:pathData="
+        M 275,450
+        L 550,200
+        L 550,450
+        Z" />
+
+    <path
+        android:fillColor="#00a831"
+        android:pathData="
+        M 275,450
+        L 0,200
+        L 0,450
+        Z" />
+
+    <path
+        android:fillColor="#00a831"
+        android:strokeColor="#85881b"
+        android:strokeAlpha="1"
+        android:strokeWidth="6"
+        android:pathData="
+        M 275,450
+        L 137.5,325
+        L 275,200
+        L 412.5,325
+        Z" />
+
+    <path
+        android:fillColor="#ad6a24"
+        android:pathData="
+        M 275,325
+        m -20,0
+        a 20,20 0 1,0 40,0
+        a 20,20 0 1,0 -40,0"/>
+
+    <path
+        android:name="first_base"
+        android:fillColor="#FFFFFF"
+        android:pathData="
+        M 137.5,325
+        m 5,5
+        l -10,-10
+        l 10,-10
+        l 10,10
+        l -10,10
+        Z" />
+
+    <path
+        android:name="second_base"
+        android:fillColor="#FFFFFF"
+        android:pathData="
+        M 275,200
+        m 0,10
+        l -10,-10
+        l 10,-10
+        l 10,10
+        l -10,10
+        Z" />
+
+    <path
+        android:name="third_base"
+        android:fillColor="#FFFFFF"
+        android:pathData="
+        M 412.5,325
+        l -10,-10
+        l 10,-10
+        l 10,10
+        l -10,10
+        Z" />
+
+    <path
+        android:fillAlpha="1"
+        android:strokeWidth="3"
+        android:strokeColor="#FFFFFFFF"
+        android:pathData="M 275,450 L 0,200 Z" />
+
+    <path
+        android:fillAlpha="1"
+        android:strokeWidth="3"
+        android:strokeColor="#FFFFFFFF"
+        android:pathData="M 275,450 L 550,200 Z" />
+
+    <path
+        android:fillColor="#a18e3c"
+        android:strokeWidth="3"
+        android:strokeColor="#FFFFFFFF"
+        android:pathData="
+        M 275,450
+        m -40,-10
+        a 40,40 0 1,0 80,0
+        a 40,40 0 1,0 -80,0"/>
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="
+        M 275,450
+        l -8,-8
+        l 0,-8
+        h 16
+        l 0,8
+        Z" />
+
+    <!--<path-->
+        <!--android:strokeColor="#FFFFFFFF"-->
+        <!--android:strokeWidth="2"-->
+        <!--android:pathData="-->
+        <!--M 275,450-->
+        <!--m -8,5-->
+        <!--h 16-->
+        <!--v 20-->
+        <!--h -16-->
+        <!--Z" />-->
+
+    <!--<path-->
+        <!--android:strokeColor="#FFFFFFFF"-->
+        <!--android:strokeWidth="2"-->
+        <!--android:pathData="-->
+        <!--M 275,450-->
+        <!--m 13,-28-->
+        <!--h 16-->
+        <!--v 35-->
+        <!--h -16-->
+        <!--Z" />-->
+
+    <!--<path-->
+        <!--android:strokeColor="#FFFFFFFF"-->
+        <!--android:strokeWidth="2"-->
+        <!--android:pathData="-->
+        <!--M 275,450-->
+        <!--m -29,-28-->
+        <!--h 16-->
+        <!--v 35-->
+        <!--h -16-->
+        <!--Z" />-->
+</vector>
