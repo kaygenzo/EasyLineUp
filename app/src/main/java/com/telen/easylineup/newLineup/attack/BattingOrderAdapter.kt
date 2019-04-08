@@ -1,9 +1,8 @@
-package com.telen.easylineup.battingOrder
+package com.telen.easylineup.newLineup.attack
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
@@ -43,7 +42,7 @@ class BattingOrderAdapter(private val players: List<Player>): RecyclerView.Adapt
         with(holder) {
             playerName.text = player.name
             shortNumber.text = player.shirtNumber.toString()
-            fieldPosition.text = "-1"
+            fieldPosition.text = "0"
         }
     }
 

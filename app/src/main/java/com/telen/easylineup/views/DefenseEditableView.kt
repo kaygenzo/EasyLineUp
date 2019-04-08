@@ -12,12 +12,13 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
+import com.telen.easylineup.data.PlayerFieldPosition
 import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
 import org.w3c.dom.Text
 import kotlin.math.roundToInt
 
-class BaseballFieldAndPlayersView: ConstraintLayout {
+class DefenseEditableView: ConstraintLayout {
 
     constructor(context: Context?) : super(context) { init(context)}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) { init(context)}
@@ -70,7 +71,7 @@ class BaseballFieldAndPlayersView: ConstraintLayout {
         }
     }
 
-    fun setListPlayerInContainer(players: List<Player>) {
+    fun setListPlayerInContainer(players: List<PlayerFieldPosition>) {
         playersContainer.removeAllViews()
 
         val columnCount = 6
@@ -81,32 +82,32 @@ class BaseballFieldAndPlayersView: ConstraintLayout {
         playersContainer.rowCount = rowCount
 
         for(i in 0 until players.size) {
-            var playerView = PlayerFieldIcon(context).run {
-                //layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
-
-                val param = GridLayout.LayoutParams().apply {
-                    rightMargin = 10
-                    topMargin = 10
-                    bottomMargin = 10
-                    leftMargin = 10
-                }
-
-                layoutParams = param
-
-                setPlayerIcon(R.drawable.pikachu)
-                setShirtNumber(players[i].shirtNumber)
-                //replace by license id which is unique
-                tag = players[i].name + "_" + players[i].shirtNumber
-                setPadding(20,20,20,20)
-                setOnLongClickListener { view ->
-                    val item = ClipData.Item(tag as? CharSequence)
-                    val dragData = ClipData(tag as? CharSequence, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), item)
-                    val shadowBuilder = DragShadowBuilder(view)
-                    view.startDrag(dragData, shadowBuilder, null, 0)
-                }
-                this
-            }
-            playersContainer.addView(playerView)
+//            var playerView = PlayerFieldIcon(context).run {
+//                //layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+//
+//                val param = GridLayout.LayoutParams().apply {
+//                    rightMargin = 10
+//                    topMargin = 10
+//                    bottomMargin = 10
+//                    leftMargin = 10
+//                }
+//
+//                layoutParams = param
+//
+//                setPlayerIcon(R.drawable.pikachu)
+//                setShirtNumber(-1)
+//                //replace by license id which is unique
+//                tag = players[i].name + "_" + players[i].shirtNumber
+//                setPadding(20,20,20,20)
+//                setOnLongClickListener { view ->
+//                    val item = ClipData.Item(tag as? CharSequence)
+//                    val dragData = ClipData(tag as? CharSequence, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), item)
+//                    val shadowBuilder = DragShadowBuilder(view)
+//                    view.startDrag(dragData, shadowBuilder, null, 0)
+//                }
+//                this
+//            }
+//            playersContainer.addView(playerView)
         }
     }
 

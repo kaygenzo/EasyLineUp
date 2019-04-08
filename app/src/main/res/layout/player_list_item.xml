@@ -19,7 +19,8 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:src="@drawable/pikachu"/>
-        <TextView
+        <com.telen.easylineup.views.CollegedStyledTextView
+            style="@style/BaseballTextStyled"
             android:id="@+id/playerName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -28,10 +29,10 @@
             app:layout_constraintTop_toBottomOf="@+id/playerImage"
             tools:text="Awesome Player"
             android:textSize="20sp"
-            android:textColor="#000000"
+            android:textColor="@color/text_orange"
             android:gravity="center"/>
 
-        <TextView
+        <com.telen.easylineup.views.NumberedStyledTextView
             android:id="@+id/playerShirtNumber"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -39,8 +40,25 @@
             app:layout_constraintRight_toRightOf="@+id/playerImage"
             app:layout_constraintTop_toBottomOf="@+id/playerName"
             tools:text="50"
-            android:textSize="25sp"
+            android:textColor="@color/number_blue"
+            android:textSize="50sp"
             android:gravity="center"/>
+
+        <!--<androidx.appcompat.widget.AppCompatButton-->
+            <!--android:id="@+id/deletePlayer"-->
+            <!--android:layout_width="40dp"-->
+            <!--android:layout_height="40dp"-->
+            <!--app:layout_constraintTop_toBottomOf="@+id/playerShirtNumber"-->
+            <!--app:layout_constraintRight_toRightOf="parent"-->
+            <!--android:background="@drawable/ic_delete_black_24dp"/>-->
+
+        <!--<androidx.appcompat.widget.AppCompatButton-->
+            <!--android:id="@+id/editPlayer"-->
+            <!--android:layout_width="40dp"-->
+            <!--android:layout_height="40dp"-->
+            <!--app:layout_constraintTop_toBottomOf="@+id/playerShirtNumber"-->
+            <!--app:layout_constraintLeft_toLeftOf="parent"-->
+            <!--android:background="@drawable/ic_edit_black_24dp"/>-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

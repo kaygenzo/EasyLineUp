@@ -1,26 +1,29 @@
 package com.telen.easylineup.data
 
-data class Team(val name: String, val image: String?) {
-    val players: MutableList<Player> by lazy {
-        ArrayList<Player>()
-    }
+import androidx.room.*
+
+@Entity(
+        tableName = "teams",
+        indices = [Index(value = ["name"])]
+)
+data class Team(
+        @PrimaryKey(autoGenerate = true) var id: Int = 0,
+        @ColumnInfo(name = "name") var name: String = "",
+        @ColumnInfo(name = "image") var image: String? = null,
+        @Ignore val players: MutableList<Player> = mutableListOf()) {
 
     fun setPlayers(players: List<Player>) {
         this.players.clear()
         this.players.addAll(players)
     }
 
-    fun addPlayers(players: List<Player>) {
-        this.players.addAll(players)
-    }
-
-    fun addPlayer(player: Player) {
-        this.players.add(player)
-    }
-
     override fun toString(): String {
         val builder = StringBuffer().apply {
             append("Team {")
+            append("id=$id,")
+            append("name=$name,")
+            append("image=$image,")
+            append("players:")
             players.forEach {
                 append(it)
                 append(",")

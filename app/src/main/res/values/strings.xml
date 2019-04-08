@@ -6,4 +6,10 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="bottom_bar_home">Home</string>
+    <string name="bottom_bar_team">My team</string>
+    <string name="bottom_bar_lineups">My LineUp</string>
+    <string name="bottom_bar_settings">Settings</string>
+    <string name="new_lineup_tab_field_defense">Defense</string>
+    <string name="new_lineup_tab_field_attack">Attack</string>
 </resources>

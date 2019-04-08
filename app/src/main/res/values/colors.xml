@@ -5,5 +5,9 @@
     <color name="colorAccent">#D81B60</color>
     <color name="board_cell">#397B64</color>
     <color name="board_border">#FFFFFFFF</color>
-
+    <color name="bottom_bar_text_color">#FFFFFFFF</color>
+    <color name="bottom_bar_icon_tint_color">#FFFFFFFF</color>
+    <color name="number_blue">#FF2D3783</color>
+    <color name="text_orange">#FFd37240</color>
+    <color name="lineup_name">#FF2a3488</color>
 </resources>
