@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/headerRootView"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.telen.easylineup.views.CollegedStyledTextView
+        android:id="@+id/sectionHeaderTitle"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        tools:text="The Awesome Tournament"
+        android:gravity="center_vertical"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="8dp"/>
+
+    <ImageView
+        android:id="@+id/sectionHeaderArrow"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        tools:src="@drawable/ic_keyboard_arrow_down_black_24dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="8dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

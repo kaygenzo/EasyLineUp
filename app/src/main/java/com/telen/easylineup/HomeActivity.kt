@@ -1,14 +1,10 @@
 package com.telen.easylineup
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.telen.easylineup.data.AppDatabase
 import com.telen.easylineup.data.DatabaseMockProvider
-import com.telen.easylineup.history.ListLineupFragment
-import com.telen.easylineup.newLineup.attack.BattingOrderFragment
-import com.telen.easylineup.newLineup.NewLineUpActivity
-import com.telen.easylineup.recentActivity.RecentActivityFragment
+import com.telen.easylineup.currentLineup.CurrentLineupFragment
+import com.telen.easylineup.listLineup.CategorizedListLineupFragment
 import com.telen.easylineup.team.TeamFragment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -22,6 +18,7 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_list_line_up)
 
         DatabaseMockProvider().insertTeam()
+                .andThen(DatabaseMockProvider().insertTournaments())
                 .andThen(DatabaseMockProvider().insertPlayers())
                 .andThen(DatabaseMockProvider().insertLineups())
                 .andThen(DatabaseMockProvider().insertPlayerFieldPositions())
@@ -32,12 +29,13 @@ class HomeActivity : AppCompatActivity() {
                     DatabaseMockProvider().checkPlayers(this)
                     DatabaseMockProvider().checkLineups(this)
                     DatabaseMockProvider().checkPlayerFieldPositions(this)
+                    DatabaseMockProvider().checkTournaments(this)
                 }, { throwable ->
                     Timber.e(throwable)
                 })
 
         supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, RecentActivityFragment())
+                .replace(R.id.fragmentContainer, CurrentLineupFragment())
                 .commit()
 
         bottom_navigation.setOnNavigationItemSelectedListener { item ->
@@ -50,13 +48,16 @@ class HomeActivity : AppCompatActivity() {
                 }
                 R.id.navigation_home -> {
                     supportFragmentManager.beginTransaction()
-                            .replace(R.id.fragmentContainer, RecentActivityFragment())
+                            .replace(R.id.fragmentContainer, CurrentLineupFragment())
                             .commit()
                     true
                 }
                 R.id.navigation_lineups -> {
+//                    supportFragmentManager.beginTransaction()
+//                            .replace(R.id.fragmentContainer, ListLineupFragment())
+//                            .commit()
                     supportFragmentManager.beginTransaction()
-                            .replace(R.id.fragmentContainer, ListLineupFragment())
+                            .replace(R.id.fragmentContainer, CategorizedListLineupFragment())
                             .commit()
                     true
                 }

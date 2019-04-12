@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
+import com.telen.easylineup.R
 import java.lang.StringBuilder
 
 class CollegedStyledTextView: AppCompatTextView {
@@ -13,7 +15,7 @@ class CollegedStyledTextView: AppCompatTextView {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {initView(context)}
 
     private fun initView(context: Context?) {
-
+        setTextColor(ContextCompat.getColor(getContext(), R.color.text_orange))
     }
 
     override fun setTypeface(tf: Typeface?, style: Int) {

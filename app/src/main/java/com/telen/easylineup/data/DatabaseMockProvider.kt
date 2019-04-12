@@ -2,6 +2,7 @@ package com.telen.easylineup.data
 
 import androidx.arch.core.util.Function
 import androidx.lifecycle.*
+import androidx.lifecycle.Observer
 import com.telen.easylineup.App
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -9,6 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Action
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.util.*
 import java.util.function.Consumer
 
 class DatabaseMockProvider {
@@ -17,14 +19,14 @@ class DatabaseMockProvider {
         val players = getMockPlayers()
         val listResult = mutableListOf<PlayerFieldPosition>()
         var position = 1
-        var x = 20f
-        var y = 20f
+        var x = 10f
+        var y = 10f
         players.forEach { player ->
             if(position <= 9) {
                 listResult.add(PlayerFieldPosition(position, player.id, 1, position, x, y))
                 position++
-                x+=60
-                y+=30
+                x+=10
+                y+=10
             }
         }
         return listResult
@@ -33,6 +35,14 @@ class DatabaseMockProvider {
     private fun getMockTeam(): Team {
         val team = Team(1,"Seadogs", null, mutableListOf())
         return team
+    }
+
+    private fun getMockTournaments(): List<Tournament> {
+        val tournaments: MutableList<Tournament> = mutableListOf()
+        tournaments.add(Tournament(1,"Breal Tournament"))
+        tournaments.add(Tournament(2,"Brest Tournament"))
+        tournaments.add(Tournament(3,"Rennes Tournament"))
+        return tournaments
     }
 
     private fun getMockPlayers() : List<Player> {
@@ -51,9 +61,15 @@ class DatabaseMockProvider {
 
     private fun getMockLineUps(): List<Lineup> {
         val list: MutableList<Lineup> = mutableListOf()
-        list.add(Lineup(1,"Seadogs vs Seadogs 1", getMockTeam().id, mutableListOf()))
-        list.add(Lineup(2,"Seadogs vs Seadogs 2", getMockTeam().id, mutableListOf()))
-        list.add(Lineup(3,"Seadogs vs Seadogs 3", getMockTeam().id, mutableListOf()))
+        val currentTimeInmillis = Calendar.getInstance().timeInMillis
+        list.add(Lineup(1,"Seadogs vs Seadogs 1", getMockTeam().id, 1, currentTimeInmillis, currentTimeInmillis+100, mutableListOf()))
+        list.add(Lineup(2,"Seadogs vs Seadogs 2", getMockTeam().id, 1, currentTimeInmillis, currentTimeInmillis+200,mutableListOf()))
+        list.add(Lineup(3,"Seadogs vs Seadogs 3", getMockTeam().id, 1, currentTimeInmillis, currentTimeInmillis+300,mutableListOf()))
+        list.add(Lineup(4,"Seadogs vs Seadogs 4", getMockTeam().id, 1, currentTimeInmillis, currentTimeInmillis+400,mutableListOf()))
+        list.add(Lineup(5,"Seadogs vs Seadogs 5", getMockTeam().id, 1, currentTimeInmillis, currentTimeInmillis+500,mutableListOf()))
+        list.add(Lineup(6,"Seadogs vs Seadogs 6", getMockTeam().id, 2, currentTimeInmillis, currentTimeInmillis+600,mutableListOf()))
+        list.add(Lineup(7,"Seadogs vs Seadogs 7", getMockTeam().id, 3, currentTimeInmillis, currentTimeInmillis+700,mutableListOf()))
+        list.add(Lineup(8,"Seadogs vs Seadogs 8", getMockTeam().id, 3, currentTimeInmillis, currentTimeInmillis+800,mutableListOf()))
         return list
     }
 
@@ -110,6 +126,20 @@ class DatabaseMockProvider {
         App.database.lineupDao().getAllPlayerFieldPositions().observe(lifecycle, Observer {  playerFieldPositions ->
             playerFieldPositions.forEach { playerFieldPosition ->
                 Timber.d("playerFieldPosition -> $playerFieldPosition")
+            }
+        })
+    }
+
+    fun insertTournaments(): Completable {
+        return App.database.tournamentDao().insertTournaments(getMockTournaments())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun checkTournaments(lifecycle: LifecycleOwner) {
+        App.database.tournamentDao().getTournaments().observe(lifecycle, Observer {  tournaments ->
+            tournaments.forEach { tournament ->
+                Timber.d("tournament -> $tournament")
             }
         })
     }

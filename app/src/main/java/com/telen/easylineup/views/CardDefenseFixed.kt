@@ -20,4 +20,12 @@ class CardDefenseFixed: CardView {
     fun setListPlayer(players: List<PlayerFieldPosition>) {
         fieldAndPlayersRootView.setListPlayerInField(players)
     }
+
+    fun setIcons(players: List<PlayerFieldPosition>) {
+        fieldAndPlayersRootView.setSmallPlayerPosition(players)
+    }
+
+    fun setLineupName(name: String) {
+        lineup_name.text = name
+    }
 }

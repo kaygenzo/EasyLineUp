@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
 import com.telen.easylineup.newLineup.PlayersPositionViewModel
-import kotlinx.android.synthetic.main.generic_list.view.*
+import kotlinx.android.synthetic.main.fragment_list_batter.view.*
 
 class BattingOrderFragment: Fragment() {
 
@@ -33,7 +32,7 @@ class BattingOrderFragment: Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.generic_list, container, false)
+        val view = inflater.inflate(R.layout.fragment_list_batter, container, false)
 
         view.recyclerView.apply {
             layoutManager = LinearLayoutManager(activity)
@@ -43,16 +42,16 @@ class BattingOrderFragment: Fragment() {
         itemTouchedHelper.attachToRecyclerView(view.recyclerView)
 
         viewModel = ViewModelProviders.of(activity as AppCompatActivity).get(PlayersPositionViewModel::class.java)
-        viewModel.teams.observe(this, Observer {teams ->
-            val team = teams.first()
-            viewModel.getPlayersForTeam(team.id).observe(this@BattingOrderFragment, Observer { playerList ->
-                players.apply {
-                    clear()
-                    addAll(playerList)
-                }
-                playerAdapter.notifyDataSetChanged()
-            })
-        })
+//        viewModel.teams.observe(this, Observer {teams ->
+//            val team = teams.first()
+//            viewModel.getPlayersForTeam(team.id).observe(this@BattingOrderFragment, Observer { playerList ->
+//                players.apply {
+//                    clear()
+//                    addAll(playerList)
+//                }
+//                playerAdapter.notifyDataSetChanged()
+//            })
+//        })
 
         return view
     }

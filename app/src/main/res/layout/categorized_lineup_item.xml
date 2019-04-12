@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content">
+
+    <com.telen.easylineup.views.DefenseFixedView
+        android:id="@+id/itemField"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <com.telen.easylineup.views.MLBStyledTextView
+        android:id="@+id/itemTitle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        tools:text="Text Awsome"
+        app:layout_constraintLeft_toRightOf="@+id/itemField"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/itemField"
+        app:layout_constraintBottom_toBottomOf="@+id/itemField"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:textSize="20sp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

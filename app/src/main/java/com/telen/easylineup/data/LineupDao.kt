@@ -3,11 +3,12 @@ package com.telen.easylineup.data
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import io.reactivex.Completable
+import io.reactivex.Single
 
 @Dao
 interface LineupDao {
     @Insert
-    fun insertLineup(lineup: Lineup): Completable
+    fun insertLineup(lineup: Lineup): Single<Long>
 
     @Insert
     fun insertLineup(lineups: List<Lineup>): Completable
@@ -37,4 +38,15 @@ interface LineupDao {
         WHERE playerFieldPosition.lineupID = :lineupId
     """)
     fun getAllPlayerFieldPositionsForLineup(lineupId: Int): LiveData<List<PlayerFieldPosition>>
+
+    @Query("""
+        SELECT lineups.* FROM lineups
+        INNER JOIN tournaments ON lineups.tournamentID = tournaments.id
+        INNER JOIN teams ON lineups.teamID = teams.id
+        WHERE lineups.tournamentID = :tournamentId
+    """)
+    fun getLineupsForTournament(tournamentId: Int): LiveData<List<Lineup>>
+
+    @Query("SELECT * FROM lineups ORDER BY editedAt DESC LIMIT 1")
+    fun getLastLineup(): LiveData<Lineup>
 }

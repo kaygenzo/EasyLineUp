@@ -21,4 +21,8 @@ class CardDefenseEditable: CardView {
     fun setListPlayer(players: List<PlayerFieldPosition>) {
         fieldAndPlayersRootView.setListPlayerInContainer(players)
     }
+
+    fun setLineupName(name: String) {
+        lineup_name.text = name
+    }
 }

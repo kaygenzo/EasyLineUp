@@ -20,7 +20,6 @@
             android:layout_height="200dp"
             android:src="@drawable/pikachu"/>
         <com.telen.easylineup.views.CollegedStyledTextView
-            style="@style/BaseballTextStyled"
             android:id="@+id/playerName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -29,7 +28,6 @@
             app:layout_constraintTop_toBottomOf="@+id/playerImage"
             tools:text="Awesome Player"
             android:textSize="20sp"
-            android:textColor="@color/text_orange"
             android:gravity="center"/>
 
         <com.telen.easylineup.views.NumberedStyledTextView

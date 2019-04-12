@@ -3,8 +3,10 @@ package com.telen.easylineup.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
 import com.telen.easylineup.data.PlayerFieldPosition
@@ -21,13 +23,19 @@ class DefenseFixedView: ConstraintLayout {
         LayoutInflater.from(context).inflate(R.layout.baseball_field_only, this)
     }
 
-    private fun addPlayerOnField(view: PlayerFieldIcon, x: Float, y: Float) {
+    private fun addPlayerOnField(view: View, x: Float, y: Float) {
         val imageWidth = view.width
         val imageHeight = view.height
 
+        val layoutHeight = fieldFrameLayout.height
+        val layoutWidth = fieldFrameLayout.width
+
+        val positionX = ((x * layoutWidth)/100f).roundToInt()
+        val positionY = ((y * layoutHeight)/100f).roundToInt()
+
         val layoutParamCustom = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).run {
-            leftMargin = x.roundToInt() - imageWidth / 2
-            topMargin = y.roundToInt() - imageHeight / 2
+            leftMargin = positionX - imageWidth / 2
+            topMargin = positionY - imageHeight / 2
             this
         }
 
@@ -48,6 +56,16 @@ class DefenseFixedView: ConstraintLayout {
                 this
             }
             addPlayerOnField(playerView, playerFieldPosition.x, playerFieldPosition.y)
+        }
+    }
+
+    fun setSmallPlayerPosition(players: List<PlayerFieldPosition>) {
+        players.forEach { playerFieldPosition ->
+            var iconView = ImageView(context).run {
+                setImageResource(R.drawable.baseball_ball_icon)
+                this
+            }
+            addPlayerOnField(iconView, playerFieldPosition.x, playerFieldPosition.y)
         }
     }
 }
