@@ -8,6 +8,6 @@ import androidx.room.PrimaryKey
         tableName = "tournaments"
 )
 data class Tournament(
-        @PrimaryKey(autoGenerate = true) val id: Int,
+        @PrimaryKey(autoGenerate = true) val id: Long = 0,
         @ColumnInfo(name = "name") val name: String
 )

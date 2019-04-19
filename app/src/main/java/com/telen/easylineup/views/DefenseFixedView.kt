@@ -11,7 +11,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
 import com.telen.easylineup.data.PlayerFieldPosition
 import kotlinx.android.synthetic.main.field_view.view.*
+import timber.log.Timber
 import kotlin.math.roundToInt
+
+const val SMALL_IMAGE_SIZE = 30
 
 class DefenseFixedView: ConstraintLayout {
 
@@ -24,32 +27,38 @@ class DefenseFixedView: ConstraintLayout {
     }
 
     private fun addPlayerOnField(view: View, x: Float, y: Float) {
-        val imageWidth = view.width
-        val imageHeight = view.height
+        fieldFrameLayout.post {
+            val layoutHeight = fieldFrameLayout.height
+            val layoutWidth = fieldFrameLayout.width
 
-        val layoutHeight = fieldFrameLayout.height
-        val layoutWidth = fieldFrameLayout.width
+            val positionX = ((x * layoutWidth)/100f).roundToInt()
+            val positionY = ((y * layoutHeight)/100f).roundToInt()
 
-        val positionX = ((x * layoutWidth)/100f).roundToInt()
-        val positionY = ((y * layoutHeight)/100f).roundToInt()
+            view.post {
+                val imageWidth = view.width
+                val imageHeight = view.height
 
-        val layoutParamCustom = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).run {
-            leftMargin = positionX - imageWidth / 2
-            topMargin = positionY - imageHeight / 2
-            this
+                Timber.d("imageWidth=$imageWidth imageHeight=$imageHeight layoutWidth=$layoutWidth layoutHeight=$layoutHeight")
+
+                val layoutParamCustom = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).run {
+                    leftMargin = positionX - imageWidth / 2
+                    topMargin = positionY - imageHeight / 2
+                    this
+                }
+
+                view.run {
+                    layoutParams = layoutParamCustom
+                    invalidate()
+                }
+            }
+
+            fieldFrameLayout.addView(view)
         }
-
-        view.run {
-            layoutParams = layoutParamCustom
-            invalidate()
-        }
-
-        fieldFrameLayout.addView(view, layoutParamCustom)
     }
 
     fun setListPlayerInField(players: List<PlayerFieldPosition>) {
         players.forEach { playerFieldPosition ->
-            var playerView = PlayerFieldIcon(context).run {
+            val playerView = PlayerFieldIcon(context).run {
                 setPlayerIcon(R.drawable.pikachu)
                 setShirtNumber(-1)
                 setPadding(20,20,20,20)
@@ -62,6 +71,7 @@ class DefenseFixedView: ConstraintLayout {
     fun setSmallPlayerPosition(players: List<PlayerFieldPosition>) {
         players.forEach { playerFieldPosition ->
             var iconView = ImageView(context).run {
+                layoutParams = LayoutParams(SMALL_IMAGE_SIZE,SMALL_IMAGE_SIZE)
                 setImageResource(R.drawable.baseball_ball_icon)
                 this
             }

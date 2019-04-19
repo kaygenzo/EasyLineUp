@@ -13,9 +13,9 @@ import java.util.*
         ]
 )
 data class PlayerFieldPosition(
-        @PrimaryKey(autoGenerate = true) val id: Int,
-        @ColumnInfo(name = "playerID") var playerId: Int,
-        @ColumnInfo(name = "lineupID") var lineupId: Int,
+        @PrimaryKey(autoGenerate = true) val id: Long,
+        @ColumnInfo(name = "playerID") var playerId: Long,
+        @ColumnInfo(name = "lineupID") var lineupId: Long,
         @ColumnInfo(name = "position") var position: Int,
         @ColumnInfo(name = "x") var x: Float,
         @ColumnInfo(name = "y") var y: Float
@@ -32,10 +32,10 @@ data class PlayerFieldPosition(
         ]
 )
 data class Lineup(
-        @PrimaryKey(autoGenerate = true) var id: Int = 0,
+        @PrimaryKey(autoGenerate = true) var id: Long = 0,
         @ColumnInfo(name = "name") var name: String = "",
-        @ColumnInfo(name = "teamID") var teamId: Int = 0,
-        @ColumnInfo(name = "tournamentID") var tournamentId: Int = 0,
+        @ColumnInfo(name = "teamID") var teamId: Long = 0,
+        @ColumnInfo(name = "tournamentID") var tournamentId: Long = 0,
         @ColumnInfo(name = "createdAt") var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         @ColumnInfo(name = "editedAt") var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         @Ignore val playerFieldPosition: MutableList<PlayerFieldPosition> = mutableListOf())

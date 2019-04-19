@@ -16,7 +16,7 @@ interface TeamDao {
     fun updateTeam(team: Team)
 
     @Query("SELECT * FROM teams WHERE id = :teamId")
-    fun getTeamById(teamId: Int): LiveData<Team>
+    fun getTeamById(teamId: Long): LiveData<Team>
 
     @Query("SELECT * FROM teams")
     fun getTeams(): LiveData<List<Team>>

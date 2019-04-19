@@ -14,10 +14,13 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.aigestudio.wheelpicker.WheelPicker
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
+import com.telen.easylineup.newLineup.LineupCreationDialog
 import com.telen.easylineup.newLineup.NewLineUpActivity
+import com.telen.easylineup.newLineup.configuration.ChooseConfigurationActivity
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.Constants
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
@@ -25,6 +28,7 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_list_lineup.view.*
+import timber.log.Timber
 
 class CategorizedListLineupFragment: Fragment() {
 
@@ -39,16 +43,13 @@ class CategorizedListLineupFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_list_lineup, container, false)
 
-//        val layoutMgr = GridLayoutManager(activity as AppCompatActivity, 2).apply {
-//            spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {
-//                override fun getSpanSize(position: Int): Int {
-//                    return when(sectionAdapter.getSectionItemViewType(position)) {
-//                        SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER -> 2
-//                        else -> 1
-//                    }
-//                }
-//            }
-//        }
+        val tournamentViewModel =  ViewModelProviders.of(activity as AppCompatActivity).get(TournamentViewModel::class.java)
+        lineupViewModel = ViewModelProviders.of(this).get(LineupViewModel::class.java)
+
+        view.fab.setOnClickListener {
+            val dialog = LineupCreationDialog()
+            dialog.show(fragmentManager, "dialog")
+        }
 
         val layoutMgr = LinearLayoutManager(activity as AppCompatActivity)
 
@@ -56,9 +57,6 @@ class CategorizedListLineupFragment: Fragment() {
             layoutManager = layoutMgr
             adapter = sectionAdapter
         }
-
-        lineupViewModel = ViewModelProviders.of(this).get(LineupViewModel::class.java)
-        val tournamentViewModel =  ViewModelProviders.of(activity as AppCompatActivity).get(TournamentViewModel::class.java)
 
         tournamentViewModel.tournaments.observe(this@CategorizedListLineupFragment, Observer { tournaments ->
             sectionAdapter.removeAllSections()
@@ -78,8 +76,9 @@ class CategorizedListLineupFragment: Fragment() {
         return view
     }
 
-    fun getLineupsFor(tournament: Tournament, list: MutableList<Lineup>) {
+    private fun getLineupsFor(tournament: Tournament, list: MutableList<Lineup>) {
         lineupViewModel.getLineupsForTournament(tournament).observe(this@CategorizedListLineupFragment, Observer {
+            list.clear()
             list.addAll(it)
             it.forEach { lineup ->
                 getPlayersPositionsFor(lineup)
@@ -87,7 +86,7 @@ class CategorizedListLineupFragment: Fragment() {
         })
     }
 
-    fun getPlayersPositionsFor(lineup: Lineup) {
+    private fun getPlayersPositionsFor(lineup: Lineup) {
         lineupViewModel.getPlayerFieldPositionFor(lineup).observe(this@CategorizedListLineupFragment, Observer {
             lineup.playerFieldPosition.apply {
                 clear()

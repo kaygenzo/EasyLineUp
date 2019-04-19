@@ -23,7 +23,7 @@ interface LineupDao {
     fun getAllLineup(): LiveData<List<Lineup>>
 
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
-    fun getLineupById(lineupId: Int): LiveData<Lineup>
+    fun getLineupById(lineupId: Long): LiveData<Lineup>
 
     @Insert
     fun insertPlayerFieldPosition(fieldPositions: List<PlayerFieldPosition>): Completable
@@ -37,7 +37,7 @@ interface LineupDao {
         INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
         WHERE playerFieldPosition.lineupID = :lineupId
     """)
-    fun getAllPlayerFieldPositionsForLineup(lineupId: Int): LiveData<List<PlayerFieldPosition>>
+    fun getAllPlayerFieldPositionsForLineup(lineupId: Long): LiveData<List<PlayerFieldPosition>>
 
     @Query("""
         SELECT lineups.* FROM lineups
@@ -45,7 +45,7 @@ interface LineupDao {
         INNER JOIN teams ON lineups.teamID = teams.id
         WHERE lineups.tournamentID = :tournamentId
     """)
-    fun getLineupsForTournament(tournamentId: Int): LiveData<List<Lineup>>
+    fun getLineupsForTournament(tournamentId: Long): LiveData<List<Lineup>>
 
     @Query("SELECT * FROM lineups ORDER BY editedAt DESC LIMIT 1")
     fun getLastLineup(): LiveData<Lineup>

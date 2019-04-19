@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".newLineup.NewLineUpActivity" />
+        <activity android:name=".newLineup.configuration.ChooseConfigurationActivity" />
     </application>
 
 </manifest>

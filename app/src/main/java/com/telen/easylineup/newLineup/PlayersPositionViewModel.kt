@@ -9,7 +9,7 @@ import com.telen.easylineup.data.Team
 class PlayersPositionViewModel: ViewModel() {
     val teams: LiveData<List<Team>> = App.database.teamDao().getTeams()
 
-    fun getPlayersForTeam(teamID: Int): LiveData<List<Player>> {
+    fun getPlayersForTeam(teamID: Long): LiveData<List<Player>> {
         return App.database.playerDao().getPlayersForTeam(teamID)
     }
 }

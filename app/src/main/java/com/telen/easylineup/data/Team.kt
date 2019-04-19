@@ -7,7 +7,7 @@ import androidx.room.*
         indices = [Index(value = ["name"])]
 )
 data class Team(
-        @PrimaryKey(autoGenerate = true) var id: Int = 0,
+        @PrimaryKey(autoGenerate = true) var id: Long = 0,
         @ColumnInfo(name = "name") var name: String = "",
         @ColumnInfo(name = "image") var image: String? = null,
         @Ignore val players: MutableList<Player> = mutableListOf()) {
