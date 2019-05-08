@@ -6,27 +6,33 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
+import com.telen.easylineup.newLineup.NewLineUpActivity
 import com.telen.easylineup.newLineup.PlayersPositionViewModel
 import kotlinx.android.synthetic.main.fragment_list_batter.view.*
 
 class BattingOrderFragment: Fragment() {
 
     private lateinit var playerAdapter: BattingOrderAdapter
-    private lateinit var players: MutableList<Player>
+    private val adapterDataList = mutableListOf<PlayerItem>()
+
+    private val playersMap: MutableMap<Long, Player> = mutableMapOf()
+    private val itemsMap: MutableMap<Long, PlayerItem> = mutableMapOf()
+
     private lateinit var viewModel: PlayersPositionViewModel
+
     private lateinit var itemTouchedCallback: BattingOrderItemTouchCallback
     private lateinit var itemTouchedHelper: ItemTouchHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        players = mutableListOf()
-        playerAdapter = BattingOrderAdapter(players)
+        playerAdapter = BattingOrderAdapter(adapterDataList)
         itemTouchedCallback = BattingOrderItemTouchCallback(playerAdapter)
         itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
     }
@@ -52,6 +58,33 @@ class BattingOrderFragment: Fragment() {
 //                playerAdapter.notifyDataSetChanged()
 //            })
 //        })
+
+        viewModel = ViewModelProviders.of(activity as NewLineUpActivity).get(PlayersPositionViewModel::class.java)
+        viewModel.getPlayersForTeam(viewModel.teamID).observe(this, Observer { players ->
+
+            playersMap.clear()
+
+            players.forEach {player ->
+                playersMap[player.id] = player
+            }
+
+            viewModel.getPlayerPositionsForLineup(viewModel.lineupID).observe(this@BattingOrderFragment, Observer { positions ->
+                itemsMap.clear()
+                positions.forEach { fieldPosition ->
+                    playersMap[fieldPosition.playerId]?.let { correspondingPlayer ->
+                        if(itemsMap[correspondingPlayer.id]==null) {
+                            itemsMap[correspondingPlayer.id] = PlayerItem(name = correspondingPlayer.name, shirtNumber = correspondingPlayer.shirtNumber)
+                        }
+                        itemsMap[correspondingPlayer.id]?.let { item ->
+                            item.position = fieldPosition.position
+                        }
+                    }
+                }
+                adapterDataList.clear()
+                adapterDataList.addAll(itemsMap.values)
+                playerAdapter.notifyDataSetChanged()
+            })
+        })
 
         return view
     }

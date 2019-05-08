@@ -13,7 +13,9 @@ interface OnItemTouchedListener {
     fun onSwiped(position: Int)
 }
 
-class BattingOrderAdapter(private val players: List<Player>): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
+data class PlayerItem(val name: String, var position: Int = 0, val shirtNumber: Int)
+
+class BattingOrderAdapter(private val players: List<PlayerItem>): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
     override fun onSwiped(position: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -42,9 +44,7 @@ class BattingOrderAdapter(private val players: List<Player>): RecyclerView.Adapt
         with(holder) {
             playerName.text = player.name
             shortNumber.text = player.shirtNumber.toString()
-            fieldPosition.text = "0"
+            fieldPosition.text = player.position.toString()
         }
     }
-
-
 }

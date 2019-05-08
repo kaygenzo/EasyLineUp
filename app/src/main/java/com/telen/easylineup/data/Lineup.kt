@@ -13,12 +13,12 @@ import java.util.*
         ]
 )
 data class PlayerFieldPosition(
-        @PrimaryKey(autoGenerate = true) val id: Long,
-        @ColumnInfo(name = "playerID") var playerId: Long,
-        @ColumnInfo(name = "lineupID") var lineupId: Long,
-        @ColumnInfo(name = "position") var position: Int,
-        @ColumnInfo(name = "x") var x: Float,
-        @ColumnInfo(name = "y") var y: Float
+        @PrimaryKey(autoGenerate = true) var id: Long = 0,
+        @ColumnInfo(name = "playerID") var playerId: Long = 0,
+        @ColumnInfo(name = "lineupID") var lineupId: Long = 0,
+        @ColumnInfo(name = "position") var position: Int = 0,
+        @ColumnInfo(name = "x") var x: Float = 0f,
+        @ColumnInfo(name = "y") var y: Float = 0f
 )
 
 @Entity(

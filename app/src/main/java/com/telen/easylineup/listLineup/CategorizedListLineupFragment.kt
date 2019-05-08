@@ -1,34 +1,20 @@
 package com.telen.easylineup.listLineup
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.aigestudio.wheelpicker.WheelPicker
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
 import com.telen.easylineup.newLineup.LineupCreationDialog
-import com.telen.easylineup.newLineup.NewLineUpActivity
-import com.telen.easylineup.newLineup.configuration.ChooseConfigurationActivity
-import com.telen.easylineup.team.TeamViewModel
-import com.telen.easylineup.utils.Constants
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
-import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_list_lineup.view.*
-import timber.log.Timber
 
 class CategorizedListLineupFragment: Fragment() {
 

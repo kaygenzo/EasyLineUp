@@ -3,6 +3,7 @@ package com.telen.easylineup.data
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 
 @Dao
@@ -28,6 +29,9 @@ interface LineupDao {
     @Insert
     fun insertPlayerFieldPosition(fieldPositions: List<PlayerFieldPosition>): Completable
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertPlayerFieldPosition(fieldPositions: PlayerFieldPosition): Single<Long>
+
     @Query("SELECT * from playerFieldPosition")
     fun getAllPlayerFieldPositions(): LiveData<List<PlayerFieldPosition>>
 
@@ -38,6 +42,14 @@ interface LineupDao {
         WHERE playerFieldPosition.lineupID = :lineupId
     """)
     fun getAllPlayerFieldPositionsForLineup(lineupId: Long): LiveData<List<PlayerFieldPosition>>
+
+    @Query("""
+        SELECT playerFieldPosition.* FROM playerFieldPosition
+        INNER JOIN players ON playerFieldPosition.playerID = players.id
+        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
+        WHERE playerFieldPosition.lineupID = :lineupID AND playerFieldPosition.playerID = :playerID
+    """)
+    fun getPlayerPositionFor(lineupID: Long, playerID: Long): Maybe<PlayerFieldPosition>
 
     @Query("""
         SELECT lineups.* FROM lineups

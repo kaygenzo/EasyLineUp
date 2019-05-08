@@ -30,6 +30,7 @@ import timber.log.Timber
 class LineupCreationDialog: DialogFragment() {
 
     private var saveDisposable: Disposable? = null
+    private lateinit var dialog: AlertDialog
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
@@ -51,7 +52,7 @@ class LineupCreationDialog: DialogFragment() {
                     .setOnDismissListener {
                         saveDisposable?.dispose()
                     }
-            val dialog = builder.create()
+            this.dialog = builder.create()
             dialog.setOnShowListener { dialogInterface ->
                 val positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 positive.isEnabled = false
@@ -81,7 +82,7 @@ class LineupCreationDialog: DialogFragment() {
         saveDisposable = tournamentViewModel.insertTournamentIfNotExists(tournament)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Consumer {tournamentID ->
+                .subscribe { tournamentID ->
                     Timber.d("successfully inserted tournament, new id: $tournamentID")
                     teamViewModel.getTeam().observe(activity as AppCompatActivity, Observer { team ->
                         val newLineup = Lineup(name = lineupTitle, teamId = team.id, tournamentId = tournamentID)
@@ -89,14 +90,16 @@ class LineupCreationDialog: DialogFragment() {
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({ lineupID ->
+                                    dialog.dismiss()
                                     Timber.d("successfully inserted new lineup, new id: $lineupID")
                                     val intent = Intent(activity, NewLineUpActivity::class.java)
                                     intent.putExtra(Constants.LINEUP_ID, lineupID)
+                                    intent.putExtra(Constants.TEAM_ID, team.id)
                                     startActivity(intent)
-                                }, {
-                                    throwable -> Timber.e(throwable)
+                                }, { throwable ->
+                                    Timber.e(throwable)
                                 })
                     })
-                })
+                }
     }
 }

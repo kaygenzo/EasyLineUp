@@ -18,18 +18,6 @@
         android:hint="Locale VS Visitors"
         android:layout_marginBottom="20dp"/>
 
-    <!--<com.aigestudio.wheelpicker.WheelPicker-->
-        <!--android:id="@+id/lineupTournamentPicker"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--app:layout_constraintTop_toBottomOf="@+id/lineupTitle"-->
-        <!--app:wheel_curved="true"-->
-        <!--app:wheel_atmospheric="true"-->
-        <!--app:wheel_curtain="true"-->
-        <!--app:wheel_visible_item_count="5"-->
-        <!--app:wheel_indicator="true"/>-->
-
     <androidx.appcompat.widget.AppCompatAutoCompleteTextView
         android:id="@+id/tournamentChoiceAutoComplete"
         android:layout_width="0dp"
@@ -39,16 +27,5 @@
         app:layout_constraintTop_toBottomOf="@+id/lineupTitle"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
-
-    <!--<androidx.appcompat.widget.AppCompatButton-->
-        <!--android:id="@+id/addButton"-->
-        <!--android:layout_width="40dp"-->
-        <!--android:layout_height="40dp"-->
-        <!--android:layout_marginLeft="20dp"-->
-        <!--android:background="@drawable/ic_add_circle_outline_black_24dp"-->
-        <!--app:layout_constraintBottom_toBottomOf="@+id/tournamentChoiceAutoComplete"-->
-        <!--app:layout_constraintLeft_toRightOf="@+id/tournamentChoiceAutoComplete"-->
-        <!--app:layout_constraintRight_toRightOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="@+id/tournamentChoiceAutoComplete" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -26,4 +26,8 @@ class LineupViewModel: ViewModel() {
     fun getLineupsForTournament(tournament: Tournament): LiveData<List<Lineup>> {
         return App.database.lineupDao().getLineupsForTournament(tournament.id)
     }
+
+    fun getLineupByID(lineupID: Long): LiveData<Lineup> {
+        return App.database.lineupDao().getLineupById(lineupID)
+    }
 }

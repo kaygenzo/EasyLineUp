@@ -18,8 +18,12 @@ class CardDefenseEditable: CardView {
         LayoutInflater.from(context).inflate(R.layout.card_defense_editable, this)
     }
 
-    fun setListPlayer(players: List<PlayerFieldPosition>) {
-        fieldAndPlayersRootView.setListPlayerInContainer(players)
+    fun setListPlayer(players: MutableMap<Player, PlayerFieldPosition?>) {
+        fieldAndPlayersRootView.setListPlayer(players)
+    }
+
+    fun setPlayerStateListener(playerStateChanged: OnPlayerStateChanged) {
+        fieldAndPlayersRootView.setOnPlayerListener(playerStateChanged)
     }
 
     fun setLineupName(name: String) {
