@@ -1,19 +1,19 @@
 package com.telen.easylineup.newLineup
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.telen.easylineup.App
 import com.telen.easylineup.data.Player
 import com.telen.easylineup.data.PlayerFieldPosition
+import com.telen.easylineup.data.PlayerWithPosition
 import com.telen.easylineup.data.Team
 import io.reactivex.Completable
 import io.reactivex.Maybe
-import io.reactivex.Single
 
 class PlayersPositionViewModel: ViewModel() {
 
     var lineupID: Long = 0
     var teamID: Long = 0
+    var lineupTitle = ""
 
     val teams: LiveData<List<Team>> = App.database.teamDao().getTeams()
 
@@ -33,7 +33,20 @@ class PlayersPositionViewModel: ViewModel() {
                 }
     }
 
-    fun getPlayerPositionsForLineup(lineupID: Long): LiveData<List<PlayerFieldPosition>> {
-        return App.database.lineupDao().getAllPlayerFieldPositionsForLineup(lineupID)
+    fun saveNewBattingOrder(playerBattingOrder: Map<Long, Int>): Completable {
+        val listOperations: MutableList<Completable> = mutableListOf()
+        playerBattingOrder.forEach {
+            listOperations.add(App.database.lineupDao().getPlayerFieldPosition(it.key)
+                    .flatMapCompletable { playerPosition ->
+                        playerPosition.order = it.value
+                        App.database.lineupDao().updatePlayerFieldPosition(playerPosition)
+                    }
+            )
+        }
+        return Completable.concat(listOperations)
+    }
+
+    fun getPlayersWithPositions(): LiveData<List<PlayerWithPosition>> {
+        return App.database.lineupDao().getAllPlayersWithPositionsForLineup(lineupID)
     }
 }

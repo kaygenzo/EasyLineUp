@@ -7,8 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.views.CollegedStyledTextView
-import com.telen.easylineup.views.DefenseFixedView
-import com.telen.easylineup.views.MLBStyledTextView
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 
@@ -35,7 +33,8 @@ class CategorizedLineupAdapter(val lineups: List<Lineup>, val tournamentName: St
         val cardHolder = holder as LineupViewHolder
         val lineup = lineups[position]
         cardHolder.field.setSmallPlayerPosition(lineup.playerFieldPosition)
-        cardHolder.title.text = lineup.name
+        cardHolder.lineupName.text = lineup.name
+        cardHolder.tournamentName.visibility = View.GONE
     }
 
     override fun getItemViewHolder(view: View): RecyclerView.ViewHolder {
@@ -66,11 +65,6 @@ class CategorizedLineupAdapter(val lineups: List<Lineup>, val tournamentName: St
 
     override fun getHeaderViewHolder(view: View): RecyclerView.ViewHolder {
         return HeaderViewHolder(view)
-    }
-
-    inner class LineupViewHolder(view: View): RecyclerView.ViewHolder(view) {
-        val field = view.findViewById<DefenseFixedView>(R.id.itemField)
-        val title = view.findViewById<MLBStyledTextView>(R.id.itemTitle)
     }
 
     inner class HeaderViewHolder(view: View): RecyclerView.ViewHolder(view) {

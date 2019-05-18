@@ -18,7 +18,8 @@ data class PlayerFieldPosition(
         @ColumnInfo(name = "lineupID") var lineupId: Long = 0,
         @ColumnInfo(name = "position") var position: Int = 0,
         @ColumnInfo(name = "x") var x: Float = 0f,
-        @ColumnInfo(name = "y") var y: Float = 0f
+        @ColumnInfo(name = "y") var y: Float = 0f,
+        @ColumnInfo(name = "order") var order: Int = 0
 )
 
 @Entity(
@@ -38,4 +39,24 @@ data class Lineup(
         @ColumnInfo(name = "tournamentID") var tournamentId: Long = 0,
         @ColumnInfo(name = "createdAt") var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         @ColumnInfo(name = "editedAt") var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
-        @Ignore val playerFieldPosition: MutableList<PlayerFieldPosition> = mutableListOf())
+        @Ignore val playerFieldPosition: MutableList<PlayerWithPosition> = mutableListOf())
+
+data class PlayerWithPosition(
+        @ColumnInfo(name = "playerName") val playerName: String,
+        @ColumnInfo(name = "shirtNumber") val shirtNumber: Int,
+        @ColumnInfo(name = "licenseNumber") val licenseNumber: Long,
+        @ColumnInfo(name = "position") var position: Int = 0,
+        @ColumnInfo(name = "x") var x: Float = 0f,
+        @ColumnInfo(name = "y") var y: Float = 0f,
+        @ColumnInfo(name = "order") var order: Int = 0,
+        @ColumnInfo(name = "fieldPositionID") val fieldPositionID: Long
+)
+
+data class PositionWithLineup(
+        @ColumnInfo(name = "position") var position: Int = 0,
+        @ColumnInfo(name = "x") var x: Float = 0f,
+        @ColumnInfo(name = "y") var y: Float = 0f,
+        @ColumnInfo(name = "order") var order: Int = 0,
+        @ColumnInfo(name = "lineupName") var lineupName: String = "",
+        @ColumnInfo(name = "tournamentName") var tournamentName: String = ""
+)

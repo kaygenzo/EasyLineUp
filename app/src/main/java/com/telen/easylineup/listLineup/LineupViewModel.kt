@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.PlayerFieldPosition
+import com.telen.easylineup.data.PlayerWithPosition
 import com.telen.easylineup.data.Tournament
 import io.reactivex.Single
 
@@ -13,6 +14,10 @@ class LineupViewModel: ViewModel() {
 
     fun getPlayerFieldPositionFor(lineup: Lineup): LiveData<List<PlayerFieldPosition>> {
         return App.database.lineupDao().getAllPlayerFieldPositionsForLineup(lineup.id)
+    }
+
+    fun getPlayersWithPositionsFor(lineup: Lineup): LiveData<List<PlayerWithPosition>> {
+        return App.database.lineupDao().getAllPlayersWithPositionsForLineup(lineup.id)
     }
 
     fun createNewLineup(lineup: Lineup): Single<Long> {

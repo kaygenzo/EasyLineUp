@@ -1,6 +1,7 @@
 package com.telen.easylineup.views
 
 import android.content.Context
+import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +10,10 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
+import com.telen.easylineup.data.Player
 import com.telen.easylineup.data.PlayerFieldPosition
+import com.telen.easylineup.data.PlayerWithPosition
+import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
 import timber.log.Timber
 import kotlin.math.roundToInt
@@ -39,6 +43,7 @@ class DefenseFixedView: ConstraintLayout {
                 val imageHeight = view.height
 
                 Timber.d("imageWidth=$imageWidth imageHeight=$imageHeight layoutWidth=$layoutWidth layoutHeight=$layoutHeight")
+                Timber.d("x=$x y=$y positionX=$positionX positionY=$positionY")
 
                 val layoutParamCustom = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).run {
                     leftMargin = positionX - imageWidth / 2
@@ -56,19 +61,22 @@ class DefenseFixedView: ConstraintLayout {
         }
     }
 
-    fun setListPlayerInField(players: List<PlayerFieldPosition>) {
-        players.forEach { playerFieldPosition ->
+    fun setListPlayerInField(players: List<PlayerWithPosition>) {
+        players.forEach { player ->
+            var coordinatePercent: PointF = PointF(player.x, player.y)
+
             val playerView = PlayerFieldIcon(context).run {
+                layoutParams = LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                 setPlayerIcon(R.drawable.pikachu)
-                setShirtNumber(-1)
-                setPadding(20,20,20,20)
+                setShirtNumber(player.shirtNumber)
                 this
             }
-            addPlayerOnField(playerView, playerFieldPosition.x, playerFieldPosition.y)
+
+            addPlayerOnField(playerView, coordinatePercent.x, coordinatePercent.y)
         }
     }
 
-    fun setSmallPlayerPosition(players: List<PlayerFieldPosition>) {
+    fun setSmallPlayerPosition(players: List<PlayerWithPosition>) {
         players.forEach { playerFieldPosition ->
             var iconView = ImageView(context).run {
                 layoutParams = LayoutParams(SMALL_IMAGE_SIZE,SMALL_IMAGE_SIZE)
@@ -77,5 +85,14 @@ class DefenseFixedView: ConstraintLayout {
             }
             addPlayerOnField(iconView, playerFieldPosition.x, playerFieldPosition.y)
         }
+    }
+
+    fun setSmallPlayer(player: PointF) {
+        var iconView = ImageView(context).run {
+            layoutParams = LayoutParams(SMALL_IMAGE_SIZE,SMALL_IMAGE_SIZE)
+            setImageResource(R.drawable.baseball_ball_icon)
+            this
+        }
+        addPlayerOnField(iconView, player.x, player.y)
     }
 }

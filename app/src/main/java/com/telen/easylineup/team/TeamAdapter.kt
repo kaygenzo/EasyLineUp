@@ -5,13 +5,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
 
-class TeamAdapter(private val players: List<Player>): RecyclerView.Adapter<TeamAdapter.PlayerViewHolder>() {
+interface OnPlayerClickListener {
+    fun onPlayerSelected(player: Player)
+}
+
+class TeamAdapter(private val players: List<Player>, val onPlayerClickListener: OnPlayerClickListener): RecyclerView.Adapter<TeamAdapter.PlayerViewHolder>() {
 
     class PlayerViewHolder(view: View): RecyclerView.ViewHolder(view) {
+        val rootView = view.findViewById<CardView>(R.id.playerCardRootView)
         val playerImage = view.findViewById<ImageView>(R.id.playerImage)
         val playerName = view.findViewById<TextView>(R.id.playerName)
         val playerShirtNumber = view.findViewById<TextView>(R.id.playerShirtNumber)
@@ -31,6 +37,9 @@ class TeamAdapter(private val players: List<Player>): RecyclerView.Adapter<TeamA
         with(holder) {
             playerName.text = player.name
             playerShirtNumber.text = player.shirtNumber.toString()
+            rootView.setOnClickListener {
+                onPlayerClickListener.onPlayerSelected(player)
+            }
         }
     }
 

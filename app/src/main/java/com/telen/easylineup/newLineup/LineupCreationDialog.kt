@@ -11,6 +11,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProviders
+import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
@@ -29,6 +30,10 @@ import timber.log.Timber
 
 class LineupCreationDialog: DialogFragment() {
 
+    companion object {
+        const val REQUEST_CODE_NEW_LINEUP = 0
+    }
+
     private var saveDisposable: Disposable? = null
     private lateinit var dialog: AlertDialog
 
@@ -44,11 +49,8 @@ class LineupCreationDialog: DialogFragment() {
 
             builder.setTitle(R.string.new_lineup_dialog_title)
                     .setView(view)
-                    .setPositiveButton(android.R.string.ok) { dialog, id ->
-
-                    }
-                    .setNegativeButton(android.R.string.cancel) { dialog, id ->
-                    }
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setNegativeButton(android.R.string.cancel, null)
                     .setOnDismissListener {
                         saveDisposable?.dispose()
                     }
@@ -94,8 +96,9 @@ class LineupCreationDialog: DialogFragment() {
                                     Timber.d("successfully inserted new lineup, new id: $lineupID")
                                     val intent = Intent(activity, NewLineUpActivity::class.java)
                                     intent.putExtra(Constants.LINEUP_ID, lineupID)
+                                    intent.putExtra(Constants.LINEUP_TITLE, lineupTitle)
                                     intent.putExtra(Constants.TEAM_ID, team.id)
-                                    startActivity(intent)
+                                    activity?.startActivityForResult(intent, REQUEST_CODE_NEW_LINEUP)
                                 }, { throwable ->
                                     Timber.e(throwable)
                                 })

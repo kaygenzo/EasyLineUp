@@ -1,5 +1,6 @@
 package com.telen.easylineup.team
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,9 +12,11 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
+import com.telen.easylineup.team.details.PlayerDetailsActivity
+import com.telen.easylineup.utils.Constants
 import kotlinx.android.synthetic.main.team_list_players.view.*
 
-class TeamFragment: Fragment() {
+class TeamFragment: Fragment(), OnPlayerClickListener {
 
     private lateinit var playersAdapter: TeamAdapter
     private lateinit var players: MutableList<Player>
@@ -23,7 +26,7 @@ class TeamFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         players = mutableListOf()
-        playersAdapter = TeamAdapter(players)
+        playersAdapter = TeamAdapter(players, this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,5 +49,11 @@ class TeamFragment: Fragment() {
         })
 
         return view
+    }
+
+    override fun onPlayerSelected(player: Player) {
+        val intent = Intent(activity, PlayerDetailsActivity::class.java)
+        intent.putExtra(Constants.PLAYER_ID, player.id)
+        startActivity(intent)
     }
 }

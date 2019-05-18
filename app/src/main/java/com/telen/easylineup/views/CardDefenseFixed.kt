@@ -5,7 +5,9 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.cardview.widget.CardView
 import com.telen.easylineup.R
+import com.telen.easylineup.data.Player
 import com.telen.easylineup.data.PlayerFieldPosition
+import com.telen.easylineup.data.PlayerWithPosition
 import kotlinx.android.synthetic.main.card_defense_fixed.view.*
 
 class CardDefenseFixed: CardView {
@@ -17,11 +19,11 @@ class CardDefenseFixed: CardView {
         LayoutInflater.from(context).inflate(R.layout.card_defense_fixed, this)
     }
 
-    fun setListPlayer(players: List<PlayerFieldPosition>) {
+    fun setListPlayer(players: List<PlayerWithPosition>) {
         fieldAndPlayersRootView.setListPlayerInField(players)
     }
 
-    fun setIcons(players: List<PlayerFieldPosition>) {
+    fun setGenericIcons(players: List<PlayerWithPosition>) {
         fieldAndPlayersRootView.setSmallPlayerPosition(players)
     }
 

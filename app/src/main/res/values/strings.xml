@@ -13,4 +13,7 @@
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_attack">Attack</string>
     <string name="new_lineup_dialog_title">Lineup creation</string>
+    <string name="save_button">Save</string>
+    <string name="lineup_saved">Lineup saved!</string>
+    <string name="problem_occurred">A problem occurred!</string>
 </resources>

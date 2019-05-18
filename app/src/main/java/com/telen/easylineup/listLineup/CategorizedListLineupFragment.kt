@@ -73,7 +73,7 @@ class CategorizedListLineupFragment: Fragment() {
     }
 
     private fun getPlayersPositionsFor(lineup: Lineup) {
-        lineupViewModel.getPlayerFieldPositionFor(lineup).observe(this@CategorizedListLineupFragment, Observer {
+        lineupViewModel.getPlayersWithPositionsFor(lineup).observe(this@CategorizedListLineupFragment, Observer {
             lineup.playerFieldPosition.apply {
                 clear()
                 addAll(it)

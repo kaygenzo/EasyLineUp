@@ -10,22 +10,22 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProviders
 import com.telen.easylineup.R
 import com.telen.easylineup.listLineup.LineupViewModel
-import kotlinx.android.synthetic.main.fragment_current_lineup.view.*
+import kotlinx.android.synthetic.main.fragment_last_lineup.view.*
 
-class CurrentLineupFragment: Fragment() {
+class LastLineupFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_current_lineup, container, false)
+        val view = inflater.inflate(R.layout.fragment_last_lineup, container, false)
 
-        val lineupViewModel = ViewModelProviders.of(this@CurrentLineupFragment).get(LineupViewModel::class.java)
-
+        val lineupViewModel = ViewModelProviders.of(this@LastLineupFragment).get(LineupViewModel::class.java)
         Transformations.switchMap(lineupViewModel.getLastEditedLineup()) {
+            //I don't know why but sometime the first live data is null
             it?.let {
                 view.lastEditedLineupCard.apply {
                     setLineupName(it.name)
                 }
-                lineupViewModel.getPlayerFieldPositionFor(it)
+                lineupViewModel.getPlayersWithPositionsFor(it)
             }
-        }.observe(this@CurrentLineupFragment, Observer {
+        }.observe(this@LastLineupFragment, Observer {
             view.lastEditedLineupCard.apply {
                 setListPlayer(it)
             }

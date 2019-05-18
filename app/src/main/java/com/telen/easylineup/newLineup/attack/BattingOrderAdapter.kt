@@ -6,21 +6,39 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
-import com.telen.easylineup.data.Player
+import com.telen.easylineup.data.PlayerWithPosition
 
 interface OnItemTouchedListener {
     fun onMoved(fromPosition: Int, toPosition: Int)
     fun onSwiped(position: Int)
+    fun onDragStart()
+    fun onIdle()
 }
 
-data class PlayerItem(val name: String, var position: Int = 0, val shirtNumber: Int)
+interface OnDataChangedListener {
+    fun onOrderChanged()
+}
 
-class BattingOrderAdapter(private val players: List<PlayerItem>): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
+class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, val dataListener: OnDataChangedListener?): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
+
+    override fun onDragStart() {
+
+    }
+
+    override fun onIdle() {
+        dataListener?.onOrderChanged()
+    }
+
     override fun onSwiped(position: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun onMoved(fromPosition: Int, toPosition: Int) {
+        val fromOrder = players[fromPosition].order
+        val toOrder = players[toPosition].order
+        players[fromPosition].order = toOrder
+        players[toPosition].order = fromOrder
+        players.sortBy { it.order }
         notifyItemMoved(fromPosition, toPosition)
     }
 
@@ -28,6 +46,7 @@ class BattingOrderAdapter(private val players: List<PlayerItem>): RecyclerView.A
         val playerName = view.findViewById<TextView>(R.id.playerName)
         val shortNumber = view.findViewById<TextView>(R.id.shortNumber)
         val fieldPosition = view.findViewById<TextView>(R.id.fieldPosition)
+        val order = view.findViewById<TextView>(R.id.order)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BatterViewHolder {
@@ -42,9 +61,10 @@ class BattingOrderAdapter(private val players: List<PlayerItem>): RecyclerView.A
     override fun onBindViewHolder(holder: BatterViewHolder, position: Int) {
         val player = players[position]
         with(holder) {
-            playerName.text = player.name
+            playerName.text = player.playerName
             shortNumber.text = player.shirtNumber.toString()
             fieldPosition.text = player.position.toString()
+            order.text = player.order.toString()
         }
     }
 }

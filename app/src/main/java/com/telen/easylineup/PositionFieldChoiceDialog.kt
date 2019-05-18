@@ -1,12 +1,9 @@
-package com.telen.easylineup.newLineup
+package com.telen.easylineup
 
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
-import android.view.View
 import androidx.appcompat.app.AlertDialog
-import com.telen.easylineup.FieldPosition
-import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.dialog_field_position_picker.*
 
 interface OnPositionListener {

@@ -1,10 +1,14 @@
 package com.telen.easylineup
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
+import com.telen.easylineup.currentLineup.LastLineupFragment
 import com.telen.easylineup.data.DatabaseMockProvider
-import com.telen.easylineup.currentLineup.CurrentLineupFragment
 import com.telen.easylineup.listLineup.CategorizedListLineupFragment
+import com.telen.easylineup.newLineup.LineupCreationDialog
 import com.telen.easylineup.team.TeamFragment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -35,7 +39,7 @@ class HomeActivity : AppCompatActivity() {
                 })
 
         supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, CurrentLineupFragment())
+                .replace(R.id.fragmentContainer, LastLineupFragment())
                 .commit()
 
         bottom_navigation.setOnNavigationItemSelectedListener { item ->
@@ -48,7 +52,7 @@ class HomeActivity : AppCompatActivity() {
                 }
                 R.id.navigation_home -> {
                     supportFragmentManager.beginTransaction()
-                            .replace(R.id.fragmentContainer, CurrentLineupFragment())
+                            .replace(R.id.fragmentContainer, LastLineupFragment())
                             .commit()
                     true
                 }
@@ -69,6 +73,17 @@ class HomeActivity : AppCompatActivity() {
 
 
                 else -> false
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == LineupCreationDialog.REQUEST_CODE_NEW_LINEUP) {
+            if(resultCode == Activity.RESULT_OK) {
+                Snackbar.make(rootView, R.string.lineup_saved, Snackbar.LENGTH_LONG).show()
+            }
+            else {
+                Snackbar.make(rootView, R.string.problem_occurred, Snackbar.LENGTH_LONG).show()
             }
         }
     }

@@ -10,4 +10,7 @@
     <color name="number_blue">#FF2D3783</color>
     <color name="text_orange">#FFd37240</color>
     <color name="lineup_name">#FF2a3488</color>
+    <color name="button_text_color">@color/colorAccent</color>
+    <color name="button_background">#00FFFFFF</color>
+    <color name="separator_color">#FF000000</color>
 </resources>

@@ -23,12 +23,15 @@ class DatabaseMockProvider {
         var y = 10f
         players.forEach { player ->
             if(position <= 9) {
-                listResult.add(PlayerFieldPosition(position.toLong(), player.id, 1, position, x, y))
+                listResult.add(PlayerFieldPosition(position.toLong(), player.id, 1, position, x, y, position))
                 position++
                 x+=10
                 y+=10
             }
         }
+        listResult.add(PlayerFieldPosition(10, 1, 6, 1, 50f, 50f, 1))
+        listResult.add(PlayerFieldPosition(11, 1, 7, 1, 50f, 50f, 1))
+        listResult.add(PlayerFieldPosition(12, 1, 8, 1, 50f, 50f, 1))
         return listResult
     }
 

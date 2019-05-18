@@ -22,6 +22,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.card_defense_editable.view.*
 import kotlinx.android.synthetic.main.fragment_new_lineup_defense.view.*
 import timber.log.Timber
 
@@ -31,13 +32,14 @@ class DefenseFragment: Fragment(), OnPlayerStateChanged {
     private var loadingPositionsDisposable: Disposable? = null
     private var savingPositionDisposable: Disposable? = null
 
-    override fun onPlayerUpdated(player: Player, point: PointF, position: FieldPosition) {
+    override fun onPlayerUpdated(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean) {
         Timber.d("player=$player point=$point position=$position")
 
         if(playersPosition[player]==null) {
             playersPosition[player] = PlayerFieldPosition(
                     playerId = player.id,
-                    lineupId = viewModel.lineupID)
+                    lineupId = viewModel.lineupID,
+                    order = playersPosition.filter { it.value !=null }.count()+1)
         }
 
         Timber.d("before playerFieldPosition=${playersPosition[player]}")
@@ -62,6 +64,7 @@ class DefenseFragment: Fragment(), OnPlayerStateChanged {
         val view = inflater.inflate(R.layout.fragment_new_lineup_defense, container, false)
 
         viewModel = ViewModelProviders.of(activity as NewLineUpActivity).get(PlayersPositionViewModel::class.java)
+        view.lineup_name.text = viewModel.lineupTitle
         viewModel.getPlayersForTeam(viewModel.teamID).observe(this, Observer { players ->
 
             playersPosition.clear()

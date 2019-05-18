@@ -3,7 +3,6 @@ package com.telen.easylineup.views
 import android.content.ClipData
 import android.content.ClipDescription
 import android.content.Context
-import android.graphics.Point
 import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.DragEvent
@@ -15,14 +14,14 @@ import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
 import com.telen.easylineup.data.PlayerFieldPosition
-import com.telen.easylineup.newLineup.OnPositionListener
-import com.telen.easylineup.newLineup.PositionFieldChoiceDialog
+import com.telen.easylineup.OnPositionListener
+import com.telen.easylineup.PositionFieldChoiceDialog
 import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
 import timber.log.Timber
 
 interface OnPlayerStateChanged {
-    fun onPlayerUpdated(player: Player, point: PointF, position: FieldPosition)
+    fun onPlayerUpdated(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean)
 }
 
 class DefenseEditableView: ConstraintLayout {
@@ -92,18 +91,24 @@ class DefenseEditableView: ConstraintLayout {
                     playerView?.let { view ->
                         addPlayerOnFieldWithCoordinate(view, eventX, eventY)
                     }
-                    val positionXpercentage: Float = (eventX/fieldFrameLayout.width)*100
-                    val positionYpercentage: Float = (eventY/fieldFrameLayout.height)*100
+                    val positionXpercentage: Float = (eventX / fieldFrameLayout.width) * 100
+                    val positionYpercentage: Float = (eventY / fieldFrameLayout.height) * 100
 
                     val player = it.first
                     var playerPoint = it.second
 
-                    if(playerPoint == null) {
-                        playerPoint = PointF(positionXpercentage,positionYpercentage)
+                    var isNewObject = false
+
+                    if (playerPoint == null) {
+                        playerPoint = PointF()
                         playerPositions[tag] = Pair(player, playerPoint)
+                        isNewObject = true
                     }
 
-                    playerListener?.onPlayerUpdated(player, playerPoint, fieldPosition)
+                    playerPoint.x = positionXpercentage
+                    playerPoint.y = positionYpercentage
+
+                    playerListener?.onPlayerUpdated(player, playerPoint, fieldPosition, isNewObject)
                 }
             }
         })
