@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/tournamentChoiceAutoComplete"
         app:layout_constraintVertical_chainStyle="packed"
-        android:hint="Locale VS Visitors"
+        android:hint="@string/dialog_create_lineup_name"
         android:layout_marginBottom="20dp"/>
 
     <androidx.appcompat.widget.AppCompatAutoCompleteTextView
@@ -26,7 +26,7 @@
         android:layout_height="60dp"
         android:textSize="20sp"
         tools:text="The tournament"
-
+        android:hint="@string/dialog_create_lineup_tournament"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lineupTitle"
         app:layout_constraintLeft_toLeftOf="parent"

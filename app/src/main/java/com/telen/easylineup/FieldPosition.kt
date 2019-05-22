@@ -9,5 +9,15 @@ enum class FieldPosition(val position: Int) {
     SHORT_STOP(6),
     LEFT_FIELD(7),
     CENTER_FIELD(8),
-    RIGHT_FIELD(9)
+    RIGHT_FIELD(9);
+
+    companion object {
+        fun getFieldPosition(position: Int): FieldPosition? {
+            values().forEach {
+                if(position == it.position)
+                    return it
+            }
+            return null
+        }
+    }
 }

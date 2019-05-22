@@ -21,7 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".newLineup.NewLineUpActivity" />
+        <activity android:name=".lineup.LineupActivity" />
         <activity android:name=".team.details.PlayerDetailsActivity" />
 
         <meta-data

@@ -1,5 +1,6 @@
-package com.telen.easylineup.listLineup
+package com.telen.easylineup.lineup.list
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
-import com.telen.easylineup.newLineup.LineupCreationDialog
+import com.telen.easylineup.lineup.LineupActivity
+import com.telen.easylineup.lineup.create.LineupCreationDialog
+import com.telen.easylineup.utils.Constants
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter
 import kotlinx.android.synthetic.main.fragment_list_lineup.view.*
 
@@ -48,8 +51,18 @@ class CategorizedListLineupFragment: Fragment() {
             sectionAdapter.removeAllSections()
             tournaments.forEach { tournament ->
                 val listLineup = mutableListOf<Lineup>()
-                val section = CategorizedLineupAdapter(listLineup, tournament.name, object: OnHeaderClickedListener {
-                    override fun onViewClicked() {
+                val section = CategorizedLineupAdapter(listLineup, tournament.name, object : OnItemClickedListener {
+                    override fun onLineupClicked(lineup: Lineup) {
+                        activity?.let {
+                            val intent = Intent(activity, LineupActivity::class.java)
+                            intent.putExtra(Constants.EXTRA_EDITABLE, false)
+                            intent.putExtra(Constants.LINEUP_ID, lineup.id)
+                            intent.putExtra(Constants.LINEUP_TITLE, lineup.name)
+                            startActivity(intent)
+                        }
+                    }
+
+                    override fun onHeaderClicked() {
                         sectionAdapter.notifyDataSetChanged()
                     }
                 })

@@ -1,4 +1,4 @@
-package com.telen.easylineup.newLineup.attack
+package com.telen.easylineup.lineup.attack
 
 import android.view.LayoutInflater
 import android.view.View

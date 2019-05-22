@@ -9,7 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProviders
 import com.telen.easylineup.R
-import com.telen.easylineup.listLineup.LineupViewModel
+import com.telen.easylineup.lineup.list.LineupViewModel
 import kotlinx.android.synthetic.main.fragment_last_lineup.view.*
 
 class LastLineupFragment: Fragment() {

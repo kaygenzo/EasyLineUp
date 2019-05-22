@@ -13,6 +13,7 @@ import com.github.mikephil.charting.data.RadarDataSet
 import com.github.mikephil.charting.data.RadarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet
+import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.view_radar_chart.view.*
 
@@ -38,10 +39,7 @@ class PositionsRadarChart: ConstraintLayout {
         chart.webColorInner = Color.rgb(42, 52, 136)
         chart.webAlpha = 100
 
-
-        setData()
-
-        chart.animateXY(1400, 1400, Easing.EaseInOutQuad)
+        chart.animateXY(1000, 1000, Easing.EaseInOutQuad)
 
         val xAxis = chart.xAxis
         xAxis.valueFormatter = object : ValueFormatter() {
@@ -65,27 +63,33 @@ class PositionsRadarChart: ConstraintLayout {
         yAxis.setLabelCount(5, true)
         yAxis.textSize = 9f
         yAxis.axisMinimum = 0f
-        yAxis.axisMaximum = 100f
+        yAxis.axisMaximum = 120f
         yAxis.setDrawLabels(false)
     }
 
-    private fun setData() {
+    fun setData(positionsMap: Map<FieldPosition, Int>) {
 
         val chart = playerPositionsChart
 
-        val entries1: MutableList<RadarEntry> = mutableListOf()
+        val entries: MutableList<RadarEntry> = mutableListOf()
 
-        entries1.add(RadarEntry(10f))
-        entries1.add(RadarEntry(30f))
-        entries1.add(RadarEntry(80f))
-        entries1.add(RadarEntry(60f))
-        entries1.add(RadarEntry(20f))
-        entries1.add(RadarEntry(70f))
-        entries1.add(RadarEntry(40f))
-        entries1.add(RadarEntry(80f))
-        entries1.add(RadarEntry(50f))
+        val offsetMin = 20f
+        var count = 0
+        positionsMap.forEach {
+            count += it.value
+        }
 
-        val set1 = RadarDataSet(entries1,"")
+        FieldPosition.values().forEach {
+            val value = positionsMap[it]
+            if(value!=null) {
+                entries.add(it.ordinal, RadarEntry(offsetMin + (value.toFloat()/count.toFloat())*100))
+            }
+            else {
+                entries.add(it.ordinal, RadarEntry(offsetMin))
+            }
+        }
+
+        val set1 = RadarDataSet(entries,"")
         set1.color = Color.rgb(103, 110, 129)
         set1.fillColor = Color.rgb(0, 168, 49)
         set1.setDrawFilled(true)
@@ -94,7 +98,7 @@ class PositionsRadarChart: ConstraintLayout {
         set1.isDrawHighlightCircleEnabled = true
         set1.setDrawHighlightIndicators(false)
 
-        val sets: MutableList<IRadarDataSet> = ArrayList()
+        val sets: MutableList<IRadarDataSet> = mutableListOf()
         sets.add(set1)
 
         val data = RadarData(sets)

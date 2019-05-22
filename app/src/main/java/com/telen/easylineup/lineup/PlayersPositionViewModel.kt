@@ -1,4 +1,4 @@
-package com.telen.easylineup.newLineup
+package com.telen.easylineup.lineup
 
 import androidx.lifecycle.*
 import com.telen.easylineup.App
@@ -11,9 +11,9 @@ import io.reactivex.Maybe
 
 class PlayersPositionViewModel: ViewModel() {
 
-    var lineupID: Long = 0
-    var teamID: Long = 0
-    var lineupTitle = ""
+    var lineupID: Long? = 0
+    var teamID: Long? = 0
+    var lineupTitle: String? = null
 
     val teams: LiveData<List<Team>> = App.database.teamDao().getTeams()
 
@@ -46,7 +46,7 @@ class PlayersPositionViewModel: ViewModel() {
         return Completable.concat(listOperations)
     }
 
-    fun getPlayersWithPositions(): LiveData<List<PlayerWithPosition>> {
+    fun getPlayersWithPositions(lineupID: Long): LiveData<List<PlayerWithPosition>> {
         return App.database.lineupDao().getAllPlayersWithPositionsForLineup(lineupID)
     }
 }

@@ -1,4 +1,4 @@
-package com.telen.easylineup.listLineup
+package com.telen.easylineup.lineup.list
 
 import android.graphics.PointF
 import android.view.LayoutInflater

@@ -1,4 +1,4 @@
-package com.telen.easylineup.listLineup
+package com.telen.easylineup.lineup.list
 
 import android.view.View
 import android.widget.ImageView
@@ -10,11 +10,12 @@ import com.telen.easylineup.views.CollegedStyledTextView
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
 
-interface OnHeaderClickedListener {
-    fun onViewClicked()
+interface OnItemClickedListener {
+    fun onHeaderClicked()
+    fun onLineupClicked(lineup: Lineup)
 }
 
-class CategorizedLineupAdapter(val lineups: List<Lineup>, val tournamentName: String, val onHeaderClickedListener: OnHeaderClickedListener): StatelessSection(
+class CategorizedLineupAdapter(val lineups: List<Lineup>, val tournamentName: String, val onItemClickedListener: OnItemClickedListener): StatelessSection(
         SectionParameters.builder()
                 .itemResourceId(R.layout.categorized_lineup_item)
                 .headerResourceId(R.layout.header_section_tournaments)
@@ -35,6 +36,9 @@ class CategorizedLineupAdapter(val lineups: List<Lineup>, val tournamentName: St
         cardHolder.field.setSmallPlayerPosition(lineup.playerFieldPosition)
         cardHolder.lineupName.text = lineup.name
         cardHolder.tournamentName.visibility = View.GONE
+        cardHolder.rootView.setOnClickListener {
+            onItemClickedListener.onLineupClicked(lineup)
+        }
     }
 
     override fun getItemViewHolder(view: View): RecyclerView.ViewHolder {
@@ -50,7 +54,7 @@ class CategorizedLineupAdapter(val lineups: List<Lineup>, val tournamentName: St
         sectionHolder.rootView.setOnClickListener {
             isExpanded = !isExpanded
             updateArrow(sectionHolder)
-            onHeaderClickedListener.onViewClicked()
+            onItemClickedListener.onHeaderClicked()
         }
     }
 

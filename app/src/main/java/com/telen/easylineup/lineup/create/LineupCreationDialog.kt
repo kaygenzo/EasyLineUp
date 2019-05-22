@@ -1,30 +1,25 @@
-package com.telen.easylineup.newLineup
+package com.telen.easylineup.lineup.create
 
 import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProviders
-import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
-import com.telen.easylineup.listLineup.LineupViewModel
-import com.telen.easylineup.listLineup.TournamentViewModel
+import com.telen.easylineup.lineup.LineupActivity
+import com.telen.easylineup.lineup.list.LineupViewModel
+import com.telen.easylineup.lineup.list.TournamentViewModel
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.Constants
 import com.telen.easylineup.views.LineupCreationDialogView
 import com.telen.easylineup.views.OnFormReadyListener
-import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
@@ -47,7 +42,7 @@ class LineupCreationDialog: DialogFragment() {
                 view.setList(it)
             })
 
-            builder.setTitle(R.string.new_lineup_dialog_title)
+            builder.setTitle(R.string.dialog_create_lineup_title)
                     .setView(view)
                     .setPositiveButton(android.R.string.ok, null)
                     .setNegativeButton(android.R.string.cancel, null)
@@ -94,10 +89,11 @@ class LineupCreationDialog: DialogFragment() {
                                 .subscribe({ lineupID ->
                                     dialog.dismiss()
                                     Timber.d("successfully inserted new lineup, new id: $lineupID")
-                                    val intent = Intent(activity, NewLineUpActivity::class.java)
+                                    val intent = Intent(activity, LineupActivity::class.java)
                                     intent.putExtra(Constants.LINEUP_ID, lineupID)
                                     intent.putExtra(Constants.LINEUP_TITLE, lineupTitle)
                                     intent.putExtra(Constants.TEAM_ID, team.id)
+                                    intent.putExtra(Constants.EXTRA_EDITABLE, true)
                                     activity?.startActivityForResult(intent, REQUEST_CODE_NEW_LINEUP)
                                 }, { throwable ->
                                     Timber.e(throwable)

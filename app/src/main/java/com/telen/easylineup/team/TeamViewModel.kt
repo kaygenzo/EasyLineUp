@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
-import com.telen.easylineup.data.DatabaseMockProvider
-import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Player
 import com.telen.easylineup.data.Team
 

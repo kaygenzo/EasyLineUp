@@ -1,4 +1,4 @@
-package com.telen.easylineup.listLineup
+package com.telen.easylineup.lineup.list
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel

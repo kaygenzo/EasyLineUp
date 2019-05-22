@@ -1,4 +1,4 @@
-package com.telen.easylineup.newLineup.attack
+package com.telen.easylineup.lineup.attack
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,31 +9,30 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import com.telen.easylineup.R
 import com.telen.easylineup.data.PlayerWithPosition
-import com.telen.easylineup.newLineup.NewLineUpActivity
-import com.telen.easylineup.newLineup.PlayersPositionViewModel
+import com.telen.easylineup.lineup.LineupActivity
+import com.telen.easylineup.lineup.PlayersPositionViewModel
+import com.telen.easylineup.utils.Constants
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_list_batter.view.*
-import kotlinx.android.synthetic.main.new_lineup_activity.view.*
 import timber.log.Timber
 
-class BattingOrderFragment: Fragment(), OnDataChangedListener {
+class AttackFragment: Fragment(), OnDataChangedListener {
 
     private lateinit var playerAdapter: BattingOrderAdapter
     private val adapterDataList = mutableListOf<PlayerWithPosition>()
 
     private lateinit var viewModel: PlayersPositionViewModel
 
-    private lateinit var itemTouchedCallback: BattingOrderItemTouchCallback
+    private lateinit var itemTouchedCallback: AttackItemTouchCallback
     private lateinit var itemTouchedHelper: ItemTouchHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         playerAdapter = BattingOrderAdapter(adapterDataList, this)
-        itemTouchedCallback = BattingOrderItemTouchCallback(playerAdapter)
+        itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
         itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
     }
 
@@ -45,15 +44,20 @@ class BattingOrderFragment: Fragment(), OnDataChangedListener {
             adapter = playerAdapter
         }
 
-        itemTouchedHelper.attachToRecyclerView(view.recyclerView)
+        val editable = arguments?.getBoolean(Constants.EXTRA_EDITABLE)
+        editable?.takeIf { it }?.let {
+            itemTouchedHelper.attachToRecyclerView(view.recyclerView)
+        }
 
-        viewModel = ViewModelProviders.of(activity as NewLineUpActivity).get(PlayersPositionViewModel::class.java)
-        viewModel.getPlayersWithPositions().observe(this, Observer { items ->
-            Timber.d("PlayerFieldPosition list changed!")
-            adapterDataList.clear()
-            adapterDataList.addAll(items)
-            playerAdapter.notifyDataSetChanged()
-        })
+        viewModel = ViewModelProviders.of(activity as LineupActivity).get(PlayersPositionViewModel::class.java)
+        viewModel.lineupID?.let {
+            viewModel.getPlayersWithPositions(it).observe(this, Observer { items ->
+                Timber.d("PlayerFieldPosition list changed!")
+                adapterDataList.clear()
+                adapterDataList.addAll(items)
+                playerAdapter.notifyDataSetChanged()
+            })
+        }
 
         return view
     }

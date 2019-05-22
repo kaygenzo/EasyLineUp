@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Tournament
-import kotlinx.android.synthetic.main.choose_configuration_new_lineup.view.*
+import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
 import timber.log.Timber
 
 interface OnFormReadyListener {
@@ -36,7 +36,7 @@ class LineupCreationDialogView: ConstraintLayout, TextWatcher {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context)}
 
     private fun init(context: Context?) {
-        LayoutInflater.from(context).inflate(R.layout.choose_configuration_new_lineup, this)
+        LayoutInflater.from(context).inflate(R.layout.dialog_create_lineup, this)
 
         lineupTitle.addTextChangedListener(this)
         tournamentChoiceAutoComplete.addTextChangedListener(this)

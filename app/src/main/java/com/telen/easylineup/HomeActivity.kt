@@ -6,9 +6,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.telen.easylineup.currentLineup.LastLineupFragment
-import com.telen.easylineup.data.DatabaseMockProvider
-import com.telen.easylineup.listLineup.CategorizedListLineupFragment
-import com.telen.easylineup.newLineup.LineupCreationDialog
+import com.telen.easylineup.mock.DatabaseMockProvider
+import com.telen.easylineup.lineup.list.CategorizedListLineupFragment
+import com.telen.easylineup.lineup.create.LineupCreationDialog
 import com.telen.easylineup.team.TeamFragment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -66,7 +66,7 @@ class HomeActivity : AppCompatActivity() {
                     true
                 }
 //                R.id.navigation_settings -> {
-//                    val intent = Intent(this@HomeActivity, NewLineUpActivity::class.java)
+//                    val intent = Intent(this@HomeActivity, LineupActivity::class.java)
 //                    startActivity(intent)
 //                    true
 //                }
