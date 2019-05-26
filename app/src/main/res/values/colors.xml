@@ -3,6 +3,20 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574b</color>
     <color name="colorAccent">#D81B60</color>
+
+    <!--<color name="colorPrimary">@color/primaryColor</color>-->
+    <!--<color name="colorPrimaryDark">@color/primaryDarkColor</color>-->
+    <!--<color name="colorAccent">@color/secondaryColor</color>-->
+
+    <!--<color name="primaryColor">#1a237e</color>-->
+    <!--<color name="primaryLightColor">#534bae</color>-->
+    <!--<color name="primaryDarkColor">#000051</color>-->
+    <!--<color name="secondaryColor">#dd2c00</color>-->
+    <!--<color name="secondaryLightColor">#ff6434</color>-->
+    <!--<color name="secondaryDarkColor">#a30000</color>-->
+    <!--<color name="primaryTextColor">#ffffff</color>-->
+    <!--<color name="secondaryTextColor">#ffffff</color>-->
+
     <color name="board_cell">#397B64</color>
     <color name="board_border">#FFFFFFFF</color>
     <color name="bottom_bar_text_color">#FFFFFFFF</color>

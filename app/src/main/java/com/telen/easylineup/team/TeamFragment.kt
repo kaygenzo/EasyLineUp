@@ -12,6 +12,8 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
+import com.telen.easylineup.team.createPlayer.CreationPlayerDialog
+import com.telen.easylineup.team.createPlayer.PlayerViewModel
 import com.telen.easylineup.team.details.PlayerDetailsActivity
 import com.telen.easylineup.utils.Constants
 import kotlinx.android.synthetic.main.team_list_players.view.*
@@ -37,8 +39,10 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
         }
 
         viewModel = ViewModelProviders.of(this).get(TeamViewModel::class.java)
+        val playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel::class.java)
         viewModel.teams.observe(this, Observer { teams ->
             val team = teams.first()
+
             viewModel.getPlayersForTeam(team.id).observe(this@TeamFragment, Observer { playerList ->
                 players.apply {
                     clear()
@@ -46,6 +50,17 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
                 }
                 playersAdapter.notifyDataSetChanged()
             })
+
+            view.fab.setOnClickListener {
+                context?.let {
+                    val fragment = CreationPlayerDialog()
+                    val bundle = Bundle()
+                    bundle.putLong(Constants.TEAM_ID, team.id)
+                    fragment.arguments = bundle
+
+                    fragment.show(fragmentManager, "dialog")
+                }
+            }
         })
 
         return view

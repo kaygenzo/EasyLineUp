@@ -11,8 +11,9 @@ import androidx.room.*
         ]
 )
 data class Player(
-        @PrimaryKey(autoGenerate = true) var id: Long,
+        @PrimaryKey(autoGenerate = true) var id: Long = 0,
         @ColumnInfo(name = "teamID") var teamId: Long,
         @ColumnInfo(name = "name") var name: String,
         @ColumnInfo(name = "shirtNumber") var shirtNumber: Int,
-        @ColumnInfo(name = "licenseNumber") var licenseNumber: Long)
+        @ColumnInfo(name = "licenseNumber") var licenseNumber: Long,
+        @ColumnInfo(name = "image") var image: String? = null)

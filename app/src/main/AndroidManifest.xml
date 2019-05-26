@@ -12,17 +12,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".HomeActivity" android:label="@string/app_name"/>
+        <activity android:name=".lineup.LineupActivity" />
+        <activity android:name=".team.details.PlayerDetailsActivity" />
         <activity
-            android:name=".HomeActivity"
+            android:name=".SplashScreen"
+            android:theme="@style/AppTheme.NoActionBar.FullScreen"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".lineup.LineupActivity" />
-        <activity android:name=".team.details.PlayerDetailsActivity" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
