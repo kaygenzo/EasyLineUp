@@ -23,6 +23,7 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
     private lateinit var playersAdapter: TeamAdapter
     private lateinit var players: MutableList<Player>
     private lateinit var viewModel: TeamViewModel
+    private var teamID: Long? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,9 +40,10 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
         }
 
         viewModel = ViewModelProviders.of(this).get(TeamViewModel::class.java)
-        val playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel::class.java)
         viewModel.teams.observe(this, Observer { teams ->
             val team = teams.first()
+
+            teamID = team.id
 
             viewModel.getPlayersForTeam(team.id).observe(this@TeamFragment, Observer { playerList ->
                 players.apply {
@@ -57,7 +59,6 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
                     val bundle = Bundle()
                     bundle.putLong(Constants.TEAM_ID, team.id)
                     fragment.arguments = bundle
-
                     fragment.show(fragmentManager, "dialog")
                 }
             }
@@ -69,6 +70,7 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
     override fun onPlayerSelected(player: Player) {
         val intent = Intent(activity, PlayerDetailsActivity::class.java)
         intent.putExtra(Constants.PLAYER_ID, player.id)
+        intent.putExtra(Constants.TEAM_ID, teamID)
         startActivity(intent)
     }
 }

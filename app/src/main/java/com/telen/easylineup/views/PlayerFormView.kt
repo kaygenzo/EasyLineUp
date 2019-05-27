@@ -41,7 +41,7 @@ interface ImagePicker {
     fun openCamera(context: Context): Observable<com.qingmei2.rximagepicker.entity.Result>
 }
 
-class PlayerFormDialogView: ConstraintLayout {
+class PlayerFormView: ConstraintLayout {
 
     private var listener: PlayerFormListener? = null
     private var imageUri: Uri? = null
@@ -75,8 +75,7 @@ class PlayerFormDialogView: ConstraintLayout {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {result ->
                             val uri = result.uri
-                            imageUri = uri
-                            Picasso.get().load(uri).into(playerImage)
+                            setImage(uri)
                         }
             }
         }
@@ -110,11 +109,28 @@ class PlayerFormDialogView: ConstraintLayout {
 
     private fun getLicenseNumber(): Long? {
         return try {
-            playerShirtNumberInput.text.toString().toLong()
+            playerLicenseNumberInput.text.toString().toLong()
         }
         catch (exception: NumberFormatException) {
             null
         }
+    }
+
+    fun setName(name: String) {
+        playerNameInput.setText(name)
+    }
+
+    fun setShirtNumber(shirtNumber: Int) {
+        playerShirtNumberInput.setText(shirtNumber.toString())
+    }
+
+    fun setLicenseNumber(licenseNumber: Long) {
+        playerLicenseNumberInput.setText(licenseNumber.toString())
+    }
+
+    fun setImage(uri: Uri) {
+        imageUri = uri
+        Picasso.get().load(uri).into(playerImage)
     }
 
 //    private fun getRoundedBitmap(bitmap: Bitmap): RoundedBitmapDrawable {

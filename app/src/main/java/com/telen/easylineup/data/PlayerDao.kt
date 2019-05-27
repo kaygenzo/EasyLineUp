@@ -16,6 +16,9 @@ interface PlayerDao {
     @Delete
     fun deletePlayer(player: Player)
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun updatePlayer(player: Player): Completable
+
     @Query("SELECT * from players WHERE id = :playerID" )
     fun getPlayerById(playerID: Long): LiveData<Player>
 

@@ -8,8 +8,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import com.telen.easylineup.data.Player
 import com.telen.easylineup.utils.Constants
-import com.telen.easylineup.views.PlayerFormDialogView
+import com.telen.easylineup.views.PlayerFormCardView
 import com.telen.easylineup.views.PlayerFormListener
+import com.telen.easylineup.views.PlayerFormView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
@@ -30,7 +31,7 @@ class CreationPlayerDialog:  DialogFragment(), PlayerFormListener {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
-            val view = PlayerFormDialogView(it)
+            val view = PlayerFormCardView(it)
             view.setListener(this)
             val builder = AlertDialog.Builder(it).setView(view)
             val dialog = builder.create()
