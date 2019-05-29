@@ -17,7 +17,7 @@ interface OnItemClickedListener {
 
 class CategorizedLineupAdapter(val lineups: List<Lineup>, val tournamentName: String, val onItemClickedListener: OnItemClickedListener): StatelessSection(
         SectionParameters.builder()
-                .itemResourceId(R.layout.categorized_lineup_item)
+                .itemResourceId(R.layout.item_categorized_lineup)
                 .headerResourceId(R.layout.header_section_tournaments)
                 .build()
 ) {

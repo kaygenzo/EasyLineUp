@@ -10,7 +10,7 @@ import com.telen.easylineup.data.PositionWithLineup
 class ListLineupAdapter(val lineups: List<PositionWithLineup>): RecyclerView.Adapter<LineupViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LineupViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.categorized_lineup_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_categorized_lineup, parent, false)
         return LineupViewHolder(view)
     }
 

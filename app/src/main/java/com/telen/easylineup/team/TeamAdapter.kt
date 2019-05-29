@@ -1,6 +1,5 @@
 package com.telen.easylineup.team
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +25,7 @@ class TeamAdapter(private val players: List<Player>, val onPlayerClickListener: 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {
-        val viewItem = LayoutInflater.from(parent.context).inflate(R.layout.player_list_item, parent, false)
+        val viewItem = LayoutInflater.from(parent.context).inflate(R.layout.item_player_list, parent, false)
         return PlayerViewHolder(viewItem)
     }
 

@@ -14,6 +14,7 @@ class PlayersPositionViewModel: ViewModel() {
     var lineupID: Long? = 0
     var teamID: Long? = 0
     var lineupTitle: String? = null
+    var editable = false
 
     val teams: LiveData<List<Team>> = App.database.teamDao().getTeams()
 

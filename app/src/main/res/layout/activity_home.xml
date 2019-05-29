@@ -10,6 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitStart"
+            android:src="@drawable/background_full" />
+
         <LinearLayout
             android:id="@+id/fragmentContainer"
             android:orientation="vertical"

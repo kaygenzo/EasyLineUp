@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#80FFFFFF">
 
     <com.telen.easylineup.views.CollegedStyledTextView
         android:id="@+id/sectionHeaderTitle"

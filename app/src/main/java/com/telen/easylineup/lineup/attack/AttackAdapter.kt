@@ -50,7 +50,7 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BatterViewHolder {
-        val viewItem = LayoutInflater.from(parent.context).inflate(R.layout.batter_item, parent, false)
+        val viewItem = LayoutInflater.from(parent.context).inflate(R.layout.item_player_attack, parent, false)
         return BatterViewHolder(viewItem)
     }
 

@@ -12,14 +12,14 @@ import com.telen.easylineup.lineup.create.LineupCreationDialog
 import com.telen.easylineup.team.TeamFragment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_list_line_up.*
+import kotlinx.android.synthetic.main.activity_home.*
 import timber.log.Timber
 
 class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_list_line_up)
+        setContentView(R.layout.activity_home)
 
         DatabaseMockProvider().insertTeam()
                 .andThen(DatabaseMockProvider().insertTournaments())

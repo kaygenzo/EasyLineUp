@@ -43,7 +43,7 @@ class LineupCreationDialogView: ConstraintLayout, TextWatcher {
 
         tournamentsNames = mutableListOf()
         context?.let {
-            adapter = ArrayAdapter(context, R.layout.auto_completion_item, tournamentsNames)
+            adapter = ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
             tournamentChoiceAutoComplete.setAdapter(adapter)
         }
     }

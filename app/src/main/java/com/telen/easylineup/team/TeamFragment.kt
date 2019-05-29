@@ -13,10 +13,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
 import com.telen.easylineup.team.createPlayer.CreationPlayerDialog
-import com.telen.easylineup.team.createPlayer.PlayerViewModel
 import com.telen.easylineup.team.details.PlayerDetailsActivity
 import com.telen.easylineup.utils.Constants
-import kotlinx.android.synthetic.main.team_list_players.view.*
+import kotlinx.android.synthetic.main.fragment_player_list.view.*
 
 class TeamFragment: Fragment(), OnPlayerClickListener {
 
@@ -33,7 +32,7 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.team_list_players, container, false)
+        val view = inflater.inflate(R.layout.fragment_player_list, container, false)
         view.teamPlayersRecyclerView.apply {
             layoutManager = GridLayoutManager(activity as AppCompatActivity, 2)
             adapter = playersAdapter
