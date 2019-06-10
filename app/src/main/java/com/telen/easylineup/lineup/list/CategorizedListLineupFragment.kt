@@ -72,6 +72,8 @@ class CategorizedListLineupFragment: Fragment() {
             sectionAdapter.notifyDataSetChanged()
         })
 
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.title_lineups)
+
         return view
     }
 

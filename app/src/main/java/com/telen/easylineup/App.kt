@@ -1,6 +1,5 @@
 package com.telen.easylineup
 
-import android.app.Application
 import android.support.multidex.MultiDexApplication
 import androidx.room.Room
 import com.crashlytics.android.Crashlytics
@@ -23,5 +22,7 @@ class App: MultiDexApplication() {
         }
 
         Fabric.with(this, Crashlytics())
+
+        //Stetho.initializeWithDefaults(this)
     }
 }

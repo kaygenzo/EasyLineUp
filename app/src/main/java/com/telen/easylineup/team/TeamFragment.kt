@@ -63,6 +63,8 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
             }
         })
 
+        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.title_team)
+
         return view
     }
 

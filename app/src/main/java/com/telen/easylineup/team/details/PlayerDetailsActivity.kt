@@ -63,6 +63,7 @@ class PlayerDetailsActivity: AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.title = getString(R.string.title_player_details)
     }
 
     override fun onSupportNavigateUp(): Boolean {

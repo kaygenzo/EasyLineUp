@@ -45,12 +45,24 @@ data class PlayerWithPosition(
         @ColumnInfo(name = "playerName") val playerName: String,
         @ColumnInfo(name = "shirtNumber") val shirtNumber: Int,
         @ColumnInfo(name = "licenseNumber") val licenseNumber: Long,
+        @ColumnInfo(name = "teamID") val teamId: Long,
+        @ColumnInfo(name = "image") val image: String?,
         @ColumnInfo(name = "position") var position: Int = 0,
         @ColumnInfo(name = "x") var x: Float = 0f,
         @ColumnInfo(name = "y") var y: Float = 0f,
         @ColumnInfo(name = "order") var order: Int = 0,
-        @ColumnInfo(name = "fieldPositionID") val fieldPositionID: Long
-)
+        @ColumnInfo(name = "fieldPositionID") var fieldPositionID: Long = 0,
+        @ColumnInfo(name = "playerID") val playerID: Long,
+        @ColumnInfo(name = "lineupID") val lineupId: Long
+) {
+    fun toPlayer(): Player {
+        return Player(id = playerID, teamId = teamId, name = playerName, shirtNumber = shirtNumber, licenseNumber = licenseNumber, image = image)
+    }
+
+    fun toPlayerFieldPosition(): PlayerFieldPosition {
+        return PlayerFieldPosition(id = fieldPositionID, playerId = playerID, position = position, x = x, y = y, order = order, lineupId = lineupId)
+    }
+}
 
 data class PositionWithLineup(
         @ColumnInfo(name = "position") var position: Int = 0,

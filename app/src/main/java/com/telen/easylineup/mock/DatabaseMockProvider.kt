@@ -47,7 +47,6 @@ class DatabaseMockProvider {
 
     private fun getMockPlayers() : List<Player> {
         var playersList = ArrayList<Player>()
-        playersList.add(Player(9, 1, "Karim", 20, 1))
         playersList.add(Player(1, 1, "Valentin", 90, 2))
         playersList.add(Player(2, 1, "Antoine", 10, 3))
         playersList.add(Player(3, 1, "Vincent", 24, 4))
@@ -56,6 +55,9 @@ class DatabaseMockProvider {
         playersList.add(Player(6, 1, "JM", 3, 7))
         playersList.add(Player(7, 1, "Lya", 4, 8))
         playersList.add(Player(8, 1, "Fanny", 5, 9))
+        playersList.add(Player(9, 1, "Maiwenn", 6, 10))
+        playersList.add(Player(10, 1, "Laurenn", 7, 11))
+        playersList.add(Player(11, 1, "Karim", 20, 1))
         return playersList
     }
 

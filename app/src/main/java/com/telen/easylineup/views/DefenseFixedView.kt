@@ -63,11 +63,11 @@ class DefenseFixedView: ConstraintLayout {
 
     fun setListPlayerInField(players: List<PlayerWithPosition>) {
         players.forEach { player ->
-            var coordinatePercent: PointF = PointF(player.x, player.y)
+            var coordinatePercent = PointF(player.x, player.y)
 
             val playerView = PlayerFieldIcon(context).run {
                 layoutParams = LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                setPlayerIcon(R.drawable.pikachu)
+                setPlayerImage(player.image)
                 setShirtNumber(player.shirtNumber)
                 this
             }

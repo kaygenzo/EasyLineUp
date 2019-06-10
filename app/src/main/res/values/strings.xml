@@ -3,10 +3,6 @@
     <string name="splashscreen_title" translatable="false">Easylineup</string>
     <string name="action_settings">Settings</string>
     <string name="action_edit">Edit</string>
-    <string name="bottom_bar_home">Home</string>
-    <string name="bottom_bar_team">My team</string>
-    <string name="bottom_bar_lineups">My LineUp</string>
-    <string name="bottom_bar_settings">Settings</string>
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_attack">Attack</string>
     <string name="save_button">Save</string>
@@ -19,4 +15,12 @@
     <string name="player_hint_name">Name</string>
     <string name="player_hint_shirt_number">Shirt number</string>
     <string name="player_hint_license_number">License number</string>
+
+    <string name="title_last_lineup">Last lineup</string>
+    <string name="title_team">My team</string>
+    <string name="title_lineups">My Lineups</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_player_details">Statistics</string>
+    <string name="title_player_edition">Player edition</string>
+    <string name="title_lineup_edition">Lineup edition</string>
 </resources>

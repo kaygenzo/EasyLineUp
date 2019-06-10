@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
+import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.player_icon_field.view.*
 
@@ -20,7 +21,11 @@ class PlayerFieldIcon: LinearLayout {
         playerShirtNumber.text = shirtNumber.toString()
     }
 
-    fun setPlayerIcon(drawableRes: Int) {
-        playerImage.setImageResource(drawableRes)
+    fun setPlayerImage(url: String?) {
+        Picasso.get().load(url)
+                .placeholder(R.drawable.pikachu)
+                .error(R.drawable.pikachu)
+                .into(playerImage)
+        //playerImage.setImageResource(drawableRes)
     }
 }

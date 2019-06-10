@@ -1,12 +1,12 @@
 package com.telen.easylineup.views
 
 import android.content.Context
+import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.cardview.widget.CardView
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
-import com.telen.easylineup.data.PlayerFieldPosition
 import kotlinx.android.synthetic.main.card_defense_editable.view.*
 
 class CardDefenseEditable: CardView {
@@ -18,7 +18,7 @@ class CardDefenseEditable: CardView {
         LayoutInflater.from(context).inflate(R.layout.card_defense_editable, this)
     }
 
-    fun setListPlayer(players: MutableMap<Player, PlayerFieldPosition?>) {
+    fun setListPlayer(players: Map<Player, PointF?>) {
         fieldAndPlayersRootView.setListPlayer(players)
     }
 

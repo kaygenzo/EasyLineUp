@@ -53,7 +53,14 @@ interface LineupDao {
     fun getAllPlayerFieldPositionsForLineup(lineupId: Long): LiveData<List<PlayerFieldPosition>>
 
     @Query("""
-        SELECT players.name as playerName, players.shirtNumber, players.licenseNumber, playerFieldPosition.position, playerFieldPosition.x, playerFieldPosition.y, playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID
+        SELECT players.name as playerName,
+        players.shirtNumber, players.licenseNumber,
+        playerFieldPosition.position,
+        playerFieldPosition.x, playerFieldPosition.y,
+        playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID,
+        playerFieldPosition.lineupID,
+        players.id as playerID,
+        players.teamID, players.image
         FROM playerFieldPosition
         INNER JOIN players ON playerFieldPosition.playerID = players.id
         INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
@@ -81,14 +88,6 @@ interface LineupDao {
     @Query("SELECT * FROM lineups ORDER BY editedAt DESC LIMIT 1")
     fun getLastLineup(): LiveData<Lineup>
 
-//    @Query("""
-//        SELECT lineups.name as lineupName, tournaments.name as tournamentName, playerFieldPosition.position, playerFieldPosition.x, playerFieldPosition.y, playerFieldPosition.`order`
-//        FROM playerFieldPosition
-//        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
-//        INNER JOIN tournaments ON lineups.tournamentID = tournaments.id
-//        WHERE playerFieldPosition.playerID = :playerID
-//        ORDER BY lineups.editedAt DESC
-//    """)
     @Query("""
         SELECT lineups.name as lineupName, tournaments.name as tournamentName, playerFieldPosition.position, playerFieldPosition.x, playerFieldPosition.y, playerFieldPosition.`order`
         FROM playerFieldPosition

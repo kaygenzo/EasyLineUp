@@ -27,4 +27,30 @@ interface PlayerDao {
 
     @Query("SELECT players.* FROM players INNER JOIN teams ON players.teamID = teams.id WHERE teams.id = :teamId")
     fun getPlayersForTeam(teamId: Long): LiveData<List<Player>>
+
+    @Query("""
+        SELECT result.*, position, x, y, `order`, playerFieldPosition.id as fieldPositionID
+        FROM (
+            SELECT lineups.id as lineupID, players.name as playerName, players.shirtNumber, players.licenseNumber, players.id as playerID, players.teamID, players.image
+            FROM lineups, players where lineups.id = :lineupID) as result
+        LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = result.lineupID and playerFieldPosition.playerID = result.playerID
+        ORDER BY result.playerID
+
+    """)
+    fun getTeamPlayersWithPositions(lineupID: Long): LiveData<List<PlayerWithPosition>>
+
+//    @Query("""
+//        SELECT players.name as playerName, players.shirtNumber, players.licenseNumber, playerFieldPosition.position, playerFieldPosition.x, playerFieldPosition.y, playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID, players.id as playerID
+//        FROM players
+//        LEFT JOIN playerFieldPosition ON players.id = playerFieldPosition.playerID
+//    """)
+//    fun getTeamPlayersWithPositions(): LiveData<List<PlayerWithPosition>>
+
+//    @Query("""
+//        SELECT players.name as playerName, players.shirtNumber, players.licenseNumber, playerFieldPosition.position, playerFieldPosition.x, playerFieldPosition.y, playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID, players.id as playerID
+//        FROM players
+//        LEFT JOIN playerFieldPosition ON players.id = playerFieldPosition.playerID
+//        WHERE players.teamID = :teamId AND playerFieldPosition.lineupID = :lineupID
+//    """)
+//    fun getTeamPlayersWithPositions(teamId: Long, lineupID: Long): LiveData<List<PlayerWithPosition>>
 }

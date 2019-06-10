@@ -7,13 +7,11 @@ import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.DragEvent
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
-import com.telen.easylineup.data.PlayerFieldPosition
 import com.telen.easylineup.OnPositionListener
 import com.telen.easylineup.PositionFieldChoiceDialog
 import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
@@ -115,7 +113,7 @@ class DefenseEditableView: ConstraintLayout {
         positionDialog.show()
     }
 
-    fun setListPlayer(players: MutableMap<Player, PlayerFieldPosition?>) {
+    fun setListPlayer(players: Map<Player, PointF?>) {
         playersContainer.removeAllViews()
 
         val columnCount = 6
@@ -128,22 +126,14 @@ class DefenseEditableView: ConstraintLayout {
         players.forEach { entry ->
 
             val player = entry.key
-            val positionOnField = entry.value
-
             val playerTag: String = player.id.toString()
-
-            var coordinatePercent: PointF? = null
-            positionOnField?.let {
-                coordinatePercent = PointF(it.x, it.y)
-            }
+            val coordinatePercent: PointF? = entry.value
 
             playerPositions[playerTag] = Pair(player, coordinatePercent)
 
-            var playerView = PlayerFieldIcon(context).run {
-
-                clipToPadding = false
-
-                setPlayerIcon(R.drawable.pikachu)
+            val playerView = PlayerFieldIcon(context).run {
+                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+                setPlayerImage(player.image)
                 setShirtNumber(player.shirtNumber)
 
                 //replace by an id which is unique
@@ -158,23 +148,25 @@ class DefenseEditableView: ConstraintLayout {
                 this
             }
 
-            playersContainer.addView(playerView)
+            coordinatePercent?.let {
+                addPlayerOnFieldWithPercentage(playerView, it.x, it.y)
+            } ?: playersContainer.addView(playerView)
         }
     }
 
     private fun addPlayerOnFieldWithPercentage(view: PlayerFieldIcon, x: Float, y: Float) {
-        val layoutHeight = fieldFrameLayout.height
-        val layoutWidth = fieldFrameLayout.width
+        fieldFrameLayout.post {
+            val layoutHeight = fieldFrameLayout.height
+            val layoutWidth = fieldFrameLayout.width
 
-        val positionX = ((x * layoutWidth)/100f)
-        val positionY = ((y * layoutHeight)/100f)
+            val positionX = ((x * layoutWidth) / 100f)
+            val positionY = ((y * layoutHeight) / 100f)
 
-        addPlayerOnFieldWithCoordinate(view, positionX, positionY)
+            addPlayerOnFieldWithCoordinate(view, positionX, positionY)
+        }
     }
 
     private fun addPlayerOnFieldWithCoordinate(view: PlayerFieldIcon, x: Float, y: Float) {
-        val imageWidth = view.width.toFloat()
-        val imageHeight = view.height.toFloat()
 
         if(playersContainer.findViewWithTag<PlayerFieldIcon>(view.tag)!=null)
             playersContainer.removeView(view)
@@ -187,27 +179,32 @@ class DefenseEditableView: ConstraintLayout {
         var positionX: Float = x
         var positionY: Float = y
 
-        if(positionX + imageWidth/2 > fieldWidth)
-            positionX = fieldWidth - imageWidth/2
-        if(positionX - imageWidth/2 < 0)
-            positionX = imageWidth/2
+        view.post {
+            val imageWidth = view.width.toFloat()
+            val imageHeight = view.height.toFloat()
 
-        if(positionY - imageHeight/2 < 0)
-            positionY = imageHeight/2
-        if(positionY + imageHeight/2 > fieldHeight)
-            positionY = fieldHeight - imageHeight/2
+            if(positionX + imageWidth/2 > fieldWidth)
+                positionX = fieldWidth - imageWidth/2
+            if(positionX - imageWidth/2 < 0)
+                positionX = imageWidth/2
 
-        positionX -= imageWidth / 2
-        positionY -= imageHeight / 2
+            if(positionY - imageHeight/2 < 0)
+                positionY = imageHeight/2
+            if(positionY + imageHeight/2 > fieldHeight)
+                positionY = fieldHeight - imageHeight/2
 
-        val layoutParamCustom = LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).run {
-            leftMargin = positionX.toInt()
-            topMargin = positionY.toInt()
-            this
+            positionX -= imageWidth / 2
+            positionY -= imageHeight / 2
+
+            val layoutParamCustom = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT).run {
+                leftMargin = positionX.toInt()
+                topMargin = positionY.toInt()
+                this
+            }
+
+            view.layoutParams = layoutParamCustom
         }
 
-        view.layoutParams = layoutParamCustom
-
-        fieldFrameLayout.addView(view, layoutParamCustom)
+        fieldFrameLayout.addView(view)
     }
 }

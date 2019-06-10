@@ -50,6 +50,7 @@ class PlayerEditActivity: AppCompatActivity(), PlayerFormListener {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.title = getString(R.string.title_player_edition)
     }
 
     override fun onSupportNavigateUp(): Boolean {

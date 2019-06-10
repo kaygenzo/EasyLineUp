@@ -22,7 +22,6 @@ class LineupActivity: AppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this).get(PlayersPositionViewModel::class.java)
         viewModel.lineupID = intent.getLongExtra(Constants.LINEUP_ID, 0)
-        viewModel.teamID = intent.getLongExtra(Constants.TEAM_ID, 0)
         viewModel.lineupTitle = intent.getStringExtra(Constants.LINEUP_TITLE)
         viewModel.editable = intent.getBooleanExtra(Constants.EXTRA_EDITABLE, false)
 
@@ -32,6 +31,13 @@ class LineupActivity: AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
+
+        if (viewModel.editable) {
+            supportActionBar?.title = getString(R.string.title_lineup_edition)
+        }
+        else {
+            supportActionBar?.title = ""
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -58,7 +64,6 @@ class LineupActivity: AppCompatActivity() {
         when (item.itemId) {
             R.id.action_edit -> {
                 val intent = Intent(this, LineupActivity::class.java)
-                intent.putExtra(Constants.TEAM_ID, viewModel.teamID)
                 intent.putExtra(Constants.EXTRA_EDITABLE, true)
                 intent.putExtra(Constants.LINEUP_ID, viewModel.lineupID)
                 intent.putExtra(Constants.LINEUP_TITLE, viewModel.lineupTitle)

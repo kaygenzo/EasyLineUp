@@ -52,7 +52,7 @@ class AttackFragment: Fragment(), OnDataChangedListener {
         viewModel = ViewModelProviders.of(activity as LineupActivity).get(PlayersPositionViewModel::class.java)
         viewModel.lineupID?.let {
             viewModel.getPlayersWithPositions(it).observe(this, Observer { items ->
-                Timber.d("PlayerFieldPosition list changed!")
+                Timber.d("PlayerWithPositions list changed!")
                 adapterDataList.clear()
                 adapterDataList.addAll(items)
                 playerAdapter.notifyDataSetChanged()
@@ -70,8 +70,8 @@ class AttackFragment: Fragment(), OnDataChangedListener {
 
     private fun save(): Completable {
         val playerMap : MutableMap<Long, Int> = mutableMapOf()
-        adapterDataList.forEach {
-            playerMap[it.fieldPositionID] = it.order
+        adapterDataList.forEach { player ->
+            playerMap[player.fieldPositionID] = player.order
         }
         return viewModel.saveNewBattingOrder(playerMap)
                 .subscribeOn(Schedulers.io())
