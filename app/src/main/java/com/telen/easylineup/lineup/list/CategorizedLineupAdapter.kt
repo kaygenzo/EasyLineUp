@@ -1,11 +1,14 @@
 package com.telen.easylineup.lineup.list
 
+import android.graphics.PointF
 import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Lineup
+import com.telen.easylineup.data.Tournament
+import com.telen.easylineup.data.TournamentWithLineup
 import com.telen.easylineup.views.CollegedStyledTextView
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection
@@ -15,7 +18,7 @@ interface OnItemClickedListener {
     fun onLineupClicked(lineup: Lineup)
 }
 
-class CategorizedLineupAdapter(val lineups: List<Lineup>, val tournamentName: String, val onItemClickedListener: OnItemClickedListener): StatelessSection(
+class CategorizedLineupAdapter(val tournament: Tournament, val lineups: List<Lineup>, val onItemClickedListener: OnItemClickedListener): StatelessSection(
         SectionParameters.builder()
                 .itemResourceId(R.layout.item_categorized_lineup)
                 .headerResourceId(R.layout.header_section_tournaments)
@@ -33,7 +36,7 @@ class CategorizedLineupAdapter(val lineups: List<Lineup>, val tournamentName: St
     override fun onBindItemViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
         val cardHolder = holder as LineupViewHolder
         val lineup = lineups[position]
-        cardHolder.field.setSmallPlayerPosition(lineup.playerFieldPosition)
+        cardHolder.field.setSmallPlayerPosition(lineup.playerPositions)
         cardHolder.lineupName.text = lineup.name
         cardHolder.tournamentName.visibility = View.GONE
         cardHolder.rootView.setOnClickListener {
@@ -47,7 +50,7 @@ class CategorizedLineupAdapter(val lineups: List<Lineup>, val tournamentName: St
 
     override fun onBindHeaderViewHolder(holder: RecyclerView.ViewHolder?) {
         val sectionHolder = holder as HeaderViewHolder
-        sectionHolder.title.text = tournamentName
+        sectionHolder.title.text = tournament.name
 
         updateArrow(sectionHolder)
 

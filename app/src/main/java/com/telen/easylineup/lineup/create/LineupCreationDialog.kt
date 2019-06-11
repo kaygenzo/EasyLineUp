@@ -9,12 +9,10 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.telen.easylineup.R
-import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
 import com.telen.easylineup.lineup.LineupActivity
 import com.telen.easylineup.lineup.list.LineupViewModel
-import com.telen.easylineup.lineup.list.TournamentViewModel
-import com.telen.easylineup.team.TeamViewModel
+import com.telen.easylineup.lineup.list.CategorizedLineupsViewModel
 import com.telen.easylineup.utils.Constants
 import com.telen.easylineup.views.LineupCreationDialogView
 import com.telen.easylineup.views.OnFormReadyListener
@@ -36,11 +34,11 @@ class LineupCreationDialog: DialogFragment() {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
 
-            val tournamentViewModel =  ViewModelProviders.of(activity as AppCompatActivity).get(TournamentViewModel::class.java)
+            val tournamentViewModel =  ViewModelProviders.of(activity as AppCompatActivity).get(CategorizedLineupsViewModel::class.java)
             val view = LineupCreationDialogView(activity as AppCompatActivity)
-            tournamentViewModel.tournaments.observe(this, Observer {
-                view.setList(it)
-            })
+//            tournamentViewModel.tournaments.observe(this, Observer { tournaments ->
+//                view.setList(tournaments)
+//            })
 
             builder.setTitle(R.string.dialog_create_lineup_title)
                     .setView(view)
@@ -72,33 +70,22 @@ class LineupCreationDialog: DialogFragment() {
         Timber.d("chosen tournament = $tournament")
         Timber.d("chosen title = $lineupTitle")
 
-        val tournamentViewModel = ViewModelProviders.of(this).get(TournamentViewModel::class.java)
-        val teamViewModel = ViewModelProviders.of(this).get(TeamViewModel::class.java)
         val lineupViewModel = ViewModelProviders.of(this).get(LineupViewModel::class.java)
 
-        saveDisposable = tournamentViewModel.insertTournamentIfNotExists(tournament)
+        saveDisposable?.takeIf { !it.isDisposed }?.let { it.dispose() }
+        saveDisposable = lineupViewModel.createNewLineup(tournament, lineupTitle)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { tournamentID ->
-                    Timber.d("successfully inserted tournament, new id: $tournamentID")
-                    teamViewModel.getTeam().observe(activity as AppCompatActivity, Observer { team ->
-                        val newLineup = Lineup(name = lineupTitle, teamId = team.id, tournamentId = tournamentID)
-                        lineupViewModel.createNewLineup(newLineup)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe({ lineupID ->
-                                    dialog.dismiss()
-                                    Timber.d("successfully inserted new lineup, new id: $lineupID")
-                                    val intent = Intent(activity, LineupActivity::class.java)
-                                    intent.putExtra(Constants.LINEUP_ID, lineupID)
-                                    intent.putExtra(Constants.LINEUP_TITLE, lineupTitle)
-                                    intent.putExtra(Constants.TEAM_ID, team.id)
-                                    intent.putExtra(Constants.EXTRA_EDITABLE, true)
-                                    activity?.startActivityForResult(intent, REQUEST_CODE_NEW_LINEUP)
-                                }, { throwable ->
-                                    Timber.e(throwable)
-                                })
-                    })
-                }
+                .subscribe({ lineupID ->
+                    dialog.dismiss()
+                    Timber.d("successfully inserted new lineup, new id: $lineupID")
+                    val intent = Intent(activity, LineupActivity::class.java)
+                    intent.putExtra(Constants.LINEUP_ID, lineupID)
+                    intent.putExtra(Constants.LINEUP_TITLE, lineupTitle)
+                    intent.putExtra(Constants.EXTRA_EDITABLE, true)
+                    activity?.startActivityForResult(intent, REQUEST_CODE_NEW_LINEUP)
+                }, { throwable ->
+                    Timber.e(throwable)
+                })
     }
 }

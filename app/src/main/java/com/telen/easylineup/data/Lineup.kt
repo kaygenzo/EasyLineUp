@@ -1,5 +1,6 @@
 package com.telen.easylineup.data
 
+import android.graphics.PointF
 import androidx.room.*
 import java.util.*
 
@@ -39,7 +40,7 @@ data class Lineup(
         @ColumnInfo(name = "tournamentID") var tournamentId: Long = 0,
         @ColumnInfo(name = "createdAt") var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         @ColumnInfo(name = "editedAt") var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
-        @Ignore val playerFieldPosition: MutableList<PlayerWithPosition> = mutableListOf())
+        @Ignore val playerPositions: MutableList<PointF> = mutableListOf())
 
 data class PlayerWithPosition(
         @ColumnInfo(name = "playerName") val playerName: String,
@@ -72,3 +73,21 @@ data class PositionWithLineup(
         @ColumnInfo(name = "lineupName") var lineupName: String = "",
         @ColumnInfo(name = "tournamentName") var tournamentName: String = ""
 )
+
+data class TournamentWithLineup(
+        @ColumnInfo(name = "tournamentID") var tournamentID: Long = 0,
+        @ColumnInfo(name = "tournamentName") var tournamentName: String = "",
+        @ColumnInfo(name = "fieldPositionID") var fieldPositionID: Long = 0,
+        @ColumnInfo(name = "lineupName") var lineupName: String = "",
+        @ColumnInfo(name = "lineupID") var lineupID: Long = 0,
+        @ColumnInfo(name = "x") var x: Float = 0f,
+        @ColumnInfo(name = "y") var y: Float = 0f
+) {
+    fun toTournament() : Tournament {
+        return Tournament(id = tournamentID, name = tournamentName)
+    }
+
+    fun toLineup(): Lineup {
+        return Lineup(id = lineupID, name = lineupName, tournamentId = tournamentID)
+    }
+}

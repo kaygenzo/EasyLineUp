@@ -97,4 +97,18 @@ interface LineupDao {
         ORDER BY lineups.editedAt DESC
     """)
     fun getAllPositionsForPlayer(playerID: Long): LiveData<List<PositionWithLineup>>
+
+    @Query("""
+        SELECT tournaments.id as tournamentID,
+        tournaments.name as tournamentName,
+        playerFieldPosition.id as fieldPositionID,
+        lineups.name as lineupName,
+        lineups.id as lineupID,
+        x, y
+        FROM tournaments
+        LEFT JOIN lineups ON tournaments.id = lineups.tournamentID
+        LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = lineups.id
+        ORDER BY tournaments.name ASC
+    """)
+    fun getAllTournamentsWithLineups(): LiveData<List<TournamentWithLineup>>
 }

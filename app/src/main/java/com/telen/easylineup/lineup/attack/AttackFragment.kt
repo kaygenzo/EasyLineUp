@@ -69,11 +69,7 @@ class AttackFragment: Fragment(), OnDataChangedListener {
     }
 
     private fun save(): Completable {
-        val playerMap : MutableMap<Long, Int> = mutableMapOf()
-        adapterDataList.forEach { player ->
-            playerMap[player.fieldPositionID] = player.order
-        }
-        return viewModel.saveNewBattingOrder(playerMap)
+        return viewModel.saveNewBattingOrder(adapterDataList)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
     }

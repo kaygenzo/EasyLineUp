@@ -20,11 +20,11 @@ class DefenseFragmentFixed: Fragment() {
         val view = inflater.inflate(R.layout.fragment_lineup_defense_fixed, container, false)
 
         viewModel = ViewModelProviders.of(activity as LineupActivity).get(PlayersPositionViewModel::class.java)
-        view.lineup_name.text = viewModel.lineupTitle
 
         viewModel.lineupID?.let {
             viewModel.getPlayersWithPositions(it).observe(this, Observer { players ->
                 view.cardDefenseView.setListPlayer(players)
+                view.cardDefenseView.setLineupName(viewModel.lineupTitle ?: "")
             })
         }
 

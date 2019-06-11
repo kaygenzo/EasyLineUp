@@ -22,8 +22,6 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
     private lateinit var playersAdapter: TeamAdapter
     private lateinit var players: MutableList<Player>
     private lateinit var viewModel: TeamViewModel
-    private var teamID: Long? = null
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,24 +37,18 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
         }
 
         viewModel = ViewModelProviders.of(this).get(TeamViewModel::class.java)
-        viewModel.teams.observe(this, Observer { teams ->
-            val team = teams.first()
-
-            teamID = team.id
-
-            viewModel.getPlayersForTeam(team.id).observe(this@TeamFragment, Observer { playerList ->
-                players.apply {
-                    clear()
-                    addAll(playerList)
-                }
-                playersAdapter.notifyDataSetChanged()
-            })
+        viewModel.getPlayers().observe(this@TeamFragment, Observer { playerList ->
+            players.apply {
+                clear()
+                addAll(playerList)
+            }
+            playersAdapter.notifyDataSetChanged()
 
             view.fab.setOnClickListener {
                 context?.let {
                     val fragment = CreationPlayerDialog()
                     val bundle = Bundle()
-                    bundle.putLong(Constants.TEAM_ID, team.id)
+                    bundle.putLong(Constants.TEAM_ID, viewModel.teamID ?: 0)
                     fragment.arguments = bundle
                     fragment.show(fragmentManager, "dialog")
                 }
@@ -69,9 +61,11 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
     }
 
     override fun onPlayerSelected(player: Player) {
-        val intent = Intent(activity, PlayerDetailsActivity::class.java)
-        intent.putExtra(Constants.PLAYER_ID, player.id)
-        intent.putExtra(Constants.TEAM_ID, teamID)
-        startActivity(intent)
+        viewModel.teamID?.let {
+            val intent = Intent(activity, PlayerDetailsActivity::class.java)
+            intent.putExtra(Constants.PLAYER_ID, player.id)
+            intent.putExtra(Constants.TEAM_ID, it)
+            startActivity(intent)
+        }
     }
 }

@@ -10,15 +10,13 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
-import com.telen.easylineup.data.Player
-import com.telen.easylineup.data.PlayerFieldPosition
 import com.telen.easylineup.data.PlayerWithPosition
-import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
 import timber.log.Timber
 import kotlin.math.roundToInt
 
 const val SMALL_IMAGE_SIZE = 30
+const val PLAYER_ICON_TAG = "playerIconTag"
 
 class DefenseFixedView: ConstraintLayout {
 
@@ -62,6 +60,7 @@ class DefenseFixedView: ConstraintLayout {
     }
 
     fun setListPlayerInField(players: List<PlayerWithPosition>) {
+        cleanPlayerIcons()
         players.forEach { player ->
             var coordinatePercent = PointF(player.x, player.y)
 
@@ -69,21 +68,23 @@ class DefenseFixedView: ConstraintLayout {
                 layoutParams = LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                 setPlayerImage(player.image)
                 setShirtNumber(player.shirtNumber)
+                tag = PLAYER_ICON_TAG
                 this
             }
-
             addPlayerOnField(playerView, coordinatePercent.x, coordinatePercent.y)
         }
     }
 
-    fun setSmallPlayerPosition(players: List<PlayerWithPosition>) {
-        players.forEach { playerFieldPosition ->
+    fun setSmallPlayerPosition(players: List<PointF>) {
+        cleanPlayerIcons()
+        players.forEach { playerCoordinate ->
             var iconView = ImageView(context).run {
                 layoutParams = LayoutParams(SMALL_IMAGE_SIZE,SMALL_IMAGE_SIZE)
                 setImageResource(R.drawable.baseball_ball_icon)
+                tag = PLAYER_ICON_TAG
                 this
             }
-            addPlayerOnField(iconView, playerFieldPosition.x, playerFieldPosition.y)
+            addPlayerOnField(iconView, playerCoordinate.x, playerCoordinate.y)
         }
     }
 
@@ -91,8 +92,20 @@ class DefenseFixedView: ConstraintLayout {
         var iconView = ImageView(context).run {
             layoutParams = LayoutParams(SMALL_IMAGE_SIZE,SMALL_IMAGE_SIZE)
             setImageResource(R.drawable.baseball_ball_icon)
+            tag = PLAYER_ICON_TAG
             this
         }
         addPlayerOnField(iconView, player.x, player.y)
+    }
+
+    private fun cleanPlayerIcons() {
+        if(fieldFrameLayout.childCount > 1) {
+            for (i in fieldFrameLayout.childCount-1 downTo 0) {
+                val view = fieldFrameLayout.getChildAt(i)
+                view.tag?.takeIf { it == PLAYER_ICON_TAG }?.let {
+                    fieldFrameLayout.removeView(fieldFrameLayout.getChildAt(i))
+                }
+            }
+        }
     }
 }

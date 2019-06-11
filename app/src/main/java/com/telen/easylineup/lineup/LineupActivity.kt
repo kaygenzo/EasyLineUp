@@ -61,16 +61,16 @@ class LineupActivity: AppCompatActivity() {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.action_edit -> {
                 val intent = Intent(this, LineupActivity::class.java)
                 intent.putExtra(Constants.EXTRA_EDITABLE, true)
                 intent.putExtra(Constants.LINEUP_ID, viewModel.lineupID)
                 intent.putExtra(Constants.LINEUP_TITLE, viewModel.lineupTitle)
                 startActivity(intent)
-                return true
+                true
             }
-            else -> return super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

@@ -38,7 +38,6 @@ class PlayerDetailsActivity: AppCompatActivity() {
         }
 
         val playerID = intent.getLongExtra(Constants.PLAYER_ID, 0)
-        val teamID = intent.getLongExtra(Constants.TEAM_ID, 0)
 
         val playerDetailsViewModel = ViewModelProviders.of(this).get(PlayerDetailsViewModel::class.java)
         playerDetailsViewModel.getAllLineupsForPlayer(playerID).observe(this, Observer { positions ->
@@ -50,12 +49,7 @@ class PlayerDetailsActivity: AppCompatActivity() {
             positions.forEach { position ->
                 val fieldPosition = FieldPosition.getFieldPosition(position.position)
                 fieldPosition?.let { element ->
-                    chartData[element] = if(chartData[element]!=null) {
-                        chartData[element]!! + 1
-                    }
-                    else {
-                        1
-                    }
+                    chartData[element] = chartData[element]?.let { it + 1 } ?: 1
                 }
             }
             positionsChart.setData(chartData)

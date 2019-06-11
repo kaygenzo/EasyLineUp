@@ -23,14 +23,6 @@ class PlayersPositionViewModel: ViewModel() {
 
     val teams: LiveData<List<Team>> = App.database.teamDao().getTeams()
 
-    fun getPlayersForTeam(teamID: Long): LiveData<List<Player>> {
-        return App.database.playerDao().getPlayersForTeam(teamID)
-    }
-
-    fun getPlayerPositionFor(lineupID: Long, playerID: Long): Maybe<PlayerFieldPosition> {
-        return App.database.lineupDao().getPlayerPositionFor(lineupID, playerID)
-    }
-
     fun savePlayerFieldPosition(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean): Completable {
 
         lineupID?.let { lineupID ->
@@ -59,12 +51,12 @@ class PlayersPositionViewModel: ViewModel() {
         } ?: return Completable.error(IllegalStateException("LineupID is null"))
     }
 
-    fun saveNewBattingOrder(playerBattingOrder: Map<Long, Int>): Completable {
+    fun saveNewBattingOrder(playerPosition: MutableList<PlayerWithPosition>): Completable {
         val listOperations: MutableList<Completable> = mutableListOf()
-        playerBattingOrder.forEach {
-            listOperations.add(App.database.lineupDao().getPlayerFieldPosition(it.key)
+        playerPosition.forEach {player ->
+            listOperations.add(App.database.lineupDao().getPlayerFieldPosition(player.fieldPositionID)
                     .flatMapCompletable { playerPosition ->
-                        playerPosition.order = it.value
+                        playerPosition.order = player.order
                         App.database.lineupDao().updatePlayerFieldPosition(playerPosition)
                     }
             )

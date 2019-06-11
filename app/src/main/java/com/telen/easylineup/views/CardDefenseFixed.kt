@@ -1,6 +1,7 @@
 package com.telen.easylineup.views
 
 import android.content.Context
+import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.cardview.widget.CardView
@@ -27,7 +28,7 @@ class CardDefenseFixed: CardView {
         fieldAndPlayersRootView.setListPlayerInField(players)
     }
 
-    fun setGenericIcons(players: List<PlayerWithPosition>) {
+    fun setGenericIcons(players: List<PointF>) {
         fieldAndPlayersRootView.setSmallPlayerPosition(players)
     }
 
