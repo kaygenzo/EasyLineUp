@@ -7,11 +7,13 @@ import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
-import com.telen.easylineup.data.TournamentWithLineup
-import io.reactivex.Single
-import java.util.*
 
 class CategorizedLineupsViewModel: ViewModel() {
+
+    fun getTournaments(): LiveData<List<Tournament>>{
+        return App.database.tournamentDao().getTournaments()
+    }
+
     fun getCategorizedLineups(): LiveData<Map<Tournament, List<Lineup>>> {
          return Transformations.map(App.database.lineupDao().getAllTournamentsWithLineups()) {
             val result: MutableMap<Tournament, MutableList<Lineup>> = mutableMapOf()

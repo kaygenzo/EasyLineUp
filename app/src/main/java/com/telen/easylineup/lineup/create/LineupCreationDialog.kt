@@ -34,11 +34,11 @@ class LineupCreationDialog: DialogFragment() {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
 
-            val tournamentViewModel =  ViewModelProviders.of(activity as AppCompatActivity).get(CategorizedLineupsViewModel::class.java)
+            val tournamentViewModel =  ViewModelProviders.of(this).get(CategorizedLineupsViewModel::class.java)
             val view = LineupCreationDialogView(activity as AppCompatActivity)
-//            tournamentViewModel.tournaments.observe(this, Observer { tournaments ->
-//                view.setList(tournaments)
-//            })
+            tournamentViewModel.getTournaments().observe(this, Observer { tournaments ->
+                view.setList(tournaments)
+            })
 
             builder.setTitle(R.string.dialog_create_lineup_title)
                     .setView(view)
