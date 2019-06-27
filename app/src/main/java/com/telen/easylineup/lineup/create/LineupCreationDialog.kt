@@ -1,19 +1,19 @@
 package com.telen.easylineup.lineup.create
 
 import android.app.Dialog
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Tournament
-import com.telen.easylineup.lineup.LineupActivity
 import com.telen.easylineup.lineup.list.LineupViewModel
 import com.telen.easylineup.lineup.list.CategorizedLineupsViewModel
 import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.LineupCreationDialogView
 import com.telen.easylineup.views.OnFormReadyListener
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -79,11 +79,12 @@ class LineupCreationDialog: DialogFragment() {
                 .subscribe({ lineupID ->
                     dialog.dismiss()
                     Timber.d("successfully inserted new lineup, new id: $lineupID")
-                    val intent = Intent(activity, LineupActivity::class.java)
-                    intent.putExtra(Constants.LINEUP_ID, lineupID)
-                    intent.putExtra(Constants.LINEUP_TITLE, lineupTitle)
-                    intent.putExtra(Constants.EXTRA_EDITABLE, true)
-                    activity?.startActivityForResult(intent, REQUEST_CODE_NEW_LINEUP)
+//                    activity?.startActivityForResult(intent, REQUEST_CODE_NEW_LINEUP)
+                    val extras = Bundle()
+                    extras.putLong(Constants.LINEUP_ID, lineupID)
+                    extras.putString(Constants.LINEUP_TITLE, lineupTitle)
+                    extras.putBoolean(Constants.EXTRA_EDITABLE, true)
+                    findNavController().navigate(R.id.lineupFragment, extras, NavigationUtils().getOptions())
                 }, { throwable ->
                     Timber.e(throwable)
                 })

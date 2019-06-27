@@ -10,8 +10,9 @@
         android:id="@+id/reorderImage"
         android:layout_width="60dp"
         android:layout_height="match_parent"
-        android:src="@drawable/ic_reorder_black_24dp"
-        android:padding="8dp"/>
+        app:srcCompat="@drawable/ic_reorder_black_24dp"
+        android:padding="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"/>
 
     <TextView
         android:id="@+id/order"

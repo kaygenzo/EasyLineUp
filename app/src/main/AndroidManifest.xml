@@ -12,9 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".HomeActivity" android:label="@string/app_name"/>
-        <activity android:name=".lineup.LineupActivity" />
-        <activity android:name=".team.details.PlayerDetailsActivity" />
+        <activity android:name=".HomeActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".SplashScreen"
             android:theme="@style/AppTheme.NoActionBar.FullScreen"
@@ -24,8 +24,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".team.createPlayer.PlayerEditActivity" />
-
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="33d20990541fd8c5c5a28fc9aa3a1e77ff165b92" />

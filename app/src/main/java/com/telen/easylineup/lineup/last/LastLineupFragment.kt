@@ -32,8 +32,6 @@ class LastLineupFragment: Fragment() {
             }
         })
 
-        (activity as AppCompatActivity).supportActionBar?.title = getString(R.string.title_last_lineup)
-
         return view
     }
 }

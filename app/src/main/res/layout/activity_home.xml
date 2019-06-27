@@ -17,11 +17,14 @@
             android:scaleType="fitStart"
             android:src="@drawable/background_full" />
 
-        <LinearLayout
-            android:id="@+id/fragmentContainer"
-            android:orientation="vertical"
+        <fragment
+            android:id="@+id/nav_host_fragment"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_weight="1"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/app_navigation"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"/>
 

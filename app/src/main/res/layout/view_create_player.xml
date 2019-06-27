@@ -28,7 +28,7 @@
     <com.joooonho.SelectableRoundedImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/ic_add_a_photo_black_24dp"
+        app:srcCompat="@drawable/ic_add_a_photo_black_24dp"
         android:scaleType="centerCrop"
         app:sriv_left_top_corner_radius="16dp"
         app:sriv_right_top_corner_radius="16dp"

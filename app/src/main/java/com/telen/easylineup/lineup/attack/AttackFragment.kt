@@ -9,9 +9,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.data.PlayerWithPosition
-import com.telen.easylineup.lineup.LineupActivity
 import com.telen.easylineup.lineup.PlayersPositionViewModel
 import com.telen.easylineup.utils.Constants
 import io.reactivex.Completable
@@ -49,7 +49,7 @@ class AttackFragment: Fragment(), OnDataChangedListener {
             itemTouchedHelper.attachToRecyclerView(view.recyclerView)
         }
 
-        viewModel = ViewModelProviders.of(activity as LineupActivity).get(PlayersPositionViewModel::class.java)
+        viewModel = ViewModelProviders.of(activity as HomeActivity).get(PlayersPositionViewModel::class.java)
         viewModel.lineupID?.let {
             viewModel.getPlayersWithPositions(it).observe(this, Observer { items ->
                 Timber.d("PlayerWithPositions list changed!")

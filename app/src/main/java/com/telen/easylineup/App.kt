@@ -1,6 +1,6 @@
 package com.telen.easylineup
 
-import android.support.multidex.MultiDexApplication
+import androidx.multidex.MultiDexApplication
 import androidx.room.Room
 import com.crashlytics.android.Crashlytics
 import com.telen.easylineup.data.AppDatabase
