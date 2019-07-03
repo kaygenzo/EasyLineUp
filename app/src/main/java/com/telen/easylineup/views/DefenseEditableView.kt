@@ -85,16 +85,8 @@ class DefenseEditableView: ConstraintLayout {
 
                 playerPositions[tag]?.let {
 
-                    val playerView: PlayerFieldIcon? = baseballFieldAndPlayersRoot.findViewWithTag(tag)
-                    playerView?.let { view ->
-                        addPlayerOnFieldWithCoordinate(view, eventX, eventY)
-                    }
-                    val positionXpercentage: Float = (eventX / fieldFrameLayout.width) * 100
-                    val positionYpercentage: Float = (eventY / fieldFrameLayout.height) * 100
-
                     val player = it.first
                     var playerPoint = it.second
-
                     var isNewObject = false
 
                     if (playerPoint == null) {
@@ -103,10 +95,19 @@ class DefenseEditableView: ConstraintLayout {
                         isNewObject = true
                     }
 
-                    playerPoint.x = positionXpercentage
-                    playerPoint.y = positionYpercentage
+                    val view = baseballFieldAndPlayersRoot.findViewWithTag<PlayerFieldIcon>(tag)
 
-                    playerListener?.onPlayerUpdated(player, playerPoint, fieldPosition, isNewObject)
+                    view?.let {
+                        val imageWidth = view.width.toFloat()
+                        val imageHeight = view.height.toFloat()
+
+                        checkBounds(eventX, eventY, imageWidth, imageHeight) { x: Float, y: Float ->
+                            playerPoint.x = (x / fieldFrameLayout.width) * 100
+                            playerPoint.y = (y / fieldFrameLayout.height) * 100
+
+                            playerListener?.onPlayerUpdated(player, playerPoint, fieldPosition, isNewObject)
+                        }
+                    }
                 }
             }
         })
@@ -115,6 +116,7 @@ class DefenseEditableView: ConstraintLayout {
 
     fun setListPlayer(players: Map<Player, PointF?>) {
         playersContainer.removeAllViews()
+        cleanPlayerIcons()
 
         val columnCount = 6
         val rowCount = ((players.size) / columnCount)+1
@@ -173,38 +175,60 @@ class DefenseEditableView: ConstraintLayout {
         if(fieldFrameLayout.findViewWithTag<PlayerFieldIcon>(view.tag)!=null)
             fieldFrameLayout.removeView(view)
 
-        val fieldWidth = fieldFrameLayout.width.toFloat()
-        val fieldHeight = fieldFrameLayout.height.toFloat()
-
-        var positionX: Float = x
-        var positionY: Float = y
-
         view.post {
             val imageWidth = view.width.toFloat()
             val imageHeight = view.height.toFloat()
 
-            if(positionX + imageWidth/2 > fieldWidth)
-                positionX = fieldWidth - imageWidth/2
-            if(positionX - imageWidth/2 < 0)
-                positionX = imageWidth/2
+            checkBounds(x, y, imageWidth, imageHeight) {
+                correctedX: Float, correctedY: Float ->
 
-            if(positionY - imageHeight/2 < 0)
-                positionY = imageHeight/2
-            if(positionY + imageHeight/2 > fieldHeight)
-                positionY = fieldHeight - imageHeight/2
+                val positionX = correctedX - imageWidth / 2
+                val positionY = correctedY - imageHeight / 2
 
-            positionX -= imageWidth / 2
-            positionY -= imageHeight / 2
+                val layoutParamCustom = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT).run {
+                    leftMargin = positionX.toInt()
+                    topMargin = positionY.toInt()
+                    this
+                }
 
-            val layoutParamCustom = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT).run {
-                leftMargin = positionX.toInt()
-                topMargin = positionY.toInt()
-                this
+                view.run {
+                    layoutParams = layoutParamCustom
+                    invalidate()
+                }
             }
-
-            view.layoutParams = layoutParamCustom
         }
 
         fieldFrameLayout.addView(view)
+    }
+
+    private fun cleanPlayerIcons() {
+        if(fieldFrameLayout.childCount > 1) {
+            for (i in fieldFrameLayout.childCount-1 downTo 0) {
+                val view = fieldFrameLayout.getChildAt(i)
+                if(view is PlayerFieldIcon) {
+                    fieldFrameLayout.removeView(fieldFrameLayout.getChildAt(i))
+                }
+            }
+        }
+    }
+
+    private fun checkBounds(x: Float, y: Float, imageWidth: Float, imageHeight: Float, callback: (x: Float,y: Float) -> Unit) {
+        val containerWidth = fieldFrameLayout.width.toFloat()
+        val containerHeight = fieldFrameLayout.height.toFloat()
+
+        var positionX: Float = x
+        var positionY: Float = y
+
+        if(positionX + imageWidth/2 > containerWidth)
+            positionX = containerWidth - imageWidth/2
+        if(positionX - imageWidth/2 < 0)
+            positionX = imageWidth/2
+
+        if(positionY - imageHeight/2 < 0)
+            positionY = imageHeight/2
+        if(positionY + imageHeight/2 > containerHeight)
+            positionY = containerHeight - imageHeight/2
+
+        callback(positionX, positionY)
     }
 }
