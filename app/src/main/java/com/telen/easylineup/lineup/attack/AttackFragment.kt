@@ -44,19 +44,21 @@ class AttackFragment: Fragment(), OnDataChangedListener {
             adapter = playerAdapter
         }
 
-        val editable = arguments?.getBoolean(Constants.EXTRA_EDITABLE)
-        editable?.takeIf { it }?.let {
-            itemTouchedHelper.attachToRecyclerView(view.recyclerView)
-        }
+        parentFragment?.let { parent ->
+            viewModel = ViewModelProviders.of(parent).get(PlayersPositionViewModel::class.java)
 
-        viewModel = ViewModelProviders.of(activity as HomeActivity).get(PlayersPositionViewModel::class.java)
-        viewModel.lineupID?.let {
-            viewModel.getPlayersWithPositions(it).observe(this, Observer { items ->
-                Timber.d("PlayerWithPositions list changed!")
-                adapterDataList.clear()
-                adapterDataList.addAll(items)
-                playerAdapter.notifyDataSetChanged()
-            })
+            viewModel.editable?.takeIf { it }?.let {
+                itemTouchedHelper.attachToRecyclerView(view.recyclerView)
+            }
+
+            viewModel.lineupID?.let {
+                viewModel.getPlayersWithPositions(it).observe(this, Observer { items ->
+                    Timber.d("PlayerWithPositions list changed!")
+                    adapterDataList.clear()
+                    adapterDataList.addAll(items)
+                    playerAdapter.notifyDataSetChanged()
+                })
+            }
         }
 
         return view

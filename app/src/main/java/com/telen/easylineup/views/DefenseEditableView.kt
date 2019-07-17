@@ -10,10 +10,10 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.FieldPosition
-import com.telen.easylineup.R
-import com.telen.easylineup.data.Player
 import com.telen.easylineup.OnPositionListener
 import com.telen.easylineup.PositionFieldChoiceDialog
+import com.telen.easylineup.R
+import com.telen.easylineup.data.Player
 import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
 import timber.log.Timber
@@ -118,9 +118,8 @@ class DefenseEditableView: ConstraintLayout {
         playersContainer.removeAllViews()
         cleanPlayerIcons()
 
-        val columnCount = 6
+        val columnCount = resources.getInteger(R.integer.lineup_edition_players_container_column_count)
         val rowCount = ((players.size) / columnCount)+1
-        val totalCells = rowCount * columnCount
 
         playersContainer.columnCount = columnCount
         playersContainer.rowCount = rowCount

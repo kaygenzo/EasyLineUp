@@ -9,7 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.lineup.create.LineupCreationDialog
@@ -39,11 +40,29 @@ class CategorizedListLineupFragment: Fragment() {
             }
         }
 
-        val layoutMgr = LinearLayoutManager(activity as AppCompatActivity)
+        val layoutMgr = GridLayoutManager(activity as AppCompatActivity, resources.getInteger(R.integer.lineup_list_column_count))
+        layoutMgr.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (sectionAdapter.getSectionItemViewType(position)) {
+                    SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER -> resources.getInteger(R.integer.lineup_list_column_count)
+                    else ->1
+                }
+            }
+        }
 
         view.recyclerView.apply {
             layoutManager = layoutMgr
             adapter = sectionAdapter
+            addOnScrollListener(object: RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (dy > 0 && view.fab.visibility == View.VISIBLE) {
+                        view.fab.hide()
+                    } else if (dy < 0 && view.fab.visibility != View.VISIBLE) {
+                        view.fab.show()
+                    }
+                }
+            })
         }
 
         categorizedViewModel.getCategorizedLineups().observe(this, Observer { tournaments ->

@@ -40,6 +40,6 @@
         android:id="@+id/lineupFragment"
         android:name="com.telen.easylineup.lineup.LineupFragment"
         android:label="@string/title_lineups"
-        tools:layout="@layout/fragment_lineup"/>
+        tools:layout="@layout/fragment_lineup_fixed"/>
 
 </navigation>

@@ -133,6 +133,14 @@ class PlayerFormView: ConstraintLayout {
         Picasso.get().load(uri).into(playerImage)
     }
 
+    fun enableSaveButton() {
+        playerSave.isEnabled = true
+    }
+
+    fun disableSaveButton() {
+        playerSave.isEnabled = false
+    }
+
 //    private fun getRoundedBitmap(bitmap: Bitmap): RoundedBitmapDrawable {
 //        val min = Math.min(bitmap.width, bitmap.height)
 //        val drawable = RoundedBitmapDrawableFactory.create(resources, Bitmap.createBitmap(bitmap, 0,0,min, min))

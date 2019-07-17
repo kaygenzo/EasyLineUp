@@ -5,6 +5,7 @@ import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
 import kotlinx.android.synthetic.main.card_defense_editable.view.*
@@ -16,6 +17,9 @@ class CardDefenseEditable: CardView {
 
     private fun init(context: Context?) {
         LayoutInflater.from(context).inflate(R.layout.card_defense_editable, this)
+        context?.let {
+            setBackgroundColor(ContextCompat.getColor(it, android.R.color.transparent))
+        }
     }
 
     fun setListPlayer(players: Map<Player, PointF?>) {

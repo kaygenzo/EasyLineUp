@@ -39,14 +39,16 @@ class DefenseFragmentEditable: Fragment(), OnPlayerStateChanged {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_lineup_defense_editable, container, false)
 
-        viewModel = ViewModelProviders.of(activity as HomeActivity).get(PlayersPositionViewModel::class.java)
+        parentFragment?.let { parent ->
+            viewModel = ViewModelProviders.of(parent).get(PlayersPositionViewModel::class.java)
 
-        viewModel.lineupID?.let { lineupID ->
-            viewModel.getTeamPlayerWithPositions(lineupID).observe(this, Observer {
-                view.cardDefenseView.setListPlayer(it)
-                view.cardDefenseView.setPlayerStateListener(this)
-                view.cardDefenseView.setLineupName(viewModel.lineupTitle ?: "")
-            })
+            viewModel.lineupID?.let { lineupID ->
+                viewModel.getTeamPlayerWithPositions(lineupID).observe(this, Observer {
+                    view.cardDefenseView.setListPlayer(it)
+                    view.cardDefenseView.setPlayerStateListener(this)
+                    view.cardDefenseView.setLineupName(viewModel.lineupTitle ?: "")
+                })
+            }
         }
 
         return view

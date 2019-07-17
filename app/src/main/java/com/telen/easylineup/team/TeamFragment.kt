@@ -32,7 +32,7 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_player_list, container, false)
         view.teamPlayersRecyclerView.apply {
-            layoutManager = GridLayoutManager(activity as AppCompatActivity, 2)
+            layoutManager = GridLayoutManager(activity as AppCompatActivity, resources.getInteger(R.integer.player_list_column_count))
             adapter = playersAdapter
         }
 
@@ -46,13 +46,9 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
 
             view.fab.setOnClickListener {
                 context?.let {
-                    val fragment = CreationPlayerDialog()
                     val bundle = Bundle()
                     bundle.putLong(Constants.TEAM_ID, viewModel.teamID ?: 0)
-                    fragment.arguments = bundle
-                    fragmentManager?.let {
-                        fragment.show(it, "dialog")
-                    }
+                    findNavController().navigate(R.id.playerEditFragment, bundle, NavigationUtils().getOptions())
                 }
             }
         })

@@ -45,7 +45,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/lineupField"
                 android:gravity="center_vertical"
                 android:layout_marginLeft="10dp"
-                android:textSize="20sp"/>
+                android:textSize="@dimen/item_lineup_list_title_size"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

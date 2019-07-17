@@ -1,6 +1,5 @@
 package com.telen.easylineup.lineup
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -10,7 +9,7 @@ import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.utils.Constants
 import com.telen.easylineup.utils.NavigationUtils
-import kotlinx.android.synthetic.main.fragment_lineup.view.*
+import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.*
 
 class LineupFragment: Fragment() {
 
@@ -20,20 +19,27 @@ class LineupFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-    }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_lineup, container, false)
-
-        viewModel = ViewModelProviders.of(activity as HomeActivity).get(PlayersPositionViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(PlayersPositionViewModel::class.java)
         viewModel.lineupID = arguments?.getLong(Constants.LINEUP_ID, 0) ?: 0
         viewModel.lineupTitle = arguments?.getString(Constants.LINEUP_TITLE) ?: ""
         viewModel.editable = arguments?.getBoolean(Constants.EXTRA_EDITABLE, false) ?: false
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = when(viewModel.editable) {
+            true -> inflater.inflate(R.layout.fragment_lineup_edition, container, false)
+            false -> inflater.inflate(R.layout.fragment_lineup_fixed, container, false)
+        }
 
         activity?.let { activity ->
             pagerAdapter = LineupPagerAdapter(activity, childFragmentManager, viewModel.editable)
-            view.viewpager.adapter = pagerAdapter
-            view.lineupTabLayout.setupWithViewPager(view.viewpager)
+            view.viewpager?.let { pager ->
+                pager.adapter = pagerAdapter
+                view.lineupTabLayout?.let { tabLayout ->
+                    tabLayout.setupWithViewPager(view.viewpager)
+                }
+            }
 
             if (viewModel.editable) {
                 (activity as HomeActivity).supportActionBar?.title = getString(R.string.title_lineup_edition)
@@ -59,11 +65,6 @@ class LineupFragment: Fragment() {
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_edit -> {
-//                val intent = Intent(this, LineupActivity::class.java)
-//                intent.putExtra(Constants.EXTRA_EDITABLE, true)
-//                intent.putExtra(Constants.LINEUP_ID, viewModel.lineupID)
-//                intent.putExtra(Constants.LINEUP_TITLE, viewModel.lineupTitle)
-//                startActivity(intent)
                 val extras = Bundle()
                 extras.putBoolean(Constants.EXTRA_EDITABLE, true)
                 extras.putLong(Constants.LINEUP_ID, viewModel.lineupID ?: 0)

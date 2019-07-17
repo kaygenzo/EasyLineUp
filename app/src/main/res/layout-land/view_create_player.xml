@@ -9,11 +9,10 @@
 
     <com.joooonho.SelectableRoundedImageView
         android:id="@+id/playerImage"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="@dimen/player_screen_icon_size"
+        android:layout_height="@dimen/player_screen_icon_size"
         tools:src="@drawable/pikachu"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:scaleType="centerCrop"
         app:sriv_left_top_corner_radius="16dp"
@@ -23,7 +22,9 @@
         app:sriv_border_width="2dp"
         app:sriv_border_color="@color/colorAccent"
         app:sriv_oval="true"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        tools:background="#FF0000"/>
 
     <com.joooonho.SelectableRoundedImageView
         android:layout_width="50dp"
@@ -41,18 +42,19 @@
         app:layout_constraintBottom_toBottomOf="@+id/playerImage"
         android:padding="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginBottom="5dp"/>
+        android:layout_marginBottom="5dp"
+        tools:background="#00FF00"/>
 
     <LinearLayout
         android:id="@+id/formContainer"
         android:orientation="vertical"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/playerImage"
-        app:layout_constraintBottom_toTopOf="@+id/playerSave"
-        app:layout_constraintVertical_chainStyle="spread"
         android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp">
+        android:layout_marginRight="30dp"
+        app:layout_constraintLeft_toRightOf="@+id/playerImage"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/playerImage">
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -102,8 +104,7 @@
         android:layout_margin="30dp"
         android:textColor="@color/colorAccent"
         android:text="@string/save_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/formContainer"/>
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -29,16 +29,28 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
         viewModel.playerID = arguments?.getLong(Constants.PLAYER_ID)
         viewModel.teamID = arguments?.getLong(Constants.TEAM_ID)
         viewModel.playerID?.let {
-            viewModel.getPlayer(it).observe(this, Observer { player ->
-                view.editPlayerForm.setName(player.name)
-                view.editPlayerForm.setShirtNumber(player.shirtNumber)
-                view.editPlayerForm.setLicenseNumber(player.licenseNumber)
-                player.image?.let { imageUriString ->
-                    view.editPlayerForm.setImage(Uri.parse(imageUriString))
-                }
+            view.editPlayerForm.disableSaveButton()
+            if(it > 0) {
+                viewModel.getPlayer(it).observe(this, Observer { player ->
+                    player?.let {
+                        view.editPlayerForm.enableSaveButton()
+                        view.editPlayerForm.setName(player.name)
+                        view.editPlayerForm.setShirtNumber(player.shirtNumber)
+                        view.editPlayerForm.setLicenseNumber(player.licenseNumber)
+                        player.image?.let { imageUriString ->
+                            view.editPlayerForm.setImage(Uri.parse(imageUriString))
+                        }
+
+                        view.editPlayerForm.setListener(this)
+                    }
+                })
+            }
+            else {
+                view.editPlayerForm.enableSaveButton()
                 view.editPlayerForm.setListener(this)
-            })
+            }
         }
+
         return view
     }
 
