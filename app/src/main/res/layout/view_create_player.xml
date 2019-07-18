@@ -9,8 +9,8 @@
 
     <com.joooonho.SelectableRoundedImageView
         android:id="@+id/playerImage"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="@dimen/player_screen_icon_size"
+        android:layout_height="@dimen/player_screen_icon_size"
         tools:src="@drawable/pikachu"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
