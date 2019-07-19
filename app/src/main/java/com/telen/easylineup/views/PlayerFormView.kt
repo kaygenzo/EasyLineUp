@@ -90,7 +90,7 @@ class PlayerFormView: ConstraintLayout {
         }
     }
 
-    private fun getName(): String? {
+    fun getName(): String? {
         val name = playerNameInput.text.toString()
         return if(TextUtils.isEmpty(name))
             null
@@ -98,7 +98,7 @@ class PlayerFormView: ConstraintLayout {
             name
     }
 
-    private fun getShirtNumber(): Int? {
+    fun getShirtNumber(): Int? {
         return try {
             playerShirtNumberInput.text.toString().toInt()
         }
@@ -107,13 +107,17 @@ class PlayerFormView: ConstraintLayout {
         }
     }
 
-    private fun getLicenseNumber(): Long? {
+    fun getLicenseNumber(): Long? {
         return try {
             playerLicenseNumberInput.text.toString().toLong()
         }
         catch (exception: NumberFormatException) {
             null
         }
+    }
+
+    fun getImageUri(): Uri? {
+        return imageUri
     }
 
     fun setName(name: String) {

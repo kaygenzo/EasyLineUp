@@ -3,4 +3,5 @@
     <integer name="lineup_edition_players_container_column_count">6</integer>
     <integer name="player_list_column_count">2</integer>
     <integer name="lineup_list_column_count">1</integer>
+    <integer name="player_lineup_list_column_count">1</integer>
 </resources>

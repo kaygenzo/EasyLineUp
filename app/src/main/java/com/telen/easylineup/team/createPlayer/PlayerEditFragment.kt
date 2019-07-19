@@ -2,6 +2,7 @@ package com.telen.easylineup.team.createPlayer
 
 import android.net.Uri
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_player_edit.view.*
+import kotlinx.android.synthetic.main.view_create_player.*
 
 class PlayerEditFragment: Fragment(), PlayerFormListener {
 
@@ -30,14 +32,22 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
         viewModel.teamID = arguments?.getLong(Constants.TEAM_ID)
         viewModel.playerID?.let {
             view.editPlayerForm.disableSaveButton()
+
+            val savedName = savedInstanceState?.getString(Constants.PLAYER_NAME)
+            val savedShirtNumber = savedInstanceState?.getInt(Constants.PLAYER_SHIRT)
+            val savedLicenseNumber = savedInstanceState?.getLong(Constants.PLAYER_LICENSE)
+            val savedImage = savedInstanceState?.getString(Constants.PLAYER_IMAGE)
+
             if(it > 0) {
                 viewModel.getPlayer(it).observe(this, Observer { player ->
                     player?.let {
                         view.editPlayerForm.enableSaveButton()
-                        view.editPlayerForm.setName(player.name)
-                        view.editPlayerForm.setShirtNumber(player.shirtNumber)
-                        view.editPlayerForm.setLicenseNumber(player.licenseNumber)
-                        player.image?.let { imageUriString ->
+                        view.editPlayerForm.setName(savedName ?: player.name)
+                        view.editPlayerForm.setShirtNumber(savedShirtNumber ?: player.shirtNumber)
+                        view.editPlayerForm.setLicenseNumber(savedLicenseNumber ?: player.licenseNumber)
+
+                        val imagePath = savedImage ?: player.image
+                        imagePath?.let { imageUriString ->
                             view.editPlayerForm.setImage(Uri.parse(imageUriString))
                         }
 
@@ -52,6 +62,29 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
         }
 
         return view
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val name = view?.editPlayerForm?.getName()
+        val image = view?.editPlayerForm?.getImageUri()
+        val license = view?.editPlayerForm?.getLicenseNumber()
+        val shirt = view?.editPlayerForm?.getShirtNumber()
+
+        if(!TextUtils.isEmpty(name))
+            outState.putString(Constants.PLAYER_NAME, name)
+
+        license?.let {
+            outState.putLong(Constants.PLAYER_LICENSE, it)
+        }
+
+        shirt?.let {
+            outState.putInt(Constants.PLAYER_SHIRT, it)
+        }
+
+        image?.let {
+            outState.putString(Constants.PLAYER_IMAGE, it.toString())
+        }
     }
 
     override fun onSaveClicked(name: String, shirtNumber: Int, licenseNumber: Long, imageUri: Uri?) {
