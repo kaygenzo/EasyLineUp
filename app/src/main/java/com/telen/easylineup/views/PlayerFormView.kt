@@ -1,15 +1,11 @@
 package com.telen.easylineup.views
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.graphics.drawable.RoundedBitmapDrawable
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import com.qingmei2.rximagepicker.core.RxImagePicker
 import com.qingmei2.rximagepicker.entity.sources.Camera
 import com.qingmei2.rximagepicker.entity.sources.Gallery
@@ -17,17 +13,16 @@ import com.qingmei2.rximagepicker.ui.ICustomPickerConfiguration
 import com.qingmei2.rximagepicker_extension.MimeType
 import com.qingmei2.rximagepicker_extension_zhihu.ZhihuConfigurationBuilder
 import com.qingmei2.rximagepicker_extension_zhihu.ui.ZhihuImagePickerActivity
-import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.utils.PicassoEngine
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.view_create_player.view.*
 
 interface PlayerFormListener {
     fun onSaveClicked(name: String, shirtNumber: Int, licenseNumber: Long, imageUri: Uri?)
+    fun onCancel()
 }
 
 interface ImagePicker {
@@ -87,6 +82,29 @@ class PlayerFormView: ConstraintLayout {
             if(name!=null && shirtNumber!=null && licenseNumber!=null) {
                 listener?.onSaveClicked(name, shirtNumber, licenseNumber, imageUri)
             }
+            else {
+                if(name!=null) {
+                    playerNameInputLayout.error = null
+                } else {
+                    playerNameInputLayout.error = resources.getString(R.string.player_creation_error_name_empty)
+                }
+
+                if(shirtNumber!=null) {
+                    playerShirtNumberInputLayout.error = null
+                } else {
+                    playerShirtNumberInputLayout.error = resources.getString(R.string.player_creation_error_shirt_empty)
+                }
+
+                if(licenseNumber!=null) {
+                    playerLicenseNumberInputLayout.error = null
+                } else {
+                    playerLicenseNumberInputLayout.error = resources.getString(R.string.player_creation_error_license_empty)
+                }
+            }
+        }
+
+        cancel.setOnClickListener {
+            listener?.onCancel()
         }
     }
 

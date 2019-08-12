@@ -14,7 +14,7 @@ interface TeamDao {
     fun deleteTeam(team: Team)
 
     @Update
-    fun updateTeam(team: Team)
+    fun updateTeam(team: Team): Completable
 
     @Query("SELECT * FROM teams WHERE id = :teamId")
     fun getTeamById(teamId: Long): LiveData<Team>

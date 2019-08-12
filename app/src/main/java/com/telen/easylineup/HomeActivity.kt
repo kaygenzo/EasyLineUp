@@ -19,8 +19,10 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        DatabaseMockProvider().insertTeam()
-                .andThen(DatabaseMockProvider().insertTournaments())
+//        DatabaseMockProvider().insertTeam()
+//                .andThen(
+                        DatabaseMockProvider().insertTournaments()
+//                )
                 .andThen(DatabaseMockProvider().insertPlayers())
                 .andThen(DatabaseMockProvider().insertLineups())
                 .andThen(DatabaseMockProvider().insertPlayerFieldPositions())

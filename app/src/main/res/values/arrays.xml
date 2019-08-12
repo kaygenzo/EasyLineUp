@@ -11,4 +11,9 @@
         <item>CF</item>
         <item>RF</item>
     </string-array>
+
+    <string-array name="createTeamSteps">
+        <item>Team creation</item>
+        <item>Add players</item>
+    </string-array>
 </resources>

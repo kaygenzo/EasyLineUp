@@ -15,7 +15,7 @@ interface OnPlayerClickListener {
     fun onPlayerSelected(player: Player)
 }
 
-class TeamAdapter(private val players: List<Player>, val onPlayerClickListener: OnPlayerClickListener): RecyclerView.Adapter<TeamAdapter.PlayerViewHolder>() {
+class TeamAdapter(private val players: List<Player>, val onPlayerClickListener: OnPlayerClickListener?): RecyclerView.Adapter<TeamAdapter.PlayerViewHolder>() {
 
     class PlayerViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val rootView = view.findViewById<CardView>(R.id.playerCardRootView)
@@ -39,7 +39,7 @@ class TeamAdapter(private val players: List<Player>, val onPlayerClickListener: 
             playerName.text = player.name
             playerShirtNumber.text = player.shirtNumber.toString()
             rootView.setOnClickListener {
-                onPlayerClickListener.onPlayerSelected(player)
+                onPlayerClickListener?.onPlayerSelected(player)
             }
             Picasso.get()
                     .load(player.image)

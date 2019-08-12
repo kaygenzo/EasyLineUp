@@ -12,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
-import com.telen.easylineup.team.createPlayer.CreationPlayerDialog
 import com.telen.easylineup.utils.Constants
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_player_list.view.*
@@ -26,7 +25,11 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         players = mutableListOf()
-        playersAdapter = TeamAdapter(players, this)
+        val clickable = arguments?.getBoolean(Constants.EXTRA_CLICKABLE) ?: true
+        playersAdapter = TeamAdapter(players, when(clickable) {
+            true -> this
+            false -> null
+        })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

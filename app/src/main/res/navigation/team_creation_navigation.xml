@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/team_creation_navigation"
+    app:startDestination="@id/teamCreationName">
+
+    <fragment
+        android:id="@+id/teamCreationName"
+        android:name="com.telen.easylineup.team.createTeam.TeamEditFragment"
+        android:label="TeamEditFragment" />
+    <fragment
+        android:id="@+id/navigation_team"
+        android:name="com.telen.easylineup.team.TeamFragment"
+        android:label="TeamFragment" />
+    <fragment
+        android:id="@+id/playerEditFragment"
+        android:name="com.telen.easylineup.team.createPlayer.PlayerEditFragment"
+        android:label="PlayerEditFragment" />
+</navigation>

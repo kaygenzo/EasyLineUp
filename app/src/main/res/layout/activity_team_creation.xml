@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/rootView"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false">
+
+    <com.shuhart.stepview.StepView
+        android:id="@+id/stepLayout"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        app:sv_steps="@array/createTeamSteps"
+        app:sv_animationType="All"
+        app:sv_stepLineWidth="1dp"
+        app:sv_stepPadding="10dp"
+
+        app:sv_nextTextColor="@color/selected_step_text"
+        app:sv_nextStepLineColor="@color/selected_step_text"
+        app:sv_selectedCircleColor="@color/colorPrimaryDark"
+        app:sv_selectedTextColor="#FF000000"
+        app:sv_selectedStepNumberColor="@color/selected_step_circle"
+        app:sv_doneStepLineColor="#FF000000"
+        app:sv_doneStepMarkColor="@color/selected_step_circle"
+        app:sv_doneCircleColor="@color/colorPrimaryDark"
+        app:sv_doneTextColor="@color/selected_step_text"
+
+        app:sv_doneCircleRadius="12dp"
+        app:sv_selectedCircleRadius="15dp"
+
+        app:sv_animationDuration="300"
+
+        app:sv_stepViewStyle="@style/StepView"
+        app:sv_stepNumberTextSize="15sp"
+        android:elevation="16dp"/>
+
+    <fragment
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/team_creation_navigation"
+        app:layout_constraintTop_toBottomOf="@+id/stepLayout"
+        app:layout_constraintBottom_toTopOf="@+id/teamCreationNextButton"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/teamCreationNextButton"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@color/colorPrimaryDark">
+
+        <TextView
+            android:id="@+id/buttonNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintRight_toLeftOf="@+id/arrowRight"
+            android:text="@string/team_creation_button_next"
+            android:textColor="#FFFFFFFF"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textAllCaps="true"/>
+
+        <ImageView
+            android:id="@+id/arrowRight"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:srcCompat="@drawable/ic_keyboard_arrow_right_white_24dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/buttonNext"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonNext"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

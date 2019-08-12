@@ -16,6 +16,10 @@ import io.reactivex.schedulers.Schedulers
 
 class CreationPlayerDialog:  DialogFragment(), PlayerFormListener {
 
+    override fun onCancel() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun onSaveClicked(name: String, shirtNumber: Int, licenseNumber: Long, imageUri: Uri?) {
         val viewModel = ViewModelProviders.of(this).get(PlayerViewModel::class.java)
         arguments?.getLong(Constants.TEAM_ID)?.let {

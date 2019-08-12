@@ -18,9 +18,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_player_edit.view.*
-import kotlinx.android.synthetic.main.view_create_player.*
 
 class PlayerEditFragment: Fragment(), PlayerFormListener {
+
+    override fun onCancel() {
+        findNavController().popBackStack(R.id.navigation_team, false)
+    }
 
     private lateinit var viewModel: PlayerViewModel
     private var saveDisposable: Disposable? = null
@@ -33,10 +36,10 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
         viewModel.playerID?.let {
             view.editPlayerForm.disableSaveButton()
 
-            val savedName = savedInstanceState?.getString(Constants.PLAYER_NAME)
+            val savedName = savedInstanceState?.getString(Constants.NAME)
             val savedShirtNumber = savedInstanceState?.getInt(Constants.PLAYER_SHIRT)
             val savedLicenseNumber = savedInstanceState?.getLong(Constants.PLAYER_LICENSE)
-            val savedImage = savedInstanceState?.getString(Constants.PLAYER_IMAGE)
+            val savedImage = savedInstanceState?.getString(Constants.IMAGE)
 
             if(it > 0) {
                 viewModel.getPlayer(it).observe(this, Observer { player ->
@@ -72,7 +75,7 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
         val shirt = view?.editPlayerForm?.getShirtNumber()
 
         if(!TextUtils.isEmpty(name))
-            outState.putString(Constants.PLAYER_NAME, name)
+            outState.putString(Constants.NAME, name)
 
         license?.let {
             outState.putLong(Constants.PLAYER_LICENSE, it)
@@ -83,7 +86,7 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
         }
 
         image?.let {
-            outState.putString(Constants.PLAYER_IMAGE, it.toString())
+            outState.putString(Constants.IMAGE, it.toString())
         }
     }
 

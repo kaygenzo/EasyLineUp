@@ -6,6 +6,7 @@
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_attack">Attack</string>
     <string name="save_button">Save</string>
+    <string name="cancel_button">Cancel</string>
     <string name="lineup_saved">Lineup saved!</string>
     <string name="problem_occurred">A problem occurred!</string>
 
@@ -23,4 +24,13 @@
     <string name="title_player_details">Statistics</string>
     <string name="title_player_edition">Player edition</string>
     <string name="title_lineup_edition">Lineup edition</string>
+
+    <string name="team_creation_button_next">Next</string>
+    <string name="team_creation_button_previous">Previous</string>
+    <string name="team_creation_button_finish">Finish</string>
+    <string name="team_creation_error_name_empty">Team name cannot be empty</string>
+
+    <string name="player_creation_error_name_empty">Player name cannot be empty</string>
+    <string name="player_creation_error_shirt_empty">Player shirt number cannot be empty</string>
+    <string name="player_creation_error_license_empty">Player license cannot be empty</string>
 </resources>

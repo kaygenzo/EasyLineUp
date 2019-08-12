@@ -29,4 +29,7 @@
     <color name="button_text_color">@color/colorAccent</color>
     <color name="button_background">#00FFFFFF</color>
     <color name="separator_color">#FF000000</color>
+
+    <color name="selected_step_circle">#FFFFFFFF</color>
+    <color name="selected_step_text">#FF505050</color>
 </resources>
