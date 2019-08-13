@@ -27,5 +27,6 @@ app/build/
 local.properties
 .idea/
 *.iml
+!gradle/wrapper/*
 
 *.DS_Store
