@@ -33,4 +33,9 @@
     <string name="player_creation_error_name_empty">Player name cannot be empty</string>
     <string name="player_creation_error_shirt_empty">Player shirt number cannot be empty</string>
     <string name="player_creation_error_license_empty">Player license cannot be empty</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_desc">Navigation header</string>
+
 </resources>

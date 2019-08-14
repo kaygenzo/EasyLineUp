@@ -2,68 +2,63 @@ package com.telen.easylineup
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
-import androidx.navigation.ui.*
-import com.telen.easylineup.mock.DatabaseMockProvider
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_home.*
-import timber.log.Timber
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.navigation.NavigationView
+import com.squareup.picasso.Picasso
+import com.telen.easylineup.utils.SelectableRoundedImageView
+import com.telen.easylineup.views.DrawerHeader
 
 class HomeActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var viewModel: HomeViewModel
+
+    private val drawerLayout by lazy { findViewById<DrawerLayout>(R.id.drawer_layout) }
+    private val navController by lazy { findNavController(R.id.nav_host_fragment) }
+    private val navigationView by lazy { findViewById<NavigationView>(R.id.nav_view) }
+    private lateinit var drawerHeader: DrawerHeader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-//        DatabaseMockProvider().insertTeam()
-//                .andThen(
-                        DatabaseMockProvider().insertTournaments()
-//                )
-                .andThen(DatabaseMockProvider().insertPlayers())
-                .andThen(DatabaseMockProvider().insertLineups())
-                .andThen(DatabaseMockProvider().insertPlayerFieldPositions())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    DatabaseMockProvider().checkTeam(this)
-                    DatabaseMockProvider().checkPlayers(this)
-                    DatabaseMockProvider().checkLineups(this)
-                    DatabaseMockProvider().checkPlayerFieldPositions(this)
-                    DatabaseMockProvider().checkTournaments(this)
-                }, { throwable ->
-                    Timber.e(throwable)
-                })
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
-        val navController = findNavController(R.id.nav_host_fragment)
-        bottom_navigation.setupWithNavController(navController)
+        setupActionBarWithNavController(navController, drawerLayout)
+        navigationView.setupWithNavController(navController)
 
-        appBarConfiguration = AppBarConfiguration(navController.graph)
+        viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
+        viewModel.registerTeamUpdates().observe(this, Observer {
+            drawerHeader.setImage(it.image)
+            drawerHeader.setTitle(it.name)
+        })
 
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        drawerHeader = DrawerHeader(this)
+
+        navigationView.addHeaderView(drawerHeader)
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
+        return navController.navigateUp(drawerLayout)
     }
 
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        return item.onNavDestinationSelected(findNavController(R.id.nav_host_fragment))
-//                || super.onOptionsItemSelected(item)
-//    }
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        if(requestCode == LineupCreationDialog.REQUEST_CODE_NEW_LINEUP) {
-//            if(resultCode == Activity.RESULT_OK) {
-//                Snackbar.make(rootView, R.string.lineup_saved, Snackbar.LENGTH_LONG).show()
-//            }
-//            else {
-//                Snackbar.make(rootView, R.string.problem_occurred, Snackbar.LENGTH_LONG).show()
-//            }
-//        }
-//        super.onActivityResult(requestCode, resultCode, data)
-//    }
+    override fun onBackPressed() {
+        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
+    }
 }
