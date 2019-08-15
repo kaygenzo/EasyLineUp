@@ -52,7 +52,7 @@ class PlayerFormView: ConstraintLayout {
     private fun initView(context: Context?) {
         LayoutInflater.from(context).inflate(R.layout.view_create_player, this)
 
-        Picasso.get().load(R.drawable.pikachu).into(playerImage)
+        playerImage.setImageResource(R.drawable.unknown_player)
 
         playerImage.setOnClickListener {
             context?.let {
@@ -152,7 +152,12 @@ class PlayerFormView: ConstraintLayout {
 
     fun setImage(uri: Uri) {
         imageUri = uri
-        Picasso.get().load(uri).into(playerImage)
+        Picasso.get().load(uri)
+                .placeholder(R.drawable.unknown_player)
+                .error(R.drawable.unknown_player)
+                .resize(playerImage.width, playerImage.height)
+                .centerInside()
+                .into(playerImage)
     }
 
     fun enableSaveButton() {

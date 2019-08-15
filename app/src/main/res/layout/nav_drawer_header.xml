@@ -18,7 +18,6 @@
         android:layout_width="90dp"
         android:layout_height="90dp"
         android:contentDescription="@string/nav_header_desc"
-        tools:srcCompat="@drawable/pikachu"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/drawerTitle"
@@ -28,8 +27,8 @@
         app:sriv_right_top_corner_radius="16dp"
         app:sriv_left_bottom_corner_radius="16dp"
         app:sriv_right_bottom_corner_radius="16dp"
-        app:sriv_border_width="4dp"
-        app:sriv_border_color="@color/colorAccent"
+        app:sriv_border_width="2dp"
+        app:sriv_border_color="@color/white"
         app:sriv_oval="true"/>
 
     <com.telen.easylineup.views.SwashedStyledTextView

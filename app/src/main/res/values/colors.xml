@@ -32,4 +32,5 @@
 
     <color name="selected_step_circle">#FFFFFFFF</color>
     <color name="selected_step_text">#FF505050</color>
+    <color name="white">#FFFFFFFF</color>
 </resources>

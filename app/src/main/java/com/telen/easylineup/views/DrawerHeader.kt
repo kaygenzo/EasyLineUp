@@ -20,7 +20,10 @@ class DrawerHeader(context: Context): ConstraintLayout(context) {
     }
 
     fun setImage(image: String?) {
-        Picasso.get().load(image).into(imageView)
+        Picasso.get().load(image)
+                .placeholder(R.drawable.unknown_team)
+                .error(R.drawable.unknown_team)
+                .into(imageView)
     }
 
     fun setTitle(title: String) {

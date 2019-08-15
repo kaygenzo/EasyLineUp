@@ -10,12 +10,11 @@
         android:id="@+id/teamImage"
         android:layout_width="@dimen/player_screen_icon_size"
         android:layout_height="@dimen/player_screen_icon_size"
-        tools:src="@drawable/pikachu"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/formContainer"
-        android:scaleType="centerCrop"
+        android:scaleType="center"
         app:sriv_left_top_corner_radius="16dp"
         app:sriv_right_top_corner_radius="16dp"
         app:sriv_left_bottom_corner_radius="16dp"
@@ -23,12 +22,12 @@
         app:sriv_border_width="2dp"
         app:sriv_border_color="@color/colorAccent"
         app:sriv_oval="true"
-        android:layout_marginTop="20dp"
         app:layout_constraintVertical_chainStyle="packed"/>
 
     <com.telen.easylineup.utils.SelectableRoundedImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
+        tools:background="@color/colorAccent"
         app:srcCompat="@drawable/ic_add_a_photo_black_24dp"
         android:scaleType="centerCrop"
         app:sriv_left_top_corner_radius="16dp"
@@ -63,6 +62,7 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/teamNameInput"
+                android:inputType="textPersonName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 

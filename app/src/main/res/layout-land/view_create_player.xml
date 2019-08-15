@@ -11,7 +11,7 @@
         android:id="@+id/playerImage"
         android:layout_width="@dimen/player_screen_icon_size"
         android:layout_height="@dimen/player_screen_icon_size"
-        tools:src="@drawable/pikachu"
+        tools:src="@drawable/unknown_player"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:scaleType="centerCrop"

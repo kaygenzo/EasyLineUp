@@ -7,7 +7,9 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import androidx.appcompat.widget.AppCompatDrawableManager
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.qingmei2.rximagepicker.core.RxImagePicker
 import com.qingmei2.rximagepicker_extension.MimeType
 import com.qingmei2.rximagepicker_extension_zhihu.ZhihuConfigurationBuilder
@@ -38,7 +40,7 @@ class TeamFormView: ConstraintLayout {
     private fun initView(context: Context?) {
         LayoutInflater.from(context).inflate(R.layout.view_create_team, this)
 
-        Picasso.get().load(R.drawable.pikachu).into(teamImage)
+        teamImage.setImageResource(R.drawable.unknown_team)
 
         teamImage.setOnClickListener {
             context?.let {
@@ -92,6 +94,11 @@ class TeamFormView: ConstraintLayout {
 
     fun setImage(uri: Uri) {
         imageUri = uri
-        Picasso.get().load(uri).into(teamImage)
+        Picasso.get().load(uri)
+                .placeholder(R.drawable.unknown_team)
+                .error(R.drawable.unknown_team)
+                .resize(teamImage.width, teamImage.height)
+                .centerInside()
+                .into(teamImage)
     }
 }

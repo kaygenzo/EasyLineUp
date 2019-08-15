@@ -23,8 +23,8 @@ class PlayerFieldIcon: LinearLayout {
 
     fun setPlayerImage(url: String?) {
         Picasso.get().load(url)
-                .placeholder(R.drawable.pikachu)
-                .error(R.drawable.pikachu)
+                .placeholder(R.drawable.unknown_player)
+                .error(R.drawable.unknown_player)
                 .into(playerImage)
         //playerImage.setImageResource(drawableRes)
     }

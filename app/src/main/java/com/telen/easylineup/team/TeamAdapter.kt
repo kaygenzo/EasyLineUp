@@ -43,8 +43,8 @@ class TeamAdapter(private val players: List<Player>, val onPlayerClickListener: 
             }
             Picasso.get()
                     .load(player.image)
-                    .error(R.drawable.pikachu)
-                    .placeholder(R.drawable.pikachu)
+                    .error(R.drawable.unknown_player)
+                    .placeholder(R.drawable.unknown_player)
                     .into(playerImage)
         }
     }
