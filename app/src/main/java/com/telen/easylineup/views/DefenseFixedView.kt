@@ -11,8 +11,8 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
 import com.telen.easylineup.data.PlayerWithPosition
+import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.field_view.view.*
-import timber.log.Timber
 import kotlin.math.roundToInt
 
 const val SMALL_IMAGE_SIZE = 30
@@ -28,7 +28,7 @@ class DefenseFixedView: ConstraintLayout {
         LayoutInflater.from(context).inflate(R.layout.baseball_field_only, this)
     }
 
-    private fun addPlayerOnField(view: View, x: Float, y: Float) {
+    private fun addPlayerOnField(view: View, x: Float, y: Float, loadingCallback: LoadingCallback?) {
         fieldFrameLayout.post {
             val layoutHeight = fieldFrameLayout.height
             val layoutWidth = fieldFrameLayout.width
@@ -36,12 +36,14 @@ class DefenseFixedView: ConstraintLayout {
             val positionX = ((x * layoutWidth)/100f).roundToInt()
             val positionY = ((y * layoutHeight)/100f).roundToInt()
 
+            view.visibility = View.INVISIBLE
+
             view.post {
                 val imageWidth = view.width
                 val imageHeight = view.height
 
-                Timber.d("imageWidth=$imageWidth imageHeight=$imageHeight layoutWidth=$layoutWidth layoutHeight=$layoutHeight")
-                Timber.d("x=$x y=$y positionX=$positionX positionY=$positionY")
+//                Timber.d("imageWidth=$imageWidth imageHeight=$imageHeight layoutWidth=$layoutWidth layoutHeight=$layoutHeight")
+//                Timber.d("x=$x y=$y positionX=$positionX positionY=$positionY")
 
                 val layoutParamCustom = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).run {
                     leftMargin = positionX - imageWidth / 2
@@ -51,18 +53,22 @@ class DefenseFixedView: ConstraintLayout {
 
                 view.run {
                     layoutParams = layoutParamCustom
+                    visibility = View.VISIBLE
                     invalidate()
                 }
+                loadingCallback?.onFinishLoading()
             }
 
             fieldFrameLayout.addView(view)
         }
     }
 
-    fun setListPlayerInField(players: List<PlayerWithPosition>) {
+    fun setListPlayerInField(players: List<PlayerWithPosition>, loadingCallback: LoadingCallback?) {
+        if(players.isNotEmpty())
+            loadingCallback?.onStartLoading()
         cleanPlayerIcons()
         players.forEach { player ->
-            var coordinatePercent = PointF(player.x, player.y)
+            val coordinatePercent = PointF(player.x, player.y)
 
             val playerView = PlayerFieldIcon(context).run {
                 layoutParams = LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -71,11 +77,16 @@ class DefenseFixedView: ConstraintLayout {
                 tag = PLAYER_ICON_TAG
                 this
             }
-            addPlayerOnField(playerView, coordinatePercent.x, coordinatePercent.y)
+            addPlayerOnField(playerView, coordinatePercent.x, coordinatePercent.y, loadingCallback)
         }
     }
 
     fun setSmallPlayerPosition(players: List<PointF>) {
+        setSmallPlayerPosition(players, null)
+    }
+    fun setSmallPlayerPosition(players: List<PointF>, loadingCallback: LoadingCallback?) {
+        if(players.isNotEmpty())
+            loadingCallback?.onStartLoading()
         cleanPlayerIcons()
         players.forEach { playerCoordinate ->
             var iconView = ImageView(context).run {
@@ -84,18 +95,23 @@ class DefenseFixedView: ConstraintLayout {
                 tag = PLAYER_ICON_TAG
                 this
             }
-            addPlayerOnField(iconView, playerCoordinate.x, playerCoordinate.y)
+            addPlayerOnField(iconView, playerCoordinate.x, playerCoordinate.y, loadingCallback)
         }
     }
 
     fun setSmallPlayer(player: PointF) {
+        setSmallPlayer(player, null)
+    }
+
+    fun setSmallPlayer(player: PointF, loadingCallback: LoadingCallback?) {
+        loadingCallback?.onStartLoading()
         var iconView = ImageView(context).run {
             layoutParams = LayoutParams(SMALL_IMAGE_SIZE,SMALL_IMAGE_SIZE)
             setImageResource(R.drawable.baseball_ball_icon)
             tag = PLAYER_ICON_TAG
             this
         }
-        addPlayerOnField(iconView, player.x, player.y)
+        addPlayerOnField(iconView, player.x, player.y, loadingCallback)
     }
 
     private fun cleanPlayerIcons() {

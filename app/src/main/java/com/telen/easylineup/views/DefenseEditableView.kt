@@ -7,6 +7,7 @@ import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.DragEvent
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.FieldPosition
@@ -14,6 +15,7 @@ import com.telen.easylineup.OnPositionListener
 import com.telen.easylineup.PositionFieldChoiceDialog
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
+import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
 import timber.log.Timber
@@ -114,7 +116,9 @@ class DefenseEditableView: ConstraintLayout {
         positionDialog.show()
     }
 
-    fun setListPlayer(players: Map<Player, PointF?>) {
+    fun setListPlayer(players: Map<Player, PointF?>, loadingCallback: LoadingCallback?) {
+        if(players.isNotEmpty())
+            loadingCallback?.onStartLoading()
         playersContainer.removeAllViews()
         cleanPlayerIcons()
 
@@ -150,12 +154,12 @@ class DefenseEditableView: ConstraintLayout {
             }
 
             coordinatePercent?.let {
-                addPlayerOnFieldWithPercentage(playerView, it.x, it.y)
+                addPlayerOnFieldWithPercentage(playerView, it.x, it.y, loadingCallback)
             } ?: playersContainer.addView(playerView)
         }
     }
 
-    private fun addPlayerOnFieldWithPercentage(view: PlayerFieldIcon, x: Float, y: Float) {
+    private fun addPlayerOnFieldWithPercentage(view: PlayerFieldIcon, x: Float, y: Float, loadingCallback: LoadingCallback?) {
         fieldFrameLayout.post {
             val layoutHeight = fieldFrameLayout.height
             val layoutWidth = fieldFrameLayout.width
@@ -163,16 +167,18 @@ class DefenseEditableView: ConstraintLayout {
             val positionX = ((x * layoutWidth) / 100f)
             val positionY = ((y * layoutHeight) / 100f)
 
-            addPlayerOnFieldWithCoordinate(view, positionX, positionY)
+            addPlayerOnFieldWithCoordinate(view, positionX, positionY, loadingCallback)
         }
     }
 
-    private fun addPlayerOnFieldWithCoordinate(view: PlayerFieldIcon, x: Float, y: Float) {
+    private fun addPlayerOnFieldWithCoordinate(view: PlayerFieldIcon, x: Float, y: Float, loadingCallback: LoadingCallback?) {
 
         if(playersContainer.findViewWithTag<PlayerFieldIcon>(view.tag)!=null)
             playersContainer.removeView(view)
         if(fieldFrameLayout.findViewWithTag<PlayerFieldIcon>(view.tag)!=null)
             fieldFrameLayout.removeView(view)
+
+        view.visibility = View.INVISIBLE
 
         view.post {
             val imageWidth = view.width.toFloat()
@@ -192,8 +198,11 @@ class DefenseEditableView: ConstraintLayout {
 
                 view.run {
                     layoutParams = layoutParamCustom
+                    visibility = View.VISIBLE
                     invalidate()
                 }
+
+                loadingCallback?.onFinishLoading()
             }
         }
 

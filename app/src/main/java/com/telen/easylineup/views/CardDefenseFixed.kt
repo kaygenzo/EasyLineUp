@@ -4,15 +4,23 @@ import android.content.Context
 import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import com.telen.easylineup.R
-import com.telen.easylineup.data.Player
-import com.telen.easylineup.data.PlayerFieldPosition
 import com.telen.easylineup.data.PlayerWithPosition
+import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.card_defense_fixed.view.*
 
-class CardDefenseFixed: CardView {
+class CardDefenseFixed: CardView, LoadingCallback {
+    override fun onStartLoading() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    override fun onFinishLoading() {
+        progressBar.visibility = View.GONE
+    }
+
     constructor(context: Context) : super(context) { init(context)}
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs){ init(context)}
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr){ init(context)}
@@ -25,11 +33,11 @@ class CardDefenseFixed: CardView {
     }
 
     fun setListPlayer(players: List<PlayerWithPosition>) {
-        fieldAndPlayersRootView.setListPlayerInField(players)
+        fieldAndPlayersRootView.setListPlayerInField(players, this)
     }
 
     fun setGenericIcons(players: List<PointF>) {
-        fieldAndPlayersRootView.setSmallPlayerPosition(players)
+        fieldAndPlayersRootView.setSmallPlayerPosition(players, this)
     }
 
     fun setLineupName(name: String) {

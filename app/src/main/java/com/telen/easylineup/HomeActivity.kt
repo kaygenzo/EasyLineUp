@@ -1,10 +1,7 @@
 package com.telen.easylineup
 
 import android.os.Bundle
-import android.view.MenuItem
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -15,8 +12,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
-import com.squareup.picasso.Picasso
-import com.telen.easylineup.utils.SelectableRoundedImageView
 import com.telen.easylineup.views.DrawerHeader
 
 class HomeActivity : AppCompatActivity() {

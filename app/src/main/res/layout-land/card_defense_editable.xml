@@ -27,12 +27,21 @@
             <com.telen.easylineup.views.MLBStyledTextView
                 android:id="@+id/lineup_name"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/card_defense_header_height"
                 tools:text="Visitor vs Home"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/progressBar"
                 app:layout_constraintTop_toTopOf="parent"
                 android:textSize="@dimen/lineup_title_size"/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="@dimen/card_defense_header_height"
+                android:layout_height="@dimen/card_defense_header_height"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:visibility="gone"
+                tools:visibility="visible"/>
 
             <com.telen.easylineup.views.DefenseEditableView
                 android:id="@+id/fieldAndPlayersRootView"
