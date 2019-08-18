@@ -117,8 +117,6 @@ class DefenseEditableView: ConstraintLayout {
     }
 
     fun setListPlayer(players: Map<Player, PointF?>, loadingCallback: LoadingCallback?) {
-        if(players.isNotEmpty())
-            loadingCallback?.onStartLoading()
         playersContainer.removeAllViews()
         cleanPlayerIcons()
 
@@ -154,6 +152,7 @@ class DefenseEditableView: ConstraintLayout {
             }
 
             coordinatePercent?.let {
+                loadingCallback?.onStartLoading()
                 addPlayerOnFieldWithPercentage(playerView, it.x, it.y, loadingCallback)
             } ?: playersContainer.addView(playerView)
         }
