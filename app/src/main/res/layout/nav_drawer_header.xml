@@ -13,7 +13,7 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <com.telen.easylineup.utils.SelectableRoundedImageView
+    <ImageView
         android:id="@+id/drawerImage"
         android:layout_width="90dp"
         android:layout_height="90dp"
@@ -21,15 +21,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/drawerTitle"
-
-        android:scaleType="centerInside"
-        app:sriv_left_top_corner_radius="16dp"
-        app:sriv_right_top_corner_radius="16dp"
-        app:sriv_left_bottom_corner_radius="16dp"
-        app:sriv_right_bottom_corner_radius="16dp"
-        app:sriv_border_width="2dp"
-        app:sriv_border_color="@color/white"
-        app:sriv_oval="true"/>
+        android:scaleType="centerInside"/>
 
     <com.telen.easylineup.views.SwashedStyledTextView
         android:id="@+id/drawerTitle"

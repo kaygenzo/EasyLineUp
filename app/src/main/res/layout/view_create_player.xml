@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
-    <com.telen.easylineup.utils.SelectableRoundedImageView
+    <ImageView
         android:id="@+id/playerImage"
         android:layout_width="@dimen/player_screen_icon_size"
         android:layout_height="@dimen/player_screen_icon_size"
@@ -16,32 +16,16 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:scaleType="centerInside"
-        app:sriv_left_top_corner_radius="16dp"
-        app:sriv_right_top_corner_radius="16dp"
-        app:sriv_left_bottom_corner_radius="16dp"
-        app:sriv_right_bottom_corner_radius="16dp"
-        app:sriv_border_width="2dp"
-        app:sriv_border_color="@color/colorAccent"
-        app:sriv_oval="true"
         android:layout_marginTop="20dp"/>
 
-    <com.telen.easylineup.utils.SelectableRoundedImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        app:srcCompat="@drawable/ic_add_a_photo_black_24dp"
-        android:scaleType="centerCrop"
-        app:sriv_left_top_corner_radius="16dp"
-        app:sriv_right_top_corner_radius="16dp"
-        app:sriv_left_bottom_corner_radius="16dp"
-        app:sriv_right_bottom_corner_radius="16dp"
-        app:sriv_border_width="4dp"
-        app:sriv_border_color="#FFFFFFFF"
-        app:sriv_oval="true"
-        app:layout_constraintRight_toRightOf="@+id/playerImage"
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="5dp"
         app:layout_constraintBottom_toBottomOf="@+id/playerImage"
-        android:padding="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginBottom="5dp"/>
+        app:layout_constraintRight_toRightOf="@+id/playerImage"
+        android:src="@drawable/add_image" />
 
     <LinearLayout
         android:id="@+id/formContainer"

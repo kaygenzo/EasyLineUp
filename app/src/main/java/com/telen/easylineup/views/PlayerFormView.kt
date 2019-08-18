@@ -1,11 +1,13 @@
 package com.telen.easylineup.views
 
 import android.content.Context
+import android.graphics.Color
 import android.net.Uri
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.qingmei2.rximagepicker.core.RxImagePicker
 import com.qingmei2.rximagepicker.entity.sources.Camera
 import com.qingmei2.rximagepicker.entity.sources.Gallery
@@ -153,10 +155,15 @@ class PlayerFormView: ConstraintLayout {
     fun setImage(uri: Uri) {
         imageUri = uri
         Picasso.get().load(uri)
+                .fit()
+                .transform(RoundedTransformationBuilder()
+                        .borderColor(Color.BLACK)
+                        .borderWidthDp(2f)
+                        .cornerRadiusDp(16f)
+                        .oval(true)
+                        .build())
                 .placeholder(R.drawable.unknown_player)
                 .error(R.drawable.unknown_player)
-                .resize(playerImage.width, playerImage.height)
-                .centerInside()
                 .into(playerImage)
     }
 

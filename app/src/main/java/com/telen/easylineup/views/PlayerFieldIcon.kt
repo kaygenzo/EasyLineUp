@@ -1,9 +1,11 @@
 package com.telen.easylineup.views
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
+import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.player_icon_field.view.*
@@ -23,9 +25,15 @@ class PlayerFieldIcon: LinearLayout {
 
     fun setPlayerImage(url: String?) {
         Picasso.get().load(url)
+                .fit()
+                .transform(RoundedTransformationBuilder()
+                        .borderColor(Color.BLACK)
+                        .borderWidthDp(2f)
+                        .cornerRadiusDp(16f)
+                        .oval(true)
+                        .build())
                 .placeholder(R.drawable.unknown_player)
                 .error(R.drawable.unknown_player)
                 .into(playerImage)
-        //playerImage.setImageResource(drawableRes)
     }
 }

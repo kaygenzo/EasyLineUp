@@ -7,22 +7,14 @@
     android:layout_height="40dp"
     android:background="@android:color/transparent">
 
-    <com.telen.easylineup.utils.SelectableRoundedImageView
+    <ImageView
         android:id="@+id/playerImage"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        tools:src="@drawable/unknown_player"
+        tools:src="@drawable/ic_unknown_team"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:scaleType="centerCrop"
-        app:sriv_left_top_corner_radius="16dp"
-        app:sriv_right_top_corner_radius="16dp"
-        app:sriv_left_bottom_corner_radius="16dp"
-        app:sriv_right_bottom_corner_radius="16dp"
-        app:sriv_border_width="2dp"
-        app:sriv_border_color="#FFFFFF"
-        app:sriv_oval="true"
-        tools:background="#000000"/>
+        android:scaleType="fitCenter"/>
 
     <TextView
         android:id="@+id/playerShirtNumber"

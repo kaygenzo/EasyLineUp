@@ -6,42 +6,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.telen.easylineup.utils.SelectableRoundedImageView
+    <ImageView
         android:id="@+id/teamImage"
         android:layout_width="@dimen/player_screen_icon_size"
         android:layout_height="@dimen/player_screen_icon_size"
+        android:scaleType="centerInside"
+        app:layout_constraintBottom_toTopOf="@+id/formContainer"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/formContainer"
-        android:scaleType="center"
-        app:sriv_left_top_corner_radius="16dp"
-        app:sriv_right_top_corner_radius="16dp"
-        app:sriv_left_bottom_corner_radius="16dp"
-        app:sriv_right_bottom_corner_radius="16dp"
-        app:sriv_border_width="2dp"
-        app:sriv_border_color="@color/colorAccent"
-        app:sriv_oval="true"
-        app:layout_constraintVertical_chainStyle="packed"/>
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:src="@drawable/ic_unknown_team" />
 
-    <com.telen.easylineup.utils.SelectableRoundedImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        tools:background="@color/colorAccent"
-        app:srcCompat="@drawable/ic_add_a_photo_black_24dp"
-        android:scaleType="centerCrop"
-        app:sriv_left_top_corner_radius="16dp"
-        app:sriv_right_top_corner_radius="16dp"
-        app:sriv_left_bottom_corner_radius="16dp"
-        app:sriv_right_bottom_corner_radius="16dp"
-        app:sriv_border_width="4dp"
-        app:sriv_border_color="#FFFFFFFF"
-        app:sriv_oval="true"
-        app:layout_constraintRight_toRightOf="@+id/teamImage"
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="5dp"
         app:layout_constraintBottom_toBottomOf="@+id/teamImage"
-        android:padding="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginBottom="5dp"/>
+        app:layout_constraintRight_toRightOf="@+id/teamImage"
+        android:src="@drawable/add_image"
+        />
 
     <LinearLayout
         android:id="@+id/formContainer"

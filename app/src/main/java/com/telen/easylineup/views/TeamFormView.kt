@@ -1,15 +1,15 @@
 package com.telen.easylineup.views
 
 import android.content.Context
+import android.graphics.Color
 import android.net.Uri
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import androidx.appcompat.widget.AppCompatDrawableManager
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
+import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.qingmei2.rximagepicker.core.RxImagePicker
 import com.qingmei2.rximagepicker_extension.MimeType
 import com.qingmei2.rximagepicker_extension_zhihu.ZhihuConfigurationBuilder
@@ -40,7 +40,17 @@ class TeamFormView: ConstraintLayout {
     private fun initView(context: Context?) {
         LayoutInflater.from(context).inflate(R.layout.view_create_team, this)
 
-        teamImage.setImageResource(R.drawable.unknown_team)
+        Picasso.get().load(R.drawable.ic_unknown_team)
+                .fit()
+                .transform(RoundedTransformationBuilder()
+                        .borderColor(Color.BLACK)
+                        .borderWidthDp(2f)
+                        .cornerRadiusDp(16f)
+                        .oval(true)
+                        .build())
+                .placeholder(R.drawable.ic_unknown_team)
+                .error(R.drawable.ic_unknown_team)
+                .into(teamImage)
 
         teamImage.setOnClickListener {
             context?.let {
@@ -95,10 +105,15 @@ class TeamFormView: ConstraintLayout {
     fun setImage(uri: Uri) {
         imageUri = uri
         Picasso.get().load(uri)
-                .placeholder(R.drawable.unknown_team)
-                .error(R.drawable.unknown_team)
-                .resize(teamImage.width, teamImage.height)
-                .centerInside()
+                .fit()
+                .transform(RoundedTransformationBuilder()
+                        .borderColor(Color.BLACK)
+                        .borderWidthDp(2f)
+                        .cornerRadiusDp(16f)
+                        .oval(true)
+                        .build())
+                .placeholder(R.drawable.ic_unknown_team)
+                .error(R.drawable.ic_unknown_team)
                 .into(teamImage)
     }
 }
