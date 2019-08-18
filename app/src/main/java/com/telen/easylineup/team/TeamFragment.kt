@@ -26,10 +26,12 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
         super.onCreate(savedInstanceState)
         players = mutableListOf()
         val clickable = arguments?.getBoolean(Constants.EXTRA_CLICKABLE) ?: true
-        playersAdapter = TeamAdapter(players, when(clickable) {
-            true -> this
-            false -> null
-        })
+        activity?.let {
+            playersAdapter = TeamAdapter(it, players, when(clickable) {
+                true -> this
+                false -> null
+            })
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

@@ -17,4 +17,6 @@
     <dimen name="item_attack_name_text_size">20sp</dimen>
 
     <dimen name="card_defense_header_height">20dp</dimen>
+
+    <dimen name="player_item_image_size">200dp</dimen>
 </resources>

@@ -1,6 +1,6 @@
 package com.telen.easylineup.team
 
-import android.graphics.Color
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,7 +8,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
@@ -17,7 +16,7 @@ interface OnPlayerClickListener {
     fun onPlayerSelected(player: Player)
 }
 
-class TeamAdapter(private val players: List<Player>, val onPlayerClickListener: OnPlayerClickListener?): RecyclerView.Adapter<TeamAdapter.PlayerViewHolder>() {
+class TeamAdapter(private val context: Context, private val players: List<Player>, val onPlayerClickListener: OnPlayerClickListener?): RecyclerView.Adapter<TeamAdapter.PlayerViewHolder>() {
 
     class PlayerViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val rootView = view.findViewById<CardView>(R.id.playerCardRootView)
@@ -43,8 +42,13 @@ class TeamAdapter(private val players: List<Player>, val onPlayerClickListener: 
             rootView.setOnClickListener {
                 onPlayerClickListener?.onPlayerSelected(player)
             }
+
+            val sizePixel = context.resources.getDimensionPixelSize(R.dimen.player_item_image_size)
+
             Picasso.get()
                     .load(player.image)
+                    .resize(sizePixel, sizePixel)
+                    .centerCrop()
                     .error(R.drawable.ic_unknown_field_player)
                     .placeholder(R.drawable.ic_unknown_field_player)
                     .into(playerImage)

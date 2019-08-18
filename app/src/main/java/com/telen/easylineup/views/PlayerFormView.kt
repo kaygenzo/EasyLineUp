@@ -153,9 +153,13 @@ class PlayerFormView: ConstraintLayout {
     }
 
     fun setImage(uri: Uri) {
+
+        val sizePixels = playerImage.context.resources.getDimensionPixelSize(R.dimen.player_screen_icon_size)
+
         imageUri = uri
         Picasso.get().load(uri)
-                .fit()
+                .resize(sizePixels, sizePixels)
+                .centerCrop()
                 .transform(RoundedTransformationBuilder()
                         .borderColor(Color.BLACK)
                         .borderWidthDp(2f)
