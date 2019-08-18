@@ -1,16 +1,13 @@
 <resources>
     <string name="app_name" translatable="false">EasyLineup</string>
     <string name="splashscreen_title" translatable="false">Easylineup</string>
-    <string name="action_settings">Settings</string>
     <string name="action_edit">Edit</string>
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_attack">Attack</string>
     <string name="save_button">Save</string>
     <string name="cancel_button">Cancel</string>
-    <string name="lineup_saved">Lineup saved!</string>
-    <string name="problem_occurred">A problem occurred!</string>
 
-    <string name="dialog_create_lineup_title">Creation...</string>
+    <string name="dialog_create_lineup_title">Creation&#8230;</string>
     <string name="dialog_create_lineup_name">Title</string>
     <string name="dialog_create_lineup_tournament">Tournament</string>
     <string name="player_hint_name">Name</string>
@@ -26,7 +23,6 @@
     <string name="title_lineup_edition">Lineup edition</string>
 
     <string name="team_creation_button_next">Next</string>
-    <string name="team_creation_button_previous">Previous</string>
     <string name="team_creation_button_finish">Finish</string>
     <string name="team_creation_error_name_empty">Team name cannot be empty</string>
 
@@ -34,8 +30,6 @@
     <string name="player_creation_error_shirt_empty">Player shirt number cannot be empty</string>
     <string name="player_creation_error_license_empty">Player license cannot be empty</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_desc">Navigation header</string>
 
 </resources>

@@ -34,8 +34,7 @@
         app:sv_animationDuration="300"
 
         app:sv_stepViewStyle="@style/StepView"
-        app:sv_stepNumberTextSize="15sp"
-        android:elevation="16dp"/>
+        app:sv_stepNumberTextSize="15sp"/>
 
     <fragment
         android:id="@+id/nav_host_fragment"

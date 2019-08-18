@@ -19,16 +19,9 @@
     <!--<color name="primaryTextColor">#ffffff</color>-->
     <!--<color name="secondaryTextColor">#ffffff</color>-->
 
-    <color name="board_cell">#397B64</color>
-    <color name="board_border">#FFFFFFFF</color>
-    <color name="bottom_bar_text_color">#FFFFFFFF</color>
-    <color name="bottom_bar_icon_tint_color">#FFFFFFFF</color>
     <color name="number_blue">#FF2D3783</color>
     <color name="text_orange">#FFd37240</color>
     <color name="lineup_name">#FF2a3488</color>
-    <color name="button_text_color">@color/colorAccent</color>
-    <color name="button_background">#00FFFFFF</color>
-    <color name="separator_color">#FF000000</color>
 
     <color name="selected_step_circle">#FFFFFFFF</color>
     <color name="selected_step_text">#FF505050</color>

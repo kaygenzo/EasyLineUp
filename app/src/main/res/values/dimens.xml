@@ -16,7 +16,5 @@
     <dimen name="item_attack_text_size">25sp</dimen>
     <dimen name="item_attack_name_text_size">20sp</dimen>
 
-    <dimen name="dimen_toolbar_height">56dp</dimen>
-
     <dimen name="card_defense_header_height">20dp</dimen>
 </resources>
