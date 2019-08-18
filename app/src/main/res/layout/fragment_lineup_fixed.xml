@@ -15,12 +15,10 @@
         <com.google.android.material.tabs.TabItem
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:icon="@drawable/ic_menu_send"
             android:text="@string/new_lineup_tab_field_defense"/>
         <com.google.android.material.tabs.TabItem
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:icon="@drawable/ic_menu_share"
             android:text="@string/new_lineup_tab_field_attack"/>
 
     </com.google.android.material.tabs.TabLayout>
