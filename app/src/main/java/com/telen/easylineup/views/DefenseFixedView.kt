@@ -15,7 +15,6 @@ import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.field_view.view.*
 import kotlin.math.roundToInt
 
-const val SMALL_IMAGE_SIZE = 30
 const val PLAYER_ICON_TAG = "playerIconTag"
 
 class DefenseFixedView: ConstraintLayout {
@@ -38,6 +37,8 @@ class DefenseFixedView: ConstraintLayout {
 
             view.visibility = View.INVISIBLE
 
+            val iconSize = (layoutWidth * ICON_SIZE_SCALE).roundToInt()
+
             view.post {
                 val imageWidth = view.width
                 val imageHeight = view.height
@@ -45,7 +46,7 @@ class DefenseFixedView: ConstraintLayout {
 //                Timber.d("imageWidth=$imageWidth imageHeight=$imageHeight layoutWidth=$layoutWidth layoutHeight=$layoutHeight")
 //                Timber.d("x=$x y=$y positionX=$positionX positionY=$positionY")
 
-                val layoutParamCustom = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).run {
+                val layoutParamCustom = FrameLayout.LayoutParams(iconSize, iconSize).run {
                     leftMargin = positionX - imageWidth / 2
                     topMargin = positionY - imageHeight / 2
                     this
@@ -67,11 +68,14 @@ class DefenseFixedView: ConstraintLayout {
         if(players.isNotEmpty())
             loadingCallback?.onStartLoading()
         cleanPlayerIcons()
+
+        val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+
         players.forEach { player ->
             val coordinatePercent = PointF(player.x, player.y)
 
             val playerView = PlayerFieldIcon(context).run {
-                layoutParams = LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                layoutParams = LayoutParams(iconSize, iconSize)
                 setPlayerImage(player.image)
                 setShirtNumber(player.shirtNumber)
                 tag = PLAYER_ICON_TAG
@@ -89,9 +93,10 @@ class DefenseFixedView: ConstraintLayout {
             loadingCallback?.onStartLoading()
         cleanPlayerIcons()
         players.forEach { playerCoordinate ->
-            var iconView = ImageView(context).run {
-                layoutParams = LayoutParams(SMALL_IMAGE_SIZE,SMALL_IMAGE_SIZE)
+            val iconView = ImageView(context).run {
+                layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                 setImageResource(R.drawable.baseball_ball_icon)
+                scaleType = ImageView.ScaleType.CENTER_INSIDE
                 tag = PLAYER_ICON_TAG
                 this
             }
@@ -105,9 +110,10 @@ class DefenseFixedView: ConstraintLayout {
 
     fun setSmallPlayer(player: PointF, loadingCallback: LoadingCallback?) {
         loadingCallback?.onStartLoading()
-        var iconView = ImageView(context).run {
-            layoutParams = LayoutParams(SMALL_IMAGE_SIZE,SMALL_IMAGE_SIZE)
+        val iconView = ImageView(context).run {
+            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             setImageResource(R.drawable.baseball_ball_icon)
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
             tag = PLAYER_ICON_TAG
             this
         }

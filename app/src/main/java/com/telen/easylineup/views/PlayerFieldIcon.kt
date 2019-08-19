@@ -23,6 +23,21 @@ class PlayerFieldIcon: LinearLayout {
         playerShirtNumber.text = shirtNumber.toString()
     }
 
+    fun setPlayerImage(url: String?, size: Int) {
+        Picasso.get().load(url)
+                .resize(size, size)
+                .centerInside()
+                .transform(RoundedTransformationBuilder()
+                        .borderColor(Color.BLACK)
+                        .borderWidthDp(2f)
+                        .cornerRadiusDp(16f)
+                        .oval(true)
+                        .build())
+                .placeholder(R.drawable.unknown_player)
+                .error(R.drawable.unknown_player)
+                .into(playerImage)
+    }
+
     fun setPlayerImage(url: String?) {
         Picasso.get().load(url)
                 .fit()

@@ -19,6 +19,9 @@ import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
 import timber.log.Timber
+import kotlin.math.roundToInt
+
+const val ICON_SIZE_SCALE = 0.12f
 
 interface OnPlayerStateChanged {
     fun onPlayerUpdated(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean)
@@ -126,6 +129,8 @@ class DefenseEditableView: ConstraintLayout {
         playersContainer.columnCount = columnCount
         playersContainer.rowCount = rowCount
 
+        val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+
         players.forEach { entry ->
 
             val player = entry.key
@@ -135,8 +140,8 @@ class DefenseEditableView: ConstraintLayout {
             playerPositions[playerTag] = Pair(player, coordinatePercent)
 
             val playerView = PlayerFieldIcon(context).run {
-                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
-                setPlayerImage(player.image)
+                layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
+                setPlayerImage(player.image, iconSize)
                 setShirtNumber(player.shirtNumber)
 
                 //replace by an id which is unique
@@ -179,6 +184,8 @@ class DefenseEditableView: ConstraintLayout {
 
         view.visibility = View.INVISIBLE
 
+        val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+
         view.post {
             val imageWidth = view.width.toFloat()
             val imageHeight = view.height.toFloat()
@@ -189,7 +196,7 @@ class DefenseEditableView: ConstraintLayout {
                 val positionX = correctedX - imageWidth / 2
                 val positionY = correctedY - imageHeight / 2
 
-                val layoutParamCustom = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT).run {
+                val layoutParamCustom = FrameLayout.LayoutParams(iconSize, iconSize).run {
                     leftMargin = positionX.toInt()
                     topMargin = positionY.toInt()
                     this

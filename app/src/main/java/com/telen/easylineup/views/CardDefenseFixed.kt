@@ -36,10 +36,6 @@ class CardDefenseFixed: CardView, LoadingCallback {
         fieldAndPlayersRootView.setListPlayerInField(players, this)
     }
 
-    fun setGenericIcons(players: List<PointF>) {
-        fieldAndPlayersRootView.setSmallPlayerPosition(players, this)
-    }
-
     fun setLineupName(name: String) {
         lineup_name.text = name
     }
