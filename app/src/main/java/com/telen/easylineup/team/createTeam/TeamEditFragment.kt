@@ -3,28 +3,35 @@ package com.telen.easylineup.team.createTeam
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.R
 import com.telen.easylineup.utils.Constants
 import com.telen.easylineup.views.TeamFormListener
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_team_edit.view.*
+import timber.log.Timber
 
 class TeamEditFragment: Fragment() , TeamFormListener {
 
     private lateinit var viewModel: TeamViewModel
 
     override fun onNameChanged(name: String) {
-        viewModel.teamName = name
+        viewModel.setTeamName(name)
     }
 
     override fun onImageChanged(imageUri: Uri) {
-        viewModel.teamImage = imageUri.toString()
+        viewModel.setTeamImage(imageUri.toString())
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -69,4 +76,31 @@ class TeamEditFragment: Fragment() , TeamFormListener {
             outState.putString(Constants.IMAGE, it.toString())
         }
     }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.team_edit_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        return when (item.itemId) {
+            R.id.action_submit -> {
+                viewModel.saveTeam()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            findNavController().popBackStack()
+                        }, {
+                            Timber.e(it)
+                        })
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+
 }

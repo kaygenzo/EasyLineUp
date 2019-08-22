@@ -7,6 +7,8 @@ import com.telen.easylineup.data.Team
 
 class HomeViewModel: ViewModel() {
 
+    var teamID: Long? = null
+
     fun registerTeamUpdates(): LiveData<Team> {
         return Transformations.map(App.database.teamDao().getTeams()) {
             it.size

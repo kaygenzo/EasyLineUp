@@ -12,6 +12,8 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
+import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.DrawerHeader
 
 class HomeActivity : AppCompatActivity() {
@@ -37,11 +39,23 @@ class HomeActivity : AppCompatActivity() {
         viewModel.registerTeamUpdates().observe(this, Observer {
             drawerHeader.setImage(it.image)
             drawerHeader.setTitle(it.name)
+            viewModel.teamID = it.id
         })
 
         drawerHeader = DrawerHeader(this)
 
         navigationView.addHeaderView(drawerHeader)
+
+        drawerHeader.setOnClickListener {
+            viewModel.teamID?.let {
+                val arguments = Bundle()
+                arguments.putLong(Constants.TEAM_ID, it)
+                navController.navigate(R.id.teamEditFragment, arguments, NavigationUtils().getOptions())
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                }
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -49,7 +63,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
         } else {

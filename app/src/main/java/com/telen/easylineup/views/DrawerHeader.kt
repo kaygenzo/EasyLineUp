@@ -38,4 +38,8 @@ class DrawerHeader(context: Context): ConstraintLayout(context) {
     fun setTitle(title: String) {
         titleView.text = title
     }
+
+    override fun setOnClickListener(l: OnClickListener?) {
+        imageView.setOnClickListener(l)
+    }
 }

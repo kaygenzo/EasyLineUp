@@ -31,8 +31,30 @@ class TeamViewModel: ViewModel() {
     }
 
     var teamID: Long? = 0
-    var teamName: String = ""
-    var teamImage: String? = null
+    private var teamName: String = ""
+    private var teamImage: String? = null
+
+    private var nameLiveData = MutableLiveData<String>()
+    private var imageLiveData = MutableLiveData<String>()
+
+    fun registerNameObserver(): LiveData<String> {
+        return nameLiveData
+    }
+
+    fun registerImageObserver(): LiveData<String> {
+        return imageLiveData
+    }
+
+    fun setTeamName(name: String) {
+        this.teamName = name
+        if(name.isNotEmpty())
+            nameLiveData.value = name
+    }
+
+    fun setTeamImage(image: String) {
+        this.teamImage = image
+        imageLiveData.value = image
+    }
 
     private var saveDisposable: Disposable? = null
 
@@ -40,7 +62,7 @@ class TeamViewModel: ViewModel() {
     var bottomBarLiveData: MutableLiveData<BottomBarState> = MutableLiveData()
     var errorLiveData: MutableLiveData<Error> = MutableLiveData()
 
-    private fun saveTeam(): Completable {
+    fun saveTeam(): Completable {
         bottomBarLiveData.value = BottomBarState.NEXT_DISABLED
         val name = teamName
         val image = teamImage
