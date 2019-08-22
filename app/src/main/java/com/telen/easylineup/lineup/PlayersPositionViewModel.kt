@@ -100,4 +100,11 @@ class PlayersPositionViewModel: ViewModel() {
             result
         }
     }
+
+    fun deleteLineup(): Completable {
+        lineupID?.let { id ->
+            return App.database.lineupDao().getLineupByIdSingle(id)
+                    .flatMapCompletable { lineup -> App.database.lineupDao().deleteLineup(lineup) }
+        } ?: return Completable.complete()
+    }
 }

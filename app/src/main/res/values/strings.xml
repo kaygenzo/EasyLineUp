@@ -1,7 +1,11 @@
 <resources>
     <string name="app_name" translatable="false">EasyLineup</string>
     <string name="splashscreen_title" translatable="false">Easylineup</string>
+
     <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_submit">Submit</string>
+
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_attack">Attack</string>
     <string name="save_button">Save</string>
@@ -21,6 +25,7 @@
     <string name="title_player_details">Statistics</string>
     <string name="title_player_edition">Player edition</string>
     <string name="title_lineup_edition">Lineup edition</string>
+    <string name="title_team_edition">Team edition</string>
 
     <string name="team_creation_button_next">Next</string>
     <string name="team_creation_button_finish">Finish</string>
@@ -31,5 +36,9 @@
     <string name="player_creation_error_license_empty">Player license cannot be empty</string>
 
     <string name="nav_header_desc">Navigation header</string>
+
+    <string name="dialog_delete_lineup_title">Delete lineup</string>
+    <string name="dialog_delete_player_title">Delete player</string>
+    <string name="dialog_delete_cannot_undo_message">This action cannot be undo, are you sure ?</string>s
 
 </resources>

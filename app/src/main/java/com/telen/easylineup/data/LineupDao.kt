@@ -18,13 +18,16 @@ interface LineupDao {
     fun updateLineup(lineup: Lineup)
 
     @Delete
-    fun deleteLineup(lineup: Lineup)
+    fun deleteLineup(lineup: Lineup): Completable
 
     @Query("SELECT * FROM lineups ORDER BY id ASC")
     fun getAllLineup(): LiveData<List<Lineup>>
 
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
     fun getLineupById(lineupId: Long): LiveData<Lineup>
+
+    @Query("SELECT * FROM lineups WHERE id = :lineupId")
+    fun getLineupByIdSingle(lineupId: Long): Single<Lineup>
 
     @Insert
     fun insertPlayerFieldPosition(fieldPositions: List<PlayerFieldPosition>): Completable

@@ -3,6 +3,7 @@ package com.telen.easylineup.data
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import io.reactivex.Completable
+import io.reactivex.Single
 
 @Dao
 interface PlayerDao {
@@ -14,13 +15,16 @@ interface PlayerDao {
     fun insertPlayers(players: List<Player>): Completable
 
     @Delete
-    fun deletePlayer(player: Player)
+    fun deletePlayer(player: Player): Completable
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun updatePlayer(player: Player): Completable
 
     @Query("SELECT * from players WHERE id = :playerID" )
     fun getPlayerById(playerID: Long): LiveData<Player>
+
+    @Query("SELECT * from players WHERE id = :playerID" )
+    fun getPlayerByIdAsSingle(playerID: Long): Single<Player>
 
     @Query("SELECT * FROM players")
     fun getPlayers(): LiveData<List<Player>>

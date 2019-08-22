@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
+import com.telen.easylineup.views.PlayerCard
 
 interface OnPlayerClickListener {
     fun onPlayerSelected(player: Player)
@@ -18,15 +19,10 @@ interface OnPlayerClickListener {
 
 class TeamAdapter(private val context: Context, private val players: List<Player>, val onPlayerClickListener: OnPlayerClickListener?): RecyclerView.Adapter<TeamAdapter.PlayerViewHolder>() {
 
-    class PlayerViewHolder(view: View): RecyclerView.ViewHolder(view) {
-        val rootView = view.findViewById<CardView>(R.id.playerCardRootView)
-        val playerImage = view.findViewById<ImageView>(R.id.playerImage)
-        val playerName = view.findViewById<TextView>(R.id.playerName)
-        val playerShirtNumber = view.findViewById<TextView>(R.id.playerShirtNumber)
-    }
+    class PlayerViewHolder(val card: PlayerCard): RecyclerView.ViewHolder(card)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {
-        val viewItem = LayoutInflater.from(parent.context).inflate(R.layout.item_player_list, parent, false)
+        val viewItem = PlayerCard(context)
         return PlayerViewHolder(viewItem)
     }
 
@@ -37,23 +33,11 @@ class TeamAdapter(private val context: Context, private val players: List<Player
     override fun onBindViewHolder(holder: PlayerViewHolder, position: Int) {
         val player = players[position]
         with(holder) {
-            playerName.text = player.name
-            playerShirtNumber.text = player.shirtNumber.toString()
-            rootView.setOnClickListener {
+            card.setName(player.name)
+            card.setShirtNumber(player.shirtNumber)
+            card.setOnClickListener {
                 onPlayerClickListener?.onPlayerSelected(player)
             }
-
-            val sizePixel = context.resources.getDimensionPixelSize(R.dimen.player_item_image_size)
-
-            Picasso.get()
-                    .load(player.image)
-                    .resize(sizePixel, sizePixel)
-                    .centerCrop()
-                    .error(R.drawable.ic_unknown_field_player)
-                    .placeholder(R.drawable.ic_unknown_field_player)
-                    .into(playerImage)
         }
     }
-
-
 }
