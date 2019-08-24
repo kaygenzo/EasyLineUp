@@ -23,7 +23,7 @@ class PlayerCard: CardView {
         }
     }
 
-    fun setImage(path: String) {
+    fun setImage(path: String?) {
         val sizePixel = context.resources.getDimensionPixelSize(R.dimen.player_item_image_size)
 
         Picasso.get()

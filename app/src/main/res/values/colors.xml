@@ -26,4 +26,12 @@
     <color name="selected_step_circle">#FFFFFFFF</color>
     <color name="selected_step_text">#FF505050</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="tile_team_size_background_color">#1D2E2A</color>
+    <color name="tile_player_most_used_background_color">#719948</color>
+    <color name="tile_player_most_used_background_color_light">#8EAD6D</color>
+    <color name="tile_player_most_used_background_color_lighter">#C8C9A3</color>
+    <color name="tile_player_most_used_header_color">#DCCCAD</color>
+
+    <color name="normal_uppercase_style_text_color">#1C2B06</color>
 </resources>

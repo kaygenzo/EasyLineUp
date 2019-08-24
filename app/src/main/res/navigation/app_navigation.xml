@@ -8,9 +8,9 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.telen.easylineup.currentLineup.LastLineupFragment"
+        android:name="com.telen.easylineup.currentLineup.DashboardFragment"
         android:label="@string/title_last_lineup"
-        tools:layout="@layout/fragment_last_lineup" />
+        tools:layout="@layout/fragment_dashboard" />
 
     <fragment
         android:id="@+id/navigation_lineups"

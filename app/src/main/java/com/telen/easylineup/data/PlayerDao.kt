@@ -29,6 +29,9 @@ interface PlayerDao {
     @Query("SELECT * FROM players")
     fun getPlayers(): LiveData<List<Player>>
 
+    @Query("SELECT * FROM players")
+    fun getPlayersSingle(): Single<List<Player>>
+
     @Query("SELECT players.* FROM players INNER JOIN teams ON players.teamID = teams.id WHERE teams.id = :teamId")
     fun getPlayersForTeam(teamId: Long): LiveData<List<Player>>
 
@@ -42,19 +45,4 @@ interface PlayerDao {
 
     """)
     fun getTeamPlayersWithPositions(lineupID: Long): LiveData<List<PlayerWithPosition>>
-
-//    @Query("""
-//        SELECT players.name as playerName, players.shirtNumber, players.licenseNumber, playerFieldPosition.position, playerFieldPosition.x, playerFieldPosition.y, playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID, players.id as playerID
-//        FROM players
-//        LEFT JOIN playerFieldPosition ON players.id = playerFieldPosition.playerID
-//    """)
-//    fun getTeamPlayersWithPositions(): LiveData<List<PlayerWithPosition>>
-
-//    @Query("""
-//        SELECT players.name as playerName, players.shirtNumber, players.licenseNumber, playerFieldPosition.position, playerFieldPosition.x, playerFieldPosition.y, playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID, players.id as playerID
-//        FROM players
-//        LEFT JOIN playerFieldPosition ON players.id = playerFieldPosition.playerID
-//        WHERE players.teamID = :teamId AND playerFieldPosition.lineupID = :lineupID
-//    """)
-//    fun getTeamPlayersWithPositions(teamId: Long, lineupID: Long): LiveData<List<PlayerWithPosition>>
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.telen.easylineup.views.CardDefenseFixed
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Tile"
+    android:id="@+id/lastEditedLineupCard"
+    android:layout_height="wrap_content"/>
+
+<!--<androidx.cardview.widget.CardView-->
+<!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--style="@style/Tile"-->
+<!--android:id="@+id/lastEditedLineupCard"-->
+<!--android:layout_height="wrap_content">-->
+
+<!--<com.telen.easylineup.views.DefenseFixedView-->
+    <!--android:id="@+id/fieldAndPlayersRootView"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"/>-->
+
+<!--</androidx.cardview.widget.CardView>-->

@@ -73,6 +73,23 @@ interface LineupDao {
     fun getAllPlayersWithPositionsForLineup(lineupId: Long): LiveData<List<PlayerWithPosition>>
 
     @Query("""
+        SELECT players.name as playerName,
+        players.shirtNumber, players.licenseNumber,
+        playerFieldPosition.position,
+        playerFieldPosition.x, playerFieldPosition.y,
+        playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID,
+        playerFieldPosition.lineupID,
+        players.id as playerID,
+        players.teamID, players.image
+        FROM playerFieldPosition
+        INNER JOIN players ON playerFieldPosition.playerID = players.id
+        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
+        WHERE playerFieldPosition.lineupID = :lineupId
+        ORDER BY playerFieldPosition.`order` ASC
+    """)
+    fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): Maybe<List<PlayerWithPosition>>
+
+    @Query("""
         SELECT playerFieldPosition.* FROM playerFieldPosition
         INNER JOIN players ON playerFieldPosition.playerID = players.id
         INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
@@ -89,7 +106,7 @@ interface LineupDao {
     fun getLineupsForTournament(tournamentId: Long): LiveData<List<Lineup>>
 
     @Query("SELECT * FROM lineups ORDER BY editedAt DESC LIMIT 1")
-    fun getLastLineup(): LiveData<Lineup>
+    fun getLastLineup(): Single<Lineup>
 
     @Query("""
         SELECT lineups.name as lineupName, tournaments.name as tournamentName, playerFieldPosition.position, playerFieldPosition.x, playerFieldPosition.y, playerFieldPosition.`order`
@@ -114,4 +131,9 @@ interface LineupDao {
         ORDER BY tournaments.name ASC
     """)
     fun getAllTournamentsWithLineups(): LiveData<List<TournamentWithLineup>>
+
+    @Query("""
+        SELECT playerID, COUNT(*) as size FROM playerFieldPosition GROUP BY playerID ORDER BY 2 DESC
+     """)
+    fun getMostUsedPlayers(): Single<List<PlayerGamesCount>>
 }

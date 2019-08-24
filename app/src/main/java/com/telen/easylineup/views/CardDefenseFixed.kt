@@ -1,7 +1,6 @@
 package com.telen.easylineup.views
 
 import android.content.Context
-import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +12,7 @@ import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.card_defense_fixed.view.*
 
 class CardDefenseFixed: CardView, LoadingCallback {
+
     override fun onStartLoading() {
         progressBar.visibility = View.VISIBLE
     }

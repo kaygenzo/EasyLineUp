@@ -38,6 +38,7 @@ class TeamAdapter(private val context: Context, private val players: List<Player
             card.setOnClickListener {
                 onPlayerClickListener?.onPlayerSelected(player)
             }
+            card.setImage(player.image)
         }
     }
 }
