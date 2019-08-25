@@ -3,6 +3,7 @@ package com.telen.easylineup.team.details
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
+import com.telen.easylineup.data.Player
 import com.telen.easylineup.data.PositionWithLineup
 import io.reactivex.Completable
 
@@ -19,5 +20,11 @@ class PlayerDetailsViewModel: ViewModel() {
             return App.database.playerDao().getPlayerByIdAsSingle(id)
                     .flatMapCompletable { player -> App.database.playerDao().deletePlayer(player) }
         } ?: return Completable.complete()
+    }
+
+    fun getPlayer(): LiveData<Player> {
+        playerID?.let {
+            return App.database.playerDao().getPlayerById(it)
+        } ?: throw IllegalStateException()
     }
 }

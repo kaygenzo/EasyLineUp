@@ -18,7 +18,7 @@ import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.view_radar_chart.view.*
 
 
-class PositionsRadarChart: ConstraintLayout {
+class PositionsRadarChart: RadarChart {
     constructor(context: Context?) : super(context) {init(context)}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {init(context)}
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {init(context)}
@@ -26,7 +26,7 @@ class PositionsRadarChart: ConstraintLayout {
     private fun init(context: Context?) {
         LayoutInflater.from(context).inflate(R.layout.view_radar_chart, this)
 
-        val chart: RadarChart = playerPositionsChart
+        val chart: RadarChart = this
         // create a custom MarkerView (extend MarkerView) and specify the layout
         // to use for it
 
@@ -69,7 +69,7 @@ class PositionsRadarChart: ConstraintLayout {
 
     fun setData(positionsMap: Map<FieldPosition, Int>) {
 
-        val chart = playerPositionsChart
+        val chart = this
 
         val entries: MutableList<RadarEntry> = mutableListOf()
 
@@ -107,6 +107,7 @@ class PositionsRadarChart: ConstraintLayout {
         data.setValueTextColor(Color.BLUE)
 
         chart.setData(data)
+        chart.setExtraOffsets(10f, 10f, 10f, -200f)
         chart.invalidate()
     }
 }

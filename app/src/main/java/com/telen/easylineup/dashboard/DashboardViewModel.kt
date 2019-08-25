@@ -61,14 +61,15 @@ class DashboardViewModel: ViewModel() {
     }
 
     private fun getLastLineup(): Maybe<ITileData> {
-        return App.database.lineupDao().getLastLineup()
-                .flatMapMaybe { Maybe.just(it) }
-                .flatMap {
-                    val name = it.name
-                    App.database.lineupDao().getAllPlayersWithPositionsForLineupRx(it.id)
-                            .map { positions ->
-                                LastLineupData(name, positions)
-                            }
-                }
+//        return App.database.lineupDao().getLastLineup()
+//                .flatMapMaybe { Maybe.just(it) }
+//                .flatMap {
+//                    val name = it.name
+//                    App.database.lineupDao().getAllPlayersWithPositionsForLineupRx(it.id)
+//                            .map { positions ->
+//                                LastLineupData(name, positions)
+//                            }
+//                }
+        return Maybe.empty()
     }
 }

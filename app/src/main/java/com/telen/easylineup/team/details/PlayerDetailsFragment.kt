@@ -9,23 +9,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
+import com.squareup.picasso.Picasso
 import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
-import com.telen.easylineup.data.PositionWithLineup
-import com.telen.easylineup.lineup.list.ListLineupAdapter
 import com.telen.easylineup.utils.Constants
 import com.telen.easylineup.utils.NavigationUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.fragment_player_details.*
 import kotlinx.android.synthetic.main.fragment_player_details.view.*
 
 class PlayerDetailsFragment: Fragment() {
 
-    private lateinit var lineupsAdapter: ListLineupAdapter
     private lateinit var playerDetailsViewModel: PlayerDetailsViewModel
-    private val listLineup: MutableList<PositionWithLineup> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,22 +32,27 @@ class PlayerDetailsFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_player_details, container, false)
 
-        lineupsAdapter = ListLineupAdapter(listLineup)
-
-        val recyclerView = view.playerPositions
-        recyclerView.apply {
-            layoutManager = GridLayoutManager(activity, resources.getInteger(R.integer.player_lineup_list_column_count))
-            adapter = lineupsAdapter
-        }
-
         val playerID = arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
         playerDetailsViewModel.playerID = playerID
 
-        playerDetailsViewModel.getAllLineupsForPlayer(playerID).observe(this, Observer { positions ->
-            listLineup.clear()
-            listLineup.addAll(positions)
-            lineupsAdapter.notifyDataSetChanged()
+        playerDetailsViewModel.getPlayer().observe(this, Observer {
+            it?.let {
+                view.playerLicenseValue.text = it.licenseNumber.toString()
+                view.shirtNumberValue.text = it.shirtNumber.toString()
+                view.playerName.text = it.name
 
+                playerImage.post {
+                    Picasso.get().load(it.image)
+                            .resize(playerImage.width, playerImage.height)
+                            .centerCrop()
+                            .placeholder(R.drawable.ic_unknown_field_player)
+                            .error(R.drawable.ic_unknown_field_player)
+                            .into(playerImage)
+                }
+            }
+        })
+
+        playerDetailsViewModel.getAllLineupsForPlayer(playerID).observe(this, Observer { positions ->
             val chartData: MutableMap<FieldPosition, Int> = mutableMapOf()
             positions.forEach { position ->
                 val fieldPosition = FieldPosition.getFieldPosition(position.position)
@@ -59,6 +60,7 @@ class PlayerDetailsFragment: Fragment() {
                     chartData[element] = chartData[element]?.let { it + 1 } ?: 1
                 }
             }
+            view.gamesPlayedValue.text = positions.size.toString()
             view.positionsChart.setData(chartData)
         })
 

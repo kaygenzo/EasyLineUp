@@ -99,7 +99,7 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    findNavController().popBackStack(R.id.navigation_team, false)
+                    findNavController().navigateUp()
                 }
     }
 

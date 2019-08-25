@@ -28,6 +28,7 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="tile_team_size_background_color">#1D2E2A</color>
+    <color name="tile_player_most_used_background_color_dark">#5A7E2D</color>
     <color name="tile_player_most_used_background_color">#719948</color>
     <color name="tile_player_most_used_background_color_light">#8EAD6D</color>
     <color name="tile_player_most_used_background_color_lighter">#C8C9A3</color>

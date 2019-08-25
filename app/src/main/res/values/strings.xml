@@ -16,7 +16,9 @@
     <string name="dialog_create_lineup_tournament">Tournament</string>
     <string name="player_hint_name">Name</string>
     <string name="player_hint_shirt_number">Shirt number</string>
+    <string name="player_hint_shirt_number_short">Shirt N°</string>
     <string name="player_hint_license_number">License number</string>
+    <string name="player_hint_license_number_short">License N°</string>
 
     <string name="title_last_lineup">Last lineup</string>
     <string name="title_team">My team</string>

@@ -9,7 +9,6 @@ import com.telen.easylineup.dashboard.models.ITileData
 import com.telen.easylineup.dashboard.models.KEY_LINEUP_NAME
 import com.telen.easylineup.dashboard.models.KEY_LINEUP_PLAYERS
 import com.telen.easylineup.data.PlayerWithPosition
-import kotlinx.android.synthetic.main.card_defense_fixed.view.*
 import kotlinx.android.synthetic.main.tile_last_lineup.view.*
 
 class LastLineupTile: ConstraintLayout{
@@ -27,12 +26,10 @@ class LastLineupTile: ConstraintLayout{
         val name = map[KEY_LINEUP_NAME] as String
         val players = map[KEY_LINEUP_PLAYERS] as? List<PlayerWithPosition>
 
-        lastEditedLineupCard.apply {
-            setLineupName(name)
-            players?.let {
-                fieldAndPlayersRootView.setListPlayerInField(it)
+        lineup_name.text = name
+        players?.let {
+            fieldAndPlayersRootView.setListPlayerInField(it)
 //                setListPlayer(it)
-            }
         }
     }
 }
