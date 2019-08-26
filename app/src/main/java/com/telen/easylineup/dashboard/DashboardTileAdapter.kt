@@ -12,7 +12,11 @@ const val TYPE_LAST_LINEUP = 0
 const val TYPE_TEAM_SIZE = 1
 const val TYPE_MOST_USED_PLAYER = 2
 
-class DashboardTileAdapter(val list: List<ITileData>): RecyclerView.Adapter<DashboardTileAdapter.TileViewHolder>() {
+interface TileClickListener {
+    fun onTileClicked(type: Int)
+}
+
+class DashboardTileAdapter(val list: List<ITileData>, val tileClickListener: TileClickListener): RecyclerView.Adapter<DashboardTileAdapter.TileViewHolder>() {
 
     inner class TileViewHolder(val view: View): RecyclerView.ViewHolder(view)
 
@@ -44,14 +48,13 @@ class DashboardTileAdapter(val list: List<ITileData>): RecyclerView.Adapter<Dash
 
     override fun onBindViewHolder(holder: TileViewHolder, position: Int) {
         val element = list[position]
-        if(holder.view is TeamSizeTile) {
-            holder.view.bind(element)
+        when {
+            holder.view is TeamSizeTile -> holder.view.bind(element)
+            holder.view is MostUsedPlayerTile -> holder.view.bind(element)
+            holder.view is LastLineupTile -> holder.view.bind(element)
         }
-        else if(holder.view is MostUsedPlayerTile) {
-            holder.view.bind(element)
-        }
-        else if(holder.view is LastLineupTile) {
-            holder.view.bind(element)
+        holder.view.setOnClickListener {
+            tileClickListener.onTileClicked(element.getType())
         }
     }
 }

@@ -7,15 +7,16 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.telen.easylineup.R
-import com.telen.easylineup.dashboard.DashboardTileAdapter
-import com.telen.easylineup.dashboard.DashboardViewModel
+import com.telen.easylineup.dashboard.*
 import com.telen.easylineup.dashboard.models.ITileData
 import com.telen.easylineup.dashboard.models.LastLineupData
+import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
 
-class DashboardFragment: Fragment() {
+class DashboardFragment: Fragment(), TileClickListener {
 
     lateinit var tileAdapter: DashboardTileAdapter
     lateinit var dashboardViewModel: DashboardViewModel
@@ -24,7 +25,7 @@ class DashboardFragment: Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        tileAdapter = DashboardTileAdapter(tileList)
+        tileAdapter = DashboardTileAdapter(tileList, this)
         dashboardViewModel = ViewModelProviders.of(this)[DashboardViewModel::class.java]
         dataObserver = Observer {
             tileList.clear()
@@ -61,5 +62,16 @@ class DashboardFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         dashboardViewModel.loadTiles()
+    }
+
+    override fun onTileClicked(type: Int) {
+        when(type) {
+            TYPE_TEAM_SIZE -> {
+                findNavController().navigate(R.id.navigation_team, null, NavigationUtils().getOptions())
+            }
+            else -> {
+
+            }
+        }
     }
 }
