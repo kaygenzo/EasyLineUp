@@ -24,15 +24,16 @@ class PlayerCard: CardView {
     }
 
     fun setImage(path: String?) {
-        val sizePixel = context.resources.getDimensionPixelSize(R.dimen.player_item_image_size)
 
-        Picasso.get()
-                .load(path)
-                .resize(sizePixel, sizePixel)
-                .centerCrop()
-                .error(R.drawable.ic_unknown_field_player)
-                .placeholder(R.drawable.ic_unknown_field_player)
-                .into(playerImage)
+        playerImage.post {
+            Picasso.get()
+                    .load(path)
+                    .resize(playerImage.width, playerImage.height)
+                    .centerCrop()
+                    .error(R.drawable.ic_unknown_field_player)
+                    .placeholder(R.drawable.ic_unknown_field_player)
+                    .into(playerImage)
+        }
     }
 
     fun setName(name: String) {

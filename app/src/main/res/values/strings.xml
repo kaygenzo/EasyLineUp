@@ -44,6 +44,7 @@
     <string name="dialog_delete_cannot_undo_message">This action cannot be undo, are you sure ?</string>
 
     <string name="tile_team_size_message">%d players in your team</string>
+    <string name="tile_team_size_warning_message">Not enough players to have a complete team!</string>
     <string name="tile_most_used_player_header">Most used player</string>
     <string name="tile_most_used_player_games_played">Games played</string>
 

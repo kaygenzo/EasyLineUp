@@ -1,23 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--<color name="colorPrimary">#008577</color>-->
-    <color name="colorPrimary">#4A9B52</color>
-    <!--<color name="colorPrimaryDark">#00574b</color>-->
-    <color name="colorPrimaryDark">#367034</color>
-    <color name="colorAccent">#D81B60</color>
-
-    <!--<color name="colorPrimary">@color/primaryColor</color>-->
-    <!--<color name="colorPrimaryDark">@color/primaryDarkColor</color>-->
-    <!--<color name="colorAccent">@color/secondaryColor</color>-->
-
-    <!--<color name="primaryColor">#1a237e</color>-->
-    <!--<color name="primaryLightColor">#534bae</color>-->
-    <!--<color name="primaryDarkColor">#000051</color>-->
-    <!--<color name="secondaryColor">#dd2c00</color>-->
-    <!--<color name="secondaryLightColor">#ff6434</color>-->
-    <!--<color name="secondaryDarkColor">#a30000</color>-->
-    <!--<color name="primaryTextColor">#ffffff</color>-->
-    <!--<color name="secondaryTextColor">#ffffff</color>-->
+    <color name="colorPrimary">#5a7e2d</color>
+    <color name="colorPrimaryLight">#89ad59</color>
+    <color name="colorPrimaryDark">#2d5100</color>
+    <color name="primaryTextColor">#ffffff</color>
+    <color name="colorAccent">#2d5100</color>
 
     <color name="number_blue">#FF2D3783</color>
     <color name="text_orange">#FFd37240</color>
@@ -35,4 +22,6 @@
     <color name="tile_player_most_used_header_color">#DCCCAD</color>
 
     <color name="normal_uppercase_style_text_color">#1C2B06</color>
+
+    <color name="tile_player_size_warning">#CC0000</color>
 </resources>

@@ -19,4 +19,5 @@
     <dimen name="card_defense_header_height">20dp</dimen>
 
     <dimen name="player_item_image_size">200dp</dimen>
+    <dimen name="player_details_container_separator_width">2dp</dimen>
 </resources>
