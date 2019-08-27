@@ -19,9 +19,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             android:text="@string/tile_most_used_player_header"
-            android:textSize="15sp"
-            android:gravity="center"
-            android:padding="4dp"/>
+            android:padding="@dimen/player_details_container_separator_width"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -38,13 +36,12 @@
                 app:layout_constraintGuide_percent="0.5" />
 
             <ImageView
-                style="@style/Field.Green"
                 android:id="@+id/tile_player_most_used_image"
                 android:src="@drawable/ic_unknown_field_player"
-                android:layout_width="100dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/tile_most_used_player_image_size"
+                android:layout_height="@dimen/tile_most_used_player_image_size"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/guidelineMiddle"
+                app:layout_constraintBottom_toTopOf="@+id/tile_player_most_used_match_played_container"
                 app:layout_constraintLeft_toLeftOf="parent"/>
 
             <com.telen.easylineup.views.NumberedStyledTextView
@@ -55,10 +52,8 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tile_player_most_used_image"
                 app:layout_constraintBottom_toBottomOf="@id/tile_player_most_used_image"
-                style="@style/Field.Green.Light"
+                style="@style/Field.Green.Light.Biggest"
                 tools:text="20"
-                android:gravity="center"
-                android:textSize="70sp"
                 android:layout_marginStart="@dimen/player_details_container_separator_width"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -70,12 +65,11 @@
                 android:layout_marginTop="@dimen/player_details_container_separator_width">
 
                 <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                    style="@style/Field.Green"
+                    style="@style/Field.Green.Small"
                     android:id="@+id/tile_player_most_used_match_played_label"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:text="@string/tile_most_used_player_games_played"
-                    android:textSize="20sp"
                     android:gravity="center"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -83,13 +77,11 @@
                     app:layout_constraintRight_toLeftOf="@+id/tile_player_most_used_match_played_value" />
 
                 <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                    style="@style/Field.Green.Light"
+                    style="@style/Field.Green.Light.Biggest"
                     android:id="@+id/tile_player_most_used_match_played_value"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     tools:text="42"
-                    android:textSize="50sp"
-                    android:gravity="center"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -98,15 +90,13 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                style="@style/Field.Green.Lighter"
+                style="@style/Field.Green.Lighter.Big"
                 android:id="@+id/tile_player_most_used_name"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tile_player_most_used_match_played_container"
                 tools:text="Player"
-                android:textSize="30sp"
-                android:gravity="center"
                 android:layout_marginTop="@dimen/player_details_container_separator_width"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

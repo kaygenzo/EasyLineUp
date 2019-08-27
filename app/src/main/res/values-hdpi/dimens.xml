@@ -10,5 +10,6 @@
     <dimen name="player_details_picture_width">100dp</dimen>
     <dimen name="player_details_picture_height">120dp</dimen>
 
-    <dimen name="dashboard_tile_height">200dp</dimen>
+    <dimen name="dashboard_tile_height">220dp</dimen>
+    <dimen name="tile_most_used_player_image_size">60dp</dimen>
 </resources>

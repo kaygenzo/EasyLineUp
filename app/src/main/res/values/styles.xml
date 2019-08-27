@@ -120,6 +120,7 @@
 
     <style name="Field.Header" parent="Field">
         <item name="android:background">@color/tile_player_most_used_header_color</item>
+        <item name="android:textSize">@dimen/text_size_smallest</item>
     </style>
 
     <!-- DRAWER -->

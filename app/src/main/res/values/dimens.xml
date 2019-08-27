@@ -35,4 +35,5 @@
     <dimen name="player_details_picture_width">120dp</dimen>
     <dimen name="player_details_picture_height">150dp</dimen>
     <dimen name="player_item_image_size">@dimen/player_details_picture_height</dimen>
+    <dimen name="tile_most_used_player_image_size">80dp</dimen>
 </resources>
