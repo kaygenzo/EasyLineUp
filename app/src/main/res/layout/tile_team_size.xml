@@ -20,7 +20,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             tools:text="42 players in your team very long"
             android:gravity="center"
-            android:textSize="20sp"
+            android:textSize="@dimen/text_size_small"
             android:layout_margin="20dp"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -28,9 +28,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginStart="20dp">
+            android:layout_marginTop="@dimen/default_margin"
+            android:layout_marginEnd="@dimen/default_margin"
+            android:layout_marginStart="@dimen/default_margin">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/warningIcon"
@@ -50,7 +50,7 @@
                 android:text="@string/tile_team_size_warning_message"
                 android:textColor="@color/tile_player_size_warning"
                 android:lines="3"
-                android:textSize="16sp"
+                android:textSize="@dimen/text_size_smallest"
                 android:gravity="right|center_vertical"
                 android:layout_marginEnd="10dp"
                 android:textStyle="italic"/>

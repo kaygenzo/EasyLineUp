@@ -18,6 +18,21 @@
 
     <dimen name="card_defense_header_height">20dp</dimen>
 
-    <dimen name="player_item_image_size">200dp</dimen>
     <dimen name="player_details_container_separator_width">2dp</dimen>
+
+    <dimen name="dashboard_tile_height">300dp</dimen>
+
+    <dimen name="text_size_smallest">15sp</dimen>
+    <dimen name="text_size_small">20sp</dimen>
+    <dimen name="text_size_middle">25sp</dimen>
+    <dimen name="text_size_big">30sp</dimen>
+    <dimen name="text_size_biggest">60sp</dimen>
+
+    <dimen name="default_margin">20dp</dimen>
+
+    <dimen name="radar_chart_size">175dp</dimen>
+
+    <dimen name="player_details_picture_width">120dp</dimen>
+    <dimen name="player_details_picture_height">150dp</dimen>
+    <dimen name="player_item_image_size">@dimen/player_details_picture_height</dimen>
 </resources>
