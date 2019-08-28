@@ -13,6 +13,14 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+<!--    <style name="AppTheme.TextInputLayout" parent="Widget.Design.TextInputLayout">-->
+<!--        <item name="android:textColor">#FF00FF</item>-->
+<!--        <item name="android:textColorHint">@color/white</item>-->
+<!--        <item name="colorControlNormal">#0000FF</item>-->
+<!--        <item name="colorControlActivated">#00FF00</item>-->
+<!--        <item name="colorControlHighlight">#FF0000</item>-->
+<!--    </style>-->
+
     <style name="AppTheme.NoActionBar.FullScreen" parent="AppTheme.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>

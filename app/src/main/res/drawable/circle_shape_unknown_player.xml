@@ -10,6 +10,6 @@
         android:radius="16dp"/>
 
     <size
-        android:height="@dimen/player_screen_icon_size"
-        android:width="@dimen/player_screen_icon_size"/>
+        android:height="@dimen/image_circle_size"
+        android:width="@dimen/image_circle_size"/>
 </shape>

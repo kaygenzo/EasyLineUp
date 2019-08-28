@@ -2,4 +2,5 @@
 <resources>
     <dimen name="player_details_picture_width">140dp</dimen>
     <dimen name="player_details_picture_height">180dp</dimen>
+    <dimen name="image_circle_size">100dp</dimen>
 </resources>

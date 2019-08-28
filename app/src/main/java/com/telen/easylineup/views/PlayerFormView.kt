@@ -154,21 +154,22 @@ class PlayerFormView: ConstraintLayout {
 
     fun setImage(uri: Uri) {
 
-        val sizePixels = playerImage.context.resources.getDimensionPixelSize(R.dimen.player_screen_icon_size)
-
         imageUri = uri
-        Picasso.get().load(uri)
-                .resize(sizePixels, sizePixels)
-                .centerCrop()
-                .transform(RoundedTransformationBuilder()
-                        .borderColor(Color.BLACK)
-                        .borderWidthDp(2f)
-                        .cornerRadiusDp(16f)
-                        .oval(true)
-                        .build())
-                .placeholder(R.drawable.unknown_player)
-                .error(R.drawable.unknown_player)
-                .into(playerImage)
+
+        playerImage.post {
+            Picasso.get().load(uri)
+                    .resize(playerImage.width, playerImage.height)
+                    .centerCrop()
+                    .transform(RoundedTransformationBuilder()
+                            .borderColor(Color.BLACK)
+                            .borderWidthDp(2f)
+                            .cornerRadiusDp(16f)
+                            .oval(true)
+                            .build())
+                    .placeholder(R.drawable.unknown_player)
+                    .error(R.drawable.unknown_player)
+                    .into(playerImage)
+        }
     }
 
     fun enableSaveButton() {

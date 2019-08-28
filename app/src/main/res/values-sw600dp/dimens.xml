@@ -1,6 +1,6 @@
 <resources>
     <dimen name="field_size">500dp</dimen>
-    <dimen name="player_screen_icon_size">300dp</dimen>
+    <dimen name="image_circle_size">300dp</dimen>
     <dimen name="lineup_title_size">40sp</dimen>
     <dimen name="item_lineup_list_title_size">25sp</dimen>
 

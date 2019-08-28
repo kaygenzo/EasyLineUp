@@ -10,7 +10,7 @@
     app:cardCornerRadius="6dp"
     app:cardElevation="2dp"
     app:cardBackgroundColor="#a0FFFFFF"
-    tools:layout_width="@dimen/player_item_image_size">
+    tools:layout_width="@dimen/image_item_player">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/playerImage"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/player_item_image_size"
+            android:layout_height="@dimen/image_item_player"
             app:srcCompat="@drawable/ic_unknown_field_player"
             android:scaleType="centerInside"
             app:layout_constraintLeft_toLeftOf="parent"
