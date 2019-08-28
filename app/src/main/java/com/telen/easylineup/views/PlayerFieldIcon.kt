@@ -26,7 +26,7 @@ class PlayerFieldIcon: LinearLayout {
     fun setPlayerImage(url: String?, size: Int) {
         Picasso.get().load(url)
                 .resize(size, size)
-                .centerInside()
+                .centerCrop()
                 .transform(RoundedTransformationBuilder()
                         .borderColor(Color.BLACK)
                         .borderWidthDp(2f)
