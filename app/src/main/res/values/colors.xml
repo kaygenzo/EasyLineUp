@@ -24,4 +24,6 @@
     <color name="normal_uppercase_style_text_color">#1C2B06</color>
 
     <color name="tile_player_size_warning">#CC0000</color>
+
+    <color name="baseball_field_color">@color/colorPrimary</color>
 </resources>

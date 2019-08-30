@@ -48,4 +48,8 @@
     <string name="tile_most_used_player_header">Most used player</string>
     <string name="tile_most_used_player_games_played">Games played</string>
 
+    <string name="header_batting_order_player_name">Player name</string>
+    <string name="header_batting_order_player_shirt">N°</string>
+    <string name="header_batting_order_player_position">Pos.</string>
+
 </resources>

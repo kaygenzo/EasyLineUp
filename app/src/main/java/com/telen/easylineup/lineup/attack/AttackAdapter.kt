@@ -3,6 +3,7 @@ package com.telen.easylineup.lineup.attack
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
@@ -19,7 +20,7 @@ interface OnDataChangedListener {
     fun onOrderChanged()
 }
 
-class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, val dataListener: OnDataChangedListener?): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
+class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, val dataListener: OnDataChangedListener?, val isEditable: Boolean): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
 
     override fun onDragStart() {
 
@@ -44,9 +45,10 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
 
     class BatterViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val playerName = view.findViewById<TextView>(R.id.playerName)
-        val shortNumber = view.findViewById<TextView>(R.id.shortNumber)
+        val shortNumber = view.findViewById<TextView>(R.id.shirtNumber)
         val fieldPosition = view.findViewById<TextView>(R.id.fieldPosition)
         val order = view.findViewById<TextView>(R.id.order)
+        val reorderImage = view.findViewById<ImageView>(R.id.reorderImage)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BatterViewHolder {
@@ -65,6 +67,10 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
             shortNumber.text = player.shirtNumber.toString()
             fieldPosition.text = player.position.toString()
             order.text = player.order.toString()
+            if(!isEditable)
+                reorderImage.visibility = View.GONE
+            else
+                reorderImage.visibility = View.VISIBLE
         }
     }
 }

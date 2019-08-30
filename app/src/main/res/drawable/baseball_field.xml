@@ -4,7 +4,7 @@
     android:viewportWidth="550.0"
     android:viewportHeight="550.0">
     <path
-        android:fillColor="#00a831"
+        android:fillColor="@color/baseball_field_color"
         android:pathData="M0,0 h 550 v 550 h -550z" />
 
 
@@ -36,7 +36,7 @@
         a 200,200 0 1,0 -400,0"/>
 
     <path
-        android:fillColor="#00a831"
+        android:fillColor="@color/baseball_field_color"
         android:pathData="
         M 275,450
         L 550,200
@@ -44,7 +44,7 @@
         Z" />
 
     <path
-        android:fillColor="#00a831"
+        android:fillColor="@color/baseball_field_color"
         android:pathData="
         M 275,450
         L 0,200
@@ -52,7 +52,7 @@
         Z" />
 
     <path
-        android:fillColor="#00a831"
+        android:fillColor="@color/baseball_field_color"
         android:strokeColor="#85881b"
         android:strokeAlpha="1"
         android:strokeWidth="6"

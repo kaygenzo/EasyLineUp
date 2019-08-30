@@ -7,13 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.data.PlayerWithPosition
 import com.telen.easylineup.lineup.PlayersPositionViewModel
-import com.telen.easylineup.utils.Constants
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_list_batter.view.*
@@ -29,27 +28,31 @@ class AttackFragment: Fragment(), OnDataChangedListener {
     private lateinit var itemTouchedCallback: AttackItemTouchCallback
     private lateinit var itemTouchedHelper: ItemTouchHelper
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        playerAdapter = BattingOrderAdapter(adapterDataList, this)
-        itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
-        itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_list_batter, container, false)
 
-        view.recyclerView.apply {
-            layoutManager = LinearLayoutManager(activity)
-            adapter = playerAdapter
-        }
+        val linearLayoutManager = LinearLayoutManager(activity)
+        val dividerItemDecoration = DividerItemDecoration(context, linearLayoutManager.orientation)
 
         parentFragment?.let { parent ->
             viewModel = ViewModelProviders.of(parent).get(PlayersPositionViewModel::class.java)
+            val isEditable = viewModel.editable
 
-            viewModel.editable?.takeIf { it }?.let {
+            playerAdapter = BattingOrderAdapter(adapterDataList, this, isEditable)
+            itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
+            itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
+
+            view.recyclerView.apply {
+                layoutManager = linearLayoutManager
+                addItemDecoration(dividerItemDecoration)
+                adapter = playerAdapter
+            }
+
+            isEditable.takeIf { it }?.let {
                 itemTouchedHelper.attachToRecyclerView(view.recyclerView)
             }
+
+            view.header.setIsEditable(isEditable)
 
             viewModel.lineupID?.let {
                 viewModel.getPlayersWithPositions(it).observe(this, Observer { items ->

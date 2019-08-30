@@ -8,7 +8,7 @@
 
     <ImageView
         android:id="@+id/reorderImage"
-        android:layout_width="@dimen/item_attack_width"
+        android:layout_width="@dimen/item_attack_height"
         android:layout_height="match_parent"
         app:srcCompat="@drawable/ic_reorder_black_24dp"
         android:padding="8dp"
@@ -26,7 +26,7 @@
         android:gravity="center"
         android:textSize="@dimen/item_attack_text_size"/>
 
-    <com.telen.easylineup.views.HandmadeStyledTextView
+    <TextView
         android:id="@+id/playerName"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -42,18 +42,18 @@
         android:paddingEnd="10dp"
         tools:text="Player Name very long for test" />
 
-    <com.telen.easylineup.views.HandmadeStyledTextView
+    <TextView
         android:id="@+id/fieldPosition"
         android:layout_width="@dimen/item_attack_width"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/shirtNumber"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="1"
+        tools:text="9"
         android:gravity="center"
         android:textSize="@dimen/item_attack_text_size"/>
 
-    <com.telen.easylineup.views.HandmadeStyledTextView
+    <TextView
         android:id="@+id/shirtNumber"
         android:layout_width="@dimen/item_attack_width"
         android:layout_height="match_parent"
