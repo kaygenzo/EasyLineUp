@@ -9,6 +9,7 @@ import com.telen.easylineup.App
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
+import com.telen.easylineup.mock.DatabaseMockProvider
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -22,7 +23,11 @@ class SplashScreenActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splashscreen)
         appVersion.text = BuildConfig.VERSION_NAME
-        Completable.timer(3000, TimeUnit.MILLISECONDS)
+        var commands: Completable = Completable.timer(3000, TimeUnit.MILLISECONDS)
+        if(BuildConfig.usePrefilledDatabase) {
+            commands = commands.andThen(DatabaseMockProvider().createMockDatabase(this))
+        }
+        commands
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     App.database.teamDao().getTeams().observe(this, Observer {

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pl.hypeapp.materialtimelineview.MaterialTimelineView
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/material_timeline_view"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:background="@android:color/transparent"
+    app:timeline_top_radio_color="@color/tournaments_timeline_color"
+    app:timeline_bottom_radio_color="@color/tournaments_timeline_color"
+    app:timeline_line_color="@color/tournaments_timeline_color"
+    app:timeline_type="line"
+    app:timeline_position="middle"
+    app:timeline_margin_start="@dimen/timeline_radio_margin_left"
+    app:timeline_radio_outline_radius="@integer/timeline_radio_radius_outline"
+    app:timeline_radio_radius="@integer/timeline_radio_radius"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.telen.easylineup.views.CollegedStyledTextView
+            android:id="@+id/tournamentName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/tournamentDate"
+            android:textSize="@dimen/text_size_middle"
+            tools:text="Name"
+            app:layout_constraintVertical_chainStyle="packed"/>
+
+        <TextView
+            android:id="@+id/tournamentDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            app:layout_constraintTop_toBottomOf="@+id/tournamentName"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="31/12/2019"
+            android:textSize="@dimen/text_size_middle"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</pl.hypeapp.materialtimelineview.MaterialTimelineView>

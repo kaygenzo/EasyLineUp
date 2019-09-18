@@ -15,4 +15,19 @@ class NavigationUtils {
             }
         }
     }
+
+    fun getOptionsWithPopDestination(popDestination: Int, isInclusive: Boolean) : NavOptions {
+        return navOptions {
+            anim {
+                enter = R.anim.slide_in_right
+                exit = R.anim.slide_out_left
+                popEnter = R.anim.slide_in_left
+                popExit = R.anim.slide_out_right
+            }
+
+            popUpTo(popDestination) {
+                inclusive = isInclusive
+            }
+        }
+    }
 }

@@ -5,31 +5,132 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="20dp"
-    android:padding="20dp">
+    android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/lineupTitle"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:textSize="20sp"
+        android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/tournamentChoiceAutoComplete"
-        app:layout_constraintVertical_chainStyle="packed"
-        android:hint="@string/dialog_create_lineup_name"
-        android:layout_marginBottom="20dp"/>
+        app:layout_constraintBottom_toTopOf="@+id/actionContainer">
 
-    <androidx.appcompat.widget.AppCompatAutoCompleteTextView
-        android:id="@+id/tournamentChoiceAutoComplete"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:textSize="20sp"
-        tools:text="The tournament"
-        android:hint="@string/dialog_create_lineup_tournament"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/lineupTitleInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="@string/dialog_create_lineup_name">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/lineupTitleInput"
+                    android:inputType="textPersonName"
+                    tools:text="The lineup name"
+                    android:textSize="@dimen/text_size_big"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tournamentTitleInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="@string/dialog_create_lineup_tournament">
+
+                <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+                    android:id="@+id/tournamentChoiceAutoComplete"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="@dimen/text_size_big"
+                    tools:text="The tournament"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/expandableContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/expandableButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/expandableLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@+id/expandableArrow"
+                        android:text="@string/form_lineup_creation_more_label"
+                        android:gravity="center_vertical"
+                        android:textSize="20sp"/>
+
+                    <ImageView
+                        android:id="@+id/expandableArrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        android:gravity="center_vertical"
+                        app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <net.cachapa.expandablelayout.ExpandableLayout
+                    android:id="@+id/expandableView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/expandableButton"
+                    app:el_duration="1000"
+                    app:el_expanded="false"
+                    app:el_parallax="0.5">
+
+                    <CalendarView
+                        android:id="@+id/calendarView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </net.cachapa.expandablelayout.ExpandableLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </ScrollView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/actionContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lineupTitle"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
+        android:layout_margin="@dimen/default_margin">
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/background_negative_button"
+            android:textColor="@color/colorAccent"
+            android:text="@string/cancel_button"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/save"
+            android:layout_marginEnd="10dp" />
+
+        <Button
+            android:id="@+id/save"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/background_positive_button"
+            android:textColor="#FFFFFFFF"
+            android:text="@string/save_button"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/cancel" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

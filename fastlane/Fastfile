@@ -27,6 +27,36 @@ platform :android do
     gradle(task: "test")
   end
 
+  desc "Runs tests with usage of emulator plugin"
+  lane :automation_integrationTests do
+
+    build_android_app(
+      task: 'assembleDemo',
+      build_type: 'Debug'
+    )
+    build_android_app(
+      task: 'assembleDemoDebug',
+      build_type: 'AndroidTest'
+    )
+
+    desc "Build debug and test APK for screenshots"
+    automated_test_emulator_run(
+      AVD_setup_path: "./AVD_config.json",
+      AVD_path: "~/Library/Android/sdk/tools/bin/avdmanager",
+      SDK_path: "~/Library/Android/sdk",
+      shell_task: "fastlane build_for_screengrab"
+    )
+  end
+
+  lane :build_for_screengrab do
+    capture_android_screenshots(
+      locales: ["en-US"],
+      clear_previous_screenshots: true,
+      app_apk_path: "app/build/outputs/apk/demo/debug/app-demo-debug.apk",
+      tests_apk_path: "app/build/outputs/apk/androidTest/demo/debug/app-demo-debug-androidTest.apk"
+    )
+  end
+
   desc "Submit a new Beta Build to Crashlytics Beta"
   lane :beta do
     build_android_app(task: "assembleRelease")

@@ -1,0 +1,279 @@
+{
+  "team": {
+    "id": 1,
+    "name": "DC Univers",
+    "image": "https://cdn.tomsguide.fr/content/uploads/sites/2/2016/10/batman3.jpg"
+  },
+  "players": [
+    {
+      "id": 1,
+      "teamId": 1,
+      "name": "Albert",
+      "shirtNumber": 90,
+      "licenseNumber": 2
+    },
+    {
+      "id": 2,
+      "teamId": 1,
+      "name": "Bernard",
+      "shirtNumber": 10,
+      "licenseNumber": 3
+    },
+    {
+      "id": 3,
+      "teamId": 1,
+      "name": "Chrystel",
+      "shirtNumber": 24,
+      "licenseNumber": 4
+    },
+    {
+      "id": 4,
+      "teamId": 1,
+      "name": "Damien",
+      "shirtNumber": 1,
+      "licenseNumber": 5
+    },
+    {
+      "id": 5,
+      "teamId": 1,
+      "name": "Estelle",
+      "shirtNumber": 2,
+      "licenseNumber": 6
+    },
+    {
+      "id": 6,
+      "teamId": 1,
+      "name": "Fanny",
+      "shirtNumber": 3,
+      "licenseNumber": 7
+    },
+    {
+      "id": 7,
+      "teamId": 1,
+      "name": "Gregoire",
+      "shirtNumber": 4,
+      "licenseNumber": 8
+    },
+    {
+      "id": 8,
+      "teamId": 1,
+      "name": "Hans",
+      "shirtNumber": 5,
+      "licenseNumber": 9
+    },
+    {
+      "id": 9,
+      "teamId": 1,
+      "name": "Ivan",
+      "shirtNumber": 6,
+      "licenseNumber": 10
+    },
+    {
+      "id": 10,
+      "teamId": 1,
+      "name": "John",
+      "shirtNumber": 7,
+      "licenseNumber": 11
+    },
+    {
+      "id": 11,
+      "teamId": 1,
+      "name": "Karine",
+      "shirtNumber": 20,
+      "licenseNumber": 1
+    }
+  ],
+  "tournaments": [
+    {
+      "id": 1,
+      "name": "Paris Series",
+      "createdAt": 1514977200000
+    },
+    {
+      "id": 2,
+      "name": "AllStars Series",
+      "createdAt": 1514890800000
+    },
+    {
+      "id": 3,
+      "name": "London Series",
+      "createdAt": 1514804400000
+    }
+  ],
+  "lineups": [
+    {
+      "id": 1,
+      "name":  "DC vs DC 1",
+      "teamId": 1,
+      "tournamentId": 1,
+      "createdTimeInMillis": 1567368919,
+      "editedTimeInMillis": 1567368919
+    },
+    {
+      "id": 2,
+      "name":  "DC vs DC 2",
+      "teamId": 1,
+      "tournamentId": 1,
+      "createdTimeInMillis": 1567368920,
+      "editedTimeInMillis": 1567368920
+    },
+    {
+      "id": 3,
+      "name":  "DC vs DC 3",
+      "teamId": 1,
+      "tournamentId": 1,
+      "createdTimeInMillis": 1567368921,
+      "editedTimeInMillis": 1567368921
+    },
+    {
+      "id": 4,
+      "name":  "DC vs DC 4",
+      "teamId": 1,
+      "tournamentId": 1,
+      "createdTimeInMillis": 1567368922,
+      "editedTimeInMillis": 1567368922
+    },
+    {
+      "id": 5,
+      "name":  "DC vs DC 5",
+      "teamId": 1,
+      "tournamentId": 1,
+      "createdTimeInMillis": 1567368923,
+      "editedTimeInMillis": 1567368923
+    },
+    {
+      "id": 6,
+      "name":  "DC vs DC 6",
+      "teamId": 1,
+      "tournamentId": 2,
+      "createdTimeInMillis": 1567368924,
+      "editedTimeInMillis": 1567368924
+    },
+    {
+      "id": 7,
+      "name":  "DC vs DC 7",
+      "teamId": 1,
+      "tournamentId": 3,
+      "createdTimeInMillis": 1567368925,
+      "editedTimeInMillis": 1567368925
+    },
+    {
+      "id": 8,
+      "name":  "DC vs DC 8",
+      "teamId": 1,
+      "tournamentId": 3,
+      "createdTimeInMillis": 1567368926,
+      "editedTimeInMillis": 1567368926
+    }
+  ],
+  "playerPositions": [
+    {
+      "id": 1,
+      "playerId": 1,
+      "lineupId": 1,
+      "position": 1,
+      "x": 10,
+      "y": 10,
+      "order": 1
+    },
+    {
+      "id": 2,
+      "playerId": 2,
+      "lineupId": 1,
+      "position": 2,
+      "x": 20,
+      "y": 20,
+      "order": 2
+    },
+    {
+      "id": 3,
+      "playerId": 3,
+      "lineupId": 1,
+      "position": 3,
+      "x": 30,
+      "y": 30,
+      "order": 3
+    },
+    {
+      "id": 4,
+      "playerId": 4,
+      "lineupId": 1,
+      "position": 4,
+      "x": 40,
+      "y": 40,
+      "order": 4
+    },
+    {
+      "id": 5,
+      "playerId": 5,
+      "lineupId": 1,
+      "position": 5,
+      "x": 50,
+      "y": 50,
+      "order": 5
+    },
+    {
+      "id": 6,
+      "playerId": 6,
+      "lineupId": 1,
+      "position": 6,
+      "x": 60,
+      "y": 60,
+      "order": 6
+    },
+    {
+      "id": 7,
+      "playerId": 7,
+      "lineupId": 1,
+      "position": 7,
+      "x": 70,
+      "y": 70,
+      "order": 7
+    },
+    {
+      "id": 8,
+      "playerId": 8,
+      "lineupId": 1,
+      "position": 8,
+      "x": 80,
+      "y": 80,
+      "order": 8
+    },
+    {
+      "id": 9,
+      "playerId": 9,
+      "lineupId": 1,
+      "position": 9,
+      "x": 90,
+      "y": 90,
+      "order": 9
+    },
+    {
+      "id": 10,
+      "playerId": 1,
+      "lineupId": 6,
+      "position": 8,
+      "x": 50,
+      "y": 50,
+      "order": 1
+    },
+    {
+      "id": 11,
+      "playerId": 1,
+      "lineupId": 7,
+      "position": 9,
+      "x": 50,
+      "y": 50,
+      "order": 1
+    },
+    {
+      "id": 12,
+      "playerId": 1,
+      "lineupId": 8,
+      "position": 7,
+      "x": 50,
+      "y": 50,
+      "order": 1
+    }
+  ]
+}

@@ -121,6 +121,7 @@ interface LineupDao {
     @Query("""
         SELECT tournaments.id as tournamentID,
         tournaments.name as tournamentName,
+        tournaments.createdAt as tournamentCreatedAt,
         playerFieldPosition.id as fieldPositionID,
         lineups.name as lineupName,
         lineups.id as lineupID,
@@ -128,7 +129,7 @@ interface LineupDao {
         FROM tournaments
         LEFT JOIN lineups ON tournaments.id = lineups.tournamentID
         LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = lineups.id
-        ORDER BY tournaments.name ASC
+        ORDER BY tournaments.createdAt DESC
     """)
     fun getAllTournamentsWithLineups(): LiveData<List<TournamentWithLineup>>
 

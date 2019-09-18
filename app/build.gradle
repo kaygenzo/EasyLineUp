@@ -28,10 +28,15 @@ android {
         targetSdkVersion 28
         versionCode 105
         versionName "1.0.5"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary true
+        buildConfigField("boolean", "usePrefilledDatabase", "false")
     }
+
+    useLibrary 'android.test.runner'
+    useLibrary 'android.test.base'
+    useLibrary 'android.test.mock'
 
     flavorDimensions 'version'
 
@@ -59,6 +64,11 @@ android {
         prod {
             dimension 'version'
             signingConfig signingConfigs.release
+        }
+        demo {
+            dimension 'version'
+            signingConfig signingConfigs.debug
+            buildConfigField("boolean", "usePrefilledDatabase", "true")
         }
     }
 
@@ -92,15 +102,44 @@ android {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.annotation:annotation:' + rootProject.androidxLibVersion
 
+    // Testing-only dependencies
+    androidTestImplementation 'androidx.test:core:' + rootProject.coreVersion
+    androidTestImplementation 'androidx.test:core-ktx:' + rootProject.coreVersion
+    androidTestImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion
+    androidTestImplementation 'androidx.test.ext:junit-ktx:' + rootProject.extJUnitVersion
+    androidTestImplementation 'androidx.test:runner:' + rootProject.runnerVersion
+    androidTestImplementation 'androidx.test:rules:' + rootProject.runnerVersion
+
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+    androidTestImplementation ('tools.fastlane:screengrab:1.2.0') {
+        exclude group: 'com.android.support.test.uiautomator', module: 'uiautomator-v18'
+    }
+    androidTestImplementation('com.schibsted.spain:barista:3.2.0') {
+        exclude group: 'org.jetbrains.kotlin' // Only if you already use Kotlin in your project
+    }
+
+//    androidTestImplementation 'androidx.test.espresso:espresso-contrib:'+ rootProject.espressoVersion
+//    androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoVersion
+
+//    testImplementation 'androidx.test:core:' + rootProject.coreVersion
+//    testImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion
 //    testImplementation 'junit:junit:4.12'
-//    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-//    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+//    testImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoVersion
+//    testImplementation 'androidx.test.espresso:espresso-intents:' + rootProject.espressoVersion
+//    testImplementation 'androidx.test.ext:truth:' + rootProject.extTruthVersion
 
     def lifecycle_version = "2.0.0"
 
@@ -121,7 +160,6 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
-    implementation 'io.github.luizgrp.sectionedrecyclerviewadapter:sectionedrecyclerviewadapter:2.0.0'
     implementation 'cn.aigestudio.wheelpicker:WheelPicker:1.1.2'
 
     implementation('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
@@ -147,4 +185,10 @@ dependencies {
     implementation 'com.makeramen:roundedimageview:2.3.0'
 
 //    implementation 'com.facebook.stetho:stetho:1.5.1'
+
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    implementation 'pl.hypeapp:materialtimelineview:1.1'
+
+    implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
 }

@@ -9,5 +9,6 @@ import androidx.room.PrimaryKey
 )
 data class Tournament(
         @PrimaryKey(autoGenerate = true) var id: Long = 0,
-        @ColumnInfo(name = "name") val name: String
+        @ColumnInfo(name = "name") val name: String,
+        @ColumnInfo(name = "createdAt") var createdAt: Long
 )

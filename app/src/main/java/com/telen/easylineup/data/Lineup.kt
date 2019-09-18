@@ -77,6 +77,7 @@ data class PositionWithLineup(
 data class TournamentWithLineup(
         @ColumnInfo(name = "tournamentID") var tournamentID: Long = 0,
         @ColumnInfo(name = "tournamentName") var tournamentName: String = "",
+        @ColumnInfo(name = "tournamentCreatedAt") var tournamentCreatedAt: Long = 0,
         @ColumnInfo(name = "fieldPositionID") var fieldPositionID: Long = 0,
         @ColumnInfo(name = "lineupName") var lineupName: String? = "",
         @ColumnInfo(name = "lineupID") var lineupID: Long = 0,
@@ -84,7 +85,7 @@ data class TournamentWithLineup(
         @ColumnInfo(name = "y") var y: Float = 0f
 ) {
     fun toTournament() : Tournament {
-        return Tournament(id = tournamentID, name = tournamentName)
+        return Tournament(id = tournamentID, name = tournamentName, createdAt = tournamentCreatedAt)
     }
 
     fun toLineup(): Lineup {

@@ -14,9 +14,9 @@
 
     <fragment
         android:id="@+id/navigation_lineups"
-        android:name="com.telen.easylineup.lineup.list.CategorizedListLineupFragment"
+        android:name="com.telen.easylineup.lineup.list.TournamentListFragment"
         android:label="@string/title_lineups"
-        tools:layout="@layout/fragment_list_lineup"/>
+        tools:layout="@layout/fragment_list_tournaments"/>
 
     <fragment
         android:id="@+id/navigation_team"
@@ -46,5 +46,10 @@
         android:name="com.telen.easylineup.team.createTeam.TeamEditFragment"
         android:label="@string/title_team_edition"
         tools:layout="@layout/fragment_team_edit"/>
+    <fragment
+        android:id="@+id/lineupCreationFragment"
+        android:name="com.telen.easylineup.lineup.create.LineupCreationFragment"
+        android:label="@string/dialog_create_lineup_title"
+        tools:layout="@layout/fragment_lineup_creation"/>
 
 </navigation>

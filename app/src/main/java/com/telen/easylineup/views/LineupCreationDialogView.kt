@@ -12,15 +12,29 @@ import com.telen.easylineup.R
 import com.telen.easylineup.data.Tournament
 import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
 import timber.log.Timber
+import java.util.*
 
 interface OnFormReadyListener {
     fun onFormStateChanged(isReady: Boolean)
 }
 
+interface OnActionButtonListener {
+    fun onSaveClicked()
+    fun onCancelClicked()
+}
+
 class LineupCreationDialogView: ConstraintLayout, TextWatcher {
 
     override fun afterTextChanged(s: Editable?) {
-        readyStateListener?.onFormStateChanged(!TextUtils.isEmpty(lineupTitle.text) && !TextUtils.isEmpty(tournamentChoiceAutoComplete.text))
+        //readyStateListener?.onFormStateChanged()
+        val lineupName = lineupTitleInput.text
+        val tournamentName = tournamentChoiceAutoComplete.text
+        if(!TextUtils.isEmpty(lineupName)) {
+            lineupTitleInputLayout.error = null
+        }
+        if(!TextUtils.isEmpty(tournamentName)){
+            tournamentTitleInputLayout.error = null
+        }
     }
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -30,25 +44,76 @@ class LineupCreationDialogView: ConstraintLayout, TextWatcher {
     private lateinit var adapter: ArrayAdapter<String>
     private lateinit var tournamentsNames: MutableList<String>
     private var readyStateListener: OnFormReadyListener? = null
+    private var actionClickListener: OnActionButtonListener? = null
+    private lateinit var calendar: Calendar
 
-    constructor(context: Context?) : super(context) { init(context)}
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) { init(context)}
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context)}
+    constructor(context: Context) : super(context) { init(context)}
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init(context)}
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context)}
 
-    private fun init(context: Context?) {
+    private fun init(context: Context) {
         LayoutInflater.from(context).inflate(R.layout.dialog_create_lineup, this)
 
-        lineupTitle.addTextChangedListener(this)
+        lineupTitleInput.addTextChangedListener(this)
         tournamentChoiceAutoComplete.addTextChangedListener(this)
 
         tournamentsNames = mutableListOf()
-        context?.let {
-            adapter = ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
-            tournamentChoiceAutoComplete.setAdapter(adapter)
+
+        calendar = Calendar.getInstance()
+
+        calendarView.setDate(calendar.timeInMillis, true, true)
+        calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
+            calendar.set(Calendar.YEAR, year)
+            calendar.set(Calendar.MONTH, month)
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+        }
+
+        adapter = ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
+        tournamentChoiceAutoComplete.setAdapter(adapter)
+        tournamentChoiceAutoComplete.setOnItemClickListener { parent, view, position, id ->
+            val selected = parent.getItemAtPosition(position).toString()
+            val truePosition = tournamentsNames.indexOf(selected)
+            val tournament = tournaments[truePosition]
+            calendar.timeInMillis = tournament.createdAt
+            calendarView.setDate(calendar.timeInMillis, true, true)
+        }
+
+        expandableButton.setOnClickListener {
+            when(expandableView.isExpanded) {
+                true -> {
+                    expandableView.collapse()
+                    expandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp)
+                }
+                else -> {
+                    expandableView.expand()
+                    expandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp)
+                }
+            }
+        }
+
+        save.setOnClickListener {
+            val lineupName = lineupTitleInput.text.toString()
+            val tournamentName = tournamentChoiceAutoComplete.text
+            if(!TextUtils.isEmpty(lineupName) && !TextUtils.isEmpty(tournamentName))
+                actionClickListener?.onSaveClicked()
+            else if(TextUtils.isEmpty(lineupName)) {
+                lineupTitleInputLayout.error = resources.getString(R.string.lineup_creation_error_name_empty)
+            }
+            else {
+                tournamentTitleInputLayout.error = resources.getString(R.string.lineup_creation_error_tournament_empty)
+            }
+        }
+
+        cancel.setOnClickListener {
+            actionClickListener?.onCancelClicked()
         }
     }
 
-    fun setOnReadyStateListener(listener: OnFormReadyListener) {
+    fun setOnActionClickListener(listener: OnActionButtonListener) {
+        this.actionClickListener = listener
+    }
+
+    fun setOnFormReadyListener(listener: OnFormReadyListener) {
         this.readyStateListener = listener
     }
 
@@ -68,13 +133,19 @@ class LineupCreationDialogView: ConstraintLayout, TextWatcher {
     fun getSelectedTournament(): Tournament {
         val position = tournamentsNames.indexOf(tournamentChoiceAutoComplete.text.toString())
         Timber.d("position = $position")
-        return if(position >= 0)
+        return if(position >= 0) {
+            tournaments[position].createdAt = calendar.timeInMillis
             tournaments[position]
+        }
         else
-            Tournament(name = tournamentChoiceAutoComplete.text.toString())
+            Tournament(name = tournamentChoiceAutoComplete.text.toString(), createdAt = calendar.timeInMillis)
     }
 
     fun getLineupTitle(): String {
-        return lineupTitle.text.toString()
+        return lineupTitleInput.text.toString()
+    }
+
+    fun setSaveButtonEnabled(enabled: Boolean) {
+        save.isEnabled = enabled
     }
 }

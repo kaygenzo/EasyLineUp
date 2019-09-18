@@ -22,17 +22,20 @@ class DrawerHeader(context: Context): ConstraintLayout(context) {
     }
 
     fun setImage(image: String?) {
-        Picasso.get().load(image)
-                .fit()
-                .transform(RoundedTransformationBuilder()
-                        .borderColor(Color.BLACK)
-                        .borderWidthDp(2f)
-                        .cornerRadiusDp(16f)
-                        .oval(true)
-                        .build())
-                .placeholder(R.drawable.ic_unknown_team)
-                .error(R.drawable.ic_unknown_team)
-                .into(imageView)
+        imageView.post {
+            Picasso.get().load(image)
+                    .resize(imageView.width, imageView.height)
+                    .centerCrop()
+                    .transform(RoundedTransformationBuilder()
+                            .borderColor(Color.BLACK)
+                            .borderWidthDp(2f)
+                            .cornerRadiusDp(16f)
+                            .oval(true)
+                            .build())
+                    .placeholder(R.drawable.ic_unknown_team)
+                    .error(R.drawable.ic_unknown_team)
+                    .into(imageView)
+        }
     }
 
     fun setTitle(title: String) {

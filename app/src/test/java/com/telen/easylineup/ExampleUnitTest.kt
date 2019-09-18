@@ -13,19 +13,19 @@ import org.junit.Before
  */
 class ExampleUnitTest {
 //
-//    lateinit var subject : Activity
-//
-//    @Before
-//    fun setup() {
+    lateinit var subject : Activity
+
+    @Before
+    fun setup() {
 //        subject = Robolectric.setupActivity(MainActivity::class.java)
-//    }
-//
-//    @Test
-//    fun helpDefault_before() {
+    }
+
+    @Test
+    fun helpDefault_before() {
 //        val menu = shadowOf(subject).getOptionsMenu()
 //        menu.findItem(R.id.help).shouldHaveTitle("Help")
-//    }
-//
+    }
+
 //    @Test
 //    fun helpDefault_after() {
 //        val menu = subject.shadow.optionsMenu

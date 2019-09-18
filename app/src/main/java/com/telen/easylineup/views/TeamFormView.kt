@@ -104,16 +104,19 @@ class TeamFormView: ConstraintLayout {
 
     fun setImage(uri: Uri) {
         imageUri = uri
-        Picasso.get().load(uri)
-                .fit()
-                .transform(RoundedTransformationBuilder()
-                        .borderColor(Color.BLACK)
-                        .borderWidthDp(2f)
-                        .cornerRadiusDp(16f)
-                        .oval(true)
-                        .build())
-                .placeholder(R.drawable.ic_unknown_team)
-                .error(R.drawable.ic_unknown_team)
-                .into(teamImage)
+        teamImage.post {
+            Picasso.get().load(uri)
+                    .resize(teamImage.width, teamImage.height)
+                    .centerCrop()
+                    .transform(RoundedTransformationBuilder()
+                            .borderColor(Color.BLACK)
+                            .borderWidthDp(2f)
+                            .cornerRadiusDp(16f)
+                            .oval(true)
+                            .build())
+                    .placeholder(R.drawable.ic_unknown_team)
+                    .error(R.drawable.ic_unknown_team)
+                    .into(teamImage)
+        }
     }
 }

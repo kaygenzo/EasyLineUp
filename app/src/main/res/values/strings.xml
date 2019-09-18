@@ -37,6 +37,9 @@
     <string name="player_creation_error_shirt_empty">Player shirt number cannot be empty</string>
     <string name="player_creation_error_license_empty">Player license cannot be empty</string>
 
+    <string name="lineup_creation_error_name_empty">Lineup name cannot be empty</string>
+    <string name="lineup_creation_error_tournament_empty">Tournament name cannot be empty</string>
+
     <string name="nav_header_desc">Navigation header</string>
 
     <string name="dialog_delete_lineup_title">Delete lineup</string>
@@ -51,5 +54,9 @@
     <string name="header_batting_order_player_name">Player name</string>
     <string name="header_batting_order_player_shirt">N°</string>
     <string name="header_batting_order_player_position">Pos.</string>
+
+    <string name="form_lineup_creation_more_label">More</string>
+
+    <string name="lineup_list_empty_label">Empty</string>
 
 </resources>

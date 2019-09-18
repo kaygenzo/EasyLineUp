@@ -1,0 +1,17 @@
+# remove the leading '#' to uncomment lines
+
+# app_package_name('your.app.package')
+# use_tests_in_packages(['your.screenshot.tests.package'])
+
+app_apk_path('app/build/outputs/apk/demo/debug/app-demo-debug.apk')
+tests_apk_path('app/build/outputs/apk/androidTest/demo/debug/app-demo-debug-androidTest.apk')
+
+locales(['en-US'])
+
+# clear all previously generated screenshots in your local output directory before creating new ones
+clear_previous_screenshots(true)
+
+test_instrumentation_runner('androidx.test.runner.AndroidJUnitRunner')
+
+# For more information about all available options run
+#   fastlane screengrab --help

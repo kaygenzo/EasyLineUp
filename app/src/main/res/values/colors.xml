@@ -26,4 +26,5 @@
     <color name="tile_player_size_warning">#CC0000</color>
 
     <color name="baseball_field_color">@color/colorPrimary</color>
+    <color name="tournaments_timeline_color">@color/colorPrimaryDark</color>
 </resources>

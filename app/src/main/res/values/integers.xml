@@ -4,4 +4,7 @@
     <integer name="player_list_column_count">2</integer>
     <integer name="lineup_list_column_count">1</integer>
     <integer name="player_lineup_list_column_count">1</integer>
+
+    <integer name="timeline_radio_radius">25</integer>
+    <integer name="timeline_radio_radius_outline">30</integer>
 </resources>

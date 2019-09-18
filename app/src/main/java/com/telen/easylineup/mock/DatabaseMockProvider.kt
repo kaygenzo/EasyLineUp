@@ -1,148 +1,113 @@
 package com.telen.easylineup.mock
 
-import androidx.lifecycle.*
-import androidx.lifecycle.Observer
+import android.content.Context
+import com.google.gson.JsonParser
 import com.telen.easylineup.App
 import com.telen.easylineup.data.*
 import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
+import java.lang.Exception
 import java.util.*
+
 
 class DatabaseMockProvider {
 
-    private fun getMockFieldPosition(): List<PlayerFieldPosition> {
-        val players = getMockPlayers()
-        val listResult = mutableListOf<PlayerFieldPosition>()
-        var position = 1
-        var x = 10f
-        var y = 10f
-        players.forEach { player ->
-            if(position <= 9) {
-                listResult.add(PlayerFieldPosition(position.toLong(), player.id, 1, position, x, y, position))
-                position++
-                x+=10
-                y+=10
+    fun createMockDatabase(context: Context): Completable {
+         return Single.create<String> { emitter ->
+
+            var json: String? = null
+            try {
+                val input = context.assets.open("database.json")
+                val size = input.available()
+                val buffer = ByteArray(size)
+                input.read(buffer)
+                input.close()
+                json = String(buffer, Charsets.UTF_8)
+                emitter.onSuccess(json)
+            } catch (ex: Throwable) {
+                ex.printStackTrace()
+                emitter.onError(ex)
             }
         }
-        listResult.add(PlayerFieldPosition(10, 1, 6, 8, 50f, 50f, 1))
-        listResult.add(PlayerFieldPosition(11, 1, 7, 9, 50f, 50f, 1))
-        listResult.add(PlayerFieldPosition(12, 1, 8, 7, 50f, 50f, 1))
-        return listResult
+                 .flatMapCompletable { json ->
+                     try {
+                         val root = JsonParser().parse(json).asJsonObject
+                         val teamJson = root.getAsJsonObject("team")
+                         val playersJson = root.getAsJsonArray("players")
+                         val tournamentsJson = root.getAsJsonArray("tournaments")
+                         val lineupsJson = root.getAsJsonArray("lineups")
+                         val positionsJson = root.getAsJsonArray("playerPositions")
+
+                         val team = Team(teamJson.get("id").asLong, teamJson.get("name").asString, teamJson.get("image").asString)
+
+                         val playersList = mutableListOf<Player>()
+                         for( i in 0 until playersJson.size()) {
+                             val line = playersJson[i].asJsonObject
+                             playersList.add(Player(line["id"].asLong, line["teamId"].asLong, line["name"].asString,
+                                     line["shirtNumber"].asInt, line["licenseNumber"].asLong,
+                                     if(line.has("image")) line["image"].asString else null))
+                         }
+
+                         val tournamentsList = mutableListOf<Tournament>()
+                         for( i in 0 until tournamentsJson.size()) {
+                             val line = tournamentsJson[i].asJsonObject
+                             tournamentsList.add(Tournament(line["id"].asLong, line["name"].asString, line["createdAt"].asLong))
+                         }
+
+                         val lineupsList = mutableListOf<Lineup>()
+                         for( i in 0 until lineupsJson.size()) {
+                             val line = lineupsJson[i].asJsonObject
+                             lineupsList.add(Lineup(line["id"].asLong, line["name"].asString, line["teamId"].asLong,
+                                     line["tournamentId"].asLong, line["createdTimeInMillis"].asLong, line["editedTimeInMillis"].asLong))
+                         }
+
+                         val positionsList = mutableListOf<PlayerFieldPosition>()
+                         for( i in 0 until positionsJson.size()) {
+                             val line = positionsJson[i].asJsonObject
+                             positionsList.add(PlayerFieldPosition(line["id"].asLong, line["playerId"].asLong, line["lineupId"].asLong,
+                                     line["position"].asInt, line["x"].asFloat, line["y"].asFloat, line["order"].asInt))
+                         }
+
+                         insertTeam(team).andThen(insertPlayers(playersList))
+                                 .andThen(insertTournaments(tournamentsList))
+                                 .andThen(insertLineups(lineupsList))
+                                 .andThen(insertPlayerFieldPositions(positionsList))
+
+                     } catch (e: Exception) {
+                         Completable.error(e)
+                     }
+                 }
     }
 
-    private fun getMockTeam(): Team {
-        val team = Team(1, "Seadogs", null, mutableListOf())
-        return team
-    }
-
-    private fun getMockTournaments(): List<Tournament> {
-        val tournaments: MutableList<Tournament> = mutableListOf()
-        tournaments.add(Tournament(1, "Breal Tournament"))
-        tournaments.add(Tournament(2, "Brest Tournament"))
-        tournaments.add(Tournament(3, "Rennes Tournament"))
-        return tournaments
-    }
-
-    private fun getMockPlayers() : List<Player> {
-        var playersList = ArrayList<Player>()
-        playersList.add(Player(1, 1, "Valentin", 90, 2))
-        playersList.add(Player(2, 1, "Antoine", 10, 3))
-        playersList.add(Player(3, 1, "Vincent", 24, 4))
-        playersList.add(Player(4, 1, "Angie", 1, 5))
-        playersList.add(Player(5, 1, "Cyrille", 2, 6))
-        playersList.add(Player(6, 1, "JM", 3, 7))
-        playersList.add(Player(7, 1, "Lya", 4, 8))
-        playersList.add(Player(8, 1, "Fanny", 5, 9))
-        playersList.add(Player(9, 1, "Maiwenn", 6, 10))
-        playersList.add(Player(10, 1, "Laurenn", 7, 11))
-        playersList.add(Player(11, 1, "Karim", 20, 1))
-        return playersList
-    }
-
-    private fun getMockLineUps(): List<Lineup> {
-        val list: MutableList<Lineup> = mutableListOf()
-        val currentTimeInmillis = Calendar.getInstance().timeInMillis
-        list.add(Lineup(1, "Seadogs vs Seadogs 1", getMockTeam().id, 1, currentTimeInmillis, currentTimeInmillis + 100, mutableListOf()))
-        list.add(Lineup(2, "Seadogs vs Seadogs 2", getMockTeam().id, 1, currentTimeInmillis, currentTimeInmillis + 200, mutableListOf()))
-        list.add(Lineup(3, "Seadogs vs Seadogs 3", getMockTeam().id, 1, currentTimeInmillis, currentTimeInmillis + 300, mutableListOf()))
-        list.add(Lineup(4, "Seadogs vs Seadogs 4", getMockTeam().id, 1, currentTimeInmillis, currentTimeInmillis + 400, mutableListOf()))
-        list.add(Lineup(5, "Seadogs vs Seadogs 5", getMockTeam().id, 1, currentTimeInmillis, currentTimeInmillis + 500, mutableListOf()))
-        list.add(Lineup(6, "Seadogs vs Seadogs 6", getMockTeam().id, 2, currentTimeInmillis, currentTimeInmillis + 600, mutableListOf()))
-        list.add(Lineup(7, "Seadogs vs Seadogs 7", getMockTeam().id, 3, currentTimeInmillis, currentTimeInmillis + 700, mutableListOf()))
-        list.add(Lineup(8, "Seadogs vs Seadogs 8", getMockTeam().id, 3, currentTimeInmillis, currentTimeInmillis + 800, mutableListOf()))
-        return list
-    }
-
-    fun insertTeam(): Completable {
-        val team = getMockTeam()
+    private fun insertTeam(team:Team): Completable {
         return App.database.teamDao().insertTeam(team)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun checkTeam(lifecycle: LifecycleOwner) {
-        App.database.teamDao().getTeams().observe(lifecycle, Observer { teams ->
-            teams.forEach { team ->
-                Timber.d("team -> $team")
-            }
-        })
-    }
-
-    fun insertPlayers(): Completable {
-        return App.database.playerDao().insertPlayers(getMockPlayers())
+    private fun insertPlayers(list: List<Player>): Completable {
+        return App.database.playerDao().insertPlayers(list)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun checkPlayers(lifecycle: LifecycleOwner) {
-        App.database.playerDao().getPlayers().observe(lifecycle, Observer {  players ->
-            players.forEach { player ->
-                Timber.d("player -> $player")
-            }
-        })
-    }
-
-    fun insertLineups(): Completable {
-        return App.database.lineupDao().insertLineup(getMockLineUps())
+    private fun insertLineups(list: List<Lineup>): Completable {
+        return App.database.lineupDao().insertLineup(list)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun checkLineups(lifecycle: LifecycleOwner) {
-        App.database.lineupDao().getAllLineup().observe(lifecycle, Observer {  lineups ->
-            lineups.forEach { lineup ->
-                Timber.d("lineup -> $lineup")
-            }
-        })
-    }
-
-    fun insertPlayerFieldPositions(): Completable {
-        return App.database.lineupDao().insertPlayerFieldPosition(getMockFieldPosition())
+    private fun insertPlayerFieldPositions(list: List<PlayerFieldPosition>): Completable {
+        return App.database.lineupDao().insertPlayerFieldPosition(list)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun checkPlayerFieldPositions(lifecycle: LifecycleOwner) {
-        App.database.lineupDao().getAllPlayerFieldPositions().observe(lifecycle, Observer {  playerFieldPositions ->
-            playerFieldPositions.forEach { playerFieldPosition ->
-                Timber.d("playerFieldPosition -> $playerFieldPosition")
-            }
-        })
-    }
-
-    fun insertTournaments(): Completable {
-        return App.database.tournamentDao().insertTournaments(getMockTournaments())
+    private fun insertTournaments(list: List<Tournament>): Completable {
+        return App.database.tournamentDao().insertTournaments(list)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-    }
-
-    fun checkTournaments(lifecycle: LifecycleOwner) {
-        App.database.tournamentDao().getTournaments().observe(lifecycle, Observer {  tournaments ->
-            tournaments.forEach { tournament ->
-                Timber.d("tournament -> $tournament")
-            }
-        })
     }
 }

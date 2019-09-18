@@ -42,6 +42,6 @@ class LineupViewModel: ViewModel() {
         return if(tournament.id == 0L)
             App.database.tournamentDao().insertTournament(tournament)
         else
-            Single.just(tournament.id)
+            App.database.tournamentDao().updateTournament(tournament).andThen(Single.just(tournament.id))
     }
 }

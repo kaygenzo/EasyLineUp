@@ -8,7 +8,7 @@ import com.telen.easylineup.App
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
 
-class CategorizedLineupsViewModel: ViewModel() {
+class TournamentListViewModel: ViewModel() {
 
     fun getTournaments(): LiveData<List<Tournament>>{
         return App.database.tournamentDao().getTournaments()
