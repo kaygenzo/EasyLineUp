@@ -46,9 +46,14 @@ class TeamEditFragment: Fragment() , TeamFormListener {
             if(it > 0) {
                 viewModel.getTeam().observe(this, Observer { team ->
                     team?.let {
-                        view.editTeamForm.setName(savedName ?: team.name)
+                        val name = savedName ?: team.name
                         val imagePath = savedImage ?: team.image
+
+                        viewModel.setTeamName(name)
+                        view.editTeamForm.setName(name)
+
                         imagePath?.let { imageUriString ->
+                            viewModel.setTeamImage(imageUriString)
                             view.editTeamForm.setImage(Uri.parse(imageUriString))
                         }
 
