@@ -58,5 +58,7 @@
     <string name="form_lineup_creation_more_label">More</string>
 
     <string name="lineup_list_empty_label">Empty</string>
+    <string name="lineup_list_filter_focused_hint">Enter name</string>
+    <string name="lineup_list_filter_unfocused_hint">Filter name&#8230;</string>
 
 </resources>

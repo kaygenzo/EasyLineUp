@@ -6,6 +6,7 @@ import android.net.Uri
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.widget.GridLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.qingmei2.rximagepicker.core.RxImagePicker
@@ -16,6 +17,7 @@ import com.qingmei2.rximagepicker_extension.MimeType
 import com.qingmei2.rximagepicker_extension_zhihu.ZhihuConfigurationBuilder
 import com.qingmei2.rximagepicker_extension_zhihu.ui.ZhihuImagePickerActivity
 import com.squareup.picasso.Picasso
+import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
 import com.telen.easylineup.utils.PicassoEngine
 import io.reactivex.Observable
@@ -23,7 +25,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.view_create_player.view.*
 
 interface PlayerFormListener {
-    fun onSaveClicked(name: String, shirtNumber: Int, licenseNumber: Long, imageUri: Uri?)
+    fun onSaveClicked(name: String, shirtNumber: Int, licenseNumber: Long, imageUri: Uri?, positions: Int)
     fun onCancel()
 }
 
@@ -42,16 +44,18 @@ class PlayerFormView: ConstraintLayout {
 
     private var listener: PlayerFormListener? = null
     private var imageUri: Uri? = null
+    private var playerPositions = 0
+    private val positionState: MutableMap<FieldPosition, Boolean> = mutableMapOf()
 
-    constructor(context: Context?) : super(context) {initView(context)}
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {initView(context)}
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {initView(context)}
+    constructor(context: Context) : super(context) {initView(context)}
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {initView(context)}
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {initView(context)}
 
     fun setListener(listener: PlayerFormListener) {
         this.listener = listener
     }
 
-    private fun initView(context: Context?) {
+    private fun initView(context: Context) {
         LayoutInflater.from(context).inflate(R.layout.view_create_player, this)
 
         playerImage.setImageResource(R.drawable.unknown_player)
@@ -81,8 +85,10 @@ class PlayerFormView: ConstraintLayout {
             val name = getName()
             val shirtNumber = getShirtNumber()
             val licenseNumber = getLicenseNumber()
+            val positions = getPlayerPositions()
+
             if(name!=null && shirtNumber!=null && licenseNumber!=null) {
-                listener?.onSaveClicked(name, shirtNumber, licenseNumber, imageUri)
+                listener?.onSaveClicked(name, shirtNumber, licenseNumber, imageUri, positions)
             }
             else {
                 if(name!=null) {
@@ -108,6 +114,11 @@ class PlayerFormView: ConstraintLayout {
         cancel.setOnClickListener {
             listener?.onCancel()
         }
+
+        favoritePositionsContainer.useDefaultMargins = true
+        favoritePositionsContainer.alignmentMode = GridLayout.ALIGN_MARGINS
+
+        setPositionsFilter(0)
     }
 
     fun getName(): String? {
@@ -178,6 +189,65 @@ class PlayerFormView: ConstraintLayout {
 
     fun disableSaveButton() {
         playerSave.isEnabled = false
+    }
+
+    fun getPlayerPositions() : Int {
+        return playerPositions
+    }
+
+    fun setPositionsFilter(positions: Int) {
+
+        this.playerPositions = positions
+        this.positionState.clear()
+
+        val positionShortDescription = resources.getStringArray(R.array.field_positions_list)
+
+        favoritePositionsContainer.removeAllViews()
+
+        FieldPosition.values().forEach { position ->
+            val isEnabled = (positions and position.mask) != 0
+            positionState[position] = isEnabled
+
+            val view = PlayerPositionFilterView(context)
+            view.setText(positionShortDescription[position.ordinal])
+            applyFilterOnView(view, isEnabled)
+
+            view.setOnClickListener { _ ->
+
+                positionState[position]?.let { oldState ->
+                    val newState = !oldState
+
+                    if(newState) {
+                        if(positionState.filterValues { it == true }.size >= 3) {
+                            return@setOnClickListener
+                        }
+                    }
+
+                    positionState[position] = newState
+                    applyFilterOnView(view, newState)
+                    playerPositions = if(newState) {
+                        playerPositions or position.mask
+                    } else {
+                        playerPositions and position.mask.inv()
+                    }
+                }
+            }
+
+            favoritePositionsContainer.addView(view)
+        }
+    }
+
+    private fun applyFilterOnView(view: PlayerPositionFilterView, isEnabled: Boolean) {
+        when(isEnabled) {
+            true -> {
+                view.setBackground(R.drawable.position_selected_background)
+                view.setTextColor(R.color.white)
+            }
+            else -> {
+                view.setBackground(R.drawable.position_unselected_background)
+                view.setTextColor(R.color.tile_team_size_background_color)
+            }
+        }
     }
 
 //    private fun getRoundedBitmap(bitmap: Bitmap): RoundedBitmapDrawable {

@@ -191,4 +191,8 @@ dependencies {
     implementation 'pl.hypeapp:materialtimelineview:1.1'
 
     implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
+
+    implementation 'com.github.mancj:MaterialSearchBar:0.8.2'
+
+    implementation 'com.github.BugBattle:BugBattle-Android-SDK:1.3'
 }

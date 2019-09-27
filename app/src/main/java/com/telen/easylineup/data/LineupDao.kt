@@ -129,9 +129,10 @@ interface LineupDao {
         FROM tournaments
         LEFT JOIN lineups ON tournaments.id = lineups.tournamentID
         LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = lineups.id
+        WHERE tournamentName LIKE '%' || :filter || '%' OR lineupName LIKE '%' || :filter || '%'
         ORDER BY tournaments.createdAt DESC
     """)
-    fun getAllTournamentsWithLineups(): LiveData<List<TournamentWithLineup>>
+    fun getAllTournamentsWithLineups(filter: String): LiveData<List<TournamentWithLineup>>
 
     @Query("""
         SELECT playerID, COUNT(*) as size FROM playerFieldPosition GROUP BY playerID ORDER BY 2 DESC

@@ -40,6 +40,7 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
             val savedShirtNumber = savedInstanceState?.getInt(Constants.PLAYER_SHIRT)
             val savedLicenseNumber = savedInstanceState?.getLong(Constants.PLAYER_LICENSE)
             val savedImage = savedInstanceState?.getString(Constants.IMAGE)
+            val savedPositions = savedInstanceState?.getInt(Constants.PLAYER_POSITIONS)
 
             if(it > 0) {
                 viewModel.getPlayer(it).observe(this, Observer { player ->
@@ -48,7 +49,7 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
                         view.editPlayerForm.setName(savedName ?: player.name)
                         view.editPlayerForm.setShirtNumber(savedShirtNumber ?: player.shirtNumber)
                         view.editPlayerForm.setLicenseNumber(savedLicenseNumber ?: player.licenseNumber)
-
+                        view.editPlayerForm.setPositionsFilter(savedPositions ?: player.positions)
                         val imagePath = savedImage ?: player.image
                         imagePath?.let { imageUriString ->
                             view.editPlayerForm.setImage(Uri.parse(imageUriString))
@@ -73,6 +74,7 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
         val image = view?.editPlayerForm?.getImageUri()
         val license = view?.editPlayerForm?.getLicenseNumber()
         val shirt = view?.editPlayerForm?.getShirtNumber()
+        val positions = view?.editPlayerForm?.getPlayerPositions()
 
         if(!TextUtils.isEmpty(name))
             outState.putString(Constants.NAME, name)
@@ -85,15 +87,20 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
             outState.putInt(Constants.PLAYER_SHIRT, it)
         }
 
+        positions?.let {
+            outState.putInt(Constants.PLAYER_POSITIONS, it)
+        }
+
         image?.let {
             outState.putString(Constants.IMAGE, it.toString())
         }
     }
 
-    override fun onSaveClicked(name: String, shirtNumber: Int, licenseNumber: Long, imageUri: Uri?) {
+    override fun onSaveClicked(name: String, shirtNumber: Int, licenseNumber: Long, imageUri: Uri?, positions: Int) {
         val playerID: Long = viewModel.playerID ?: 0
         val teamID: Long = viewModel.teamID ?: 0
-        val player = Player(id = playerID, teamId = teamID, name = name, shirtNumber = shirtNumber, licenseNumber = licenseNumber, image = imageUri?.toString())
+        val player = Player(id = playerID, teamId = teamID, name = name, shirtNumber = shirtNumber,
+                licenseNumber = licenseNumber, image = imageUri?.toString(), positions = positions)
         dispose(saveDisposable)
         saveDisposable = viewModel.savePlayer(player)
                 .subscribeOn(Schedulers.io())

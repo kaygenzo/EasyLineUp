@@ -5,10 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
-import com.telen.easylineup.views.TimeLineEmptyView
-import com.telen.easylineup.views.TimeLineHeaderView
-import com.telen.easylineup.views.TimeLineMiddleView
-import com.telen.easylineup.views.TournamentItemView
+import com.telen.easylineup.views.*
 import pl.hypeapp.materialtimelineview.MaterialTimelineView
 
 sealed class TimeLineItem

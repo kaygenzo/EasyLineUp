@@ -16,4 +16,6 @@ data class Player(
         @ColumnInfo(name = "name") var name: String,
         @ColumnInfo(name = "shirtNumber") var shirtNumber: Int,
         @ColumnInfo(name = "licenseNumber") var licenseNumber: Long,
-        @ColumnInfo(name = "image") var image: String? = null)
+        @ColumnInfo(name = "image") var image: String? = null
+        ,@ColumnInfo(name = "positions") var positions: Int = 0
+)

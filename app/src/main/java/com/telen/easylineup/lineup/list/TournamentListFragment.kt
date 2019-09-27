@@ -1,6 +1,8 @@
 package com.telen.easylineup.lineup.list
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.mancj.materialsearchbar.MaterialSearchBar
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
@@ -17,7 +20,7 @@ import com.telen.easylineup.utils.Constants
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_list_tournaments.view.*
 
-class TournamentListFragment: Fragment(), OnItemClickedListener {
+class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchBar.OnSearchActionListener {
 
     override fun onHeaderClicked() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -62,13 +65,34 @@ class TournamentListFragment: Fragment(), OnItemClickedListener {
             })
         }
 
-        val categorizedViewModel =  ViewModelProviders.of(this).get(TournamentListViewModel::class.java)
+        view.searchBar.setOnSearchActionListener(this)
+        view.searchBar.addTextChangeListener(object: TextWatcher {
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                if((before > count + 1) && (count == 0)) {
+//                    onFilterCallback?.onSearchConfirmed("")
+//                }
+            }
+
+        })
 
         view.fab.setOnClickListener {
             findNavController().navigate(R.id.lineupCreationFragment, null, NavigationUtils().getOptions())
         }
 
-        categorizedViewModel.getCategorizedLineups().observe(this, Observer { tournaments ->
+        loadTournaments()
+        return view
+    }
+
+    private fun loadTournaments() {
+        val categorizedViewModel =  ViewModelProviders.of(this).get(TournamentListViewModel::class.java)
+        categorizedViewModel.registerTournamentsChanges().observe(this, Observer { tournaments ->
 
             listTournaments.clear()
             tournaments.forEach { item ->
@@ -79,7 +103,25 @@ class TournamentListFragment: Fragment(), OnItemClickedListener {
             tournamentsAdapter.setList(listTournaments)
             tournamentsAdapter.notifyDataSetChanged()
         })
+        categorizedViewModel.setFilter("")
+    }
 
-        return view
+    override fun onButtonClicked(buttonCode: Int) {
+    }
+
+    override fun onSearchStateChanged(enabled: Boolean) {
+        if(!enabled)
+            onSearch("")
+    }
+
+    override fun onSearchConfirmed(text: CharSequence?) {
+        text?.let {
+            onSearch(it.toString())
+        }
+    }
+
+    fun onSearch(text: String) {
+        val categorizedViewModel =  ViewModelProviders.of(this).get(TournamentListViewModel::class.java)
+        categorizedViewModel.setFilter(text)
     }
 }

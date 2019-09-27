@@ -6,7 +6,6 @@ import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import com.telen.easylineup.R
-import java.lang.StringBuilder
 
 class CollegedStyledTextView: AppCompatTextView {
 
@@ -16,9 +15,10 @@ class CollegedStyledTextView: AppCompatTextView {
 
     private fun initView(context: Context?) {
         setTextColor(ContextCompat.getColor(getContext(), R.color.text_orange))
+        isAllCaps = true
     }
 
     override fun setTypeface(tf: Typeface?, style: Int) {
-        super.setTypeface(Typeface.createFromAsset(context.assets, "Colleged.ttf"))
+        super.setTypeface(Typeface.createFromAsset(context.assets, "Chivo-Black.ttf"))
     }
 }

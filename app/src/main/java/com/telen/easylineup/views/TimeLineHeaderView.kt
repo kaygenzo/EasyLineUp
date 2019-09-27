@@ -2,12 +2,10 @@ package com.telen.easylineup.views
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.TypedValue
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.view_timeline_header.view.*
-import pl.hypeapp.materialtimelineview.MaterialTimelineView
 
 class TimeLineHeaderView: ConstraintLayout {
 

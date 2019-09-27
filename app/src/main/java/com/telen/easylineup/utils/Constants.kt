@@ -13,6 +13,7 @@ class Constants {
         const val IMAGE = "_image"
         const val PLAYER_SHIRT = "player_shirtNumber"
         const val PLAYER_LICENSE = "player_licenseNumber"
+        const val PLAYER_POSITIONS = "player_positions"
 
         const val MIN_PLAYER_COUNT = 9
     }
