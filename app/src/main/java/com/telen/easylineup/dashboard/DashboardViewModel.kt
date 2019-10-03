@@ -4,11 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
-import com.telen.easylineup.dashboard.models.ITileData
-import com.telen.easylineup.dashboard.models.LastLineupData
-import com.telen.easylineup.dashboard.models.MostUsedPlayerData
-import com.telen.easylineup.dashboard.models.TeamSizeData
+import com.telen.easylineup.dashboard.models.*
+import com.telen.easylineup.data.Team
+import io.reactivex.Completable
 import io.reactivex.Maybe
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -24,7 +24,8 @@ class DashboardViewModel: ViewModel() {
 
     fun loadTiles() {
         loadDisposable?.takeIf { !it.isDisposed }?.dispose()
-        loadDisposable = getTeamSize()
+        loadDisposable = getShakeBeta()
+                .concatWith(getTeamSize())
                 .concatWith(getMostUsedPlayer())
                 .concatWith(getLastLineup())
                 .toList()
@@ -37,10 +38,21 @@ class DashboardViewModel: ViewModel() {
                 })
     }
 
+    private fun getTeam(): Single<Team> {
+        return App.database.teamDao().getTeamsList().map { it.first() }
+    }
+
+    private fun getShakeBeta(): Maybe<ITileData> {
+        return Maybe.just(ShakeBetaData())
+    }
+
     private fun getTeamSize(): Maybe<ITileData> {
-        return App.database.playerDao().getPlayersSingle()
-                .flatMapMaybe { players -> Maybe.just(players) }
-                .map { TeamSizeData(it.size) }
+        return getTeam()
+                .flatMapMaybe { team ->
+                    App.database.playerDao().getPlayersSingle()
+                            .flatMapMaybe { players -> Maybe.just(players) }
+                            .map { TeamSizeData(it.size, teamImage = team.image) }
+                }
     }
 
     private fun getMostUsedPlayer(): Maybe<ITileData> {

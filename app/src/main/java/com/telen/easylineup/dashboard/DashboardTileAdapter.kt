@@ -6,11 +6,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.dashboard.models.ITileData
 import com.telen.easylineup.dashboard.tiles.LastLineupTile
 import com.telen.easylineup.dashboard.tiles.MostUsedPlayerTile
+import com.telen.easylineup.dashboard.tiles.ShakeBetaTile
 import com.telen.easylineup.dashboard.tiles.TeamSizeTile
 
 const val TYPE_LAST_LINEUP = 0
 const val TYPE_TEAM_SIZE = 1
 const val TYPE_MOST_USED_PLAYER = 2
+const val TYPE_SHAKE_BETA = 3
 
 interface TileClickListener {
     fun onTileClicked(type: Int)
@@ -30,6 +32,9 @@ class DashboardTileAdapter(val list: List<ITileData>, val tileClickListener: Til
             }
             TYPE_LAST_LINEUP -> {
                 TileViewHolder(LastLineupTile(parent.context))
+            }
+            TYPE_SHAKE_BETA -> {
+                TileViewHolder(ShakeBetaTile(parent.context))
             }
             else -> {
                 throw NotImplementedError()

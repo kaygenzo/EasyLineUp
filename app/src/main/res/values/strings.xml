@@ -61,4 +61,6 @@
     <string name="lineup_list_filter_focused_hint">Enter name</string>
     <string name="lineup_list_filter_unfocused_hint">Filter name&#8230;</string>
 
+    <string name="shake_beta_description">Any problem ? Shake your phone and send a report!</string>
+
 </resources>

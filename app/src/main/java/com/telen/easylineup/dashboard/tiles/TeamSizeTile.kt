@@ -1,13 +1,19 @@
 package com.telen.easylineup.dashboard.tiles
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.makeramen.roundedimageview.RoundedTransformationBuilder
+import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.dashboard.models.ITileData
 import com.telen.easylineup.dashboard.models.KEY_DATA_SIZE
+import com.telen.easylineup.dashboard.models.KEY_DATA_TEAM_IMAGE
 import com.telen.easylineup.utils.Constants
 import kotlinx.android.synthetic.main.tile_team_size.view.*
 
@@ -25,6 +31,24 @@ class TeamSizeTile: ConstraintLayout {
         val map = data.getData()
         val size: Int = map[KEY_DATA_SIZE] as Int
         tile_team_size_text.text = resources.getString(R.string.tile_team_size_message, size)
+
+        val image = map[KEY_DATA_TEAM_IMAGE] as String?
+        image?.let {
+            teamImage.post {
+                Picasso.get().load(it)
+                        .resize(teamImage.height, teamImage.height)
+                        .centerCrop()
+                        .transform(RoundedTransformationBuilder()
+                                .borderColor(Color.BLACK)
+                                .borderWidthDp(2f)
+                                .cornerRadiusDp(16f)
+                                .oval(true)
+                                .build())
+                        .placeholder(R.drawable.ic_unknown_team)
+                        .error(R.drawable.ic_unknown_team)
+                        .into(teamImage)
+            }
+        }
 
         team_size_warning_container.visibility = if (size < Constants.MIN_PLAYER_COUNT) View.VISIBLE else View.GONE
 
