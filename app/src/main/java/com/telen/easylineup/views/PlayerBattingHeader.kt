@@ -19,8 +19,8 @@ class PlayerBattingHeader: ConstraintLayout {
         LayoutInflater.from(context).inflate(R.layout.header_player_attack, this)
         reorderImage.visibility = View.INVISIBLE
         playerName.setText(R.string.header_batting_order_player_name)
-        fieldPosition.setText(R.string.header_batting_order_player_shirt)
-        shirtNumber.setText(R.string.header_batting_order_player_position)
+        fieldPosition.setText(R.string.header_batting_order_player_position)
+        shirtNumber.setText(R.string.header_batting_order_player_shirt)
         setBackgroundColor(ContextCompat.getColor(context, R.color.tile_player_most_used_header_color))
     }
 

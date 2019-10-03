@@ -1,169 +1,104 @@
 package com.telen.easylineup.views
 
-import android.content.ClipData
-import android.content.ClipDescription
 import android.content.Context
-import android.graphics.PointF
 import android.util.AttributeSet
-import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.FieldPosition
-import com.telen.easylineup.OnPositionListener
-import com.telen.easylineup.PositionFieldChoiceDialog
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
-import timber.log.Timber
 import kotlin.math.roundToInt
 
 const val ICON_SIZE_SCALE = 0.12f
 
-interface OnPlayerStateChanged {
-    fun onPlayerUpdated(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean)
+interface OnPlayerButtonCallback {
+    fun onPlayerButtonClicked(players: List<Player>, position: FieldPosition, isNewPlayer: Boolean)
+    fun onPlayerButtonLongClicked(position: FieldPosition)
 }
 
 class DefenseEditableView: ConstraintLayout {
 
-    private lateinit var playerPositions: MutableMap<String, Pair<Player, PointF?>>
-    private var playerListener: OnPlayerStateChanged? = null
+    private lateinit var playerPositions: MutableMap<String, Pair<Player, FieldPosition?>>
+    private var playerListener: OnPlayerButtonCallback? = null
 
     constructor(context: Context?) : super(context) { init(context)}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) { init(context)}
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context)}
 
-    fun setOnPlayerListener(playerStateChanged: OnPlayerStateChanged) {
-        playerListener = playerStateChanged
+    fun setOnPlayerListener(playerButtonCallback: OnPlayerButtonCallback) {
+        playerListener = playerButtonCallback
     }
 
     private fun init(context: Context?) {
         LayoutInflater.from(context).inflate(R.layout.baseball_field_with_players, this)
         playerPositions = mutableMapOf()
-
-        fieldFrameLayout.setOnDragListener { v, event ->
-            when(event.action) {
-                DragEvent.ACTION_DRAG_STARTED -> {
-                    Timber.d("action=ACTION_DRAG_STARTED")
-                    true
-                }
-                DragEvent.ACTION_DRAG_ENTERED -> {
-                    //Log.d("BaseballFieldView", "action=ACTION_DRAG_ENTERED")
-                    true
-                }
-                DragEvent.ACTION_DRAG_LOCATION -> {
-                    //Log.d("BaseballFieldView", "action=ACTION_DRAG_LOCATION")
-                    true
-                }
-                DragEvent.ACTION_DRAG_EXITED -> {
-                    Timber.d( "action=ACTION_DRAG_EXITED")
-                    true
-                }
-                DragEvent.ACTION_DROP -> {
-                    Timber.d( "action=ACTION_DROP")
-                    Timber.d( "Position: x=${event.x} y=${event.y}")
-
-                    val item: ClipData.Item = event.clipData.getItemAt(0)
-                    val tag = item.text.toString()
-                    onUserDropObject(tag, event.x, event.y)
-                    true
-                }
-                DragEvent.ACTION_DRAG_ENDED -> {
-                    Timber.d("action=ACTION_DRAG_ENDED")
-                    true
-                }
-                else -> {
-                    Timber.d( "action=UNKNOWN")
-                    false
-                }
-            }
-            true
-        }
     }
 
-    private fun onUserDropObject(tag: String, eventX: Float, eventY: Float) {
-        val positionDialog = PositionFieldChoiceDialog(context, object : OnPositionListener {
-            override fun onPositionChosen(fieldPosition: FieldPosition) {
-
-                playerPositions[tag]?.let {
-
-                    val player = it.first
-                    var playerPoint = it.second
-                    var isNewObject = false
-
-                    if (playerPoint == null) {
-                        playerPoint = PointF()
-                        playerPositions[tag] = Pair(player, playerPoint)
-                        isNewObject = true
-                    }
-
-                    val view = baseballFieldAndPlayersRoot.findViewWithTag<PlayerFieldIcon>(tag)
-
-                    view?.let {
-                        val imageWidth = view.width.toFloat()
-                        val imageHeight = view.height.toFloat()
-
-                        checkBounds(eventX, eventY, imageWidth, imageHeight) { x: Float, y: Float ->
-                            playerPoint.x = (x / fieldFrameLayout.width) * 100
-                            playerPoint.y = (y / fieldFrameLayout.height) * 100
-
-                            playerListener?.onPlayerUpdated(player, playerPoint, fieldPosition, isNewObject)
-                        }
-                    }
-                }
-            }
-        })
-        positionDialog.show()
-    }
-
-    fun setListPlayer(players: Map<Player, PointF?>, loadingCallback: LoadingCallback?) {
+    fun setListPlayer(players: Map<Player, FieldPosition?>, loadingCallback: LoadingCallback?) {
         playersContainer.removeAllViews()
         cleanPlayerIcons()
 
-        val columnCount = resources.getInteger(R.integer.lineup_edition_players_container_column_count)
-        val rowCount = ((players.size) / columnCount)+1
-
-        playersContainer.columnCount = columnCount
-        playersContainer.rowCount = rowCount
-
         val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+
+        val emptyPositions = mutableListOf<FieldPosition>()
+        emptyPositions.addAll(FieldPosition.values())
 
         players.forEach { entry ->
 
             val player = entry.key
             val playerTag: String = player.id.toString()
-            val coordinatePercent: PointF? = entry.value
+            var fieldPosition = entry.value
 
-            playerPositions[playerTag] = Pair(player, coordinatePercent)
+            playerPositions[playerTag] = Pair(player, fieldPosition)
 
             val playerView = PlayerFieldIcon(context).run {
                 layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
                 setPlayerImage(player.image, iconSize)
                 setShirtNumber(player.shirtNumber)
+                this
+            }
 
-                //replace by an id which is unique
-                tag = playerTag
+            fieldPosition?.let { pos ->
+                loadingCallback?.onStartLoading()
+                emptyPositions.remove(pos)
+                addPlayerOnFieldWithPercentage(playerView, pos.xPercent, pos.yPercent, loadingCallback)
+                playerView.setOnClickListener { view ->
+                    playerListener?.onPlayerButtonClicked(players.filter { it.value == null }.keys.toList(), pos, false)
+                }
+                playerView.setOnLongClickListener {
+                    playerListener?.onPlayerButtonLongClicked(pos)
+                    true
+                }
+            }
+        }
 
-                setOnLongClickListener { view ->
-                    val item = ClipData.Item(playerTag as? CharSequence)
-                    val dragData = ClipData(playerTag as? CharSequence, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), item)
-                    val shadowBuilder = DragShadowBuilder(view)
-                    view.startDrag(dragData, shadowBuilder, null, 0)
+        addEmptyPositionMarker(players, emptyPositions)
+    }
+
+    private fun addEmptyPositionMarker(players: Map<Player, FieldPosition?>, positionMarkers: MutableList<FieldPosition>) {
+        val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+        positionMarkers.forEach {position ->
+
+            val positionView = AddPlayerButton(context).run {
+                layoutParams = LayoutParams(iconSize, iconSize)
+                setScaleType(ImageView.ScaleType.CENTER)
+                setOnClickListener {
+                    playerListener?.onPlayerButtonClicked(players.filter { it.value == null }.keys.toList(), position, true)
                 }
                 this
             }
 
-            coordinatePercent?.let {
-                loadingCallback?.onStartLoading()
-                addPlayerOnFieldWithPercentage(playerView, it.x, it.y, loadingCallback)
-            } ?: playersContainer.addView(playerView)
+            addPlayerOnFieldWithPercentage(positionView, position.xPercent, position.yPercent, null)
         }
     }
 
-    private fun addPlayerOnFieldWithPercentage(view: PlayerFieldIcon, x: Float, y: Float, loadingCallback: LoadingCallback?) {
+    private fun addPlayerOnFieldWithPercentage(view: View, x: Float, y: Float, loadingCallback: LoadingCallback?) {
         fieldFrameLayout.post {
             val layoutHeight = fieldFrameLayout.height
             val layoutWidth = fieldFrameLayout.width
@@ -175,7 +110,7 @@ class DefenseEditableView: ConstraintLayout {
         }
     }
 
-    private fun addPlayerOnFieldWithCoordinate(view: PlayerFieldIcon, x: Float, y: Float, loadingCallback: LoadingCallback?) {
+    private fun addPlayerOnFieldWithCoordinate(view: View, x: Float, y: Float, loadingCallback: LoadingCallback?) {
 
         if(playersContainer.findViewWithTag<PlayerFieldIcon>(view.tag)!=null)
             playersContainer.removeView(view)
@@ -219,7 +154,7 @@ class DefenseEditableView: ConstraintLayout {
         if(fieldFrameLayout.childCount > 1) {
             for (i in fieldFrameLayout.childCount-1 downTo 0) {
                 val view = fieldFrameLayout.getChildAt(i)
-                if(view is PlayerFieldIcon) {
+                if(view is PlayerFieldIcon || view is AddPlayerButton) {
                     fieldFrameLayout.removeView(fieldFrameLayout.getChildAt(i))
                 }
             }

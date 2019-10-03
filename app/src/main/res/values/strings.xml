@@ -42,9 +42,11 @@
 
     <string name="nav_header_desc">Navigation header</string>
 
-    <string name="dialog_delete_lineup_title">Delete lineup</string>
-    <string name="dialog_delete_player_title">Delete player</string>
+    <string name="dialog_delete_lineup_title">Delete lineup ?</string>
+    <string name="dialog_delete_player_title">Delete player ?</string>
+    <string name="dialog_delete_position_title">Delete position ?</string>
     <string name="dialog_delete_cannot_undo_message">This action cannot be undo, are you sure ?</string>
+    <string name="dialog_delete_progress_message">Deleting&#8230;</string>
 
     <string name="tile_team_size_message">%d players in your team</string>
     <string name="tile_team_size_warning_message">Not enough players to have a complete team!</string>

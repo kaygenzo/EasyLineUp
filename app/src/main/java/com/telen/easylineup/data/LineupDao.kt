@@ -35,6 +35,9 @@ interface LineupDao {
     @Update
     fun updatePlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>): Completable
 
+    @Delete
+    fun deletePosition(position: PlayerFieldPosition): Completable
+
     @Update
     fun updatePlayerFieldPosition(fieldPosition: PlayerFieldPosition): Completable
 
@@ -125,7 +128,7 @@ interface LineupDao {
         playerFieldPosition.id as fieldPositionID,
         lineups.name as lineupName,
         lineups.id as lineupID,
-        x, y
+        x, y, position
         FROM tournaments
         LEFT JOIN lineups ON tournaments.id = lineups.tournamentID
         LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = lineups.id

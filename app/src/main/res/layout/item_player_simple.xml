@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:layout_margin="4dp">
+
+    <ImageView
+        android:id="@+id/playerImage"
+        android:layout_width="40dp"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:src="@drawable/unknown_player"/>
+
+    <com.telen.easylineup.views.NormalUppercaseStyledTextView
+        android:id="@+id/playerName"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toRightOf="@+id/playerImage"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:text="Player"
+        android:textSize="@dimen/text_size_middle"
+        android:gravity="center_vertical"
+        android:layout_marginStart="@dimen/default_margin"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

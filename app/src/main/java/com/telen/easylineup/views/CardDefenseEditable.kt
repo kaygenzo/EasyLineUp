@@ -1,12 +1,12 @@
 package com.telen.easylineup.views
 
 import android.content.Context
-import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
 import com.telen.easylineup.utils.LoadingCallback
@@ -33,12 +33,12 @@ class CardDefenseEditable: CardView, LoadingCallback {
         }
     }
 
-    fun setListPlayer(players: Map<Player, PointF?>) {
+    fun setListPlayer(players: Map<Player, FieldPosition?>) {
         fieldAndPlayersRootView.setListPlayer(players, this)
     }
 
-    fun setPlayerStateListener(playerStateChanged: OnPlayerStateChanged) {
-        fieldAndPlayersRootView.setOnPlayerListener(playerStateChanged)
+    fun setPlayerStateListener(playerButtonCallback: OnPlayerButtonCallback) {
+        fieldAndPlayersRootView.setOnPlayerListener(playerButtonCallback)
     }
 
     fun setLineupName(name: String) {

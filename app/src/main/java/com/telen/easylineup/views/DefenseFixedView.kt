@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
 import com.telen.easylineup.data.PlayerWithPosition
 import com.telen.easylineup.utils.LoadingCallback
@@ -77,31 +78,34 @@ class DefenseFixedView: ConstraintLayout {
             val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
 
             players.forEach { player ->
-                val coordinatePercent = PointF(player.x, player.y)
+                val position = FieldPosition.getFieldPosition(player.position)
+                position?.let {
+                    val coordinatePercent = PointF(it.xPercent, it.yPercent)
 
-                val playerView = PlayerFieldIcon(context).run {
-                    layoutParams = LayoutParams(iconSize, iconSize)
-                    setPlayerImage(player.image)
-                    setShirtNumber(player.shirtNumber)
-                    tag = PLAYER_ICON_TAG
-                    this
+                    val playerView = PlayerFieldIcon(context).run {
+                        layoutParams = LayoutParams(iconSize, iconSize)
+                        setPlayerImage(player.image)
+                        setShirtNumber(player.shirtNumber)
+                        tag = PLAYER_ICON_TAG
+                        this
+                    }
+                    addPlayerOnField(playerView, coordinatePercent.x, coordinatePercent.y, loadingCallback)
                 }
-                addPlayerOnField(playerView, coordinatePercent.x, coordinatePercent.y, loadingCallback)
             }
         }
     }
 
-    fun setSmallPlayerPosition(players: List<PointF>) {
+    fun setSmallPlayerPosition(players: List<FieldPosition>) {
         setSmallPlayerPosition(players, null)
     }
-    fun setSmallPlayerPosition(players: List<PointF>, loadingCallback: LoadingCallback?) {
+    fun setSmallPlayerPosition(positions: List<FieldPosition>, loadingCallback: LoadingCallback?) {
 
-        if(players.isNotEmpty())
+        if(positions.isNotEmpty())
             loadingCallback?.onStartLoading()
 
         fieldFrameLayout.post {
             cleanPlayerIcons()
-            players.forEach { playerCoordinate ->
+            positions.forEach { position ->
                 val iconView = ImageView(context).run {
                     layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                     setImageResource(R.drawable.baseball_ball_icon)
@@ -109,28 +113,8 @@ class DefenseFixedView: ConstraintLayout {
                     tag = PLAYER_ICON_TAG
                     this
                 }
-                addPlayerOnField(iconView, playerCoordinate.x, playerCoordinate.y, loadingCallback)
+                addPlayerOnField(iconView, position.xPercent, position.yPercent, loadingCallback)
             }
-        }
-    }
-
-    fun setSmallPlayer(player: PointF) {
-        setSmallPlayer(player, null)
-    }
-
-    fun setSmallPlayer(player: PointF, loadingCallback: LoadingCallback?) {
-
-        loadingCallback?.onStartLoading()
-
-        fieldFrameLayout.post {
-            val iconView = ImageView(context).run {
-                layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                setImageResource(R.drawable.baseball_ball_icon)
-                scaleType = ImageView.ScaleType.CENTER_INSIDE
-                tag = PLAYER_ICON_TAG
-                this
-            }
-            addPlayerOnField(iconView, player.x, player.y, loadingCallback)
         }
     }
 

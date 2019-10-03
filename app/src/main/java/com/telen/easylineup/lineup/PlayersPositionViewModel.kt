@@ -30,13 +30,14 @@ class PlayersPositionViewModel: ViewModel() {
                 PlayerFieldPosition(
                         playerId = player.id,
                         lineupId = lineupID,
+                        position = position.position,
                         order = listPlayersWithPosition.filter { it.fieldPositionID > 0 }.count() + 1)
             } else {
-                listPlayersWithPosition.first { it.playerID == player.id }.toPlayerFieldPosition()
+                listPlayersWithPosition.first { it.position == position.position }.toPlayerFieldPosition()
             }
 
             playerPosition.apply {
-                this.position = position.position
+                playerId = player.id
                 x = point.x
                 y = point.y
             }
@@ -49,6 +50,17 @@ class PlayersPositionViewModel: ViewModel() {
                 App.database.lineupDao().insertPlayerFieldPosition(playerPosition).ignoreElement()
             }
         } ?: return Completable.error(IllegalStateException("LineupID is null"))
+    }
+
+    fun deletePosition(position: FieldPosition): Completable {
+        try {
+            listPlayersWithPosition.first { it.position == position.position }.let {
+                return App.database.lineupDao().deletePosition(it.toPlayerFieldPosition())
+            }
+        }
+        catch (e: NoSuchElementException) {
+            return Completable.error(e)
+        }
     }
 
     fun saveNewBattingOrder(playerPosition: MutableList<PlayerWithPosition>): Completable {
@@ -73,7 +85,7 @@ class PlayersPositionViewModel: ViewModel() {
 
     }
 
-    fun getTeamPlayerWithPositions(lineupID: Long): LiveData<Map<Player, PointF?>> {
+    fun getTeamPlayerWithPositions(lineupID: Long): LiveData<Map<Player, FieldPosition?>> {
 
         val getTeamLiveData = Transformations.map(App.database.teamDao().getTeams()) {
             it.first()
@@ -88,14 +100,14 @@ class PlayersPositionViewModel: ViewModel() {
             listPlayersWithPosition.clear()
             listPlayersWithPosition.addAll(players)
 
-            val result: MutableMap<Player, PointF?> = mutableMapOf()
+            val result: MutableMap<Player, FieldPosition?> = mutableMapOf()
             players.forEach {
-                var point: PointF? = null
+                var position: FieldPosition? = null
                 if(it.fieldPositionID > 0) {
-                    point = PointF(it.x, it.y)
+                    position = FieldPosition.getFieldPosition(it.position)
                 }
                 val player = it.toPlayer()
-                result[player] = point
+                result[player] = position
             }
             result
         }

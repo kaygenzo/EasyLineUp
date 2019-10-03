@@ -45,7 +45,7 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
 
     class BatterViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val playerName = view.findViewById<TextView>(R.id.playerName)
-        val shortNumber = view.findViewById<TextView>(R.id.shirtNumber)
+        val shirtNumber = view.findViewById<TextView>(R.id.shirtNumber)
         val fieldPosition = view.findViewById<TextView>(R.id.fieldPosition)
         val order = view.findViewById<TextView>(R.id.order)
         val reorderImage = view.findViewById<ImageView>(R.id.reorderImage)
@@ -64,7 +64,7 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
         val player = players[position]
         with(holder) {
             playerName.text = player.playerName
-            shortNumber.text = player.shirtNumber.toString()
+            shirtNumber.text = player.shirtNumber.toString()
             fieldPosition.text = player.position.toString()
             order.text = player.order.toString()
             if(!isEditable)

@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
+import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
 
@@ -35,7 +36,7 @@ class TournamentListViewModel: ViewModel() {
             it.forEach { item ->
                 val tournament = item.toTournament()
                 val lineup = item.toLineup()
-                val point = PointF(item.x, item.y)
+                val position = FieldPosition.getFieldPosition(item.position)
 
                 if(result[tournament] == null) {
                     result[tournament] = mutableListOf()
@@ -47,7 +48,9 @@ class TournamentListViewModel: ViewModel() {
                         result[tournament]?.add(lineup)
                     }
                     if(item.fieldPositionID > 0)
-                        lineups[lineup.id]?.playerPositions?.add(point)
+                        position?.let {
+                            lineups[lineup.id]?.playerPositions?.add(position)
+                        }
                 }
             }
             result
