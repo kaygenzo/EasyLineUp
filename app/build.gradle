@@ -10,6 +10,10 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+def reportPropertiesFile = rootProject.file("bugbattle.properties")
+def reportProperties = new Properties()
+reportProperties.load(new FileInputStream(reportPropertiesFile))
+
 // Create a variable called keystorePropertiesFile, and initialize it to your
 // keystore.properties file, in the rootProject folder.
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -32,6 +36,7 @@ android {
         multiDexEnabled true
         vectorDrawables.useSupportLibrary true
         buildConfigField("boolean", "usePrefilledDatabase", "false")
+        buildConfigField("String", "ReportToolApiKey", reportProperties['apiKey'])
     }
 
     useLibrary 'android.test.runner'
