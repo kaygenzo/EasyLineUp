@@ -1,10 +1,8 @@
 package com.telen.easylineup.team.details
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -13,9 +11,8 @@ import com.squareup.picasso.Picasso
 import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
 import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_player_details.*
 import kotlinx.android.synthetic.main.fragment_player_details.view.*
 
@@ -93,23 +90,19 @@ class PlayerDetailsFragment: Fragment() {
     }
 
     private fun askUserConsentForDelete() {
-        AlertDialog.Builder(activity as AppCompatActivity)
-                .setCancelable(true)
-                .setTitle(R.string.dialog_delete_player_title)
-                .setMessage(R.string.dialog_delete_cannot_undo_message)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
+        activity?.let {
+            DialogFactory.getWarningDialog(it,
+                    it.getString(R.string.dialog_delete_player_title),
+                    it.getString(R.string.dialog_delete_cannot_undo_message),
                     playerDetailsViewModel.deletePlayer()
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({
-                                findNavController().popBackStack(R.id.navigation_team, false)
-                            }, {
+                            .doOnComplete {
+                                FragmentActivity@it.runOnUiThread {
+                                    findNavController().popBackStack(R.id.navigation_team, false)
+                                }
+                            }.doOnError {
                                 Toast.makeText(activity, "Something wrong happened: ${it.message}", Toast.LENGTH_LONG).show()
                             })
-                }
-                .setNegativeButton(android.R.string.cancel, null)
-                .create()
-                .show()
+                    .show()
+        }
     }
-
 }

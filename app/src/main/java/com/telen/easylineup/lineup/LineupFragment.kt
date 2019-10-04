@@ -1,22 +1,16 @@
 package com.telen.easylineup.lineup
 
-import android.app.AlertDialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Action
-import io.reactivex.functions.Consumer
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.*
 
 class LineupFragment: Fragment() {
@@ -89,22 +83,19 @@ class LineupFragment: Fragment() {
     }
 
     private fun askUserConsentForDelete() {
-        AlertDialog.Builder(activity as AppCompatActivity)
-                .setCancelable(true)
-                .setTitle(R.string.dialog_delete_lineup_title)
-                .setMessage(R.string.dialog_delete_cannot_undo_message)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
+        activity?.let {
+            DialogFactory.getWarningDialog(it,
+                    it.getString(R.string.dialog_delete_lineup_title),
+                    it.getString(R.string.dialog_delete_cannot_undo_message),
                     viewModel.deleteLineup()
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({
-                                findNavController().popBackStack(R.id.navigation_lineups, false)
-                            }, {
+                            .doOnComplete {
+                                FragmentActivity@it.runOnUiThread {
+                                    findNavController().popBackStack(R.id.navigation_lineups, false)
+                                }
+                            }.doOnError {
                                 Toast.makeText(activity, "Something wrong happened: ${it.message}", Toast.LENGTH_LONG).show()
                             })
-                }
-                .setNegativeButton(android.R.string.cancel, null)
-                .create()
-                .show()
+                    .show()
+        }
     }
 }
