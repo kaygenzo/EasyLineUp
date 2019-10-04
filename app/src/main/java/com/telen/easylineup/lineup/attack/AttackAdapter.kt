@@ -6,8 +6,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
 import com.telen.easylineup.data.PlayerWithPosition
+import com.telen.easylineup.views.PlayerPositionFilterView
 
 interface OnItemTouchedListener {
     fun onMoved(fromPosition: Int, toPosition: Int)
@@ -21,6 +23,8 @@ interface OnDataChangedListener {
 }
 
 class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, val dataListener: OnDataChangedListener?, val isEditable: Boolean): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
+
+    private var positionDescriptions: Array<String>? = null
 
     override fun onDragStart() {
 
@@ -49,6 +53,7 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
         val fieldPosition = view.findViewById<TextView>(R.id.fieldPosition)
         val order = view.findViewById<TextView>(R.id.order)
         val reorderImage = view.findViewById<ImageView>(R.id.reorderImage)
+        val positionDesc = view.findViewById<PlayerPositionFilterView>(R.id.fieldPositionDescription)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BatterViewHolder {
@@ -62,15 +67,32 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
 
     override fun onBindViewHolder(holder: BatterViewHolder, position: Int) {
         val player = players[position]
+
+        if(positionDescriptions == null)
+            positionDescriptions = holder.positionDesc.context.resources.getStringArray(R.array.field_positions_list)
+
         with(holder) {
             playerName.text = player.playerName
             shirtNumber.text = player.shirtNumber.toString()
             fieldPosition.text = player.position.toString()
             order.text = player.order.toString()
-            if(!isEditable)
+
+            positionDescriptions?.let { descs ->
+                FieldPosition.getFieldPosition(player.position)?.let {
+                    positionDesc.setText(descs[it.ordinal])
+                }
+                positionDesc.setBackground(R.drawable.position_unselected_background)
+                positionDesc.setTextColor(R.color.tile_team_size_background_color)
+            }
+
+            if(!isEditable) {
                 reorderImage.visibility = View.GONE
-            else
+                positionDesc.visibility = View.VISIBLE
+            }
+            else {
                 reorderImage.visibility = View.VISIBLE
+                positionDesc.visibility = View.GONE
+            }
         }
     }
 }
