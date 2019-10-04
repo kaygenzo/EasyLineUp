@@ -31,6 +31,19 @@ class DefenseEditableView: ConstraintLayout {
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) { init(context)}
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context)}
 
+    private fun getPlayerComparator(position: FieldPosition): Comparator<Player> {
+        return Comparator { p1, p2 ->
+            val firstHasPosition = p1.positions and position.mask > 0
+            val secondHasPosition = p2.positions and position.mask > 0
+            if(firstHasPosition && !secondHasPosition)
+                -1
+            else if(!firstHasPosition && secondHasPosition)
+                1
+            else
+                p1.name.compareTo(p2.name)
+        }
+    }
+
     fun setOnPlayerListener(playerButtonCallback: OnPlayerButtonCallback) {
         playerListener = playerButtonCallback
     }
@@ -69,7 +82,11 @@ class DefenseEditableView: ConstraintLayout {
                 emptyPositions.remove(pos)
                 addPlayerOnFieldWithPercentage(playerView, pos.xPercent, pos.yPercent, loadingCallback)
                 playerView.setOnClickListener { view ->
-                    playerListener?.onPlayerButtonClicked(players.filter { it.value == null }.keys.toList(), pos, false)
+                    val listAvailablePlayers = players
+                            .filter { it.value == null }
+                            .keys.toList()
+                            .sortedWith(getPlayerComparator(pos))
+                    playerListener?.onPlayerButtonClicked(listAvailablePlayers, pos, false)
                 }
                 playerView.setOnLongClickListener {
                     playerListener?.onPlayerButtonLongClicked(pos)
@@ -89,7 +106,11 @@ class DefenseEditableView: ConstraintLayout {
                 layoutParams = LayoutParams(iconSize, iconSize)
                 setScaleType(ImageView.ScaleType.CENTER)
                 setOnClickListener {
-                    playerListener?.onPlayerButtonClicked(players.filter { it.value == null }.keys.toList(), position, true)
+                    val listAvailablePlayers = players
+                            .filter { it.value == null }
+                            .keys.toList()
+                            .sortedWith(getPlayerComparator(position))
+                    playerListener?.onPlayerButtonClicked(listAvailablePlayers, position, true)
                 }
                 this
             }

@@ -21,11 +21,20 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         app:layout_constraintLeft_toRightOf="@+id/playerImage"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/filterPosition"
         tools:text="Player"
         android:textSize="@dimen/text_size_middle"
         android:gravity="center_vertical"
-        android:layout_marginStart="@dimen/default_margin"/>
+        android:layout_marginStart="@dimen/default_margin" />
+
+    <com.telen.easylineup.views.PlayerPositionFilterView
+        android:id="@+id/filterPosition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/default_margin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

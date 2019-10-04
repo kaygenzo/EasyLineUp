@@ -66,7 +66,8 @@ interface LineupDao {
         playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID,
         playerFieldPosition.lineupID,
         players.id as playerID,
-        players.teamID, players.image
+        players.teamID, players.image,
+        players.positions as playerPositions
         FROM playerFieldPosition
         INNER JOIN players ON playerFieldPosition.playerID = players.id
         INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
@@ -83,7 +84,8 @@ interface LineupDao {
         playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID,
         playerFieldPosition.lineupID,
         players.id as playerID,
-        players.teamID, players.image
+        players.teamID, players.image,
+        players.positions as playerPositions
         FROM playerFieldPosition
         INNER JOIN players ON playerFieldPosition.playerID = players.id
         INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id

@@ -8,10 +8,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
 import kotlinx.android.synthetic.main.view_bottom_sheet_player_list.view.*
@@ -47,9 +49,10 @@ class PlayerListView: ConstraintLayout, OnPlayerClickListener {
         }
     }
 
-    fun setPlayers(players: List<Player>) {
+    fun setPlayers(players: List<Player>, position: FieldPosition) {
         listPlayers.clear()
         listPlayers.addAll(players)
+        mAdapter.setFilter(position)
         mAdapter.notifyDataSetChanged()
     }
 
@@ -59,6 +62,8 @@ class PlayerListView: ConstraintLayout, OnPlayerClickListener {
 }
 
 class PlayerListAdapter(val list: List<Player>, val playerListener: OnPlayerClickListener?): RecyclerView.Adapter<PlayerListAdapter.PlayerViewHolder>() {
+
+    private var filter: FieldPosition? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_player_simple, parent, false)
@@ -72,6 +77,20 @@ class PlayerListAdapter(val list: List<Player>, val playerListener: OnPlayerClic
     override fun onBindViewHolder(holder: PlayerViewHolder, position: Int) {
         val player = list[position]
         holder.name.text = player.name
+
+        filter?.let {
+            val isMatchingPosition = player.positions and it.mask > 0
+            if(isMatchingPosition) {
+                holder.position.visibility = View.VISIBLE
+                val positionShortDescription = holder.position.context.resources.getStringArray(R.array.field_positions_list)
+                holder.position.setText(positionShortDescription[it.ordinal])
+                holder.position.setBackground(R.drawable.position_selected_background)
+                holder.position.setTextColor(R.color.white)
+            }
+            else {
+                holder.position.visibility = View.GONE
+            }
+        }
 
         holder.image.post {
             Picasso.get().load(player.image)
@@ -87,9 +106,14 @@ class PlayerListAdapter(val list: List<Player>, val playerListener: OnPlayerClic
         }
     }
 
+    fun setFilter(filter: FieldPosition) {
+        this.filter = filter
+    }
+
     class PlayerViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val root = view.findViewById<ConstraintLayout>(R.id.rootView)
         val image = view.findViewById<ImageView>(R.id.playerImage)
         val name = view.findViewById<TextView>(R.id.playerName)
+        val position = view.findViewById<PlayerPositionFilterView>(R.id.filterPosition)
     }
 }

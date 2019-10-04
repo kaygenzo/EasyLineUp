@@ -38,7 +38,14 @@ interface PlayerDao {
     @Query("""
         SELECT result.*, position, x, y, `order`, playerFieldPosition.id as fieldPositionID
         FROM (
-            SELECT lineups.id as lineupID, players.name as playerName, players.shirtNumber, players.licenseNumber, players.id as playerID, players.teamID, players.image
+            SELECT lineups.id as lineupID, 
+                players.name as playerName, 
+                players.shirtNumber, 
+                players.licenseNumber, 
+                players.id as playerID, 
+                players.teamID, 
+                players.image, 
+                players.positions as playerPositions
             FROM lineups, players where lineups.id = :lineupID) as result
         LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = result.lineupID and playerFieldPosition.playerID = result.playerID
         ORDER BY result.playerID

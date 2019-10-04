@@ -55,10 +55,11 @@ data class PlayerWithPosition(
         @ColumnInfo(name = "order") var order: Int = 0,
         @ColumnInfo(name = "fieldPositionID") var fieldPositionID: Long = 0,
         @ColumnInfo(name = "playerID") val playerID: Long,
-        @ColumnInfo(name = "lineupID") val lineupId: Long
+        @ColumnInfo(name = "lineupID") val lineupId: Long,
+        @ColumnInfo(name = "playerPositions") val playerPositions: Int
 ) {
     fun toPlayer(): Player {
-        return Player(id = playerID, teamId = teamId, name = playerName, shirtNumber = shirtNumber, licenseNumber = licenseNumber, image = image)
+        return Player(id = playerID, teamId = teamId, name = playerName, shirtNumber = shirtNumber, licenseNumber = licenseNumber, image = image, positions = playerPositions)
     }
 
     fun toPlayerFieldPosition(): PlayerFieldPosition {
