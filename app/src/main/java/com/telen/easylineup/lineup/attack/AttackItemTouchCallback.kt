@@ -2,10 +2,15 @@ package com.telen.easylineup.lineup.attack
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import timber.log.Timber
 
 class AttackItemTouchCallback(val adapter: BattingOrderAdapter): ItemTouchHelper.Callback() {
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-        val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+        val dragFlags = when(viewHolder.adapterPosition) {
+            in 0..8 -> ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            else -> 0
+        }
+        Timber.d("getMovementFlags=$dragFlags position=${viewHolder.adapterPosition}")
         return makeMovementFlags(dragFlags, 0)
     }
 

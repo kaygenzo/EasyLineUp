@@ -1,6 +1,7 @@
 package com.telen.easylineup
 
 enum class FieldPosition(val position: Int, val mask: Int, val xPercent: Float, val yPercent: Float) {
+    SUBSTITUTE(0, 0, 0f, 100f),
     PITCHER(1,      0b1, 50f, 60f),
     CATCHER(2,      0b10, 50f, 87f),
     FIRST_BASE(3,   0b100, 74f, 57f),
@@ -18,6 +19,10 @@ enum class FieldPosition(val position: Int, val mask: Int, val xPercent: Float, 
                     return it
             }
             return null
+        }
+
+        fun isSubstitute(position: Int): Boolean {
+            return position == SUBSTITUTE.position
         }
     }
 }

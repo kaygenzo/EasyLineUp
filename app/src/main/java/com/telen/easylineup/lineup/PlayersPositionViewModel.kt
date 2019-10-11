@@ -27,11 +27,15 @@ class PlayersPositionViewModel: ViewModel() {
 
         lineupID?.let { lineupID ->
             val playerPosition: PlayerFieldPosition = if(isNewObject) {
+                val order = when(position) {
+                    FieldPosition.SUBSTITUTE -> 200
+                    else -> listPlayersWithPosition.filter { !FieldPosition.isSubstitute(it.position) }.count() + 1
+                }
                 PlayerFieldPosition(
                         playerId = player.id,
                         lineupId = lineupID,
                         position = position.position,
-                        order = listPlayersWithPosition.filter { it.fieldPositionID > 0 }.count() + 1)
+                        order = order)
             } else {
                 listPlayersWithPosition.first { it.position == position.position }.toPlayerFieldPosition()
             }
@@ -55,6 +59,17 @@ class PlayersPositionViewModel: ViewModel() {
     fun deletePosition(position: FieldPosition): Completable {
         try {
             listPlayersWithPosition.first { it.position == position.position }.let {
+                return App.database.lineupDao().deletePosition(it.toPlayerFieldPosition())
+            }
+        }
+        catch (e: NoSuchElementException) {
+            return Completable.error(e)
+        }
+    }
+
+    fun deletePosition(player: Player, position: FieldPosition): Completable {
+        try {
+            listPlayersWithPosition.first { it.playerID == player.id && it.position == position.position }.let {
                 return App.database.lineupDao().deletePosition(it.toPlayerFieldPosition())
             }
         }

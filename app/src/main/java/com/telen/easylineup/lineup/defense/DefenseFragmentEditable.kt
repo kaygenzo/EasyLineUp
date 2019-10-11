@@ -30,6 +30,18 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
     lateinit var viewModel: PlayersPositionViewModel
     private var savingPositionDisposable: Disposable? = null
 
+    override fun onPlayerButtonLongClicked(player: Player, position: FieldPosition) {
+        activity?.let {
+            DialogFactory.getWarningDialog(it,
+                    it.getString(R.string.dialog_delete_position_title),
+                    it.getString(R.string.dialog_delete_cannot_undo_message),
+                    viewModel.deletePosition(player, position).doOnSubscribe {disposable ->
+                        savingPositionDisposable = disposable
+                    })
+                    .show()
+        }
+    }
+
     override fun onPlayerButtonLongClicked(position: FieldPosition) {
         activity?.let {
             DialogFactory.getWarningDialog(it,

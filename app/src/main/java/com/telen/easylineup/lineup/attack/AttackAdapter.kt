@@ -39,12 +39,15 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
     }
 
     override fun onMoved(fromPosition: Int, toPosition: Int) {
-        val fromOrder = players[fromPosition].order
-        val toOrder = players[toPosition].order
-        players[fromPosition].order = toOrder
-        players[toPosition].order = fromOrder
-        players.sortBy { it.order }
-        notifyItemMoved(fromPosition, toPosition)
+        if(!FieldPosition.isSubstitute(players[fromPosition].position) &&
+                !FieldPosition.isSubstitute(players[toPosition].position)) {
+            val fromOrder = players[fromPosition].order
+            val toOrder = players[toPosition].order
+            players[fromPosition].order = toOrder
+            players[toPosition].order = fromOrder
+            players.sortBy { it.order }
+            notifyItemMoved(fromPosition, toPosition)
+        }
     }
 
     class BatterViewHolder(view: View): RecyclerView.ViewHolder(view) {
@@ -72,9 +75,17 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
             positionDescriptions = holder.positionDesc.context.resources.getStringArray(R.array.field_positions_list)
 
         with(holder) {
+
+            val isSubstitute = FieldPosition.isSubstitute(player.position)
+
             playerName.text = player.playerName
             shirtNumber.text = player.shirtNumber.toString()
-            fieldPosition.text = player.position.toString()
+
+            if(!isSubstitute)
+                fieldPosition.text = player.position.toString()
+            else
+                fieldPosition.text = ""
+
             order.text = player.order.toString()
 
             positionDescriptions?.let { descs ->
@@ -85,7 +96,7 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
                 positionDesc.setTextColor(R.color.tile_team_size_background_color)
             }
 
-            if(!isEditable) {
+            if(!isEditable || isSubstitute) {
                 reorderImage.visibility = View.GONE
                 positionDesc.visibility = View.VISIBLE
             }

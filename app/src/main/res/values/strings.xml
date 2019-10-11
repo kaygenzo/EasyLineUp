@@ -8,6 +8,7 @@
 
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_attack">Attack</string>
+    <string name="new_lineup_substitute_label">Substitutes</string>
     <string name="save_button">Save</string>
     <string name="cancel_button">Cancel</string>
 

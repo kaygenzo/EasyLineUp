@@ -80,7 +80,70 @@
       "teamId": 1,
       "name": "Karine",
       "shirtNumber": 20,
-      "licenseNumber": 1
+      "licenseNumber": 12
+    },
+    {
+      "id": 12,
+      "teamId": 1,
+      "name": "Laurent",
+      "shirtNumber": 21,
+      "licenseNumber": 13
+    },
+    {
+      "id": 13,
+      "teamId": 1,
+      "name": "Marine",
+      "shirtNumber": 22,
+      "licenseNumber": 14
+    },
+    {
+      "id": 14,
+      "teamId": 1,
+      "name": "Nora",
+      "shirtNumber": 23,
+      "licenseNumber": 15
+    },
+    {
+      "id": 15,
+      "teamId": 1,
+      "name": "OBrian",
+      "shirtNumber": 24,
+      "licenseNumber": 16
+    },
+    {
+      "id": 16,
+      "teamId": 1,
+      "name": "Pascal",
+      "shirtNumber": 25,
+      "licenseNumber": 17
+    },
+    {
+      "id": 17,
+      "teamId": 1,
+      "name": "Quentin",
+      "shirtNumber": 26,
+      "licenseNumber": 18
+    },
+    {
+      "id": 18,
+      "teamId": 1,
+      "name": "Romain",
+      "shirtNumber": 27,
+      "licenseNumber": 19
+    },
+    {
+      "id": 19,
+      "teamId": 1,
+      "name": "Sandra",
+      "shirtNumber": 28,
+      "licenseNumber": 20
+    },
+    {
+      "id": 20,
+      "teamId": 1,
+      "name": "Thomas",
+      "shirtNumber": 29,
+      "licenseNumber": 21
     }
   ],
   "tournaments": [
@@ -274,6 +337,60 @@
       "x": 50,
       "y": 50,
       "order": 1
+    },
+    {
+      "id": 13,
+      "playerId": 10,
+      "lineupId": 1,
+      "position": 0,
+      "x": 90,
+      "y": 90,
+      "order": 200
+    },
+    {
+      "id": 14,
+      "playerId": 11,
+      "lineupId": 1,
+      "position": 0,
+      "x": 90,
+      "y": 90,
+      "order": 200
+    },
+    {
+      "id": 15,
+      "playerId": 12,
+      "lineupId": 1,
+      "position": 0,
+      "x": 90,
+      "y": 90,
+      "order": 200
+    },
+    {
+      "id": 16,
+      "playerId": 13,
+      "lineupId": 1,
+      "position": 0,
+      "x": 90,
+      "y": 90,
+      "order": 200
+    },
+    {
+      "id": 17,
+      "playerId": 14,
+      "lineupId": 1,
+      "position": 0,
+      "x": 90,
+      "y": 90,
+      "order": 200
+    },
+    {
+      "id": 18,
+      "playerId": 15,
+      "lineupId": 1,
+      "position": 0,
+      "x": 90,
+      "y": 90,
+      "order": 200
     }
   ]
 }

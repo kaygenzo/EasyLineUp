@@ -20,6 +20,7 @@ const val ICON_SIZE_SCALE = 0.12f
 interface OnPlayerButtonCallback {
     fun onPlayerButtonClicked(players: List<Player>, position: FieldPosition, isNewPlayer: Boolean)
     fun onPlayerButtonLongClicked(position: FieldPosition)
+    fun onPlayerButtonLongClicked(player: Player, position: FieldPosition)
 }
 
 class DefenseEditableView: ConstraintLayout {
@@ -54,13 +55,12 @@ class DefenseEditableView: ConstraintLayout {
     }
 
     fun setListPlayer(players: Map<Player, FieldPosition?>, loadingCallback: LoadingCallback?) {
-        playersContainer.removeAllViews()
         cleanPlayerIcons()
 
         val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
 
         val emptyPositions = mutableListOf<FieldPosition>()
-        emptyPositions.addAll(FieldPosition.values())
+        emptyPositions.addAll(FieldPosition.values().filter { !FieldPosition.isSubstitute(it.position) })
 
         players.forEach { entry ->
 
@@ -70,32 +70,39 @@ class DefenseEditableView: ConstraintLayout {
 
             playerPositions[playerTag] = Pair(player, fieldPosition)
 
-            val playerView = PlayerFieldIcon(context).run {
-                layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-                setPlayerImage(player.image, iconSize)
-                setShirtNumber(player.shirtNumber)
-                this
-            }
-
             fieldPosition?.let { pos ->
-                loadingCallback?.onStartLoading()
+
                 emptyPositions.remove(pos)
-                addPlayerOnFieldWithPercentage(playerView, pos.xPercent, pos.yPercent, loadingCallback)
-                playerView.setOnClickListener { view ->
-                    val listAvailablePlayers = players
-                            .filter { it.value == null }
-                            .keys.toList()
-                            .sortedWith(getPlayerComparator(pos))
-                    playerListener?.onPlayerButtonClicked(listAvailablePlayers, pos, false)
-                }
-                playerView.setOnLongClickListener {
-                    playerListener?.onPlayerButtonLongClicked(pos)
-                    true
+
+                if(!FieldPosition.isSubstitute(pos.position)) {
+
+                    loadingCallback?.onStartLoading()
+
+                    val playerView = PlayerFieldIcon(context).run {
+                        layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
+                        setPlayerImage(player.image, iconSize)
+                        setShirtNumber(player.shirtNumber)
+                        this
+                    }
+
+                    addPlayerOnFieldWithPercentage(playerView, pos.xPercent, pos.yPercent, loadingCallback)
+                    playerView.setOnClickListener { view ->
+                        val listAvailablePlayers = players
+                                .filter { it.value == null }
+                                .keys.toList()
+                                .sortedWith(getPlayerComparator(pos))
+                        playerListener?.onPlayerButtonClicked(listAvailablePlayers, pos, false)
+                    }
+                    playerView.setOnLongClickListener {
+                        playerListener?.onPlayerButtonLongClicked(pos)
+                        true
+                    }
                 }
             }
         }
 
         addEmptyPositionMarker(players, emptyPositions)
+        addSubstitutePlayers(players)
     }
 
     private fun addEmptyPositionMarker(players: Map<Player, FieldPosition?>, positionMarkers: MutableList<FieldPosition>) {
@@ -119,6 +126,46 @@ class DefenseEditableView: ConstraintLayout {
         }
     }
 
+    private fun addSubstitutePlayers(players: Map<Player, FieldPosition?>) {
+        val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+        val columnCount = (substituteContainer.width - substituteContainer.paddingStart - substituteContainer.paddingEnd) / iconSize
+        substituteContainer.columnCount = columnCount
+        substituteContainer.removeAllViews()
+        val addSubstituteView = ImageView(context).run {
+            layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
+            setPadding(10,10,10,10)
+            setImageResource(R.drawable.ic_person_add_black_24dp)
+
+            setOnClickListener {
+                val listAvailablePlayers = players
+                        .filter { it.value == null }
+                        .keys.toList()
+                playerListener?.onPlayerButtonClicked(listAvailablePlayers, FieldPosition.SUBSTITUTE, true)
+            }
+
+            this
+        }
+
+        substituteContainer.addView(addSubstituteView)
+
+        players.filter { FieldPosition.isSubstitute(it.value?.position ?: FieldPosition.PITCHER.position) }
+                .forEach { entry ->
+                    val playerView = PlayerFieldIcon(context).run {
+                        layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
+                        setPlayerImage(entry.key.image, iconSize)
+                        setShirtNumber(entry.key.shirtNumber)
+
+                        setOnLongClickListener {
+                            playerListener?.onPlayerButtonLongClicked(entry.key, FieldPosition.SUBSTITUTE)
+                            true
+                        }
+
+                        this
+                    }
+                    substituteContainer.addView(playerView)
+                }
+    }
+
     private fun addPlayerOnFieldWithPercentage(view: View, x: Float, y: Float, loadingCallback: LoadingCallback?) {
         fieldFrameLayout.post {
             val layoutHeight = fieldFrameLayout.height
@@ -132,9 +179,6 @@ class DefenseEditableView: ConstraintLayout {
     }
 
     private fun addPlayerOnFieldWithCoordinate(view: View, x: Float, y: Float, loadingCallback: LoadingCallback?) {
-
-        if(playersContainer.findViewWithTag<PlayerFieldIcon>(view.tag)!=null)
-            playersContainer.removeView(view)
         if(fieldFrameLayout.findViewWithTag<PlayerFieldIcon>(view.tag)!=null)
             fieldFrameLayout.removeView(view)
 

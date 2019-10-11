@@ -69,7 +69,7 @@ class DefenseFixedView: ConstraintLayout {
 
     fun setListPlayerInField(players: List<PlayerWithPosition>, loadingCallback: LoadingCallback?) {
 
-        if(players.isNotEmpty())
+        if(players.filter { !FieldPosition.isSubstitute(it.position) }.isNotEmpty())
             loadingCallback?.onStartLoading()
 
         fieldFrameLayout.post {
@@ -77,21 +77,22 @@ class DefenseFixedView: ConstraintLayout {
 
             val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
 
-            players.forEach { player ->
-                val position = FieldPosition.getFieldPosition(player.position)
-                position?.let {
-                    val coordinatePercent = PointF(it.xPercent, it.yPercent)
+            players.filter { !FieldPosition.isSubstitute(it.position) }
+                    .forEach { player ->
+                        val position = FieldPosition.getFieldPosition(player.position)
+                        position?.let {
+                            val coordinatePercent = PointF(it.xPercent, it.yPercent)
 
-                    val playerView = PlayerFieldIcon(context).run {
-                        layoutParams = LayoutParams(iconSize, iconSize)
-                        setPlayerImage(player.image)
-                        setShirtNumber(player.shirtNumber)
-                        tag = PLAYER_ICON_TAG
-                        this
+                            val playerView = PlayerFieldIcon(context).run {
+                                layoutParams = LayoutParams(iconSize, iconSize)
+                                setPlayerImage(player.image)
+                                setShirtNumber(player.shirtNumber)
+                                tag = PLAYER_ICON_TAG
+                                this
+                            }
+                            addPlayerOnField(playerView, coordinatePercent.x, coordinatePercent.y, loadingCallback)
+                        }
                     }
-                    addPlayerOnField(playerView, coordinatePercent.x, coordinatePercent.y, loadingCallback)
-                }
-            }
         }
     }
 
@@ -105,16 +106,18 @@ class DefenseFixedView: ConstraintLayout {
 
         fieldFrameLayout.post {
             cleanPlayerIcons()
-            positions.forEach { position ->
-                val iconView = ImageView(context).run {
-                    layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                    setImageResource(R.drawable.baseball_ball_icon)
-                    scaleType = ImageView.ScaleType.CENTER_INSIDE
-                    tag = PLAYER_ICON_TAG
-                    this
-                }
-                addPlayerOnField(iconView, position.xPercent, position.yPercent, loadingCallback)
-            }
+            positions.filter { !FieldPosition.isSubstitute(it.position) }
+                    .forEach { position ->
+                        val iconView = ImageView(context).run {
+                            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                            setImageResource(R.drawable.baseball_ball_icon)
+                            scaleType = ImageView.ScaleType.CENTER_INSIDE
+                            tag = PLAYER_ICON_TAG
+                            this
+                        }
+                        addPlayerOnField(iconView, position.xPercent, position.yPercent, loadingCallback)
+                    }
+
         }
     }
 

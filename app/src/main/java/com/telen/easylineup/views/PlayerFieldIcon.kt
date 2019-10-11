@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
+import androidx.annotation.DrawableRes
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
@@ -41,6 +42,21 @@ class PlayerFieldIcon: LinearLayout {
     fun setPlayerImage(url: String?) {
         Picasso.get().load(url)
                 .fit()
+                .transform(RoundedTransformationBuilder()
+                        .borderColor(Color.BLACK)
+                        .borderWidthDp(2f)
+                        .cornerRadiusDp(16f)
+                        .oval(true)
+                        .build())
+                .placeholder(R.drawable.unknown_player)
+                .error(R.drawable.unknown_player)
+                .into(playerImage)
+    }
+
+    fun setPlayerImage(@DrawableRes resId: Int, size: Int) {
+        Picasso.get().load(resId)
+                .resize(size, size)
+                .centerCrop()
                 .transform(RoundedTransformationBuilder()
                         .borderColor(Color.BLACK)
                         .borderWidthDp(2f)
