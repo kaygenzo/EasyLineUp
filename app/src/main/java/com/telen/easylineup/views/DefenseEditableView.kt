@@ -8,12 +8,14 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.FieldPosition
-import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
 import kotlin.math.roundToInt
+import android.view.animation.AnimationUtils
+import com.telen.easylineup.R
+
 
 const val ICON_SIZE_SCALE = 0.12f
 
@@ -208,6 +210,11 @@ class DefenseEditableView: ConstraintLayout {
                     invalidate()
                 }
 
+                if(view is AddPlayerButton) {
+                    val shake = AnimationUtils.loadAnimation(context, R.anim.shake_effect)
+                    view.animation = shake
+                }
+
                 loadingCallback?.onFinishLoading()
             }
         }
@@ -220,6 +227,7 @@ class DefenseEditableView: ConstraintLayout {
             for (i in fieldFrameLayout.childCount-1 downTo 0) {
                 val view = fieldFrameLayout.getChildAt(i)
                 if(view is PlayerFieldIcon || view is AddPlayerButton) {
+                    view.clearAnimation()
                     fieldFrameLayout.removeView(fieldFrameLayout.getChildAt(i))
                 }
             }

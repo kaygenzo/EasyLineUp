@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.R
 import com.telen.easylineup.data.PlayerWithPosition
 import com.telen.easylineup.lineup.PlayersPositionViewModel
+import com.telen.easylineup.views.ItemDecoratorAttackRecycler
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_list_batter.view.*
@@ -32,7 +32,7 @@ class AttackFragment: Fragment(), OnDataChangedListener {
         val view = inflater.inflate(R.layout.fragment_list_batter, container, false)
 
         val linearLayoutManager = LinearLayoutManager(activity)
-        val dividerItemDecoration = DividerItemDecoration(context, linearLayoutManager.orientation)
+        val dividerItemDecoration = ItemDecoratorAttackRecycler(context, linearLayoutManager.orientation)
 
         parentFragment?.let { parent ->
             viewModel = ViewModelProviders.of(parent).get(PlayersPositionViewModel::class.java)
