@@ -24,6 +24,7 @@ const val TYPE_ITEM_EMPTY = 3
 interface OnItemClickedListener {
     fun onHeaderClicked()
     fun onLineupClicked(lineup: Lineup)
+    fun onTournamentLongClicked(tournament: Tournament)
 }
 
 class TournamentsAdapter(private val itemClickListener: OnItemClickedListener): RecyclerView.Adapter<TournamentsAdapter.TournamentsViewHolder>() {
@@ -78,6 +79,10 @@ class TournamentsAdapter(private val itemClickListener: OnItemClickedListener): 
                 val item = items[position] as TimeLineLineItem
                 view.setTournamentName(item.tournament.name)
                 view.setTournamentDate(item.tournament.createdAt)
+                view.setOnLongClickListener {
+                    itemClickListener.onTournamentLongClicked(item.tournament)
+                    true
+                }
             }
             is TimelineTopView -> {
                 val view = holder.view as TournamentItemView

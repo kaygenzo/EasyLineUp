@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
 import com.telen.easylineup.data.Team
+import com.telen.easylineup.data.TeamType
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -16,7 +17,7 @@ class NameEmptyException: Exception()
 class TeamViewModel: ViewModel() {
 
     enum class NextStep(val id: Int) {
-        TEAM(0), PLAYERS(1), FINISH(2);
+        TEAM(0), TYPE(1), PLAYERS(2), FINISH(3);
     }
 
     enum class Error {
@@ -33,6 +34,7 @@ class TeamViewModel: ViewModel() {
     var teamID: Long? = 0
     private var teamName: String = ""
     private var teamImage: String? = null
+    private var teamType: TeamType = TeamType.BASEBALL
 
     private var nameLiveData = MutableLiveData<String>()
     private var imageLiveData = MutableLiveData<String>()
@@ -68,10 +70,13 @@ class TeamViewModel: ViewModel() {
         val image = teamImage
 
         return if(!TextUtils.isEmpty(name)) {
-            val team = Team(id = teamID ?: 0, name = name, image = image)
+            val team = Team(id = teamID ?: 0, name = name, image = image, type = teamType.id)
 
             if(team.id == 0L) {
-                App.database.teamDao().insertTeam(team)
+                App.database.teamDao().insertTeam(team).flatMapCompletable {
+                    teamID = it
+                    Completable.complete()
+                }
             }
             else {
                 App.database.teamDao().updateTeam(team)
@@ -93,9 +98,8 @@ class TeamViewModel: ViewModel() {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            stepLiveData.value = NextStep.PLAYERS
+                            stepLiveData.value = NextStep.TYPE
                             bottomBarLiveData.value = BottomBarState.NEXT_ENABLED
-                            bottomBarLiveData.value = BottomBarState.NEXT_FINISH
                         }, {
                             bottomBarLiveData.value = BottomBarState.NEXT_ENABLED
                             if(it is NameEmptyException) {
@@ -104,6 +108,20 @@ class TeamViewModel: ViewModel() {
                             else {
                                 errorLiveData.value = Error.UNKNOWN
                             }
+                        })
+            }
+            NextStep.TYPE.id -> {
+                dispose(saveDisposable)
+                saveDisposable = saveTeam()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            stepLiveData.value = NextStep.PLAYERS
+                            bottomBarLiveData.value = BottomBarState.NEXT_ENABLED
+                            bottomBarLiveData.value = BottomBarState.NEXT_FINISH
+                        }, {
+                            bottomBarLiveData.value = BottomBarState.NEXT_ENABLED
+                            errorLiveData.value = Error.UNKNOWN
                         })
             }
             NextStep.PLAYERS.id -> {
@@ -122,6 +140,20 @@ class TeamViewModel: ViewModel() {
 
     fun backPressed() {
 
+    }
+
+    fun getTeamType(): LiveData<TeamType> {
+        val liveDataType = MutableLiveData<TeamType>()
+        liveDataType.value = teamType
+        return liveDataType
+    }
+
+    fun setTeamType(position: Int) {
+        TeamType.values().forEach {
+            if(it.position == position) {
+                teamType = it
+            }
+        }
     }
 
 }

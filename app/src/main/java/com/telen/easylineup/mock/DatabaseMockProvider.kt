@@ -40,7 +40,7 @@ class DatabaseMockProvider {
                          val lineupsJson = root.getAsJsonArray("lineups")
                          val positionsJson = root.getAsJsonArray("playerPositions")
 
-                         val team = Team(teamJson.get("id").asLong, teamJson.get("name").asString, teamJson.get("image").asString)
+                         val team = Team(teamJson.get("id").asLong, teamJson.get("name").asString, teamJson.get("image").asString, type = teamJson.get("type").asInt)
 
                          val playersList = mutableListOf<Player>()
                          for( i in 0 until playersJson.size()) {
@@ -60,7 +60,7 @@ class DatabaseMockProvider {
                          for( i in 0 until lineupsJson.size()) {
                              val line = lineupsJson[i].asJsonObject
                              lineupsList.add(Lineup(line["id"].asLong, line["name"].asString, line["teamId"].asLong,
-                                     line["tournamentId"].asLong, line["createdTimeInMillis"].asLong, line["editedTimeInMillis"].asLong))
+                                     line["tournamentId"].asLong, line["mode"].asInt, line["createdTimeInMillis"].asLong, line["editedTimeInMillis"].asLong))
                          }
 
                          val positionsList = mutableListOf<PlayerFieldPosition>()
@@ -82,7 +82,7 @@ class DatabaseMockProvider {
     }
 
     private fun insertTeam(team:Team): Completable {
-        return App.database.teamDao().insertTeam(team)
+        return App.database.teamDao().insertTeam(team).ignoreElement()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

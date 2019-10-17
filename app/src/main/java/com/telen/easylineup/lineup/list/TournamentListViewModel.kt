@@ -9,6 +9,7 @@ import com.telen.easylineup.App
 import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
+import io.reactivex.Completable
 
 class TournamentListViewModel: ViewModel() {
 
@@ -55,5 +56,9 @@ class TournamentListViewModel: ViewModel() {
             }
             result
         }
+    }
+
+    fun deleteTournament(tournament: Tournament) : Completable {
+        return App.database.tournamentDao().deleteTournament(tournament)
     }
 }

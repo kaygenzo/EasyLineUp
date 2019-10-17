@@ -8,7 +8,7 @@ import io.reactivex.Single
 @Dao
 interface TeamDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTeam(team: Team): Completable
+    fun insertTeam(team: Team): Single<Long>
 
     @Delete
     fun deleteTeam(team: Team)

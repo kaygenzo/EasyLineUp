@@ -45,6 +45,7 @@
 
     <string name="dialog_delete_lineup_title">Delete lineup ?</string>
     <string name="dialog_delete_player_title">Delete player ?</string>
+    <string name="dialog_delete_tournament_title">Delete tournament %s ?</string>
     <string name="dialog_delete_position_title">Delete position ?</string>
     <string name="dialog_delete_cannot_undo_message">This action cannot be undo, are you sure ?</string>
     <string name="dialog_delete_progress_message">Deleting&#8230;</string>
@@ -65,5 +66,15 @@
     <string name="lineup_list_filter_unfocused_hint">Filter name&#8230;</string>
 
     <string name="shake_beta_description">Any problem ? Shake your phone and send a report!</string>
+
+    <string name="field_position_dp">DP</string>
+    <string name="field_position_dh">DH</string>
+    <string name="field_position_flex">FLEX</string>
+
+    <string name="action_add_dp_flex">Use DP/Flex</string>
+    <string name="action_add_dh">Use DH</string>
+
+    <string name="title_baseball">Baseball</string>
+    <string name="title_softball">Softball</string>
 
 </resources>

@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -17,13 +18,28 @@ import com.telen.easylineup.R
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
 import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
+import io.reactivex.Completable
 import kotlinx.android.synthetic.main.fragment_list_tournaments.view.*
 
 class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchBar.OnSearchActionListener {
 
+    override fun onTournamentLongClicked(tournament: Tournament) {
+        activity?.let {
+            val categorizedViewModel =  ViewModelProviders.of(this).get(TournamentListViewModel::class.java)
+            val task: Completable = categorizedViewModel.deleteTournament(tournament).doOnComplete {
+
+            }.doOnError {throwable ->
+                Toast.makeText(activity, "Something wrong happened: ${throwable.message}", Toast.LENGTH_LONG).show()
+            }
+            DialogFactory.getWarningDialog(it, it.getString(R.string.dialog_delete_tournament_title, tournament.name),
+                    it.getString(R.string.dialog_delete_cannot_undo_message), task).show()
+        }
+    }
+
     override fun onHeaderClicked() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun onLineupClicked(lineup: Lineup) {

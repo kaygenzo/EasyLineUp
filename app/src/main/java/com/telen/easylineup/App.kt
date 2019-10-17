@@ -21,6 +21,7 @@ class App: MultiDexApplication() {
         super.onCreate()
         database = Room.databaseBuilder(this, AppDatabase::class.java, "easylineup_database")
                 .addMigrations(migration_1_2())
+                .addMigrations(migration_2_3())
                 .build()
 
         if (BuildConfig.DEBUG) {
@@ -38,6 +39,15 @@ class App: MultiDexApplication() {
         return object: Migration(1,2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE Players ADD COLUMN positions INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+    }
+
+    private fun migration_2_3(): Migration {
+        return object: Migration(2,3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE Lineups ADD COLUMN mode INTEGER NOT NULL DEFAULT 0")
+                database.execSQL("ALTER TABLE Teams ADD COLUMN type INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

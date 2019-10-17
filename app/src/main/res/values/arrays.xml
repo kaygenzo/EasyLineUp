@@ -14,7 +14,8 @@
     </string-array>
 
     <string-array name="createTeamSteps">
-        <item>Team creation</item>
+        <item>Team init</item>
+        <item>Choose type</item>
         <item>Add players</item>
     </string-array>
 </resources>

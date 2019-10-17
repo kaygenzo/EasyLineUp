@@ -57,7 +57,8 @@ class LineupFragment: Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         if(!viewModel.editable)
-            inflater.inflate(R.menu.lineup_edit_menu, menu)
+            inflater.inflate(R.menu.menu_lineup_summary, menu)
+
         super.onCreateOptionsMenu(menu, inflater)
     }
 

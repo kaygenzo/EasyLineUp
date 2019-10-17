@@ -39,6 +39,7 @@ data class Lineup(
         @ColumnInfo(name = "name") var name: String = "",
         @ColumnInfo(name = "teamID") var teamId: Long = 0,
         @ColumnInfo(name = "tournamentID") var tournamentId: Long = 0,
+        @ColumnInfo(name = "mode") var mode: Int = 0,
         @ColumnInfo(name = "createdAt") var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         @ColumnInfo(name = "editedAt") var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         @Ignore val playerPositions: MutableList<FieldPosition> = mutableListOf())

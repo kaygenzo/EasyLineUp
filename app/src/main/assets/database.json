@@ -2,6 +2,7 @@
   "team": {
     "id": 1,
     "name": "DC Univers",
+    "type": 0,
     "image": "https://cdn.tomsguide.fr/content/uploads/sites/2/2016/10/batman3.jpg"
   },
   "players": [
@@ -169,6 +170,7 @@
       "name":  "DC vs DC 1",
       "teamId": 1,
       "tournamentId": 1,
+      "mode": 1,
       "createdTimeInMillis": 1567368919,
       "editedTimeInMillis": 1567368919
     },
@@ -177,6 +179,7 @@
       "name":  "DC vs DC 2",
       "teamId": 1,
       "tournamentId": 1,
+      "mode": 0,
       "createdTimeInMillis": 1567368920,
       "editedTimeInMillis": 1567368920
     },
@@ -185,6 +188,7 @@
       "name":  "DC vs DC 3",
       "teamId": 1,
       "tournamentId": 1,
+      "mode": 0,
       "createdTimeInMillis": 1567368921,
       "editedTimeInMillis": 1567368921
     },
@@ -193,6 +197,7 @@
       "name":  "DC vs DC 4",
       "teamId": 1,
       "tournamentId": 1,
+      "mode": 0,
       "createdTimeInMillis": 1567368922,
       "editedTimeInMillis": 1567368922
     },
@@ -201,6 +206,7 @@
       "name":  "DC vs DC 5",
       "teamId": 1,
       "tournamentId": 1,
+      "mode": 0,
       "createdTimeInMillis": 1567368923,
       "editedTimeInMillis": 1567368923
     },
@@ -209,6 +215,7 @@
       "name":  "DC vs DC 6",
       "teamId": 1,
       "tournamentId": 2,
+      "mode": 0,
       "createdTimeInMillis": 1567368924,
       "editedTimeInMillis": 1567368924
     },
@@ -217,6 +224,7 @@
       "name":  "DC vs DC 7",
       "teamId": 1,
       "tournamentId": 3,
+      "mode": 0,
       "createdTimeInMillis": 1567368925,
       "editedTimeInMillis": 1567368925
     },
@@ -225,6 +233,7 @@
       "name":  "DC vs DC 8",
       "teamId": 1,
       "tournamentId": 3,
+      "mode": 0,
       "createdTimeInMillis": 1567368926,
       "editedTimeInMillis": 1567368926
     }

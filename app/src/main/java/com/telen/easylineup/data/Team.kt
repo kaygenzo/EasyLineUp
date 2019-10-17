@@ -2,6 +2,10 @@ package com.telen.easylineup.data
 
 import androidx.room.*
 
+enum class TeamType(val id: Int, val position: Int) {
+    UNKNOWN(0, -1), BASEBALL(1, 0), SOFTBALL(2, 1);
+}
+
 @Entity(
         tableName = "teams",
         indices = [Index(value = ["name"])]
@@ -10,12 +14,7 @@ data class Team(
         @PrimaryKey(autoGenerate = true) var id: Long = 0,
         @ColumnInfo(name = "name") var name: String = "",
         @ColumnInfo(name = "image") var image: String? = null,
-        @Ignore val players: MutableList<Player> = mutableListOf()) {
-
-    fun setPlayers(players: List<Player>) {
-        this.players.clear()
-        this.players.addAll(players)
-    }
+        @ColumnInfo(name = "type") val type: Int) {
 
     override fun toString(): String {
         val builder = StringBuffer().apply {
@@ -23,11 +22,7 @@ data class Team(
             append("id=$id,")
             append("name=$name,")
             append("image=$image,")
-            append("players:")
-            players.forEach {
-                append(it)
-                append(",")
-            }
+            append("type=$type")
             append("}")
         }
         return builder.toString()

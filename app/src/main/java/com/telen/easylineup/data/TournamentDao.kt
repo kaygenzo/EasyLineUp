@@ -19,4 +19,7 @@ interface TournamentDao {
 
     @Update
     fun updateTournament(tournament: Tournament): Completable
+
+    @Delete
+    fun deleteTournament(tournament: Tournament): Completable
 }

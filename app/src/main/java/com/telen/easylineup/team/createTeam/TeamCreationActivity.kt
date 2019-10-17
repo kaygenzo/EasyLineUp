@@ -43,6 +43,10 @@ class TeamCreationActivity: AppCompatActivity() {
                     arguments.putBoolean(Constants.EXTRA_CLICKABLE, false)
                     navController.navigate(R.id.navigation_team, arguments, NavigationUtils().getOptions())
                 }
+                TeamViewModel.NextStep.TYPE -> {
+                    stepLayout.go(it.id, true)
+                    navController.navigate(R.id.teamTypeFragment, null, NavigationUtils().getOptions())
+                }
                 TeamViewModel.NextStep.FINISH -> {
                     val intent = Intent(this, HomeActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
