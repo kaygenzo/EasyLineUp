@@ -15,6 +15,10 @@ def reportPropertiesFile = rootProject.file("bugbattle.properties")
 def reportProperties = new Properties()
 reportProperties.load(new FileInputStream(reportPropertiesFile))
 
+def sonarPropertiesFile = rootProject.file("sonar.properties")
+def sonarProperties = new Properties()
+sonarProperties.load(new FileInputStream(sonarPropertiesFile))
+
 // Create a variable called keystorePropertiesFile, and initialize it to your
 // keystore.properties file, in the rootProject folder.
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -137,14 +141,9 @@ dependencies {
         exclude group: 'org.jetbrains.kotlin' // Only if you already use Kotlin in your project
     }
 
-//    androidTestImplementation 'androidx.test.espresso:espresso-contrib:'+ rootProject.espressoVersion
-//    androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoVersion
-
-//    testImplementation 'androidx.test:core:' + rootProject.coreVersion
-//    testImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion
-//    testImplementation 'junit:junit:4.12'
-//    testImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoVersion
-//    testImplementation 'androidx.test.espresso:espresso-intents:' + rootProject.espressoVersion
+    testImplementation 'androidx.test:core:' + rootProject.coreVersion
+    testImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion
+    testImplementation 'junit:junit:4.12'
 //    testImplementation 'androidx.test.ext:truth:' + rootProject.extTruthVersion
 
     def lifecycle_version = "2.0.0"
@@ -211,3 +210,23 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'org.sonarqube'
+
+sonarqube {
+    properties {
+        property "sonar.projectKey",  sonarProperties['sonar.projectKey']
+        property "sonar.projectName",  sonarProperties['sonar.projectName']
+        property "sonar.projectVersion",  sonarProperties['sonar.projectVersion']
+        property "sonar.host.url",  sonarProperties['sonar.host.url']
+
+        property "sonar.language",  sonarProperties['sonar.language']
+        property "sonar.sourceEncoding",  sonarProperties['sonar.sourceEncoding']
+        property "sonar.java.source",  sonarProperties['sonar.java.source']
+        property "sonar.java.target",  sonarProperties['sonar.java.target']
+
+        property "sonar.sources",  sonarProperties['sonar.sources']
+        property "sonar.java.binaries",  sonarProperties['sonar.java.binaries']
+        property "sonar.profile",  sonarProperties['sonar.profile']
+        property "sonar.host.url", sonarProperties['sonar.host.url']
+    }
+}
