@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">EasyLineup</string>
     <string name="splashscreen_title" translatable="false">Easylineup</string>
@@ -21,8 +22,8 @@
     <string name="player_hint_license_number">License number</string>
     <string name="player_hint_license_number_short">License N°</string>
 
-    <string name="title_last_lineup">Last lineup</string>
-    <string name="title_team">My team</string>
+    <string name="title_last_lineup">Dashboard</string>
+    <string name="title_team">Team Roster</string>
     <string name="title_lineups">My Lineups</string>
     <string name="title_settings">Settings</string>
     <string name="title_player_details">Statistics</string>
@@ -76,5 +77,4 @@
 
     <string name="title_baseball">Baseball</string>
     <string name="title_softball">Softball</string>
-
 </resources>

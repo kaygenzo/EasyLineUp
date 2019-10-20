@@ -8,10 +8,10 @@
     <dimen name="lineup_title_size">20sp</dimen>
     <dimen name="item_lineup_list_title_size">20sp</dimen>
 
-    <dimen name="item_attack_height">60dp</dimen>
-    <dimen name="item_attack_width">60dp</dimen>
-    <dimen name="item_attack_text_size">25sp</dimen>
-    <dimen name="item_attack_name_text_size">20sp</dimen>
+    <dimen name="item_attack_height">50dp</dimen>
+    <dimen name="item_attack_width">50dp</dimen>
+    <dimen name="item_attack_text_size">20sp</dimen>
+    <dimen name="item_attack_name_text_size">15sp</dimen>
 
     <dimen name="card_defense_header_height">20dp</dimen>
 

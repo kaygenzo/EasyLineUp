@@ -59,35 +59,35 @@ android {
         }
 
         debug {
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['debug.storeFile'])
+            storePassword keystoreProperties['debug.storePassword']
+            keyAlias keystoreProperties['debug.keyAlias']
+            keyPassword keystoreProperties['debug.keyPassword']
         }
     }
 
     productFlavors {
         dev {
             dimension 'version'
-            signingConfig signingConfigs.debug
         }
         prod {
             dimension 'version'
-            signingConfig signingConfigs.release
+
         }
         demo {
             dimension 'version'
-            signingConfig signingConfigs.debug
             buildConfigField("boolean", "usePrefilledDatabase", "true")
         }
     }
 
     buildTypes {
         debug {
+            signingConfig signingConfigs.debug
             minifyEnabled false
             versionNameSuffix "-debug"
         }
         release {
+            signingConfig signingConfigs.release
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -146,17 +146,15 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 //    testImplementation 'androidx.test.ext:truth:' + rootProject.extTruthVersion
 
-    def lifecycle_version = "2.0.0"
-
     implementation "androidx.constraintlayout:constraintlayout:1.1.3"
     implementation "androidx.appcompat:appcompat:1.1.0"
     implementation "com.google.android.material:material:1.1.0-beta01"
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
 
-    implementation 'androidx.multidex:multidex:2.0.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
 
-    def room_version = "2.1.0-beta01"
+
     implementation "androidx.room:room-runtime:$room_version"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt "androidx.room:room-compiler:$room_version"
@@ -181,7 +179,6 @@ dependencies {
     implementation 'com.github.qingmei2:rximagepicker_support_zhihu:2.4.3'
     implementation 'com.github.qingmei2:rximagepicker_support:2.4.3'
 
-    def nav_version_ktx = "2.2.0-alpha03"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version_ktx"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version_ktx"
 
@@ -204,7 +201,7 @@ dependencies {
     implementation 'com.orhanobut:dialogplus:1.11@aar'
 
     implementation 'com.google.firebase:firebase-analytics:17.2.0'
-    implementation 'com.google.firebase:firebase-perf:19.0.0'
+    implementation 'com.google.firebase:firebase-perf:19.0.1'
 
     implementation 'com.github.f0ris.sweetalert:library:1.6.2'
 }

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">EasyLineup</string>
+    <string name="splashscreen_title" translatable="false">Easylineup</string>
+
+    <string name="action_edit">Editer</string>
+    <string name="action_delete">Supprimer</string>
+    <string name="action_submit">Valider</string>
+
+    <string name="new_lineup_tab_field_defense">Defense</string>
+    <string name="new_lineup_tab_field_attack">Attaque</string>
+    <string name="new_lineup_substitute_label">Remplaçants</string>
+    <string name="save_button">Sauvegarder</string>
+    <string name="cancel_button">Annuler</string>
+
+    <string name="dialog_create_lineup_title">Creation&#8230;</string>
+    <string name="dialog_create_lineup_name">Titre</string>
+    <string name="dialog_create_lineup_tournament">Tournoi</string>
+    <string name="player_hint_name">Nom</string>
+    <string name="player_hint_shirt_number">Numéro de maillot</string>
+    <string name="player_hint_shirt_number_short">Maillot N°</string>
+    <string name="player_hint_license_number">Numéro de Licence</string>
+    <string name="player_hint_license_number_short">Licence N°</string>
+
+    <string name="title_last_lineup">Accueil</string>
+    <string name="title_team">Joueurs</string>
+    <string name="title_lineups">Mes Lineups</string>
+    <string name="title_settings">Paramètres</string>
+    <string name="title_player_details">Statistiques</string>
+    <string name="title_player_edition">Modification de joueur</string>
+    <string name="title_lineup_edition">Modification de lineup</string>
+    <string name="title_team_edition">Modification de l\'équipe</string>
+
+    <string name="team_creation_button_next">Suivant</string>
+    <string name="team_creation_button_finish">Terminer</string>
+    <string name="team_creation_error_name_empty">Le nom de l\'équipe ne peut pas être vide</string>
+
+    <string name="player_creation_error_name_empty">Le nom du joueur ne peut pas être vide</string>
+    <string name="player_creation_error_shirt_empty">Le numéro de maillot de peut pas être vide</string>
+    <string name="player_creation_error_license_empty">Le numéro de licence ne peut pas être vide</string>
+
+    <string name="lineup_creation_error_name_empty">Le nom du lineup ne peut pas être vide</string>
+    <string name="lineup_creation_error_tournament_empty">Le nom du tournoi ne peut pas être vide</string>
+
+    <string name="nav_header_desc">En-tête de navigation</string>
+
+    <string name="dialog_delete_lineup_title">Supprimer le lineup ?</string>
+    <string name="dialog_delete_player_title">Supprimer le joueur ?</string>
+    <string name="dialog_delete_tournament_title">Supprimer le tournoi %s ?</string>
+    <string name="dialog_delete_position_title">Supprimer la position ?</string>
+    <string name="dialog_delete_cannot_undo_message">Cette action ne peut pas être annulée, êtes-vous sûr ?</string>
+    <string name="dialog_delete_progress_message">Suppression&#8230;</string>
+
+    <string name="tile_team_size_message">%d joueurs dans votre équipe</string>
+    <string name="tile_team_size_warning_message">Pas assez de joueurs pour avoir une équipe complète!</string>
+    <string name="tile_most_used_player_header">Joueur le plus utilisé</string>
+    <string name="tile_most_used_player_games_played">Matchs joués</string>
+
+    <string name="header_batting_order_player_name">Nom du joueur</string>
+    <string name="header_batting_order_player_shirt">N°</string>
+    <string name="header_batting_order_player_position">Pos.</string>
+
+    <string name="form_lineup_creation_more_label">Plus</string>
+
+    <string name="lineup_list_empty_label">Vide</string>
+    <string name="lineup_list_filter_focused_hint">Tapez un nom</string>
+    <string name="lineup_list_filter_unfocused_hint">Filtrer par nom&#8230;</string>
+
+    <string name="shake_beta_description">Un problème ? Secouez votre périphérique et envoyez un rapport!</string>
+
+    <string name="title_baseball">Baseball</string>
+    <string name="title_softball">Softball</string>
+</resources>
