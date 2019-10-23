@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.header_player_attack.view.*
 
@@ -21,7 +20,6 @@ class PlayerBattingHeader: ConstraintLayout {
         playerName.setText(R.string.header_batting_order_player_name)
         fieldPosition.setText(R.string.header_batting_order_player_position)
         shirtNumber.setText(R.string.header_batting_order_player_shirt)
-        setBackgroundColor(ContextCompat.getColor(context, R.color.tile_player_most_used_header_color))
     }
 
     fun setIsEditable(isEditable: Boolean) {

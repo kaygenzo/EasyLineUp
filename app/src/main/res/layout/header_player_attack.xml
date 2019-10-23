@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="@dimen/item_attack_height"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:background="@drawable/shape_attack_header">
 
     <ImageView
         android:id="@+id/reorderImage"

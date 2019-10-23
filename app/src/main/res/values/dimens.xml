@@ -8,8 +8,8 @@
     <dimen name="lineup_title_size">20sp</dimen>
     <dimen name="item_lineup_list_title_size">20sp</dimen>
 
-    <dimen name="item_attack_height">50dp</dimen>
-    <dimen name="item_attack_width">50dp</dimen>
+    <dimen name="item_attack_height">40dp</dimen>
+    <dimen name="item_attack_width">40dp</dimen>
     <dimen name="item_attack_text_size">20sp</dimen>
     <dimen name="item_attack_name_text_size">15sp</dimen>
 
