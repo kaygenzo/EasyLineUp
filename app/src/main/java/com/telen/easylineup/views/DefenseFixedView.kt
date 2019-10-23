@@ -69,7 +69,7 @@ class DefenseFixedView: ConstraintLayout {
 
     fun setListPlayerInField(players: List<PlayerWithPosition>, loadingCallback: LoadingCallback?) {
 
-        if(players.filter { !FieldPosition.isSubstitute(it.position) }.isNotEmpty())
+        if(players.filter { FieldPosition.isDefensePlayer(it.position) }.isNotEmpty())
             loadingCallback?.onStartLoading()
 
         fieldFrameLayout.post {
@@ -77,7 +77,7 @@ class DefenseFixedView: ConstraintLayout {
 
             val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
 
-            players.filter { !FieldPosition.isSubstitute(it.position) }
+            players.filter { FieldPosition.isDefensePlayer(it.position) }
                     .forEach { player ->
                         val position = FieldPosition.getFieldPosition(player.position)
                         position?.let {
@@ -106,7 +106,7 @@ class DefenseFixedView: ConstraintLayout {
 
         fieldFrameLayout.post {
             cleanPlayerIcons()
-            positions.filter { !FieldPosition.isSubstitute(it.position) }
+            positions.filter { FieldPosition.isDefensePlayer(it.position) }
                     .forEach { position ->
                         val iconView = ImageView(context).run {
                             layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)

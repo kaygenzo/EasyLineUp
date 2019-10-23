@@ -24,6 +24,10 @@ class PlayerFieldIcon: LinearLayout {
         playerShirtNumber.text = shirtNumber.toString()
     }
 
+    fun setShirtNumber(shirtNumber: String) {
+        playerShirtNumber.text = shirtNumber
+    }
+
     fun setPlayerImage(url: String?, size: Int) {
         Picasso.get().load(url)
                 .resize(size, size)

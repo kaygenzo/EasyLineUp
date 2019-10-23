@@ -61,6 +61,14 @@ class AttackFragment: Fragment(), OnDataChangedListener {
                     adapterDataList.addAll(items)
                     playerAdapter.notifyDataSetChanged()
                 })
+
+                viewModel.registerLineupChange().observe(this, Observer { lineup ->
+                    lineup?.let {
+                        playerAdapter.lineupMode = lineup.mode
+                        playerAdapter.notifyDataSetChanged()
+                    }
+                })
+
             }
         }
 

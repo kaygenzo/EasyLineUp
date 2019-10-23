@@ -1,9 +1,11 @@
 package com.telen.easylineup.data
 
-import android.graphics.PointF
 import androidx.room.*
 import com.telen.easylineup.FieldPosition
 import java.util.*
+
+const val MODE_NONE = 0
+const val MODE_DH = 1
 
 @Entity(
         tableName = "playerFieldPosition",

@@ -15,7 +15,7 @@ interface LineupDao {
     fun insertLineup(lineups: List<Lineup>): Completable
 
     @Update
-    fun updateLineup(lineup: Lineup)
+    fun updateLineup(lineup: Lineup): Completable
 
     @Delete
     fun deleteLineup(lineup: Lineup): Completable

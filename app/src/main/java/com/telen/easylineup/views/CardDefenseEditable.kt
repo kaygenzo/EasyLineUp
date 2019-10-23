@@ -6,9 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
-import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
-import com.telen.easylineup.data.Player
+import com.telen.easylineup.lineup.LineupStatusDefense
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.card_defense_editable.view.*
 
@@ -33,8 +32,8 @@ class CardDefenseEditable: CardView, LoadingCallback {
         }
     }
 
-    fun setListPlayer(players: Map<Player, FieldPosition?>) {
-        fieldAndPlayersRootView.setListPlayer(players, this)
+    fun setListPlayer(lineupStatusDefense: LineupStatusDefense) {
+        fieldAndPlayersRootView.setListPlayer(lineupStatusDefense, this)
     }
 
     fun setPlayerStateListener(playerButtonCallback: OnPlayerButtonCallback) {

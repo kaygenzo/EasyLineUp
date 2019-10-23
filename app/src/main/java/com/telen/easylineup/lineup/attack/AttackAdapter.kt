@@ -6,8 +6,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
+import com.telen.easylineup.data.MODE_DH
+import com.telen.easylineup.data.MODE_NONE
 import com.telen.easylineup.data.PlayerWithPosition
 import com.telen.easylineup.views.PlayerPositionFilterView
 
@@ -25,6 +28,7 @@ interface OnDataChangedListener {
 class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, val dataListener: OnDataChangedListener?, val isEditable: Boolean): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
 
     private var positionDescriptions: Array<String>? = null
+    var lineupMode = MODE_NONE
 
     override fun onDragStart() {
 
@@ -39,8 +43,15 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
     }
 
     override fun onMoved(fromPosition: Int, toPosition: Int) {
-        if(!FieldPosition.isSubstitute(players[fromPosition].position) &&
-                !FieldPosition.isSubstitute(players[toPosition].position)) {
+        val canMoveFrom = if(lineupMode == MODE_NONE)
+            FieldPosition.isDefensePlayer(players[fromPosition].position)
+        else
+            FieldPosition.canBeBatterWhenDH(players[fromPosition].position)
+        val canMoveTo = if(lineupMode == MODE_NONE)
+            FieldPosition.isDefensePlayer(players[toPosition].position)
+        else
+            FieldPosition.canBeBatterWhenDH(players[toPosition].position)
+        if(canMoveFrom && canMoveTo) {
             val fromOrder = players[fromPosition].order
             val toOrder = players[toPosition].order
             players[fromPosition].order = toOrder
@@ -77,16 +88,19 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
         with(holder) {
 
             val isSubstitute = FieldPosition.isSubstitute(player.position)
+            val isDefensePlayer = FieldPosition.isDefensePlayer(player.position)
 
             playerName.text = player.playerName
             shirtNumber.text = player.shirtNumber.toString()
 
-            if(!isSubstitute)
+            if(isDefensePlayer)
                 fieldPosition.text = player.position.toString()
             else
                 fieldPosition.text = ""
 
             order.text = player.order.toString()
+            if(BuildConfig.DEBUG)
+                order.visibility = View.VISIBLE
 
             positionDescriptions?.let { descs ->
                 FieldPosition.getFieldPosition(player.position)?.let {
@@ -96,12 +110,17 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
                 positionDesc.setTextColor(R.color.tile_team_size_background_color)
             }
 
-            if(!isEditable || isSubstitute) {
+            if(!isEditable || isSubstitute || (lineupMode == MODE_DH && FieldPosition.getFieldPosition(player.position) == FieldPosition.PITCHER)) {
                 reorderImage.visibility = View.GONE
-                positionDesc.visibility = View.VISIBLE
             }
             else {
                 reorderImage.visibility = View.VISIBLE
+            }
+
+            if(!isEditable || isSubstitute || (lineupMode == MODE_DH && FieldPosition.getFieldPosition(player.position) == FieldPosition.DH)) {
+                positionDesc.visibility = View.VISIBLE
+            }
+            else {
                 positionDesc.visibility = View.GONE
             }
         }

@@ -2,18 +2,24 @@ package com.telen.easylineup.lineup
 
 import android.os.Bundle
 import android.view.*
+import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
+import com.telen.easylineup.data.MODE_DH
+import com.telen.easylineup.data.MODE_NONE
 import com.telen.easylineup.utils.Constants
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
-import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.*
+import kotlinx.android.synthetic.main.fragment_lineup_edition.view.*
+import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.lineupTabLayout
+import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.viewpager
 
-class LineupFragment: Fragment() {
+class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
 
     lateinit var pagerAdapter: LineupPagerAdapter
     lateinit var viewModel: PlayersPositionViewModel
@@ -48,6 +54,23 @@ class LineupFragment: Fragment() {
             }
             else {
                 (activity as HomeActivity).supportActionBar?.title = ""
+            }
+
+            view.useDhCheckbox?.let { _ ->
+                viewModel.registerLineupChange().observe(this,  Observer {
+                    view.useDhCheckbox.apply {
+                        setOnCheckedChangeListener(null)
+                        when(it.mode) {
+                            MODE_NONE -> {
+                                isChecked = false
+                            }
+                            MODE_DH -> {
+                                isChecked = true
+                            }
+                        }
+                        setOnCheckedChangeListener(this@LineupFragment)
+                    }
+                })
             }
         }
 
@@ -98,5 +121,10 @@ class LineupFragment: Fragment() {
                             })
                     .show()
         }
+    }
+
+    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+        Toast.makeText(activity, "Dh is $isChecked", Toast.LENGTH_SHORT).show()
+        viewModel.onDesignatedPlayerChanged(isChecked)
     }
 }

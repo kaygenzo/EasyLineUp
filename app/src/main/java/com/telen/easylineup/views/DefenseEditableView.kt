@@ -15,6 +15,8 @@ import kotlinx.android.synthetic.main.field_view.view.*
 import kotlin.math.roundToInt
 import android.view.animation.AnimationUtils
 import com.telen.easylineup.R
+import com.telen.easylineup.data.MODE_DH
+import com.telen.easylineup.lineup.LineupStatusDefense
 
 
 const val ICON_SIZE_SCALE = 0.12f
@@ -56,13 +58,15 @@ class DefenseEditableView: ConstraintLayout {
         playerPositions = mutableMapOf()
     }
 
-    fun setListPlayer(players: Map<Player, FieldPosition?>, loadingCallback: LoadingCallback?) {
+    fun setListPlayer(lineupStatusDefense: LineupStatusDefense, loadingCallback: LoadingCallback?) {
         cleanPlayerIcons()
 
         val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
 
+        val players = lineupStatusDefense.players
+
         val emptyPositions = mutableListOf<FieldPosition>()
-        emptyPositions.addAll(FieldPosition.values().filter { !FieldPosition.isSubstitute(it.position) })
+        emptyPositions.addAll(FieldPosition.values().filter { FieldPosition.isDefensePlayer(it.position) })
 
         players.forEach { entry ->
 
@@ -76,7 +80,7 @@ class DefenseEditableView: ConstraintLayout {
 
                 emptyPositions.remove(pos)
 
-                if(!FieldPosition.isSubstitute(pos.position)) {
+                if(FieldPosition.isDefensePlayer(pos.position)) {
 
                     loadingCallback?.onStartLoading()
 
@@ -105,6 +109,7 @@ class DefenseEditableView: ConstraintLayout {
 
         addEmptyPositionMarker(players, emptyPositions)
         addSubstitutePlayers(players)
+        addDesignatedPlayerIfExists(players, lineupStatusDefense.lineupMode)
     }
 
     private fun addEmptyPositionMarker(players: Map<Player, FieldPosition?>, positionMarkers: MutableList<FieldPosition>) {
@@ -168,6 +173,48 @@ class DefenseEditableView: ConstraintLayout {
                 }
     }
 
+    private fun addDesignatedPlayerIfExists(players: Map<Player, FieldPosition?>, lineupMode: Int) {
+        if(lineupMode == MODE_DH) {
+            val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+            players.filter { it.value == FieldPosition.DH }.let {
+                var view: View? = null
+                try {
+                    val player = it.keys.first()
+                    val position = players[player]
+                    position?.let {
+                        val playerView = PlayerFieldIcon(context).run {
+                            layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
+                            setPlayerImage(player.image, iconSize)
+                            setShirtNumber(context.getString(R.string.field_position_dh))
+                            this
+                        }
+
+                        view = playerView
+                    }
+                } catch (e: NoSuchElementException) {
+                    val positionView = AddDesignatedPlayerButton(context).run {
+                        layoutParams = LayoutParams(iconSize, iconSize)
+                        this
+                    }
+
+                    view = positionView
+                }
+
+                view?.apply {
+                    setOnClickListener {
+                        val listAvailablePlayers = players
+                                .filter { it.value == null }
+                                .keys.toList()
+                        playerListener?.onPlayerButtonClicked(listAvailablePlayers, FieldPosition.DH, view is AddDesignatedPlayerButton)
+                    }
+
+                    addPlayerOnFieldWithPercentage(this, FieldPosition.DH.xPercent, FieldPosition.DH.yPercent, null)
+                }
+
+            }
+        }
+    }
+
     private fun addPlayerOnFieldWithPercentage(view: View, x: Float, y: Float, loadingCallback: LoadingCallback?) {
         fieldFrameLayout.post {
             val layoutHeight = fieldFrameLayout.height
@@ -226,7 +273,7 @@ class DefenseEditableView: ConstraintLayout {
         if(fieldFrameLayout.childCount > 1) {
             for (i in fieldFrameLayout.childCount-1 downTo 0) {
                 val view = fieldFrameLayout.getChildAt(i)
-                if(view is PlayerFieldIcon || view is AddPlayerButton) {
+                if(view is PlayerFieldIcon || view is AddPlayerButton || view is AddDesignatedPlayerButton) {
                     view.clearAnimation()
                     fieldFrameLayout.removeView(fieldFrameLayout.getChildAt(i))
                 }

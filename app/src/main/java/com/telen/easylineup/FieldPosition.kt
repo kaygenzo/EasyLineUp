@@ -1,5 +1,7 @@
 package com.telen.easylineup
 
+import kotlin.math.PI
+
 enum class FieldPosition(val position: Int, val mask: Int, val xPercent: Float, val yPercent: Float) {
     SUBSTITUTE(0, 0, 0f, 100f),
     PITCHER(1,      0b1, 50f, 60f),
@@ -10,7 +12,8 @@ enum class FieldPosition(val position: Int, val mask: Int, val xPercent: Float, 
     SHORT_STOP(6,   0b100000, 37f, 43f),
     LEFT_FIELD(7,   0b1000000, 15f, 15f),
     CENTER_FIELD(8, 0b10000000, 50f, 10f),
-    RIGHT_FIELD(9,  0b100000000, 85f, 15f);
+    RIGHT_FIELD(9,  0b100000000, 85f, 15f),
+    DH(10,  0b1000000000, 0f, 100f);
 
     companion object {
         fun getFieldPosition(position: Int): FieldPosition? {
@@ -23,6 +26,14 @@ enum class FieldPosition(val position: Int, val mask: Int, val xPercent: Float, 
 
         fun isSubstitute(position: Int): Boolean {
             return position == SUBSTITUTE.position
+        }
+
+        fun isDefensePlayer(position: Int): Boolean {
+            return !isSubstitute(position) && position != DH.position
+        }
+
+        fun canBeBatterWhenDH(position: Int): Boolean {
+            return !isSubstitute(position) && position != PITCHER.position
         }
     }
 }
