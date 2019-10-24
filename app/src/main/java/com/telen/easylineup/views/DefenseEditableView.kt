@@ -186,6 +186,12 @@ class DefenseEditableView: ConstraintLayout {
                             layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
                             setPlayerImage(player.image, iconSize)
                             setShirtNumber(context.getString(R.string.field_position_dh))
+
+                            setOnLongClickListener {
+                                playerListener?.onPlayerButtonLongClicked(player, FieldPosition.DH)
+                                true
+                            }
+
                             this
                         }
 
