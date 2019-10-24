@@ -204,7 +204,9 @@ class PlayerFormView: ConstraintLayout {
 
         favoritePositionsContainer.removeAllViews()
 
-        FieldPosition.values().forEach { position ->
+        FieldPosition.values()
+                .filter { FieldPosition.isDefensePlayer(it.position) }
+                .forEach { position ->
             val isEnabled = (positions and position.mask) != 0
             positionState[position] = isEnabled
 
