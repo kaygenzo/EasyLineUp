@@ -11,6 +11,8 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
+import com.telen.easylineup.data.MODE_DH
+import com.telen.easylineup.data.Player
 import com.telen.easylineup.data.PlayerWithPosition
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.field_view.view.*
@@ -32,32 +34,39 @@ class DefenseFixedView: ConstraintLayout {
         val layoutHeight = fieldFrameLayout.height
         val layoutWidth = fieldFrameLayout.width
 
-        val positionX = ((x * layoutWidth)/100f).roundToInt()
-        val positionY = ((y * layoutHeight)/100f).roundToInt()
+        val positionX = ((x * layoutWidth)/100f)
+        val positionY = ((y * layoutHeight)/100f)
 
         view.visibility = View.INVISIBLE
 
         val iconSize = (layoutWidth * ICON_SIZE_SCALE).roundToInt()
 
         view.post {
-            val imageWidth = view.width
-            val imageHeight = view.height
+            val imageWidth = view.width.toFloat()
+            val imageHeight = view.height.toFloat()
+
+            checkBounds(positionX, positionY, imageWidth, imageHeight) { correctedX: Float, correctedY: Float ->
 
 //                Timber.d("imageWidth=$imageWidth imageHeight=$imageHeight layoutWidth=$layoutWidth layoutHeight=$layoutHeight")
 //                Timber.d("x=$x y=$y positionX=$positionX positionY=$positionY")
 
-            val layoutParamCustom = FrameLayout.LayoutParams(iconSize, iconSize).run {
-                leftMargin = positionX - imageWidth / 2
-                topMargin = positionY - imageHeight / 2
-                this
-            }
+                val newPosX = correctedX - imageWidth / 2
+                val newPosY = correctedY - imageHeight / 2
 
-            view.run {
-                layoutParams = layoutParamCustom
-                visibility = View.VISIBLE
-                invalidate()
+                val layoutParamCustom = FrameLayout.LayoutParams(iconSize, iconSize).run {
+                    leftMargin = newPosX.toInt()
+                    topMargin = newPosY.toInt()
+                    this
+                }
+
+                view.run {
+                    layoutParams = layoutParamCustom
+                    visibility = View.VISIBLE
+                    invalidate()
+                }
+
+                loadingCallback?.onFinishLoading()
             }
-            loadingCallback?.onFinishLoading()
         }
 
         fieldFrameLayout.addView(view)
@@ -77,7 +86,7 @@ class DefenseFixedView: ConstraintLayout {
 
             val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
 
-            players.filter { FieldPosition.isDefensePlayer(it.position) }
+            players.filter { !FieldPosition.isSubstitute(it.position) }
                     .forEach { player ->
                         val position = FieldPosition.getFieldPosition(player.position)
                         position?.let {
@@ -85,7 +94,7 @@ class DefenseFixedView: ConstraintLayout {
 
                             val playerView = PlayerFieldIcon(context).run {
                                 layoutParams = LayoutParams(iconSize, iconSize)
-                                setPlayerImage(player.image)
+                                setPlayerImage(player.image, iconSize)
                                 setShirtNumber(player.shirtNumber)
                                 tag = PLAYER_ICON_TAG
                                 this
@@ -130,5 +139,25 @@ class DefenseFixedView: ConstraintLayout {
                 }
             }
         }
+    }
+
+    private fun checkBounds(x: Float, y: Float, imageWidth: Float, imageHeight: Float, callback: (x: Float,y: Float) -> Unit) {
+        val containerWidth = fieldFrameLayout.width.toFloat()
+        val containerHeight = fieldFrameLayout.height.toFloat()
+
+        var positionX: Float = x
+        var positionY: Float = y
+
+        if(positionX + imageWidth/2 > containerWidth)
+            positionX = containerWidth - imageWidth/2
+        if(positionX - imageWidth/2 < 0)
+            positionX = imageWidth/2
+
+        if(positionY - imageHeight/2 < 0)
+            positionY = imageHeight/2
+        if(positionY + imageHeight/2 > containerHeight)
+            positionY = containerHeight - imageHeight/2
+
+        callback(positionX, positionY)
     }
 }
