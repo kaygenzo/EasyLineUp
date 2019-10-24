@@ -26,4 +26,8 @@ class TimeLineHeaderView: ConstraintLayout {
             material_timeline_view.radioMarginStart = resources.getDimension(R.dimen.timeline_radio_margin_left_reverse)
         }
     }
+
+    fun setHeaderText(text: String) {
+        headerText.text = text
+    }
 }

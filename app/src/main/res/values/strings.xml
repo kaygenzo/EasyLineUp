@@ -77,4 +77,16 @@
 
     <string name="title_baseball">Baseball</string>
     <string name="title_softball">Softball</string>
+
+    <string name="tournaments_summary_header">%1$s / %2$s</string>
+
+    <plurals name="tournaments_quantity">
+        <item quantity="one">%d tournament</item>
+        <item quantity="other">%d tournaments</item>
+    </plurals>
+
+    <plurals name="lineups_quantity">
+        <item quantity="one">%d lineup</item>
+        <item quantity="other">%d lineups</item>
+    </plurals>
 </resources>

@@ -3,13 +3,14 @@ package com.telen.easylineup.lineup.list
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.telen.easylineup.R
 import com.telen.easylineup.data.Lineup
 import com.telen.easylineup.data.Tournament
 import com.telen.easylineup.views.*
 import pl.hypeapp.materialtimelineview.MaterialTimelineView
 
 sealed class TimeLineItem
-data class HeaderTimeLineItem(val position: Int) : TimeLineItem()
+data class HeaderTimeLineItem(val position: Int, val tournamentsSize: Int, val lineupsSize: Int) : TimeLineItem()
 data class EmptyTimeLineItem(val position: Int) : TimeLineItem()
 data class TimeLineLineItem(val tournament: Tournament) : TimeLineItem()
 data class TimelineTopView(val tournament: Tournament, val lineups: List<Lineup>): TimeLineItem()
@@ -73,6 +74,11 @@ class TournamentsAdapter(private val itemClickListener: OnItemClickedListener): 
                 val view = holder.view as TimeLineHeaderView
                 val item = items[position] as HeaderTimeLineItem
                 view.setTimeLinePosition(item.position)
+
+                val tournamentsQuantity = view.context.resources.getQuantityString(R.plurals.tournaments_quantity, item.tournamentsSize, item.tournamentsSize)
+                val lineupsQuantity = view.context.resources.getQuantityString(R.plurals.lineups_quantity, item.lineupsSize, item.lineupsSize)
+                val headerText = view.context.getString(R.string.tournaments_summary_header, tournamentsQuantity, lineupsQuantity)
+                view.setHeaderText(headerText)
             }
             is TimeLineLineItem -> {
                 val view = holder.view as TimeLineMiddleView
@@ -115,11 +121,13 @@ class TournamentsAdapter(private val itemClickListener: OnItemClickedListener): 
     fun setList(tournaments: List<Pair<Tournament, List<Lineup>>>) {
         items.clear()
         var index = 0
+        val tournamentsSize = tournaments.size
+        val lineupsSize = tournaments.map { pair -> pair.second.size }.sum()
         if(tournaments.isEmpty()) {
-            items.add(HeaderTimeLineItem(-1))
+            items.add(HeaderTimeLineItem(-1, tournamentsSize, lineupsSize))
         }
         else
-            items.add(HeaderTimeLineItem(MaterialTimelineView.POSITION_FIRST))
+            items.add(HeaderTimeLineItem(MaterialTimelineView.POSITION_FIRST, tournamentsSize, lineupsSize))
         tournaments.forEach {
             items.add(TimeLineLineItem(it.first))
             if(it.second.isEmpty()) {
