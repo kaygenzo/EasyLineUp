@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/playerPositionFilterRoot"
-    android:layout_width="@dimen/item_attack_height"
+    android:layout_width="@dimen/item_attack_width"
     android:layout_height="wrap_content"
     tools:background="@drawable/position_selected_background"
     android:layout_margin="5dp">

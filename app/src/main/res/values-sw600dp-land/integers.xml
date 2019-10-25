@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="lineup_edition_players_container_column_count">2</integer>
     <integer name="player_list_column_count">5</integer>
+    <integer name="dashboard_tile_count">4</integer>
 </resources>

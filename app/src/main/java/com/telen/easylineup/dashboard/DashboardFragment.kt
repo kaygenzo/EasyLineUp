@@ -38,7 +38,7 @@ class DashboardFragment: Fragment(), TileClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_dashboard, container, false)
 
-        val columnCount = 2
+        val columnCount = resources.getInteger(R.integer.dashboard_tile_count)
 
         val gridLayoutManager = GridLayoutManager(context, columnCount)
         gridLayoutManager.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {
