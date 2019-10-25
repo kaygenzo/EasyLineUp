@@ -1,6 +1,7 @@
 package com.telen.easylineup.views
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -11,8 +12,6 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
-import com.telen.easylineup.data.MODE_DH
-import com.telen.easylineup.data.Player
 import com.telen.easylineup.data.PlayerWithPosition
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.field_view.view.*
@@ -78,7 +77,7 @@ class DefenseFixedView: ConstraintLayout {
 
     fun setListPlayerInField(players: List<PlayerWithPosition>, loadingCallback: LoadingCallback?) {
 
-        if(players.filter { FieldPosition.isDefensePlayer(it.position) }.isNotEmpty())
+        if(players.any { FieldPosition.isDefensePlayer(it.position) })
             loadingCallback?.onStartLoading()
 
         fieldFrameLayout.post {
@@ -94,7 +93,18 @@ class DefenseFixedView: ConstraintLayout {
 
                             val playerView = PlayerFieldIcon(context).run {
                                 layoutParams = LayoutParams(iconSize, iconSize)
-                                setPlayerImage(player.image, iconSize)
+                                if(players.any { pos -> pos.position == FieldPosition.DH.position }) {
+                                    when (position) {
+                                        FieldPosition.DH, FieldPosition.PITCHER -> {
+                                            setPlayerImage(player.image, iconSize, Color.RED, 3f)
+                                        }
+                                        else -> {
+                                            setPlayerImage(player.image, iconSize)
+                                        }
+                                    }
+                                }
+                                else
+                                    setPlayerImage(player.image, iconSize)
                                 setShirtNumber(player.shirtNumber)
                                 tag = PLAYER_ICON_TAG
                                 this

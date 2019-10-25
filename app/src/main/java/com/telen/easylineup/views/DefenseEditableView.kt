@@ -1,6 +1,7 @@
 package com.telen.easylineup.views
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -86,7 +87,19 @@ class DefenseEditableView: ConstraintLayout {
 
                     val playerView = PlayerFieldIcon(context).run {
                         layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-                        setPlayerImage(player.image, iconSize)
+                        if(lineupStatusDefense.lineupMode == MODE_DH) {
+                            when(pos) {
+                                FieldPosition.DH, FieldPosition.PITCHER -> {
+                                    setPlayerImage(player.image, iconSize, Color.RED, 3f)
+                                }
+                                else -> {
+                                    setPlayerImage(player.image, iconSize)
+                                }
+                            }
+                        }
+                        else {
+                            setPlayerImage(player.image, iconSize)
+                        }
                         setShirtNumber(player.shirtNumber)
                         this
                     }
@@ -184,7 +197,7 @@ class DefenseEditableView: ConstraintLayout {
                     position?.let {
                         val playerView = PlayerFieldIcon(context).run {
                             layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-                            setPlayerImage(player.image, iconSize)
+                            setPlayerImage(player.image, iconSize, Color.RED, 3f)
                             setShirtNumber(context.getString(R.string.field_position_dh))
 
                             setOnLongClickListener {

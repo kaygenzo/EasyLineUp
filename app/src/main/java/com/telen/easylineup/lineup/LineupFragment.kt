@@ -49,11 +49,8 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
                 }
             }
 
-            if (viewModel.editable) {
-                (activity as HomeActivity).supportActionBar?.title = getString(R.string.title_lineup_edition)
-            }
-            else {
-                (activity as HomeActivity).supportActionBar?.title = ""
+            viewModel.lineupTitle?.let {
+                (activity as HomeActivity).supportActionBar?.title = it
             }
 
             view.useDhCheckbox?.let { _ ->
