@@ -56,6 +56,8 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
 
     override fun onPlayerButtonClicked(players: List<Player>, position: FieldPosition, isNewPlayer: Boolean) {
         activity?.let {
+
+            if(players.isNotEmpty()) {
                 val view = PlayerListView(it)
                 view.setPlayers(players, position)
 
@@ -78,6 +80,10 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
                 })
 
                 dialog.show()
+            } else {
+                DialogFactory.getSimpleDialog(it, it.getString(R.string.players_list_empty)).show()
+            }
+
         }
 
     }

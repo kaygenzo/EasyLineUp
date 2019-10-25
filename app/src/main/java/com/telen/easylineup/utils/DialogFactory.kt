@@ -42,5 +42,11 @@ class DialogFactory {
                     }
             return dialog
         }
+
+        fun getSimpleDialog(context: Context, title: String): SweetAlertDialog {
+            val dialog = SweetAlertDialog(context)
+                    .setTitleText(title)
+            return dialog
+        }
     }
 }
