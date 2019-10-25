@@ -84,4 +84,6 @@
         <item quantity="one">%d lineup</item>
         <item quantity="other">%d lineups</item>
     </plurals>
+
+    <string name="players_list_empty">Plus aucun joueur disponible</string>
 </resources>
