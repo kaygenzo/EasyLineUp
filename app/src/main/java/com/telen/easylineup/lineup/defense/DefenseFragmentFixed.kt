@@ -23,7 +23,6 @@ class DefenseFragmentFixed: Fragment() {
             viewModel.lineupID?.let {
                 viewModel.getPlayersWithPositions(it).observe(this, Observer { players ->
                     view.cardDefenseView.setListPlayer(players)
-                    view.cardDefenseView.setLineupName(viewModel.lineupTitle ?: "")
                 })
             }
         }

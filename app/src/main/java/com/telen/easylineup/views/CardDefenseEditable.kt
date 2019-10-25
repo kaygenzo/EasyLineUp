@@ -39,8 +39,4 @@ class CardDefenseEditable: CardView, LoadingCallback {
     fun setPlayerStateListener(playerButtonCallback: OnPlayerButtonCallback) {
         fieldAndPlayersRootView.setOnPlayerListener(playerButtonCallback)
     }
-
-    fun setLineupName(name: String) {
-        lineup_name.text = name
-    }
 }

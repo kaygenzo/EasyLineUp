@@ -35,8 +35,4 @@ class CardDefenseFixed: CardView, LoadingCallback {
     fun setListPlayer(players: List<PlayerWithPosition>) {
         fieldAndPlayersRootView.setListPlayerInField(players, this)
     }
-
-    fun setLineupName(name: String) {
-        lineup_name.text = name
-    }
 }

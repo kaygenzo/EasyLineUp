@@ -56,28 +56,28 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
 
     override fun onPlayerButtonClicked(players: List<Player>, position: FieldPosition, isNewPlayer: Boolean) {
         activity?.let {
-            val view = PlayerListView(it)
-            view.setPlayers(players, position)
+                val view = PlayerListView(it)
+                view.setPlayers(players, position)
 
-            val dialog = DialogPlus.newDialog(it)
-                    .setContentHolder(ViewHolder(view))
-                    .setGravity(Gravity.BOTTOM)
-                    .setCancelable(true)
-                    .create()
+                val dialog = DialogPlus.newDialog(it)
+                        .setContentHolder(ViewHolder(view))
+                        .setGravity(Gravity.BOTTOM)
+                        .setCancelable(true)
+                        .create()
 
-            view.setOnPlayerClickListener(object : OnPlayerClickListener {
-                override fun onPlayerSelected(player: Player) {
-                    savingPositionDisposable = viewModel.savePlayerFieldPosition(player, PointF(position.xPercent, position.yPercent), position, isNewPlayer)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(Schedulers.io())
-                            .subscribe({
-                                Timber.d("after playerFieldPosition=$this")
-                            }, { error -> Timber.e(error) })
-                    dialog.dismiss()
-                }
-            })
+                view.setOnPlayerClickListener(object : OnPlayerClickListener {
+                    override fun onPlayerSelected(player: Player) {
+                        savingPositionDisposable = viewModel.savePlayerFieldPosition(player, PointF(position.xPercent, position.yPercent), position, isNewPlayer)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(Schedulers.io())
+                                .subscribe({
+                                    Timber.d("after playerFieldPosition=$this")
+                                }, { error -> Timber.e(error) })
+                        dialog.dismiss()
+                    }
+                })
 
-            dialog.show()
+                dialog.show()
         }
 
     }
@@ -92,7 +92,6 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
                 viewModel.getTeamPlayerWithPositions(lineupID).observe(this, Observer {
                     view.cardDefenseView.setListPlayer(it)
                     view.cardDefenseView.setPlayerStateListener(this)
-                    view.cardDefenseView.setLineupName(viewModel.lineupTitle ?: "")
                 })
             }
         }
