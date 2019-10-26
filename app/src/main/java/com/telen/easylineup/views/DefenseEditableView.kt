@@ -62,6 +62,9 @@ class DefenseEditableView: ConstraintLayout {
     fun setListPlayer(lineupStatusDefense: LineupStatusDefense, loadingCallback: LoadingCallback?) {
         cleanPlayerIcons()
 
+        if(fieldFrameLayout==null || fieldFrameLayout.width <= 0)
+            return
+
         val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
 
         val players = lineupStatusDefense.players
