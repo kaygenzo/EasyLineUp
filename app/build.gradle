@@ -35,8 +35,8 @@ android {
         applicationId "com.telen.easylineup"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 1010
-        versionName "1.0.10"
+        versionCode 1011
+        versionName "1.0.11"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary true

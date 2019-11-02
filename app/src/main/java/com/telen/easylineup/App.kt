@@ -1,5 +1,6 @@
 package com.telen.easylineup
 
+import android.util.Log
 import androidx.multidex.MultiDexApplication
 import androidx.room.Room
 import androidx.room.migration.Migration
@@ -27,6 +28,9 @@ class App: MultiDexApplication() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+        else {
+            Timber.plant(ReleaseTree())
+        }
 
         Fabric.with(this, Crashlytics())
 
@@ -49,6 +53,22 @@ class App: MultiDexApplication() {
                 database.execSQL("ALTER TABLE Lineups ADD COLUMN mode INTEGER NOT NULL DEFAULT 0")
                 database.execSQL("ALTER TABLE Teams ADD COLUMN type INTEGER NOT NULL DEFAULT 0")
             }
+        }
+    }
+
+    class ReleaseTree: Timber.DebugTree() {
+
+        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+            when(priority) {
+                Log.ERROR -> {
+                    Crashlytics.logException(t)
+                }
+                Log.WARN -> {
+                    Crashlytics.log(priority, tag, message)
+                }
+                else -> {}
+            }
+
         }
     }
 }

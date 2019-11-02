@@ -4,11 +4,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.item_player_list.view.*
+import timber.log.Timber
 
 class PlayerCard: CardView {
 
@@ -26,13 +26,17 @@ class PlayerCard: CardView {
     fun setImage(path: String?) {
 
         playerImage.post {
-            Picasso.get()
-                    .load(path)
-                    .resize(playerImage.width, playerImage.height)
-                    .centerCrop()
-                    .error(R.drawable.ic_unknown_field_player)
-                    .placeholder(R.drawable.ic_unknown_field_player)
-                    .into(playerImage)
+            try {
+                Picasso.get()
+                        .load(path)
+                        .resize(playerImage.width, playerImage.height)
+                        .centerCrop()
+                        .error(R.drawable.ic_unknown_field_player)
+                        .placeholder(R.drawable.ic_unknown_field_player)
+                        .into(playerImage)
+            } catch (e: IllegalArgumentException) {
+                Timber.e(e)
+            }
         }
     }
 
