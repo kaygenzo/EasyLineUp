@@ -7,16 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Tournament
 import com.telen.easylineup.lineup.list.LineupViewModel
-import com.telen.easylineup.lineup.list.TournamentListViewModel
+import com.telen.easylineup.lineup.list.TournamentViewModel
 import com.telen.easylineup.utils.Constants
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.OnActionButtonListener
-import com.telen.easylineup.views.OnFormReadyListener
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -30,7 +28,7 @@ class LineupCreationFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_lineup_creation, container, false)
 
-        val tournamentViewModel =  ViewModelProviders.of(this).get(TournamentListViewModel::class.java)
+        val tournamentViewModel =  ViewModelProviders.of(this).get(TournamentViewModel::class.java)
         tournamentViewModel.getTournaments().observe(this, Observer { tournaments ->
             view.lineupCreationForm.setList(tournaments)
         })

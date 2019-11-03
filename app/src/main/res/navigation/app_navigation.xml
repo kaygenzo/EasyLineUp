@@ -26,13 +26,13 @@
 
     <fragment
         android:id="@+id/playerDetailsFragment"
-        android:name="com.telen.easylineup.team.details.PlayerDetailsFragment"
+        android:name="com.telen.easylineup.player.PlayerDetailsFragment"
         android:label="@string/title_player_details"
         tools:layout="@layout/fragment_player_details"/>
 
     <fragment
         android:id="@+id/playerEditFragment"
-        android:name="com.telen.easylineup.team.createPlayer.PlayerEditFragment"
+        android:name="com.telen.easylineup.player.PlayerEditFragment"
         android:label="@string/title_player_edition"
         tools:layout="@layout/fragment_player_edit"/>
 

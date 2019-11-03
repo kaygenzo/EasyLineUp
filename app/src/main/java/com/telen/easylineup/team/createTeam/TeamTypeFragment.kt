@@ -16,13 +16,13 @@ import timber.log.Timber
 
 class TeamTypeFragment: Fragment(), ViewPager.OnPageChangeListener {
 
-    private lateinit var viewModel: TeamViewModel
+    private lateinit var viewModel: SetupViewModel
     private lateinit var mViewPager: ViewPager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activity?.let {
-            viewModel = ViewModelProviders.of(it)[TeamViewModel::class.java]
+            viewModel = ViewModelProviders.of(it)[SetupViewModel::class.java]
         }
     }
 

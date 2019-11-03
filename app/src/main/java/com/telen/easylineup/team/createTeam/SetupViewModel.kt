@@ -14,7 +14,7 @@ import io.reactivex.schedulers.Schedulers
 
 class NameEmptyException: Exception()
 
-class TeamViewModel: ViewModel() {
+class SetupViewModel: ViewModel() {
 
     enum class NextStep(val id: Int) {
         TEAM(0), TYPE(1), PLAYERS(2), FINISH(3);

@@ -9,35 +9,16 @@ import android.view.LayoutInflater
 import android.widget.GridLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
-import com.qingmei2.rximagepicker.core.RxImagePicker
-import com.qingmei2.rximagepicker.entity.sources.Camera
-import com.qingmei2.rximagepicker.entity.sources.Gallery
-import com.qingmei2.rximagepicker.ui.ICustomPickerConfiguration
-import com.qingmei2.rximagepicker_extension.MimeType
-import com.qingmei2.rximagepicker_extension_zhihu.ZhihuConfigurationBuilder
-import com.qingmei2.rximagepicker_extension_zhihu.ui.ZhihuImagePickerActivity
+import com.nguyenhoanglam.imagepicker.model.Image
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.R
-import com.telen.easylineup.utils.PicassoEngine
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.view_create_player.view.*
 
 interface PlayerFormListener {
     fun onSaveClicked(name: String, shirtNumber: Int, licenseNumber: Long, imageUri: Uri?, positions: Int)
     fun onCancel()
-}
-
-interface ImagePicker {
-
-    @Gallery(componentClazz = ZhihuImagePickerActivity::class,
-            openAsFragment = false)
-    fun openGallery(context: Context,
-                    config: ICustomPickerConfiguration): Observable<com.qingmei2.rximagepicker.entity.Result>
-
-    @Camera
-    fun openCamera(context: Context): Observable<com.qingmei2.rximagepicker.entity.Result>
+    fun onImagePickerRequested()
 }
 
 class PlayerFormView: ConstraintLayout {
@@ -61,24 +42,7 @@ class PlayerFormView: ConstraintLayout {
         playerImage.setImageResource(R.drawable.unknown_player)
 
         playerImage.setOnClickListener {
-            context?.let {
-                RxImagePicker
-                        .create(ImagePicker::class.java)
-                        .openGallery(it, ZhihuConfigurationBuilder(MimeType.ofImage(), false)
-                                .imageEngine(PicassoEngine())
-                                .capture(true)
-                                .maxSelectable(1)
-                                .showSingleMediaType(true)
-                                .countable(true)
-                                .spanCount(3)
-                                .theme(R.style.Zhihu_Dracula)
-                                .build())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {result ->
-                            val uri = result.uri
-                            setImage(uri)
-                        }
-            }
+            listener?.onImagePickerRequested()
         }
 
         playerSave.setOnClickListener {
@@ -119,6 +83,11 @@ class PlayerFormView: ConstraintLayout {
         favoritePositionsContainer.alignmentMode = GridLayout.ALIGN_MARGINS
 
         setPositionsFilter(0)
+    }
+
+    fun onImageUriReceived(image: Image) {
+        val filePathUri = android.content.ContentResolver.SCHEME_FILE + ":///" + image.path
+        setImage(filePathUri)
     }
 
     fun getName(): String? {
@@ -163,12 +132,12 @@ class PlayerFormView: ConstraintLayout {
         playerLicenseNumberInput.setText(licenseNumber.toString())
     }
 
-    fun setImage(uri: Uri) {
+    fun setImage(imagePath: String) {
 
-        imageUri = uri
+        imageUri = Uri.parse(imagePath)
 
         playerImage.post {
-            Picasso.get().load(uri)
+            Picasso.get().load(imageUri)
                     .resize(playerImage.width, playerImage.height)
                     .centerCrop()
                     .transform(RoundedTransformationBuilder()

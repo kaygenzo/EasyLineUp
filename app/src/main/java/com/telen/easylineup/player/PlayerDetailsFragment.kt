@@ -1,4 +1,4 @@
-package com.telen.easylineup.team.details
+package com.telen.easylineup.player
 
 import android.os.Bundle
 import android.view.*
@@ -18,21 +18,21 @@ import kotlinx.android.synthetic.main.fragment_player_details.view.*
 
 class PlayerDetailsFragment: Fragment() {
 
-    private lateinit var playerDetailsViewModel: PlayerDetailsViewModel
+    private lateinit var viewModel: PlayerViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        playerDetailsViewModel = ViewModelProviders.of(this).get(PlayerDetailsViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(PlayerViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_player_details, container, false)
 
         val playerID = arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
-        playerDetailsViewModel.playerID = playerID
+        viewModel.playerID = playerID
 
-        playerDetailsViewModel.getPlayer().observe(this, Observer {
+        viewModel.getPlayer().observe(this, Observer {
             it?.let {
                 view.playerLicenseValue.text = it.licenseNumber.toString()
                 view.shirtNumberValue.text = it.shirtNumber.toString()
@@ -49,16 +49,9 @@ class PlayerDetailsFragment: Fragment() {
             }
         })
 
-        playerDetailsViewModel.getAllLineupsForPlayer(playerID).observe(this, Observer { positions ->
-            val chartData: MutableMap<FieldPosition, Int> = mutableMapOf()
-            positions.forEach { position ->
-                val fieldPosition = FieldPosition.getFieldPosition(position.position)
-                fieldPosition?.let { element ->
-                    chartData[element] = chartData[element]?.let { it + 1 } ?: 1
-                }
-            }
-            view.gamesPlayedValue.text = positions.size.toString()
-            view.positionsChart.setData(chartData)
+        viewModel.getAllLineupsForPlayer().observe(this, Observer {
+            view.gamesPlayedValue.text = it.values.sum().toString()
+            view.positionsChart.setData(it)
         })
 
         return view
@@ -94,7 +87,7 @@ class PlayerDetailsFragment: Fragment() {
             DialogFactory.getWarningDialog(it,
                     it.getString(R.string.dialog_delete_player_title),
                     it.getString(R.string.dialog_delete_cannot_undo_message),
-                    playerDetailsViewModel.deletePlayer()
+                    viewModel.deletePlayer()
                             .doOnComplete {
                                 FragmentActivity@it.runOnUiThread {
                                     findNavController().popBackStack(R.id.navigation_team, false)

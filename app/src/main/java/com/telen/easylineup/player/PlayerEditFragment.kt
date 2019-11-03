@@ -1,5 +1,7 @@
-package com.telen.easylineup.team.createPlayer
+package com.telen.easylineup.player
 
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
@@ -10,10 +12,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import com.nguyenhoanglam.imagepicker.model.Config
+import com.nguyenhoanglam.imagepicker.model.Image
 import com.telen.easylineup.R
 import com.telen.easylineup.data.Player
 import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.PlayerFormListener
+import com.telen.easylineup.views.PlayerFormView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -21,12 +27,17 @@ import kotlinx.android.synthetic.main.fragment_player_edit.view.*
 
 class PlayerEditFragment: Fragment(), PlayerFormListener {
 
+    private lateinit var viewModel: PlayerViewModel
+    private var saveDisposable: Disposable? = null
+    private var playerForm: PlayerFormView? = null
+
     override fun onCancel() {
         findNavController().popBackStack(R.id.navigation_team, false)
     }
 
-    private lateinit var viewModel: PlayerViewModel
-    private var saveDisposable: Disposable? = null
+    override fun onImagePickerRequested() {
+        ImagePickerUtils.launchPicker(this)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_player_edit, container, false)
@@ -34,6 +45,9 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
         viewModel.playerID = arguments?.getLong(Constants.PLAYER_ID)
         viewModel.teamID = arguments?.getLong(Constants.TEAM_ID)
         viewModel.playerID?.let {
+
+            playerForm = view.editPlayerForm
+
             view.editPlayerForm.disableSaveButton()
 
             val savedName = savedInstanceState?.getString(Constants.NAME)
@@ -42,8 +56,9 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
             val savedImage = savedInstanceState?.getString(Constants.IMAGE)
             val savedPositions = savedInstanceState?.getInt(Constants.PLAYER_POSITIONS)
 
+            //if it's a player edition
             if(it > 0) {
-                viewModel.getPlayer(it).observe(this, Observer { player ->
+                viewModel.getPlayer().observe(this, Observer { player ->
                     player?.let {
                         view.editPlayerForm.enableSaveButton()
                         view.editPlayerForm.setName(savedName ?: player.name)
@@ -52,13 +67,14 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
                         view.editPlayerForm.setPositionsFilter(savedPositions ?: player.positions)
                         val imagePath = savedImage ?: player.image
                         imagePath?.let { imageUriString ->
-                            view.editPlayerForm.setImage(Uri.parse(imageUriString))
+                            view.editPlayerForm.setImage(imageUriString)
                         }
 
                         view.editPlayerForm.setListener(this)
                     }
                 })
             }
+            //case of a player creation
             else {
                 view.editPlayerForm.enableSaveButton()
                 view.editPlayerForm.setListener(this)
@@ -97,12 +113,8 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
     }
 
     override fun onSaveClicked(name: String, shirtNumber: Int, licenseNumber: Long, imageUri: Uri?, positions: Int) {
-        val playerID: Long = viewModel.playerID ?: 0
-        val teamID: Long = viewModel.teamID ?: 0
-        val player = Player(id = playerID, teamId = teamID, name = name, shirtNumber = shirtNumber,
-                licenseNumber = licenseNumber, image = imageUri?.toString(), positions = positions)
         dispose(saveDisposable)
-        saveDisposable = viewModel.savePlayer(player)
+        saveDisposable = viewModel.savePlayer(name, shirtNumber, licenseNumber, imageUri, positions)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -115,5 +127,17 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
             if(!it.isDisposed)
                 it.dispose()
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == Config.RC_PICK_IMAGES && resultCode == Activity.RESULT_OK) {
+            data?.let {
+                val pickedImages: ArrayList<Image> = it.getParcelableArrayListExtra(Config.EXTRA_IMAGES)
+                pickedImages.firstOrNull()?.let {image ->
+                    playerForm?.onImageUriReceived(image)
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }

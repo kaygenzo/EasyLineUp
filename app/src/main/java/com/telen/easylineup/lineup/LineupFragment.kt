@@ -44,9 +44,7 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
             pagerAdapter = LineupPagerAdapter(activity, childFragmentManager, viewModel.editable)
             view.viewpager?.let { pager ->
                 pager.adapter = pagerAdapter
-                view.lineupTabLayout?.let { tabLayout ->
-                    tabLayout.setupWithViewPager(view.viewpager)
-                }
+                view.lineupTabLayout?.setupWithViewPager(view.viewpager)
             }
 
             viewModel.lineupTitle?.let {

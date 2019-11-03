@@ -10,18 +10,17 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
-import com.qingmei2.rximagepicker.core.RxImagePicker
-import com.qingmei2.rximagepicker_extension.MimeType
-import com.qingmei2.rximagepicker_extension_zhihu.ZhihuConfigurationBuilder
+import com.nguyenhoanglam.imagepicker.model.Image
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
-import com.telen.easylineup.utils.PicassoEngine
-import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.view_create_team.view.*
+import timber.log.Timber
 
 interface TeamFormListener {
     fun onNameChanged(name: String)
     fun onImageChanged(imageUri: Uri)
+    fun onImagePickerRequested()
 }
 
 class TeamFormView: ConstraintLayout {
@@ -53,25 +52,7 @@ class TeamFormView: ConstraintLayout {
                 .into(teamImage)
 
         teamImage.setOnClickListener {
-            context?.let {
-                RxImagePicker
-                        .create(ImagePicker::class.java)
-                        .openGallery(it, ZhihuConfigurationBuilder(MimeType.ofImage(), false)
-                                .imageEngine(PicassoEngine())
-                                .capture(true)
-                                .maxSelectable(1)
-                                .showSingleMediaType(true)
-                                .countable(true)
-                                .spanCount(3)
-                                .theme(R.style.Zhihu_Dracula)
-                                .build())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {result ->
-                            val uri = result.uri
-                            setImage(uri)
-                            this.listener?.onImageChanged(uri)
-                        }
-            }
+            listener?.onImagePickerRequested()
         }
 
         teamNameInput.addTextChangedListener(object: TextWatcher {
@@ -82,8 +63,13 @@ class TeamFormView: ConstraintLayout {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 listener?.onNameChanged(s.toString())
             }
-
         })
+    }
+
+    fun onImageUriReceived(image: Image) {
+        val filePathUri = android.content.ContentResolver.SCHEME_FILE + ":///" + image.path
+        setImage(filePathUri)
+        this.listener?.onImageChanged(Uri.parse(filePathUri))
     }
 
     fun getName(): String? {
@@ -102,10 +88,10 @@ class TeamFormView: ConstraintLayout {
         teamNameInput.setText(name)
     }
 
-    fun setImage(uri: Uri) {
-        imageUri = uri
+    fun setImage(path: String) {
+        imageUri = Uri.parse(path)
         teamImage.post {
-            Picasso.get().load(uri)
+            Picasso.get().load(path)
                     .resize(teamImage.width, teamImage.height)
                     .centerCrop()
                     .transform(RoundedTransformationBuilder()
@@ -116,7 +102,16 @@ class TeamFormView: ConstraintLayout {
                             .build())
                     .placeholder(R.drawable.ic_unknown_team)
                     .error(R.drawable.ic_unknown_team)
-                    .into(teamImage)
+                    .into(teamImage,object: Callback {
+                        override fun onSuccess() {
+                            Timber.e("Successfully loaded image")
+                        }
+
+                        override fun onError(e: Exception?) {
+                            Timber.e(e)
+                        }
+
+                    })
         }
     }
 }

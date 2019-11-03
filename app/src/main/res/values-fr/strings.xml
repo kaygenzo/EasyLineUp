@@ -86,4 +86,6 @@
     </plurals>
 
     <string name="players_list_empty">Plus aucun joueur disponible</string>
+
+    <string name="gallery_picker_default_title">Albums</string>
 </resources>

@@ -1,5 +1,7 @@
 package com.telen.easylineup.team.createTeam
 
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
@@ -9,9 +11,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import com.nguyenhoanglam.imagepicker.model.Config
+import com.nguyenhoanglam.imagepicker.model.Image
 import com.telen.easylineup.R
 import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.TeamFormListener
+import com.telen.easylineup.views.TeamFormView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_team_edit.view.*
@@ -19,7 +25,12 @@ import timber.log.Timber
 
 class TeamEditFragment: Fragment() , TeamFormListener {
 
-    private lateinit var viewModel: TeamViewModel
+    private lateinit var viewModel: SetupViewModel
+    private var teamForm: TeamFormView? = null
+
+    override fun onImagePickerRequested() {
+        ImagePickerUtils.launchPicker(this)
+    }
 
     override fun onNameChanged(name: String) {
         viewModel.setTeamName(name)
@@ -36,13 +47,16 @@ class TeamEditFragment: Fragment() , TeamFormListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_team_edit, container, false)
-        viewModel = ViewModelProviders.of(activity as AppCompatActivity).get(TeamViewModel::class.java)
+        viewModel = ViewModelProviders.of(activity as AppCompatActivity).get(SetupViewModel::class.java)
         viewModel.teamID = arguments?.getLong(Constants.TEAM_ID) ?: 0
 
         val savedName = savedInstanceState?.getString(Constants.NAME)
         val savedImage = savedInstanceState?.getString(Constants.IMAGE)
 
         viewModel.teamID?.let {
+
+            teamForm = view.editTeamForm
+
             if(it > 0) {
                 viewModel.getTeam().observe(this, Observer { team ->
                     team?.let {
@@ -54,7 +68,7 @@ class TeamEditFragment: Fragment() , TeamFormListener {
 
                         imagePath?.let { imageUriString ->
                             viewModel.setTeamImage(imageUriString)
-                            view.editTeamForm.setImage(Uri.parse(imageUriString))
+                            view.editTeamForm.setImage(imageUriString)
                         }
 
                         view.editTeamForm.setListener(this)
@@ -107,5 +121,15 @@ class TeamEditFragment: Fragment() , TeamFormListener {
         }
     }
 
-
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == Config.RC_PICK_IMAGES && resultCode == Activity.RESULT_OK) {
+            data?.let {
+                val pickedImages: ArrayList<Image> = it.getParcelableArrayListExtra(Config.EXTRA_IMAGES)
+                pickedImages.firstOrNull()?.let {image ->
+                    teamForm?.onImageUriReceived(image)
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
 }

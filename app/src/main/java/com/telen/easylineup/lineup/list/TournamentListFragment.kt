@@ -25,12 +25,13 @@ import kotlinx.android.synthetic.main.fragment_list_tournaments.view.*
 
 class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchBar.OnSearchActionListener {
 
+    private lateinit var tournamentsAdapter: TournamentsAdapter
+    private lateinit var viewModel: TournamentViewModel
+    private val listTournaments: MutableList<Pair<Tournament, List<Lineup>>> = mutableListOf()
+
     override fun onTournamentLongClicked(tournament: Tournament) {
         activity?.let {
-            val categorizedViewModel =  ViewModelProviders.of(this).get(TournamentListViewModel::class.java)
-            val task: Completable = categorizedViewModel.deleteTournament(tournament).doOnComplete {
-
-            }.doOnError {throwable ->
+            val task: Completable = viewModel.deleteTournament(tournament).doOnError {throwable ->
                 Toast.makeText(activity, "Something wrong happened: ${throwable.message}", Toast.LENGTH_LONG).show()
             }
             DialogFactory.getWarningDialog(it, it.getString(R.string.dialog_delete_tournament_title, tournament.name),
@@ -52,12 +53,10 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
         }
     }
 
-    private lateinit var tournamentsAdapter: TournamentsAdapter
-    private val listTournaments: MutableList<Pair<Tournament, List<Lineup>>> = mutableListOf()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         tournamentsAdapter = TournamentsAdapter(this)
+        viewModel =  ViewModelProviders.of(this).get(TournamentViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -69,6 +68,7 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
             layoutManager = tournamentLayoutManager
             adapter = tournamentsAdapter
 
+            //display or hide the fab when scrolling
             addOnScrollListener(object: RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
@@ -107,19 +107,14 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
     }
 
     private fun loadTournaments() {
-        val categorizedViewModel =  ViewModelProviders.of(this).get(TournamentListViewModel::class.java)
-        categorizedViewModel.registerTournamentsChanges().observe(this, Observer { tournaments ->
+        viewModel.registerTournamentsChanges().observe(this, Observer { tournaments ->
 
             listTournaments.clear()
-            tournaments.forEach { item ->
-                val tournament = item.key
-                val lineups = item.value
-                listTournaments.add(Pair(tournament, lineups))
-            }
+            listTournaments.addAll(tournaments)
             tournamentsAdapter.setList(listTournaments)
             tournamentsAdapter.notifyDataSetChanged()
         })
-        categorizedViewModel.setFilter("")
+        viewModel.setFilter("")
     }
 
     override fun onButtonClicked(buttonCode: Int) {
@@ -137,7 +132,6 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
     }
 
     fun onSearch(text: String) {
-        val categorizedViewModel =  ViewModelProviders.of(this).get(TournamentListViewModel::class.java)
-        categorizedViewModel.setFilter(text)
+        viewModel.setFilter(text)
     }
 }
