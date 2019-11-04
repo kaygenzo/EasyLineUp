@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.data.MODE_DH
@@ -119,7 +120,8 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
     }
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-        Toast.makeText(activity, "Dh is $isChecked", Toast.LENGTH_SHORT).show()
+        if(BuildConfig.DEBUG)
+            Toast.makeText(activity, "Dh is $isChecked", Toast.LENGTH_SHORT).show()
         viewModel.onDesignatedPlayerChanged(isChecked)
     }
 }
