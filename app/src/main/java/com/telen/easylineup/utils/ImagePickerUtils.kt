@@ -21,7 +21,7 @@ class ImagePickerUtils {
                         .setCameraOnly(false)               //  Camera mode
                         .setMultipleMode(false)             //  Select multiple images or single image
                         .setFolderMode(true)                //  Folder mode
-                        .setShowCamera(true)                //  Show camera button
+                        .setShowCamera(false)                //  Show camera button
                         .setFolderTitle(it.getString(R.string.gallery_picker_default_title)) //  Folder title (works with FolderMode = true)
                         .setMaxSize(1)                      //  Max images can be selected
                         .setSavePath(it.getString(R.string.app_name)) //  Image capture folder name
