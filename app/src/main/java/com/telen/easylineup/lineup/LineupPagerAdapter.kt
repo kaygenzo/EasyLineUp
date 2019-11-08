@@ -15,10 +15,13 @@ const val FRAGMENT_DEFENSE_INDEX = 0
 const val FRAGMENT_ATTACK_INDEX = 1
 
 class LineupPagerAdapter(val context: Context, fm: FragmentManager, private val editable: Boolean): FragmentPagerAdapter(fm) {
+
+    private val map = mutableMapOf<Int, Fragment>()
+
     override fun getItem(position: Int): Fragment {
-        return when(position) {
+        val fragment =  when(position) {
             FRAGMENT_DEFENSE_INDEX -> {
-                return if(editable)
+                if(editable)
                     DefenseFragmentEditable()
                 else
                     DefenseFragmentFixed()
@@ -32,6 +35,8 @@ class LineupPagerAdapter(val context: Context, fm: FragmentManager, private val 
             }
             else -> Fragment()
         }
+        map[position] = fragment
+        return fragment
     }
 
     override fun getCount(): Int {
@@ -44,5 +49,9 @@ class LineupPagerAdapter(val context: Context, fm: FragmentManager, private val 
             FRAGMENT_ATTACK_INDEX -> context.getString(R.string.new_lineup_tab_field_attack)
             else -> ""
         }
+    }
+
+    fun getMapFragment() : MutableMap<Int, Fragment> {
+        return map
     }
 }

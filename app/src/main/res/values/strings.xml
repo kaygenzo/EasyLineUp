@@ -6,6 +6,7 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_submit">Submit</string>
+    <string name="action_share">Share</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_attack">Attack</string>
@@ -93,5 +94,6 @@
     <string name="players_list_empty">No more players available</string>
 
     <string name="gallery_picker_default_title">Albums</string>
+    <string name="share_lineup_subject">Here is the lineup of: %s</string>
 
 </resources>

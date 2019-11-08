@@ -1,5 +1,7 @@
 package com.telen.easylineup.lineup
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
 import android.widget.CompoundButton
@@ -16,14 +18,21 @@ import com.telen.easylineup.data.MODE_NONE
 import com.telen.easylineup.utils.Constants
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_lineup_edition.view.*
 import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.lineupTabLayout
 import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.viewpager
+import timber.log.Timber
 
 class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
 
+    companion object {
+        const val REQUEST_WRITE_EXTERENAL_STORAGE_PERMISSION = 0
+    }
+
     lateinit var pagerAdapter: LineupPagerAdapter
     lateinit var viewModel: PlayersPositionViewModel
+    private var exportDisposable : Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +82,11 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
         return view
     }
 
+    override fun onDestroy() {
+        exportDisposable?.takeIf { !it.isDisposed }?.dispose()
+        super.onDestroy()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         if(!viewModel.editable)
@@ -96,6 +110,10 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
             }
             R.id.action_delete -> {
                 askUserConsentForDelete()
+                true
+            }
+            R.id.action_share -> {
+                exportLineupToExternalStorage()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -123,5 +141,38 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
         if(BuildConfig.DEBUG)
             Toast.makeText(activity, "Dh is $isChecked", Toast.LENGTH_SHORT).show()
         viewModel.onDesignatedPlayerChanged(isChecked)
+    }
+
+    private fun exportLineupToExternalStorage() {
+        activity?.let {
+
+            exportDisposable?.takeIf { !it.isDisposed }?.dispose()
+            exportDisposable = viewModel.exportLineupToExternalStorage(it, pagerAdapter.getMapFragment())
+                    .subscribe({ intent ->
+                        startActivity(Intent.createChooser(intent, ""))
+                    }, { error ->
+                        if(error is InsufficientPermissions) {
+                            requestPermissions(error.permissionsNeeded, REQUEST_WRITE_EXTERENAL_STORAGE_PERMISSION)
+                        }
+                        else {
+                            Timber.e(error)
+                        }
+                    })
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            REQUEST_WRITE_EXTERENAL_STORAGE_PERMISSION -> {
+                // If request is cancelled, the result arrays are empty.
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    exportLineupToExternalStorage()
+                }
+            }
+            else -> {
+                // Ignore all other requests.
+            }
+        }
     }
 }

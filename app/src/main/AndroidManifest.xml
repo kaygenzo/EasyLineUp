@@ -5,6 +5,7 @@
     package="com.telen.easylineup">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" tools:node="remove"/>
     <uses-permission android:name="android.permission.CAMERA" tools:node="remove"/>
 
@@ -33,6 +34,16 @@
         </activity>
         <activity android:name=".team.createTeam.TeamCreationActivity"
             android:theme="@style/AppTheme.NoActionBar.FullScreen" />
+        
+        <provider
+            android:authorities="com.telen.easylineup.fileprovider"
+            android:name=".utils.LineupFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
 
         <meta-data
             android:name="io.fabric.ApiKey"
