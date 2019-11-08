@@ -7,6 +7,7 @@ import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.GridLayout
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.nguyenhoanglam.imagepicker.model.Image
@@ -83,6 +84,11 @@ class PlayerFormView: ConstraintLayout {
         favoritePositionsContainer.alignmentMode = GridLayout.ALIGN_MARGINS
 
         setPositionsFilter(0)
+
+        playerImageAction.run {
+            setImageResource(R.drawable.add_image)
+            setOnClickListener(null)
+        }
     }
 
     fun onImageUriReceived(image: Image) {
@@ -132,6 +138,13 @@ class PlayerFormView: ConstraintLayout {
         playerLicenseNumberInput.setText(licenseNumber.toString())
     }
 
+    fun setPlayerImage(@DrawableRes resId: Int) {
+        Picasso.get().load(resId)
+                .placeholder(R.drawable.unknown_player)
+                .error(R.drawable.unknown_player)
+                .into(playerImage)
+    }
+
     fun setImage(imagePath: String) {
 
         imageUri = Uri.parse(imagePath)
@@ -149,6 +162,18 @@ class PlayerFormView: ConstraintLayout {
                     .placeholder(R.drawable.unknown_player)
                     .error(R.drawable.unknown_player)
                     .into(playerImage)
+        }
+
+        imageUri?.let {
+            playerImageAction.run {
+                setImageResource(R.drawable.remove_image)
+                setOnClickListener {
+                    imageUri = null
+                    setPlayerImage(R.drawable.unknown_player)
+                    setImageResource(R.drawable.add_image)
+                    setOnClickListener(null)
+                }
+            }
         }
     }
 

@@ -36,8 +36,11 @@ class TeamEditFragment: Fragment() , TeamFormListener {
         viewModel.setTeamName(name)
     }
 
-    override fun onImageChanged(imageUri: Uri) {
-        viewModel.setTeamImage(imageUri.toString())
+    override fun onImageChanged(imageUri: Uri?) {
+        imageUri?.let {
+            viewModel.setTeamImage(it.toString())
+        } ?: viewModel.setTeamImage(null)
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

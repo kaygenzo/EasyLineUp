@@ -30,13 +30,13 @@
                 android:layout_marginStart="@dimen/default_margin"/>
 
             <ImageView
+                android:id="@+id/playerImageAction"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:layout_marginEnd="5dp"
                 app:layout_constraintBottom_toBottomOf="@+id/playerImage"
-                app:layout_constraintRight_toRightOf="@+id/playerImage"
-                android:src="@drawable/add_image" />
+                app:layout_constraintRight_toRightOf="@+id/playerImage" />
 
             <LinearLayout
                 android:orientation="vertical"

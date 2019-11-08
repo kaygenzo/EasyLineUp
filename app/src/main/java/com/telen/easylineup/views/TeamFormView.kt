@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.nguyenhoanglam.imagepicker.model.Image
@@ -19,7 +20,7 @@ import timber.log.Timber
 
 interface TeamFormListener {
     fun onNameChanged(name: String)
-    fun onImageChanged(imageUri: Uri)
+    fun onImageChanged(imageUri: Uri?)
     fun onImagePickerRequested()
 }
 
@@ -64,6 +65,11 @@ class TeamFormView: ConstraintLayout {
                 listener?.onNameChanged(s.toString())
             }
         })
+
+        teamImageAction.run {
+            setImageResource(R.drawable.add_image)
+            setOnClickListener(null)
+        }
     }
 
     fun onImageUriReceived(image: Image) {
@@ -86,6 +92,13 @@ class TeamFormView: ConstraintLayout {
 
     fun setName(name: String) {
         teamNameInput.setText(name)
+    }
+
+    fun setTeamImage(@DrawableRes resId: Int) {
+        Picasso.get().load(resId)
+                .placeholder(R.drawable.ic_unknown_team)
+                .error(R.drawable.ic_unknown_team)
+                .into(teamImage)
     }
 
     fun setImage(path: String) {
@@ -112,6 +125,19 @@ class TeamFormView: ConstraintLayout {
                         }
 
                     })
+        }
+
+        imageUri?.let {
+            teamImageAction.run {
+                setImageResource(R.drawable.remove_image)
+                setOnClickListener {
+                    imageUri = null
+                    setTeamImage(R.drawable.ic_unknown_team)
+                    setImageResource(R.drawable.add_image)
+                    setOnClickListener(null)
+                    listener?.onImageChanged(null)
+                }
+            }
         }
     }
 }

@@ -53,7 +53,7 @@ class SetupViewModel: ViewModel() {
             nameLiveData.value = name
     }
 
-    fun setTeamImage(image: String) {
+    fun setTeamImage(image: String?) {
         this.teamImage = image
         imageLiveData.value = image
     }
