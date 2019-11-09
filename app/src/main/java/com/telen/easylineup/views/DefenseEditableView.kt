@@ -93,15 +93,15 @@ class DefenseEditableView: ConstraintLayout {
                         if(lineupStatusDefense.lineupMode == MODE_DH) {
                             when(pos) {
                                 FieldPosition.DH, FieldPosition.PITCHER -> {
-                                    setPlayerImage(player.image, iconSize, Color.RED, 3f)
+                                    setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
                                 }
                                 else -> {
-                                    setPlayerImage(player.image, iconSize)
+                                    setPlayerImage(player.image, player.name, iconSize)
                                 }
                             }
                         }
                         else {
-                            setPlayerImage(player.image, iconSize)
+                            setPlayerImage(player.image, player.name, iconSize)
                         }
                         setShirtNumber(player.shirtNumber)
                         this
@@ -175,7 +175,7 @@ class DefenseEditableView: ConstraintLayout {
                 .forEach { entry ->
                     val playerView = PlayerFieldIcon(context).run {
                         layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-                        setPlayerImage(entry.key.image, iconSize)
+                        setPlayerImage(entry.key.image, entry.key.name, iconSize)
                         setShirtNumber(entry.key.shirtNumber)
 
                         setOnLongClickListener {
@@ -200,7 +200,7 @@ class DefenseEditableView: ConstraintLayout {
                     position?.let {
                         val playerView = PlayerFieldIcon(context).run {
                             layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-                            setPlayerImage(player.image, iconSize, Color.RED, 3f)
+                            setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
                             setShirtNumber(context.getString(R.string.field_position_dh))
 
                             setOnLongClickListener {

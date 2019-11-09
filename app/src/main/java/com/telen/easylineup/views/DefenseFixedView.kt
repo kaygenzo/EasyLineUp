@@ -96,15 +96,15 @@ class DefenseFixedView: ConstraintLayout {
                                 if(players.any { pos -> pos.position == FieldPosition.DH.position }) {
                                     when (position) {
                                         FieldPosition.DH, FieldPosition.PITCHER -> {
-                                            setPlayerImage(player.image, iconSize, Color.RED, 3f)
+                                            setPlayerImage(player.image, player.playerName, iconSize, Color.RED, 3f)
                                         }
                                         else -> {
-                                            setPlayerImage(player.image, iconSize)
+                                            setPlayerImage(player.image, player.playerName, iconSize)
                                         }
                                     }
                                 }
                                 else
-                                    setPlayerImage(player.image, iconSize)
+                                    setPlayerImage(player.image, player.playerName, iconSize)
                                 setShirtNumber(player.shirtNumber)
                                 tag = PLAYER_ICON_TAG
                                 this

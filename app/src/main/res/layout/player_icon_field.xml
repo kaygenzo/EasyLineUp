@@ -5,14 +5,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@android:color/transparent">
+    tools:layout_height="40dp"
+    tools:layout_width="40dp"
+    android:background="@android:color/transparent"
+    tools:background="#80808080">
 
     <ImageView
         android:id="@+id/playerImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:src="@drawable/unknown_player"
-        android:scaleType="centerInside"/>
+        android:scaleType="centerInside"
+        android:visibility="invisible"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/playerNameFallback"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:autoSizeTextType="uniform"
+        tools:text="JC"
+        android:background="@drawable/circle_shape_unknown_player"
+        android:padding="8dp"
+        android:layout_margin="2dp"
+        android:gravity="center"/>
 
     <TextView
         android:id="@+id/playerShirtNumber"
