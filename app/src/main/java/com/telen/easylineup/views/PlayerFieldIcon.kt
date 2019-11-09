@@ -6,11 +6,13 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
+import androidx.annotation.ColorInt
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.player_icon_field.view.*
+import timber.log.Timber
 import java.util.regex.Pattern
 
 class PlayerFieldIcon: LinearLayout {
@@ -23,47 +25,54 @@ class PlayerFieldIcon: LinearLayout {
         LayoutInflater.from(context).inflate(R.layout.player_icon_field, this)
     }
 
-    fun setShirtNumber(shirtNumber: Int) {
-        playerShirtNumber.text = shirtNumber.toString()
-    }
-
-    fun setShirtNumber(shirtNumber: String) {
-        playerShirtNumber.text = shirtNumber
-    }
-
     fun setPlayerImage(url: String?, fallbackName: String, size: Int) {
         setPlayerImage(url, fallbackName, size, Color.BLACK, 2f)
     }
 
-    fun setPlayerImage(url: String?, fallbackName: String, size: Int, borderColor: Int, borderWidth: Float) {
+    fun setPlayerImage(url: String?, fallbackName: String, size: Int, @ColorInt borderColor: Int, borderWidth: Float) {
         val nameFallback = nameToLetters(fallbackName)
         playerNameFallback.text = nameFallback
         playerNameFallback.visibility = View.VISIBLE
         playerImage.visibility = View.INVISIBLE
 
+        if(borderColor == Color.RED) {
+            playerNameFallback.setBackgroundResource(R.drawable.circle_shape_letters_border_red)
+        }
+        else {
+            playerNameFallback.setBackgroundResource(R.drawable.circle_shape_letters_border_black)
+        }
+
         url?.let {
+            playerImage.post {
+                try {
                     Picasso.get().load(url)
-                .resize(size, size)
-                .centerCrop()
-                .transform(RoundedTransformationBuilder()
-                        .borderColor(borderColor)
-                        .borderWidthDp(borderWidth)
-                        .cornerRadiusDp(16f)
-                        .oval(true)
-                        .build())
-                .into(playerImage, object: Callback {
+                            .resize(size, size)
+                            .centerCrop()
+                            .transform(RoundedTransformationBuilder()
+                                    .borderColor(borderColor)
+                                    .borderWidthDp(borderWidth)
+                                    .cornerRadiusDp(16f)
+                                    .oval(true)
+                                    .build())
+                            .into(playerImage, object : Callback {
 
-                    override fun onSuccess() {
-                        playerImage.visibility = View.VISIBLE
-                        playerNameFallback.visibility = View.INVISIBLE
-                    }
+                                override fun onSuccess() {
+                                    playerImage.visibility = View.VISIBLE
+                                    playerNameFallback.visibility = View.INVISIBLE
+                                }
 
-                    override fun onError(e: Exception?) {
-                        playerImage.visibility = View.INVISIBLE
-                        playerNameFallback.visibility = View.VISIBLE
-                    }
+                                override fun onError(e: Exception?) {
+                                    playerImage.visibility = View.INVISIBLE
+                                    playerNameFallback.visibility = View.VISIBLE
+                                }
 
-                })
+                            })
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    playerNameFallback.visibility = View.VISIBLE
+                    playerImage.visibility = View.INVISIBLE
+                }
+            }
         }
     }
 

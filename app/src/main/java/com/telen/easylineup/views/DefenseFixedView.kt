@@ -105,7 +105,6 @@ class DefenseFixedView: ConstraintLayout {
                                 }
                                 else
                                     setPlayerImage(player.image, player.playerName, iconSize)
-                                setShirtNumber(player.shirtNumber)
                                 tag = PLAYER_ICON_TAG
                                 this
                             }

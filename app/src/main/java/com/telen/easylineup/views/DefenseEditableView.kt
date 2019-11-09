@@ -103,7 +103,6 @@ class DefenseEditableView: ConstraintLayout {
                         else {
                             setPlayerImage(player.image, player.name, iconSize)
                         }
-                        setShirtNumber(player.shirtNumber)
                         this
                     }
 
@@ -176,7 +175,6 @@ class DefenseEditableView: ConstraintLayout {
                     val playerView = PlayerFieldIcon(context).run {
                         layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
                         setPlayerImage(entry.key.image, entry.key.name, iconSize)
-                        setShirtNumber(entry.key.shirtNumber)
 
                         setOnLongClickListener {
                             playerListener?.onPlayerButtonLongClicked(entry.key, FieldPosition.SUBSTITUTE)
@@ -201,7 +199,6 @@ class DefenseEditableView: ConstraintLayout {
                         val playerView = PlayerFieldIcon(context).run {
                             layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
                             setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
-                            setShirtNumber(context.getString(R.string.field_position_dh))
 
                             setOnLongClickListener {
                                 playerListener?.onPlayerButtonLongClicked(player, FieldPosition.DH)
