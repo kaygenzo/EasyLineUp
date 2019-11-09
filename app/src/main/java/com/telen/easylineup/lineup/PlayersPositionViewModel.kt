@@ -28,6 +28,7 @@ import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.lang.Exception
 import java.util.*
 import kotlin.NoSuchElementException
@@ -285,9 +286,15 @@ class PlayersPositionViewModel: ViewModel() {
                 val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", File(filePath))
 
                 val fos = FileOutputStream(filePath)
-                val success = it.value.view?.drawToBitmap()?.compress(Bitmap.CompressFormat.PNG, 100, fos)
-                success?.takeIf { true }.let {
-                    uris.add(uri)
+                try {
+                    val success = it.value.view?.drawToBitmap()?.compress(Bitmap.CompressFormat.PNG, 100, fos)
+                    fos.flush()
+                    fos.close()
+                    success?.takeIf { true }.let {
+                        uris.add(uri)
+                    }
+                } catch (e: IOException) {
+                    Timber.e(e)
                 }
             }
 
