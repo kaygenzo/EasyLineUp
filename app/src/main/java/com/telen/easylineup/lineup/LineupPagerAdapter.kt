@@ -2,6 +2,7 @@ package com.telen.easylineup.lineup
 
 import android.content.Context
 import android.os.Bundle
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -35,7 +36,6 @@ class LineupPagerAdapter(val context: Context, fm: FragmentManager, private val 
             }
             else -> Fragment()
         }
-        map[position] = fragment
         return fragment
     }
 
@@ -49,6 +49,12 @@ class LineupPagerAdapter(val context: Context, fm: FragmentManager, private val 
             FRAGMENT_ATTACK_INDEX -> context.getString(R.string.new_lineup_tab_field_attack)
             else -> ""
         }
+    }
+
+    override fun instantiateItem(container: ViewGroup, position: Int): Any {
+        val fragment =  super.instantiateItem(container, position)
+        map[position] = fragment as Fragment
+        return fragment
     }
 
     fun getMapFragment() : MutableMap<Int, Fragment> {
