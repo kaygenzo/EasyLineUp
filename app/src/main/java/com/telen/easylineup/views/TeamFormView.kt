@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Color
 import android.net.Uri
 import android.text.Editable
-import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -78,12 +77,8 @@ class TeamFormView: ConstraintLayout {
         this.listener?.onImageChanged(Uri.parse(filePathUri))
     }
 
-    fun getName(): String? {
-        val name = teamNameInput.text.toString()
-        return if(TextUtils.isEmpty(name))
-            null
-        else
-            name
+    fun getName(): String {
+        return teamNameInput.text.toString()
     }
 
     fun getImageUri(): Uri? {
@@ -139,5 +134,9 @@ class TeamFormView: ConstraintLayout {
                 }
             }
         }
+    }
+
+    fun displayInvalidName() {
+        teamNameInputLayout.error = resources.getString(R.string.team_creation_error_name_empty)
     }
 }

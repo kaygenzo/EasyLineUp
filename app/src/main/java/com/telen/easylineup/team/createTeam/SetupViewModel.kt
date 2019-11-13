@@ -69,7 +69,7 @@ class SetupViewModel: ViewModel() {
         val name = teamName
         val image = teamImage
 
-        return if(!TextUtils.isEmpty(name)) {
+        return if(!TextUtils.isEmpty(name.trim())) {
             val team = Team(id = teamID ?: 0, name = name, image = image, type = teamType.id)
 
             if(team.id == 0L) {

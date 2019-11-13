@@ -31,7 +31,8 @@
                     tools:text="The lineup name"
                     android:textSize="@dimen/text_size_big"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:lines="1"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -46,7 +47,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:textSize="@dimen/text_size_big"
-                    tools:text="The tournament"/>
+                    tools:text="The tournament"
+                    android:lines="1"
+                    android:inputType="textPersonName"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 

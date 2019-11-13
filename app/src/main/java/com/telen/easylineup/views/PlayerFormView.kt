@@ -3,7 +3,6 @@ package com.telen.easylineup.views
 import android.content.Context
 import android.graphics.Color
 import android.net.Uri
-import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.GridLayout
@@ -17,7 +16,7 @@ import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.view_create_player.view.*
 
 interface PlayerFormListener {
-    fun onSaveClicked(name: String, shirtNumber: Int, licenseNumber: Long, imageUri: Uri?, positions: Int)
+    fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int)
     fun onCancel()
     fun onImagePickerRequested()
 }
@@ -52,28 +51,7 @@ class PlayerFormView: ConstraintLayout {
             val licenseNumber = getLicenseNumber()
             val positions = getPlayerPositions()
 
-            if(name!=null && shirtNumber!=null && licenseNumber!=null) {
-                listener?.onSaveClicked(name, shirtNumber, licenseNumber, imageUri, positions)
-            }
-            else {
-                if(name!=null) {
-                    playerNameInputLayout.error = null
-                } else {
-                    playerNameInputLayout.error = resources.getString(R.string.player_creation_error_name_empty)
-                }
-
-                if(shirtNumber!=null) {
-                    playerShirtNumberInputLayout.error = null
-                } else {
-                    playerShirtNumberInputLayout.error = resources.getString(R.string.player_creation_error_shirt_empty)
-                }
-
-                if(licenseNumber!=null) {
-                    playerLicenseNumberInputLayout.error = null
-                } else {
-                    playerLicenseNumberInputLayout.error = resources.getString(R.string.player_creation_error_license_empty)
-                }
-            }
+            listener?.onSaveClicked(name, shirtNumber, licenseNumber, imageUri, positions)
         }
 
         cancel.setOnClickListener {
@@ -96,12 +74,8 @@ class PlayerFormView: ConstraintLayout {
         setImage(filePathUri)
     }
 
-    fun getName(): String? {
-        val name = playerNameInput.text.toString()
-        return if(TextUtils.isEmpty(name))
-            null
-        else
-            name
+    fun getName(): String {
+        return playerNameInput.text.toString()
     }
 
     fun getShirtNumber(): Int? {
@@ -252,4 +226,22 @@ class PlayerFormView: ConstraintLayout {
 //        drawable.isCircular = true
 //        return drawable
 //    }
+
+    fun displayInvalidName() {
+        playerNameInputLayout.error = resources.getString(R.string.player_creation_error_name_empty)
+        playerLicenseNumberInputLayout.error = null
+        playerShirtNumberInputLayout.error = null
+    }
+
+    fun displayInvalidLicense() {
+        playerNameInputLayout.error = null
+        playerLicenseNumberInputLayout.error = resources.getString(R.string.player_creation_error_license_empty)
+        playerShirtNumberInputLayout.error = null
+    }
+
+    fun displayInvalidNumber() {
+        playerNameInputLayout.error = null
+        playerLicenseNumberInputLayout.error = null
+        playerShirtNumberInputLayout.error = resources.getString(R.string.player_creation_error_shirt_empty)
+    }
 }

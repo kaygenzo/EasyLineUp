@@ -22,8 +22,11 @@ import com.telen.easylineup.views.PlayerFormListener
 import com.telen.easylineup.views.PlayerFormView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Action
+import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_player_edit.view.*
+import timber.log.Timber
 
 class PlayerEditFragment: Fragment(), PlayerFormListener {
 
@@ -81,6 +84,14 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
             }
         }
 
+        viewModel.registerFormErrorResult().observe(this, Observer {
+            when(it) {
+                FormErrorResult.INVALID_NAME -> view.editPlayerForm.displayInvalidName()
+                FormErrorResult.INVALID_LICENSE -> view.editPlayerForm.displayInvalidLicense()
+                FormErrorResult.INVALID_NUMBER -> view.editPlayerForm.displayInvalidNumber()
+            }
+        })
+
         return view
     }
 
@@ -112,14 +123,16 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
         }
     }
 
-    override fun onSaveClicked(name: String, shirtNumber: Int, licenseNumber: Long, imageUri: Uri?, positions: Int) {
+    override fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int) {
         dispose(saveDisposable)
         saveDisposable = viewModel.savePlayer(name, shirtNumber, licenseNumber, imageUri, positions)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
+                .subscribe({
                     findNavController().navigateUp()
-                }
+                }, {
+                    Timber.e(it)
+                })
     }
 
     private fun dispose(disposable: Disposable?) {

@@ -11,9 +11,9 @@ import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
+import com.telen.easylineup.utils.StringUtils
 import kotlinx.android.synthetic.main.player_icon_field.view.*
 import timber.log.Timber
-import java.util.regex.Pattern
 
 class PlayerFieldIcon: LinearLayout {
 
@@ -30,7 +30,7 @@ class PlayerFieldIcon: LinearLayout {
     }
 
     fun setPlayerImage(url: String?, fallbackName: String, size: Int, @ColorInt borderColor: Int, borderWidth: Float) {
-        val nameFallback = nameToLetters(fallbackName)
+        val nameFallback = StringUtils().nameToLetters(fallbackName)
         playerNameFallback.text = nameFallback
         playerNameFallback.visibility = View.VISIBLE
         playerImage.visibility = View.INVISIBLE
@@ -74,14 +74,5 @@ class PlayerFieldIcon: LinearLayout {
                 }
             }
         }
-    }
-
-    private fun nameToLetters(name: String): String {
-        val parts = name.split(Pattern.compile("[\\s-]+"), 2).map { it[0] }
-        val builder = StringBuilder()
-        parts.forEach {
-            builder.append(it)
-        }
-        return builder.toString()
     }
 }

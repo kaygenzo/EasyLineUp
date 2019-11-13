@@ -29,10 +29,10 @@ class LineupCreationDialogView: ConstraintLayout, TextWatcher {
         //readyStateListener?.onFormStateChanged()
         val lineupName = lineupTitleInput.text
         val tournamentName = tournamentChoiceAutoComplete.text
-        if(!TextUtils.isEmpty(lineupName)) {
+        if(!TextUtils.isEmpty(lineupName?.trim())) {
             lineupTitleInputLayout.error = null
         }
-        if(!TextUtils.isEmpty(tournamentName)){
+        if(!TextUtils.isEmpty(tournamentName.trim())){
             tournamentTitleInputLayout.error = null
         }
     }
@@ -92,11 +92,11 @@ class LineupCreationDialogView: ConstraintLayout, TextWatcher {
         }
 
         save.setOnClickListener {
-            val lineupName = lineupTitleInput.text.toString()
+            val lineupName = lineupTitleInput.text
             val tournamentName = tournamentChoiceAutoComplete.text
-            if(!TextUtils.isEmpty(lineupName) && !TextUtils.isEmpty(tournamentName))
+            if(!TextUtils.isEmpty(lineupName?.trim()) && !TextUtils.isEmpty(tournamentName.trim()))
                 actionClickListener?.onSaveClicked()
-            else if(TextUtils.isEmpty(lineupName)) {
+            else if(TextUtils.isEmpty(lineupName?.trim())) {
                 lineupTitleInputLayout.error = resources.getString(R.string.lineup_creation_error_name_empty)
             }
             else {
@@ -138,11 +138,11 @@ class LineupCreationDialogView: ConstraintLayout, TextWatcher {
             tournaments[position]
         }
         else
-            Tournament(name = tournamentChoiceAutoComplete.text.toString(), createdAt = calendar.timeInMillis)
+            Tournament(name = tournamentChoiceAutoComplete.text.toString().trim(), createdAt = calendar.timeInMillis)
     }
 
     fun getLineupTitle(): String {
-        return lineupTitleInput.text.toString()
+        return lineupTitleInput.text.toString().trim()
     }
 
     fun setSaveButtonEnabled(enabled: Boolean) {

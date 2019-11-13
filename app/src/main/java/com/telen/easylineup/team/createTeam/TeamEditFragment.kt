@@ -117,6 +117,8 @@ class TeamEditFragment: Fragment() , TeamFormListener {
                             findNavController().popBackStack()
                         }, {
                             Timber.e(it)
+                            if(it is NameEmptyException)
+                                teamForm?.displayInvalidName()
                         })
                 true
             }
