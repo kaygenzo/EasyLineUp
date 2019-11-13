@@ -22,8 +22,8 @@ class StringUtilsTest {
     @Test
     fun shouldEmptyStringReturnQuestionMarksString() {
         assertEquals("?", stringUtils.nameToLetters(""))
-        assertEquals("??", stringUtils.nameToLetters(" "))
-        assertEquals("??", stringUtils.nameToLetters(" \n\r\n"))
+        assertEquals("?", stringUtils.nameToLetters(" "))
+        assertEquals("?", stringUtils.nameToLetters(" \n\r\n"))
     }
 
     @Test
@@ -35,5 +35,10 @@ class StringUtilsTest {
     fun shouldComposedStringReturn2Letters() {
         assertEquals(stringUtils.nameToLetters("Test Blabla"), "TB")
         assertEquals(stringUtils.nameToLetters("Test-Blabla"), "TB")
+    }
+
+    @Test
+    fun shouldNameBetweenSpacesReturnInitial() {
+        assertEquals("L", stringUtils.nameToLetters("    Laura    "))
     }
 }
