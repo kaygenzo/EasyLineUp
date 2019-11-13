@@ -35,8 +35,8 @@ android {
         applicationId "com.telen.easylineup"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 1012
-        versionName "1.0.12"
+        versionCode 1013
+        versionName "1.0.13"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary true
@@ -207,7 +207,7 @@ sonarqube {
     properties {
         property "sonar.projectKey",  sonarProperties['sonar.projectKey']
         property "sonar.projectName",  sonarProperties['sonar.projectName']
-        property "sonar.projectVersion",  versionName
+        property "sonar.projectVersion",  android.defaultConfig.versionName
         property "sonar.host.url",  sonarProperties['sonar.host.url']
 
         property "sonar.language",  sonarProperties['sonar.language']
