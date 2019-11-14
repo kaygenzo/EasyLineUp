@@ -90,7 +90,7 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
             val isSubstitute = FieldPosition.isSubstitute(player.position)
             val isDefensePlayer = FieldPosition.isDefensePlayer(player.position)
 
-            playerName.text = player.playerName
+            playerName.text = player.playerName.trim()
             shirtNumber.text = player.shirtNumber.toString()
 
             if(isDefensePlayer)

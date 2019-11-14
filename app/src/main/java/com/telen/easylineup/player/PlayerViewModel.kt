@@ -42,7 +42,7 @@ class PlayerViewModel: ViewModel() {
         else {
             val playerID: Long = playerID ?: 0
             val teamID: Long = teamID ?: 0
-            val player = Player(id = playerID, teamId = teamID, name = name, shirtNumber = shirtNumber,
+            val player = Player(id = playerID, teamId = teamID, name = name.trim(), shirtNumber = shirtNumber,
                     licenseNumber = licenseNumber, image = imageUri?.toString(), positions = positions)
 
             return if(player.id == 0L) {

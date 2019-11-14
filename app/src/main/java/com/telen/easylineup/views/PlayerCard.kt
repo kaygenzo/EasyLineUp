@@ -41,7 +41,7 @@ class PlayerCard: CardView {
     }
 
     fun setName(name: String) {
-        playerName.text = name
+        playerName.text = name.trim()
     }
 
     fun setShirtNumber(shirtNumber: Int) {

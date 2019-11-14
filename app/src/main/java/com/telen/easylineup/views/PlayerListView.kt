@@ -76,7 +76,7 @@ class PlayerListAdapter(val list: List<Player>, val playerListener: OnPlayerClic
 
     override fun onBindViewHolder(holder: PlayerViewHolder, position: Int) {
         val player = list[position]
-        holder.name.text = player.name
+        holder.name.text = player.name.trim()
 
         filter?.let {
             val isMatchingPosition = player.positions and it.mask > 0

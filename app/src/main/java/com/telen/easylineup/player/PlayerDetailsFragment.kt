@@ -36,7 +36,7 @@ class PlayerDetailsFragment: Fragment() {
             it?.let {
                 view.playerLicenseValue.text = it.licenseNumber.toString()
                 view.shirtNumberValue.text = it.shirtNumber.toString()
-                view.playerName.text = it.name
+                view.playerName.text = it.name.trim()
 
                 playerImage.post {
                     Picasso.get().load(it.image)
