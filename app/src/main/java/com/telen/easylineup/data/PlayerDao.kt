@@ -51,5 +51,5 @@ interface PlayerDao {
         ORDER BY result.playerID
 
     """)
-    fun getTeamPlayersWithPositions(lineupID: Long): LiveData<List<PlayerWithPosition>>
+    fun getTeamPlayersAndMaybePositions(lineupID: Long): LiveData<List<PlayerWithPosition>>
 }

@@ -13,6 +13,7 @@ import com.telen.easylineup.data.MODE_DH
 import com.telen.easylineup.data.MODE_NONE
 import com.telen.easylineup.data.PlayerWithPosition
 import com.telen.easylineup.views.PlayerPositionFilterView
+import timber.log.Timber
 
 interface OnItemTouchedListener {
     fun onMoved(fromPosition: Int, toPosition: Int)
@@ -54,8 +55,10 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
         if(canMoveFrom && canMoveTo) {
             val fromOrder = players[fromPosition].order
             val toOrder = players[toPosition].order
+            Timber.d("Before: ("+players[fromPosition].playerName+", "+players[fromPosition].order+") ("+players[toPosition].playerName+", "+players[toPosition].order+")")
             players[fromPosition].order = toOrder
             players[toPosition].order = fromOrder
+            Timber.d("After: ("+players[fromPosition].playerName+", "+players[fromPosition].order+") ("+players[toPosition].playerName+", "+players[toPosition].order+")")
             players.sortBy { it.order }
             notifyItemMoved(fromPosition, toPosition)
         }

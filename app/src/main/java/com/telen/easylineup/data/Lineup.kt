@@ -68,6 +68,48 @@ data class PlayerWithPosition(
     fun toPlayerFieldPosition(): PlayerFieldPosition {
         return PlayerFieldPosition(id = fieldPositionID, playerId = playerID, position = position, x = x, y = y, order = order, lineupId = lineupId)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PlayerWithPosition
+
+        if (playerName != other.playerName) return false
+        if (shirtNumber != other.shirtNumber) return false
+        if (licenseNumber != other.licenseNumber) return false
+        if (teamId != other.teamId) return false
+        if (image != other.image) return false
+        if (position != other.position) return false
+        if (x != other.x) return false
+        if (y != other.y) return false
+        if (order != other.order) return false
+        if (fieldPositionID != other.fieldPositionID) return false
+        if (playerID != other.playerID) return false
+        if (lineupId != other.lineupId) return false
+        if (playerPositions != other.playerPositions) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = playerName.hashCode()
+        result = 31 * result + shirtNumber
+        result = 31 * result + licenseNumber.hashCode()
+        result = 31 * result + teamId.hashCode()
+        result = 31 * result + (image?.hashCode() ?: 0)
+        result = 31 * result + position
+        result = 31 * result + x.hashCode()
+        result = 31 * result + y.hashCode()
+        result = 31 * result + order
+        result = 31 * result + fieldPositionID.hashCode()
+        result = 31 * result + playerID.hashCode()
+        result = 31 * result + lineupId.hashCode()
+        result = 31 * result + playerPositions
+        return result
+    }
+
+
 }
 
 data class PositionWithLineup(

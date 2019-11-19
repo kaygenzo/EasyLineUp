@@ -18,6 +18,7 @@ import com.telen.easylineup.data.MODE_NONE
 import com.telen.easylineup.utils.Constants
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
+import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_lineup_edition.view.*
 import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.lineupTabLayout
@@ -77,6 +78,26 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
                     }
                 })
             }
+
+            viewModel.eventHandler.observe(this, Observer {
+                when(it) {
+                    DeleteLineupSuccess -> {
+                        activity.runOnUiThread {
+                            findNavController().popBackStack(R.id.navigation_lineups, false)
+                        }
+                    }
+                    else -> {}
+                }
+            })
+
+            viewModel.errorHandler.observe(this, Observer {
+                when(it) {
+                    ErrorCase.DELETE_LINEUP_FAILED -> {
+                        Toast.makeText(activity, "Something wrong happened when deleting lineup", Toast.LENGTH_LONG).show()
+                    }
+                    else -> {}
+                }
+            })
         }
 
         return view
@@ -125,14 +146,10 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
             DialogFactory.getWarningDialog(it,
                     it.getString(R.string.dialog_delete_lineup_title),
                     it.getString(R.string.dialog_delete_cannot_undo_message),
-                    viewModel.deleteLineup()
-                            .doOnComplete {
-                                FragmentActivity@it.runOnUiThread {
-                                    findNavController().popBackStack(R.id.navigation_lineups, false)
-                                }
-                            }.doOnError {
-                                Toast.makeText(activity, "Something wrong happened: ${it.message}", Toast.LENGTH_LONG).show()
-                            })
+                    Completable.create { emitter ->
+                        viewModel.deleteLineup()
+                        emitter.onComplete()
+                    })
                     .show()
         }
     }
