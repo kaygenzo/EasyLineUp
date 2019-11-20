@@ -13,21 +13,36 @@ repositories {
 
 def reportPropertiesFile = rootProject.file("bugbattle.properties")
 def reportProperties = new Properties()
-reportProperties.load(new FileInputStream(reportPropertiesFile))
+if (reportPropertiesFile.exists()) {
+    reportProperties.load(new FileInputStream(reportPropertiesFile))
+}
+else {
+    // Otherwise read from environment variables, this happens in CI
+    reportProperties.setProperty("apiKey", "\"${System.getenv('reporting_tool_apiKey')}\"")
+}
 
 def sonarPropertiesFile = rootProject.file("sonar.properties")
 def sonarProperties = new Properties()
-sonarProperties.load(new FileInputStream(sonarPropertiesFile))
+if (sonarPropertiesFile.exists()) {
+    sonarProperties.load(new FileInputStream(sonarPropertiesFile))
+}
 
-// Create a variable called keystorePropertiesFile, and initialize it to your
-// keystore.properties file, in the rootProject folder.
 def keystorePropertiesFile = rootProject.file("keystore.properties")
-
-// Initialize a new Properties() object called keystoreProperties.
 def keystoreProperties = new Properties()
-
-// Load your keystore.properties file into the keystoreProperties object.
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+else {
+    // Otherwise read from environment variables, this happens in CI
+    reportProperties.setProperty("storeFile", "\"${System.getenv('storeFile')}\"")
+    reportProperties.setProperty("storePassword", "\"${System.getenv('storePassword')}\"")
+    reportProperties.setProperty("keyAlias", "\"${System.getenv('keyAlias')}\"")
+    reportProperties.setProperty("keyPassword", "\"${System.getenv('keyPassword')}\"")
+    reportProperties.setProperty("debug.storeFile", "\"${System.getenv('debug_storeFile')}\"")
+    reportProperties.setProperty("debug.storePassword", "\"${System.getenv('debug_storePassword')}\"")
+    reportProperties.setProperty("debug.keyAlias", "\"${System.getenv('debug_keyAlias')}\"")
+    reportProperties.setProperty("debug.keyPassword", "\"${System.getenv('debug_keyPassword')}\"")
+}
 
 android {
     compileSdkVersion 28
