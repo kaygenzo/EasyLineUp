@@ -34,14 +34,14 @@ if (keystorePropertiesFile.exists()) {
 }
 else {
     // Otherwise read from environment variables, this happens in CI
-    reportProperties.setProperty("storeFile", "\"${System.getenv('storeFile')}\"")
-    reportProperties.setProperty("storePassword", "\"${System.getenv('storePassword')}\"")
-    reportProperties.setProperty("keyAlias", "\"${System.getenv('keyAlias')}\"")
-    reportProperties.setProperty("keyPassword", "\"${System.getenv('keyPassword')}\"")
-    reportProperties.setProperty("debug.storeFile", "\"${System.getenv('debug_storeFile')}\"")
-    reportProperties.setProperty("debug.storePassword", "\"${System.getenv('debug_storePassword')}\"")
-    reportProperties.setProperty("debug.keyAlias", "\"${System.getenv('debug_keyAlias')}\"")
-    reportProperties.setProperty("debug.keyPassword", "\"${System.getenv('debug_keyPassword')}\"")
+    keystoreProperties.setProperty("storeFile", "\"${System.getenv('storeFile')}\"")
+    keystoreProperties.setProperty("storePassword", "\"${System.getenv('storePassword')}\"")
+    keystoreProperties.setProperty("keyAlias", "\"${System.getenv('keyAlias')}\"")
+    keystoreProperties.setProperty("keyPassword", "\"${System.getenv('keyPassword')}\"")
+    keystoreProperties.setProperty("debug.storeFile", "\"${System.getenv('debug_storeFile')}\"")
+    keystoreProperties.setProperty("debug.storePassword", "\"${System.getenv('debug_storePassword')}\"")
+    keystoreProperties.setProperty("debug.keyAlias", "\"${System.getenv('debug_keyAlias')}\"")
+    keystoreProperties.setProperty("debug.keyPassword", "\"${System.getenv('debug_keyPassword')}\"")
 }
 
 android {
