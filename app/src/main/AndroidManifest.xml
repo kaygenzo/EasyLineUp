@@ -48,6 +48,10 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="33d20990541fd8c5c5a28fc9aa3a1e77ff165b92" />
+
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
     </application>
 
 </manifest>
