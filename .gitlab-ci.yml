@@ -22,23 +22,34 @@ before_script:
   - set -o pipefail
 
 stages:
-  - build
+  - debug
   - test
+  - release
 
-lintDebug:
-  stage: build
+lintProdDebug:
+  stage: debug
   script:
-    - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
+    - ./gradlew -Pci --console=plain :app:lintProdDebug -PbuildDir=lint
 
-assembleDebug:
-  stage: build
+assembleProdDebug:
+  stage: debug
   script:
-    - ./gradlew assembleDebug
+    - echo $DEBUG_KEYSTORE_FILE | base64 -d > telen.debug.jks
+    - ./gradlew assembleProdDebug
   artifacts:
     paths:
-      - app/build/outputs/
+      - app/build/outputs/apk/prod/debug
+
+assembleProdRelease:
+  stage: release
+  script:
+    - echo $KEYSTORE_FILE | base64 -d > telen.release.jks
+    - ./gradlew assembleProdDebug
+  artifacts:
+    paths:
+      - app/build/outputs/apk/prod/release
 
 debugTests:
   stage: test
   script:
-    - ./gradlew -Pci --console=plain :app:testDebug
+    - ./gradlew -Pci --console=plain :app:testProdDebugUnitTest

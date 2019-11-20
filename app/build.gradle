@@ -18,7 +18,7 @@ if (reportPropertiesFile.exists()) {
 }
 else {
     // Otherwise read from environment variables, this happens in CI
-    reportProperties.setProperty("apiKey", "\"${System.getenv('reporting_tool_apiKey')}\"")
+    reportProperties.setProperty("apiKey", "\"${System.getenv('REPORTING_TOOL_API_KEY')}\"")
 }
 
 def sonarPropertiesFile = rootProject.file("sonar.properties")
@@ -34,14 +34,14 @@ if (keystorePropertiesFile.exists()) {
 }
 else {
     // Otherwise read from environment variables, this happens in CI
-    keystoreProperties.setProperty("storeFile", "\"${System.getenv('storeFile')}\"")
-    keystoreProperties.setProperty("storePassword", "\"${System.getenv('storePassword')}\"")
-    keystoreProperties.setProperty("keyAlias", "\"${System.getenv('keyAlias')}\"")
-    keystoreProperties.setProperty("keyPassword", "\"${System.getenv('keyPassword')}\"")
-    keystoreProperties.setProperty("debug.storeFile", "\"${System.getenv('debug_storeFile')}\"")
-    keystoreProperties.setProperty("debug.storePassword", "\"${System.getenv('debug_storePassword')}\"")
-    keystoreProperties.setProperty("debug.keyAlias", "\"${System.getenv('debug_keyAlias')}\"")
-    keystoreProperties.setProperty("debug.keyPassword", "\"${System.getenv('debug_keyPassword')}\"")
+    keystoreProperties.setProperty("storeFile", "../telen.release.jks")
+    keystoreProperties.setProperty("storePassword", "${System.getenv('KEYSTORE_PASSWORD')}")
+    keystoreProperties.setProperty("keyAlias", "${System.getenv('KEY_ALIAS')}")
+    keystoreProperties.setProperty("keyPassword", "${System.getenv('KEY_PASSWORD')}")
+    keystoreProperties.setProperty("debug.storeFile", "../telen.debug.jks")
+    keystoreProperties.setProperty("debug.storePassword", "${System.getenv('DEBUG_KEYSTORE_PASSWORD')}")
+    keystoreProperties.setProperty("debug.keyAlias", "${System.getenv('DEBUG_KEY_ALIAS')}")
+    keystoreProperties.setProperty("debug.keyPassword", "${System.getenv('DEBUG_KEY_PASSWORD')}")
 }
 
 android {
