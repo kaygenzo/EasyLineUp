@@ -6,52 +6,45 @@ import com.telen.easylineup.UseCase
 import com.telen.easylineup.data.*
 import com.telen.easylineup.lineup.ORDER_PITCHER_WHEN_DH
 import com.telen.easylineup.utils.Constants
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.Single
 import timber.log.Timber
 
 class SavePlayerFieldPosition(private val lineupDao: LineupDao): UseCase<SavePlayerFieldPosition.RequestValues, SavePlayerFieldPosition.ResponseValue>() {
 
-    override fun executeUseCase(requestValues: RequestValues?) {
-        requestValues?.let {
-            it.lineupID?.let { lineupID ->
-                val playerPosition: PlayerFieldPosition = if (it.isNewPosition) {
-                    val order = when (it.position) {
-                        FieldPosition.SUBSTITUTE -> Constants.SUBSTITUTE_ORDER_VALUE
-                        FieldPosition.PITCHER -> {
-                            if (it.lineupMode == MODE_NONE)
-                                getNextAvailableOrder(it.players)
-                            else
-                                ORDER_PITCHER_WHEN_DH
-                        }
-                        else -> getNextAvailableOrder(it.players)
+    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
+        return requestValues.lineupID?.let { lineupID ->
+            val playerPosition: PlayerFieldPosition = if (requestValues.isNewPosition) {
+                val order = when (requestValues.position) {
+                    FieldPosition.SUBSTITUTE -> Constants.SUBSTITUTE_ORDER_VALUE
+                    FieldPosition.PITCHER -> {
+                        if (requestValues.lineupMode == MODE_NONE)
+                            getNextAvailableOrder(requestValues.players)
+                        else
+                            ORDER_PITCHER_WHEN_DH
                     }
-                    PlayerFieldPosition(playerId = it.player.id, lineupId = lineupID, position = it.position.position, order = order)
-                } else {
-                    it.players.first { p -> p.position == it.position.position }.toPlayerFieldPosition()
+                    else -> getNextAvailableOrder(requestValues.players)
                 }
+                PlayerFieldPosition(playerId = requestValues.player.id, lineupId = lineupID, position = requestValues.position.position, order = order)
+            } else {
+                requestValues.players.first { p -> p.position == requestValues.position.position }.toPlayerFieldPosition()
+            }
 
-                playerPosition.apply {
-                    playerId = it.player.id
-                    x = it.point.x
-                    y = it.point.y
-                }
+            playerPosition.apply {
+                playerId = requestValues.player.id
+                x = requestValues.point.x
+                y = requestValues.point.y
+            }
 
-                Timber.d("before playerFieldPosition=$playerPosition")
+            Timber.d("before playerFieldPosition=$playerPosition")
 
-                val task = if (playerPosition.id > 0) {
-                    lineupDao.updatePlayerFieldPosition(playerPosition)
-                } else {
-                    lineupDao.insertPlayerFieldPosition(playerPosition).ignoreElement()
-                }
+            val task = if (playerPosition.id > 0) {
+                lineupDao.updatePlayerFieldPosition(playerPosition)
+            } else {
+                lineupDao.insertPlayerFieldPosition(playerPosition).ignoreElement()
+            }
 
-                task.subscribeOn(Schedulers.io()).observeOn(Schedulers.io())
-                        .subscribe({
-                            mUseCaseCallback?.onSuccess(ResponseValue())
-                        }, {
-                            mUseCaseCallback?.onError()
-                        })
-            } ?: mUseCaseCallback?.onError()
-        }
+            return task.andThen(Single.just(ResponseValue()))
+        } ?: Single.error(Exception("Lineup id is null!"))
     }
 
     private fun getNextAvailableOrder(players: List<PlayerWithPosition>): Int {
@@ -69,12 +62,12 @@ class SavePlayerFieldPosition(private val lineupDao: LineupDao): UseCase<SavePla
     }
 
     class RequestValues(val lineupID: Long?,
-                              val player: Player,
-                              val position: FieldPosition,
-                              val point: PointF,
-                              val players: List<PlayerWithPosition>,
-                              val lineupMode: Int,
-                              val isNewPosition: Boolean
-                              ): UseCase.RequestValues
+                        val player: Player,
+                        val position: FieldPosition,
+                        val point: PointF,
+                        val players: List<PlayerWithPosition>,
+                        val lineupMode: Int,
+                        val isNewPosition: Boolean
+    ): UseCase.RequestValues
     inner class ResponseValue: UseCase.ResponseValue
 }

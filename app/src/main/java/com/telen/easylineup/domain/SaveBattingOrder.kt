@@ -5,26 +5,17 @@ import com.telen.easylineup.data.LineupDao
 import com.telen.easylineup.data.PlayerWithPosition
 import com.telen.easylineup.utils.Constants
 import io.reactivex.Completable
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.Single
 
 class SaveBattingOrder(private val lineupDao: LineupDao): UseCase<SaveBattingOrder.RequestValues, SaveBattingOrder.ResponseValue>() {
 
-    override fun executeUseCase(requestValues: RequestValues?) {
-        requestValues?.let { req ->
-            val listOperations: MutableList<Completable> = mutableListOf()
-            req.players.filter { it.order > 0 && it.order < Constants.SUBSTITUTE_ORDER_VALUE }.forEach { player ->
-                val playerPosition = player.toPlayerFieldPosition()
-                listOperations.add(lineupDao.updatePlayerFieldPosition(playerPosition))
-            }
-            Completable.concat(listOperations)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(Schedulers.io())
-                    .subscribe({
-                        mUseCaseCallback?.onSuccess(ResponseValue())
-                    }, {
-                        mUseCaseCallback?.onError()
-                    })
+    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
+        val listOperations: MutableList<Completable> = mutableListOf()
+        requestValues.players.filter { it.order > 0 && it.order < Constants.SUBSTITUTE_ORDER_VALUE }.forEach { player ->
+            val playerPosition = player.toPlayerFieldPosition()
+            listOperations.add(lineupDao.updatePlayerFieldPosition(playerPosition))
         }
+        return Completable.concat(listOperations).andThen(Single.just(ResponseValue()))
     }
 
     class RequestValues(val players: List<PlayerWithPosition>): UseCase.RequestValues

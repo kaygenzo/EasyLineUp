@@ -22,6 +22,7 @@ import com.telen.easylineup.domain.*
 import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Consumer
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
@@ -101,15 +102,11 @@ class PlayersPositionViewModel: ViewModel() {
 
         val requestValues = SavePlayerFieldPosition.RequestValues(
                 lineupID, player, position, point, listPlayersWithPosition, lineupMode, isNewObject)
-        UseCaseHandler.execute(savePlayerFieldPositionUseCase, requestValues, object: UseCase.UseCaseCallback<SavePlayerFieldPosition.ResponseValue> {
 
-            override fun onSuccess(response: SavePlayerFieldPosition.ResponseValue) {
-                eventHandler.value = SavePlayerPositionSuccess
-            }
-
-            override fun onError() {
-                errorHandler.value = ErrorCase.SAVE_PLAYER_FIELD_POSITION_FAILED
-            }
+        val disposable = UseCaseHandler.execute(savePlayerFieldPositionUseCase, requestValues).subscribe({
+            eventHandler.value = SavePlayerPositionSuccess
+        }, {
+            errorHandler.value = ErrorCase.SAVE_PLAYER_FIELD_POSITION_FAILED
         })
     }
 
@@ -117,16 +114,10 @@ class PlayersPositionViewModel: ViewModel() {
 
         val requestValues = DeletePlayerFieldPosition.RequestValues(listPlayersWithPosition, player, position)
 
-        UseCaseHandler.execute(deletePlayerFieldPositionUseCase, requestValues, object: UseCase.UseCaseCallback<DeletePlayerFieldPosition.ResponseValue> {
-
-            override fun onSuccess(response: DeletePlayerFieldPosition.ResponseValue) {
-                eventHandler.value = DeletePlayerPositionSuccess
-            }
-
-            override fun onError() {
-                errorHandler.value = ErrorCase.DELETE_PLAYER_FIELD_POSITION_FAILED
-            }
-
+        val disposable = UseCaseHandler.execute(deletePlayerFieldPositionUseCase, requestValues).subscribe({
+            eventHandler.value = DeletePlayerPositionSuccess
+        }, {
+            errorHandler.value = ErrorCase.DELETE_PLAYER_FIELD_POSITION_FAILED
         })
     }
 
@@ -134,32 +125,20 @@ class PlayersPositionViewModel: ViewModel() {
 
         val requestValues = GetListAvailablePlayersForSelection.RequestValues(listPlayersWithPosition, position)
 
-        UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues, object: UseCase.UseCaseCallback<GetListAvailablePlayersForSelection.ResponseValue> {
-
-            override fun onSuccess(response: GetListAvailablePlayersForSelection.ResponseValue) {
-                eventHandler.value = GetAllAvailablePlayersSuccess(response.players, position, isNewPlayer)
-            }
-
-            override fun onError() {
-                errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
-            }
-
+        val disposable = UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues).subscribe({
+            eventHandler.value = GetAllAvailablePlayersSuccess(it.players, position, isNewPlayer)
+        }, {
+            errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
         })
     }
 
     fun saveNewBattingOrder(players: List<PlayerWithPosition>) {
         val requestValues = SaveBattingOrder.RequestValues(players)
 
-        UseCaseHandler.execute(saveBattingOrder, requestValues, object: UseCase.UseCaseCallback<SaveBattingOrder.ResponseValue> {
-
-            override fun onSuccess(response: SaveBattingOrder.ResponseValue) {
-                eventHandler.value = SaveBattingOrderSuccess
-            }
-
-            override fun onError() {
-                errorHandler.value = ErrorCase.SAVE_BATTING_ORDER_FAILED
-            }
-
+        val disposable = UseCaseHandler.execute(saveBattingOrder, requestValues).subscribe({
+            eventHandler.value = SaveBattingOrderSuccess
+        }, {
+            errorHandler.value = ErrorCase.SAVE_BATTING_ORDER_FAILED
         })
     }
 
@@ -167,48 +146,32 @@ class PlayersPositionViewModel: ViewModel() {
 
         val requestValues = DeleteLineup.RequestValues(lineupID)
 
-        UseCaseHandler.execute(deleteLineup, requestValues, object: UseCase.UseCaseCallback<DeleteLineup.ResponseValue> {
-
-            override fun onSuccess(response: DeleteLineup.ResponseValue) {
-                eventHandler.value = DeleteLineupSuccess
-            }
-
-            override fun onError() {
-                errorHandler.value = ErrorCase.DELETE_LINEUP_FAILED
-            }
-
+        val disposable = UseCaseHandler.execute(deleteLineup, requestValues).subscribe({
+            eventHandler.value = DeleteLineupSuccess
+        }, {
+            errorHandler.value = ErrorCase.DELETE_LINEUP_FAILED
         })
     }
 
-    private fun saveMode(responseValue: UseCase.UseCaseCallback<SaveLineupMode.ResponseValue>) {
+    private fun saveMode(): Single<SaveLineupMode.ResponseValue> {
         val requestValues = SaveLineupMode.RequestValues(lineupID, lineupMode)
-        UseCaseHandler.execute(saveLineupMode, requestValues, responseValue)
+        return UseCaseHandler.execute(saveLineupMode, requestValues)
     }
 
     fun onDesignatedPlayerChanged(isEnabled: Boolean) {
+
         lineupMode = if(isEnabled) MODE_DH else MODE_NONE
-        saveMode(object: UseCase.UseCaseCallback<SaveLineupMode.ResponseValue> {
 
-            override fun onSuccess(response: SaveLineupMode.ResponseValue) {
-                eventHandler.value = SaveLineupModeSuccess
-                val requestValues = UpdatePlayersWithLineupMode.RequestValues(listPlayersWithPosition, isEnabled)
-                UseCaseHandler.execute(updatePlayersWithLineupMode, requestValues, object: UseCase.UseCaseCallback<UpdatePlayersWithLineupMode.ResponseValue> {
-
-                    override fun onSuccess(response: UpdatePlayersWithLineupMode.ResponseValue) {
-                        eventHandler.value = UpdatePlayersWithLineupModeSuccess
-                    }
-
-                    override fun onError() {
-                        errorHandler.value = ErrorCase.UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED
-                    }
-
-                })
-            }
-
-            override fun onError() {
-                errorHandler.value = ErrorCase.SAVE_LINEUP_MODE_FAILED
-            }
-
+        val disposable = saveMode().doOnError {
+            errorHandler.value = ErrorCase.SAVE_LINEUP_MODE_FAILED
+        }.flatMap {
+            eventHandler.value = SaveLineupModeSuccess
+            val requestValues = UpdatePlayersWithLineupMode.RequestValues(listPlayersWithPosition, isEnabled)
+            UseCaseHandler.execute(updatePlayersWithLineupMode, requestValues)
+        }.subscribe({
+            eventHandler.value = UpdatePlayersWithLineupModeSuccess
+        }, {
+            errorHandler.value = ErrorCase.UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED
         })
     }
 
@@ -275,8 +238,8 @@ class PlayersPositionViewModel: ViewModel() {
 
         val getLineup = App.database.lineupDao().getLineupById(lineupID ?: 0)
         val getPositions = Transformations.switchMap(getLineup) {
-            this.lineupMode = it.mode
-            App.database.playerDao().getTeamPlayersAndMaybePositions(it.id)
+            this.lineupMode = it?.mode ?: 0
+            App.database.playerDao().getTeamPlayersAndMaybePositions(it?.id ?: 0)
         }
 
         return Transformations.map(getPositions) {

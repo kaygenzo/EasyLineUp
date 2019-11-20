@@ -4,23 +4,22 @@ import com.telen.easylineup.FieldPosition
 import com.telen.easylineup.UseCase
 import com.telen.easylineup.data.Player
 import com.telen.easylineup.data.PlayerWithPosition
+import io.reactivex.Single
 
 class GetListAvailablePlayersForSelection: UseCase<GetListAvailablePlayersForSelection.RequestValues, GetListAvailablePlayersForSelection.ResponseValue>() {
 
-    override fun executeUseCase(requestValues: RequestValues?) {
-        requestValues?.let { req ->
-            val listAvailablePlayers = req.players
-                    .filter { it.fieldPositionID <= 0 }
-                    .map { it.toPlayer() }
+    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
+        var listAvailablePlayers = requestValues.players
+                .filter { it.fieldPositionID <= 0 }
+                .map { it.toPlayer() }
 
-            if (FieldPosition.isDefensePlayer(req.position.position))
-                listAvailablePlayers.sortedWith(getPlayerComparator(req.position))
+        if (FieldPosition.isDefensePlayer(requestValues.position.position))
+            listAvailablePlayers = listAvailablePlayers.sortedWith(getPlayerComparator(requestValues.position))
 
-            if(listAvailablePlayers.isNotEmpty())
-                mUseCaseCallback?.onSuccess(ResponseValue(listAvailablePlayers))
-            else
-                mUseCaseCallback?.onError()
-        }
+        return if(listAvailablePlayers.isNotEmpty())
+            Single.just(ResponseValue(listAvailablePlayers))
+        else
+            Single.error(NoSuchElementException())
     }
 
     private fun getPlayerComparator(position: FieldPosition): Comparator<Player> {
