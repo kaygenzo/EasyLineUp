@@ -8,16 +8,16 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.telen.easylineup.FieldPosition
-import com.telen.easylineup.data.Player
+import com.telen.easylineup.repository.data.FieldPosition
+import com.telen.easylineup.repository.data.Player
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
 import kotlin.math.roundToInt
 import android.view.animation.AnimationUtils
 import com.telen.easylineup.R
-import com.telen.easylineup.data.MODE_DH
-import com.telen.easylineup.data.PlayerWithPosition
+import com.telen.easylineup.repository.data.MODE_DH
+import com.telen.easylineup.repository.data.PlayerWithPosition
 
 
 const val ICON_SIZE_SCALE = 0.12f

@@ -7,12 +7,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import com.telen.easylineup.R
-import com.telen.easylineup.data.Lineup
+import com.telen.easylineup.repository.data.Lineup
 import com.telen.easylineup.lineup.list.LineupsAdapter
 import com.telen.easylineup.lineup.list.OnItemClickedListener
-import com.telen.easylineup.lineup.list.TimeLineItem
 import kotlinx.android.synthetic.main.item_adapter_tournaments.view.*
-import pl.hypeapp.materialtimelineview.MaterialTimelineView
 
 class TournamentItemView : ConstraintLayout {
 

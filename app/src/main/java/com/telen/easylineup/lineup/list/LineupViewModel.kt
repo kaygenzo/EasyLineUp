@@ -3,9 +3,9 @@ package com.telen.easylineup.lineup.list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
-import com.telen.easylineup.data.Lineup
-import com.telen.easylineup.data.PlayerFieldPosition
-import com.telen.easylineup.data.Tournament
+import com.telen.easylineup.repository.data.Lineup
+import com.telen.easylineup.repository.data.PlayerFieldPosition
+import com.telen.easylineup.repository.data.Tournament
 import io.reactivex.Single
 import timber.log.Timber
 

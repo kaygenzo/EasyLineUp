@@ -17,12 +17,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.*
-import com.telen.easylineup.data.*
+import com.telen.easylineup.R
 import com.telen.easylineup.domain.*
+import com.telen.easylineup.repository.data.*
 import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Consumer
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
@@ -38,8 +38,6 @@ import kotlin.collections.mutableListOf
 
 data class LineupStatusDefense(val players: Map<Player, FieldPosition?>, val lineupMode: Int)
 data class LineupStatusAttack(val players: Map<Player, FieldPosition?>, val lineupMode: Int)
-
-const val ORDER_PITCHER_WHEN_DH = 10
 
 data class InsufficientPermissions(val permissionsNeeded: Array<String>): Exception() {
     override fun equals(other: Any?): Boolean {

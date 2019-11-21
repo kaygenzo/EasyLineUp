@@ -11,7 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.nguyenhoanglam.imagepicker.model.Image
 import com.squareup.picasso.Picasso
-import com.telen.easylineup.FieldPosition
+import com.telen.easylineup.repository.data.FieldPosition
 import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.view_create_player.view.*
 

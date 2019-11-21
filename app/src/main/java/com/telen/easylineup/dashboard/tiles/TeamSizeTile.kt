@@ -5,8 +5,6 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Picasso
@@ -14,7 +12,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.dashboard.models.ITileData
 import com.telen.easylineup.dashboard.models.KEY_DATA_SIZE
 import com.telen.easylineup.dashboard.models.KEY_DATA_TEAM_IMAGE
-import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.repository.Constants
 import kotlinx.android.synthetic.main.tile_team_size.view.*
 
 class TeamSizeTile: ConstraintLayout {

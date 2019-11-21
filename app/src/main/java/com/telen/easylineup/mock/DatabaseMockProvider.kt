@@ -3,13 +3,12 @@ package com.telen.easylineup.mock
 import android.content.Context
 import com.google.gson.JsonParser
 import com.telen.easylineup.App
-import com.telen.easylineup.data.*
+import com.telen.easylineup.repository.data.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.lang.Exception
-import java.util.*
 
 
 class DatabaseMockProvider {
@@ -47,7 +46,7 @@ class DatabaseMockProvider {
                              val line = playersJson[i].asJsonObject
                              playersList.add(Player(line["id"].asLong, line["teamId"].asLong, line["name"].asString,
                                      line["shirtNumber"].asInt, line["licenseNumber"].asLong,
-                                     if(line.has("image")) line["image"].asString else null))
+                                     if (line.has("image")) line["image"].asString else null))
                          }
 
                          val tournamentsList = mutableListOf<Tournament>()
@@ -81,7 +80,7 @@ class DatabaseMockProvider {
                  }
     }
 
-    private fun insertTeam(team:Team): Completable {
+    private fun insertTeam(team: Team): Completable {
         return App.database.teamDao().insertTeam(team).ignoreElement()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

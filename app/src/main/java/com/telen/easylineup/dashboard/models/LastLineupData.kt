@@ -1,7 +1,7 @@
 package com.telen.easylineup.dashboard.models
 
 import com.telen.easylineup.dashboard.TYPE_LAST_LINEUP
-import com.telen.easylineup.data.PlayerWithPosition
+import com.telen.easylineup.repository.data.PlayerWithPosition
 
 const val KEY_LINEUP_NAME = 0
 const val KEY_LINEUP_PLAYERS = 1

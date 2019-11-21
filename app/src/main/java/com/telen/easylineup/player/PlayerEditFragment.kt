@@ -15,15 +15,12 @@ import androidx.navigation.fragment.findNavController
 import com.nguyenhoanglam.imagepicker.model.Config
 import com.nguyenhoanglam.imagepicker.model.Image
 import com.telen.easylineup.R
-import com.telen.easylineup.data.Player
-import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.repository.Constants
 import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.PlayerFormListener
 import com.telen.easylineup.views.PlayerFormView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Action
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_player_edit.view.*
 import timber.log.Timber

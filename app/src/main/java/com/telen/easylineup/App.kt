@@ -9,7 +9,7 @@ import bugbattle.io.bugbattle.BugBattle
 import bugbattle.io.bugbattle.controller.BugBattleActivationMethod
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
-import com.telen.easylineup.data.AppDatabase
+import com.telen.easylineup.repository.data.AppDatabase
 import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 

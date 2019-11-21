@@ -3,7 +3,7 @@ package com.telen.easylineup
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.data.Team
+import com.telen.easylineup.repository.data.Team
 
 class HomeViewModel: ViewModel() {
 

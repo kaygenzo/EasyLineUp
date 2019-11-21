@@ -6,9 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
-import com.telen.easylineup.FieldPosition
-import com.telen.easylineup.data.Player
-import com.telen.easylineup.data.PositionWithLineup
+import com.telen.easylineup.repository.data.FieldPosition
+import com.telen.easylineup.repository.data.Player
 import io.reactivex.Completable
 import java.security.InvalidParameterException
 

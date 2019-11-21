@@ -5,9 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
-import com.telen.easylineup.FieldPosition
-import com.telen.easylineup.data.Lineup
-import com.telen.easylineup.data.Tournament
+import com.telen.easylineup.repository.data.FieldPosition
+import com.telen.easylineup.repository.data.Lineup
+import com.telen.easylineup.repository.data.Tournament
 import io.reactivex.Completable
 
 class TournamentViewModel: ViewModel() {
