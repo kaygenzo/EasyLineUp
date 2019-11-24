@@ -21,7 +21,7 @@ class DefenseFragmentFixed: Fragment() {
             viewModel = ViewModelProviders.of(parent).get(PlayersPositionViewModel::class.java)
 
             viewModel.lineupID?.let {
-                viewModel.getPlayersWithPositions(it).observe(this, Observer { players ->
+                viewModel.registerLineupAndPositionsChanged().observe(this, Observer { players ->
                     view.cardDefenseView.setListPlayer(players)
                 })
             }

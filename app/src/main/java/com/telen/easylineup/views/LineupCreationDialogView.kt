@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.widget.ArrayAdapter
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
-import com.telen.easylineup.data.Tournament
+import com.telen.easylineup.repository.data.Tournament
 import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
 import timber.log.Timber
 import java.util.*

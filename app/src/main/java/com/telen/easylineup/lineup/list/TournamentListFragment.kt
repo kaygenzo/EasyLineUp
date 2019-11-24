@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mancj.materialsearchbar.MaterialSearchBar
 import com.telen.easylineup.R
-import com.telen.easylineup.data.Lineup
-import com.telen.easylineup.data.Tournament
-import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.repository.Constants
+import com.telen.easylineup.repository.data.Lineup
+import com.telen.easylineup.repository.data.Tournament
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
 import io.reactivex.Completable

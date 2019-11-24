@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.RadarChart
 import com.github.mikephil.charting.components.Legend
@@ -13,9 +12,8 @@ import com.github.mikephil.charting.data.RadarDataSet
 import com.github.mikephil.charting.data.RadarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet
-import com.telen.easylineup.FieldPosition
+import com.telen.easylineup.repository.data.FieldPosition
 import com.telen.easylineup.R
-import kotlinx.android.synthetic.main.view_radar_chart.view.*
 
 
 class PositionsRadarChart: RadarChart {

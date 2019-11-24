@@ -12,7 +12,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
-import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.repository.Constants
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.DrawerHeader
 

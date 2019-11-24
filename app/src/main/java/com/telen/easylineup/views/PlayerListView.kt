@@ -8,14 +8,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
-import com.telen.easylineup.FieldPosition
+import com.telen.easylineup.repository.data.FieldPosition
 import com.telen.easylineup.R
-import com.telen.easylineup.data.Player
+import com.telen.easylineup.repository.data.Player
 import kotlinx.android.synthetic.main.view_bottom_sheet_player_list.view.*
 
 interface OnPlayerClickListener {

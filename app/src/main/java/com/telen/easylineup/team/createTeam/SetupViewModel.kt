@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
-import com.telen.easylineup.data.Team
-import com.telen.easylineup.data.TeamType
+import com.telen.easylineup.repository.data.Team
+import com.telen.easylineup.repository.data.TeamType
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable

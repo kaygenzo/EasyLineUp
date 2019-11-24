@@ -9,10 +9,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.R
-import com.telen.easylineup.data.Tournament
+import com.telen.easylineup.repository.data.Tournament
 import com.telen.easylineup.lineup.list.LineupViewModel
 import com.telen.easylineup.lineup.list.TournamentViewModel
-import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.repository.Constants
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.OnActionButtonListener
 import io.reactivex.android.schedulers.AndroidSchedulers

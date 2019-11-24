@@ -7,14 +7,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.R
-import com.telen.easylineup.data.PlayerWithPosition
-import com.telen.easylineup.lineup.PlayersPositionViewModel
+import com.telen.easylineup.repository.data.PlayerWithPosition
+import com.telen.easylineup.lineup.*
 import com.telen.easylineup.views.ItemDecoratorAttackRecycler
-import io.reactivex.Completable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_list_batter.view.*
 import timber.log.Timber
 
@@ -55,11 +54,16 @@ class AttackFragment: Fragment(), OnDataChangedListener {
             view.header.setIsEditable(isEditable)
 
             viewModel.lineupID?.let {
-                viewModel.getPlayersWithPositions(it).observe(this, Observer { items ->
+                viewModel.registerLineupBatters().observe(this, Observer { items ->
                     Timber.d("PlayerWithPositions list changed!")
+
+                    val diffCallback = BattersDiffCallback(adapterDataList, items)
+                    val diffResult = DiffUtil.calculateDiff(diffCallback)
+
                     adapterDataList.clear()
                     adapterDataList.addAll(items)
-                    playerAdapter.notifyDataSetChanged()
+
+                    diffResult.dispatchUpdatesTo(playerAdapter)
                 })
 
                 viewModel.registerLineupChange().observe(this, Observer { lineup ->
@@ -70,20 +74,22 @@ class AttackFragment: Fragment(), OnDataChangedListener {
                 })
 
             }
+
+            viewModel.eventHandler.observe(this, Observer {
+                when(it) {
+                    SaveBattingOrderSuccess -> Timber.d("Successfully saved!")
+                }
+            })
         }
 
         return view
     }
 
     override fun onOrderChanged() {
-        save().doOnComplete {
-            Timber.d("Successfully saved!")
-        }.subscribe()
+        save()
     }
 
-    private fun save(): Completable {
-        return viewModel.saveNewBattingOrder(adapterDataList)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
+    private fun save() {
+        viewModel.saveNewBattingOrder(adapterDataList)
     }
 }

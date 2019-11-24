@@ -8,47 +8,32 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.telen.easylineup.FieldPosition
-import com.telen.easylineup.data.Player
+import com.telen.easylineup.repository.data.FieldPosition
+import com.telen.easylineup.repository.data.Player
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
 import kotlin.math.roundToInt
 import android.view.animation.AnimationUtils
 import com.telen.easylineup.R
-import com.telen.easylineup.data.MODE_DH
-import com.telen.easylineup.lineup.LineupStatusDefense
+import com.telen.easylineup.repository.data.MODE_DH
+import com.telen.easylineup.repository.data.PlayerWithPosition
 
 
 const val ICON_SIZE_SCALE = 0.12f
 
 interface OnPlayerButtonCallback {
-    fun onPlayerButtonClicked(players: List<Player>, position: FieldPosition, isNewPlayer: Boolean)
-    fun onPlayerButtonLongClicked(position: FieldPosition)
+    fun onPlayerButtonClicked(position: FieldPosition, isNewPlayer: Boolean)
     fun onPlayerButtonLongClicked(player: Player, position: FieldPosition)
 }
 
 class DefenseEditableView: ConstraintLayout {
 
-    private lateinit var playerPositions: MutableMap<String, Pair<Player, FieldPosition?>>
     private var playerListener: OnPlayerButtonCallback? = null
 
     constructor(context: Context?) : super(context) { init(context)}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) { init(context)}
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context)}
-
-    private fun getPlayerComparator(position: FieldPosition): Comparator<Player> {
-        return Comparator { p1, p2 ->
-            val firstHasPosition = p1.positions and position.mask > 0
-            val secondHasPosition = p2.positions and position.mask > 0
-            if(firstHasPosition && !secondHasPosition)
-                -1
-            else if(!firstHasPosition && secondHasPosition)
-                1
-            else
-                p1.name.compareTo(p2.name)
-        }
-    }
 
     fun setOnPlayerListener(playerButtonCallback: OnPlayerButtonCallback) {
         playerListener = playerButtonCallback
@@ -56,10 +41,9 @@ class DefenseEditableView: ConstraintLayout {
 
     private fun init(context: Context?) {
         LayoutInflater.from(context).inflate(R.layout.baseball_field_with_players, this)
-        playerPositions = mutableMapOf()
     }
 
-    fun setListPlayer(lineupStatusDefense: LineupStatusDefense, loadingCallback: LoadingCallback?) {
+    fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int, loadingCallback: LoadingCallback?) {
         cleanPlayerIcons()
 
         if(fieldFrameLayout==null || fieldFrameLayout.width <= 0)
@@ -67,16 +51,16 @@ class DefenseEditableView: ConstraintLayout {
 
         val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
 
-        val players = lineupStatusDefense.players
-
         val emptyPositions = mutableListOf<FieldPosition>()
         emptyPositions.addAll(FieldPosition.values().filter { FieldPosition.isDefensePlayer(it.position) })
 
+        val playerPositions: MutableMap<String, Pair<Player, FieldPosition?>> = mutableMapOf()
+
         players.forEach { entry ->
 
-            val player = entry.key
+            val player = entry.toPlayer()
             val playerTag: String = player.id.toString()
-            var fieldPosition = entry.value
+            val fieldPosition = FieldPosition.getFieldPosition(entry.position)
 
             playerPositions[playerTag] = Pair(player, fieldPosition)
 
@@ -90,7 +74,7 @@ class DefenseEditableView: ConstraintLayout {
 
                     val playerView = PlayerFieldIcon(context).run {
                         layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-                        if(lineupStatusDefense.lineupMode == MODE_DH) {
+                        if(lineupMode == MODE_DH) {
                             when(pos) {
                                 FieldPosition.DH, FieldPosition.PITCHER -> {
                                     setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
@@ -108,14 +92,10 @@ class DefenseEditableView: ConstraintLayout {
 
                     addPlayerOnFieldWithPercentage(playerView, pos.xPercent, pos.yPercent, loadingCallback)
                     playerView.setOnClickListener { view ->
-                        val listAvailablePlayers = players
-                                .filter { it.value == null }
-                                .keys.toList()
-                                .sortedWith(getPlayerComparator(pos))
-                        playerListener?.onPlayerButtonClicked(listAvailablePlayers, pos, false)
+                        playerListener?.onPlayerButtonClicked(pos, false)
                     }
                     playerView.setOnLongClickListener {
-                        playerListener?.onPlayerButtonLongClicked(pos)
+                        playerListener?.onPlayerButtonLongClicked(player, pos)
                         true
                     }
                 }
@@ -124,10 +104,10 @@ class DefenseEditableView: ConstraintLayout {
 
         addEmptyPositionMarker(players, emptyPositions)
         addSubstitutePlayers(players)
-        addDesignatedPlayerIfExists(players, lineupStatusDefense.lineupMode)
+        addDesignatedPlayerIfExists(players, lineupMode)
     }
 
-    private fun addEmptyPositionMarker(players: Map<Player, FieldPosition?>, positionMarkers: MutableList<FieldPosition>) {
+    private fun addEmptyPositionMarker(players: List<PlayerWithPosition>, positionMarkers: MutableList<FieldPosition>) {
         val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
         positionMarkers.forEach {position ->
 
@@ -135,11 +115,7 @@ class DefenseEditableView: ConstraintLayout {
                 layoutParams = LayoutParams(iconSize, iconSize)
                 setScaleType(ImageView.ScaleType.CENTER)
                 setOnClickListener {
-                    val listAvailablePlayers = players
-                            .filter { it.value == null }
-                            .keys.toList()
-                            .sortedWith(getPlayerComparator(position))
-                    playerListener?.onPlayerButtonClicked(listAvailablePlayers, position, true)
+                    playerListener?.onPlayerButtonClicked(position, true)
                 }
                 this
             }
@@ -148,7 +124,7 @@ class DefenseEditableView: ConstraintLayout {
         }
     }
 
-    private fun addSubstitutePlayers(players: Map<Player, FieldPosition?>) {
+    private fun addSubstitutePlayers(players: List<PlayerWithPosition>) {
         val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
         val columnCount = (substituteContainer.width - substituteContainer.paddingStart - substituteContainer.paddingEnd) / iconSize
         substituteContainer.columnCount = columnCount
@@ -159,10 +135,7 @@ class DefenseEditableView: ConstraintLayout {
             setImageResource(R.drawable.ic_person_add_black_24dp)
 
             setOnClickListener {
-                val listAvailablePlayers = players
-                        .filter { it.value == null }
-                        .keys.toList()
-                playerListener?.onPlayerButtonClicked(listAvailablePlayers, FieldPosition.SUBSTITUTE, true)
+                playerListener?.onPlayerButtonClicked(FieldPosition.SUBSTITUTE, true)
             }
 
             this
@@ -170,14 +143,14 @@ class DefenseEditableView: ConstraintLayout {
 
         substituteContainer.addView(addSubstituteView)
 
-        players.filter { FieldPosition.isSubstitute(it.value?.position ?: FieldPosition.PITCHER.position) }
+        players.filter { FieldPosition.isSubstitute(it.position) && it.fieldPositionID > 0 }
                 .forEach { entry ->
                     val playerView = PlayerFieldIcon(context).run {
                         layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-                        setPlayerImage(entry.key.image, entry.key.name, iconSize)
+                        setPlayerImage(entry.image, entry.playerName, iconSize)
 
                         setOnLongClickListener {
-                            playerListener?.onPlayerButtonLongClicked(entry.key, FieldPosition.SUBSTITUTE)
+                            playerListener?.onPlayerButtonLongClicked(entry.toPlayer(), FieldPosition.SUBSTITUTE)
                             true
                         }
 
@@ -187,29 +160,27 @@ class DefenseEditableView: ConstraintLayout {
                 }
     }
 
-    private fun addDesignatedPlayerIfExists(players: Map<Player, FieldPosition?>, lineupMode: Int) {
-        if(lineupMode == MODE_DH) {
+    private fun addDesignatedPlayerIfExists(players: List<PlayerWithPosition>, lineupMode: Int) {
+         if(lineupMode == MODE_DH) {
             val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
-            players.filter { it.value == FieldPosition.DH }.let {
-                var view: View? = null
+            players.filter { it.position == FieldPosition.DH.position }?.let {
+                var view: View?
                 try {
-                    val player = it.keys.first()
-                    val position = players[player]
-                    position?.let {
-                        val playerView = PlayerFieldIcon(context).run {
-                            layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-                            setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
+                    val player = it.first().toPlayer()
+                    val position = FieldPosition.DH
+                    val playerView = PlayerFieldIcon(context).run {
+                        layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
+                        setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
 
-                            setOnLongClickListener {
-                                playerListener?.onPlayerButtonLongClicked(player, FieldPosition.DH)
-                                true
-                            }
-
-                            this
+                        setOnLongClickListener {
+                            playerListener?.onPlayerButtonLongClicked(player, position)
+                            true
                         }
 
-                        view = playerView
+                        this
                     }
+
+                    view = playerView
                 } catch (e: NoSuchElementException) {
                     val positionView = AddDesignatedPlayerButton(context).run {
                         layoutParams = LayoutParams(iconSize, iconSize)
@@ -221,10 +192,7 @@ class DefenseEditableView: ConstraintLayout {
 
                 view?.apply {
                     setOnClickListener {
-                        val listAvailablePlayers = players
-                                .filter { it.value == null }
-                                .keys.toList()
-                        playerListener?.onPlayerButtonClicked(listAvailablePlayers, FieldPosition.DH, view is AddDesignatedPlayerButton)
+                        playerListener?.onPlayerButtonClicked(FieldPosition.DH, view is AddDesignatedPlayerButton)
                     }
 
                     addPlayerOnFieldWithPercentage(this, FieldPosition.DH.xPercent, FieldPosition.DH.yPercent, null)

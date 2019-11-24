@@ -6,8 +6,6 @@ import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
-import com.telen.easylineup.lineup.attack.BattingOrderAdapter
-import timber.log.Timber
 
 
 class ItemDecoratorAttackRecycler(context: Context?, orientation: Int) : DividerItemDecoration(context, orientation) {
@@ -59,7 +57,6 @@ class ItemDecoratorAttackRecycler(context: Context?, orientation: Int) : Divider
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         drawable?.let {
             val position = parent.getChildAdapterPosition(view)
-            Timber.d("position=$position")
             if(position == mExtraDividerIndex)
                 outRect.set(0, 0, 0, it.intrinsicHeight + mExtraDividerHeight)
             else

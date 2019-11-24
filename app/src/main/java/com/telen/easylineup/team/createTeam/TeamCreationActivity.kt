@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
-import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.repository.Constants
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.activity_team_creation.*
 import kotlinx.android.synthetic.main.view_create_team.*

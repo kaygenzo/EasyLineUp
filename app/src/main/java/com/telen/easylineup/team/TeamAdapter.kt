@@ -1,16 +1,9 @@
 package com.telen.easylineup.team
 
 import android.content.Context
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.squareup.picasso.Picasso
-import com.telen.easylineup.R
-import com.telen.easylineup.data.Player
+import com.telen.easylineup.repository.data.Player
 import com.telen.easylineup.views.PlayerCard
 
 interface OnPlayerClickListener {

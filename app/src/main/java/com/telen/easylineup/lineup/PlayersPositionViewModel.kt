@@ -13,41 +13,31 @@ import androidx.core.content.FileProvider
 import androidx.core.view.drawToBitmap
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.App
-import com.telen.easylineup.FieldPosition
+import com.telen.easylineup.*
 import com.telen.easylineup.R
-import com.telen.easylineup.data.*
-import io.reactivex.Completable
-import io.reactivex.Observable
+import com.telen.easylineup.domain.*
+import com.telen.easylineup.repository.data.*
 import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.lang.Exception
 import java.util.*
-import kotlin.NoSuchElementException
 import kotlin.collections.ArrayList
 import kotlin.collections.List
 import kotlin.collections.Map
 import kotlin.collections.MutableList
-import kotlin.collections.MutableMap
-import kotlin.collections.filter
-import kotlin.collections.first
 import kotlin.collections.forEach
 import kotlin.collections.mutableListOf
-import kotlin.collections.mutableMapOf
-import kotlin.collections.set
 
 data class LineupStatusDefense(val players: Map<Player, FieldPosition?>, val lineupMode: Int)
 data class LineupStatusAttack(val players: Map<Player, FieldPosition?>, val lineupMode: Int)
-
-const val ORDER_PITCHER_WHEN_DH = 10
 
 data class InsufficientPermissions(val permissionsNeeded: Array<String>): Exception() {
     override fun equals(other: Any?): Boolean {
@@ -67,195 +57,123 @@ data class InsufficientPermissions(val permissionsNeeded: Array<String>): Except
 
 }
 
+enum class ErrorCase {
+    SAVE_PLAYER_FIELD_POSITION_FAILED,
+    DELETE_PLAYER_FIELD_POSITION_FAILED,
+    LIST_AVAILABLE_PLAYERS_EMPTY,
+    SAVE_BATTING_ORDER_FAILED,
+    DELETE_LINEUP_FAILED,
+    SAVE_LINEUP_MODE_FAILED,
+    UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED
+}
+
+sealed class EventCase
+object SavePlayerPositionSuccess: EventCase()
+object DeletePlayerPositionSuccess: EventCase()
+data class GetAllAvailablePlayersSuccess(val players: List<Player>, val position: FieldPosition, val isNewPlayer: Boolean): EventCase()
+object SaveBattingOrderSuccess: EventCase()
+object DeleteLineupSuccess: EventCase()
+object SaveLineupModeSuccess: EventCase()
+object UpdatePlayersWithLineupModeSuccess: EventCase()
+
 class PlayersPositionViewModel: ViewModel() {
 
     var lineupID: Long? = 0
     var lineupTitle: String? = null
     var lineupMode = MODE_NONE
     var editable = false
-    val listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
 
-    val teams: LiveData<List<Team>> = App.database.teamDao().getTeams()
+    val errorHandler = MutableLiveData<ErrorCase>()
+    val eventHandler = MutableLiveData<EventCase>()
 
-    private fun getNextAvailableOrder(): Int {
-        var availableOrder = 1
-        listPlayersWithPosition
-                .filter { it.fieldPositionID > 0 }
-                .sortedBy { it.order }
-                .forEach {
-                    if(it.order == availableOrder)
-                        availableOrder++
-                    else
-                        return availableOrder
-                }
-        return availableOrder
+    private val listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
+
+    private val savePlayerFieldPositionUseCase = SavePlayerFieldPosition(App.database.lineupDao())
+    private val deletePlayerFieldPositionUseCase = DeletePlayerFieldPosition(App.database.lineupDao())
+    private val getListAvailablePlayersForLineup = GetListAvailablePlayersForSelection()
+    private val saveBattingOrder = SaveBattingOrder(App.database.lineupDao())
+    private val deleteLineup = DeleteLineup(App.database.lineupDao())
+    private val saveLineupMode = SaveLineupMode(App.database.lineupDao())
+    private val updatePlayersWithLineupMode = UpdatePlayersWithLineupMode(App.database.lineupDao())
+
+    fun savePlayerFieldPosition(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean) {
+
+        val requestValues = SavePlayerFieldPosition.RequestValues(
+                lineupID, player, position, point.x, point.y, listPlayersWithPosition, lineupMode, isNewObject)
+
+        val disposable = UseCaseHandler.execute(savePlayerFieldPositionUseCase, requestValues).subscribe({
+            eventHandler.value = SavePlayerPositionSuccess
+        }, {
+            errorHandler.value = ErrorCase.SAVE_PLAYER_FIELD_POSITION_FAILED
+        })
     }
 
-    fun savePlayerFieldPosition(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean): Completable {
+    fun deletePosition(player: Player, position: FieldPosition) {
 
-        lineupID?.let { lineupID ->
-            val playerPosition: PlayerFieldPosition = if(isNewObject) {
-                val order = when(position) {
-                    FieldPosition.SUBSTITUTE -> 200
-                    FieldPosition.PITCHER -> {
-                        if(lineupMode == MODE_NONE)
-                            getNextAvailableOrder()
-                        else
-                            ORDER_PITCHER_WHEN_DH
-                    }
-                    else -> getNextAvailableOrder()
-                }
-                PlayerFieldPosition(
-                        playerId = player.id,
-                        lineupId = lineupID,
-                        position = position.position,
-                        order = order)
-            } else {
-                listPlayersWithPosition.first { it.position == position.position }.toPlayerFieldPosition()
-            }
+        val requestValues = DeletePlayerFieldPosition.RequestValues(listPlayersWithPosition, player, position)
 
-            playerPosition.apply {
-                playerId = player.id
-                x = point.x
-                y = point.y
-            }
-
-            Timber.d("before playerFieldPosition=$playerPosition")
-
-            return if(playerPosition.id > 0) {
-                App.database.lineupDao().updatePlayerFieldPosition(playerPosition)
-            } else {
-                App.database.lineupDao().insertPlayerFieldPosition(playerPosition).ignoreElement()
-            }
-        } ?: return Completable.error(IllegalStateException("LineupID is null"))
+        val disposable = UseCaseHandler.execute(deletePlayerFieldPositionUseCase, requestValues).subscribe({
+            eventHandler.value = DeletePlayerPositionSuccess
+        }, {
+            errorHandler.value = ErrorCase.DELETE_PLAYER_FIELD_POSITION_FAILED
+        })
     }
 
-    fun deletePosition(position: FieldPosition): Completable {
-        try {
-            listPlayersWithPosition.first { it.position == position.position }.let {
-                return App.database.lineupDao().deletePosition(it.toPlayerFieldPosition())
-            }
-        }
-        catch (e: NoSuchElementException) {
-            return Completable.error(e)
-        }
+    fun getAllAvailablePlayers(position: FieldPosition, isNewPlayer: Boolean) {
+
+        val requestValues = GetListAvailablePlayersForSelection.RequestValues(listPlayersWithPosition, position)
+
+        val disposable = UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues).subscribe({
+            eventHandler.value = GetAllAvailablePlayersSuccess(it.players, position, isNewPlayer)
+        }, {
+            errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
+        })
     }
 
-    fun deletePosition(player: Player, position: FieldPosition): Completable {
-        try {
-            listPlayersWithPosition.first { it.playerID == player.id && it.position == position.position }.let {
-                return App.database.lineupDao().deletePosition(it.toPlayerFieldPosition())
-            }
-        }
-        catch (e: NoSuchElementException) {
-            return Completable.error(e)
-        }
+    fun saveNewBattingOrder(players: List<PlayerWithPosition>) {
+        val requestValues = SaveBattingOrder.RequestValues(players)
+
+        val disposable = UseCaseHandler.execute(saveBattingOrder, requestValues).subscribe({
+            eventHandler.value = SaveBattingOrderSuccess
+        }, {
+            errorHandler.value = ErrorCase.SAVE_BATTING_ORDER_FAILED
+        })
     }
 
-    fun saveNewBattingOrder(playerPosition: MutableList<PlayerWithPosition>): Completable {
-        val listOperations: MutableList<Completable> = mutableListOf()
-        playerPosition.forEach {player ->
-            listOperations.add(App.database.lineupDao().getPlayerFieldPosition(player.fieldPositionID)
-                    .flatMapCompletable { playerPosition ->
-                        playerPosition.order = player.order
-                        App.database.lineupDao().updatePlayerFieldPosition(playerPosition)
-                    }
-            )
-        }
-        return Completable.concat(listOperations)
+    fun deleteLineup() {
+
+        val requestValues = DeleteLineup.RequestValues(lineupID)
+
+        val disposable = UseCaseHandler.execute(deleteLineup, requestValues).subscribe({
+            eventHandler.value = DeleteLineupSuccess
+        }, {
+            errorHandler.value = ErrorCase.DELETE_LINEUP_FAILED
+        })
     }
 
-    fun getPlayersWithPositions(lineupID: Long): LiveData<List<PlayerWithPosition>> {
-        return Transformations.map(App.database.lineupDao().getAllPlayersWithPositionsForLineup(lineupID)) {
-            listPlayersWithPosition.clear()
-            listPlayersWithPosition.addAll(it)
-            it
-        }
-
-    }
-
-    fun getTeamPlayerWithPositions(lineupID: Long): LiveData<LineupStatusDefense> {
-
-        val getLineup = App.database.lineupDao().getLineupById(lineupID)
-
-        val getListPlayersLiveData = Transformations.switchMap(getLineup) {
-            this.lineupMode = it.mode
-            App.database.playerDao().getTeamPlayersWithPositions(lineupID)
-        }
-
-        return Transformations.map(getListPlayersLiveData) { players ->
-
-            listPlayersWithPosition.clear()
-            listPlayersWithPosition.addAll(players)
-
-            val result: MutableMap<Player, FieldPosition?> = mutableMapOf()
-            players.forEach {
-                var position: FieldPosition? = null
-                if(it.fieldPositionID > 0) {
-                    position = FieldPosition.getFieldPosition(it.position)
-                }
-                val player = it.toPlayer()
-                result[player] = position
-            }
-            LineupStatusDefense(result, lineupMode)
-        }
-    }
-
-    fun deleteLineup(): Completable {
-        lineupID?.let { id ->
-            return App.database.lineupDao().getLineupByIdSingle(id)
-                    .flatMapCompletable { lineup -> App.database.lineupDao().deleteLineup(lineup) }
-        } ?: return Completable.complete()
-    }
-
-    private fun saveMode(): Completable {
-        lineupID?.let { id ->
-            return App.database.lineupDao().getLineupByIdSingle(id)
-                    .flatMapCompletable { lineup ->
-                        lineup.mode = lineupMode
-                        App.database.lineupDao().updateLineup(lineup)
-                    }
-        } ?: return Completable.complete()
-    }
-
-    fun registerLineupChange(): LiveData<Lineup> {
-        return App.database.lineupDao().getLineupById(lineupID ?: 0)
+    private fun saveMode(): Single<SaveLineupMode.ResponseValue> {
+        val requestValues = SaveLineupMode.RequestValues(lineupID, lineupMode)
+        return UseCaseHandler.execute(saveLineupMode, requestValues)
     }
 
     fun onDesignatedPlayerChanged(isEnabled: Boolean) {
-        val task = Single.just(isEnabled)
-                .flatMapCompletable { isDesignatedPlayerEnabled ->
-                    this.lineupMode = if(isEnabled) MODE_DH else MODE_NONE
-                    val playerTask: Completable = when(isDesignatedPlayerEnabled) {
-                        true -> {
-                            listPlayersWithPosition.filter { it.position == FieldPosition.PITCHER.position }.firstOrNull()?.let {
-                                val playerFieldPosition = it.toPlayerFieldPosition()
-                                playerFieldPosition.order = ORDER_PITCHER_WHEN_DH
-                                App.database.lineupDao().updatePlayerFieldPosition(playerFieldPosition)
-                            } ?: Completable.complete()
-                        }
-                        false -> {
-                            listPlayersWithPosition.filter {
-                                it.position == FieldPosition.DH.position || it.position == FieldPosition.PITCHER.position
-                            }.let { list ->
-                                Observable.fromIterable(list).flatMapCompletable { playerPosition ->
-                                    FieldPosition.getFieldPosition(playerPosition.position)?.let {
-                                        deletePosition(it)
-                                    }
-                                }
-                            } ?: Completable.complete()
-                        }
-                    }
-                    saveMode().andThen(playerTask)
-                }
-                .subscribeOn(Schedulers.io())
-                .subscribe({
 
-                }, {
-                    Timber.e(it)
-                })
+        lineupMode = if(isEnabled) MODE_DH else MODE_NONE
+
+        val disposable = saveMode().doOnError {
+            errorHandler.value = ErrorCase.SAVE_LINEUP_MODE_FAILED
+        }.flatMap {
+            eventHandler.value = SaveLineupModeSuccess
+            val requestValues = UpdatePlayersWithLineupMode.RequestValues(listPlayersWithPosition, isEnabled)
+            UseCaseHandler.execute(updatePlayersWithLineupMode, requestValues)
+        }.subscribe({
+            eventHandler.value = UpdatePlayersWithLineupModeSuccess
+        }, {
+            errorHandler.value = ErrorCase.UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED
+        })
     }
 
+    //TODO use case ?
     fun exportLineupToExternalStorage(context: Context, map: Map<Int, Fragment>): Single<Intent> {
         return Single.create(SingleOnSubscribe<ArrayList<Uri>> {
 
@@ -310,5 +228,33 @@ class PlayersPositionViewModel: ViewModel() {
                 }
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    ///////////// LIVE DATA OBSERVER //////////////
+
+    fun registerLineupAndPositionsChanged(): LiveData<List<PlayerWithPosition>> {
+
+        val getLineup = App.database.lineupDao().getLineupById(lineupID ?: 0)
+        val getPositions = Transformations.switchMap(getLineup) {
+            this.lineupMode = it?.mode ?: 0
+            App.database.playerDao().getTeamPlayersAndMaybePositions(it?.id ?: 0)
+        }
+
+        return Transformations.map(getPositions) {
+            listPlayersWithPosition.clear()
+            listPlayersWithPosition.addAll(it)
+            it
+        }
+    }
+
+    fun registerLineupBatters(): LiveData<List<PlayerWithPosition>> {
+        return Transformations.map(registerLineupAndPositionsChanged()) { players ->
+            players.filter { it.order > 0 }
+                    .sortedBy { it.order }
+        }
+    }
+
+    fun registerLineupChange(): LiveData<Lineup> {
+        return App.database.lineupDao().getLineupById(lineupID ?: 0)
     }
 }

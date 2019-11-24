@@ -9,7 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.telen.easylineup.R
-import com.telen.easylineup.data.TeamType
+import com.telen.easylineup.repository.data.TeamType
 import kotlinx.android.synthetic.main.fragment_team_type.view.*
 import timber.log.Timber
 
@@ -32,7 +32,7 @@ class TeamTypeFragment: Fragment(), ViewPager.OnPageChangeListener {
         mViewPager = view.teamTypeViewPager
         val mCardAdapter = CardPagerAdapter()
 
-        TeamType.values().forEach {type ->
+        TeamType.values().forEach { type ->
             when(type) {
                 TeamType.BASEBALL -> {
                     mCardAdapter.addCardItem(TeamTypeCardItem(R.string.title_baseball, R.drawable.image_baseball_ball))

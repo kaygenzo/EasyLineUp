@@ -8,7 +8,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.dashboard.models.ITileData
 import com.telen.easylineup.dashboard.models.KEY_LINEUP_NAME
 import com.telen.easylineup.dashboard.models.KEY_LINEUP_PLAYERS
-import com.telen.easylineup.data.PlayerWithPosition
+import com.telen.easylineup.repository.data.PlayerWithPosition
 import kotlinx.android.synthetic.main.tile_last_lineup.view.*
 
 class LastLineupTile: ConstraintLayout{

@@ -8,7 +8,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import bugbattle.io.bugbattle.BugBattle
 import bugbattle.io.bugbattle.controller.BugBattleActivationMethod
 import com.crashlytics.android.Crashlytics
-import com.telen.easylineup.data.AppDatabase
+import com.crashlytics.android.core.CrashlyticsCore
+import com.telen.easylineup.repository.data.AppDatabase
 import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 
@@ -32,7 +33,11 @@ class App: MultiDexApplication() {
             Timber.plant(ReleaseTree())
         }
 
-        Fabric.with(this, Crashlytics())
+        val crashlytics = Crashlytics.Builder()
+                .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
+                .build()
+
+        Fabric.with(this, crashlytics)
 
         BugBattle.initialise(BuildConfig.ReportToolApiKey, BugBattleActivationMethod.SHAKE, this)
 

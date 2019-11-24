@@ -14,7 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.nguyenhoanglam.imagepicker.model.Config
 import com.nguyenhoanglam.imagepicker.model.Image
 import com.telen.easylineup.R
-import com.telen.easylineup.utils.Constants
+import com.telen.easylineup.repository.Constants
 import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.TeamFormListener
 import com.telen.easylineup.views.TeamFormView
