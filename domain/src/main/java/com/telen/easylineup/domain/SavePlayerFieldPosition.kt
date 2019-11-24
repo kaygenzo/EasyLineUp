@@ -1,6 +1,5 @@
 package com.telen.easylineup.domain
 
-import android.graphics.PointF
 import com.telen.easylineup.repository.Constants
 import com.telen.easylineup.repository.data.*
 import io.reactivex.Single
@@ -27,8 +26,8 @@ class SavePlayerFieldPosition(private val lineupDao: LineupDao): UseCase<SavePla
 
             playerPosition.apply {
                 playerId = requestValues.player.id
-                x = requestValues.point.x
-                y = requestValues.point.y
+                x = requestValues.x
+                y = requestValues.y
             }
 
             val task = if (playerPosition.id > 0) {
@@ -44,7 +43,7 @@ class SavePlayerFieldPosition(private val lineupDao: LineupDao): UseCase<SavePla
     private fun getNextAvailableOrder(players: List<PlayerWithPosition>): Int {
         var availableOrder = 1
         players
-                .filter { it.fieldPositionID > 0 }
+                .filter { it.fieldPositionID > 0 && it.order > 0 }
                 .sortedBy { it.order }
                 .forEach {
                     if(it.order == availableOrder)
@@ -58,7 +57,8 @@ class SavePlayerFieldPosition(private val lineupDao: LineupDao): UseCase<SavePla
     class RequestValues(val lineupID: Long?,
                         val player: Player,
                         val position: FieldPosition,
-                        val point: PointF,
+                        val x: Float,
+                        val y: Float,
                         val players: List<PlayerWithPosition>,
                         val lineupMode: Int,
                         val isNewPosition: Boolean

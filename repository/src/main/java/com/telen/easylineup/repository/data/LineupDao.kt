@@ -30,7 +30,7 @@ interface LineupDao {
     fun getLineupByIdSingle(lineupId: Long): Single<Lineup>
 
     @Insert
-    fun insertPlayerFieldPosition(fieldPositions: List<PlayerFieldPosition>): Completable
+    fun insertPlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>): Completable
 
     @Update
     fun updatePlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>): Completable

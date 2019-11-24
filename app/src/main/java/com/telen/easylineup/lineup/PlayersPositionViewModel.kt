@@ -99,7 +99,7 @@ class PlayersPositionViewModel: ViewModel() {
     fun savePlayerFieldPosition(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean) {
 
         val requestValues = SavePlayerFieldPosition.RequestValues(
-                lineupID, player, position, point, listPlayersWithPosition, lineupMode, isNewObject)
+                lineupID, player, position, point.x, point.y, listPlayersWithPosition, lineupMode, isNewObject)
 
         val disposable = UseCaseHandler.execute(savePlayerFieldPositionUseCase, requestValues).subscribe({
             eventHandler.value = SavePlayerPositionSuccess

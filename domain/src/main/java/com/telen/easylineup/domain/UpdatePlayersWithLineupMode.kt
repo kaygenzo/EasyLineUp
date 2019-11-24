@@ -26,7 +26,7 @@ class UpdatePlayersWithLineupMode(private val lineupDao: LineupDao): UseCase<Upd
                     Observable.fromIterable(list).flatMapCompletable { playerPosition ->
                         lineupDao.deletePosition(playerPosition.toPlayerFieldPosition())
                     }
-                } ?: Completable.complete()
+                }
             }
         }
         return playerTask.andThen(Single.just(ResponseValue()))
