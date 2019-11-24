@@ -99,7 +99,7 @@ class DatabaseMockProvider {
     }
 
     private fun insertPlayerFieldPositions(list: List<PlayerFieldPosition>): Completable {
-        return App.database.lineupDao().insertPlayerFieldPosition(list)
+        return App.database.lineupDao().insertPlayerFieldPositions(list)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

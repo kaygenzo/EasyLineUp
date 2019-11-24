@@ -242,3 +242,5 @@ sonarqube {
         property "sonar.host.url", sonarProperties['sonar.host.url']
     }
 }
+
+apply from: '../jacoco.gradle'

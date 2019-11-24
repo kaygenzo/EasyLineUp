@@ -34,14 +34,6 @@ lintProdDebug:
   script:
     - ./gradlew -Pci --console=plain :app:lintProdDebug -PbuildDir=lint
 
-assembleProdDebug:
-  stage: debug
-  script:
-    - ./gradlew assembleProdDebug
-  artifacts:
-    paths:
-      - app/build/outputs/apk/prod/debug
-
 assembleProdRelease:
   stage: release
   script:
@@ -49,8 +41,14 @@ assembleProdRelease:
   artifacts:
     paths:
       - app/build/outputs/apk/prod/release
+      - app/build/outputs/mapping/prod/release
 
-debugTests:
+unitTests:
   stage: test
   script:
     - ./gradlew -Pci --console=plain :app:testProdDebugUnitTest
+
+coverageTests:
+  stage: test
+  script:
+    - ./gradlew -Pci --console=plain :app:testProdDebugUnitTestCoverage coveralls
