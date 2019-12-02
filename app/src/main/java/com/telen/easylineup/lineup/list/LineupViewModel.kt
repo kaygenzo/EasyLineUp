@@ -1,41 +1,32 @@
 package com.telen.easylineup.lineup.list
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
-import com.telen.easylineup.repository.data.Lineup
-import com.telen.easylineup.repository.data.PlayerFieldPosition
-import com.telen.easylineup.repository.data.Tournament
+import com.telen.easylineup.UseCaseHandler
+import com.telen.easylineup.domain.GetTeam
+import com.telen.easylineup.repository.model.Lineup
+import com.telen.easylineup.repository.model.Tournament
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 class LineupViewModel: ViewModel() {
     val lineups = App.database.lineupDao().getAllLineup()
 
-    fun getPlayerFieldPositionFor(lineup: Lineup): LiveData<List<PlayerFieldPosition>> {
-        return App.database.lineupDao().getAllPlayerFieldPositionsForLineup(lineup.id)
-    }
+    private val getTeamUseCase = GetTeam(App.database.teamDao(), App.prefs)
 
     fun createNewLineup(tournament: Tournament, lineupTitle: String): Single<Long> {
         return insertTournamentIfNotExists(tournament)
                 .flatMap { tournamentID ->
                     Timber.d("successfully inserted tournament or already existing, id: $tournamentID")
                     tournament.id = tournamentID
-                    App.database.teamDao().getTeamsList()
+                    UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues(), observeOn = Schedulers.io())
                 }
-                .map { it.first() }
+                .map { it.team }
                 .flatMap {team ->
                     val newLineup = Lineup(name = lineupTitle, teamId = team.id, tournamentId = tournament.id)
                     App.database.lineupDao().insertLineup(newLineup)
                 }
-    }
-
-    fun getLineupsForTournament(tournament: Tournament): LiveData<List<Lineup>> {
-        return App.database.lineupDao().getLineupsForTournament(tournament.id)
-    }
-
-    fun getLineupByID(lineupID: Long): LiveData<Lineup> {
-        return App.database.lineupDao().getLineupById(lineupID)
     }
 
     private fun insertTournamentIfNotExists(tournament: Tournament): Single<Long> {

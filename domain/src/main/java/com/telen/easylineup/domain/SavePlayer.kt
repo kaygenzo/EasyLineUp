@@ -1,7 +1,7 @@
 package com.telen.easylineup.domain
 
 import android.net.Uri
-import com.telen.easylineup.repository.data.Player
+import com.telen.easylineup.repository.model.Player
 import com.telen.easylineup.repository.data.PlayerDao
 import io.reactivex.Single
 import java.lang.Exception

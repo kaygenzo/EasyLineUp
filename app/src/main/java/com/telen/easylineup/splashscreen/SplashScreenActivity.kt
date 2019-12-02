@@ -4,19 +4,20 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import com.telen.easylineup.App
-import com.telen.easylineup.BuildConfig
-import com.telen.easylineup.HomeActivity
-import com.telen.easylineup.R
+import com.telen.easylineup.*
+import com.telen.easylineup.domain.GetTeam
 import com.telen.easylineup.mock.DatabaseMockProvider
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.splashscreen.*
 import java.util.concurrent.TimeUnit
 
 class SplashScreenActivity: AppCompatActivity() {
+
+    private val getTeamUseCase = GetTeam(App.database.teamDao(), App.prefs)
+    private var disposable: Disposable? = null
 
     @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,25 +28,23 @@ class SplashScreenActivity: AppCompatActivity() {
         if(BuildConfig.usePrefilledDatabase) {
             commands = commands.andThen(DatabaseMockProvider().createMockDatabase(this))
         }
-        commands
+        disposable = commands.andThen(UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    App.database.teamDao().getTeams().observe(this, Observer {
-                        when(it.size) {
-                            0 -> {
-                                val intent = Intent(this, TeamCreationActivity::class.java)
-                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                startActivity(intent)
-                                finish()
-                            }
-                            else -> {
-                                val intent = Intent(this, HomeActivity::class.java)
-                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                startActivity(intent)
-                                finish()
-                            }
-                        }
-                    })
-                }
+                .subscribe({
+                    val intent = Intent(this, HomeActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)
+                    finish()
+                }, {
+                    val intent = Intent(this, TeamCreationActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)
+                    finish()
+                })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable?.takeIf { !it.isDisposed }?.dispose()
     }
 }

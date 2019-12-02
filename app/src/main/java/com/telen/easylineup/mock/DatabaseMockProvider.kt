@@ -3,7 +3,7 @@ package com.telen.easylineup.mock
 import android.content.Context
 import com.google.gson.JsonParser
 import com.telen.easylineup.App
-import com.telen.easylineup.repository.data.*
+import com.telen.easylineup.repository.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -99,7 +99,7 @@ class DatabaseMockProvider {
     }
 
     private fun insertPlayerFieldPositions(list: List<PlayerFieldPosition>): Completable {
-        return App.database.lineupDao().insertPlayerFieldPositions(list)
+        return App.database.playerFieldPositionsDao().insertPlayerFieldPositions(list)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

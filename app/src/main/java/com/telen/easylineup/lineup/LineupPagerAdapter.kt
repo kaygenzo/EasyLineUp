@@ -10,7 +10,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.lineup.defense.DefenseFragmentFixed
 import com.telen.easylineup.lineup.defense.DefenseFragmentEditable
 import com.telen.easylineup.lineup.attack.AttackFragment
-import com.telen.easylineup.repository.Constants
+import com.telen.easylineup.repository.model.Constants
 
 const val FRAGMENT_DEFENSE_INDEX = 0
 const val FRAGMENT_ATTACK_INDEX = 1

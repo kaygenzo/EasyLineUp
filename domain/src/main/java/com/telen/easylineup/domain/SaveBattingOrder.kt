@@ -1,12 +1,12 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.Constants
-import com.telen.easylineup.repository.data.LineupDao
-import com.telen.easylineup.repository.data.PlayerFieldPosition
-import com.telen.easylineup.repository.data.PlayerWithPosition
+import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
+import com.telen.easylineup.repository.model.PlayerFieldPosition
+import com.telen.easylineup.repository.model.PlayerWithPosition
 import io.reactivex.Single
 
-class SaveBattingOrder(private val lineupDao: LineupDao): UseCase<SaveBattingOrder.RequestValues, SaveBattingOrder.ResponseValue>() {
+class SaveBattingOrder(private val lineupDao: PlayerFieldPositionsDao): UseCase<SaveBattingOrder.RequestValues, SaveBattingOrder.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         val listOperations: MutableList<PlayerFieldPosition> = mutableListOf()

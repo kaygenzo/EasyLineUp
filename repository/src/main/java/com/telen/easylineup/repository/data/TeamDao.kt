@@ -2,6 +2,7 @@ package com.telen.easylineup.repository.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.telen.easylineup.repository.model.Team
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -17,11 +18,11 @@ interface TeamDao {
     fun updateTeam(team: Team): Completable
 
     @Query("SELECT * FROM teams WHERE id = :teamId")
-    fun getTeamById(teamId: Long): LiveData<Team>
+    fun getTeamById(teamId: Long): Single<Team>
 
     @Query("SELECT * FROM teams")
     fun getTeams(): LiveData<List<Team>>
 
     @Query("SELECT * FROM teams")
-    fun getTeamsList(): Single<List<Team>>
+    fun getTeamsRx(): Single<List<Team>>
 }

@@ -2,6 +2,7 @@ package com.telen.easylineup.repository.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.telen.easylineup.repository.model.Tournament
 import io.reactivex.Completable
 import io.reactivex.Single
 

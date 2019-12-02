@@ -7,11 +7,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.BuildConfig
-import com.telen.easylineup.repository.data.FieldPosition
+import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.data.MODE_DH
-import com.telen.easylineup.repository.data.MODE_NONE
-import com.telen.easylineup.repository.data.PlayerWithPosition
+import com.telen.easylineup.repository.model.MODE_DH
+import com.telen.easylineup.repository.model.MODE_NONE
+import com.telen.easylineup.repository.model.PlayerWithPosition
 import com.telen.easylineup.views.PlayerPositionFilterView
 import timber.log.Timber
 

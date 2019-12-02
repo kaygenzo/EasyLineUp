@@ -3,8 +3,14 @@ package com.telen.easylineup.domain
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.repository.Constants
-import com.telen.easylineup.repository.data.*
+import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.model.MODE_DH
+import com.telen.easylineup.repository.model.MODE_NONE
+import com.telen.easylineup.repository.model.Player
+import com.telen.easylineup.repository.model.PlayerWithPosition
+import com.telen.easylineup.repository.model.FieldPosition
+import com.telen.easylineup.repository.data.LineupDao
+import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -21,7 +27,7 @@ import org.mockito.junit.MockitoJUnitRunner
 class SavePlayerFieldPositionTests {
 
     lateinit var savePlayerFieldPosition: SavePlayerFieldPosition
-    @Mock lateinit var lineupDao: LineupDao
+    @Mock lateinit var lineupDao: PlayerFieldPositionsDao
     lateinit var players: MutableList<PlayerWithPosition>
     var observer = TestObserver<SavePlayerFieldPosition.ResponseValue>()
     var newPlayer = Player(6, 1, "tyty", 6, 6, null, 128)
@@ -32,15 +38,15 @@ class SavePlayerFieldPositionTests {
         savePlayerFieldPosition = SavePlayerFieldPosition(lineupDao)
         players = mutableListOf()
         players.add(PlayerWithPosition("toto", 1, 1, 1, null,
-                FieldPosition.PITCHER.position, 0f, 0f, 0, 1, 1, 1,1))
+                FieldPosition.PITCHER.position, 0f, 0f, 0, 1, 1, 1, 1))
         players.add(PlayerWithPosition("tata", 2, 2, 1, null,
-                FieldPosition.CATCHER.position, 0f, 0f, 2, 2, 2, 1,2))
+                FieldPosition.CATCHER.position, 0f, 0f, 2, 2, 2, 1, 2))
         players.add(PlayerWithPosition("titi", 3, 3, 1, null,
-                FieldPosition.CENTER_FIELD.position, 0f, 0f, 4, 3, 3, 1,4))
+                FieldPosition.CENTER_FIELD.position, 0f, 0f, 4, 3, 3, 1, 4))
         players.add(PlayerWithPosition("tutu", 4, 4, 1, null,
                 FieldPosition.FIRST_BASE.position, 0f, 0f, 6, 4, 4, 1, 8))
         players.add(PlayerWithPosition("tete", 5, 5, 1, null,
-                FieldPosition.SUBSTITUTE.position, 0f, 0f, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1,16))
+                FieldPosition.SUBSTITUTE.position, 0f, 0f, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
         Mockito.`when`(lineupDao.insertPlayerFieldPosition(any())).thenReturn(Single.just(6))
         Mockito.`when`(lineupDao.updatePlayerFieldPosition(any())).thenReturn(Completable.complete())
     }
@@ -148,7 +154,7 @@ class SavePlayerFieldPositionTests {
         val request = SavePlayerFieldPosition.RequestValues(1, newPlayer, fieldPosition, 0f, 0f, players, mode, isNewPosition)
 
         players.add(PlayerWithPosition("test", 7, 7, 1, null,
-                FieldPosition.FIRST_BASE.position, 0f, 0f, 1, 7, 7, 1,16))
+                FieldPosition.FIRST_BASE.position, 0f, 0f, 1, 7, 7, 1, 16))
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -168,9 +174,9 @@ class SavePlayerFieldPositionTests {
         val request = SavePlayerFieldPosition.RequestValues(1, newPlayer, fieldPosition, 0f, 0f, players, mode, isNewPosition)
 
         players.add(PlayerWithPosition("test", 7, 7, 1, null,
-                FieldPosition.FIRST_BASE.position, 0f, 0f, 1, 7, 7, 1,16))
+                FieldPosition.FIRST_BASE.position, 0f, 0f, 1, 7, 7, 1, 16))
         players.add(PlayerWithPosition("test2", 8, 8, 1, null,
-                FieldPosition.THIRD_BASE.position, 0f, 0f, 3, 8, 8, 1,16))
+                FieldPosition.THIRD_BASE.position, 0f, 0f, 3, 8, 8, 1, 16))
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
         observer.await()

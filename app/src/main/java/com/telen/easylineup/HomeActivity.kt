@@ -12,9 +12,9 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
-import com.telen.easylineup.repository.Constants
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.DrawerHeader
+import timber.log.Timber
 
 class HomeActivity : AppCompatActivity() {
 
@@ -37,9 +37,12 @@ class HomeActivity : AppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         viewModel.registerTeamUpdates().observe(this, Observer {
-            drawerHeader.setImage(it.image)
-            drawerHeader.setTitle(it.name)
-            viewModel.teamID = it.id
+            viewModel.getTeam().subscribe({
+                drawerHeader.setImage(it.image)
+                drawerHeader.setTitle(it.name)
+            }, { throwable ->
+                Timber.d(throwable)
+            })
         })
 
         drawerHeader = DrawerHeader(this)
@@ -47,13 +50,10 @@ class HomeActivity : AppCompatActivity() {
         navigationView.addHeaderView(drawerHeader)
 
         drawerHeader.setOnClickListener {
-            viewModel.teamID?.let {
-                val arguments = Bundle()
-                arguments.putLong(Constants.TEAM_ID, it)
-                navController.navigate(R.id.teamEditFragment, arguments, NavigationUtils().getOptions())
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START)
-                }
+            val arguments = Bundle()
+            navController.navigate(R.id.teamEditFragment, arguments, NavigationUtils().getOptions())
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START)
             }
         }
     }

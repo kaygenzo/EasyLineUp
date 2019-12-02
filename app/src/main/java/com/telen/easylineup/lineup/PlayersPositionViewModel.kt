@@ -19,7 +19,8 @@ import androidx.lifecycle.ViewModel
 import com.telen.easylineup.*
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.*
-import com.telen.easylineup.repository.data.*
+import com.telen.easylineup.repository.model.*
+import com.telen.easylineup.repository.model.FieldPosition
 import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -88,13 +89,13 @@ class PlayersPositionViewModel: ViewModel() {
 
     private val listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
 
-    private val savePlayerFieldPositionUseCase = SavePlayerFieldPosition(App.database.lineupDao())
-    private val deletePlayerFieldPositionUseCase = DeletePlayerFieldPosition(App.database.lineupDao())
+    private val savePlayerFieldPositionUseCase = SavePlayerFieldPosition(App.database.playerFieldPositionsDao())
+    private val deletePlayerFieldPositionUseCase = DeletePlayerFieldPosition(App.database.playerFieldPositionsDao())
     private val getListAvailablePlayersForLineup = GetListAvailablePlayersForSelection()
-    private val saveBattingOrder = SaveBattingOrder(App.database.lineupDao())
+    private val saveBattingOrder = SaveBattingOrder(App.database.playerFieldPositionsDao())
     private val deleteLineup = DeleteLineup(App.database.lineupDao())
     private val saveLineupMode = SaveLineupMode(App.database.lineupDao())
-    private val updatePlayersWithLineupMode = UpdatePlayersWithLineupMode(App.database.lineupDao())
+    private val updatePlayersWithLineupMode = UpdatePlayersWithLineupMode(App.database.playerFieldPositionsDao())
 
     fun savePlayerFieldPosition(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean) {
 

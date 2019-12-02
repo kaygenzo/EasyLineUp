@@ -1,5 +1,7 @@
 package com.telen.easylineup
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.multidex.MultiDexApplication
 import androidx.room.Room
@@ -9,6 +11,7 @@ import bugbattle.io.bugbattle.BugBattle
 import bugbattle.io.bugbattle.controller.BugBattleActivationMethod
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
+import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.repository.data.AppDatabase
 import io.fabric.sdk.android.Fabric
 import timber.log.Timber
@@ -17,6 +20,7 @@ class App: MultiDexApplication() {
 
     companion object {
         lateinit var database: AppDatabase
+        lateinit var prefs: SharedPreferences
     }
 
     override fun onCreate() {
@@ -25,6 +29,8 @@ class App: MultiDexApplication() {
                 .addMigrations(migration_1_2())
                 .addMigrations(migration_2_3())
                 .build()
+
+        prefs = getSharedPreferences(Constants.APPLICATION_PREFERENCES, Context.MODE_PRIVATE)
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())

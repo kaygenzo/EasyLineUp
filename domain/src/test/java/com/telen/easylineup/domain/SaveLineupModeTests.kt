@@ -1,10 +1,10 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.repository.data.Lineup
+import com.telen.easylineup.repository.model.Lineup
 import com.telen.easylineup.repository.data.LineupDao
-import com.telen.easylineup.repository.data.MODE_DH
-import com.telen.easylineup.repository.data.MODE_NONE
+import com.telen.easylineup.repository.model.MODE_DH
+import com.telen.easylineup.repository.model.MODE_NONE
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver

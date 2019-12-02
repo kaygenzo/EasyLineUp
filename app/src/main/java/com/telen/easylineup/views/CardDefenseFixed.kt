@@ -7,7 +7,7 @@ import android.view.View
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.data.PlayerWithPosition
+import com.telen.easylineup.repository.model.PlayerWithPosition
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.card_defense_fixed.view.*
 

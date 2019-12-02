@@ -1,12 +1,12 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.data.FieldPosition
-import com.telen.easylineup.repository.data.LineupDao
-import com.telen.easylineup.repository.data.Player
-import com.telen.easylineup.repository.data.PlayerWithPosition
+import com.telen.easylineup.repository.model.FieldPosition
+import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
+import com.telen.easylineup.repository.model.Player
+import com.telen.easylineup.repository.model.PlayerWithPosition
 import io.reactivex.Single
 
-class DeletePlayerFieldPosition(private val dao: LineupDao): UseCase<DeletePlayerFieldPosition.RequestValues, DeletePlayerFieldPosition.ResponseValue>() {
+class DeletePlayerFieldPosition(private val dao: PlayerFieldPositionsDao): UseCase<DeletePlayerFieldPosition.RequestValues, DeletePlayerFieldPosition.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return try {

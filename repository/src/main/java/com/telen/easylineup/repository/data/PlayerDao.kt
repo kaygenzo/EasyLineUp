@@ -2,6 +2,8 @@ package com.telen.easylineup.repository.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.telen.easylineup.repository.model.Player
+import com.telen.easylineup.repository.model.PlayerWithPosition
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -33,7 +35,7 @@ interface PlayerDao {
     fun getPlayersSingle(): Single<List<Player>>
 
     @Query("SELECT players.* FROM players INNER JOIN teams ON players.teamID = teams.id WHERE teams.id = :teamId")
-    fun getPlayersForTeam(teamId: Long): LiveData<List<Player>>
+    fun getPlayersForTeamRx(teamId: Long): Single<List<Player>>
 
     @Query("""
         SELECT result.*, position, x, y, `order`, playerFieldPosition.id as fieldPositionID

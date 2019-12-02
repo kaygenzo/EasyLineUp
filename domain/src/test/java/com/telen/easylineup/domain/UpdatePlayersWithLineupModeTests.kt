@@ -1,10 +1,11 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.*
-import com.telen.easylineup.repository.Constants
-import com.telen.easylineup.repository.data.FieldPosition
+import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.repository.data.LineupDao
-import com.telen.easylineup.repository.data.PlayerWithPosition
+import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
+import com.telen.easylineup.repository.model.PlayerWithPosition
 import io.reactivex.Completable
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
@@ -23,7 +24,7 @@ class UpdatePlayersWithLineupModeTests {
     lateinit var players: MutableList<PlayerWithPosition>
     var observer = TestObserver<UpdatePlayersWithLineupMode.ResponseValue>()
 
-    @Mock lateinit var lineupDao: LineupDao
+    @Mock lateinit var lineupDao: PlayerFieldPositionsDao
 
     @Before
     fun init() {
@@ -31,15 +32,15 @@ class UpdatePlayersWithLineupModeTests {
         updatePlayersWithLineupMode = UpdatePlayersWithLineupMode(lineupDao)
         players = mutableListOf()
         players.add(PlayerWithPosition("toto", 1, 1, 1, null,
-                FieldPosition.SECOND_BASE.position, 0f, 0f, 0, 1, 1, 1,1))
+                FieldPosition.SECOND_BASE.position, 0f, 0f, 0, 1, 1, 1, 1))
         players.add(PlayerWithPosition("tata", 2, 2, 1, null,
-                FieldPosition.CATCHER.position, 0f, 0f, 2, 2, 2, 1,2))
+                FieldPosition.CATCHER.position, 0f, 0f, 2, 2, 2, 1, 2))
         players.add(PlayerWithPosition("titi", 3, 3, 1, null,
-                FieldPosition.CENTER_FIELD.position, 0f, 0f, 4, 3, 3, 1,4))
+                FieldPosition.CENTER_FIELD.position, 0f, 0f, 4, 3, 3, 1, 4))
         players.add(PlayerWithPosition("tutu", 4, 4, 1, null,
                 FieldPosition.FIRST_BASE.position, 0f, 0f, 6, 4, 4, 1, 8))
         players.add(PlayerWithPosition("tete", 5, 5, 1, null,
-                FieldPosition.SUBSTITUTE.position, 0f, 0f, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1,16))
+                FieldPosition.SUBSTITUTE.position, 0f, 0f, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
 
         Mockito.`when`(lineupDao.updatePlayerFieldPosition(any())).thenReturn(Completable.complete())
         Mockito.`when`(lineupDao.deletePosition(any())).thenReturn(Completable.complete())

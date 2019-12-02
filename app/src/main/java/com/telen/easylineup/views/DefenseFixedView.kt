@@ -10,9 +10,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.telen.easylineup.repository.data.FieldPosition
+import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.data.PlayerWithPosition
+import com.telen.easylineup.repository.model.PlayerWithPosition
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.field_view.view.*
 import kotlin.math.roundToInt

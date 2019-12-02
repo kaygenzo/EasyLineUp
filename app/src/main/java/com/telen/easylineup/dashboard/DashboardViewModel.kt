@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
+import com.telen.easylineup.UseCaseHandler
 import com.telen.easylineup.dashboard.models.*
-import com.telen.easylineup.repository.data.Team
+import com.telen.easylineup.domain.GetTeam
+import com.telen.easylineup.repository.model.Team
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -16,6 +18,7 @@ import timber.log.Timber
 class DashboardViewModel: ViewModel() {
     private val tilesLiveData = MutableLiveData<List<ITileData>>()
     private var loadDisposable: Disposable? = null
+    private val getTeamUseCase = GetTeam(App.database.teamDao(), App.prefs)
 
     fun registerTilesLiveData(): LiveData<List<ITileData>> {
         return tilesLiveData
@@ -38,7 +41,7 @@ class DashboardViewModel: ViewModel() {
     }
 
     private fun getTeam(): Single<Team> {
-        return App.database.teamDao().getTeamsList().map { it.first() }
+        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
     }
 
     private fun getShakeBeta(): Maybe<ITileData> {
@@ -48,14 +51,14 @@ class DashboardViewModel: ViewModel() {
     private fun getTeamSize(): Maybe<ITileData> {
         return getTeam()
                 .flatMapMaybe { team ->
-                    App.database.playerDao().getPlayersSingle()
+                    App.database.playerDao().getPlayersSingle().subscribeOn(Schedulers.io())
                             .flatMapMaybe { players -> Maybe.just(players) }
                             .map { TeamSizeData(it.size, teamImage = team.image) }
                 }
     }
 
     private fun getMostUsedPlayer(): Maybe<ITileData> {
-        return App.database.lineupDao().getMostUsedPlayers()
+        return App.database.playerFieldPositionsDao().getMostUsedPlayers()
                 .flatMapMaybe {
                     try {
                         val mostUsed = it.first()

@@ -11,9 +11,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.ViewHolder
-import com.telen.easylineup.repository.data.FieldPosition
+import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.data.Player
+import com.telen.easylineup.repository.model.Player
 import com.telen.easylineup.lineup.*
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.views.OnPlayerButtonCallback

@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.Constants
+import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_player_details.*
@@ -69,7 +69,6 @@ class PlayerDetailsFragment: Fragment() {
             R.id.action_edit -> {
                 val extras = Bundle()
                 extras.putLong(Constants.PLAYER_ID, arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0)
-                extras.putLong(Constants.TEAM_ID, arguments?.getLong(Constants.TEAM_ID, 0) ?: 0)
                 findNavController().navigate(R.id.playerEditFragment, extras, NavigationUtils().getOptions())
                 true
             }

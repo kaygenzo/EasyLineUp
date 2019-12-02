@@ -1,4 +1,4 @@
-package com.telen.easylineup.repository.data
+package com.telen.easylineup.repository.model
 
 enum class FieldPosition(val position: Int, val mask: Int, val xPercent: Float, val yPercent: Float) {
     SUBSTITUTE(0, 0, 0f, 100f),

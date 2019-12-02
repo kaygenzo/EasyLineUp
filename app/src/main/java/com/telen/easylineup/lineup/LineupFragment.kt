@@ -13,9 +13,9 @@ import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.Constants
-import com.telen.easylineup.repository.data.MODE_DH
-import com.telen.easylineup.repository.data.MODE_NONE
+import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.model.MODE_DH
+import com.telen.easylineup.repository.model.MODE_NONE
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
 import io.reactivex.Completable

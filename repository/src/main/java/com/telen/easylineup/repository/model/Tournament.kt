@@ -1,4 +1,4 @@
-package com.telen.easylineup.repository.data
+package com.telen.easylineup.repository.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

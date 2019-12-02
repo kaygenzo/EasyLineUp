@@ -9,8 +9,8 @@ import io.reactivex.schedulers.Schedulers
 object UseCaseHandler {
 
     fun <T : UseCase.RequestValues, R : UseCase.ResponseValue> execute(useCase: UseCase<T, R>, values: T,
-                                                                                                                               subscribeOn: Scheduler = Schedulers.io(),
-                                                                                                                               observeOn: Scheduler = AndroidSchedulers.mainThread()): Single<R> {
+                                                                       subscribeOn: Scheduler = Schedulers.io(),
+                                                                       observeOn: Scheduler = AndroidSchedulers.mainThread()): Single<R> {
         return useCase.executeUseCase(values).subscribeOn(subscribeOn).observeOn(observeOn)
     }
 }

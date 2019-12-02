@@ -12,7 +12,7 @@ import com.github.mikephil.charting.data.RadarDataSet
 import com.github.mikephil.charting.data.RadarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet
-import com.telen.easylineup.repository.data.FieldPosition
+import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.R
 
 

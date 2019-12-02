@@ -1,34 +1,25 @@
 package com.telen.easylineup.team
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
-import com.telen.easylineup.repository.data.Player
-import com.telen.easylineup.repository.data.Team
+import com.telen.easylineup.UseCaseHandler
+import com.telen.easylineup.domain.GetTeam
+import com.telen.easylineup.repository.model.Player
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 class TeamViewModel: ViewModel() {
 
-    var teamID: Long? = null
+    private val getTeamUseCase = GetTeam(App.database.teamDao(), App.prefs)
 
-    val teams: LiveData<List<Team>> = App.database.teamDao().getTeams()
-
-    fun getPlayersForTeam(teamID: Long): LiveData<List<Player>> {
-        return App.database.playerDao().getPlayersForTeam(teamID)
-    }
-
-    fun getPlayers(): LiveData<List<Player>> {
-        val getTeam : LiveData<Team> = Transformations.map(App.database.teamDao().getTeams()) {
-            it.first()
-        }
-
-        val getTeamID = Transformations.map(getTeam) {
-            teamID = it.id
-            it.id
-        }
-
-        return Transformations.switchMap(getTeamID) {
-            getPlayersForTeam(it)
-        }
+    fun getPlayers(): Single<List<Player>> {
+        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
+                .map { it.team }
+                .flatMap {
+                    App.database.playerDao().getPlayersForTeamRx(it.id)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                }
     }
 }

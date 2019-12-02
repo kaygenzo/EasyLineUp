@@ -1,14 +1,14 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.Constants
-import com.telen.easylineup.repository.data.FieldPosition
-import com.telen.easylineup.repository.data.LineupDao
-import com.telen.easylineup.repository.data.PlayerWithPosition
+import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.model.FieldPosition
+import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
+import com.telen.easylineup.repository.model.PlayerWithPosition
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
-class UpdatePlayersWithLineupMode(private val lineupDao: LineupDao): UseCase<UpdatePlayersWithLineupMode.RequestValues, UpdatePlayersWithLineupMode.ResponseValue>() {
+class UpdatePlayersWithLineupMode(private val lineupDao: PlayerFieldPositionsDao): UseCase<UpdatePlayersWithLineupMode.RequestValues, UpdatePlayersWithLineupMode.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         val playerTask: Completable = when(requestValues.isDesignatedPlayerEnabled) {

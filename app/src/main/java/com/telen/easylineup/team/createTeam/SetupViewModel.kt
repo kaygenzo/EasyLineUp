@@ -5,9 +5,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
-import com.telen.easylineup.repository.data.Team
-import com.telen.easylineup.repository.data.TeamType
+import com.telen.easylineup.UseCaseHandler
+import com.telen.easylineup.domain.GetTeam
+import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.model.Team
+import com.telen.easylineup.repository.model.TeamType
 import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -15,6 +19,8 @@ import io.reactivex.schedulers.Schedulers
 class NameEmptyException: Exception()
 
 class SetupViewModel: ViewModel() {
+
+    private val getTeamUseCase = GetTeam(App.database.teamDao(), App.prefs)
 
     enum class NextStep(val id: Int) {
         TEAM(0), TYPE(1), PLAYERS(2), FINISH(3);
@@ -31,7 +37,6 @@ class SetupViewModel: ViewModel() {
         NEXT_FINISH
     }
 
-    var teamID: Long? = 0
     private var teamName: String = ""
     private var teamImage: String? = null
     private var teamType: TeamType = TeamType.BASEBALL
@@ -70,13 +75,11 @@ class SetupViewModel: ViewModel() {
         val image = teamImage
 
         return if(!TextUtils.isEmpty(name.trim())) {
-            val team = Team(id = teamID ?: 0, name = name, image = image, type = teamType.id)
+            val teamID = App.prefs.getLong(Constants.PREF_CURRENT_TEAM_ID, 1)
+            val team = Team(id = teamID, name = name, image = image, type = teamType.id)
 
             if(team.id == 0L) {
-                App.database.teamDao().insertTeam(team).flatMapCompletable {
-                    teamID = it
-                    Completable.complete()
-                }
+                App.database.teamDao().insertTeam(team).ignoreElement()
             }
             else {
                 App.database.teamDao().updateTeam(team)
@@ -86,8 +89,10 @@ class SetupViewModel: ViewModel() {
             Completable.error(NameEmptyException())
     }
 
-    fun getTeam(): LiveData<Team> {
-        return App.database.teamDao().getTeamById(teamID ?: 0)
+    fun getTeam(): Single<Team> {
+        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map {
+            it.team
+        }
     }
 
     fun nextButtonClicked(currentStep: Int) {

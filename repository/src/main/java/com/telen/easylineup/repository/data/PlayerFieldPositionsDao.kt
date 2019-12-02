@@ -1,0 +1,102 @@
+package com.telen.easylineup.repository.data
+
+import androidx.lifecycle.LiveData
+import androidx.room.*
+import com.telen.easylineup.repository.model.PlayerFieldPosition
+import com.telen.easylineup.repository.model.PlayerGamesCount
+import com.telen.easylineup.repository.model.PlayerWithPosition
+import com.telen.easylineup.repository.model.PositionWithLineup
+import io.reactivex.Completable
+import io.reactivex.Maybe
+import io.reactivex.Single
+
+@Dao
+interface PlayerFieldPositionsDao {
+    @Insert
+    fun insertPlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>): Completable
+
+    @Update
+    fun updatePlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>): Completable
+
+    @Delete
+    fun deletePosition(position: PlayerFieldPosition): Completable
+
+    @Update
+    fun updatePlayerFieldPosition(fieldPosition: PlayerFieldPosition): Completable
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertPlayerFieldPosition(fieldPositions: PlayerFieldPosition): Single<Long>
+
+    @Query("SELECT * from playerFieldPosition")
+    fun getAllPlayerFieldPositions(): LiveData<List<PlayerFieldPosition>>
+
+    @Query("SELECT * FROM playerFieldPosition WHERE id = :positionID")
+    fun getPlayerFieldPosition(positionID: Long): Single<PlayerFieldPosition>
+
+    @Query("""
+        SELECT playerFieldPosition.* FROM playerFieldPosition
+        INNER JOIN players ON playerFieldPosition.playerID = players.id
+        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
+        WHERE playerFieldPosition.lineupID = :lineupId
+    """)
+    fun getAllPlayerFieldPositionsForLineup(lineupId: Long): LiveData<List<PlayerFieldPosition>>
+
+    @Query("""
+        SELECT players.name as playerName,
+        players.shirtNumber, players.licenseNumber,
+        playerFieldPosition.position,
+        playerFieldPosition.x, playerFieldPosition.y,
+        playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID,
+        playerFieldPosition.lineupID,
+        players.id as playerID,
+        players.teamID, players.image,
+        players.positions as playerPositions
+        FROM playerFieldPosition
+        INNER JOIN players ON playerFieldPosition.playerID = players.id
+        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
+        WHERE playerFieldPosition.lineupID = :lineupId
+        ORDER BY playerFieldPosition.`order` ASC
+    """)
+    fun getAllPlayersWithPositionsForLineup(lineupId: Long): LiveData<List<PlayerWithPosition>>
+
+    @Query("""
+        SELECT players.name as playerName,
+        players.shirtNumber, players.licenseNumber,
+        playerFieldPosition.position,
+        playerFieldPosition.x, playerFieldPosition.y,
+        playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID,
+        playerFieldPosition.lineupID,
+        players.id as playerID,
+        players.teamID, players.image,
+        players.positions as playerPositions
+        FROM playerFieldPosition
+        INNER JOIN players ON playerFieldPosition.playerID = players.id
+        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
+        WHERE playerFieldPosition.lineupID = :lineupId
+        ORDER BY playerFieldPosition.`order` ASC
+    """)
+    fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): Maybe<List<PlayerWithPosition>>
+
+    @Query("""
+        SELECT playerFieldPosition.* FROM playerFieldPosition
+        INNER JOIN players ON playerFieldPosition.playerID = players.id
+        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
+        WHERE playerFieldPosition.lineupID = :lineupID AND playerFieldPosition.playerID = :playerID
+    """)
+    fun getPlayerPositionFor(lineupID: Long, playerID: Long): Maybe<PlayerFieldPosition>
+
+    @Query("""
+        SELECT lineups.name as lineupName, tournaments.name as tournamentName, playerFieldPosition.position, playerFieldPosition.x, playerFieldPosition.y, playerFieldPosition.`order`
+        FROM playerFieldPosition
+        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
+        INNER JOIN tournaments ON lineups.tournamentID = tournaments.id
+        WHERE playerFieldPosition.playerID = :playerID
+        ORDER BY lineups.editedAt DESC
+    """)
+    fun getAllPositionsForPlayer(playerID: Long): LiveData<List<PositionWithLineup>>
+
+    @Query("""
+        SELECT playerID, COUNT(*) as size FROM playerFieldPosition GROUP BY playerID ORDER BY 2 DESC
+     """)
+    fun getMostUsedPlayers(): Single<List<PlayerGamesCount>>
+}

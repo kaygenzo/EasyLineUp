@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.data.PlayerWithPosition
+import com.telen.easylineup.repository.model.PlayerWithPosition
 import com.telen.easylineup.lineup.*
 import com.telen.easylineup.views.ItemDecoratorAttackRecycler
 import kotlinx.android.synthetic.main.fragment_list_batter.view.*

@@ -1,10 +1,15 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.Constants
-import com.telen.easylineup.repository.data.*
+import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.model.MODE_NONE
+import com.telen.easylineup.repository.model.Player
+import com.telen.easylineup.repository.model.PlayerFieldPosition
+import com.telen.easylineup.repository.model.PlayerWithPosition
+import com.telen.easylineup.repository.model.FieldPosition
+import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
 import io.reactivex.Single
 
-class SavePlayerFieldPosition(private val lineupDao: LineupDao): UseCase<SavePlayerFieldPosition.RequestValues, SavePlayerFieldPosition.ResponseValue>() {
+class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositionsDao): UseCase<SavePlayerFieldPosition.RequestValues, SavePlayerFieldPosition.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return requestValues.lineupID?.let { lineupID ->

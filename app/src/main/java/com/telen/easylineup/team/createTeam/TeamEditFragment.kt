@@ -8,13 +8,12 @@ import android.text.TextUtils
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.nguyenhoanglam.imagepicker.model.Config
 import com.nguyenhoanglam.imagepicker.model.Image
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.Constants
+import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.TeamFormListener
 import com.telen.easylineup.views.TeamFormView
@@ -51,37 +50,31 @@ class TeamEditFragment: Fragment() , TeamFormListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_team_edit, container, false)
         viewModel = ViewModelProviders.of(activity as AppCompatActivity).get(SetupViewModel::class.java)
-        viewModel.teamID = arguments?.getLong(Constants.TEAM_ID) ?: 0
 
         val savedName = savedInstanceState?.getString(Constants.NAME)
         val savedImage = savedInstanceState?.getString(Constants.IMAGE)
 
-        viewModel.teamID?.let {
+        teamForm = view.editTeamForm
 
-            teamForm = view.editTeamForm
+        viewModel.getTeam().subscribe({ team ->
+            team?.let {
+                val name = savedName ?: team.name
+                val imagePath = savedImage ?: team.image
 
-            if(it > 0) {
-                viewModel.getTeam().observe(this, Observer { team ->
-                    team?.let {
-                        val name = savedName ?: team.name
-                        val imagePath = savedImage ?: team.image
+                viewModel.setTeamName(name)
+                view.editTeamForm.setName(name)
 
-                        viewModel.setTeamName(name)
-                        view.editTeamForm.setName(name)
+                imagePath?.let { imageUriString ->
+                    viewModel.setTeamImage(imageUriString)
+                    view.editTeamForm.setImage(imageUriString)
+                }
 
-                        imagePath?.let { imageUriString ->
-                            viewModel.setTeamImage(imageUriString)
-                            view.editTeamForm.setImage(imageUriString)
-                        }
-
-                        view.editTeamForm.setListener(this)
-                    }
-                })
-            }
-            else {
                 view.editTeamForm.setListener(this)
             }
-        }
+        }, { throwable ->
+            Timber.e(throwable)
+            view.editTeamForm.setListener(this)
+        })
 
         return view
     }
