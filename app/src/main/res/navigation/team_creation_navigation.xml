@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/teamCreationName"
-        android:name="com.telen.easylineup.team.createTeam.TeamEditFragment"
+        android:name="com.telen.easylineup.team.createTeam.teamMain.TeamEditFragment"
         android:label="TeamEditFragment" />
     <fragment
         android:id="@+id/navigation_team"
@@ -17,6 +17,6 @@
         android:label="PlayerEditFragment" />
     <fragment
         android:id="@+id/teamTypeFragment"
-        android:name="com.telen.easylineup.team.createTeam.TeamTypeFragment"
+        android:name="com.telen.easylineup.team.createTeam.teamType.TeamTypeFragment"
         android:label="TeamTypeFragment" />
 </navigation>

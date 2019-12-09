@@ -1,6 +1,7 @@
 package com.telen.easylineup.splashscreen
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -16,8 +17,12 @@ import java.util.concurrent.TimeUnit
 
 class SplashScreenActivity: AppCompatActivity() {
 
-    private val getTeamUseCase = GetTeam(App.database.teamDao(), App.prefs)
+    private val getTeamUseCase = GetTeam(App.database.teamDao())
     private var disposable: Disposable? = null
+
+    companion object {
+        const val REQUEST_CREATE_TEAM = 0
+    }
 
     @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,20 +36,33 @@ class SplashScreenActivity: AppCompatActivity() {
         disposable = commands.andThen(UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    val intent = Intent(this, HomeActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intent)
-                    finish()
+                    launchHome()
                 }, {
-                    val intent = Intent(this, TeamCreationActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intent)
-                    finish()
+                    launchTeamCreation()
                 })
     }
 
     override fun onDestroy() {
         super.onDestroy()
         disposable?.takeIf { !it.isDisposed }?.dispose()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == REQUEST_CREATE_TEAM && resultCode == Activity.RESULT_OK) {
+            launchHome()
+        }
+    }
+
+    private fun launchHome() {
+        val intent = Intent(this, HomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        finish()
+    }
+
+    private fun launchTeamCreation() {
+        val intent = Intent(this, TeamCreationActivity::class.java)
+        startActivityForResult(intent, REQUEST_CREATE_TEAM)
     }
 }

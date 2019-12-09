@@ -1,4 +1,4 @@
-package com.telen.easylineup.team.createTeam
+package com.telen.easylineup.team.createTeam.teamMain
 
 import android.app.Activity
 import android.content.Intent
@@ -13,7 +13,10 @@ import androidx.navigation.fragment.findNavController
 import com.nguyenhoanglam.imagepicker.model.Config
 import com.nguyenhoanglam.imagepicker.model.Image
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.NameEmptyException
 import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.model.Team
+import com.telen.easylineup.team.createTeam.SetupViewModel
 import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.TeamFormListener
 import com.telen.easylineup.views.TeamFormView
@@ -51,45 +54,26 @@ class TeamEditFragment: Fragment() , TeamFormListener {
         val view = inflater.inflate(R.layout.fragment_team_edit, container, false)
         viewModel = ViewModelProviders.of(activity as AppCompatActivity).get(SetupViewModel::class.java)
 
-        val savedName = savedInstanceState?.getString(Constants.NAME)
-        val savedImage = savedInstanceState?.getString(Constants.IMAGE)
+        arguments?.getSerializable(Constants.EXTRA_TEAM)?.let {
+            viewModel.team = it as Team
+        }
 
         teamForm = view.editTeamForm
 
-        viewModel.getTeam().subscribe({ team ->
+        val disposable = viewModel.getTeam().subscribe({ team ->
             team?.let {
-                val name = savedName ?: team.name
-                val imagePath = savedImage ?: team.image
-
-                viewModel.setTeamName(name)
-                view.editTeamForm.setName(name)
-
-                imagePath?.let { imageUriString ->
-                    viewModel.setTeamImage(imageUriString)
+                view.editTeamForm.setName(team.name)
+                team.image?.let { imageUriString ->
                     view.editTeamForm.setImage(imageUriString)
                 }
-
-                view.editTeamForm.setListener(this)
             }
         }, { throwable ->
             Timber.e(throwable)
-            view.editTeamForm.setListener(this)
         })
 
+        view.editTeamForm.setListener(this)
+
         return view
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        val name = view?.editTeamForm?.getName()
-        val image = view?.editTeamForm?.getImageUri()
-
-        if(!TextUtils.isEmpty(name))
-            outState.putString(Constants.NAME, name)
-
-        image?.let {
-            outState.putString(Constants.IMAGE, it.toString())
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

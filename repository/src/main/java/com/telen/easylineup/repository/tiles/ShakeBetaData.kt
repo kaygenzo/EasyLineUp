@@ -1,6 +1,6 @@
 package com.telen.easylineup.dashboard.models
 
-import com.telen.easylineup.dashboard.TYPE_SHAKE_BETA
+import com.telen.easylineup.repository.model.Constants
 
 class ShakeBetaData(): ITileData {
 
@@ -9,6 +9,6 @@ class ShakeBetaData(): ITileData {
     }
 
     override fun getType(): Int {
-        return TYPE_SHAKE_BETA
+        return Constants.TYPE_SHAKE_BETA
     }
 }

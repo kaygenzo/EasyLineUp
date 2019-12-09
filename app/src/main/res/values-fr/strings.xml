@@ -32,8 +32,6 @@
     <string name="title_lineup_edition">Modification de lineup</string>
     <string name="title_team_edition">Modification de l\'équipe</string>
 
-    <string name="team_creation_button_next">Suivant</string>
-    <string name="team_creation_button_finish">Terminer</string>
     <string name="team_creation_error_name_empty">Le nom de l\'équipe ne peut pas être vide</string>
 
     <string name="player_creation_error_name_empty">Le nom du joueur ne peut pas être vide</string>

@@ -1,0 +1,74 @@
+package com.telen.easylineup.team.swap
+
+/*
+ * Copyright (C) 2015 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import android.content.Context
+import android.net.Uri
+import android.text.TextUtils
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.widget.LinearLayout
+import com.makeramen.roundedimageview.RoundedTransformationBuilder
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
+import com.telen.easylineup.R
+import kotlinx.android.synthetic.main.team_item_view.view.*
+
+class TeamItemView: LinearLayout {
+
+    private var mAvatarOnly = false
+
+    constructor(context: Context) : super(context) { init(context) }
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init(context) }
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context) }
+
+    private fun init(context: Context) {
+        LayoutInflater.from(context).inflate(R.layout.team_item_view, this, true)
+    }
+
+    /**
+     * When set to true, we display only the avatar of the person and hide everything else.
+     */
+    fun setAvatarOnly(avatarOnly: Boolean) {
+        mAvatarOnly = avatarOnly
+        details_container.visibility = if(avatarOnly) GONE else VISIBLE
+    }
+
+    fun isAvatarOnly() : Boolean {
+        return mAvatarOnly
+    }
+
+    fun setNameTextColor(color: Int) {
+        name.setTextColor(color)
+    }
+
+    fun setTeamName(teamName: String) {
+        name.text = teamName
+    }
+
+    fun setImage(stringUri: String?) {
+        val size = resources.getDimensionPixelSize(R.dimen.teams_list_icon_size)
+        Picasso.get().load(stringUri)
+                .resize(size, size)
+                .centerCrop()
+                .transform(RoundedTransformationBuilder()
+                        .cornerRadiusDp(16f)
+                        .oval(true)
+                        .build())
+                .into(teamIcon)
+    }
+}

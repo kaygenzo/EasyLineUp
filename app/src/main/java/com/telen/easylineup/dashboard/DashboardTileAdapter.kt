@@ -8,11 +8,7 @@ import com.telen.easylineup.dashboard.tiles.LastLineupTile
 import com.telen.easylineup.dashboard.tiles.MostUsedPlayerTile
 import com.telen.easylineup.dashboard.tiles.ShakeBetaTile
 import com.telen.easylineup.dashboard.tiles.TeamSizeTile
-
-const val TYPE_LAST_LINEUP = 0
-const val TYPE_TEAM_SIZE = 1
-const val TYPE_MOST_USED_PLAYER = 2
-const val TYPE_SHAKE_BETA = 3
+import com.telen.easylineup.repository.model.Constants
 
 interface TileClickListener {
     fun onTileClicked(type: Int)
@@ -24,16 +20,16 @@ class DashboardTileAdapter(val list: List<ITileData>, val tileClickListener: Til
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TileViewHolder {
         return when(viewType) {
-            TYPE_TEAM_SIZE -> {
+            Constants.TYPE_TEAM_SIZE -> {
                 TileViewHolder(TeamSizeTile(parent.context))
             }
-            TYPE_MOST_USED_PLAYER -> {
+            Constants.TYPE_MOST_USED_PLAYER -> {
                 TileViewHolder(MostUsedPlayerTile(parent.context))
             }
-            TYPE_LAST_LINEUP -> {
+            Constants.TYPE_LAST_LINEUP -> {
                 TileViewHolder(LastLineupTile(parent.context))
             }
-            TYPE_SHAKE_BETA -> {
+            Constants.TYPE_SHAKE_BETA -> {
                 TileViewHolder(ShakeBetaTile(parent.context))
             }
             else -> {

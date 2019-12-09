@@ -1,5 +1,6 @@
 package com.telen.easylineup.team.createTeam
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.GetTeamCreationNextStep
 import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.activity_team_creation.*
@@ -26,31 +28,26 @@ class TeamCreationActivity: AppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this).get(SetupViewModel::class.java)
 
-        viewModel.bottomBarLiveData.observe(this, Observer {
-            when(it) {
-                SetupViewModel.BottomBarState.NEXT_ENABLED -> teamCreationNextButton.isEnabled = true
-                SetupViewModel.BottomBarState.NEXT_DISABLED -> teamCreationNextButton.isEnabled = false
-                SetupViewModel.BottomBarState.NEXT_FINISH -> buttonNext.setText(R.string.team_creation_button_finish)
-                else -> {}
-            }
-        })
-
         viewModel.stepLiveData.observe(this, Observer {
-            when(it) {
-                SetupViewModel.NextStep.PLAYERS -> {
-                    stepLayout.go(it.id, true)
+
+            stepLayout.go(it.nextStep.id, true)
+
+            buttonNext.visibility = it.nextButtonVisibility
+            buttonNext.isEnabled = it.nextButtonEnabled
+            if(it.nextButtonLabel > 0)
+                buttonNext.setText(it.nextButtonLabel)
+
+            when(it.nextStep) {
+                GetTeamCreationNextStep.TeamCreationStep.TYPE -> {
+                    navController.navigate(R.id.teamTypeFragment, null, NavigationUtils().getOptions())
+                }
+                GetTeamCreationNextStep.TeamCreationStep.PLAYERS -> {
                     val arguments = Bundle()
                     arguments.putBoolean(Constants.EXTRA_CLICKABLE, false)
                     navController.navigate(R.id.navigation_team, arguments, NavigationUtils().getOptions())
                 }
-                SetupViewModel.NextStep.TYPE -> {
-                    stepLayout.go(it.id, true)
-                    navController.navigate(R.id.teamTypeFragment, null, NavigationUtils().getOptions())
-                }
-                SetupViewModel.NextStep.FINISH -> {
-                    val intent = Intent(this, HomeActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intent)
+                GetTeamCreationNextStep.TeamCreationStep.FINISH -> {
+                    setResult(Activity.RESULT_OK)
                     finish()
                 }
                 else -> {}
@@ -66,7 +63,7 @@ class TeamCreationActivity: AppCompatActivity() {
             }
         })
 
-        teamCreationNextButton.setOnClickListener {
+        buttonNext.setOnClickListener {
             viewModel.nextButtonClicked(stepLayout.currentStep)
         }
     }

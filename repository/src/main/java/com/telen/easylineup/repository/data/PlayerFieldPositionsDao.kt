@@ -96,7 +96,11 @@ interface PlayerFieldPositionsDao {
     fun getAllPositionsForPlayer(playerID: Long): LiveData<List<PositionWithLineup>>
 
     @Query("""
-        SELECT playerID, COUNT(*) as size FROM playerFieldPosition GROUP BY playerID ORDER BY 2 DESC
+        SELECT playerID, COUNT(*) as size FROM playerFieldPosition 
+        INNER JOIN lineups ON lineups.id = playerFieldPosition.lineupID
+        INNER JOIN teams ON teams.id = lineups.teamID
+        WHERE teams.id = :teamID
+        GROUP BY playerID ORDER BY 2 DESC
      """)
-    fun getMostUsedPlayers(): Single<List<PlayerGamesCount>>
+    fun getMostUsedPlayers(teamID: Long): Single<List<PlayerGamesCount>>
 }

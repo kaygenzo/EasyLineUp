@@ -33,9 +33,9 @@ interface LineupDao {
         SELECT lineups.* FROM lineups
         INNER JOIN tournaments ON lineups.tournamentID = tournaments.id
         INNER JOIN teams ON lineups.teamID = teams.id
-        WHERE lineups.tournamentID = :tournamentId
+        WHERE lineups.tournamentID = :tournamentId AND lineups.teamID = :teamID
     """)
-    fun getLineupsForTournament(tournamentId: Long): LiveData<List<Lineup>>
+    fun getLineupsForTournament(tournamentId: Long, teamID: Long): LiveData<List<Lineup>>
 
     @Query("SELECT * FROM lineups ORDER BY editedAt DESC LIMIT 1")
     fun getLastLineup(): Single<Lineup>
@@ -47,12 +47,13 @@ interface LineupDao {
         playerFieldPosition.id as fieldPositionID,
         lineups.name as lineupName,
         lineups.id as lineupID,
+        lineups.teamID as teamID,
         x, y, position
         FROM tournaments
         LEFT JOIN lineups ON tournaments.id = lineups.tournamentID
         LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = lineups.id
-        WHERE tournamentName LIKE '%' || :filter || '%' OR lineupName LIKE '%' || :filter || '%'
+        WHERE teamID = :teamID AND (tournamentName LIKE '%' || :filter || '%' OR lineupName LIKE '%' || :filter || '%')
         ORDER BY tournaments.createdAt DESC
     """)
-    fun getAllTournamentsWithLineups(filter: String): LiveData<List<TournamentWithLineup>>
+    fun getAllTournamentsWithLineups(filter: String, teamID: Long): Single<List<TournamentWithLineup>>
 }

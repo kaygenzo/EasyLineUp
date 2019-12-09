@@ -1,15 +1,15 @@
-package com.telen.easylineup.team.createTeam
+package com.telen.easylineup.team.createTeam.teamType
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.telen.easylineup.R
 import com.telen.easylineup.repository.model.TeamType
+import com.telen.easylineup.team.createTeam.SetupViewModel
 import kotlinx.android.synthetic.main.fragment_team_type.view.*
 import timber.log.Timber
 
@@ -54,8 +54,12 @@ class TeamTypeFragment: Fragment(), ViewPager.OnPageChangeListener {
         val shadowTransformer = ShadowTransformer(mViewPager, mCardAdapter)
         mViewPager.addOnPageChangeListener(shadowTransformer)
 
-        viewModel.getTeamType().observe(this, Observer { type ->
-            mViewPager.currentItem = type.position
+        val disposable = viewModel.getTeam().subscribe({
+            TeamType.getTypeById(it.type).let { type ->
+                mViewPager.currentItem = type.position
+            }
+        }, {
+            Timber.e(it)
         })
 
         return view

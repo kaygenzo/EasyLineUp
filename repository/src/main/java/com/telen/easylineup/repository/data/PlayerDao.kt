@@ -28,14 +28,14 @@ interface PlayerDao {
     @Query("SELECT * from players WHERE id = :playerID" )
     fun getPlayerByIdAsSingle(playerID: Long): Single<Player>
 
-    @Query("SELECT * FROM players")
-    fun getPlayers(): LiveData<List<Player>>
+//    @Query("SELECT * FROM players WHERE players.teamID = :teamID")
+//    fun getPlayers(teamID: Long): LiveData<List<Player>>
 
-    @Query("SELECT * FROM players")
-    fun getPlayersSingle(): Single<List<Player>>
+    @Query("SELECT * FROM players WHERE players.teamID = :teamID")
+    fun getPlayers(teamID: Long): Single<List<Player>>
 
-    @Query("SELECT players.* FROM players INNER JOIN teams ON players.teamID = teams.id WHERE teams.id = :teamId")
-    fun getPlayersForTeamRx(teamId: Long): Single<List<Player>>
+//    @Query("SELECT players.* FROM players INNER JOIN teams ON players.teamID = teams.id WHERE teams.id = :teamId")
+//    fun getPlayersForTeamRx(teamId: Long): Single<List<Player>>
 
     @Query("""
         SELECT result.*, position, x, y, `order`, playerFieldPosition.id as fieldPositionID
@@ -48,7 +48,7 @@ interface PlayerDao {
                 players.teamID, 
                 players.image, 
                 players.positions as playerPositions
-            FROM lineups, players where lineups.id = :lineupID) as result
+            FROM lineups, players where lineups.id = :lineupID AND players.teamID = lineups.teamID) as result
         LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = result.lineupID and playerFieldPosition.playerID = result.playerID
         ORDER BY result.playerID
 

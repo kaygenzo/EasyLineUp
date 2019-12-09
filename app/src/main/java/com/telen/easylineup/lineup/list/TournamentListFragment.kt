@@ -21,37 +21,17 @@ import com.telen.easylineup.repository.model.Tournament
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
 import io.reactivex.Completable
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_list_tournaments.view.*
+import timber.log.Timber
 
 class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchBar.OnSearchActionListener {
 
     private lateinit var tournamentsAdapter: TournamentsAdapter
     private lateinit var viewModel: TournamentViewModel
     private val listTournaments: MutableList<Pair<Tournament, List<Lineup>>> = mutableListOf()
-
-    override fun onTournamentLongClicked(tournament: Tournament) {
-        activity?.let {
-            val task: Completable = viewModel.deleteTournament(tournament).doOnError {throwable ->
-                Toast.makeText(activity, "Something wrong happened: ${throwable.message}", Toast.LENGTH_LONG).show()
-            }
-            DialogFactory.getWarningDialog(it, it.getString(R.string.dialog_delete_tournament_title, tournament.name),
-                    it.getString(R.string.dialog_delete_cannot_undo_message), task).show()
-        }
-    }
-
-    override fun onHeaderClicked() {
-
-    }
-
-    override fun onLineupClicked(lineup: Lineup) {
-        activity?.let {
-            val extras = Bundle()
-            extras.putBoolean(Constants.EXTRA_EDITABLE, false)
-            extras.putLong(Constants.LINEUP_ID, lineup.id)
-            extras.putString(Constants.LINEUP_TITLE, lineup.name)
-            findNavController().navigate(R.id.lineupFragment, extras, NavigationUtils().getOptions())
-        }
-    }
+    private var loadTournamentsDisposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,19 +82,53 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
             findNavController().navigate(R.id.lineupCreationFragment, null, NavigationUtils().getOptions())
         }
 
-        loadTournaments()
+        viewModel.registerFilterChanged().observe(this, Observer {
+            loadTournaments(it)
+        })
+
+        viewModel.setFilter("")
+
         return view
     }
 
-    private fun loadTournaments() {
-        viewModel.registerTournamentsChanges().observe(this, Observer { tournaments ->
-
+    private fun loadTournaments(filter: String) {
+        loadTournamentsDisposable?.dispose()
+        loadTournamentsDisposable = viewModel.getCategorizedLineups(filter).subscribe({
             listTournaments.clear()
-            listTournaments.addAll(tournaments)
+            listTournaments.addAll(it)
             tournamentsAdapter.setList(listTournaments)
             tournamentsAdapter.notifyDataSetChanged()
+        }, {
+            Timber.e(it)
         })
-        viewModel.setFilter("")
+    }
+
+    override fun onTournamentLongClicked(tournament: Tournament) {
+        activity?.let {
+            val task: Completable = viewModel.deleteTournament(tournament)
+                    .doOnError {throwable ->
+                        Toast.makeText(activity, "Something wrong happened: ${throwable.message}", Toast.LENGTH_LONG).show()
+                    }
+                    .doOnComplete {
+                        viewModel.setFilter("")
+                    }
+            DialogFactory.getWarningDialog(it, it.getString(R.string.dialog_delete_tournament_title, tournament.name),
+                    it.getString(R.string.dialog_delete_cannot_undo_message), task).show()
+        }
+    }
+
+    override fun onHeaderClicked() {
+
+    }
+
+    override fun onLineupClicked(lineup: Lineup) {
+        activity?.let {
+            val extras = Bundle()
+            extras.putBoolean(Constants.EXTRA_EDITABLE, false)
+            extras.putLong(Constants.LINEUP_ID, lineup.id)
+            extras.putString(Constants.LINEUP_TITLE, lineup.name)
+            findNavController().navigate(R.id.lineupFragment, extras, NavigationUtils().getOptions())
+        }
     }
 
     override fun onButtonClicked(buttonCode: Int) {

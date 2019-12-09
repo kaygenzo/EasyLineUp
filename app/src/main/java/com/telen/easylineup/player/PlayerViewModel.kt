@@ -6,10 +6,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.App
-import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.UseCaseHandler
+import com.telen.easylineup.domain.GetTeam
 import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.repository.model.Player
 import io.reactivex.Completable
+import io.reactivex.schedulers.Schedulers
 import java.security.InvalidParameterException
 
 enum class FormErrorResult {
@@ -21,6 +23,7 @@ enum class FormErrorResult {
 class PlayerViewModel: ViewModel() {
 
     private val errorResult = MutableLiveData<FormErrorResult>()
+    private val getTeamUseCase = GetTeam(App.database.teamDao())
 
     var playerID: Long? = 0
 
@@ -39,17 +42,19 @@ class PlayerViewModel: ViewModel() {
             return Completable.error(InvalidParameterException())
         }
         else {
-            val playerID: Long = playerID ?: 0
-            val teamID = App.prefs.getLong(Constants.PREF_CURRENT_TEAM_ID, 1)
-            val player = Player(id = playerID, teamId = teamID, name = name.trim(), shirtNumber = shirtNumber,
-                    licenseNumber = licenseNumber, image = imageUri?.toString(), positions = positions)
+            return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues(), observeOn = Schedulers.io()).map { it.team }
+                    .flatMapCompletable {
+                        val playerID: Long = playerID ?: 0
+                        val player = Player(id = playerID, teamId = it.id, name = name.trim(), shirtNumber = shirtNumber,
+                                licenseNumber = licenseNumber, image = imageUri?.toString(), positions = positions)
 
-            return if(player.id == 0L) {
-                App.database.playerDao().insertPlayer(player)
-            }
-            else {
-                App.database.playerDao().updatePlayer(player)
-            }
+                        if(player.id == 0L) {
+                            App.database.playerDao().insertPlayer(player)
+                        }
+                        else {
+                            App.database.playerDao().updatePlayer(player)
+                        }
+                    }
         }
     }
 

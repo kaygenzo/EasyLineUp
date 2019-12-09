@@ -32,8 +32,6 @@
     <string name="title_lineup_edition">Lineup edition</string>
     <string name="title_team_edition">Team edition</string>
 
-    <string name="team_creation_button_next">Next</string>
-    <string name="team_creation_button_finish">Finish</string>
     <string name="team_creation_error_name_empty">Team name cannot be empty</string>
 
     <string name="player_creation_error_name_empty">Player name cannot be empty</string>
@@ -95,5 +93,9 @@
 
     <string name="gallery_picker_default_title">Albums</string>
     <string name="share_lineup_subject">Here is the lineup of: %s</string>
+
+    <string name="team_list_empty_text">Once you create a team, you’ll see it listed here</string>
+    <string name="team_list_dialog_title">Your teams</string>
+    <string name="team_list_dialog_create">Create</string>
 
 </resources>

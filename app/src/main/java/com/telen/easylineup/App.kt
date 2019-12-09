@@ -20,7 +20,6 @@ class App: MultiDexApplication() {
 
     companion object {
         lateinit var database: AppDatabase
-        lateinit var prefs: SharedPreferences
     }
 
     override fun onCreate() {
@@ -28,9 +27,8 @@ class App: MultiDexApplication() {
         database = Room.databaseBuilder(this, AppDatabase::class.java, "easylineup_database")
                 .addMigrations(migration_1_2())
                 .addMigrations(migration_2_3())
+                .addMigrations(migration_3_4())
                 .build()
-
-        prefs = getSharedPreferences(Constants.APPLICATION_PREFERENCES, Context.MODE_PRIVATE)
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
@@ -63,6 +61,14 @@ class App: MultiDexApplication() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE Lineups ADD COLUMN mode INTEGER NOT NULL DEFAULT 0")
                 database.execSQL("ALTER TABLE Teams ADD COLUMN type INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+    }
+
+    private fun migration_3_4(): Migration {
+        return object: Migration(3,4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE Teams ADD COLUMN main INTEGER NOT NULL DEFAULT 1")
             }
         }
     }

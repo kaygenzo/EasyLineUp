@@ -13,7 +13,7 @@ import timber.log.Timber
 class LineupViewModel: ViewModel() {
     val lineups = App.database.lineupDao().getAllLineup()
 
-    private val getTeamUseCase = GetTeam(App.database.teamDao(), App.prefs)
+    private val getTeamUseCase = GetTeam(App.database.teamDao())
 
     fun createNewLineup(tournament: Tournament, lineupTitle: String): Single<Long> {
         return insertTournamentIfNotExists(tournament)

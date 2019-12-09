@@ -1,6 +1,9 @@
 package com.telen.easylineup
 
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
@@ -12,11 +15,18 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
+import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.model.Team
+import com.telen.easylineup.team.createTeam.TeamCreationActivity
+import com.telen.easylineup.team.swap.HostInterface
+import com.telen.easylineup.team.swap.SwapTeamFragment
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.DrawerHeader
+import io.reactivex.functions.Action
+import io.reactivex.functions.Consumer
 import timber.log.Timber
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), HostInterface {
 
     private lateinit var viewModel: HomeViewModel
 
@@ -37,25 +47,32 @@ class HomeActivity : AppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         viewModel.registerTeamUpdates().observe(this, Observer {
-            viewModel.getTeam().subscribe({
-                drawerHeader.setImage(it.image)
-                drawerHeader.setTitle(it.name)
-            }, { throwable ->
-                Timber.d(throwable)
-            })
+            loadTeamData()
         })
 
         drawerHeader = DrawerHeader(this)
 
         navigationView.addHeaderView(drawerHeader)
 
-        drawerHeader.setOnClickListener {
-            val arguments = Bundle()
-            navController.navigate(R.id.teamEditFragment, arguments, NavigationUtils().getOptions())
-            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                drawerLayout.closeDrawer(GravityCompat.START)
-            }
-        }
+        drawerHeader.setOnImageClickListener(View.OnClickListener {
+            viewModel.getTeam().subscribe({
+                val arguments = Bundle()
+                arguments.putSerializable(Constants.EXTRA_TEAM, it)
+                navController.navigate(R.id.teamEditFragment, arguments, NavigationUtils().getOptions())
+                closeDrawer()
+            }, {
+               Timber.e(it)
+            })
+        })
+
+        drawerHeader.setOnSwapTeamClickListener(View.OnClickListener {
+           viewModel.onSwapButtonClicked()
+        })
+
+        viewModel.registerTeamsDialog().observe(this, Observer { teams ->
+            SwapTeamFragment(teams, this).show(supportFragmentManager, "SwapTeamFragment")
+        })
+
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -68,5 +85,35 @@ class HomeActivity : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onCreateTeamClick() {
+        closeDrawer()
+        val intent = Intent(this, TeamCreationActivity::class.java)
+        startActivity(intent)
+    }
+
+    override fun onTeamClick(team: Team) {
+        val disposable = viewModel.updateCurrentTeam(team).subscribe({
+            navController.popBackStack(R.id.navigation_home, false)
+            closeDrawer()
+        }, {
+            Timber.e(it)
+        })
+    }
+
+    private fun closeDrawer() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
+        }
+    }
+
+    private fun loadTeamData() {
+        val disposable = viewModel.getTeam().subscribe({
+            drawerHeader.setImage(it.image)
+            drawerHeader.setTitle(it.name)
+        }, { throwable ->
+            Timber.d(throwable)
+        })
     }
 }

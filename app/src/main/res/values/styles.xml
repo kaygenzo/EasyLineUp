@@ -148,4 +148,25 @@
         <item name="android:padding">3dp</item>
     </style>
 
+    <style name="ListEmptyText">
+        <item name="android:textSize">@dimen/list_empty_text_size</item>
+        <item name="android:textColor">@color/list_empty_text</item>
+    </style>
+
+    <style name="ContactListItemLinearLayoutStyle">
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">24dp</item>
+    </style>
+
+    <style name="ParticipantListItem">
+        <item name="android:textSize">@dimen/teams_list_text_size</item>
+        <item name="android:textColor">@color/teams_list_text_primary</item>
+        <item name="android:background">@null</item>
+        <item name="android:layout_gravity">left|center_vertical</item>
+    </style>
+
+    <style name="PeopleListItemViewStyle">
+        <item name="android:paddingLeft">16dp</item>
+    </style>
+
 </resources>

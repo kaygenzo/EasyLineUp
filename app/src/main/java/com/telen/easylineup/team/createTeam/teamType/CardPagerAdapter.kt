@@ -1,4 +1,4 @@
-package com.telen.easylineup.team.createTeam
+package com.telen.easylineup.team.createTeam.teamType
 
 import androidx.cardview.widget.CardView
 import androidx.viewpager.widget.PagerAdapter

@@ -17,6 +17,7 @@ import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.OnActionButtonListener
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_lineup_creation.view.*
 import timber.log.Timber
@@ -29,8 +30,10 @@ class LineupCreationFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_lineup_creation, container, false)
 
         val tournamentViewModel =  ViewModelProviders.of(this).get(TournamentViewModel::class.java)
-        tournamentViewModel.getTournaments().observe(this, Observer { tournaments ->
-            view.lineupCreationForm.setList(tournaments)
+        tournamentViewModel.getTournaments().subscribe({
+            view.lineupCreationForm.setList(it)
+        }, {
+            Timber.e(it)
         })
 
         view.lineupCreationForm.setOnActionClickListener(object: OnActionButtonListener {

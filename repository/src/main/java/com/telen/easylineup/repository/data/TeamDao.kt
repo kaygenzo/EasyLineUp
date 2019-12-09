@@ -17,6 +17,9 @@ interface TeamDao {
     @Update
     fun updateTeam(team: Team): Completable
 
+    @Update
+    fun updateTeams(team: List<Team>): Completable
+
     @Query("SELECT * FROM teams WHERE id = :teamId")
     fun getTeamById(teamId: Long): Single<Team>
 

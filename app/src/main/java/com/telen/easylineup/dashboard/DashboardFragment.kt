@@ -13,13 +13,14 @@ import com.telen.easylineup.R
 import com.telen.easylineup.dashboard.*
 import com.telen.easylineup.dashboard.models.ITileData
 import com.telen.easylineup.dashboard.models.LastLineupData
+import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
 
 class DashboardFragment: Fragment(), TileClickListener {
 
-    lateinit var tileAdapter: DashboardTileAdapter
-    lateinit var dashboardViewModel: DashboardViewModel
+    private lateinit var tileAdapter: DashboardTileAdapter
+    private lateinit var dashboardViewModel: DashboardViewModel
     private val tileList = mutableListOf<ITileData>()
     private lateinit var dataObserver: Observer<List<ITileData>>
 
@@ -32,7 +33,6 @@ class DashboardFragment: Fragment(), TileClickListener {
             tileList.addAll(it)
             tileAdapter.notifyDataSetChanged()
         }
-        dashboardViewModel.registerTilesLiveData().observeForever(dataObserver)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -61,12 +61,15 @@ class DashboardFragment: Fragment(), TileClickListener {
 
     override fun onResume() {
         super.onResume()
-        dashboardViewModel.loadTiles()
+        dashboardViewModel.registerTilesLiveData().observe(this, dataObserver)
+        dashboardViewModel.registerTeamChange().observe(this, Observer {
+            dashboardViewModel.loadTiles()
+        })
     }
 
     override fun onTileClicked(type: Int) {
         when(type) {
-            TYPE_TEAM_SIZE -> {
+            Constants.TYPE_TEAM_SIZE -> {
                 findNavController().navigate(R.id.navigation_team, null, NavigationUtils().getOptions())
             }
             else -> {

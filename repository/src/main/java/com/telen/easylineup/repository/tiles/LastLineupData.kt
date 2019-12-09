@@ -1,6 +1,6 @@
 package com.telen.easylineup.dashboard.models
 
-import com.telen.easylineup.dashboard.TYPE_LAST_LINEUP
+import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.repository.model.PlayerWithPosition
 
 const val KEY_LINEUP_NAME = 0
@@ -16,6 +16,6 @@ class LastLineupData(val name: String, val playersWithPosition: List<PlayerWithP
     }
 
     override fun getType(): Int {
-        return TYPE_LAST_LINEUP
+        return Constants.TYPE_LAST_LINEUP
     }
 }

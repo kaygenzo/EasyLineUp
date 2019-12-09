@@ -1,6 +1,6 @@
 package com.telen.easylineup.dashboard.models
 
-import com.telen.easylineup.dashboard.TYPE_MOST_USED_PLAYER
+import com.telen.easylineup.repository.model.Constants
 
 const val KEY_DATA_IMAGE = 0
 const val KEY_DATA_NAME = 1
@@ -22,6 +22,6 @@ class MostUsedPlayerData(val image: String?, val name: String, val shirtNumber: 
     }
 
     override fun getType(): Int {
-        return TYPE_MOST_USED_PLAYER
+        return Constants.TYPE_MOST_USED_PLAYER
     }
 }

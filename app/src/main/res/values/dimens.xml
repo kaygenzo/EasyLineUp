@@ -39,4 +39,12 @@
 
     <dimen name="timeline_radio_margin_left">32dp</dimen>
     <dimen name="timeline_radio_margin_left_reverse">-32dp</dimen>
+
+    <dimen name="list_empty_text_left_right_margin">60dp</dimen>
+    <dimen name="list_empty_text_top_margin">20dp</dimen>
+    <dimen name="teams_list_first_item_extra_padding">8dp</dimen>
+    <dimen name="list_empty_text_size">14sp</dimen>
+    <dimen name="teams_list_text_size">18sp</dimen>
+    <dimen name="teams_list_icon_size">42dp</dimen>
+
 </resources>

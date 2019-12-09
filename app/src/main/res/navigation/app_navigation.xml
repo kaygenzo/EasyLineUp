@@ -43,7 +43,7 @@
         tools:layout="@layout/fragment_lineup_fixed"/>
     <fragment
         android:id="@+id/teamEditFragment"
-        android:name="com.telen.easylineup.team.createTeam.TeamEditFragment"
+        android:name="com.telen.easylineup.team.createTeam.teamMain.TeamEditFragment"
         android:label="@string/title_team_edition"
         tools:layout="@layout/fragment_team_edit"/>
     <fragment

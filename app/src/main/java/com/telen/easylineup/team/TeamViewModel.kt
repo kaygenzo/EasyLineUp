@@ -11,13 +11,13 @@ import io.reactivex.schedulers.Schedulers
 
 class TeamViewModel: ViewModel() {
 
-    private val getTeamUseCase = GetTeam(App.database.teamDao(), App.prefs)
+    private val getTeamUseCase = GetTeam(App.database.teamDao())
 
     fun getPlayers(): Single<List<Player>> {
         return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
                 .map { it.team }
                 .flatMap {
-                    App.database.playerDao().getPlayersForTeamRx(it.id)
+                    App.database.playerDao().getPlayers(it.id)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                 }

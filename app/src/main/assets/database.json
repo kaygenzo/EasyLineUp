@@ -3,7 +3,8 @@
     "id": 1,
     "name": "DC Univers",
     "type": 0,
-    "image": "https://cdn.tomsguide.fr/content/uploads/sites/2/2016/10/batman3.jpg"
+    "image": "https://cdn.tomsguide.fr/content/uploads/sites/2/2016/10/batman3.jpg",
+    "main": true
   },
   "players": [
     {

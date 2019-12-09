@@ -39,7 +39,7 @@ class DatabaseMockProvider {
                          val lineupsJson = root.getAsJsonArray("lineups")
                          val positionsJson = root.getAsJsonArray("playerPositions")
 
-                         val team = Team(teamJson.get("id").asLong, teamJson.get("name").asString, teamJson.get("image").asString, type = teamJson.get("type").asInt)
+                         val team = Team(teamJson.get("id").asLong, teamJson.get("name").asString, teamJson.get("image").asString, type = teamJson.get("type").asInt, main = teamJson.get("main").asBoolean)
 
                          val playersList = mutableListOf<Player>()
                          for( i in 0 until playersJson.size()) {

@@ -46,7 +46,7 @@ class TeamSizeTile: ConstraintLayout {
                         .error(R.drawable.ic_unknown_team)
                         .into(teamImage)
             }
-        }
+        } ?: Picasso.get().load(R.drawable.ic_unknown_team).into(teamImage)
 
         team_size_warning_container.visibility = if (size < Constants.MIN_PLAYER_COUNT) View.VISIBLE else View.GONE
 

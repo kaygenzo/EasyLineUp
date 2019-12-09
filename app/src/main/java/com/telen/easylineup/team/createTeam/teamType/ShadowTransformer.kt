@@ -1,4 +1,4 @@
-package com.telen.easylineup.team.createTeam
+package com.telen.easylineup.team.createTeam.teamType
 
 import android.view.View
 import androidx.viewpager.widget.ViewPager

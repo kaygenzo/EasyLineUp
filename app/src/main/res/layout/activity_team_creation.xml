@@ -45,10 +45,10 @@
         app:defaultNavHost="true"
         app:navGraph="@navigation/team_creation_navigation"
         app:layout_constraintTop_toBottomOf="@+id/stepLayout"
-        app:layout_constraintBottom_toTopOf="@+id/teamCreationNextButton"/>
+        app:layout_constraintBottom_toTopOf="@+id/teamCreationActionButtons"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/teamCreationNextButton"
+        android:id="@+id/teamCreationActionButtons"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -59,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintRight_toLeftOf="@+id/arrowRight"
-            android:text="@string/team_creation_button_next"
+            android:text="@string/team_creation_label_next"
             android:textColor="#FFFFFFFF"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"

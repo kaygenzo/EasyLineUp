@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(
         tableName = "teams",
@@ -13,7 +14,8 @@ data class Team(
         @PrimaryKey(autoGenerate = true) var id: Long = 0,
         @ColumnInfo(name = "name") var name: String = "",
         @ColumnInfo(name = "image") var image: String? = null,
-        @ColumnInfo(name = "type") val type: Int) {
+        @ColumnInfo(name = "type") var type: Int = 0,
+        @ColumnInfo(name = "main") var main: Boolean = false): Serializable {
 
     override fun toString(): String {
         val builder = StringBuffer().apply {
@@ -22,6 +24,7 @@ data class Team(
             append("name=$name,")
             append("image=$image,")
             append("type=$type")
+            append("main=$main")
             append("}")
         }
         return builder.toString()
