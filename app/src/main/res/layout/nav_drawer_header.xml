@@ -23,12 +23,13 @@
         app:layout_constraintBottom_toTopOf="@+id/drawerTitle"
         android:scaleType="centerInside"/>
 
-    <com.telen.easylineup.views.SwashedStyledTextView
+    <com.telen.easylineup.views.NormalUppercaseStyledTextView
         android:id="@+id/drawerTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:textSize="30sp"
+        android:textSize="@dimen/text_size_big"
+        app:normalUppercaseStyledTextColor="@color/white"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/drawerImage"
