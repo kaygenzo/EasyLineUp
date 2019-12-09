@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.squareup.picasso.Picasso
@@ -14,6 +13,7 @@ import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_player_details.*
 import kotlinx.android.synthetic.main.fragment_player_details.view.*
+import timber.log.Timber
 
 class PlayerDetailsFragment: Fragment() {
 
@@ -31,26 +31,28 @@ class PlayerDetailsFragment: Fragment() {
         val playerID = arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
         viewModel.playerID = playerID
 
-        viewModel.getPlayer().observe(this, Observer {
-            it?.let {
-                view.playerLicenseValue.text = it.licenseNumber.toString()
-                view.shirtNumberValue.text = it.shirtNumber.toString()
-                view.playerName.text = it.name.trim()
+        viewModel.getPlayer().subscribe({
+            view.playerLicenseValue.text = it.licenseNumber.toString()
+            view.shirtNumberValue.text = it.shirtNumber.toString()
+            view.playerName.text = it.name.trim()
 
-                playerImage.post {
-                    Picasso.get().load(it.image)
-                            .resize(playerImage.width, playerImage.height)
-                            .centerCrop()
-                            .placeholder(R.drawable.ic_unknown_field_player)
-                            .error(R.drawable.ic_unknown_field_player)
-                            .into(playerImage)
-                }
+            playerImage.post {
+                Picasso.get().load(it.image)
+                        .resize(playerImage.width, playerImage.height)
+                        .centerCrop()
+                        .placeholder(R.drawable.ic_unknown_field_player)
+                        .error(R.drawable.ic_unknown_field_player)
+                        .into(playerImage)
             }
+        }, {
+            Timber.e(it)
         })
 
-        viewModel.getAllLineupsForPlayer().observe(this, Observer {
+        viewModel.getAllLineupsForPlayer().subscribe({
             view.gamesPlayedValue.text = it.values.sum().toString()
             view.positionsChart.setData(it)
+        }, {
+            Timber.e(it)
         })
 
         return view

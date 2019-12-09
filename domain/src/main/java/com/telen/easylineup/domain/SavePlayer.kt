@@ -1,18 +1,20 @@
 package com.telen.easylineup.domain
 
 import android.net.Uri
-import com.telen.easylineup.repository.model.Player
 import com.telen.easylineup.repository.data.PlayerDao
+import com.telen.easylineup.repository.model.Player
 import io.reactivex.Single
-import java.lang.Exception
+
+class ShirtNumberEmptyException: Exception()
+class LicenseNumberEmptyException: Exception()
 
 class SavePlayer(val dao: PlayerDao): UseCase<SavePlayer.RequestValues, SavePlayer.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return when {
-            requestValues.name.isNullOrBlank() -> Single.error(Exception("Name is empty"))
-            requestValues.shirtNumber == null -> Single.error(Exception("Shirt number is empty"))
-            requestValues.licenseNumber == null -> Single.error(Exception("License number is  empty"))
+            requestValues.name.isNullOrBlank() -> Single.error(NameEmptyException())
+            requestValues.shirtNumber == null -> Single.error(ShirtNumberEmptyException())
+            requestValues.licenseNumber == null -> Single.error(LicenseNumberEmptyException())
             else -> {
                 val player = Player(id = requestValues.playerID, teamId = requestValues.teamID, name = requestValues.name.trim(), shirtNumber = requestValues.shirtNumber,
                         licenseNumber = requestValues.licenseNumber, image = requestValues.imageUri?.toString(), positions = requestValues.positions)
@@ -29,7 +31,7 @@ class SavePlayer(val dao: PlayerDao): UseCase<SavePlayer.RequestValues, SavePlay
         }
     }
 
-    inner class RequestValues(val playerID: Long,
+    class RequestValues(val playerID: Long,
                               val teamID: Long,
                               val name: String?,
                               val shirtNumber: Int?,
@@ -38,5 +40,5 @@ class SavePlayer(val dao: PlayerDao): UseCase<SavePlayer.RequestValues, SavePlay
                               val positions: Int
     ): UseCase.RequestValues
 
-    inner class ResponseValue: UseCase.ResponseValue
+    class ResponseValue: UseCase.ResponseValue
 }

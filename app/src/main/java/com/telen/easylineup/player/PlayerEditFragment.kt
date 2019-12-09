@@ -43,7 +43,7 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
         val view = inflater.inflate(R.layout.fragment_player_edit, container, false)
         viewModel = ViewModelProviders.of(this).get(PlayerViewModel::class.java)
         viewModel.playerID = arguments?.getLong(Constants.PLAYER_ID)
-        viewModel.playerID?.let {
+        viewModel.playerID?.let { id ->
 
             playerForm = view.editPlayerForm
 
@@ -56,21 +56,21 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
             val savedPositions = savedInstanceState?.getInt(Constants.PLAYER_POSITIONS)
 
             //if it's a player edition
-            if(it > 0) {
-                viewModel.getPlayer().observe(this, Observer { player ->
-                    player?.let {
-                        view.editPlayerForm.enableSaveButton()
-                        view.editPlayerForm.setName(savedName ?: player.name)
-                        view.editPlayerForm.setShirtNumber(savedShirtNumber ?: player.shirtNumber)
-                        view.editPlayerForm.setLicenseNumber(savedLicenseNumber ?: player.licenseNumber)
-                        view.editPlayerForm.setPositionsFilter(savedPositions ?: player.positions)
-                        val imagePath = savedImage ?: player.image
-                        imagePath?.let { imageUriString ->
-                            view.editPlayerForm.setImage(imageUriString)
-                        }
-
-                        view.editPlayerForm.setListener(this)
+            if(id > 0) {
+                viewModel.getPlayer().subscribe({ player ->
+                    view.editPlayerForm.enableSaveButton()
+                    view.editPlayerForm.setName(savedName ?: player.name)
+                    view.editPlayerForm.setShirtNumber(savedShirtNumber ?: player.shirtNumber)
+                    view.editPlayerForm.setLicenseNumber(savedLicenseNumber ?: player.licenseNumber)
+                    view.editPlayerForm.setPositionsFilter(savedPositions ?: player.positions)
+                    val imagePath = savedImage ?: player.image
+                    imagePath?.let { imageUriString ->
+                        view.editPlayerForm.setImage(imageUriString)
                     }
+
+                    view.editPlayerForm.setListener(this)
+                }, {
+                    Timber.e(it)
                 })
             }
             //case of a player creation
@@ -80,8 +80,8 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
             }
         }
 
-        viewModel.registerFormErrorResult().observe(this, Observer {
-            when(it) {
+        viewModel.registerFormErrorResult().observe(this, Observer { error ->
+            when(error) {
                 FormErrorResult.INVALID_NAME -> view.editPlayerForm.displayInvalidName()
                 FormErrorResult.INVALID_LICENSE -> view.editPlayerForm.displayInvalidLicense()
                 FormErrorResult.INVALID_NUMBER -> view.editPlayerForm.displayInvalidNumber()

@@ -93,7 +93,7 @@ interface PlayerFieldPositionsDao {
         WHERE playerFieldPosition.playerID = :playerID
         ORDER BY lineups.editedAt DESC
     """)
-    fun getAllPositionsForPlayer(playerID: Long): LiveData<List<PositionWithLineup>>
+    fun getAllPositionsForPlayer(playerID: Long): Single<List<PositionWithLineup>>
 
     @Query("""
         SELECT playerID, COUNT(*) as size FROM playerFieldPosition 
