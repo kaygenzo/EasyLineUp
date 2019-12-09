@@ -1,7 +1,5 @@
-package com.telen.easylineup
+package com.telen.easylineup.application
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.multidex.MultiDexApplication
 import androidx.room.Room
@@ -11,9 +9,11 @@ import bugbattle.io.bugbattle.BugBattle
 import bugbattle.io.bugbattle.controller.BugBattleActivationMethod
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
-import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.repository.data.AppDatabase
 import io.fabric.sdk.android.Fabric
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 import timber.log.Timber
 
 class App: MultiDexApplication() {
@@ -44,6 +44,11 @@ class App: MultiDexApplication() {
         Fabric.with(this, crashlytics)
 
         BugBattle.initialise(BuildConfig.ReportToolApiKey, BugBattleActivationMethod.SHAKE, this)
+
+        startKoin {
+            androidContext(this@App)
+            modules(appModules)
+        }
 
         //Stetho.initializeWithDefaults(this)
     }

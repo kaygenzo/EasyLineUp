@@ -2,7 +2,6 @@ package com.telen.easylineup.team.createTeam
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.App
 import com.telen.easylineup.UseCaseHandler
 import com.telen.easylineup.domain.GetTeamCreationNextStep
 import com.telen.easylineup.domain.NameEmptyException
@@ -13,12 +12,14 @@ import com.telen.easylineup.repository.model.TeamType
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
-class SetupViewModel: ViewModel() {
+class SetupViewModel: ViewModel(), KoinComponent {
 
-    private val saveTeamUseCase = SaveTeam(App.database.teamDao())
-    private val saveCurrentTeamUseCase = SaveCurrentTeam(App.database.teamDao())
-    private val getTeamCreationNextStep = GetTeamCreationNextStep()
+    private val saveTeamUseCase: SaveTeam by inject()
+    private val saveCurrentTeamUseCase: SaveCurrentTeam by inject()
+    private val getTeamCreationNextStep: GetTeamCreationNextStep by inject()
 
     var team = Team(0, "", null, TeamType.BASEBALL.id, true)
 

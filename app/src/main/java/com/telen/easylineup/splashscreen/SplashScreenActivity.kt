@@ -5,7 +5,10 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.telen.easylineup.*
+import com.telen.easylineup.BuildConfig
+import com.telen.easylineup.HomeActivity
+import com.telen.easylineup.R
+import com.telen.easylineup.UseCaseHandler
 import com.telen.easylineup.domain.GetTeam
 import com.telen.easylineup.mock.DatabaseMockProvider
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
@@ -13,11 +16,13 @@ import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.splashscreen.*
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.util.concurrent.TimeUnit
 
-class SplashScreenActivity: AppCompatActivity() {
+class SplashScreenActivity: AppCompatActivity(), KoinComponent {
 
-    private val getTeamUseCase = GetTeam(App.database.teamDao())
+    private val getTeamUseCase: GetTeam by inject()
     private var disposable: Disposable? = null
 
     companion object {

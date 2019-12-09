@@ -4,13 +4,14 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.App
 import com.telen.easylineup.UseCaseHandler
 import com.telen.easylineup.domain.*
 import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.repository.model.Player
 import io.reactivex.Completable
 import io.reactivex.Single
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
 enum class FormErrorResult {
     INVALID_NAME,
@@ -18,14 +19,15 @@ enum class FormErrorResult {
     INVALID_NUMBER
 }
 
-class PlayerViewModel: ViewModel() {
+class PlayerViewModel: ViewModel(), KoinComponent {
 
     private val errorResult = MutableLiveData<FormErrorResult>()
-    private val getTeamUseCase = GetTeam(App.database.teamDao())
-    private val getPlayerUseCase = GetPlayer(App.database.playerDao())
-    private val deletePlayerUseCase = DeletePlayer(App.database.playerDao())
-    private val savePlayerUseCase = SavePlayer(App.database.playerDao())
-    private val getPlayerPositionsSummaryUseCase = GetPositionsSummaryForPlayer(App.database.playerFieldPositionsDao())
+
+    private val getTeamUseCase: GetTeam by inject()
+    private val getPlayerUseCase: GetPlayer by inject()
+    private val deletePlayerUseCase: DeletePlayer by inject()
+    private val savePlayerUseCase: SavePlayer by inject()
+    private val getPlayerPositionsSummaryUseCase: GetPositionsSummaryForPlayer by inject()
 
     var playerID: Long? = 0
 

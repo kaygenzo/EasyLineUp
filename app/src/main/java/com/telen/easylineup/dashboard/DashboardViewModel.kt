@@ -3,9 +3,10 @@ package com.telen.easylineup.dashboard
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.App
 import com.telen.easylineup.UseCaseHandler
-import com.telen.easylineup.dashboard.models.*
+import com.telen.easylineup.application.App
+import com.telen.easylineup.dashboard.models.ITileData
+import com.telen.easylineup.dashboard.models.ShakeBetaData
 import com.telen.easylineup.domain.GetMostUsedPlayer
 import com.telen.easylineup.domain.GetTeam
 import com.telen.easylineup.domain.GetTeamSize
@@ -15,14 +16,17 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import timber.log.Timber
 
-class DashboardViewModel: ViewModel() {
+class DashboardViewModel: ViewModel(), KoinComponent {
     private val tilesLiveData = MutableLiveData<List<ITileData>>()
     private var loadDisposable: Disposable? = null
-    private val getTeamUseCase = GetTeam(App.database.teamDao())
-    private val getTeamSizeUseCase = GetTeamSize(App.database.playerDao())
-    private val getMostUsedPlayerUseCase = GetMostUsedPlayer(App.database.playerFieldPositionsDao(), App.database.playerDao())
+
+    private val getTeamUseCase: GetTeam by inject()
+    private val getTeamSizeUseCase:  GetTeamSize by inject()
+    private val getMostUsedPlayerUseCase: GetMostUsedPlayer by inject()
 
     fun registerTilesLiveData(): LiveData<List<ITileData>> {
         return tilesLiveData

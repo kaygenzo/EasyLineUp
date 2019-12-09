@@ -3,6 +3,7 @@ package com.telen.easylineup
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.telen.easylineup.application.App
 import com.telen.easylineup.domain.GetAllTeams
 import com.telen.easylineup.domain.GetTeam
 import com.telen.easylineup.domain.SaveCurrentTeam
@@ -10,12 +11,14 @@ import com.telen.easylineup.repository.model.Team
 import io.reactivex.Completable
 import io.reactivex.Single
 import timber.log.Timber
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
-class HomeViewModel: ViewModel() {
+class HomeViewModel: ViewModel(), KoinComponent {
 
-    private val getTeamUseCase = GetTeam(App.database.teamDao())
-    private val getAllTeamsUseCase = GetAllTeams(App.database.teamDao())
-    private val saveCurrentTeam = SaveCurrentTeam(App.database.teamDao())
+    private val getTeamUseCase: GetTeam by inject()
+    private val getAllTeamsUseCase: GetAllTeams by inject()
+    private val saveCurrentTeam: SaveCurrentTeam by inject()
 
     private val swapTeamLiveData = MutableLiveData<List<Team>>()
 

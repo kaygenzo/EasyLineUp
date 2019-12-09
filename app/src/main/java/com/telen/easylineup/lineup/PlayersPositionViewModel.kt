@@ -18,12 +18,15 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.*
 import com.telen.easylineup.R
+import com.telen.easylineup.application.App
 import com.telen.easylineup.domain.*
 import com.telen.easylineup.repository.model.*
 import com.telen.easylineup.repository.model.FieldPosition
 import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
@@ -36,9 +39,6 @@ import kotlin.collections.Map
 import kotlin.collections.MutableList
 import kotlin.collections.forEach
 import kotlin.collections.mutableListOf
-
-data class LineupStatusDefense(val players: Map<Player, FieldPosition?>, val lineupMode: Int)
-data class LineupStatusAttack(val players: Map<Player, FieldPosition?>, val lineupMode: Int)
 
 data class InsufficientPermissions(val permissionsNeeded: Array<String>): Exception() {
     override fun equals(other: Any?): Boolean {
@@ -77,7 +77,7 @@ object DeleteLineupSuccess: EventCase()
 object SaveLineupModeSuccess: EventCase()
 object UpdatePlayersWithLineupModeSuccess: EventCase()
 
-class PlayersPositionViewModel: ViewModel() {
+class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
     var lineupID: Long? = 0
     var lineupTitle: String? = null
@@ -89,13 +89,13 @@ class PlayersPositionViewModel: ViewModel() {
 
     private val listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
 
-    private val savePlayerFieldPositionUseCase = SavePlayerFieldPosition(App.database.playerFieldPositionsDao())
-    private val deletePlayerFieldPositionUseCase = DeletePlayerFieldPosition(App.database.playerFieldPositionsDao())
-    private val getListAvailablePlayersForLineup = GetListAvailablePlayersForSelection()
-    private val saveBattingOrder = SaveBattingOrder(App.database.playerFieldPositionsDao())
-    private val deleteLineup = DeleteLineup(App.database.lineupDao())
-    private val saveLineupMode = SaveLineupMode(App.database.lineupDao())
-    private val updatePlayersWithLineupMode = UpdatePlayersWithLineupMode(App.database.playerFieldPositionsDao())
+    private val savePlayerFieldPositionUseCase: SavePlayerFieldPosition by inject()
+    private val deletePlayerFieldPositionUseCase: DeletePlayerFieldPosition by inject()
+    private val getListAvailablePlayersForLineup: GetListAvailablePlayersForSelection by inject()
+    private val saveBattingOrder: SaveBattingOrder by inject()
+    private val deleteLineup: DeleteLineup by inject()
+    private val saveLineupMode: SaveLineupMode by inject()
+    private val updatePlayersWithLineupMode: UpdatePlayersWithLineupMode by inject()
 
     fun savePlayerFieldPosition(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean) {
 

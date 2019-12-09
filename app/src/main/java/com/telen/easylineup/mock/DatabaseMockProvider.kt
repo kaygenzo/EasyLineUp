@@ -2,7 +2,7 @@ package com.telen.easylineup.mock
 
 import android.content.Context
 import com.google.gson.JsonParser
-import com.telen.easylineup.App
+import com.telen.easylineup.application.App
 import com.telen.easylineup.repository.model.*
 import io.reactivex.Completable
 import io.reactivex.Single

@@ -3,7 +3,6 @@ package com.telen.easylineup.lineup.list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.App
 import com.telen.easylineup.UseCaseHandler
 import com.telen.easylineup.domain.DeleteTournament
 import com.telen.easylineup.domain.GetAllTournamentsWithLineups
@@ -13,14 +12,17 @@ import com.telen.easylineup.repository.model.Lineup
 import com.telen.easylineup.repository.model.Tournament
 import io.reactivex.Completable
 import io.reactivex.Single
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
-class TournamentViewModel: ViewModel() {
+class TournamentViewModel: ViewModel(), KoinComponent {
 
     private val filterLiveData: MutableLiveData<String> = MutableLiveData()
-    private val getTeamUseCase = GetTeam(App.database.teamDao())
-    private val deleteTournamentUseCase = DeleteTournament(App.database.tournamentDao())
-    private val getAllTournamentsWithLineups = GetAllTournamentsWithLineups(App.database.lineupDao())
-    private val getTournaments = GetTournaments(App.database.tournamentDao())
+
+    private val getTeamUseCase: GetTeam by inject()
+    private val deleteTournamentUseCase: DeleteTournament by inject()
+    private val getAllTournamentsWithLineups: GetAllTournamentsWithLineups by inject()
+    private val getTournaments: GetTournaments by inject()
 
     fun setFilter(filter: String) {
         filterLiveData.value = filter
