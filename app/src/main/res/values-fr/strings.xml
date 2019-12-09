@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">EasyLineup</string>
-    <string name="splashscreen_title" translatable="false">Easylineup</string>
-
     <string name="action_edit">Editer</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_submit">Valider</string>
@@ -89,4 +86,8 @@
     <string name="gallery_picker_default_title">Albums</string>
 
     <string name="share_lineup_subject">Voici le lineup de: %s</string>
+
+    <string name="team_list_empty_text">Une fois que vous aurez créé votre équipe, elle sera visible ici</string>
+    <string name="team_list_dialog_title">Vos équipes</string>
+    <string name="team_list_dialog_create">Nouveau</string>
 </resources>

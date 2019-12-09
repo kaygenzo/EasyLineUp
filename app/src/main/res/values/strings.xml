@@ -67,9 +67,9 @@
 
     <string name="shake_beta_description">Any problem ? Shake your phone and send a report!</string>
 
-    <string name="field_position_dp">DP</string>
-    <string name="field_position_dh">DH</string>
-    <string name="field_position_flex">FLEX</string>
+    <string name="field_position_dp" translatable="false">DP</string>
+    <string name="field_position_dh" translatable="false">DH</string>
+    <string name="field_position_flex" translatable="false">FLEX</string>
 
     <string name="action_add_dp_flex">Use DP/Flex</string>
     <string name="action_add_dh">Use DH</string>
