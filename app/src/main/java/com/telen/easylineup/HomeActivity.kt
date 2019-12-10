@@ -1,7 +1,6 @@
 package com.telen.easylineup
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -22,9 +21,8 @@ import com.telen.easylineup.team.swap.HostInterface
 import com.telen.easylineup.team.swap.SwapTeamFragment
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.DrawerHeader
-import io.reactivex.functions.Action
-import io.reactivex.functions.Consumer
 import timber.log.Timber
+import java.io.Serializable
 
 class HomeActivity : AppCompatActivity(), HostInterface {
 
@@ -66,13 +64,24 @@ class HomeActivity : AppCompatActivity(), HostInterface {
         })
 
         drawerHeader.setOnSwapTeamClickListener(View.OnClickListener {
-           viewModel.onSwapButtonClicked()
+           viewModel.onSwapButtonClicked().subscribe({
+               val argument = Bundle()
+               argument.putSerializable(Constants.EXTRA_TEAM, it as Serializable)
+               val dialog = SwapTeamFragment()
+               dialog.arguments = argument
+               dialog.setHostInterface(this)
+               dialog.show(supportFragmentManager, "SwapTeamFragment")
+           }, {
+               Timber.e(it)
+           })
         })
+    }
 
-        viewModel.registerTeamsDialog().observe(this, Observer { teams ->
-            SwapTeamFragment(teams, this).show(supportFragmentManager, "SwapTeamFragment")
-        })
-
+    override fun onResume() {
+        super.onResume()
+        supportFragmentManager.findFragmentByTag("SwapTeamFragment")?.let {
+            (it as SwapTeamFragment).setHostInterface(this)
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

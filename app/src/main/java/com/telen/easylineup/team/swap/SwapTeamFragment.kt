@@ -9,6 +9,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
+import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.repository.model.Team
 import com.telen.easylineup.views.ListEmptyView
 import kotlinx.android.synthetic.main.teams_list_view.view.*
@@ -18,16 +19,24 @@ interface HostInterface {
     fun onCreateTeamClick()
 }
 
-class SwapTeamFragment(private val teams: List<Team>, private val hostInterface: HostInterface): DialogFragment() {
+class SwapTeamFragment: DialogFragment() {
 
     private var mAdapter: SwapTeamsListAdapter? = null
+    private var mHostInterface: HostInterface? = null
+
+    fun setHostInterface(hostInterface: HostInterface) {
+        mHostInterface = hostInterface
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+
         activity?.let { activity ->
             val inflater = activity.layoutInflater
             val view = inflater.inflate(R.layout.teams_list_view, null)
             val mEmptyListMessageView = view.findViewById(R.id.no_teams_view) as ListEmptyView
             mEmptyListMessageView.setImageHint(R.drawable.ic_oobe_conv_list)
+
+            val teams = arguments?.getSerializable(Constants.EXTRA_TEAM) as? List<Team> ?: mutableListOf()
 
             if (teams.isEmpty()) {
                 mEmptyListMessageView.setTextHint(R.string.team_list_empty_text)
@@ -44,7 +53,7 @@ class SwapTeamFragment(private val teams: List<Team>, private val hostInterface:
 
             mAdapter = SwapTeamsListAdapter(teams, object : SwapTeamsListAdapter.HostInterface {
                 override fun onTeamClicked(team: Team) {
-                    hostInterface.onTeamClick(team)
+                    mHostInterface?.onTeamClick(team)
                     dismiss()
                 }
             })
@@ -55,11 +64,12 @@ class SwapTeamFragment(private val teams: List<Team>, private val hostInterface:
             }
 
             val dialogBuilder = AlertDialog.Builder(activity)
+                    .setCancelable(true)
                     .setView(view)
                     .setTitle(R.string.team_list_dialog_title)
 
             dialogBuilder.setPositiveButton(R.string.team_list_dialog_create) { dialog, which ->
-                hostInterface.onCreateTeamClick()
+                mHostInterface?.onCreateTeamClick()
                 dismiss()
             }
 
@@ -68,5 +78,4 @@ class SwapTeamFragment(private val teams: List<Team>, private val hostInterface:
 
         } ?: throw Exception("Activity is null, it's not allowed at this step")
     }
-
 }

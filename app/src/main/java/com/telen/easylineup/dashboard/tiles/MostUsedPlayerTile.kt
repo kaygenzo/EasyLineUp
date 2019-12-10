@@ -47,5 +47,9 @@ class MostUsedPlayerTile: ConstraintLayout {
                 }
             }
         }
+
+        if(!map.containsKey(KEY_DATA_IMAGE)) {
+            Picasso.get().load(R.drawable.ic_unknown_field_player).into(tile_player_most_used_image)
+        }
     }
 }

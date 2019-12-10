@@ -33,18 +33,24 @@ class TeamSizeTile: ConstraintLayout {
         val image = map[KEY_DATA_TEAM_IMAGE] as String?
         image?.let {
             teamImage.post {
-                Picasso.get().load(it)
-                        .resize(teamImage.height, teamImage.height)
-                        .centerCrop()
-                        .transform(RoundedTransformationBuilder()
-                                .borderColor(Color.BLACK)
-                                .borderWidthDp(2f)
-                                .cornerRadiusDp(16f)
-                                .oval(true)
-                                .build())
-                        .placeholder(R.drawable.ic_unknown_team)
-                        .error(R.drawable.ic_unknown_team)
-                        .into(teamImage)
+                val imageSize = teamImage.height
+                if(imageSize > 0) {
+                    Picasso.get().load(it)
+                            .resize(imageSize, imageSize)
+                            .centerCrop()
+                            .transform(RoundedTransformationBuilder()
+                                    .borderColor(Color.BLACK)
+                                    .borderWidthDp(2f)
+                                    .cornerRadiusDp(16f)
+                                    .oval(true)
+                                    .build())
+                            .placeholder(R.drawable.ic_unknown_team)
+                            .error(R.drawable.ic_unknown_team)
+                            .into(teamImage)
+                }
+                else {
+                    Picasso.get().load(R.drawable.ic_unknown_team).into(teamImage)
+                }
             }
         } ?: Picasso.get().load(R.drawable.ic_unknown_team).into(teamImage)
 
