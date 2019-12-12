@@ -102,6 +102,7 @@ android {
             versionNameSuffix "-debug"
 //            manifestPlaceholders = [crashlyticsEnabled: true]
             ext.enableCrashlytics = false
+            testCoverageEnabled true
         }
         release {
             signingConfig signingConfigs.release
@@ -239,10 +240,14 @@ sonarqube {
         property "sonar.java.target",  sonarProperties['sonar.java.target']
 
         property "sonar.sources",  sonarProperties['sonar.sources']
-        property "sonar.java.binaries",  sonarProperties['sonar.java.binaries']
+        property "sonar.java.binaries",  "app/build"
         property "sonar.profile",  sonarProperties['sonar.profile']
         property "sonar.host.url", sonarProperties['sonar.host.url']
     }
 }
 
 apply from: '../jacoco.gradle'
+
+//coveralls {
+//    jacocoReportPath "${project.buildDir}/reports/jacoco/testProdDebugUnitTestCoverage/testProdDebugUnitTestCoverage.xml"
+//}

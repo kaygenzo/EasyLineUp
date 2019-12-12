@@ -1,6 +1,7 @@
 apply plugin: 'jacoco'
 jacoco {
-    toolVersion = "0.8.1"
+    toolVersion = "0.8.2"
+    reportsDir = file("$buildDir/customJacocoReportDir")
 }
 
 project.afterEvaluate {
@@ -23,22 +24,31 @@ project.afterEvaluate {
                 '**/Manifest*.*'
         ]
 
-        classDirectories = fileTree(
+        def javaDebugTree = fileTree(
                 // Java generated classes on Android project (debug build)
                 dir: "${project.buildDir}/intermediates/classes/${sourcePath}",
                 excludes: excludes
-        ) + fileTree(
+        )
+
+        def kotlinDebugTree = fileTree(
                 // Kotlin generated classes on Android project (debug build)
                 dir: "${project.buildDir}/tmp/kotlin-classes/${sourcePath}",
                 excludes: excludes
         )
 
+        classDirectories = files([javaDebugTree], [kotlinDebugTree])
+
         def coverageSourceDirs = [
-                "src/main/java",
-                "src/main/kotlin",
-                "src/$productFlavorName/java",
-                "src/$buildTypeName/java"
+                "${project.projectDir}/src/main/java",
+                "${project.projectDir}/src/main/kotlin",
+                "${project.projectDir}/src/$productFlavorName/java",
+                "${project.projectDir}/src/$buildTypeName/java",
+                "${project.projectDir}/src/$productFlavorName/kotlin",
+                "${project.projectDir}/src/$buildTypeName/kotlin"
         ]
+
+        System.out.println("coverageSourceDirs=${coverageSourceDirs}")
+
         additionalSourceDirs = files(coverageSourceDirs)
         sourceDirectories = files(coverageSourceDirs)
         executionData = files("${project.buildDir}/jacoco/${testTaskName}.exec")

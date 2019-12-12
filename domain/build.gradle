@@ -1,6 +1,17 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+def sonarPropertiesFile = rootProject.file("sonar.properties")
+def sonarProperties = new Properties()
+if (sonarPropertiesFile.exists()) {
+    sonarProperties.load(new FileInputStream(sonarPropertiesFile))
+}
+
 android {
     compileSdkVersion 28
 
@@ -26,6 +37,36 @@ android {
         targetCompatibility = 1.8
     }
 
+    flavorDimensions 'version'
+
+    productFlavors {
+        dev {
+            dimension 'version'
+        }
+        prod {
+            dimension 'version'
+        }
+        demo {
+            dimension 'version'
+        }
+    }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+        release {
+
+        }
+    }
+
+    testOptions {
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+            }
+        }
+    }
 }
 
 dependencies {
@@ -44,3 +85,30 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:2.2.14"
     implementation project(path: ':repository')
 }
+
+apply plugin: 'org.sonarqube'
+
+sonarqube {
+    properties {
+        property "sonar.projectKey",  sonarProperties['sonar.projectKey']
+        property "sonar.projectName",  sonarProperties['sonar.projectName']
+        property "sonar.projectVersion",  android.defaultConfig.versionName
+        property "sonar.host.url",  sonarProperties['sonar.host.url']
+
+        property "sonar.language",  sonarProperties['sonar.language']
+        property "sonar.sourceEncoding",  sonarProperties['sonar.sourceEncoding']
+        property "sonar.java.source",  sonarProperties['sonar.java.source']
+        property "sonar.java.target",  sonarProperties['sonar.java.target']
+
+        property "sonar.sources",  sonarProperties['sonar.sources']
+        property "sonar.java.binaries",  "domain/build"
+        property "sonar.profile",  sonarProperties['sonar.profile']
+        property "sonar.host.url", sonarProperties['sonar.host.url']
+    }
+}
+
+apply from: '../jacoco.gradle'
+
+//coveralls {
+//    jacocoReportPath "${project.buildDir}/reports/jacoco/testProdDebugUnitTestCoverage/testProdDebugUnitTestCoverage.xml"
+//}
