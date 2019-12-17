@@ -4,39 +4,75 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Tournament
+import com.telen.easylineup.domain.GetRoaster
+import com.telen.easylineup.domain.STATUS_ALL
 import com.telen.easylineup.lineup.list.LineupViewModel
-import com.telen.easylineup.lineup.list.TournamentViewModel
 import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.model.Tournament
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.OnActionButtonListener
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
 import kotlinx.android.synthetic.main.fragment_lineup_creation.view.*
 import timber.log.Timber
 
 class LineupCreationFragment: Fragment() {
 
     private var saveDisposable: Disposable? = null
+    private lateinit var lineupViewModel: LineupViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        lineupViewModel = ViewModelProviders.of(this).get(LineupViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_lineup_creation, container, false)
 
-        val tournamentViewModel =  ViewModelProviders.of(this).get(TournamentViewModel::class.java)
-        tournamentViewModel.getTournaments().subscribe({
+        lineupViewModel.getTournaments().subscribe({
             view.lineupCreationForm.setList(it)
         }, {
             Timber.e(it)
         })
 
         view.lineupCreationForm.setOnActionClickListener(object: OnActionButtonListener {
+            override fun onRoasterChangeClicked() {
+                val disposable = lineupViewModel.getRoaster().subscribe({ response ->
+                    activity?.let { activity ->
+                        val names = mutableListOf<CharSequence>()
+//                        names.add("All")
+                        names.addAll(response.players.map { it.player.name })
+
+                        val checked = mutableListOf<Boolean>()
+//                        when(response.status) {
+//                            STATUS_ALL -> checked.add(true)
+//                            STATUS_NONE -> checked.add(false)
+//                        }
+                        checked.addAll(response.players.map { it.status })
+
+                        AlertDialog.Builder(activity)
+                                .setMultiChoiceItems(names.toTypedArray(), checked.toBooleanArray()) { dialog, which, isChecked ->
+                                    lineupViewModel.roasterPlayerStatusChanged(which, isChecked)
+                                    updateRoasterSize(view.playerCount, response)
+                                }
+                                .setPositiveButton(android.R.string.ok, null)
+                                .create()
+                                .show()
+                    }
+
+                }, {
+                    Timber.e(it)
+                })
+            }
+
             override fun onSaveClicked() {
                 val tournament = view.lineupCreationForm.getSelectedTournament()
                 saveLineup(tournament, view.lineupCreationForm.getLineupTitle())
@@ -47,14 +83,30 @@ class LineupCreationFragment: Fragment() {
             }
         })
 
+        lineupViewModel.getRoaster().subscribe({
+            updateRoasterSize(view.playerCount, it)
+        }, {
+            Timber.e(it)
+        })
+
         return view
+    }
+
+    private fun updateRoasterSize(view: TextView, response: GetRoaster.ResponseValue) {
+        when(response.status) {
+            STATUS_ALL -> {
+                view.text = getString(R.string.roaster_size_status_all)
+            }
+            else -> {
+                val size = response.players.filter { it.status }.size
+                view.text = resources.getQuantityString(R.plurals.roaster_size_status_selection, size, size)
+            }
+        }
     }
 
     private fun saveLineup(tournament: Tournament, lineupTitle: String) {
         Timber.d("chosen tournament = $tournament")
         Timber.d("chosen title = $lineupTitle")
-
-        val lineupViewModel = ViewModelProviders.of(this).get(LineupViewModel::class.java)
 
         saveDisposable?.takeIf { !it.isDisposed }?.dispose()
         saveDisposable = lineupViewModel.createNewLineup(tournament, lineupTitle)

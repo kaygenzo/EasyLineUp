@@ -59,7 +59,9 @@
     <string name="header_batting_order_player_shirt">N°</string>
     <string name="header_batting_order_player_position">Pos.</string>
 
-    <string name="form_lineup_creation_more_label">More</string>
+    <string name="form_lineup_creation_date_label">Date</string>
+    <string name="form_lineup_creation_roaster_label">Roaster</string>
+    <string name="form_lineup_creation_roaster_change_button">Change</string>
 
     <string name="lineup_list_empty_label">Empty</string>
     <string name="lineup_list_filter_focused_hint">Enter name</string>
@@ -97,5 +99,12 @@
     <string name="team_list_empty_text">Once you create a team, you’ll see it listed here</string>
     <string name="team_list_dialog_title">Your teams</string>
     <string name="team_list_dialog_create">Create</string>
+
+    <string name="roaster_size_status_all">All players</string>
+    <plurals name="roaster_size_status_selection">
+        <item quantity="one">%d player</item>
+        <item quantity="other">%d players</item>
+    </plurals>
+
 
 </resources>

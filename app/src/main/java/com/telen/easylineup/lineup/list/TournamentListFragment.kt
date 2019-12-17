@@ -22,21 +22,20 @@ import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_list_tournaments.view.*
 import timber.log.Timber
 
 class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchBar.OnSearchActionListener {
 
     private lateinit var tournamentsAdapter: TournamentsAdapter
-    private lateinit var viewModel: TournamentViewModel
+    private lateinit var viewModel: LineupViewModel
     private val listTournaments: MutableList<Pair<Tournament, List<Lineup>>> = mutableListOf()
     private var loadTournamentsDisposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         tournamentsAdapter = TournamentsAdapter(this)
-        viewModel =  ViewModelProviders.of(this).get(TournamentViewModel::class.java)
+        viewModel =  ViewModelProviders.of(this).get(LineupViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

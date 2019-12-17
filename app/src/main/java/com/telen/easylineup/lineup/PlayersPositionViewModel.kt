@@ -96,6 +96,8 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     private val deleteLineup: DeleteLineup by inject()
     private val saveLineupMode: SaveLineupMode by inject()
     private val updatePlayersWithLineupMode: UpdatePlayersWithLineupMode by inject()
+    private val getRoasterUseCase: GetRoaster by inject()
+    private val getTeamUseCase: GetTeam by inject()
 
     fun savePlayerFieldPosition(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean) {
 
@@ -121,14 +123,17 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun getAllAvailablePlayers(position: FieldPosition, isNewPlayer: Boolean) {
-
-        val requestValues = GetListAvailablePlayersForSelection.RequestValues(listPlayersWithPosition, position)
-
-        val disposable = UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues).subscribe({
-            eventHandler.value = GetAllAvailablePlayersSuccess(it.players, position, isNewPlayer)
-        }, {
-            errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
-        })
+        val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+                .flatMap { UseCaseHandler.execute(getRoasterUseCase, GetRoaster.RequestValues(it.id, lineupID)) }
+                .flatMap {
+                    val requestValues = GetListAvailablePlayersForSelection.RequestValues(lineupID, listPlayersWithPosition, position, it.players)
+                    UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues)
+                }
+                .subscribe({
+                    eventHandler.value = GetAllAvailablePlayersSuccess(it.players, position, isNewPlayer)
+                }, {
+                    errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
+                })
     }
 
     fun saveNewBattingOrder(players: List<PlayerWithPosition>) {

@@ -56,7 +56,9 @@
     <string name="header_batting_order_player_shirt">N°</string>
     <string name="header_batting_order_player_position">Pos.</string>
 
-    <string name="form_lineup_creation_more_label">Plus</string>
+    <string name="form_lineup_creation_date_label">Date</string>
+    <string name="form_lineup_creation_roaster_label">Joueurs</string>
+    <string name="form_lineup_creation_roaster_change_button">Changer</string>
 
     <string name="lineup_list_empty_label">Vide</string>
     <string name="lineup_list_filter_focused_hint">Tapez un nom</string>
@@ -90,4 +92,10 @@
     <string name="team_list_empty_text">Une fois que vous aurez créé votre équipe, elle sera visible ici</string>
     <string name="team_list_dialog_title">Vos équipes</string>
     <string name="team_list_dialog_create">Nouveau</string>
+
+    <string name="roaster_size_status_all">Tous les joueurs</string>
+    <plurals name="roaster_size_status_selection">
+        <item quantity="one">%d joueur</item>
+        <item quantity="other">%d joueurs</item>
+    </plurals>
 </resources>
