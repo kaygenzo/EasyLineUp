@@ -2,13 +2,11 @@ package com.telen.easylineup.domain
 
 import com.telen.easylineup.repository.data.LineupDao
 import com.telen.easylineup.repository.data.PlayerDao
-import com.telen.easylineup.repository.model.Player
+import com.telen.easylineup.repository.model.RoasterPlayerStatus
 import io.reactivex.Single
 
 const val STATUS_ALL = 0
 const val STATUS_NONE = 1
-
-data class RoasterPlayerStatus(val player: Player, var status: Boolean = true)
 
 class GetRoaster(private val dao: PlayerDao, private val lineupDao: LineupDao): UseCase<GetRoaster.RequestValues, GetRoaster.ResponseValue>() {
 

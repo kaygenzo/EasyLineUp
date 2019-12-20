@@ -31,7 +31,7 @@ val appModules = module {
     single { GetTeamCreationNextStep() }
     single { SavePlayerFieldPosition(get()) }
     single { DeletePlayerFieldPosition(get()) }
-    single { GetListAvailablePlayersForSelection(get()) }
+    single { GetListAvailablePlayersForSelection() }
     single { SaveBattingOrder(get()) }
     single { DeleteLineup(get()) }
     single { SaveLineupMode(get()) }

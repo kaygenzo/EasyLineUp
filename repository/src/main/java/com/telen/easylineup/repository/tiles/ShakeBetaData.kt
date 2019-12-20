@@ -1,6 +1,7 @@
-package com.telen.easylineup.dashboard.models
+package com.telen.easylineup.repository.tiles
 
 import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.tiles.ITileData
 
 class ShakeBetaData(): ITileData {
 

@@ -126,7 +126,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
                 .flatMap { UseCaseHandler.execute(getRoasterUseCase, GetRoaster.RequestValues(it.id, lineupID)) }
                 .flatMap {
-                    val requestValues = GetListAvailablePlayersForSelection.RequestValues(lineupID, listPlayersWithPosition, position, it.players)
+                    val requestValues = GetListAvailablePlayersForSelection.RequestValues(listPlayersWithPosition, position, it.players)
                     UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues)
                 }
                 .subscribe({

@@ -1,13 +1,10 @@
 package com.telen.easylineup.domain
 
-import android.annotation.SuppressLint
-import com.telen.easylineup.dashboard.models.ITileData
-import com.telen.easylineup.dashboard.models.MostUsedPlayerData
-import com.telen.easylineup.dashboard.models.TeamSizeData
+import com.telen.easylineup.repository.tiles.ITileData
+import com.telen.easylineup.repository.tiles.MostUsedPlayerData
 import com.telen.easylineup.repository.data.PlayerDao
 import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
 import com.telen.easylineup.repository.model.Team
-import io.reactivex.Maybe
 import io.reactivex.Single
 
 class GetMostUsedPlayer(val dao: PlayerFieldPositionsDao, val playerDao: PlayerDao): UseCase<GetMostUsedPlayer.RequestValues, GetMostUsedPlayer.ResponseValue>() {

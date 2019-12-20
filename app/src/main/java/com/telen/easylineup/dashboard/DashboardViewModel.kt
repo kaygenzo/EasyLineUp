@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.UseCaseHandler
 import com.telen.easylineup.application.App
-import com.telen.easylineup.dashboard.models.ITileData
-import com.telen.easylineup.dashboard.models.ShakeBetaData
+import com.telen.easylineup.repository.tiles.ITileData
+import com.telen.easylineup.repository.tiles.ShakeBetaData
 import com.telen.easylineup.domain.GetMostUsedPlayer
 import com.telen.easylineup.domain.GetTeam
 import com.telen.easylineup.domain.GetTeamSize

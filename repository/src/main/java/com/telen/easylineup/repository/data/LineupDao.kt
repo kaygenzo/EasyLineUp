@@ -12,7 +12,7 @@ interface LineupDao {
     fun insertLineup(lineup: Lineup): Single<Long>
 
     @Insert
-    fun insertLineup(lineups: List<Lineup>): Completable
+    fun insertLineups(lineups: List<Lineup>): Completable
 
     @Update
     fun updateLineup(lineup: Lineup): Completable

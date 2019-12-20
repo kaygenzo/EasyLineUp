@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
-import com.telen.easylineup.dashboard.models.*
+import com.telen.easylineup.repository.tiles.*
 import kotlinx.android.synthetic.main.tile_most_used_player.view.*
 
 class MostUsedPlayerTile: ConstraintLayout {

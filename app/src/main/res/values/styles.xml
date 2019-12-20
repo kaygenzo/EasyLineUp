@@ -155,7 +155,7 @@
     </style>
 
     <style name="ContactListItemLinearLayoutStyle">
-        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingLeft">20dp</item>
         <item name="android:paddingRight">24dp</item>
     </style>
 
@@ -167,7 +167,7 @@
     </style>
 
     <style name="PeopleListItemViewStyle">
-        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingLeft">24dp</item>
     </style>
 
 </resources>

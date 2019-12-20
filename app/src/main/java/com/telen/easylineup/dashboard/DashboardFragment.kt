@@ -11,8 +11,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.telen.easylineup.R
 import com.telen.easylineup.dashboard.*
-import com.telen.easylineup.dashboard.models.ITileData
-import com.telen.easylineup.dashboard.models.LastLineupData
+import com.telen.easylineup.repository.tiles.ITileData
+import com.telen.easylineup.repository.tiles.LastLineupData
 import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
