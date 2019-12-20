@@ -4,10 +4,14 @@ class Constants {
     companion object {
 
         const val APPLICATION_PREFERENCES = "easylineup_prefs"
+        const val PREF_FEATURE_SHOW_NEW_SWAP_TEAM = "pref_show_new_swap_team"
+        const val PREF_FEATURE_SHOW_NEW_ROASTER = "pref_show_new_roaster"
 
         const val LINEUP_ID = "lineup_id"
         const val PLAYER_ID = "player_id"
         const val LINEUP_TITLE = "lineup_title"
+
+        //extras
         const val EXTRA_EDITABLE = "com.telen.extra.editable"
         const val EXTRA_CLICKABLE = "com.telen.extra.clickable"
         const val EXTRA_TEAM = "com.telen.extra.team"

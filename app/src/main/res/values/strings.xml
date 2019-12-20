@@ -106,5 +106,10 @@
         <item quantity="other">%d players</item>
     </plurals>
 
+    <string name="feature_manage_teams_title">Manage your teams</string>
+    <string name="feature_manage_teams_description">Now, you can have more than one team!</string>
+
+    <string name="feature_roaster_title">Setup your roaster</string>
+    <string name="feature_roaster_description">Add players who will play the game!</string>
 
 </resources>

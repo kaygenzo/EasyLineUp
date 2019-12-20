@@ -1,10 +1,12 @@
 package com.telen.easylineup.lineup.list
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.UseCaseHandler
 import com.telen.easylineup.domain.*
+import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.repository.model.Lineup
 import com.telen.easylineup.repository.model.Tournament
 import io.reactivex.Completable
@@ -77,5 +79,14 @@ class LineupViewModel: ViewModel(), KoinComponent {
             }
         }
 
+    }
+
+    fun showNewRoasterFeature(context: Context): Single<Boolean> {
+        val prefs = context.getSharedPreferences(Constants.APPLICATION_PREFERENCES, 0)
+        val show = prefs.getBoolean(Constants.PREF_FEATURE_SHOW_NEW_ROASTER, true)
+        if(show) {
+            prefs.edit().putBoolean(Constants.PREF_FEATURE_SHOW_NEW_ROASTER, false).apply()
+        }
+        return Single.just(show)
     }
 }

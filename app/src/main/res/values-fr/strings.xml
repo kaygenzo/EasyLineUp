@@ -98,4 +98,10 @@
         <item quantity="one">%d joueur</item>
         <item quantity="other">%d joueurs</item>
     </plurals>
+
+    <string name="feature_manage_teams_title">Gérez vos équipes</string>
+    <string name="feature_manage_teams_description">Maintenant, vous pouvez avoir plus d\'une équipe!</string>
+
+    <string name="feature_roaster_title">Créez votre composition initiale</string>
+    <string name="feature_roaster_description">Ajoutez les joueurs qui participeront au match!</string>
 </resources>

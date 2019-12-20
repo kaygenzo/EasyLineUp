@@ -221,6 +221,8 @@ dependencies {
     implementation project(path: ':domain')
 
     implementation "org.koin:koin-android:$koin_version"
+
+    implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

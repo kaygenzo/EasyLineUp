@@ -13,20 +13,26 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.android.material.navigation.NavigationView
 import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.repository.model.Team
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.team.swap.HostInterface
 import com.telen.easylineup.team.swap.SwapTeamFragment
+import com.telen.easylineup.utils.FeatureViewFactory
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.DrawerHeader
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import kotlinx.android.synthetic.main.nav_drawer_header.view.*
 import timber.log.Timber
 import java.io.Serializable
 
 class HomeActivity : AppCompatActivity(), HostInterface {
 
     private lateinit var viewModel: HomeViewModel
+    private var swapDialogDisposable: Disposable? = null
 
     private val drawerLayout by lazy { findViewById<DrawerLayout>(R.id.drawer_layout) }
     private val navController by lazy { findNavController(R.id.nav_host_fragment) }
@@ -59,21 +65,50 @@ class HomeActivity : AppCompatActivity(), HostInterface {
                 navController.navigate(R.id.teamEditFragment, arguments, NavigationUtils().getOptions())
                 closeDrawer()
             }, {
-               Timber.e(it)
+                Timber.e(it)
             })
         })
 
         drawerHeader.setOnSwapTeamClickListener(View.OnClickListener {
-           viewModel.onSwapButtonClicked().subscribe({
-               val argument = Bundle()
-               argument.putSerializable(Constants.EXTRA_TEAM, it as Serializable)
-               val dialog = SwapTeamFragment()
-               dialog.arguments = argument
-               dialog.setHostInterface(this)
-               dialog.show(supportFragmentManager, "SwapTeamFragment")
-           }, {
-               Timber.e(it)
-           })
+            showSwapDialog()
+        })
+
+        drawerLayout.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
+            override fun onDrawerOpened(drawerView: View) {
+                val disposable = viewModel.showNewSwapTeamFeature(this@HomeActivity)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            showFeatureTargetView(it)
+                        }, {
+                            Timber.e(it)
+                        })
+            }
+        })
+    }
+
+    private fun showFeatureTargetView(show: Boolean) {
+        if(show) {
+            FeatureViewFactory.apply(drawerHeader.changeTeam, this, getString(R.string.feature_manage_teams_title),
+                    getString(R.string.feature_manage_teams_description), object : TapTargetView.Listener() {
+                override fun onTargetClick(view: TapTargetView?) {
+                    showSwapDialog()
+                    view?.dismiss(true)
+                }
+            })
+        }
+    }
+
+    private fun showSwapDialog() {
+        swapDialogDisposable?.dispose()
+        swapDialogDisposable = viewModel.onSwapButtonClicked().subscribe({
+            val argument = Bundle()
+            argument.putSerializable(Constants.EXTRA_TEAM, it as Serializable)
+            val dialog = SwapTeamFragment()
+            dialog.arguments = argument
+            dialog.setHostInterface(this)
+            dialog.show(supportFragmentManager, "SwapTeamFragment")
+        }, {
+            Timber.e(it)
         })
     }
 
