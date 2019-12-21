@@ -100,8 +100,10 @@
     </plurals>
 
     <string name="feature_manage_teams_title">Gérez vos équipes</string>
-    <string name="feature_manage_teams_description">Maintenant, vous pouvez avoir plus d\'une équipe!</string>
+    <string name="feature_manage_teams_description">Cliquez ici pour accéder au menu vous permettant de créer ou de changer d\'équipe</string>
 
-    <string name="feature_roaster_title">Créez votre composition initiale</string>
-    <string name="feature_roaster_description">Ajoutez les joueurs qui participeront au match!</string>
+    <string name="feature_roaster_title">Gérez votre composition initiale</string>
+    <string name="feature_roaster_description">Vous pouvez changer les joueurs qui participeront au match</string>
+
+    <string name="roaster_list_player_dialog_title">Liste des joueurs de l\'équipe</string>
 </resources>

@@ -87,6 +87,7 @@ class LineupCreationFragment: Fragment() {
                         checked.addAll(response.players.map { it.status })
 
                         AlertDialog.Builder(activity)
+                                .setTitle(R.string.roaster_list_player_dialog_title)
                                 .setMultiChoiceItems(names.toTypedArray(), checked.toBooleanArray()) { dialog, which, isChecked ->
                                     lineupViewModel.roasterPlayerStatusChanged(which, isChecked)
                                     updateRoasterSize(formView.playerCount, response)
@@ -118,6 +119,10 @@ class LineupCreationFragment: Fragment() {
                                             override fun onTargetClick(view: TapTargetView?) {
                                                 showRoasterDialog(form)
                                                 view?.dismiss(true)
+                                            }
+
+                                            override fun onOuterCircleClick(view: TapTargetView?) {
+                                                view?.dismiss(false)
                                             }
                                         })
                             }

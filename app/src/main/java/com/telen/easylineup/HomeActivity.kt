@@ -94,6 +94,10 @@ class HomeActivity : AppCompatActivity(), HostInterface {
                     showSwapDialog()
                     view?.dismiss(true)
                 }
+
+                override fun onOuterCircleClick(view: TapTargetView?) {
+                    view?.dismiss(false)
+                }
             })
         }
     }
@@ -134,6 +138,7 @@ class HomeActivity : AppCompatActivity(), HostInterface {
     override fun onCreateTeamClick() {
         closeDrawer()
         val intent = Intent(this, TeamCreationActivity::class.java)
+        intent.putExtra(Constants.EXTRA_CAN_EXIT, true)
         startActivity(intent)
     }
 

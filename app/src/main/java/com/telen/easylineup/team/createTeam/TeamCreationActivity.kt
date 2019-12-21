@@ -1,20 +1,19 @@
 package com.telen.easylineup.team.createTeam
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
-import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.GetTeamCreationNextStep
 import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.activity_team_creation.*
 import kotlinx.android.synthetic.main.view_create_team.*
+import timber.log.Timber
 
 class TeamCreationActivity: AppCompatActivity() {
 
@@ -69,6 +68,11 @@ class TeamCreationActivity: AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        viewModel.backPressed()
+        viewModel.backPressed(intent.extras)
+                .subscribe({
+                    finish()
+                }, {
+                    Timber.d("Cannot quit")
+                })
     }
 }
