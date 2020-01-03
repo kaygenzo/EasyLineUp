@@ -1,13 +1,8 @@
 package com.telen.easylineup.domain
 
-import android.content.SharedPreferences
 import android.view.View
 import androidx.annotation.StringRes
-import com.telen.easylineup.repository.model.Team
-import com.telen.easylineup.repository.data.TeamDao
-import com.telen.easylineup.repository.model.Constants
 import io.reactivex.Single
-import java.lang.IllegalArgumentException
 
 class GetTeamCreationNextStep: UseCase<GetTeamCreationNextStep.RequestValues, GetTeamCreationNextStep.ResponseValue>() {
 

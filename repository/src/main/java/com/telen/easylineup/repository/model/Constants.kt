@@ -17,6 +17,8 @@ class Constants {
         const val EXTRA_TEAM = "com.telen.extra.team"
         const val EXTRA_CAN_EXIT = "com.telen.extra.can_exit"
 
+        const val EXTRA_TRAINING_CARD = "com.telen.extra.training_card"
+
         const val NAME = "_name"
         const val IMAGE = "_image"
         const val PLAYER_SHIRT = "player_shirtNumber"
@@ -33,5 +35,8 @@ class Constants {
         const val TYPE_TEAM_SIZE = 1
         const val TYPE_MOST_USED_PLAYER = 2
         const val TYPE_SHAKE_BETA = 3
+
+        const val STATUS_ALL = 0
+        const val STATUS_NONE = 1
     }
 }

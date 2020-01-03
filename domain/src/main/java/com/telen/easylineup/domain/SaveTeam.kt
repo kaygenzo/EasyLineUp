@@ -12,8 +12,8 @@ class SaveTeam(val dao: TeamDao): UseCase<SaveTeam.RequestValues, SaveTeam.Respo
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.just(requestValues.team)
                 .flatMap { team ->
-                    if(!TextUtils.isEmpty(team.name.trim())) {
-                        //TODO put all other main to false
+                    if("" != team.name.trim()) {
+                        //TODO put all other main to false ?
                         if(team.id == 0L) {
                             dao.insertTeam(team).map { id ->
                                 team.id = id

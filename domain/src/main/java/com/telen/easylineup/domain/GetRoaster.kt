@@ -2,11 +2,9 @@ package com.telen.easylineup.domain
 
 import com.telen.easylineup.repository.data.LineupDao
 import com.telen.easylineup.repository.data.PlayerDao
+import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.repository.model.RoasterPlayerStatus
 import io.reactivex.Single
-
-const val STATUS_ALL = 0
-const val STATUS_NONE = 1
 
 class GetRoaster(private val dao: PlayerDao, private val lineupDao: LineupDao): UseCase<GetRoaster.RequestValues, GetRoaster.ResponseValue>() {
 
@@ -18,12 +16,12 @@ class GetRoaster(private val dao: PlayerDao, private val lineupDao: LineupDao): 
                         dao.getPlayers(requestValues.teamID).map { players ->
                             // if roasterIds is null, it means that all players are selected
                             val status = roasterIds?.let {
-                                if(it.size == players.size) STATUS_ALL else STATUS_NONE
-                            } ?: STATUS_ALL
+                                if(it.size == players.size) Constants.STATUS_ALL else Constants.STATUS_NONE
+                            } ?: Constants.STATUS_ALL
                             ResponseValue(status, players.map { RoasterPlayerStatus(it, roasterIds?.contains(it.id) ?: true) })
                         }
                     }
-        } ?: dao.getPlayers(requestValues.teamID).map { ResponseValue(STATUS_ALL, it.map { RoasterPlayerStatus(it, true) }) }
+        } ?: dao.getPlayers(requestValues.teamID).map { ResponseValue(Constants.STATUS_ALL, it.map { RoasterPlayerStatus(it, true) }) }
     }
 
     class ResponseValue(var status: Int, val players: List<RoasterPlayerStatus>): UseCase.ResponseValue
