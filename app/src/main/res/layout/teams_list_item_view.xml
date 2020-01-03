@@ -19,5 +19,7 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="@dimen/teams_list_item_size"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
     android:background="?android:attr/selectableItemBackground"
     style="@style/PeopleListItemViewStyle" />

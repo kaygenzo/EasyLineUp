@@ -13,7 +13,6 @@ import androidx.navigation.fragment.findNavController
 import com.getkeepsafe.taptargetview.TapTargetView
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.GetRoaster
-import com.telen.easylineup.domain.STATUS_ALL
 import com.telen.easylineup.lineup.list.LineupViewModel
 import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.repository.model.Tournament
@@ -135,7 +134,7 @@ class LineupCreationFragment: Fragment() {
 
     private fun updateRoasterSize(view: TextView, response: GetRoaster.ResponseValue) {
         when(response.status) {
-            STATUS_ALL -> {
+            Constants.STATUS_ALL -> {
                 view.text = getString(R.string.roaster_size_status_all)
             }
             else -> {
