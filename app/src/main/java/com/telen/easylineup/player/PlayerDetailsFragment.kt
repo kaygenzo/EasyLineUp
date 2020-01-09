@@ -50,7 +50,7 @@ class PlayerDetailsFragment: Fragment() {
 
         viewModel.getAllLineupsForPlayer().subscribe({
             view.gamesPlayedValue.text = it.values.sum().toString()
-            view.positionsChart.setData(it)
+            view.positionsBarChart.setData(it)
         }, {
             Timber.e(it)
         })
