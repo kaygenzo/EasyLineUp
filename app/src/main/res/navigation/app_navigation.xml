@@ -26,9 +26,9 @@
 
     <fragment
         android:id="@+id/playerDetailsFragment"
-        android:name="com.telen.easylineup.player.PlayerDetailsFragment"
+        android:name="com.telen.easylineup.player.PlayersDetailsContainerFragment"
         android:label="@string/title_player_details"
-        tools:layout="@layout/fragment_player_details"/>
+        tools:layout="@layout/fragment_players_details_container"/>
 
     <fragment
         android:id="@+id/playerEditFragment"
