@@ -60,9 +60,7 @@ class HomeActivity : AppCompatActivity(), HostInterface {
 
         drawerHeader.setOnImageClickListener(View.OnClickListener {
             viewModel.getTeam().subscribe({
-                val arguments = Bundle()
-                arguments.putSerializable(Constants.EXTRA_TEAM, it)
-                navController.navigate(R.id.teamEditFragment, arguments, NavigationUtils().getOptions())
+                navController.navigate(R.id.teamDetailsFragment, null, NavigationUtils().getOptions())
                 closeDrawer()
             }, {
                 Timber.e(it)

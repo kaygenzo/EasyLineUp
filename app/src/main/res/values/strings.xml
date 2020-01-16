@@ -31,6 +31,7 @@
     <string name="title_player_edition">Player edition</string>
     <string name="title_lineup_edition">Lineup edition</string>
     <string name="title_team_edition">Team edition</string>
+    <string name="title_team_details">Team details</string>
 
     <string name="team_creation_error_name_empty">Team name cannot be empty</string>
 
@@ -113,5 +114,14 @@
     <string name="feature_roaster_description">You can now change players who will play the game!</string>
 
     <string name="roaster_list_player_dialog_title">List of all team players</string>
+
+    <string name="team_details_type_baseball">Baseball team</string>
+    <string name="team_details_type_softball">Softball team</string>
+    <string name="team_details_type_unknown">Team type undefined</string>
+
+    <plurals name="team_details_team_size">
+        <item quantity="one">Your team is composed of %d member</item>
+        <item quantity="other">Your team is composed of %d members</item>
+    </plurals>
 
 </resources>

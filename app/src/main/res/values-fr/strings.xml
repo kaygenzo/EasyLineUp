@@ -28,6 +28,7 @@
     <string name="title_player_edition">Modification de joueur</string>
     <string name="title_lineup_edition">Modification de lineup</string>
     <string name="title_team_edition">Modification de l\'équipe</string>
+    <string name="title_team_details">Infos d\'équipe</string>
 
     <string name="team_creation_error_name_empty">Le nom de l\'équipe ne peut pas être vide</string>
 
@@ -106,4 +107,13 @@
     <string name="feature_roaster_description">Vous pouvez changer les joueurs qui participeront au match</string>
 
     <string name="roaster_list_player_dialog_title">Liste des joueurs de l\'équipe</string>
+
+    <string name="team_details_type_baseball">Equipe de Baseball</string>
+    <string name="team_details_type_softball">Equipe de Softball</string>
+    <string name="team_details_type_unknown">Type d\'équipe non défini</string>
+
+    <plurals name="team_details_team_size">
+        <item quantity="one">Votre équipe est composée de %d membre</item>
+        <item quantity="other">Votre équipe est composée de %d membres</item>
+    </plurals>
 </resources>

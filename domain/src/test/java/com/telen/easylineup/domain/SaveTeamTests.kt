@@ -80,4 +80,15 @@ class SaveTeamTests {
         verify(teamDao, never()).updateTeam(any())
         Assert.assertEquals(2L, observer.values().first().team.id)
     }
+
+    @Test
+    fun shouldCorrectTeamTypeIfUnknown() {
+        mTeam.type = TeamType.UNKNOWN.id
+        val request = SaveTeam.RequestValues(mTeam)
+        val observer = TestObserver<SaveTeam.ResponseValue>()
+        mSaveTeam.executeUseCase(request).subscribe(observer)
+        observer.await()
+        observer.assertComplete()
+        Assert.assertEquals(TeamType.BASEBALL.id, observer.values().first().team.type)
+    }
 }

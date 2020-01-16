@@ -10,6 +10,7 @@ import androidx.navigation.findNavController
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.GetTeamCreationNextStep
 import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.model.Team
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.activity_team_creation.*
 import kotlinx.android.synthetic.main.view_create_team.*
@@ -26,6 +27,10 @@ class TeamCreationActivity: AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
 
         viewModel = ViewModelProviders.of(this).get(SetupViewModel::class.java)
+
+        intent.extras?.get(Constants.EXTRA_TEAM)?.let {
+            viewModel.team = it as Team
+        }
 
         viewModel.stepLiveData.observe(this, Observer {
 

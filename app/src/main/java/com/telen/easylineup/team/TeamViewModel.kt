@@ -5,6 +5,7 @@ import com.telen.easylineup.UseCaseHandler
 import com.telen.easylineup.domain.GetPlayers
 import com.telen.easylineup.domain.GetTeam
 import com.telen.easylineup.repository.model.Player
+import com.telen.easylineup.repository.model.Team
 import io.reactivex.Single
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -17,5 +18,9 @@ class TeamViewModel: ViewModel(), KoinComponent {
     fun getPlayers(): Single<List<Player>> {
         return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
                 .flatMap { team -> UseCaseHandler.execute(getPlayersUseCase, GetPlayers.RequestValues(team.id)).map { it.players } }
+    }
+
+    fun getTeam(): Single<Team> {
+        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
     }
 }
