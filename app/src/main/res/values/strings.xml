@@ -44,6 +44,7 @@
 
     <string name="nav_header_desc">Navigation header</string>
 
+    <string name="dialog_delete_team_title">Delete team %s ?</string>
     <string name="dialog_delete_lineup_title">Delete lineup ?</string>
     <string name="dialog_delete_player_title">Delete player ?</string>
     <string name="dialog_delete_tournament_title">Delete tournament %s ?</string>

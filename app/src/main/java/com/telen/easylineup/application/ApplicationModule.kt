@@ -37,4 +37,5 @@ val appModules = module {
     single { SaveLineupMode(get()) }
     single { UpdatePlayersWithLineupMode(get()) }
     single { GetRoaster(get(), get()) }
+    single { DeleteTeam(get()) }
 }

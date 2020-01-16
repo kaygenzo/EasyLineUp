@@ -16,6 +16,7 @@ class Constants {
         const val EXTRA_CLICKABLE = "com.telen.extra.clickable"
         const val EXTRA_TEAM = "com.telen.extra.team"
         const val EXTRA_CAN_EXIT = "com.telen.extra.can_exit"
+        const val EXTRA_TEAM_COUNT = "com.telen.extra.team_count"
 
         const val EXTRA_TRAINING_CARD = "com.telen.extra.training_card"
 

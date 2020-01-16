@@ -18,7 +18,8 @@ import com.telen.easylineup.repository.model.Team
 import com.telen.easylineup.repository.model.TeamType
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
-import com.telen.easylineup.utils.NavigationUtils
+import com.telen.easylineup.utils.DialogFactory
+import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_details_team.*
 import timber.log.Timber
@@ -77,6 +78,18 @@ class TeamDetailsFragment: Fragment() {
                     }
                     catch (e: Exception) {
                         Timber.d("Image is surely null or something bad happened: ${e.message}")
+                        teamImage.post {
+                            Picasso.get().load(R.drawable.ic_unknown_team)
+                                    .resize(teamImage.width, teamImage.height)
+                                    .centerCrop()
+                                    .transform(RoundedTransformationBuilder()
+                                            .borderColor(Color.BLACK)
+                                            .borderWidthDp(2f)
+                                            .cornerRadiusDp(16f)
+                                            .oval(true)
+                                            .build())
+                                    .into(teamImage)
+                        }
                     }
 
                     when(it.type) {
@@ -130,7 +143,13 @@ class TeamDetailsFragment: Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.team_edit_menu, menu)
+        arguments?.getInt(Constants.EXTRA_TEAM_COUNT)?.let {
+            if(it < 2)
+                inflater.inflate(R.menu.team_edit_menu, menu)
+            else {
+                inflater.inflate(R.menu.team_edit_or_delete_menu, menu)
+            }
+        }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -142,6 +161,27 @@ class TeamDetailsFragment: Fragment() {
                     intent.putExtra(Constants.EXTRA_CAN_EXIT, true)
                     intent.putExtra(Constants.EXTRA_TEAM, it)
                     startActivityForResult(intent, REQUEST_EDIT_TEAM)
+                }
+                true
+            }
+            R.id.action_delete -> {
+                activity?.let {
+                    team?.let { team ->
+                        val teamViewModel = ViewModelProviders.of(this)[TeamViewModel::class.java]
+                        DialogFactory.getWarningDialog(it,
+                                it.getString(R.string.dialog_delete_team_title, team.name),
+                                it.getString(R.string.dialog_delete_cannot_undo_message),
+                                Completable.create { emitter ->
+                                    teamViewModel.deleteTeam(team)
+                                            .subscribe({
+                                                findNavController().popBackStack()
+                                            }, {
+                                                Timber.e(it)
+                                            })
+                                    emitter.onComplete()
+                                })
+                                .show()
+                    }
                 }
                 true
             }

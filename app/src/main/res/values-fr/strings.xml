@@ -41,6 +41,7 @@
 
     <string name="nav_header_desc">En-tête de navigation</string>
 
+    <string name="dialog_delete_team_title">Supprimer l\'équipe %s ?</string>
     <string name="dialog_delete_lineup_title">Supprimer le lineup ?</string>
     <string name="dialog_delete_player_title">Supprimer le joueur ?</string>
     <string name="dialog_delete_tournament_title">Supprimer le tournoi %s ?</string>

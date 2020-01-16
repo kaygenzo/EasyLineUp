@@ -30,8 +30,16 @@ class HomeViewModel: ViewModel(), KoinComponent {
         }
     }
 
-    fun onSwapButtonClicked(): Single<List<Team>> {
+    private fun getAllTeams(): Single<List<Team>> {
         return UseCaseHandler.execute(getAllTeamsUseCase, GetAllTeams.RequestValues()).map { it.teams }
+    }
+
+    fun getTeamsCount(): Single<Int> {
+        return getAllTeams().map { it.size }
+    }
+
+    fun onSwapButtonClicked(): Single<List<Team>> {
+        return getAllTeams()
     }
 
     fun updateCurrentTeam(currentTeam: Team): Completable {
