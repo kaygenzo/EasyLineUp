@@ -22,6 +22,7 @@ import com.telen.easylineup.application.App
 import com.telen.easylineup.domain.*
 import com.telen.easylineup.repository.model.*
 import com.telen.easylineup.repository.model.FieldPosition
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -98,6 +99,8 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     private val updatePlayersWithLineupMode: UpdatePlayersWithLineupMode by inject()
     private val getRoasterUseCase: GetRoaster by inject()
     private val getTeamUseCase: GetTeam by inject()
+    private val switchPlayersPositionUseCase: SwitchPlayersPosition by inject()
+    private val reassignPlayerPosition: ReassignPlayerPosition by inject()
 
     fun savePlayerFieldPosition(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean) {
 
@@ -234,6 +237,14 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                 }
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun switchPlayersPosition(p1: PlayerWithPosition, p2: PlayerWithPosition): Completable {
+        return UseCaseHandler.execute(switchPlayersPositionUseCase, SwitchPlayersPosition.RequestValues(p1, p2)).ignoreElement()
+    }
+
+    fun changePlayerPosition(p: PlayerWithPosition, newPosition: FieldPosition): Completable {
+        return UseCaseHandler.execute(reassignPlayerPosition, ReassignPlayerPosition.RequestValues(p, newPosition)).ignoreElement()
     }
 
     ///////////// LIVE DATA OBSERVER //////////////
