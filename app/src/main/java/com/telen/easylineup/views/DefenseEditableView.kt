@@ -3,7 +3,9 @@ package com.telen.easylineup.views
 import android.content.ClipData
 import android.content.ClipDescription
 import android.content.Context
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Point
 import android.os.Build
 import android.util.AttributeSet
 import android.view.DragEvent
@@ -132,7 +134,7 @@ class DefenseEditableView: DefenseView {
                         val playerPosition = ClipData.Item(pos.name)
                         val dragData = ClipData(ClipDescription(playerTag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)), playerID)
                         dragData.addItem(playerPosition)
-                        val shadowBuilder = DragShadowBuilder(playerView)
+                        val shadowBuilder = PlayerDragShadowBuilder(playerView)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             playerView.startDragAndDrop(dragData, shadowBuilder, null, 0)
                         } else {
@@ -296,7 +298,7 @@ class DefenseEditableView: DefenseView {
                             val playerPosition = ClipData.Item(position.name)
                             val dragData = ClipData(ClipDescription(player.id.toString(), arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)), playerID)
                             dragData.addItem(playerPosition)
-                            val shadowBuilder = DragShadowBuilder(this)
+                            val shadowBuilder = PlayerDragShadowBuilder(this)
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 startDragAndDrop(dragData, shadowBuilder, null, 0)
                             } else {
@@ -370,5 +372,36 @@ class DefenseEditableView: DefenseView {
 
             }
         }
+    }
+}
+
+class PlayerDragShadowBuilder(view: View): View.DragShadowBuilder(view) {
+
+    private var mScaleFactor: Point? = null
+
+    override fun onProvideShadowMetrics(outShadowSize: Point?, outShadowTouchPoint: Point?) {
+
+        // Sets the width of the shadow to half the width of the original View
+        val width = view.width * 2
+
+        // Sets the height of the shadow to half the height of the original View
+        val height = view.height * 2
+
+        // Sets the size parameter's width and height values. These get back to the system
+        // through the size parameter.
+        outShadowSize?.set(width, height)
+        // Sets size parameter to member that will be used for scaling shadow image.
+        mScaleFactor = outShadowSize
+
+        // Sets the touch point's position to be in the middle of the drag shadow
+        outShadowTouchPoint?.set(width / 2, height / 2)
+    }
+
+    override fun onDrawShadow(canvas: Canvas?) {
+        // Draws the ColorDrawable in the Canvas passed in from the system.
+        mScaleFactor?.let {
+            canvas?.scale(it.x / view.width.toFloat(), it.y / view.height.toFloat())
+            view.draw(canvas)
+        } ?: super.onDrawShadow(canvas)
     }
 }
