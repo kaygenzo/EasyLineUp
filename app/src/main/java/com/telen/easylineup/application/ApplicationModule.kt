@@ -40,4 +40,5 @@ val appModules = module {
     single { DeleteTeam(get()) }
     single { SwitchPlayersPosition(get()) }
     single { ReassignPlayerPosition(get()) }
+    single { DeleteAllData(get(), get()) }
 }

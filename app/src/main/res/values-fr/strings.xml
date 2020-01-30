@@ -117,4 +117,11 @@
         <item quantity="one">Votre équipe est composée de %d membre</item>
         <item quantity="other">Votre équipe est composée de %d membres</item>
     </plurals>
+
+    <string name="setting_category_display_title">Affichage</string>
+    <string name="setting_category_data_title">Données</string>
+    <string name="setting_category_about_title">A propos</string>
+    <string name="setting_delete_data_description">Supprimer toutes les données</string>
+    <string name="setting_version_title">Version</string>
+    <string name="setting_play_store_title">Page officielle du Google Play store</string>
 </resources>

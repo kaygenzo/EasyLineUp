@@ -14,6 +14,9 @@ interface TeamDao {
     @Delete
     fun deleteTeam(team: Team): Completable
 
+    @Delete
+    fun deleteTeams(team: List<Team>): Completable
+
     @Update
     fun updateTeam(team: Team): Completable
 
