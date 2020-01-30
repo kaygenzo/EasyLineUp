@@ -102,7 +102,7 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
         })
     }
 
-    override fun onTournamentLongClicked(tournament: Tournament) {
+    override fun onDeleteTournamentClicked(tournament: Tournament) {
         activity?.let {
             val task: Completable = viewModel.deleteTournament(tournament)
                     .doOnError {throwable ->
@@ -114,6 +114,10 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
             DialogFactory.getWarningDialog(it, it.getString(R.string.dialog_delete_tournament_title, tournament.name),
                     it.getString(R.string.dialog_delete_cannot_undo_message), task).show()
         }
+    }
+
+    override fun onStatisticsTournamentClicked(tournament: Tournament) {
+
     }
 
     override fun onHeaderClicked() {
