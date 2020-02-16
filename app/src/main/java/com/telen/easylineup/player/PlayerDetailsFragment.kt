@@ -32,13 +32,17 @@ class PlayerDetailsFragment: Fragment() {
             view.shirtNumberValue.text = it.shirtNumber.toString()
             view.playerName.text = it.name.trim()
 
-            view.playerImage?.post {
-                Picasso.get().load(it.image)
-                        .resize(view.playerImage.width, view.playerImage.height)
-                        .centerCrop()
-                        .placeholder(R.drawable.ic_unknown_field_player)
-                        .error(R.drawable.ic_unknown_field_player)
-                        .into(view.playerImage)
+            try {
+                view.playerImage?.post {
+                    Picasso.get().load(it.image)
+                            .resize(view.playerImage.width, view.playerImage.height)
+                            .centerCrop()
+                            .placeholder(R.drawable.ic_unknown_field_player)
+                            .error(R.drawable.ic_unknown_field_player)
+                            .into(view.playerImage)
+                }
+            } catch (e: IllegalArgumentException) {
+                Timber.e(e)
             }
         }, {
             Timber.e(it)

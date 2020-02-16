@@ -17,16 +17,14 @@ package com.telen.easylineup.team.swap
  */
 
 import android.content.Context
-import android.net.Uri
-import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
-import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.team_item_view.view.*
+import timber.log.Timber
 
 class TeamItemView: LinearLayout {
 
@@ -62,13 +60,17 @@ class TeamItemView: LinearLayout {
 
     fun setImage(stringUri: String?) {
         val size = resources.getDimensionPixelSize(R.dimen.teams_list_icon_size)
-        Picasso.get().load(stringUri)
-                .resize(size, size)
-                .centerCrop()
-                .transform(RoundedTransformationBuilder()
-                        .cornerRadiusDp(16f)
-                        .oval(true)
-                        .build())
-                .into(teamIcon)
+        try {
+            Picasso.get().load(stringUri)
+                    .resize(size, size)
+                    .centerCrop()
+                    .transform(RoundedTransformationBuilder()
+                            .cornerRadiusDp(16f)
+                            .oval(true)
+                            .build())
+                    .into(teamIcon)
+        } catch (e: IllegalArgumentException) {
+            Timber.e(e)
+        }
     }
 }

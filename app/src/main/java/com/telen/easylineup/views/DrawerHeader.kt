@@ -11,6 +11,7 @@ import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.nav_drawer_header.view.*
+import timber.log.Timber
 
 class DrawerHeader(context: Context): ConstraintLayout(context) {
 
@@ -20,18 +21,22 @@ class DrawerHeader(context: Context): ConstraintLayout(context) {
 
     fun setImage(image: String?) {
         drawerImage.post {
-            Picasso.get().load(image)
-                    .resize(drawerImage.width, drawerImage.height)
-                    .centerCrop()
-                    .transform(RoundedTransformationBuilder()
-                            .borderColor(Color.BLACK)
-                            .borderWidthDp(2f)
-                            .cornerRadiusDp(16f)
-                            .oval(true)
-                            .build())
-                    .placeholder(R.drawable.ic_unknown_team)
-                    .error(R.drawable.ic_unknown_team)
-                    .into(drawerImage)
+            try {
+                Picasso.get().load(image)
+                        .resize(drawerImage.width, drawerImage.height)
+                        .centerCrop()
+                        .transform(RoundedTransformationBuilder()
+                                .borderColor(Color.BLACK)
+                                .borderWidthDp(2f)
+                                .cornerRadiusDp(16f)
+                                .oval(true)
+                                .build())
+                        .placeholder(R.drawable.ic_unknown_team)
+                        .error(R.drawable.ic_unknown_team)
+                        .into(drawerImage)
+            } catch (e: IllegalArgumentException) {
+                Timber.e(e)
+            }
         }
     }
 

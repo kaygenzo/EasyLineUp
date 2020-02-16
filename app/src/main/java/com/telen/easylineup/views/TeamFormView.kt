@@ -99,27 +99,31 @@ class TeamFormView: ConstraintLayout {
     fun setImage(path: String) {
         imageUri = Uri.parse(path)
         teamImage.post {
-            Picasso.get().load(path)
-                    .resize(teamImage.width, teamImage.height)
-                    .centerCrop()
-                    .transform(RoundedTransformationBuilder()
-                            .borderColor(Color.BLACK)
-                            .borderWidthDp(2f)
-                            .cornerRadiusDp(16f)
-                            .oval(true)
-                            .build())
-                    .placeholder(R.drawable.ic_unknown_team)
-                    .error(R.drawable.ic_unknown_team)
-                    .into(teamImage,object: Callback {
-                        override fun onSuccess() {
-                            Timber.e("Successfully loaded image")
-                        }
+            try {
+                Picasso.get().load(path)
+                        .resize(teamImage.width, teamImage.height)
+                        .centerCrop()
+                        .transform(RoundedTransformationBuilder()
+                                .borderColor(Color.BLACK)
+                                .borderWidthDp(2f)
+                                .cornerRadiusDp(16f)
+                                .oval(true)
+                                .build())
+                        .placeholder(R.drawable.ic_unknown_team)
+                        .error(R.drawable.ic_unknown_team)
+                        .into(teamImage,object: Callback {
+                            override fun onSuccess() {
+                                Timber.e("Successfully loaded image")
+                            }
 
-                        override fun onError(e: Exception?) {
-                            Timber.e(e)
-                        }
+                            override fun onError(e: Exception?) {
+                                Timber.e(e)
+                            }
 
-                    })
+                        })
+            } catch (e: IllegalArgumentException) {
+                Timber.e(e)
+            }
         }
 
         imageUri?.let {

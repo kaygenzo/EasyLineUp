@@ -53,42 +53,50 @@ class TeamDetailsFragment: Fragment() {
                     try {
                         val imageUri = Uri.parse(it.image)
                         teamImage.post {
-                            Picasso.get().load(imageUri)
-                                    .resize(teamImage.width, teamImage.height)
-                                    .centerCrop()
-                                    .transform(RoundedTransformationBuilder()
-                                            .borderColor(Color.BLACK)
-                                            .borderWidthDp(2f)
-                                            .cornerRadiusDp(16f)
-                                            .oval(true)
-                                            .build())
-                                    .placeholder(R.drawable.ic_unknown_team)
-                                    .error(R.drawable.ic_unknown_team)
-                                    .into(teamImage, object : Callback {
-                                        override fun onSuccess() {
-                                            Timber.e("Successfully loaded image")
-                                        }
+                            try {
+                                Picasso.get().load(imageUri)
+                                        .resize(teamImage.width, teamImage.height)
+                                        .centerCrop()
+                                        .transform(RoundedTransformationBuilder()
+                                                .borderColor(Color.BLACK)
+                                                .borderWidthDp(2f)
+                                                .cornerRadiusDp(16f)
+                                                .oval(true)
+                                                .build())
+                                        .placeholder(R.drawable.ic_unknown_team)
+                                        .error(R.drawable.ic_unknown_team)
+                                        .into(teamImage, object : Callback {
+                                            override fun onSuccess() {
+                                                Timber.e("Successfully loaded image")
+                                            }
 
-                                        override fun onError(e: Exception?) {
-                                            Timber.e(e)
-                                        }
+                                            override fun onError(e: Exception?) {
+                                                Timber.e(e)
+                                            }
 
-                                    })
+                                        })
+                            } catch (e: IllegalArgumentException) {
+                                Timber.e(e)
+                            }
                         }
                     }
                     catch (e: Exception) {
                         Timber.d("Image is surely null or something bad happened: ${e.message}")
                         teamImage.post {
-                            Picasso.get().load(R.drawable.ic_unknown_team)
-                                    .resize(teamImage.width, teamImage.height)
-                                    .centerCrop()
-                                    .transform(RoundedTransformationBuilder()
-                                            .borderColor(Color.BLACK)
-                                            .borderWidthDp(2f)
-                                            .cornerRadiusDp(16f)
-                                            .oval(true)
-                                            .build())
-                                    .into(teamImage)
+                            try {
+                                Picasso.get().load(R.drawable.ic_unknown_team)
+                                        .resize(teamImage.width, teamImage.height)
+                                        .centerCrop()
+                                        .transform(RoundedTransformationBuilder()
+                                                .borderColor(Color.BLACK)
+                                                .borderWidthDp(2f)
+                                                .cornerRadiusDp(16f)
+                                                .oval(true)
+                                                .build())
+                                        .into(teamImage)
+                            } catch (e: IllegalArgumentException) {
+                                Timber.e(e)
+                            }
                         }
                     }
 

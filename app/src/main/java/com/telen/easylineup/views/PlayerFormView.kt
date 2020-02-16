@@ -14,6 +14,7 @@ import com.squareup.picasso.Picasso
 import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.view_create_player.view.*
+import timber.log.Timber
 
 interface PlayerFormListener {
     fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int)
@@ -124,18 +125,22 @@ class PlayerFormView: ConstraintLayout {
         imageUri = Uri.parse(imagePath)
 
         playerImage.post {
-            Picasso.get().load(imageUri)
-                    .resize(playerImage.width, playerImage.height)
-                    .centerCrop()
-                    .transform(RoundedTransformationBuilder()
-                            .borderColor(Color.BLACK)
-                            .borderWidthDp(2f)
-                            .cornerRadiusDp(16f)
-                            .oval(true)
-                            .build())
-                    .placeholder(R.drawable.unknown_player)
-                    .error(R.drawable.unknown_player)
-                    .into(playerImage)
+            try {
+                Picasso.get().load(imageUri)
+                        .resize(playerImage.width, playerImage.height)
+                        .centerCrop()
+                        .transform(RoundedTransformationBuilder()
+                                .borderColor(Color.BLACK)
+                                .borderWidthDp(2f)
+                                .cornerRadiusDp(16f)
+                                .oval(true)
+                                .build())
+                        .placeholder(R.drawable.unknown_player)
+                        .error(R.drawable.unknown_player)
+                        .into(playerImage)
+            } catch (e: IllegalArgumentException) {
+                Timber.e(e)
+            }
         }
 
         imageUri?.let {

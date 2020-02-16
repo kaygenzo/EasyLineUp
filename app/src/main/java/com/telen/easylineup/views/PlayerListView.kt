@@ -16,6 +16,7 @@ import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.R
 import com.telen.easylineup.repository.model.Player
 import kotlinx.android.synthetic.main.view_bottom_sheet_player_list.view.*
+import timber.log.Timber
 
 interface OnPlayerClickListener {
     fun onPlayerSelected(player: Player)
@@ -92,12 +93,16 @@ class PlayerListAdapter(val list: List<Player>, val playerListener: OnPlayerClic
         }
 
         holder.image.post {
-            Picasso.get().load(player.image)
-                    .resize(holder.image.width, holder.image.height)
-                    .centerCrop()
-                    .placeholder(R.drawable.ic_unknown_field_player)
-                    .error(R.drawable.ic_unknown_field_player)
-                    .into(holder.image)
+            try {
+                Picasso.get().load(player.image)
+                        .resize(holder.image.width, holder.image.height)
+                        .centerCrop()
+                        .placeholder(R.drawable.ic_unknown_field_player)
+                        .error(R.drawable.ic_unknown_field_player)
+                        .into(holder.image)
+            } catch (e: IllegalArgumentException) {
+                Timber.e(e)
+            }
         }
 
         holder.root.setOnClickListener {
