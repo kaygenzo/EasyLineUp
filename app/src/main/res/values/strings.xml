@@ -27,6 +27,7 @@
     <string name="title_team">Team Roster</string>
     <string name="title_lineups">My Lineups</string>
     <string name="title_settings">Settings</string>
+    <string name="title_tournament_summary">Summary</string>
     <string name="title_player_details">Statistics</string>
     <string name="title_player_edition">Player edition</string>
     <string name="title_lineup_edition">Lineup edition</string>

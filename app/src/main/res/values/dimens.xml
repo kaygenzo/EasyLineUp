@@ -48,4 +48,9 @@
     <dimen name="teams_list_icon_size">40dp</dimen>
     <dimen name="teams_list_item_size">56dp</dimen>
 
+    <dimen name="table_multiple_scroll_cell_width">50dp</dimen>
+    <dimen name="table_multiple_scroll_cell_height">30dp</dimen>
+    <dimen name="table_multiple_scroll_left_header_width">90dp</dimen>
+    <dimen name="table_multiple_scroll_top_header_height">30dp</dimen>
+
 </resources>

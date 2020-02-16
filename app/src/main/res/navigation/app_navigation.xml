@@ -59,4 +59,10 @@
         android:name="com.telen.easylineup.settings.SettingsFragment"
         android:label="@string/title_settings" />
 
+    <fragment
+        android:id="@+id/tournamentStatisticsTableFragment"
+        android:name="com.telen.easylineup.lineup.statistics.TournamentStatisticsTableFragment"
+        android:label="@string/title_tournament_summary"
+        tools:layout="@layout/view_table_multi_scroll"/>
+
 </navigation>

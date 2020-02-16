@@ -2,4 +2,7 @@
 <resources>
     <string name="team_creation_label_next">Suivant</string>
     <string name="team_creation_label_finish">Terminer</string>
+
+    <string name="tournament_stats_unknown_player_name">Inconnu</string>
+    <string name="tournament_stats_label_games_played">Total</string>
 </resources>

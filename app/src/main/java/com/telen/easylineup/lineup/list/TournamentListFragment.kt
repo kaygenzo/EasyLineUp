@@ -117,7 +117,9 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
     }
 
     override fun onStatisticsTournamentClicked(tournament: Tournament) {
-
+        val extras = Bundle()
+        extras.putSerializable(Constants.EXTRA_TOURNAMENT, tournament)
+        findNavController().navigate(R.id.tournamentStatisticsTableFragment, extras, NavigationUtils().getOptions())
     }
 
     override fun onHeaderClicked() {

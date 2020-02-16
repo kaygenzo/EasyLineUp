@@ -24,6 +24,7 @@
     <string name="title_team">Joueurs</string>
     <string name="title_lineups">Mes Lineups</string>
     <string name="title_settings">Paramètres</string>
+    <string name="title_tournament_summary">Résumé</string>
     <string name="title_player_details">Statistiques</string>
     <string name="title_player_edition">Modification de joueur</string>
     <string name="title_lineup_edition">Modification de lineup</string>

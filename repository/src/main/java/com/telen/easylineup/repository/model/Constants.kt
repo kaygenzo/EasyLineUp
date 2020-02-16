@@ -26,6 +26,8 @@ class Constants {
         const val PLAYER_LICENSE = "player_licenseNumber"
         const val PLAYER_POSITIONS = "player_positions"
 
+        const val EXTRA_TOURNAMENT = "com.telen.extra.tournament"
+
         const val MIN_PLAYER_COUNT = 9
 
         const val SUBSTITUTE_ORDER_VALUE = 200

@@ -3,15 +3,16 @@ package com.telen.easylineup.repository.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(
         tableName = "tournaments"
 )
-data class Tournament(
+data class Tournament (
         @PrimaryKey(autoGenerate = true) var id: Long = 0,
         @ColumnInfo(name = "name") val name: String,
         @ColumnInfo(name = "createdAt") var createdAt: Long
-) {
+): Serializable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

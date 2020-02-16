@@ -41,4 +41,5 @@ val appModules = module {
     single { SwitchPlayersPosition(get()) }
     single { ReassignPlayerPosition(get()) }
     single { DeleteAllData(get(), get()) }
+    single { GetTournamentStatsForPositionTable(get()) }
 }
