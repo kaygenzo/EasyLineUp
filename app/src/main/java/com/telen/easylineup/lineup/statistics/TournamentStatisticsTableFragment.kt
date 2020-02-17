@@ -11,7 +11,8 @@ import androidx.lifecycle.ViewModelProviders
 import com.telen.easylineup.R
 import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.repository.model.Tournament
-import com.telen.library.widget.tablemultiscroll.views.MultipleScrollTableView
+import com.telen.library.widget.tablemultiscroll.views.StyleConfiguration
+import com.telen.library.widget.tablemultiscroll.views.TableConfiguration
 import kotlinx.android.synthetic.main.fragment_tournament_statistics_table.view.*
 
 class TournamentStatisticsTableFragment: Fragment() {
@@ -26,7 +27,7 @@ class TournamentStatisticsTableFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_tournament_statistics_table, container, false)
 
-        val headersStyle = MultipleScrollTableView.StyleConfiguration(
+        val headersStyle = StyleConfiguration(
                 cellTextSize = R.dimen.text_size_middle,
                 cellTextTypeface = Typeface.DEFAULT_BOLD,
                 cellDefaultBackgroundColor = R.color.tile_player_most_used_header_color,
@@ -36,7 +37,7 @@ class TournamentStatisticsTableFragment: Fragment() {
         view.tableMultiScroll.setLeftHeaderStyle(headersStyle)
         view.tableMultiScroll.setTopHeaderStyle(headersStyle)
 
-        view.tableMultiScroll.setTableConfiguration(MultipleScrollTableView.TableConfiguration(
+        view.tableMultiScroll.setTableConfiguration(TableConfiguration(
                 cellHeight = R.dimen.table_multiple_scroll_cell_height,
                 cellWidth = R.dimen.table_multiple_scroll_cell_width,
                 topHeaderHeight = R.dimen.table_multiple_scroll_top_header_height,
@@ -53,6 +54,10 @@ class TournamentStatisticsTableFragment: Fragment() {
 
         viewModel.mainTableData.observe(this, Observer {
             view.tableMultiScroll.setMainData(it)
+        })
+
+        viewModel.columnHighlights.observe(this, Observer {
+            view.tableMultiScroll.setColumnHighlights(it)
         })
 
         arguments?.getSerializable(Constants.EXTRA_TOURNAMENT)?.let { tournament ->

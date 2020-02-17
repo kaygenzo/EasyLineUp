@@ -46,7 +46,9 @@ class GetTournamentStatsForPositionTable(val dao: LineupDao): UseCase<GetTournam
                         mainData.add(data)
 
                         //games played
-                        val gamesCount = playerIdToData[entry.key]?.size?.toString() ?: "0"
+                        val gamesCount = playerIdToData[entry.key]
+                                ?.filter{ !FieldPosition.isSubstitute(it.position ?: FieldPosition.SUBSTITUTE.position) }
+                                ?.size?.toString() ?: "0"
                         data.add(Pair(gamesCount, -1))
 
                         playerIdToData[entry.key]?.let { positions ->
@@ -57,13 +59,14 @@ class GetTournamentStatsForPositionTable(val dao: LineupDao): UseCase<GetTournam
                         }
                     }
 
-                    ResponseValue(leftHeaderData, topHeaderData, mainData)
+                    ResponseValue(leftHeaderData, topHeaderData, mainData, mutableListOf(FieldPosition.SUBSTITUTE.position))
                 }
     }
 
     class ResponseValue(val leftHeader: List<Pair<String, Int>>,
                         val topHeader: List<Pair<String, Int>>,
-                        val mainTable: List<List<Pair<String, Int>>>): UseCase.ResponseValue
+                        val mainTable: List<List<Pair<String, Int>>>,
+                        val columnToHighlight: List<Int>): UseCase.ResponseValue
 
     class RequestValues(val tournament: Tournament, val team: Team, val context: Context): UseCase.RequestValues
 }
