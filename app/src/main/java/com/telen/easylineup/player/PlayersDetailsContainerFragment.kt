@@ -26,8 +26,16 @@ class PlayersDetailsContainerFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        mAdapter = PlayersDetailsPagerAdapter(playersIds, parentFragmentManager)
+        mAdapter = PlayersDetailsPagerAdapter(playersIds, childFragmentManager)
         teamViewModel = ViewModelProviders.of(this)[TeamViewModel::class.java]
+
+        val playerID = savedInstanceState?.getLong(Constants.PLAYER_ID) ?: arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
+        teamViewModel.setPlayerId(playerID)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putLong(Constants.PLAYER_ID, teamViewModel.getPlayerId())
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,10 +54,10 @@ class PlayersDetailsContainerFragment: Fragment() {
                     playersIds.addAll(players.map { it.id })
                     mAdapter.notifyDataSetChanged()
 
-                    val playerID = arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
-                    val index = if(playersIds.indexOf(playerID) >= 0) {
-                        playersIds.indexOf(playerID)
+                    val index = if(playersIds.indexOf(teamViewModel.getPlayerId()) >= 0) {
+                        playersIds.indexOf(teamViewModel.getPlayerId())
                     } else  0 // not supposed to happen...
+
                     pager.setCurrentItem(index, false)
                 }, {
                     Timber.e(it)
@@ -64,6 +72,7 @@ class PlayersDetailsContainerFragment: Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         val selectedPlayerId = playersIds[pager.currentItem]
+        teamViewModel.setPlayerId(selectedPlayerId)
 
         return when (item.itemId) {
             R.id.action_edit -> {

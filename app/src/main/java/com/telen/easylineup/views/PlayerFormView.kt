@@ -13,6 +13,7 @@ import com.nguyenhoanglam.imagepicker.model.Image
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.R
+import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.view_create_player.view.*
 import timber.log.Timber
 
@@ -124,7 +125,7 @@ class PlayerFormView: ConstraintLayout {
 
         imageUri = Uri.parse(imagePath)
 
-        playerImage.post {
+        playerImage.ready {
             try {
                 Picasso.get().load(imageUri)
                         .resize(playerImage.width, playerImage.height)

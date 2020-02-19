@@ -14,6 +14,7 @@ import com.nguyenhoanglam.imagepicker.model.Image
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
+import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.view_create_team.view.*
 import timber.log.Timber
 
@@ -98,7 +99,7 @@ class TeamFormView: ConstraintLayout {
 
     fun setImage(path: String) {
         imageUri = Uri.parse(path)
-        teamImage.post {
+        teamImage.ready {
             try {
                 Picasso.get().load(path)
                         .resize(teamImage.width, teamImage.height)
@@ -111,7 +112,7 @@ class TeamFormView: ConstraintLayout {
                                 .build())
                         .placeholder(R.drawable.ic_unknown_team)
                         .error(R.drawable.ic_unknown_team)
-                        .into(teamImage,object: Callback {
+                        .into(teamImage, object: Callback {
                             override fun onSuccess() {
                                 Timber.e("Successfully loaded image")
                             }

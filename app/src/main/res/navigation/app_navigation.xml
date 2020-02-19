@@ -52,7 +52,7 @@
         android:id="@+id/teamDetailsFragment"
         android:name="com.telen.easylineup.team.details.TeamDetailsFragment"
         android:label="@string/title_team_details"
-        tools:layout="@layout/fragment_details_team"/>
+        tools:layout="@layout/fragment_team_details"/>
 
     <fragment
         android:id="@+id/navigation_settings"

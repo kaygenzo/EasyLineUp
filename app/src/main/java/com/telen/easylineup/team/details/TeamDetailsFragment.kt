@@ -19,9 +19,10 @@ import com.telen.easylineup.repository.model.TeamType
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.utils.ready
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.fragment_details_team.*
+import kotlinx.android.synthetic.main.fragment_team_details.*
 import timber.log.Timber
 
 const val REQUEST_EDIT_TEAM = 0
@@ -37,7 +38,7 @@ class TeamDetailsFragment: Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_details_team, container, false)
+        val view = inflater.inflate(R.layout.fragment_team_details, container, false)
         load()
         return view
     }
@@ -52,7 +53,7 @@ class TeamDetailsFragment: Fragment() {
 
                     try {
                         val imageUri = Uri.parse(it.image)
-                        teamImage.post {
+                        teamImage.ready {
                             try {
                                 Picasso.get().load(imageUri)
                                         .resize(teamImage.width, teamImage.height)
@@ -82,7 +83,7 @@ class TeamDetailsFragment: Fragment() {
                     }
                     catch (e: Exception) {
                         Timber.d("Image is surely null or something bad happened: ${e.message}")
-                        teamImage.post {
+                        teamImage.ready {
                             try {
                                 Picasso.get().load(R.drawable.ic_unknown_team)
                                         .resize(teamImage.width, teamImage.height)

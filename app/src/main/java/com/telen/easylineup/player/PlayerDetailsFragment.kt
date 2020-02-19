@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.fragment_player_details.view.*
 import timber.log.Timber
 
@@ -27,23 +28,24 @@ class PlayerDetailsFragment: Fragment() {
         val playerID = arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
         viewModel.playerID = playerID
 
-        viewModel.getPlayer().subscribe({
+        val disposable = viewModel.getPlayer().subscribe({
             view.playerLicenseValue.text = it.licenseNumber.toString()
             view.shirtNumberValue.text = it.shirtNumber.toString()
             view.playerName.text = it.name.trim()
 
-            try {
-                view.playerImage?.post {
+            view.playerImage.ready {
+                try {
                     Picasso.get().load(it.image)
                             .resize(view.playerImage.width, view.playerImage.height)
                             .centerCrop()
                             .placeholder(R.drawable.ic_unknown_field_player)
                             .error(R.drawable.ic_unknown_field_player)
                             .into(view.playerImage)
+                } catch (e: IllegalArgumentException) {
+                    Timber.e(e)
                 }
-            } catch (e: IllegalArgumentException) {
-                Timber.e(e)
             }
+
         }, {
             Timber.e(it)
         })

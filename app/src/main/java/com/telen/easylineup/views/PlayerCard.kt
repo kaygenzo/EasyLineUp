@@ -7,6 +7,7 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
+import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.item_player_list.view.*
 import timber.log.Timber
 
@@ -25,7 +26,7 @@ class PlayerCard: CardView {
 
     fun setImage(path: String?) {
 
-        playerImage.post {
+        playerImage.ready {
             try {
                 Picasso.get()
                         .load(path)

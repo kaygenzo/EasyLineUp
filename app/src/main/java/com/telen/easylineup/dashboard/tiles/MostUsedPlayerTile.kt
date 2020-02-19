@@ -7,6 +7,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.repository.tiles.*
+import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.tile_most_used_player.view.*
 import timber.log.Timber
 
@@ -27,7 +28,7 @@ class MostUsedPlayerTile: ConstraintLayout {
             val item = iterator.next()
             when(item.key) {
                 KEY_DATA_IMAGE -> {
-                    tile_player_most_used_image.post {
+                    tile_player_most_used_image.ready {
                         try {
                             Picasso.get()
                                     .load(item.value.toString())

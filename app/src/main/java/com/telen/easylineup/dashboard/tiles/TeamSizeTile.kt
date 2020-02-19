@@ -13,6 +13,7 @@ import com.telen.easylineup.repository.tiles.ITileData
 import com.telen.easylineup.repository.tiles.KEY_DATA_SIZE
 import com.telen.easylineup.repository.tiles.KEY_DATA_TEAM_IMAGE
 import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.tile_team_size.view.*
 
 class TeamSizeTile: ConstraintLayout {
@@ -32,25 +33,20 @@ class TeamSizeTile: ConstraintLayout {
 
         val image = map[KEY_DATA_TEAM_IMAGE] as String?
         image?.let {
-            teamImage.post {
+            teamImage.ready {
                 val imageSize = teamImage.height
-                if(imageSize > 0) {
-                    Picasso.get().load(it)
-                            .resize(imageSize, imageSize)
-                            .centerCrop()
-                            .transform(RoundedTransformationBuilder()
-                                    .borderColor(Color.BLACK)
-                                    .borderWidthDp(2f)
-                                    .cornerRadiusDp(16f)
-                                    .oval(true)
-                                    .build())
-                            .placeholder(R.drawable.ic_unknown_team)
-                            .error(R.drawable.ic_unknown_team)
-                            .into(teamImage)
-                }
-                else {
-                    Picasso.get().load(R.drawable.ic_unknown_team).into(teamImage)
-                }
+                Picasso.get().load(it)
+                        .resize(imageSize, imageSize)
+                        .centerCrop()
+                        .transform(RoundedTransformationBuilder()
+                                .borderColor(Color.BLACK)
+                                .borderWidthDp(2f)
+                                .cornerRadiusDp(16f)
+                                .oval(true)
+                                .build())
+                        .placeholder(R.drawable.ic_unknown_team)
+                        .error(R.drawable.ic_unknown_team)
+                        .into(teamImage)
             }
         } ?: Picasso.get().load(R.drawable.ic_unknown_team).into(teamImage)
 

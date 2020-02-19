@@ -14,6 +14,8 @@ import org.koin.core.inject
 
 class TeamViewModel: ViewModel(), KoinComponent {
 
+    private var playerSelectedID = 0L
+
     private val getTeamUseCase: GetTeam by inject()
     private val getPlayersUseCase: GetPlayers by inject()
     private val deleteTeamUseCase: DeleteTeam by inject()
@@ -29,5 +31,13 @@ class TeamViewModel: ViewModel(), KoinComponent {
 
     fun deleteTeam(team: Team): Completable {
         return UseCaseHandler.execute(deleteTeamUseCase, DeleteTeam.RequestValues(team)).ignoreElement()
+    }
+
+    fun getPlayerId() : Long {
+        return playerSelectedID
+    }
+
+    fun setPlayerId(id: Long) {
+        playerSelectedID = id
     }
 }
