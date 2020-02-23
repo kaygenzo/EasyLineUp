@@ -12,10 +12,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
-import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.R
+import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.repository.model.Player
-import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.view_bottom_sheet_player_list.view.*
 import timber.log.Timber
 
@@ -93,16 +92,26 @@ class PlayerListAdapter(val list: List<Player>, val playerListener: OnPlayerClic
             }
         }
 
-        holder.image.ready {
-            try {
-                Picasso.get().load(player.image)
-                        .resize(holder.image.width, holder.image.height)
-                        .centerCrop()
-                        .placeholder(R.drawable.ic_unknown_field_player)
+        holder.image.post {
+            // I put this test here because untilReady is too long to complete so the adapter inflate too late the image.
+            // this cause the images to be at the wrong place in the recycler
+            if(holder.image.width > 0 && holder.image.height > 0) {
+                try {
+                    Picasso.get().load(player.image)
+                            .resize(holder.image.width, holder.image.height)
+                            .centerCrop()
+                            .placeholder(R.drawable.ic_unknown_field_player)
+                            .error(R.drawable.ic_unknown_field_player)
+                            .into(holder.image)
+                } catch (e: IllegalArgumentException) {
+                    Timber.e(e)
+                }
+            }
+            else {
+                Picasso.get().load(R.drawable.ic_unknown_field_player)
                         .error(R.drawable.ic_unknown_field_player)
+                        .placeholder(R.drawable.ic_unknown_field_player)
                         .into(holder.image)
-            } catch (e: IllegalArgumentException) {
-                Timber.e(e)
             }
         }
 

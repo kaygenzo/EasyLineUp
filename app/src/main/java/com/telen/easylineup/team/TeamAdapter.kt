@@ -10,7 +10,7 @@ interface OnPlayerClickListener {
     fun onPlayerSelected(player: Player)
 }
 
-class TeamAdapter(private val context: Context, private val players: List<Player>, val onPlayerClickListener: OnPlayerClickListener?): RecyclerView.Adapter<TeamAdapter.PlayerViewHolder>() {
+class TeamAdapter(private val context: Context, private val players: List<Player>, private val onPlayerClickListener: OnPlayerClickListener?): RecyclerView.Adapter<TeamAdapter.PlayerViewHolder>() {
 
     class PlayerViewHolder(val card: PlayerCard): RecyclerView.ViewHolder(card)
 
