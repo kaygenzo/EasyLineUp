@@ -13,7 +13,6 @@ import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.repository.model.Team
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.activity_team_creation.*
-import kotlinx.android.synthetic.main.view_create_team.*
 import timber.log.Timber
 
 class TeamCreationActivity: AppCompatActivity() {
@@ -55,15 +54,6 @@ class TeamCreationActivity: AppCompatActivity() {
                     finish()
                 }
                 else -> {}
-            }
-        })
-
-        viewModel.errorLiveData.observe(this, Observer {
-            when(it) {
-                SetupViewModel.Error.NAME_EMPTY -> {
-                    teamNameInputLayout.error = getString(R.string.team_creation_error_name_empty)
-                }
-                else -> Toast.makeText(this, "Something wrong happened, please try again", Toast.LENGTH_SHORT).show()
             }
         })
 

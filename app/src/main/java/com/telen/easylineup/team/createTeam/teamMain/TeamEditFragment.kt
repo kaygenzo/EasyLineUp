@@ -7,8 +7,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.nguyenhoanglam.imagepicker.model.Config
 import com.nguyenhoanglam.imagepicker.model.Image
@@ -16,10 +18,12 @@ import com.telen.easylineup.R
 import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.repository.model.Team
 import com.telen.easylineup.team.createTeam.SetupViewModel
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.TeamFormListener
 import com.telen.easylineup.views.TeamFormView
 import kotlinx.android.synthetic.main.fragment_team_edit.view.*
+import kotlinx.android.synthetic.main.view_create_team.*
 import timber.log.Timber
 
 class TeamEditFragment: Fragment() , TeamFormListener {
@@ -64,6 +68,16 @@ class TeamEditFragment: Fragment() , TeamFormListener {
         })
 
         view.editTeamForm.setListener(this)
+
+        viewModel.errorLiveData.observe(this, Observer {
+            when(it) {
+                SetupViewModel.Error.NAME_EMPTY -> {
+                    teamNameInputLayout.error = getString(R.string.team_creation_error_name_empty)
+                    FirebaseAnalyticsUtils.logInvalidParameter(activity, "invalid_parameter", "team_name", "exception")
+                }
+                else -> Toast.makeText(activity, "Something wrong happened, please try again", Toast.LENGTH_SHORT).show()
+            }
+        })
 
         return view
     }
