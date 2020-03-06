@@ -38,6 +38,8 @@ class PositionsBarChart: ConstraintLayout {
         chart.setDrawBarShadow(false)
         chart.setDrawValueAboveBar(true)
         chart.setPinchZoom(false)
+        chart.isDoubleTapToZoomEnabled = false
+        chart.setScaleEnabled(false)
         chart.setDrawGridBackground(false)
         chart.setFitBars(true)
         chart.setExtraOffsets(0f, 0f, 0f, 0f)
