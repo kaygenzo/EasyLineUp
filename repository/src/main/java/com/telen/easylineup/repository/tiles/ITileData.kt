@@ -1,4 +1,4 @@
-package com.telen.easylineup.dashboard.models
+package com.telen.easylineup.repository.tiles
 
 interface ITileData {
     fun getType(): Int

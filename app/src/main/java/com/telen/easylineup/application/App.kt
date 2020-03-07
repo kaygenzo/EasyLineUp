@@ -28,6 +28,7 @@ class App: MultiDexApplication() {
                 .addMigrations(migration_1_2())
                 .addMigrations(migration_2_3())
                 .addMigrations(migration_3_4())
+                .addMigrations(migration_4_5())
                 .build()
 
         if (BuildConfig.DEBUG) {
@@ -74,6 +75,14 @@ class App: MultiDexApplication() {
         return object: Migration(3,4) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE Teams ADD COLUMN main INTEGER NOT NULL DEFAULT 1")
+            }
+        }
+    }
+
+    private fun migration_4_5(): Migration {
+        return object: Migration(4,5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE Lineups ADD COLUMN roaster TEXT DEFAULT null")
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.telen.easylineup.team.createTeam
 
+import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.UseCaseHandler
@@ -7,6 +8,7 @@ import com.telen.easylineup.domain.GetTeamCreationNextStep
 import com.telen.easylineup.domain.NameEmptyException
 import com.telen.easylineup.domain.SaveCurrentTeam
 import com.telen.easylineup.domain.SaveTeam
+import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.repository.model.Team
 import com.telen.easylineup.repository.model.TeamType
 import io.reactivex.Completable
@@ -84,7 +86,9 @@ class SetupViewModel: ViewModel(), KoinComponent {
         }
     }
 
-    fun backPressed() {
-
+    fun backPressed(bundle: Bundle?): Completable {
+        return bundle?.getBoolean(Constants.EXTRA_CAN_EXIT)?.takeIf { it }?.let {
+            Completable.complete()
+        } ?: Completable.error(UnsupportedOperationException())
     }
 }

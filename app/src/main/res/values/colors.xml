@@ -10,9 +10,13 @@
     <color name="text_orange">#FFd37240</color>
     <color name="lineup_name">#FF2a3488</color>
 
+    <color name="infield">#a18e3c</color>
+    <color name="infield_stroke">#85881b</color>
+
     <color name="selected_step_circle">#FFFFFFFF</color>
     <color name="selected_step_text">#FF505050</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="black">#000000</color>
 
     <color name="tile_team_size_background_color">#1D2E2A</color>
     <color name="tile_shake_beta_background_color">@color/white</color>
@@ -34,4 +38,6 @@
 
     <color name="list_empty_text">#6d6d6d</color>
     <color name="teams_list_text_primary">#4d4d4d</color>
+
+    <color name="blue_grey_80">#ff37474f</color>
 </resources>

@@ -36,5 +36,10 @@ val appModules = module {
     single { DeleteLineup(get()) }
     single { SaveLineupMode(get()) }
     single { UpdatePlayersWithLineupMode(get()) }
-
+    single { GetRoaster(get(), get()) }
+    single { DeleteTeam(get()) }
+    single { SwitchPlayersPosition(get()) }
+    single { ReassignPlayerPosition(get()) }
+    single { DeleteAllData(get(), get()) }
+    single { GetTournamentStatsForPositionTable(get()) }
 }

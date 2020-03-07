@@ -1,33 +1,44 @@
 package com.telen.easylineup.views
 
+import android.content.ClipData
+import android.content.ClipDescription
 import android.content.Context
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Point
+import android.os.Build
 import android.util.AttributeSet
+import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.repository.model.FieldPosition
+import com.telen.easylineup.repository.model.MODE_DH
 import com.telen.easylineup.repository.model.Player
+import com.telen.easylineup.repository.model.PlayerWithPosition
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
+import timber.log.Timber
 import kotlin.math.roundToInt
-import android.view.animation.AnimationUtils
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.Animation
+import android.view.animation.ScaleAnimation
+import android.view.animation.DecelerateInterpolator
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.MODE_DH
-import com.telen.easylineup.repository.model.PlayerWithPosition
 
-
-const val ICON_SIZE_SCALE = 0.12f
+const val TAG_TRASH = "_trash"
 
 interface OnPlayerButtonCallback {
     fun onPlayerButtonClicked(position: FieldPosition, isNewPlayer: Boolean)
     fun onPlayerButtonLongClicked(player: Player, position: FieldPosition)
+    fun onPlayerSentToTrash(player: Player, position: FieldPosition)
+    fun onPlayersSwitched(player1: PlayerWithPosition, player2: PlayerWithPosition)
+    fun onPlayerReassigned(player: PlayerWithPosition, newPosition: FieldPosition)
 }
 
-class DefenseEditableView: ConstraintLayout {
+class DefenseEditableView: DefenseView {
 
     private var playerListener: OnPlayerButtonCallback? = null
 
@@ -87,16 +98,48 @@ class DefenseEditableView: ConstraintLayout {
                         else {
                             setPlayerImage(player.image, player.name, iconSize)
                         }
+
+                        setOnDragListener { v, event ->
+                            when(event.action) {
+                                DragEvent.ACTION_DRAG_STARTED,
+                                DragEvent.ACTION_DRAG_ENDED,
+                                DragEvent.ACTION_DRAG_EXITED,
+                                DragEvent.ACTION_DRAG_ENTERED,
+                                DragEvent.ACTION_DRAG_LOCATION -> true
+                                DragEvent.ACTION_DROP -> {
+                                    val id: ClipData.Item = event.clipData.getItemAt(0)
+                                    val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
+                                    Timber.d( "action=ACTION_DROP switch ${playerFound?.playerName} with ${entry.playerName}")
+                                    playerFound?.let {
+                                        playerListener?.onPlayersSwitched(entry, it)
+                                    }
+                                    true
+                                }
+                                else -> false
+                            }
+                            true
+                        }
+
                         this
                     }
 
                     addPlayerOnFieldWithPercentage(playerView, pos.xPercent, pos.yPercent, loadingCallback)
+
                     playerView.setOnClickListener { view ->
                         playerListener?.onPlayerButtonClicked(pos, false)
                     }
+
                     playerView.setOnLongClickListener {
-                        playerListener?.onPlayerButtonLongClicked(player, pos)
-                        true
+                        val playerID = ClipData.Item(playerTag)
+                        val playerPosition = ClipData.Item(pos.name)
+                        val dragData = ClipData(ClipDescription(playerTag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)), playerID)
+                        dragData.addItem(playerPosition)
+                        val shadowBuilder = PlayerDragShadowBuilder(playerView)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            playerView.startDragAndDrop(dragData, shadowBuilder, null, 0)
+                        } else {
+                            playerView.startDrag(dragData, shadowBuilder, null, 0)
+                        }
                     }
                 }
             }
@@ -105,6 +148,62 @@ class DefenseEditableView: ConstraintLayout {
         addEmptyPositionMarker(players, emptyPositions)
         addSubstitutePlayers(players)
         addDesignatedPlayerIfExists(players, lineupMode)
+        addTrashButton(players)
+    }
+
+    private fun addTrashButton(players: List<PlayerWithPosition>) {
+        val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+
+        val trashView = TrashFieldButton(context).run {
+            layoutParams = LayoutParams(iconSize, iconSize)
+            setScaleType(ImageView.ScaleType.CENTER)
+            tag = TAG_TRASH
+
+            setOnDragListener { v, event ->
+                Timber.d( "action=${event.action}")
+                when(event.action) {
+                    DragEvent.ACTION_DRAG_STARTED,
+                    DragEvent.ACTION_DRAG_ENDED,
+                    DragEvent.ACTION_DRAG_LOCATION -> true
+                    DragEvent.ACTION_DRAG_EXITED -> {
+                        val expand = ScaleAnimation(2f, 1f, 2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+                        expand.duration = 100
+                        expand.interpolator = DecelerateInterpolator()
+                        expand.fillAfter = true
+                        this.startAnimation(expand)
+                        true
+                    }
+                    DragEvent.ACTION_DRAG_ENTERED -> {
+                        val btnAnim = ScaleAnimation(1f, 2f, 1f, 2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+                        btnAnim.duration = 100
+                        btnAnim.interpolator = AccelerateInterpolator()
+                        btnAnim.fillAfter = true
+                        startAnimation(btnAnim)
+                        true
+                    }
+                    DragEvent.ACTION_DROP -> {
+                        clearAnimation()
+                        val id: ClipData.Item = event.clipData.getItemAt(0)
+                        val player = players.firstOrNull { it.playerID.toString() == id.text.toString() }
+                        val position = event.clipData.getItemAt(1)
+                        val fieldPosition = FieldPosition.valueOf(position.text.toString())
+                        Timber.d( "action=ACTION_DROP player=${player?.playerName} position=$fieldPosition")
+                        player?.let {
+                            playerListener?.onPlayerSentToTrash(it.toPlayer(), fieldPosition)
+                        }
+                        true
+                    }
+                    else -> false
+                }
+                true
+            }
+
+            this
+        }
+
+        trashView.apply {
+            addPlayerOnFieldWithPercentage(this, 100f, 100f, null)
+        }
     }
 
     private fun addEmptyPositionMarker(players: List<PlayerWithPosition>, positionMarkers: MutableList<FieldPosition>) {
@@ -117,6 +216,28 @@ class DefenseEditableView: ConstraintLayout {
                 setOnClickListener {
                     playerListener?.onPlayerButtonClicked(position, true)
                 }
+
+                setOnDragListener { v, event ->
+                    when(event.action) {
+                        DragEvent.ACTION_DRAG_STARTED,
+                        DragEvent.ACTION_DRAG_ENDED,
+                        DragEvent.ACTION_DRAG_EXITED,
+                        DragEvent.ACTION_DRAG_ENTERED,
+                        DragEvent.ACTION_DRAG_LOCATION -> true
+                        DragEvent.ACTION_DROP -> {
+                            val id: ClipData.Item = event.clipData.getItemAt(0)
+                            val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
+                            Timber.d( "action=ACTION_DROP reassigned ${playerFound?.playerName} to ${position}")
+                            playerFound?.let {
+                                playerListener?.onPlayerReassigned(it, position)
+                            }
+                            true
+                        }
+                        else -> false
+                    }
+                    true
+                }
+
                 this
             }
 
@@ -163,17 +284,46 @@ class DefenseEditableView: ConstraintLayout {
     private fun addDesignatedPlayerIfExists(players: List<PlayerWithPosition>, lineupMode: Int) {
          if(lineupMode == MODE_DH) {
             val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
-            players.filter { it.position == FieldPosition.DH.position }?.let {
+            players.filter { it.position == FieldPosition.DH.position }.let { listPlayers ->
                 var view: View?
                 try {
-                    val player = it.first().toPlayer()
+                    val player = listPlayers.first().toPlayer()
                     val position = FieldPosition.DH
                     val playerView = PlayerFieldIcon(context).run {
                         layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
                         setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
 
                         setOnLongClickListener {
-                            playerListener?.onPlayerButtonLongClicked(player, position)
+                            val playerID = ClipData.Item(player.id.toString())
+                            val playerPosition = ClipData.Item(position.name)
+                            val dragData = ClipData(ClipDescription(player.id.toString(), arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)), playerID)
+                            dragData.addItem(playerPosition)
+                            val shadowBuilder = PlayerDragShadowBuilder(this)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                startDragAndDrop(dragData, shadowBuilder, null, 0)
+                            } else {
+                                startDrag(dragData, shadowBuilder, null, 0)
+                            }
+                        }
+
+                        setOnDragListener { v, event ->
+                            when(event.action) {
+                                DragEvent.ACTION_DRAG_STARTED,
+                                DragEvent.ACTION_DRAG_ENDED,
+                                DragEvent.ACTION_DRAG_EXITED,
+                                DragEvent.ACTION_DRAG_ENTERED,
+                                DragEvent.ACTION_DRAG_LOCATION -> true
+                                DragEvent.ACTION_DROP -> {
+                                    val id: ClipData.Item = event.clipData.getItemAt(0)
+                                    val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
+                                    Timber.d( "action=ACTION_DROP switch ${playerFound?.playerName} with ${listPlayers.first().playerName}")
+                                    playerFound?.let {
+                                        playerListener?.onPlayersSwitched(listPlayers.first(), it)
+                                    }
+                                    true
+                                }
+                                else -> false
+                            }
                             true
                         }
 
@@ -184,6 +334,28 @@ class DefenseEditableView: ConstraintLayout {
                 } catch (e: NoSuchElementException) {
                     val positionView = AddDesignatedPlayerButton(context).run {
                         layoutParams = LayoutParams(iconSize, iconSize)
+
+                        setOnDragListener { v, event ->
+                            when(event.action) {
+                                DragEvent.ACTION_DRAG_STARTED,
+                                DragEvent.ACTION_DRAG_ENDED,
+                                DragEvent.ACTION_DRAG_EXITED,
+                                DragEvent.ACTION_DRAG_ENTERED,
+                                DragEvent.ACTION_DRAG_LOCATION -> true
+                                DragEvent.ACTION_DROP -> {
+                                    val id: ClipData.Item = event.clipData.getItemAt(0)
+                                    val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
+                                    Timber.d( "action=ACTION_DROP reassigned ${playerFound?.playerName} to ${FieldPosition.DH}")
+                                    playerFound?.let {
+                                        playerListener?.onPlayerReassigned(it, FieldPosition.DH)
+                                    }
+                                    true
+                                }
+                                else -> false
+                            }
+                            true
+                        }
+
                         this
                     }
 
@@ -201,90 +373,35 @@ class DefenseEditableView: ConstraintLayout {
             }
         }
     }
+}
 
-    private fun addPlayerOnFieldWithPercentage(view: View, x: Float, y: Float, loadingCallback: LoadingCallback?) {
-        fieldFrameLayout.post {
-            val layoutHeight = fieldFrameLayout.height
-            val layoutWidth = fieldFrameLayout.width
+class PlayerDragShadowBuilder(view: View): View.DragShadowBuilder(view) {
 
-            val positionX = ((x * layoutWidth) / 100f)
-            val positionY = ((y * layoutHeight) / 100f)
+    private var mScaleFactor: Point? = null
 
-            addPlayerOnFieldWithCoordinate(view, positionX, positionY, loadingCallback)
-        }
+    override fun onProvideShadowMetrics(outShadowSize: Point?, outShadowTouchPoint: Point?) {
+
+        // Sets the width of the shadow to half the width of the original View
+        val width = view.width * 2
+
+        // Sets the height of the shadow to half the height of the original View
+        val height = view.height * 2
+
+        // Sets the size parameter's width and height values. These get back to the system
+        // through the size parameter.
+        outShadowSize?.set(width, height)
+        // Sets size parameter to member that will be used for scaling shadow image.
+        mScaleFactor = outShadowSize
+
+        // Sets the touch point's position to be in the middle of the drag shadow
+        outShadowTouchPoint?.set(width / 2, height / 2)
     }
 
-    private fun addPlayerOnFieldWithCoordinate(view: View, x: Float, y: Float, loadingCallback: LoadingCallback?) {
-        if(fieldFrameLayout.findViewWithTag<PlayerFieldIcon>(view.tag)!=null)
-            fieldFrameLayout.removeView(view)
-
-        view.visibility = View.INVISIBLE
-
-        val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
-
-        view.post {
-            val imageWidth = view.width.toFloat()
-            val imageHeight = view.height.toFloat()
-
-            checkBounds(x, y, imageWidth, imageHeight) {
-                correctedX: Float, correctedY: Float ->
-
-                val positionX = correctedX - imageWidth / 2
-                val positionY = correctedY - imageHeight / 2
-
-                val layoutParamCustom = FrameLayout.LayoutParams(iconSize, iconSize).run {
-                    leftMargin = positionX.toInt()
-                    topMargin = positionY.toInt()
-                    this
-                }
-
-                view.run {
-                    layoutParams = layoutParamCustom
-                    visibility = View.VISIBLE
-                    invalidate()
-                }
-
-                if(view is AddPlayerButton) {
-                    val shake = AnimationUtils.loadAnimation(context, R.anim.shake_effect)
-                    view.animation = shake
-                }
-
-                loadingCallback?.onFinishLoading()
-            }
-        }
-
-        fieldFrameLayout.addView(view)
-    }
-
-    private fun cleanPlayerIcons() {
-        if(fieldFrameLayout.childCount > 1) {
-            for (i in fieldFrameLayout.childCount-1 downTo 0) {
-                val view = fieldFrameLayout.getChildAt(i)
-                if(view is PlayerFieldIcon || view is AddPlayerButton || view is AddDesignatedPlayerButton) {
-                    view.clearAnimation()
-                    fieldFrameLayout.removeView(fieldFrameLayout.getChildAt(i))
-                }
-            }
-        }
-    }
-
-    private fun checkBounds(x: Float, y: Float, imageWidth: Float, imageHeight: Float, callback: (x: Float,y: Float) -> Unit) {
-        val containerWidth = fieldFrameLayout.width.toFloat()
-        val containerHeight = fieldFrameLayout.height.toFloat()
-
-        var positionX: Float = x
-        var positionY: Float = y
-
-        if(positionX + imageWidth/2 > containerWidth)
-            positionX = containerWidth - imageWidth/2
-        if(positionX - imageWidth/2 < 0)
-            positionX = imageWidth/2
-
-        if(positionY - imageHeight/2 < 0)
-            positionY = imageHeight/2
-        if(positionY + imageHeight/2 > containerHeight)
-            positionY = containerHeight - imageHeight/2
-
-        callback(positionX, positionY)
+    override fun onDrawShadow(canvas: Canvas?) {
+        // Draws the ColorDrawable in the Canvas passed in from the system.
+        mScaleFactor?.let {
+            canvas?.scale(it.x / view.width.toFloat(), it.y / view.height.toFloat())
+            view.draw(canvas)
+        } ?: super.onDrawShadow(canvas)
     }
 }

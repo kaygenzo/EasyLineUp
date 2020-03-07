@@ -3,13 +3,17 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.repository.model.Player
 import com.telen.easylineup.repository.model.PlayerWithPosition
+import com.telen.easylineup.repository.model.RoasterPlayerStatus
 import io.reactivex.Single
 
 class GetListAvailablePlayersForSelection: UseCase<GetListAvailablePlayersForSelection.RequestValues, GetListAvailablePlayersForSelection.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
+        val roasterIDs = requestValues.roasterPlayers?.filter { it.status }?.map { it.player.id }
         var listAvailablePlayers = requestValues.players
-                .filter { it.fieldPositionID <= 0 }
+                .filter { player ->
+                    player.fieldPositionID <= 0 && roasterIDs?.contains(player.playerID) ?: true
+                }
                 .map { it.toPlayer() }
 
         if (FieldPosition.isDefensePlayer(requestValues.position.position))
@@ -34,6 +38,6 @@ class GetListAvailablePlayersForSelection: UseCase<GetListAvailablePlayersForSel
         }
     }
 
-    class RequestValues(val players: List<PlayerWithPosition>, val position: FieldPosition): UseCase.RequestValues
+    class RequestValues(val players: List<PlayerWithPosition>, val position: FieldPosition, val roasterPlayers: List<RoasterPlayerStatus>?): UseCase.RequestValues
     class ResponseValue(val players: List<Player>): UseCase.ResponseValue
 }

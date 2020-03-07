@@ -7,8 +7,8 @@ import io.reactivex.Single
 class GetPositionsSummaryForPlayer(val dao: PlayerFieldPositionsDao): UseCase<GetPositionsSummaryForPlayer.RequestValues, GetPositionsSummaryForPlayer.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        requestValues.playerID?.let { id ->
-            return dao.getAllPositionsForPlayer(id)
+        return requestValues.playerID?.let { id ->
+            dao.getAllPositionsForPlayer(id)
                     .map { list ->
                         val chartData: MutableMap<FieldPosition, Int> = mutableMapOf()
                         list.forEach { position ->
@@ -19,7 +19,7 @@ class GetPositionsSummaryForPlayer(val dao: PlayerFieldPositionsDao): UseCase<Ge
                         }
                         ResponseValue(chartData)
                     }
-        } ?: throw IllegalArgumentException()
+        } ?: Single.error(IllegalArgumentException())
     }
 
     class ResponseValue(val summary: Map<FieldPosition, Int>): UseCase.ResponseValue

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="single" android:id="@+id/group_management">
         <item android:id="@+id/navigation_home"
             android:icon="@drawable/ic_dashboard_black_24dp"
             android:title="@string/title_last_lineup"/>
@@ -17,17 +17,11 @@
             android:title="@string/title_lineups"/>
     </group>
 
-    <!--<item android:title="Communicate">-->
-        <!--<menu>-->
-            <!--<item-->
-                <!--android:id="@+id/nav_share"-->
-                <!--android:icon="@drawable/ic_menu_share"-->
-                <!--android:title="@string/menu_share" />-->
-            <!--<item-->
-                <!--android:id="@+id/nav_send"-->
-                <!--android:icon="@drawable/ic_menu_send"-->
-                <!--android:title="@string/menu_send" />-->
-        <!--</menu>-->
-    <!--</item>-->
+    <group android:checkableBehavior="single" android:id="@+id/group_utils">
+        <item
+            android:id="@+id/navigation_settings"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/title_settings" />
+    </group>
 
 </menu>

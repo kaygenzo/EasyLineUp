@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:background="#000000">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         style="@style/PlayerDetailsContainer"
@@ -101,16 +105,17 @@
         style="@style/PlayerDetailsContainer"
         android:id="@+id/playerStatistics"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/radar_chart_size"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/playerInformation"
         android:layout_margin="@dimen/default_margin">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             style="@style/Field.Green"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/positionsChart"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             android:layout_marginEnd="@dimen/player_details_container_separator_width">
 
             <com.telen.easylineup.views.NormalUppercaseStyledTextView
@@ -127,7 +132,7 @@
                 android:background="@color/normal_uppercase_style_text_color"
                 android:id="@+id/separator"
                 android:layout_width="@dimen/player_details_container_separator_width"
-                android:layout_height="100dp"
+                android:layout_height="60dp"
                 app:layout_constraintTop_toTopOf="@id/gamesPlayedValue"
                 app:layout_constraintBottom_toBottomOf="@+id/gamesPlayedValue"
                 app:layout_constraintLeft_toRightOf="@+id/gamesPlayedValue"
@@ -148,15 +153,28 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.telen.easylineup.views.PositionsRadarChart
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        style="@style/PlayerDetailsContainer"
+        android:id="@+id/playerPositionRepartition"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/radar_chart_size"
+        app:layout_constraintTop_toBottomOf="@+id/playerStatistics"
+        android:layout_margin="@dimen/default_margin">
+
+        <com.telen.easylineup.views.PositionsBarChart
             style="@style/Field.Green.Dark"
-            android:id="@+id/positionsChart"
-            android:layout_width="@dimen/radar_chart_size"
-            android:layout_height="@dimen/radar_chart_size"
+            android:id="@+id/positionsBarChart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

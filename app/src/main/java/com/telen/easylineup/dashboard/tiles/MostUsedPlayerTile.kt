@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
-import com.telen.easylineup.dashboard.models.*
+import com.telen.easylineup.repository.tiles.*
+import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.tile_most_used_player.view.*
+import timber.log.Timber
 
 class MostUsedPlayerTile: ConstraintLayout {
 
@@ -26,14 +28,18 @@ class MostUsedPlayerTile: ConstraintLayout {
             val item = iterator.next()
             when(item.key) {
                 KEY_DATA_IMAGE -> {
-                    tile_player_most_used_image.post {
-                        Picasso.get()
-                                .load(item.value.toString())
-                                .resize(tile_player_most_used_image.width, tile_player_most_used_image.height)
-                                .centerCrop()
-                                .placeholder(R.drawable.ic_unknown_field_player)
-                                .error(R.drawable.ic_unknown_field_player)
-                                .into(tile_player_most_used_image)
+                    tile_player_most_used_image.ready {
+                        try {
+                            Picasso.get()
+                                    .load(item.value.toString())
+                                    .resize(tile_player_most_used_image.width, tile_player_most_used_image.height)
+                                    .centerCrop()
+                                    .placeholder(R.drawable.ic_unknown_field_player)
+                                    .error(R.drawable.ic_unknown_field_player)
+                                    .into(tile_player_most_used_image)
+                        } catch (e: IllegalArgumentException) {
+                            Timber.e(e)
+                        }
                     }
                 }
                 KEY_DATA_NAME -> {

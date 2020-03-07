@@ -9,7 +9,14 @@ import kotlinx.android.synthetic.main.view_timeline_middle.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+interface OnActionsClickListener {
+    fun onDeleteClicked()
+    fun onStatsClicked()
+}
+
 class TimeLineMiddleView: ConstraintLayout {
+
+    private var listener: OnActionsClickListener? = null
 
     constructor(context: Context) : super(context) { initView(context) }
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { initView(context) }
@@ -17,6 +24,14 @@ class TimeLineMiddleView: ConstraintLayout {
 
     private fun initView(context: Context) {
         LayoutInflater.from(context).inflate(R.layout.view_timeline_middle, this)
+
+        deleteTournament.setOnClickListener {
+            listener?.onDeleteClicked()
+        }
+
+        statsTournament.setOnClickListener {
+            listener?.onStatsClicked()
+        }
     }
 
     fun setTournamentName(name: String) {
@@ -27,5 +42,9 @@ class TimeLineMiddleView: ConstraintLayout {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = createdAt
         tournamentDate.text = SimpleDateFormat("dd/MM/yyyy").format(calendar.timeInMillis)
+    }
+
+    fun setOnActionsClickListener(listener: OnActionsClickListener) {
+        this.listener = listener
     }
 }

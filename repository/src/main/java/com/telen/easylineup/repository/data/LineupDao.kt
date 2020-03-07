@@ -12,7 +12,7 @@ interface LineupDao {
     fun insertLineup(lineup: Lineup): Single<Long>
 
     @Insert
-    fun insertLineup(lineups: List<Lineup>): Completable
+    fun insertLineups(lineups: List<Lineup>): Completable
 
     @Update
     fun updateLineup(lineup: Lineup): Completable
@@ -56,4 +56,18 @@ interface LineupDao {
         ORDER BY tournaments.createdAt DESC
     """)
     fun getAllTournamentsWithLineups(filter: String, teamID: Long): Single<List<TournamentWithLineup>>
+
+    @Query("""
+        SELECT
+        lineups.name as lineupName,
+        lineups.id as lineupID,
+        position,
+        players.name as playerName,
+        players.id as playerID
+        FROM lineups
+        LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = lineups.id
+        LEFT JOIN players ON playerFieldPosition.playerID = players.id
+        WHERE lineups.teamID = :teamID AND lineups.tournamentID = :tournamentId
+    """)
+    fun getAllPlayerPositionsForTournament(tournamentId: Long, teamID: Long): Single<List<PlayerInLineup>>
 }

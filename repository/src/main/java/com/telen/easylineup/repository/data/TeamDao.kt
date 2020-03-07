@@ -12,7 +12,10 @@ interface TeamDao {
     fun insertTeam(team: Team): Single<Long>
 
     @Delete
-    fun deleteTeam(team: Team)
+    fun deleteTeam(team: Team): Completable
+
+    @Delete
+    fun deleteTeams(team: List<Team>): Completable
 
     @Update
     fun updateTeam(team: Team): Completable

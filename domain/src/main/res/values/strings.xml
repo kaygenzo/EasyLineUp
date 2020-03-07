@@ -1,4 +1,7 @@
 <resources>
     <string name="team_creation_label_next">Next</string>
     <string name="team_creation_label_finish">Finish</string>
+
+    <string name="tournament_stats_unknown_player_name">Unknown</string>
+    <string name="tournament_stats_label_games_played">Total</string>
 </resources>

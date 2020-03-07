@@ -14,6 +14,7 @@ import com.nguyenhoanglam.imagepicker.model.Image
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
+import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.view_create_team.view.*
 import timber.log.Timber
 
@@ -98,28 +99,32 @@ class TeamFormView: ConstraintLayout {
 
     fun setImage(path: String) {
         imageUri = Uri.parse(path)
-        teamImage.post {
-            Picasso.get().load(path)
-                    .resize(teamImage.width, teamImage.height)
-                    .centerCrop()
-                    .transform(RoundedTransformationBuilder()
-                            .borderColor(Color.BLACK)
-                            .borderWidthDp(2f)
-                            .cornerRadiusDp(16f)
-                            .oval(true)
-                            .build())
-                    .placeholder(R.drawable.ic_unknown_team)
-                    .error(R.drawable.ic_unknown_team)
-                    .into(teamImage,object: Callback {
-                        override fun onSuccess() {
-                            Timber.e("Successfully loaded image")
-                        }
+        teamImage.ready {
+            try {
+                Picasso.get().load(path)
+                        .resize(teamImage.width, teamImage.height)
+                        .centerCrop()
+                        .transform(RoundedTransformationBuilder()
+                                .borderColor(Color.BLACK)
+                                .borderWidthDp(2f)
+                                .cornerRadiusDp(16f)
+                                .oval(true)
+                                .build())
+                        .placeholder(R.drawable.ic_unknown_team)
+                        .error(R.drawable.ic_unknown_team)
+                        .into(teamImage, object: Callback {
+                            override fun onSuccess() {
+                                Timber.e("Successfully loaded image")
+                            }
 
-                        override fun onError(e: Exception?) {
-                            Timber.e(e)
-                        }
+                            override fun onError(e: Exception?) {
+                                Timber.e(e)
+                            }
 
-                    })
+                        })
+            } catch (e: IllegalArgumentException) {
+                Timber.e(e)
+            }
         }
 
         imageUri?.let {

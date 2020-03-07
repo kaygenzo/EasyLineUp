@@ -1,7 +1,7 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.dashboard.models.ITileData
-import com.telen.easylineup.dashboard.models.TeamSizeData
+import com.telen.easylineup.repository.tiles.ITileData
+import com.telen.easylineup.repository.tiles.TeamSizeData
 import com.telen.easylineup.repository.data.PlayerDao
 import com.telen.easylineup.repository.model.Team
 import io.reactivex.Single

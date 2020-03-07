@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">EasyLineup</string>
-    <string name="splashscreen_title" translatable="false">Easylineup</string>
+    <string name="app_name" translatable="false">Baseball Softball Lineups Keeper</string>
+    <string name="splashscreen_title" translatable="false">Baseball softball\nlineups Keeper6</string>
 
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
@@ -27,10 +27,12 @@
     <string name="title_team">Team Roster</string>
     <string name="title_lineups">My Lineups</string>
     <string name="title_settings">Settings</string>
+    <string name="title_tournament_summary">Summary</string>
     <string name="title_player_details">Statistics</string>
     <string name="title_player_edition">Player edition</string>
     <string name="title_lineup_edition">Lineup edition</string>
     <string name="title_team_edition">Team edition</string>
+    <string name="title_team_details">Team details</string>
 
     <string name="team_creation_error_name_empty">Team name cannot be empty</string>
 
@@ -43,6 +45,7 @@
 
     <string name="nav_header_desc">Navigation header</string>
 
+    <string name="dialog_delete_team_title">Delete team %s ?</string>
     <string name="dialog_delete_lineup_title">Delete lineup ?</string>
     <string name="dialog_delete_player_title">Delete player ?</string>
     <string name="dialog_delete_tournament_title">Delete tournament %s ?</string>
@@ -59,7 +62,9 @@
     <string name="header_batting_order_player_shirt">N°</string>
     <string name="header_batting_order_player_position">Pos.</string>
 
-    <string name="form_lineup_creation_more_label">More</string>
+    <string name="form_lineup_creation_date_label">Date</string>
+    <string name="form_lineup_creation_roaster_label">Roaster</string>
+    <string name="form_lineup_creation_roaster_change_button">Change</string>
 
     <string name="lineup_list_empty_label">Empty</string>
     <string name="lineup_list_filter_focused_hint">Enter name</string>
@@ -97,5 +102,43 @@
     <string name="team_list_empty_text">Once you create a team, you’ll see it listed here</string>
     <string name="team_list_dialog_title">Your teams</string>
     <string name="team_list_dialog_create">Create</string>
+
+    <string name="roaster_size_status_all">All players</string>
+    <plurals name="roaster_size_status_selection">
+        <item quantity="one">%d player</item>
+        <item quantity="other">%d players</item>
+    </plurals>
+
+    <string name="feature_manage_teams_title">Manage your teams</string>
+    <string name="feature_manage_teams_description">Click here to access a menu to let you create and change the main team</string>
+
+    <string name="feature_roaster_title">Setup your roaster</string>
+    <string name="feature_roaster_description">You can now change players who will play the game!</string>
+
+    <string name="roaster_list_player_dialog_title">List of all team players</string>
+
+    <string name="team_details_type_baseball">Baseball team</string>
+    <string name="team_details_type_softball">Softball team</string>
+    <string name="team_details_type_unknown">Team type undefined</string>
+
+    <plurals name="team_details_team_size">
+        <item quantity="one">Your team is composed of %d member</item>
+        <item quantity="other">Your team is composed of %d members</item>
+    </plurals>
+
+    <string name="setting_category_display_title">Display</string>
+    <string name="setting_category_data_title">Data</string>
+    <string name="setting_category_about_title">About</string>
+    <string name="setting_import_data_description">Import data from file</string>
+    <string name="setting_export_data_description">Export data to file</string>
+    <string name="setting_delete_data_description">Delete all data</string>
+    <string name="setting_version_title">Version</string>
+    <string name="setting_play_store_title">Google Play Store official page</string>
+
+    <string name="key_export_data" translatable="false">key_export_data</string>
+    <string name="key_import_data" translatable="false">key_import_data</string>
+    <string name="key_delete_data" translatable="false">key_delete_data</string>
+    <string name="key_app_version" translatable="false">key_app_version</string>
+    <string name="key_play_store" translatable="false">key_play_store</string>
 
 </resources>

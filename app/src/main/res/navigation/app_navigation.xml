@@ -26,9 +26,9 @@
 
     <fragment
         android:id="@+id/playerDetailsFragment"
-        android:name="com.telen.easylineup.player.PlayerDetailsFragment"
+        android:name="com.telen.easylineup.player.PlayersDetailsContainerFragment"
         android:label="@string/title_player_details"
-        tools:layout="@layout/fragment_player_details"/>
+        tools:layout="@layout/fragment_players_details_container"/>
 
     <fragment
         android:id="@+id/playerEditFragment"
@@ -41,15 +41,28 @@
         android:name="com.telen.easylineup.lineup.LineupFragment"
         android:label="@string/title_lineups"
         tools:layout="@layout/fragment_lineup_fixed"/>
-    <fragment
-        android:id="@+id/teamEditFragment"
-        android:name="com.telen.easylineup.team.createTeam.teamMain.TeamEditFragment"
-        android:label="@string/title_team_edition"
-        tools:layout="@layout/fragment_team_edit"/>
+
     <fragment
         android:id="@+id/lineupCreationFragment"
         android:name="com.telen.easylineup.lineup.create.LineupCreationFragment"
         android:label="@string/dialog_create_lineup_title"
         tools:layout="@layout/fragment_lineup_creation"/>
+
+    <fragment
+        android:id="@+id/teamDetailsFragment"
+        android:name="com.telen.easylineup.team.details.TeamDetailsFragment"
+        android:label="@string/title_team_details"
+        tools:layout="@layout/fragment_team_details"/>
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.telen.easylineup.settings.SettingsFragment"
+        android:label="@string/title_settings" />
+
+    <fragment
+        android:id="@+id/tournamentStatisticsTableFragment"
+        android:name="com.telen.easylineup.lineup.statistics.TournamentStatisticsTableFragment"
+        android:label="@string/title_tournament_summary"
+        tools:layout="@layout/view_table_multi_scroll"/>
 
 </navigation>

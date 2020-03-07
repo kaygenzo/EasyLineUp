@@ -3,7 +3,7 @@ package com.telen.easylineup.dashboard
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.telen.easylineup.dashboard.models.ITileData
+import com.telen.easylineup.repository.tiles.ITileData
 import com.telen.easylineup.dashboard.tiles.LastLineupTile
 import com.telen.easylineup.dashboard.tiles.MostUsedPlayerTile
 import com.telen.easylineup.dashboard.tiles.ShakeBetaTile

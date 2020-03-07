@@ -93,7 +93,7 @@ class DatabaseMockProvider {
     }
 
     private fun insertLineups(list: List<Lineup>): Completable {
-        return App.database.lineupDao().insertLineup(list)
+        return App.database.lineupDao().insertLineups(list)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

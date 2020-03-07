@@ -22,21 +22,20 @@ import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_list_tournaments.view.*
 import timber.log.Timber
 
 class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchBar.OnSearchActionListener {
 
     private lateinit var tournamentsAdapter: TournamentsAdapter
-    private lateinit var viewModel: TournamentViewModel
+    private lateinit var viewModel: LineupViewModel
     private val listTournaments: MutableList<Pair<Tournament, List<Lineup>>> = mutableListOf()
     private var loadTournamentsDisposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         tournamentsAdapter = TournamentsAdapter(this)
-        viewModel =  ViewModelProviders.of(this).get(TournamentViewModel::class.java)
+        viewModel =  ViewModelProviders.of(this).get(LineupViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -103,7 +102,7 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
         })
     }
 
-    override fun onTournamentLongClicked(tournament: Tournament) {
+    override fun onDeleteTournamentClicked(tournament: Tournament) {
         activity?.let {
             val task: Completable = viewModel.deleteTournament(tournament)
                     .doOnError {throwable ->
@@ -115,6 +114,12 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
             DialogFactory.getWarningDialog(it, it.getString(R.string.dialog_delete_tournament_title, tournament.name),
                     it.getString(R.string.dialog_delete_cannot_undo_message), task).show()
         }
+    }
+
+    override fun onStatisticsTournamentClicked(tournament: Tournament) {
+        val extras = Bundle()
+        extras.putSerializable(Constants.EXTRA_TOURNAMENT, tournament)
+        findNavController().navigate(R.id.tournamentStatisticsTableFragment, extras, NavigationUtils().getOptions())
     }
 
     override fun onHeaderClicked() {

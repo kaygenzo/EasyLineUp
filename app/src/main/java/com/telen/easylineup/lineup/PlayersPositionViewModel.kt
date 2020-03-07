@@ -22,6 +22,7 @@ import com.telen.easylineup.application.App
 import com.telen.easylineup.domain.*
 import com.telen.easylineup.repository.model.*
 import com.telen.easylineup.repository.model.FieldPosition
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -96,6 +97,10 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     private val deleteLineup: DeleteLineup by inject()
     private val saveLineupMode: SaveLineupMode by inject()
     private val updatePlayersWithLineupMode: UpdatePlayersWithLineupMode by inject()
+    private val getRoasterUseCase: GetRoaster by inject()
+    private val getTeamUseCase: GetTeam by inject()
+    private val switchPlayersPositionUseCase: SwitchPlayersPosition by inject()
+    private val reassignPlayerPosition: ReassignPlayerPosition by inject()
 
     fun savePlayerFieldPosition(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean) {
 
@@ -121,14 +126,17 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun getAllAvailablePlayers(position: FieldPosition, isNewPlayer: Boolean) {
-
-        val requestValues = GetListAvailablePlayersForSelection.RequestValues(listPlayersWithPosition, position)
-
-        val disposable = UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues).subscribe({
-            eventHandler.value = GetAllAvailablePlayersSuccess(it.players, position, isNewPlayer)
-        }, {
-            errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
-        })
+        val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+                .flatMap { UseCaseHandler.execute(getRoasterUseCase, GetRoaster.RequestValues(it.id, lineupID)) }
+                .flatMap {
+                    val requestValues = GetListAvailablePlayersForSelection.RequestValues(listPlayersWithPosition, position, it.players)
+                    UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues)
+                }
+                .subscribe({
+                    eventHandler.value = GetAllAvailablePlayersSuccess(it.players, position, isNewPlayer)
+                }, {
+                    errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
+                })
     }
 
     fun saveNewBattingOrder(players: List<PlayerWithPosition>) {
@@ -229,6 +237,14 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                 }
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun switchPlayersPosition(p1: PlayerWithPosition, p2: PlayerWithPosition): Completable {
+        return UseCaseHandler.execute(switchPlayersPositionUseCase, SwitchPlayersPosition.RequestValues(p1, p2)).ignoreElement()
+    }
+
+    fun changePlayerPosition(p: PlayerWithPosition, newPosition: FieldPosition): Completable {
+        return UseCaseHandler.execute(reassignPlayerPosition, ReassignPlayerPosition.RequestValues(p, newPosition)).ignoreElement()
     }
 
     ///////////// LIVE DATA OBSERVER //////////////

@@ -11,10 +11,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.ViewHolder
-import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Player
 import com.telen.easylineup.lineup.*
+import com.telen.easylineup.repository.model.FieldPosition
+import com.telen.easylineup.repository.model.Player
+import com.telen.easylineup.repository.model.PlayerWithPosition
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.views.OnPlayerButtonCallback
 import com.telen.easylineup.views.OnPlayerClickListener
@@ -22,7 +23,6 @@ import com.telen.easylineup.views.PlayerListView
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.fragment_lineup_defense_editable.view.*
 import timber.log.Timber
-import java.lang.Exception
 
 
 class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
@@ -102,7 +102,25 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
         }
     }
 
+    override fun onPlayerSentToTrash(player: Player, position: FieldPosition) {
+        viewModel.deletePosition(player, position)
+    }
+
     override fun onPlayerButtonClicked(position: FieldPosition, isNewPlayer: Boolean) {
         viewModel.getAllAvailablePlayers(position, isNewPlayer)
+    }
+
+    override fun onPlayersSwitched(player1: PlayerWithPosition, player2: PlayerWithPosition) {
+        Timber.d("Switch ${player1.playerName} with ${player2.playerName}")
+        val disposable = viewModel.switchPlayersPosition(player1, player2).subscribe({}, {
+            Timber.e("Cannot switch players: ${it.message}")
+        })
+    }
+
+    override fun onPlayerReassigned(player: PlayerWithPosition, newPosition: FieldPosition) {
+        Timber.d("${player.playerName} reassigned to ${newPosition}")
+        val disposable = viewModel.changePlayerPosition(player, newPosition).subscribe({}, {
+            Timber.e("Cannot change player position: ${it.message}")
+        })
     }
 }

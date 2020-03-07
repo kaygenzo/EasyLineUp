@@ -45,6 +45,12 @@
     <dimen name="teams_list_first_item_extra_padding">8dp</dimen>
     <dimen name="list_empty_text_size">14sp</dimen>
     <dimen name="teams_list_text_size">18sp</dimen>
-    <dimen name="teams_list_icon_size">42dp</dimen>
+    <dimen name="teams_list_icon_size">40dp</dimen>
+    <dimen name="teams_list_item_size">56dp</dimen>
+
+    <dimen name="table_multiple_scroll_cell_width">50dp</dimen>
+    <dimen name="table_multiple_scroll_cell_height">30dp</dimen>
+    <dimen name="table_multiple_scroll_left_header_width">90dp</dimen>
+    <dimen name="table_multiple_scroll_top_header_height">30dp</dimen>
 
 </resources>

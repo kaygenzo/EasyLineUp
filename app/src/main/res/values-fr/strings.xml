@@ -24,10 +24,12 @@
     <string name="title_team">Joueurs</string>
     <string name="title_lineups">Mes Lineups</string>
     <string name="title_settings">Paramètres</string>
+    <string name="title_tournament_summary">Résumé</string>
     <string name="title_player_details">Statistiques</string>
     <string name="title_player_edition">Modification de joueur</string>
     <string name="title_lineup_edition">Modification de lineup</string>
     <string name="title_team_edition">Modification de l\'équipe</string>
+    <string name="title_team_details">Infos d\'équipe</string>
 
     <string name="team_creation_error_name_empty">Le nom de l\'équipe ne peut pas être vide</string>
 
@@ -40,6 +42,7 @@
 
     <string name="nav_header_desc">En-tête de navigation</string>
 
+    <string name="dialog_delete_team_title">Supprimer l\'équipe %s ?</string>
     <string name="dialog_delete_lineup_title">Supprimer le lineup ?</string>
     <string name="dialog_delete_player_title">Supprimer le joueur ?</string>
     <string name="dialog_delete_tournament_title">Supprimer le tournoi %s ?</string>
@@ -56,7 +59,9 @@
     <string name="header_batting_order_player_shirt">N°</string>
     <string name="header_batting_order_player_position">Pos.</string>
 
-    <string name="form_lineup_creation_more_label">Plus</string>
+    <string name="form_lineup_creation_date_label">Date</string>
+    <string name="form_lineup_creation_roaster_label">Joueurs</string>
+    <string name="form_lineup_creation_roaster_change_button">Changer</string>
 
     <string name="lineup_list_empty_label">Vide</string>
     <string name="lineup_list_filter_focused_hint">Tapez un nom</string>
@@ -90,4 +95,34 @@
     <string name="team_list_empty_text">Une fois que vous aurez créé votre équipe, elle sera visible ici</string>
     <string name="team_list_dialog_title">Vos équipes</string>
     <string name="team_list_dialog_create">Nouveau</string>
+
+    <string name="roaster_size_status_all">Tous les joueurs</string>
+    <plurals name="roaster_size_status_selection">
+        <item quantity="one">%d joueur</item>
+        <item quantity="other">%d joueurs</item>
+    </plurals>
+
+    <string name="feature_manage_teams_title">Gérez vos équipes</string>
+    <string name="feature_manage_teams_description">Cliquez ici pour accéder au menu vous permettant de créer ou de changer d\'équipe</string>
+
+    <string name="feature_roaster_title">Gérez votre composition initiale</string>
+    <string name="feature_roaster_description">Vous pouvez changer les joueurs qui participeront au match</string>
+
+    <string name="roaster_list_player_dialog_title">Liste des joueurs de l\'équipe</string>
+
+    <string name="team_details_type_baseball">Equipe de Baseball</string>
+    <string name="team_details_type_softball">Equipe de Softball</string>
+    <string name="team_details_type_unknown">Type d\'équipe non défini</string>
+
+    <plurals name="team_details_team_size">
+        <item quantity="one">Votre équipe est composée de %d membre</item>
+        <item quantity="other">Votre équipe est composée de %d membres</item>
+    </plurals>
+
+    <string name="setting_category_display_title">Affichage</string>
+    <string name="setting_category_data_title">Données</string>
+    <string name="setting_category_about_title">A propos</string>
+    <string name="setting_delete_data_description">Supprimer toutes les données</string>
+    <string name="setting_version_title">Version</string>
+    <string name="setting_play_store_title">Page officielle du Google Play store</string>
 </resources>

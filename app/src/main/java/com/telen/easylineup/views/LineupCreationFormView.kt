@@ -21,9 +21,10 @@ interface OnFormReadyListener {
 interface OnActionButtonListener {
     fun onSaveClicked()
     fun onCancelClicked()
+    fun onRoasterChangeClicked()
 }
 
-class LineupCreationDialogView: ConstraintLayout, TextWatcher {
+class LineupCreationFormView: ConstraintLayout, TextWatcher {
 
     override fun afterTextChanged(s: Editable?) {
         //readyStateListener?.onFormStateChanged()
@@ -78,15 +79,28 @@ class LineupCreationDialogView: ConstraintLayout, TextWatcher {
             calendarView.setDate(calendar.timeInMillis, true, true)
         }
 
-        expandableButton.setOnClickListener {
-            when(expandableView.isExpanded) {
+        dateExpandableButton.setOnClickListener {
+            when(dateExpandableView.isExpanded) {
                 true -> {
-                    expandableView.collapse()
-                    expandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp)
+                    dateExpandableView.collapse()
+                    dateExpandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp)
                 }
                 else -> {
-                    expandableView.expand()
-                    expandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp)
+                    dateExpandableView.expand()
+                    dateExpandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp)
+                }
+            }
+        }
+
+        roasterExpandableButton.setOnClickListener {
+            when(roasterExpandableView.isExpanded) {
+                true -> {
+                    roasterExpandableView.collapse()
+                    roasterExpandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp)
+                }
+                else -> {
+                    roasterExpandableView.expand()
+                    roasterExpandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp)
                 }
             }
         }
@@ -102,6 +116,10 @@ class LineupCreationDialogView: ConstraintLayout, TextWatcher {
             else {
                 tournamentTitleInputLayout.error = resources.getString(R.string.lineup_creation_error_tournament_empty)
             }
+        }
+
+        addPlayerFilter.setOnClickListener {
+            actionClickListener?.onRoasterChangeClicked()
         }
 
         cancel.setOnClickListener {

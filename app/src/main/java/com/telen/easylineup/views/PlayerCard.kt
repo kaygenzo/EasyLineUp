@@ -26,16 +26,26 @@ class PlayerCard: CardView {
     fun setImage(path: String?) {
 
         playerImage.post {
-            try {
-                Picasso.get()
-                        .load(path)
-                        .resize(playerImage.width, playerImage.height)
-                        .centerCrop()
+            // I put this test here because untilReady is too long to complete so the adapter inflate too late the image.
+            // this cause the images to be at the wrong place in the recycler
+            if(playerImage.width > 0 && playerImage.height > 0) {
+                try {
+                    Picasso.get()
+                            .load(path)
+                            .resize(playerImage.width, playerImage.height)
+                            .centerCrop()
+                            .error(R.drawable.ic_unknown_field_player)
+                            .placeholder(R.drawable.ic_unknown_field_player)
+                            .into(playerImage)
+                } catch (e: IllegalArgumentException) {
+                    Timber.e(e)
+                }
+            }
+            else {
+                Picasso.get().load(R.drawable.ic_unknown_field_player)
                         .error(R.drawable.ic_unknown_field_player)
                         .placeholder(R.drawable.ic_unknown_field_player)
                         .into(playerImage)
-            } catch (e: IllegalArgumentException) {
-                Timber.e(e)
             }
         }
     }
