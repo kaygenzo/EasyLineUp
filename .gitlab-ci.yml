@@ -48,7 +48,7 @@ unitTests:
   script:
     - ./gradlew -Pci --console=plain :app:testProdDebugUnitTest
 
-#coverageTests:
-#  stage: test
-#  script:
-#    - ./gradlew -Pci --console=plain :app:testProdDebugUnitTestCoverage coveralls
+coverageTests:
+  stage: test
+  script:
+    - ./gradlew -Pci --console=plain :app:testProdDebugUnitTestCoverage coveralls
