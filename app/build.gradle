@@ -5,6 +5,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'com.google.firebase.firebase-perf'
+apply plugin: 'com.github.kt3k.coveralls'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -249,13 +250,11 @@ sonarqube {
         property "sonar.sources", sonarProperties['sonar.sources']
         property "sonar.java.binaries", sonarProperties['sonar.java.binaries']
         property "sonar.profile", sonarProperties['sonar.profile']
-
-        property "sonar.host.url", sonarProperties['sonar.host.url']
     }
 }
 
 apply from: '../jacoco.gradle'
 
-//coveralls {
-//    jacocoReportPath "${project.buildDir}/reports/jacoco/testProdDebugUnitTestCoverage/testProdDebugUnitTestCoverage.xml"
-//}
+coveralls {
+    jacocoReportPath "${project.buildDir}/reports/jacoco/testProdDebugUnitTestCoverage/testProdDebugUnitTestCoverage.xml"
+}
