@@ -42,8 +42,14 @@ lintProdDebug:
   script:
     - ./gradlew -Pci --console=plain lintProdDebug -PbuildDir=lint
   artifacts:
+    name: "reports"
     paths:
       - app/build/reports/lint-results-prodDebug.html
+      - app/lint/reports/lint-results-prodDebug.html
+      - domain/build/reports/lint-results-prodDebug.html
+      - domain/lint/reports/lint-results-prodDebug.html
+      - repository/build/reports/lint-results-prodDebug.html
+      - repository/lint/reports/lint-results-prodDebug.html
 
 unitTests:
   stage: test
