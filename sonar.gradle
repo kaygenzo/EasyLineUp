@@ -1,0 +1,27 @@
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'org.sonarqube'
+
+def sonarPropertiesFile = rootProject.file("sonar.properties")
+def sonarProperties = new Properties()
+if (sonarPropertiesFile.exists()) {
+    sonarProperties.load(new FileInputStream(sonarPropertiesFile))
+}
+
+sonarqube {
+    properties {
+
+        property "sonar.projectKey", sonarProperties['sonar.projectKey']
+        property "sonar.projectName", sonarProperties['sonar.projectName']
+        property "sonar.projectVersion", android.defaultConfig.versionName
+        property "sonar.host.url", sonarProperties['sonar.host.url']
+
+        property "sonar.language", sonarProperties['sonar.language']
+        property "sonar.sourceEncoding", sonarProperties['sonar.sourceEncoding']
+        property "sonar.java.source", sonarProperties['sonar.java.source']
+        property "sonar.java.target", sonarProperties['sonar.java.target']
+
+        property "sonar.sources", sonarProperties['sonar.sources']
+        property "sonar.java.binaries", sonarProperties['sonar.java.binaries']
+        property "sonar.profile", sonarProperties['sonar.profile']
+    }
+}

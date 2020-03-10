@@ -25,14 +25,8 @@ before_script:
   - echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
 
 stages:
-  - debug
   - test
   - release
-
-lintProdDebug:
-  stage: debug
-  script:
-    - ./gradlew -Pci --console=plain :app:lintProdDebug -PbuildDir=lint
 
 assembleProdRelease:
   stage: release
@@ -43,12 +37,28 @@ assembleProdRelease:
       - app/build/outputs/apk/prod/release
       - app/build/outputs/mapping/prod/release
 
+lintProdDebug:
+  stage: test
+  script:
+    - ./gradlew -Pci --console=plain lintProdDebug -PbuildDir=lint
+  artifacts:
+    paths:
+      - app/build/reports/lint-results-prodDebug.html
+
 unitTests:
   stage: test
   script:
-    - ./gradlew -Pci --console=plain :app:testProdDebugUnitTest
+    - ./gradlew -Pci --console=plain testProdDebugUnitTest
 
-coverageTests:
+dependencyCheckTests:
   stage: test
   script:
-    - ./gradlew -Pci --console=plain :app:testProdDebugUnitTestCoverage coveralls
+    - ./gradlew -Pci --console=plain :app:dependencyCheckAnalyze --info
+  artifacts:
+    paths:
+      - app/build/reports/dependency-check-report.html
+
+#coverageTests:
+#  stage: test
+#  script:
+#    - ./gradlew -Pci --console=plain :app:testProdDebugUnitTestCoverage coveralls

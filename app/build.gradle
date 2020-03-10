@@ -5,7 +5,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'com.google.firebase.firebase-perf'
-apply plugin: 'com.github.kt3k.coveralls'
+//apply plugin: 'com.github.kt3k.coveralls'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -20,12 +20,6 @@ if (reportPropertiesFile.exists()) {
 else {
     // Otherwise read from environment variables, this happens in CI
     reportProperties.setProperty("apiKey", "\"${System.getenv('REPORTING_TOOL_API_KEY')}\"")
-}
-
-def sonarPropertiesFile = rootProject.file("sonar.properties")
-def sonarProperties = new Properties()
-if (sonarPropertiesFile.exists()) {
-    sonarProperties.load(new FileInputStream(sonarPropertiesFile))
 }
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -164,97 +158,68 @@ dependencies {
 
     testImplementation 'androidx.test:core:' + rootProject.coreVersion
     testImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion
-    testImplementation 'junit:junit:4.12'
-//    testImplementation 'androidx.test.ext:truth:' + rootProject.extTruthVersion
+    testImplementation "junit:junit:$junitVersion"
 
-    implementation "androidx.recyclerview:recyclerview:1.1.0"
-    implementation 'androidx.preference:preference:1.1.0-alpha05'
-    implementation "androidx.constraintlayout:constraintlayout:1.1.3"
-    implementation "androidx.appcompat:appcompat:1.1.0"
-    implementation "com.google.android.material:material:1.1.0-beta01"
+    ////////// ANDROID X //////////
+
+    implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    implementation "androidx.preference:preference:$preferenceVersion"
+    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+    implementation "androidx.appcompat:appcompat:$appCompatVersion"
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
-
     implementation 'androidx.multidex:multidex:2.0.1'
-
-
     implementation "androidx.room:room-runtime:$room_version"
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation "androidx.legacy:legacy-support-v4:$legacySupportVersion"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version"
-
-    implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
-        transitive = true
-    }
-
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-
-    implementation 'com.squareup.picasso:picasso:2.71828'
-
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version_ktx"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version_ktx"
 
-    implementation 'com.shuhart.stepview:stepview:1.5.0'
+    ////////// GOOGLE //////////
 
-    implementation 'com.makeramen:roundedimageview:2.3.0'
+    implementation "com.google.android.material:material:$googleMaterialVersion"
+    implementation "com.google.code.gson:gson:$googleGsonVersion"
+    implementation "com.google.firebase:firebase-analytics:$firebaseAnalyticsVersion"
+    implementation "com.google.firebase:firebase-perf:$firebasePerfVersion"
+    implementation "com.crashlytics.sdk.android:crashlytics:$crashlyticsVersion"
+
+    ////////// PRIVATE //////////
+
+    implementation project(path: ':repository')
+    implementation project(path: ':domain')
+    implementation "com.telen.library:tablemultiscroll:$tablemultiscrollVersion"
+
+    ////////// OTHERS //////////
+
+    implementation "com.jakewharton.timber:timber:$timberVersion"
+    implementation "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
+    implementation "com.github.PhilJay:MPAndroidChart:$androidchartVersion"
+    implementation "com.squareup.picasso:picasso:$picassoVersion"
+    implementation "com.shuhart.stepview:stepview:$stepViewVersion"
+    implementation "com.makeramen:roundedimageview:$roundedImageView"
+
+    implementation 'pl.hypeapp:materialtimelineview:1.1'
+    implementation "net.cachapa.expandablelayout:expandablelayout:$expandablelayoutVersion"
+    implementation "com.github.mancj:MaterialSearchBar:$materialSearchBarVersion"
+    implementation "com.github.BugBattle:BugBattle-Android-SDK:$bugBattleVersion"
+    implementation "com.orhanobut:dialogplus:1.11@aar"
+
+    implementation "com.github.f0ris.sweetalert:library:$sweetalertVersion"
+    implementation "com.github.nguyenhoanglam:ImagePicker:$imagepickerVersion"
+
+    implementation "org.koin:koin-android:$koinVersion"
+    implementation "com.getkeepsafe.taptargetview:taptargetview:$taptargetviewVersion"
 
 //    implementation 'com.facebook.stetho:stetho:1.5.1'
 
-    implementation 'com.google.code.gson:gson:2.8.5'
-
-    implementation 'pl.hypeapp:materialtimelineview:1.1'
-
-    implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
-
-    implementation 'com.github.mancj:MaterialSearchBar:0.8.2'
-
-    implementation 'com.github.BugBattle:BugBattle-Android-SDK:1.3'
-
-    implementation 'com.orhanobut:dialogplus:1.11@aar'
-
-    implementation 'com.google.firebase:firebase-analytics:17.2.0'
-    implementation 'com.google.firebase:firebase-perf:19.0.1'
-
-    implementation 'com.github.f0ris.sweetalert:library:1.6.2'
-
-    implementation 'com.github.nguyenhoanglam:ImagePicker:1.3.3'
-    implementation project(path: ':repository')
-    implementation project(path: ':domain')
-
-    implementation "org.koin:koin-android:$koin_version"
-
-    implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.0'
-
-    implementation 'com.telen.library:tablemultiscroll:1.0.3'
-}
-
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'org.sonarqube'
-
-sonarqube {
-    properties {
-
-        property "sonar.projectKey", sonarProperties['sonar.projectKey']
-        property "sonar.projectName", sonarProperties['sonar.projectName']
-        property "sonar.projectVersion", android.defaultConfig.versionName
-        property "sonar.host.url", sonarProperties['sonar.host.url']
-
-        property "sonar.language", sonarProperties['sonar.language']
-        property "sonar.sourceEncoding", sonarProperties['sonar.sourceEncoding']
-        property "sonar.java.source", sonarProperties['sonar.java.source']
-        property "sonar.java.target", sonarProperties['sonar.java.target']
-
-        property "sonar.sources", sonarProperties['sonar.sources']
-        property "sonar.java.binaries", sonarProperties['sonar.java.binaries']
-        property "sonar.profile", sonarProperties['sonar.profile']
-    }
 }
 
 apply from: '../jacoco.gradle'
+apply from: '../detekt.gradle'
+apply from: '../dependency-check.gradle'
+apply from: '../sonar.gradle'
 
-coveralls {
-    jacocoReportPath "${project.buildDir}/reports/jacoco/testProdDebugUnitTestCoverage/testProdDebugUnitTestCoverage.xml"
-}
+//coveralls {
+//    jacocoReportPath "${project.buildDir}/reports/jacoco/testProdDebugUnitTestCoverage/testProdDebugUnitTestCoverage.xml"
+//}
