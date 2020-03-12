@@ -73,7 +73,7 @@ class TeamEditFragment: Fragment() , TeamFormListener {
             when(it) {
                 SetupViewModel.Error.NAME_EMPTY -> {
                     teamNameInputLayout.error = getString(R.string.team_creation_error_name_empty)
-                    FirebaseAnalyticsUtils.logInvalidParameter(activity, "invalid_parameter", "team_name", "exception")
+                    FirebaseAnalyticsUtils.emptyTeamName(activity)
                 }
                 else -> Toast.makeText(activity, "Something wrong happened, please try again", Toast.LENGTH_SHORT).show()
             }

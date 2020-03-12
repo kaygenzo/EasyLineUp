@@ -105,4 +105,22 @@ class CreateLineupTests {
         observer.assertComplete()
         Assert.assertEquals(1L, observer.values().first().lineupID)
     }
+
+    @Test
+    fun shouldTriggerAnExceptionIfLineupNameEmpty() {
+        val tournament = Tournament(1L, "Tournament", 1L)
+        val observer = TestObserver<CreateLineup.ResponseValue>()
+        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "      ", roaster)).subscribe(observer)
+        observer.await()
+        observer.assertError(LineupNameEmptyException::class.java)
+    }
+
+    @Test
+    fun shouldTriggerAnExceptionIfTournamentNameEmpty() {
+        val tournament = Tournament(1L, "    ", 1L)
+        val observer = TestObserver<CreateLineup.ResponseValue>()
+        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", roaster)).subscribe(observer)
+        observer.await()
+        observer.assertError(TournamentNameEmptyException::class.java)
+    }
 }

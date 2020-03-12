@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.telen.easylineup.R
 import com.telen.easylineup.UseCaseHandler
 import com.telen.easylineup.domain.*
 import com.telen.easylineup.repository.model.Constants
@@ -14,10 +15,17 @@ import io.reactivex.Single
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
+sealed class SaveResult
+data class InvalidLineupName(val errorRes: Int): SaveResult()
+data class InvalidTournamentName(val errorRes: Int): SaveResult()
+data class SaveSuccess(val lineupID: Long, val lineupName: String): SaveResult()
+
 class LineupViewModel: ViewModel(), KoinComponent {
 
     private val filterLiveData: MutableLiveData<String> = MutableLiveData()
     private var chosenRoaster: GetRoaster.ResponseValue? = null
+
+    private val saveResult = MutableLiveData<SaveResult>()
 
     private val createLineupUseCase: CreateLineup by inject()
     private val getTeamUseCase: GetTeam by inject()
@@ -32,6 +40,10 @@ class LineupViewModel: ViewModel(), KoinComponent {
 
     fun registerFilterChanged() : LiveData<String> {
         return filterLiveData
+    }
+
+    fun registerSaveResults(): LiveData<SaveResult> {
+        return saveResult
     }
 
     fun getTournaments(): Single<List<Tournament>>{
@@ -59,14 +71,24 @@ class LineupViewModel: ViewModel(), KoinComponent {
                 }
     }
 
-    fun createNewLineup(tournament: Tournament, lineupTitle: String): Single<Long> {
-        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+    fun saveLineup(tournament: Tournament, lineupTitle: String) {
+        UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
                 .flatMap { team ->
                     getRoaster().map { it.players }.flatMap { roaster ->
                         UseCaseHandler.execute(createLineupUseCase, CreateLineup.RequestValues(team.id, tournament, lineupTitle, roaster))
                     }
                 }
                 .map { it.lineupID }
+                .subscribe({
+                    saveResult.value = SaveSuccess(it, lineupTitle)
+                }, {
+                    if (it is LineupNameEmptyException) {
+                        saveResult.value = InvalidLineupName(R.string.lineup_creation_error_name_empty)
+                    }
+                    else if(it is TournamentNameEmptyException) {
+                        saveResult.value = InvalidTournamentName(R.string.lineup_creation_error_tournament_empty)
+                    }
+                })
     }
 
     fun roasterPlayerStatusChanged(position: Int, status: Boolean) {

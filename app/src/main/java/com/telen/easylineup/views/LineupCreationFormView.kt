@@ -14,12 +14,8 @@ import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
 import timber.log.Timber
 import java.util.*
 
-interface OnFormReadyListener {
-    fun onFormStateChanged(isReady: Boolean)
-}
-
 interface OnActionButtonListener {
-    fun onSaveClicked()
+    fun onSaveClicked(lineupName: String, tournament: Tournament)
     fun onCancelClicked()
     fun onRoasterChangeClicked()
 }
@@ -44,7 +40,6 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
     private val tournaments: MutableList<Tournament> = mutableListOf()
     private lateinit var adapter: ArrayAdapter<String>
     private lateinit var tournamentsNames: MutableList<String>
-    private var readyStateListener: OnFormReadyListener? = null
     private var actionClickListener: OnActionButtonListener? = null
     private lateinit var calendar: Calendar
 
@@ -106,16 +101,7 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         }
 
         save.setOnClickListener {
-            val lineupName = lineupTitleInput.text
-            val tournamentName = tournamentChoiceAutoComplete.text
-            if(!TextUtils.isEmpty(lineupName?.trim()) && !TextUtils.isEmpty(tournamentName.trim()))
-                actionClickListener?.onSaveClicked()
-            else if(TextUtils.isEmpty(lineupName?.trim())) {
-                lineupTitleInputLayout.error = resources.getString(R.string.lineup_creation_error_name_empty)
-            }
-            else {
-                tournamentTitleInputLayout.error = resources.getString(R.string.lineup_creation_error_tournament_empty)
-            }
+            actionClickListener?.onSaveClicked(lineupTitleInput.text.toString(), getSelectedTournament())
         }
 
         addPlayerFilter.setOnClickListener {
@@ -131,8 +117,12 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         this.actionClickListener = listener
     }
 
-    fun setOnFormReadyListener(listener: OnFormReadyListener) {
-        this.readyStateListener = listener
+    fun setLineupNameError(error: String) {
+        lineupTitleInputLayout.error = error
+    }
+
+    fun setTournamentNameError(error: String) {
+        tournamentTitleInputLayout.error = error
     }
 
     fun setList(tournaments: List<Tournament>) {
@@ -148,7 +138,7 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         adapter.notifyDataSetChanged()
     }
 
-    fun getSelectedTournament(): Tournament {
+    private fun getSelectedTournament(): Tournament {
         val position = tournamentsNames.indexOf(tournamentChoiceAutoComplete.text.toString())
         Timber.d("position = $position")
         return if(position >= 0) {

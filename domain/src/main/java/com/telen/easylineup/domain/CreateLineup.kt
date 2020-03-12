@@ -6,17 +6,26 @@ import com.telen.easylineup.repository.model.Lineup
 import com.telen.easylineup.repository.model.RoasterPlayerStatus
 import com.telen.easylineup.repository.model.Tournament
 import io.reactivex.Single
+import java.lang.Exception
+
+class LineupNameEmptyException: Exception()
+class TournamentNameEmptyException: Exception()
 
 class CreateLineup(private val tournamentDao: TournamentDao, private val lineupsDao: LineupDao): UseCase<CreateLineup.RequestValues, CreateLineup.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-
         return Single.just(requestValues.tournament)
                 .flatMap {
-                    if(it.id == 0L)
-                        tournamentDao.insertTournament(it)
-                    else
-                        tournamentDao.updateTournament(it).andThen(Single.just(it.id))
+                    when {
+                        "" == requestValues.lineupTitle.trim() -> {
+                            Single.error(LineupNameEmptyException())
+                        }
+                        "" == it.name.trim() -> {
+                            Single.error(TournamentNameEmptyException())
+                        }
+                        it.id == 0L -> tournamentDao.insertTournament(it)
+                        else -> tournamentDao.updateTournament(it).andThen(Single.just(it.id))
+                    }
                 }
                 .flatMap {
                     val roaster = if(requestValues.roaster.none { !it.status }) null else roasterToString(requestValues.roaster)

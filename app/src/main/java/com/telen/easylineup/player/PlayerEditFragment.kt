@@ -16,6 +16,7 @@ import com.nguyenhoanglam.imagepicker.model.Config
 import com.nguyenhoanglam.imagepicker.model.Image
 import com.telen.easylineup.R
 import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.PlayerFormListener
 import com.telen.easylineup.views.PlayerFormView
@@ -82,9 +83,18 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
 
         viewModel.registerFormErrorResult().observe(this, Observer { error ->
             when(error) {
-                FormErrorResult.INVALID_NAME -> view.editPlayerForm.displayInvalidName()
-                FormErrorResult.INVALID_LICENSE -> view.editPlayerForm.displayInvalidLicense()
-                FormErrorResult.INVALID_NUMBER -> view.editPlayerForm.displayInvalidNumber()
+                FormErrorResult.INVALID_NAME -> {
+                    view.editPlayerForm.displayInvalidName()
+                    FirebaseAnalyticsUtils.emptyPlayerName(activity)
+                }
+                FormErrorResult.INVALID_LICENSE -> {
+                    view.editPlayerForm.displayInvalidLicense()
+                    FirebaseAnalyticsUtils.emptyPlayerLicense(activity)
+                }
+                FormErrorResult.INVALID_NUMBER -> {
+                    view.editPlayerForm.displayInvalidNumber()
+                    FirebaseAnalyticsUtils.emptyPlayerNumber(activity)
+                }
             }
         })
 
