@@ -1,12 +1,23 @@
+apply plugin: 'io.gitlab.arturbosch.detekt'
+
 detekt {
-    version = "$detektVersion"
-    profile("main") {
+    // Version of the Detekt CLI that will be used. When unspecified the latest detekt version found
+    // will be used. Override to stay on the same version.
+    toolVersion = "$detektVersion"
 
-        input = files(
-                file("src/main/java")
-        )
+    // Adds debug output during task execution. `false` by default.
+    debug = false
 
-        config = "$projectDir/default-detekt-config.yml"
-        filters = ".*test.*,.*/resources/.*,.*/tmp/.*"
+    // If set to `true` the build does not fail when the maxIssues count was reached. Defaults to `false`.
+    ignoreFailures = true
+
+    // Define the detekt configuration(s) you want to use. Defaults to the default detekt configuration.
+    //config = files("$projectDir/default-detekt-config.yml")
+    //filters = ".*test.*,.*/resources/.*,.*/tmp/.*"
+
+    reports {
+        html.enabled = true // observe findings in your browser with structure and code snippets
+        xml.enabled = true // checkstyle like format mainly for integrations like Jenkins
+        txt.enabled = true // similar to the console output, contains issue signature to manually edit baseline files
     }
 }

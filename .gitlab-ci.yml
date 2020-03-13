@@ -59,10 +59,12 @@ unitTests:
 dependencyCheckTests:
   stage: test
   script:
-    - ./gradlew -Pci --console=plain :app:dependencyCheckAnalyze --info
+    - ./gradlew -Pci --console=plain dependencyCheckAnalyze --info
   artifacts:
     paths:
       - app/build/reports/dependency-check-report.html
+      - domain/build/reports/dependency-check-report.html
+      - repository/build/reports/dependency-check-report.html
 
 #coverageTests:
 #  stage: test
