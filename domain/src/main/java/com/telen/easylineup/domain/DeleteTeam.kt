@@ -1,11 +1,7 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.data.PlayerDao
 import com.telen.easylineup.repository.data.TeamDao
-import com.telen.easylineup.repository.data.TournamentDao
-import com.telen.easylineup.repository.model.Player
 import com.telen.easylineup.repository.model.Team
-import com.telen.easylineup.repository.model.Tournament
 import io.reactivex.Completable
 import io.reactivex.Single
 
