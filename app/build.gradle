@@ -45,8 +45,8 @@ android {
         applicationId "com.telen.easylineup"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 1220
-        versionName "1.2.2" //1.2.2.0
+        versionCode appVersionCode
+        versionName appVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary true
@@ -218,4 +218,3 @@ dependencies {
 apply from: '../jacoco.gradle'
 apply from: '../detekt.gradle'
 apply from: '../dependency-check.gradle'
-apply from: '../sonar.gradle'

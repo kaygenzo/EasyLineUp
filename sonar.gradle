@@ -11,7 +11,7 @@ sonarqube {
 
         property "sonar.projectKey", "Easylineup"
         property "sonar.projectName", "Easylineup"
-        property "sonar.projectVersion", android.defaultConfig.versionName
+        property "sonar.projectVersion", appVersionName
         property "sonar.host.url", sonarProperties['sonar.host.url']
 
         property "sonar.language", "kotlin"
@@ -19,13 +19,18 @@ sonarqube {
         property "sonar.java.source", "1.8"
         property "sonar.java.target", "1.8"
 
-        property "sonar.sources", "src/main/java"
+        property "sonar.sources","src/main/java"
+        property "sonar.tests", "src/test/java"
         property "sonar.java.binaries", "build/tmp/kotlin-classes"
         property "sonar.profile", "Android Lint"
 
-        property "sonar.android.lint.report", "build/reports/lint-results-prodDebug.xml"
+        property "sonar.java.coveragePlugin", "jacoco"
+        property "sonar.coverage.exclusions", "**/test/**,**/androidTest/**,**/R.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*,**/com/example/databinding/*,**/com/example/generated/callback/*,**/*Dto*.*,**/android/databinding/*,**/androidx/databinding/*,**/di/module/*,**/*MapperImpl*.*,**/BuildConfig.*,**/*Component*.*,**/*BR*.*,**/Manifest*.*,**/*Companion*.*,**/*Module.*,**/*Dagger*.*,**/*MembersInjector*.*,**/*Extensions*.*,**/InputMethodManagerLeaks.*,**/*_Factory*.*,**/*_Provide*Factory*.*"
         property "sonar.androidLint.reportPaths", "build/reports/lint-results-prodDebug.xml"
         property "sonar.kotlin.detekt.reportPaths", "build/reports/detekt/detekt.xml"
         property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/testProdDebugUnitTestCoverage/testProdDebugUnitTestCoverage.xml"
+        property "sonar.dependencyCheck.xmlReportPath", "build/reports/dependency-check-report.xml"
+        property "sonar.dependencyCheck.jsonReportPath", "build/reports/dependency-check-report.json"
+        property "sonar.dependencyCheck.htmlReportPath", "build/reports/dependency-check-report.html"
     }
 }

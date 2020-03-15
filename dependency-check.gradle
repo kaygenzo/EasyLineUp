@@ -11,4 +11,6 @@ dependencyCheck {
     }.collect {
         it.name
     }
+
+    format='ALL'
 }

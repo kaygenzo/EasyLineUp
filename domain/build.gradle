@@ -89,4 +89,3 @@ dependencies {
 apply from: '../jacoco.gradle'
 apply from: '../detekt.gradle'
 apply from: '../dependency-check.gradle'
-apply from: '../sonar.gradle'
