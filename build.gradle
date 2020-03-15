@@ -76,6 +76,7 @@ plugins {
 }
 
 apply from: 'sonar.gradle'
+apply from: 'detekt.gradle'
 
 allprojects {
     repositories {

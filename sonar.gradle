@@ -34,3 +34,15 @@ sonarqube {
         property "sonar.dependencyCheck.htmlReportPath", "build/reports/dependency-check-report.html"
     }
 }
+
+//app
+project.tasks["sonarqube"].dependsOn ':app:testProdDebugUnitTestCoverage'
+project.tasks["sonarqube"].dependsOn ':app:lintProdDebug'
+project.tasks["sonarqube"].dependsOn ':app:dependencyCheckAnalyze'
+
+//domain
+project.tasks["sonarqube"].dependsOn ':domain:testProdDebugUnitTestCoverage'
+project.tasks["sonarqube"].dependsOn ':domain:lintProdDebug'
+
+//project
+project.tasks["sonarqube"].dependsOn 'detekt'
