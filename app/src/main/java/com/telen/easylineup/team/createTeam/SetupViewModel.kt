@@ -4,10 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.UseCaseHandler
-import com.telen.easylineup.domain.GetTeamCreationNextStep
-import com.telen.easylineup.domain.NameEmptyException
-import com.telen.easylineup.domain.SaveCurrentTeam
-import com.telen.easylineup.domain.SaveTeam
+import com.telen.easylineup.domain.*
 import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.repository.model.Team
 import com.telen.easylineup.repository.model.TeamType
@@ -22,11 +19,12 @@ class SetupViewModel: ViewModel(), KoinComponent {
     private val saveTeamUseCase: SaveTeam by inject()
     private val saveCurrentTeamUseCase: SaveCurrentTeam by inject()
     private val getTeamCreationNextStep: GetTeamCreationNextStep by inject()
+    private val getTeamCreationPreviousStep: GetTeamCreationPreviousStep by inject()
 
     var team = Team(0, "", null, TeamType.BASEBALL.id, true)
 
     private var saveDisposable: Disposable? = null
-    var stepLiveData: MutableLiveData<GetTeamCreationNextStep.ResponseValue> = MutableLiveData()
+    var stepLiveData: MutableLiveData<GetTeamCreationStep.ResponseValue> = MutableLiveData()
     var errorLiveData: MutableLiveData<Error> = MutableLiveData()
 
     enum class Error {
@@ -61,12 +59,10 @@ class SetupViewModel: ViewModel(), KoinComponent {
     fun nextButtonClicked(currentStep: Int) {
         dispose(saveDisposable)
 
-        val requestValue = GetTeamCreationNextStep.RequestValues(
-                GetTeamCreationNextStep.TeamCreationStep.getStepById(currentStep) ?: GetTeamCreationNextStep.TeamCreationStep.TEAM)
+        val requestValue = GetTeamCreationStep.RequestValues(
+                TeamCreationStep.getStepById(currentStep) ?: TeamCreationStep.TEAM)
 
-        saveDisposable =
-                saveTeam()
-                .andThen(UseCaseHandler.execute(getTeamCreationNextStep, requestValue))
+        saveDisposable =  UseCaseHandler.execute(getTeamCreationNextStep, requestValue)
                 .subscribe({
                     stepLiveData.value = it
                 }, {
@@ -76,6 +72,20 @@ class SetupViewModel: ViewModel(), KoinComponent {
                     else {
                         errorLiveData.value = Error.UNKNOWN
                     }
+                })
+    }
+
+    fun previousButtonClicked(currentStep: Int) {
+        dispose(saveDisposable)
+
+        val requestValue = GetTeamCreationStep.RequestValues(
+                TeamCreationStep.getStepById(currentStep) ?: TeamCreationStep.TEAM)
+
+        saveDisposable = UseCaseHandler.execute(getTeamCreationPreviousStep, requestValue)
+                .subscribe({
+                    stepLiveData.value = it
+                }, {
+                    errorLiveData.value = Error.UNKNOWN
                 })
     }
 

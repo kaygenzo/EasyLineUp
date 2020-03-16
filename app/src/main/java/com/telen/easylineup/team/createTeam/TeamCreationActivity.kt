@@ -2,13 +2,13 @@ package com.telen.easylineup.team.createTeam
 
 import android.app.Activity
 import android.os.Bundle
-import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.GetTeamCreationNextStep
+import com.telen.easylineup.domain.TeamCreationStep
 import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.repository.model.Team
 import com.telen.easylineup.utils.NavigationUtils
@@ -33,33 +33,63 @@ class TeamCreationActivity: AppCompatActivity() {
 
         viewModel.stepLiveData.observe(this, Observer {
 
-            stepLayout.go(it.nextStep.id, true)
-
-            buttonNext.visibility = it.nextButtonVisibility
-            buttonNext.isEnabled = it.nextButtonEnabled
-            if(it.nextButtonLabel > 0)
-                buttonNext.setText(it.nextButtonLabel)
+            val isNext = stepLayout.currentStep < it.nextStep.id
 
             when(it.nextStep) {
-                GetTeamCreationNextStep.TeamCreationStep.TYPE -> {
-                    navController.navigate(R.id.teamTypeFragment, null, NavigationUtils().getOptions())
+                TeamCreationStep.TYPE -> {
+                    if(isNext)
+                        navController.navigate(R.id.teamTypeFragment, null, NavigationUtils().getOptions())
+                    else {
+                        navController.popBackStack(R.id.teamTypeFragment, false)
+                    }
                 }
-                GetTeamCreationNextStep.TeamCreationStep.PLAYERS -> {
-                    val arguments = Bundle()
-                    arguments.putBoolean(Constants.EXTRA_CLICKABLE, false)
-                    navController.navigate(R.id.navigation_team, arguments, NavigationUtils().getOptions())
+                TeamCreationStep.TEAM -> {
+                    if(!isNext) {
+                        navController.popBackStack(R.id.teamCreationName, false)
+                    }
                 }
-                GetTeamCreationNextStep.TeamCreationStep.FINISH -> {
-                    setResult(Activity.RESULT_OK)
-                    finish()
+                TeamCreationStep.FINISH -> {
+                    viewModel.saveTeam()
+                            .subscribe({
+                                setResult(Activity.RESULT_OK)
+                                finish()
+                            }, {  error ->
+                                Timber.e(error)
+                            })
+                }
+                TeamCreationStep.CANCEL -> {
+                    AlertDialog.Builder(this)
+                            .setMessage("TODO Are you sure you really want to cancel ? You will loose all your modifications.")
+                            .setPositiveButton(android.R.string.ok) { dialog, which ->
+                                finish()
+                            }
+                            .setNegativeButton(android.R.string.cancel) { dialog, which ->
+                                dialog.dismiss()
+                            }
+                            .create()
+                            .show()
+                    return@Observer
                 }
                 else -> {}
             }
+
+            buttonNext.visibility = it.nextButtonVisibility
+            buttonNext.isEnabled = it.nextButtonEnabled
+
+            buttonPrevious.visibility = it.previousButtonVisibility
+            buttonPrevious.isEnabled = it.previousButtonEnabled
+
+            if(it.nextButtonLabel > 0)
+                buttonNext.setText(it.nextButtonLabel)
+
+            if(it.previousButtonLabel > 0)
+                buttonPrevious.setText(it.previousButtonLabel)
+            
+            stepLayout.go(it.nextStep.id, true)
         })
 
-        buttonNext.setOnClickListener {
-            viewModel.nextButtonClicked(stepLayout.currentStep)
-        }
+        buttonNext.setOnClickListener { viewModel.nextButtonClicked(stepLayout.currentStep) }
+        buttonPrevious.setOnClickListener { viewModel.previousButtonClicked(stepLayout.currentStep) }
     }
 
     override fun onBackPressed() {

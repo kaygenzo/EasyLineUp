@@ -3,6 +3,5 @@
     <string-array name="createTeamSteps">
         <item>Team init</item>
         <item>Choose type</item>
-        <item>Add players</item>
     </string-array>
 </resources>

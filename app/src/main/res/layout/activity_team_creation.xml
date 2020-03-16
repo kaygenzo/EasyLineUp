@@ -70,8 +70,30 @@
             android:id="@+id/arrowRight"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            app:srcCompat="@drawable/ic_keyboard_arrow_right_white_24dp"
+            app:srcCompat="@drawable/ic_arrow_right_white_24dp"
             app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/buttonNext"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonNext"
+            />
+
+        <TextView
+            android:id="@+id/buttonPrevious"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toRightOf="@+id/arrowLeft"
+            android:text="@string/team_creation_label_cancel"
+            android:textColor="#FFFFFFFF"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textAllCaps="true"/>
+
+        <ImageView
+            android:id="@+id/arrowLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:srcCompat="@drawable/ic_arrow_left_white_24dp"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/buttonNext"
             app:layout_constraintBottom_toBottomOf="@+id/buttonNext"
             />
