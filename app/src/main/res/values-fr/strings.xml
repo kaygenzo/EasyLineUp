@@ -125,4 +125,7 @@
     <string name="setting_delete_data_description">Supprimer toutes les données</string>
     <string name="setting_version_title">Version</string>
     <string name="setting_play_store_title">Page officielle du Google Play store</string>
+
+    <string name="login_create">Créez votre première équipe!</string>
+    <string name="login_import">Importez une équipe existante.</string>
 </resources>

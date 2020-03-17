@@ -1,7 +1,6 @@
 package com.telen.easylineup.splashscreen
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -10,8 +9,8 @@ import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.UseCaseHandler
 import com.telen.easylineup.domain.GetTeam
+import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.mock.DatabaseMockProvider
-import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -43,7 +42,7 @@ class SplashScreenActivity: AppCompatActivity(), KoinComponent {
                 .subscribe({
                     launchHome()
                 }, {
-                    launchTeamCreation()
+                    launchLoginScreen()
                 })
     }
 
@@ -52,11 +51,10 @@ class SplashScreenActivity: AppCompatActivity(), KoinComponent {
         disposable?.takeIf { !it.isDisposed }?.dispose()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == REQUEST_CREATE_TEAM && resultCode == Activity.RESULT_OK) {
-            launchHome()
-        }
+    private fun launchLoginScreen() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun launchHome() {
@@ -64,10 +62,5 @@ class SplashScreenActivity: AppCompatActivity(), KoinComponent {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
         finish()
-    }
-
-    private fun launchTeamCreation() {
-        val intent = Intent(this, TeamCreationActivity::class.java)
-        startActivityForResult(intent, REQUEST_CREATE_TEAM)
     }
 }

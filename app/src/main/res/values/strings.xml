@@ -141,4 +141,7 @@
     <string name="key_app_version" translatable="false">key_app_version</string>
     <string name="key_play_store" translatable="false">key_play_store</string>
 
+    <string name="login_create">Create your first team!</string>
+    <string name="login_import">Import an existing team.</string>
+
 </resources>

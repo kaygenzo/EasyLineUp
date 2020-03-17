@@ -28,6 +28,7 @@ val appModules = module {
     single { GetPositionsSummaryForPlayer(get()) }
     single { GetPlayers(get()) }
     single { SaveTeam(get()) }
+    single { CheckTeam(get()) }
     single { GetTeamCreationNextStep() }
     single { GetTeamCreationPreviousStep() }
     single { SavePlayerFieldPosition(get()) }

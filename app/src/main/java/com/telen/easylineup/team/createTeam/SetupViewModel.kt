@@ -17,6 +17,7 @@ import org.koin.core.inject
 class SetupViewModel: ViewModel(), KoinComponent {
 
     private val saveTeamUseCase: SaveTeam by inject()
+    private val checkTeamUseCase: CheckTeam by inject()
     private val saveCurrentTeamUseCase: SaveCurrentTeam by inject()
     private val getTeamCreationNextStep: GetTeamCreationNextStep by inject()
     private val getTeamCreationPreviousStep: GetTeamCreationPreviousStep by inject()
@@ -25,11 +26,12 @@ class SetupViewModel: ViewModel(), KoinComponent {
 
     private var saveDisposable: Disposable? = null
     var stepLiveData: MutableLiveData<GetTeamCreationStep.ResponseValue> = MutableLiveData()
-    var errorLiveData: MutableLiveData<Error> = MutableLiveData()
+    var errorLiveData: MutableLiveData<Error> = MutableLiveData(Error.NONE)
 
     enum class Error {
         NAME_EMPTY,
-        UNKNOWN
+        UNKNOWN,
+        NONE
     }
 
     fun setTeamName(name: String) {
@@ -47,9 +49,10 @@ class SetupViewModel: ViewModel(), KoinComponent {
     }
 
     fun saveTeam(): Completable {
-        return UseCaseHandler.execute(saveTeamUseCase, SaveTeam.RequestValues(team)).map { it.team }
+        return UseCaseHandler.execute(checkTeamUseCase, CheckTeam.RequestValues(team)).ignoreElement()
+                .andThen(UseCaseHandler.execute(saveTeamUseCase, SaveTeam.RequestValues(team)).map { it.team })
                 .flatMapCompletable { UseCaseHandler.execute(saveCurrentTeamUseCase, SaveCurrentTeam.RequestValues(it)).ignoreElement() }
-
+                .doOnComplete { errorLiveData.value = Error.NONE }
     }
 
     fun getTeam(): Single<Team> {
@@ -62,7 +65,9 @@ class SetupViewModel: ViewModel(), KoinComponent {
         val requestValue = GetTeamCreationStep.RequestValues(
                 TeamCreationStep.getStepById(currentStep) ?: TeamCreationStep.TEAM)
 
-        saveDisposable =  UseCaseHandler.execute(getTeamCreationNextStep, requestValue)
+        saveDisposable = UseCaseHandler.execute(checkTeamUseCase, CheckTeam.RequestValues(team)).ignoreElement()
+                .doOnComplete { errorLiveData.value = Error.NONE }
+                .andThen(UseCaseHandler.execute(getTeamCreationNextStep, requestValue))
                 .subscribe({
                     stepLiveData.value = it
                 }, {
@@ -81,12 +86,15 @@ class SetupViewModel: ViewModel(), KoinComponent {
         val requestValue = GetTeamCreationStep.RequestValues(
                 TeamCreationStep.getStepById(currentStep) ?: TeamCreationStep.TEAM)
 
-        saveDisposable = UseCaseHandler.execute(getTeamCreationPreviousStep, requestValue)
-                .subscribe({
-                    stepLiveData.value = it
-                }, {
-                    errorLiveData.value = Error.UNKNOWN
-                })
+        saveDisposable =
+                UseCaseHandler.execute(checkTeamUseCase, CheckTeam.RequestValues(team)).ignoreElement()
+                        .doOnComplete { errorLiveData.value = Error.NONE }
+                        .andThen(UseCaseHandler.execute(getTeamCreationPreviousStep, requestValue))
+                        .subscribe({
+                            stepLiveData.value = it
+                        }, {
+                            errorLiveData.value = Error.UNKNOWN
+                        })
     }
 
     private fun dispose(disposable: Disposable?) {

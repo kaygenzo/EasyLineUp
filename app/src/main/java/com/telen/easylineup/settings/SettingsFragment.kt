@@ -1,21 +1,19 @@
 package com.telen.easylineup.settings
 
 import android.content.ActivityNotFoundException
-import android.os.Bundle
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
-import com.telen.easylineup.R
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import androidx.lifecycle.ViewModelProviders
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
 import com.telen.easylineup.BuildConfig
-import com.telen.easylineup.splashscreen.SplashScreenActivity
-import com.telen.easylineup.team.createTeam.TeamCreationActivity
+import com.telen.easylineup.R
+import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.utils.DialogFactory
 import io.reactivex.Completable
-import io.reactivex.functions.Action
-import io.reactivex.functions.Consumer
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -49,9 +47,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 activity?.let {
                     DialogFactory.getWarningDialog(it, "", getString(R.string.dialog_delete_cannot_undo_message),
                             viewModel.deleteAllData().doOnComplete {
-                                val intent = Intent(activity, TeamCreationActivity::class.java)
-                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                startActivityForResult(intent, SplashScreenActivity.REQUEST_CREATE_TEAM)
+                                Completable.timer(1000, TimeUnit.MILLISECONDS).subscribe({
+                                    val intent = Intent(activity, LoginActivity::class.java)
+                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    startActivity(intent)
+                                }, {
+
+                                })
                             }.doOnError {
                                 Timber.e(it)
                             }

@@ -75,6 +75,9 @@ class TeamEditFragment: Fragment() , TeamFormListener {
                     teamNameInputLayout.error = getString(R.string.team_creation_error_name_empty)
                     FirebaseAnalyticsUtils.emptyTeamName(activity)
                 }
+                SetupViewModel.Error.NONE -> {
+                    teamNameInputLayout.error = ""
+                }
                 else -> Toast.makeText(activity, "Something wrong happened, please try again", Toast.LENGTH_SHORT).show()
             }
         })
