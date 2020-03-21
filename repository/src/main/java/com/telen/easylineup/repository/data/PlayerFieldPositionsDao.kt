@@ -18,6 +18,9 @@ interface PlayerFieldPositionsDao {
     @Update
     fun updatePlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>): Completable
 
+    @Update
+    fun updatePlayerFieldPositionsWithRowCount(fieldPositions: List<PlayerFieldPosition>): Single<Int>
+
     @Delete
     fun deletePosition(position: PlayerFieldPosition): Completable
 
@@ -30,16 +33,17 @@ interface PlayerFieldPositionsDao {
     @Query("SELECT * from playerFieldPosition")
     fun getAllPlayerFieldPositions(): LiveData<List<PlayerFieldPosition>>
 
+    @Query("SELECT * from playerFieldPosition")
+    fun getPlayerFieldPositions(): Single<List<PlayerFieldPosition>>
+
     @Query("SELECT * FROM playerFieldPosition WHERE id = :positionID")
     fun getPlayerFieldPosition(positionID: Long): Single<PlayerFieldPosition>
 
     @Query("""
-        SELECT playerFieldPosition.* FROM playerFieldPosition
-        INNER JOIN players ON playerFieldPosition.playerID = players.id
-        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
+        SELECT * FROM playerFieldPosition
         WHERE playerFieldPosition.lineupID = :lineupId
     """)
-    fun getAllPlayerFieldPositionsForLineup(lineupId: Long): LiveData<List<PlayerFieldPosition>>
+    fun getAllPlayerFieldPositionsForLineup(lineupId: Long): Single<List<PlayerFieldPosition>>
 
     @Query("""
         SELECT players.name as playerName,
@@ -59,23 +63,23 @@ interface PlayerFieldPositionsDao {
     """)
     fun getAllPlayersWithPositionsForLineup(lineupId: Long): LiveData<List<PlayerWithPosition>>
 
-    @Query("""
-        SELECT players.name as playerName,
-        players.shirtNumber, players.licenseNumber,
-        playerFieldPosition.position,
-        playerFieldPosition.x, playerFieldPosition.y,
-        playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID,
-        playerFieldPosition.lineupID,
-        players.id as playerID,
-        players.teamID, players.image,
-        players.positions as playerPositions
-        FROM playerFieldPosition
-        INNER JOIN players ON playerFieldPosition.playerID = players.id
-        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
-        WHERE playerFieldPosition.lineupID = :lineupId
-        ORDER BY playerFieldPosition.`order` ASC
-    """)
-    fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): Maybe<List<PlayerWithPosition>>
+//    @Query("""
+//        SELECT players.name as playerName,
+//        players.shirtNumber, players.licenseNumber,
+//        playerFieldPosition.position,
+//        playerFieldPosition.x, playerFieldPosition.y,
+//        playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID,
+//        playerFieldPosition.lineupID,
+//        players.id as playerID,
+//        players.teamID, players.image,
+//        players.positions as playerPositions
+//        FROM playerFieldPosition
+//        INNER JOIN players ON playerFieldPosition.playerID = players.id
+//        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
+//        WHERE playerFieldPosition.lineupID = :lineupId
+//        ORDER BY playerFieldPosition.`order` ASC
+//    """)
+//    fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): Maybe<List<PlayerWithPosition>>
 
     @Query("""
         SELECT playerFieldPosition.* FROM playerFieldPosition

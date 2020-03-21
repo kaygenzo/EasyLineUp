@@ -1,6 +1,8 @@
 package com.telen.easylineup.repository.model
 
 import androidx.room.*
+import com.telen.easylineup.repository.model.export.LineupExport
+import com.telen.easylineup.repository.model.export.PlayerPositionExport
 import java.util.*
 
 const val MODE_NONE = 0
@@ -25,6 +27,7 @@ data class Lineup(
         @ColumnInfo(name = "createdAt") var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         @ColumnInfo(name = "editedAt") var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         @ColumnInfo(name = "roaster") var roaster: String? = null,
+        @ColumnInfo(name = "hash") var hash: String? = null,
         @Ignore val playerPositions: MutableList<FieldPosition> = mutableListOf()) {
 
     override fun equals(other: Any?): Boolean {
@@ -52,4 +55,8 @@ data class Lineup(
         result = 31 * result + (roaster?.hashCode() ?: 0)
         return result
     }
+}
+
+fun Lineup.toLineupExport(playerPositions: MutableList<PlayerPositionExport>): LineupExport {
+    return LineupExport(hash ?: UUID.randomUUID().toString(), name, createdTimeInMillis, editedTimeInMillis, mode, roaster, playerPositions)
 }

@@ -192,9 +192,9 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                 return@SingleOnSubscribe
             }
 
-            val tmpSDPath = StringBuilder(Environment.getExternalStorageDirectory().absolutePath).append("/Lineups/").toString()
+            val tmpSDPath = StringBuilder(Environment.getExternalStorageDirectory().absolutePath).append("/${Constants.BASE_ROOT_DIRECTORY}/lineups/").toString()
             if(!File(tmpSDPath).exists())
-                File(tmpSDPath).mkdir()
+                File(tmpSDPath).mkdirs()
 
             val timeInMillis = Calendar.getInstance().timeInMillis
 

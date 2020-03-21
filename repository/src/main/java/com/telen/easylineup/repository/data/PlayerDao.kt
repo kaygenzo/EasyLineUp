@@ -22,6 +22,9 @@ interface PlayerDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun updatePlayer(player: Player): Completable
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun updatePlayersWithRowCount(players: List<Player>): Single<Int>
+
     @Query("SELECT * from players WHERE id = :playerID" )
     fun getPlayerById(playerID: Long): LiveData<Player>
 
@@ -33,6 +36,9 @@ interface PlayerDao {
 
     @Query("SELECT * FROM players WHERE players.teamID = :teamID")
     fun getPlayers(teamID: Long): Single<List<Player>>
+
+    @Query("SELECT * FROM players")
+    fun getPlayers(): Single<List<Player>>
 
 //    @Query("SELECT players.* FROM players INNER JOIN teams ON players.teamID = teams.id WHERE teams.id = :teamId")
 //    fun getPlayersForTeamRx(teamId: Long): Single<List<Player>>

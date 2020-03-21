@@ -4,7 +4,11 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.telen.easylineup.repository.model.export.PlayerExport
+import com.telen.easylineup.repository.model.export.TeamExport
+import com.telen.easylineup.repository.model.export.TournamentExport
 import java.io.Serializable
+import java.util.*
 
 @Entity(
         tableName = "teams",
@@ -15,7 +19,8 @@ data class Team(
         @ColumnInfo(name = "name") var name: String = "",
         @ColumnInfo(name = "image") var image: String? = null,
         @ColumnInfo(name = "type") var type: Int = 0,
-        @ColumnInfo(name = "main") var main: Boolean = false): Serializable {
+        @ColumnInfo(name = "main") var main: Boolean = false,
+        @ColumnInfo(name = "hash") var hash: String? = null): Serializable {
 
     override fun toString(): String {
         val builder = StringBuffer().apply {
@@ -25,6 +30,7 @@ data class Team(
             append("image=$image,")
             append("type=$type")
             append("main=$main")
+            append("hash=$hash")
             append("}")
         }
         return builder.toString()
@@ -53,6 +59,8 @@ data class Team(
         result = 31 * result + main.hashCode()
         return result
     }
+}
 
-
+fun Team.toTeamExport(players: List<PlayerExport>, tournaments: List<TournamentExport>) : TeamExport {
+    return TeamExport(hash ?: UUID.randomUUID().toString(), name, image, type, main, players, tournaments)
 }

@@ -17,11 +17,17 @@ interface LineupDao {
     @Update
     fun updateLineup(lineup: Lineup): Completable
 
+    @Update
+    fun updateLineupsWithRowCount(lineup: List<Lineup>): Single<Int>
+
     @Delete
     fun deleteLineup(lineup: Lineup): Completable
 
     @Query("SELECT * FROM lineups ORDER BY id ASC")
     fun getAllLineup(): LiveData<List<Lineup>>
+
+    @Query("SELECT * FROM lineups")
+    fun getLineups(): Single<List<Lineup>>
 
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
     fun getLineupById(lineupId: Long): LiveData<Lineup>
@@ -36,6 +42,12 @@ interface LineupDao {
         WHERE lineups.tournamentID = :tournamentId AND lineups.teamID = :teamID
     """)
     fun getLineupsForTournament(tournamentId: Long, teamID: Long): LiveData<List<Lineup>>
+
+    @Query("""
+        SELECT * FROM lineups
+        WHERE lineups.tournamentID = :tournamentId AND lineups.teamID = :teamID
+    """)
+    fun getLineupsForTournamentRx(tournamentId: Long, teamID: Long): Single<List<Lineup>>
 
     @Query("SELECT * FROM lineups ORDER BY editedAt DESC LIMIT 1")
     fun getLastLineup(): Single<Lineup>

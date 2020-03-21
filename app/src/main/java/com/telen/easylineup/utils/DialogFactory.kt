@@ -48,5 +48,11 @@ class DialogFactory {
                     .setTitleText(title)
             return dialog
         }
+
+        fun getErrorDialog(context: Context, title: String): SweetAlertDialog {
+            val dialog = SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText(title)
+            return dialog
+        }
     }
 }

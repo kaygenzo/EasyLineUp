@@ -29,6 +29,7 @@ class App: MultiDexApplication() {
                 .addMigrations(migration_2_3())
                 .addMigrations(migration_3_4())
                 .addMigrations(migration_4_5())
+                .addMigrations(migration_5_6())
                 .build()
 
         if (BuildConfig.DEBUG) {
@@ -83,6 +84,37 @@ class App: MultiDexApplication() {
         return object: Migration(4,5) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE Lineups ADD COLUMN roaster TEXT DEFAULT null")
+            }
+        }
+    }
+
+    //delete columns x and y + add new column hash in each table
+    private fun migration_5_6(): Migration {
+        return object: Migration(5,6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+//                database.execSQL("CREATE TABLE IF NOT EXISTS playerFieldPosition_tmp (" +
+//                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+//                        "`playerID` INTEGER NOT NULL, " +
+//                        "`lineupID` INTEGER NOT NULL, " +
+//                        "`position` INTEGER NOT NULL, " +
+//                        "`order` INTEGER NOT NULL, " +
+//                        "FOREIGN KEY(`playerID`) REFERENCES `players`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , " +
+//                        "FOREIGN KEY(`lineupID`) REFERENCES `lineups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE" +
+//                        ")")
+//                // Copy the data
+//                database.execSQL(
+//                        "INSERT INTO playerFieldPosition_tmp (id, playerID, lineupID, position, order) " +
+//                                "SELECT id, playerID, lineupID, position, order FROM playerFieldPosition")
+//                // Remove the old table
+//                database.execSQL("DROP TABLE playerFieldPosition")
+//                // Change the table name to the correct one
+//                database.execSQL("ALTER TABLE playerFieldPosition_tmp RENAME TO playerFieldPosition")
+
+                database.execSQL("ALTER TABLE teams ADD COLUMN hash TEXT DEFAULT null")
+                database.execSQL("ALTER TABLE players ADD COLUMN hash TEXT DEFAULT null")
+                database.execSQL("ALTER TABLE lineups ADD COLUMN hash TEXT DEFAULT null")
+                database.execSQL("ALTER TABLE tournaments ADD COLUMN hash TEXT DEFAULT null")
+                database.execSQL("ALTER TABLE playerFieldPosition ADD COLUMN hash TEXT DEFAULT null")
             }
         }
     }

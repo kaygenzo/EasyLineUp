@@ -18,9 +18,9 @@
 
     <PreferenceCategory app:title="@string/setting_category_data_title">
 
-<!--        <Preference-->
-<!--            app:title="@string/setting_export_data_description"-->
-<!--            app:key="@string/key_export_data"/>-->
+        <Preference
+            app:title="@string/setting_export_data_description"
+            app:key="@string/key_export_data"/>
 
 <!--        <Preference-->
 <!--            app:title="@string/setting_import_data_description"-->

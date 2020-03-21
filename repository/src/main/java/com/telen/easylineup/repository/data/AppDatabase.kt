@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.telen.easylineup.repository.model.*
 
-@Database(entities = [Player::class, Team::class, Lineup::class, PlayerFieldPosition::class, Tournament::class], version = 5)
+@Database(entities = [Player::class, Team::class, Lineup::class, PlayerFieldPosition::class, Tournament::class], version = 6)
 abstract class AppDatabase: RoomDatabase() {
     abstract fun playerDao(): PlayerDao
     abstract fun teamDao(): TeamDao

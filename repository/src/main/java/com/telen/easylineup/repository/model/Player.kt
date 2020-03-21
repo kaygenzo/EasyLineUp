@@ -1,6 +1,8 @@
 package com.telen.easylineup.repository.model
 
 import androidx.room.*
+import com.telen.easylineup.repository.model.export.PlayerExport
+import java.util.*
 
 @Entity(
         tableName = "players",
@@ -16,8 +18,9 @@ data class Player(
         @ColumnInfo(name = "name") var name: String,
         @ColumnInfo(name = "shirtNumber") var shirtNumber: Int,
         @ColumnInfo(name = "licenseNumber") var licenseNumber: Long,
-        @ColumnInfo(name = "image") var image: String? = null
-        , @ColumnInfo(name = "positions") var positions: Int = 0
+        @ColumnInfo(name = "image") var image: String? = null,
+        @ColumnInfo(name = "positions") var positions: Int = 0,
+        @ColumnInfo(name = "hash") var hash: String? = null
 ) {
 
     override fun equals(other: Any?): Boolean {
@@ -46,5 +49,9 @@ data class Player(
         result = 31 * result + (image?.hashCode() ?: 0)
         result = 31 * result + positions
         return result
+    }
+
+    fun toPlayerExport(): PlayerExport {
+        return PlayerExport(hash ?: UUID.randomUUID().toString(), name, image, shirtNumber, licenseNumber.toString(), positions)
     }
 }

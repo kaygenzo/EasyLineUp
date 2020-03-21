@@ -23,6 +23,9 @@ interface TeamDao {
     @Update
     fun updateTeams(team: List<Team>): Completable
 
+    @Update
+    fun updateTeamsWithRowCount(team: List<Team>): Single<Int>
+
     @Query("SELECT * FROM teams WHERE id = :teamId")
     fun getTeamById(teamId: Long): Single<Team>
 

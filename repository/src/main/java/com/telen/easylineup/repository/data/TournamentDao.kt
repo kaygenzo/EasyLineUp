@@ -21,6 +21,9 @@ interface TournamentDao {
     @Update
     fun updateTournament(tournament: Tournament): Completable
 
+    @Update
+    fun updateTournamentsWithRowCount(tournaments: List<Tournament>): Single<Int>
+
     @Delete
     fun deleteTournament(tournament: Tournament): Completable
 
