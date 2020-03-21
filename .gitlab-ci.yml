@@ -23,15 +23,29 @@ before_script:
   - echo $DEBUG_KEYSTORE_FILE | base64 -d > telen.debug.jks
   - echo $KEYSTORE_FILE | base64 -d > telen.release.jks
   - echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
+  - echo $APP_DISTRIBUTION_SERVICE_FILE | base64 -d > easylineup-services.json
+  - echo $APP_DISTRIBUTION_TESTERS_FILE | base64 -d > testers.txt
 
 stages:
   - test
+  - develop
   - release
 
 assembleProdRelease:
   stage: release
+  only:
+    - tags
   script:
     - ./gradlew assembleProdRelease
+  artifacts:
+    paths:
+      - app/build/outputs/apk/prod/release
+      - app/build/outputs/mapping/prod/release
+
+assembleProdReleaseAndDeployAppDistribution:
+  stage: develop
+  script:
+    - ./gradlew assembleProdRelease appDistributionUploadProdRelease
   artifacts:
     paths:
       - app/build/outputs/apk/prod/release

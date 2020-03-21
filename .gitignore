@@ -31,4 +31,5 @@ local.properties
 
 *.DS_Store
 *.properties
-google-services.json
+*-services.json
+testers.txt
