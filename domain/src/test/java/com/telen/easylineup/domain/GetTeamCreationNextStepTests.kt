@@ -23,48 +23,42 @@ class GetTeamCreationNextStepTests {
 
     @Test
     fun shouldTriggerAnExceptionIfStepNotManaged() {
-        val observer = TestObserver<GetTeamCreationNextStep.ResponseValue>()
-        mGetTeamCreationNextStep.executeUseCase(GetTeamCreationNextStep.RequestValues(GetTeamCreationNextStep.TeamCreationStep.FINISH)).subscribe(observer)
+        val observer = TestObserver<GetTeamCreationStep.ResponseValue>()
+        mGetTeamCreationNextStep.executeUseCase(GetTeamCreationStep.RequestValues(TeamCreationStep.FINISH)).subscribe(observer)
         observer.await()
         observer.assertError(IllegalArgumentException::class.java)
     }
 
     // Team -> Type
     @Test
-    fun shouldReturnTypeScreenIfCurrentIsTeam() {
-        val observer = TestObserver<GetTeamCreationNextStep.ResponseValue>()
-        mGetTeamCreationNextStep.executeUseCase(GetTeamCreationNextStep.RequestValues(GetTeamCreationNextStep.TeamCreationStep.TEAM)).subscribe(observer)
+    fun shouldReturnNextScreenTypeIfCurrentIsTeam() {
+        val observer = TestObserver<GetTeamCreationStep.ResponseValue>()
+        mGetTeamCreationNextStep.executeUseCase(GetTeamCreationStep.RequestValues(TeamCreationStep.TEAM)).subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(GetTeamCreationNextStep.TeamCreationStep.TYPE, observer.values().first().nextStep)
-        Assert.assertEquals(true, observer.values().first().nextButtonEnabled)
-        Assert.assertEquals(R.string.team_creation_label_next, observer.values().first().nextButtonLabel)
-        Assert.assertEquals(View.VISIBLE, observer.values().first().nextButtonVisibility)
-    }
-
-    // Type -> Players
-    @Test
-    fun shouldReturnPlayersScreenIfCurrentIsType() {
-        val observer = TestObserver<GetTeamCreationNextStep.ResponseValue>()
-        mGetTeamCreationNextStep.executeUseCase(GetTeamCreationNextStep.RequestValues(GetTeamCreationNextStep.TeamCreationStep.TYPE)).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(GetTeamCreationNextStep.TeamCreationStep.PLAYERS, observer.values().first().nextStep)
+        Assert.assertEquals(TeamCreationStep.TYPE, observer.values().first().nextStep)
         Assert.assertEquals(true, observer.values().first().nextButtonEnabled)
         Assert.assertEquals(R.string.team_creation_label_finish, observer.values().first().nextButtonLabel)
         Assert.assertEquals(View.VISIBLE, observer.values().first().nextButtonVisibility)
+
+        Assert.assertEquals(true, observer.values().first().previousButtonEnabled)
+        Assert.assertEquals(R.string.team_creation_label_previous, observer.values().first().previousButtonLabel)
+        Assert.assertEquals(View.VISIBLE, observer.values().first().nextButtonVisibility)
     }
 
-    // Players -> Finish
+    // Type -> Finish
     @Test
-    fun shouldReturnFinishScreenIfCurrentIsPlayers() {
-        val observer = TestObserver<GetTeamCreationNextStep.ResponseValue>()
-        mGetTeamCreationNextStep.executeUseCase(GetTeamCreationNextStep.RequestValues(GetTeamCreationNextStep.TeamCreationStep.PLAYERS)).subscribe(observer)
+    fun shouldReturnNextScreenFinishIfCurrentIsType() {
+        val observer = TestObserver<GetTeamCreationStep.ResponseValue>()
+        mGetTeamCreationNextStep.executeUseCase(GetTeamCreationStep.RequestValues(TeamCreationStep.TYPE)).subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(GetTeamCreationNextStep.TeamCreationStep.FINISH, observer.values().first().nextStep)
+        Assert.assertEquals(TeamCreationStep.FINISH, observer.values().first().nextStep)
         Assert.assertEquals(false, observer.values().first().nextButtonEnabled)
         Assert.assertEquals(0, observer.values().first().nextButtonLabel)
         Assert.assertEquals(View.INVISIBLE, observer.values().first().nextButtonVisibility)
+        Assert.assertEquals(false, observer.values().first().previousButtonEnabled)
+        Assert.assertEquals(0, observer.values().first().previousButtonLabel)
+        Assert.assertEquals(View.INVISIBLE, observer.values().first().previousButtonVisibility)
     }
 }

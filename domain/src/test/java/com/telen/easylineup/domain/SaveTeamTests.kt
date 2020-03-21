@@ -36,25 +36,25 @@ class SaveTeamTests {
         Mockito.`when`(teamDao.updateTeam(any())).thenReturn(Completable.complete())
     }
 
-    @Test
-    fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() {
-        mTeam.name = ""
-        val request = SaveTeam.RequestValues(mTeam)
-        val observer = TestObserver<SaveTeam.ResponseValue>()
-        mSaveTeam.executeUseCase(request).subscribe(observer)
-        observer.await()
-        observer.assertError(NameEmptyException::class.java)
-    }
+//    @Test
+//    fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() {
+//        mTeam.name = ""
+//        val request = SaveTeam.RequestValues(mTeam)
+//        val observer = TestObserver<SaveTeam.ResponseValue>()
+//        mSaveTeam.executeUseCase(request).subscribe(observer)
+//        observer.await()
+//        observer.assertError(NameEmptyException::class.java)
+//    }
 
-    @Test
-    fun shouldTriggerNameEmptyExceptionIfNameIsOnlyWhitespaces() {
-        mTeam.name = "\n\t\r       "
-        val request = SaveTeam.RequestValues(mTeam)
-        val observer = TestObserver<SaveTeam.ResponseValue>()
-        mSaveTeam.executeUseCase(request).subscribe(observer)
-        observer.await()
-        observer.assertError(NameEmptyException::class.java)
-    }
+//    @Test
+//    fun shouldTriggerNameEmptyExceptionIfNameIsOnlyWhitespaces() {
+//        mTeam.name = "\n\t\r       "
+//        val request = SaveTeam.RequestValues(mTeam)
+//        val observer = TestObserver<SaveTeam.ResponseValue>()
+//        mSaveTeam.executeUseCase(request).subscribe(observer)
+//        observer.await()
+//        observer.assertError(NameEmptyException::class.java)
+//    }
 
     @Test
     fun shouldUpdateTeamIfIdGreaterThatZero() {
