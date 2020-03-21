@@ -30,3 +30,5 @@ local.properties
 !gradle/wrapper/*
 
 *.DS_Store
+*.properties
+google-services.json
