@@ -5,17 +5,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:alpha="0.8">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/border_tile_shake_beta"/>
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/login_background"/>
-
-<!--    <TextView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:background="#000000"-->
-<!--        android:alpha="0.6"/>-->
+        android:src="@drawable/login_background"
+        android:layout_margin="15dp"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="300dp"
