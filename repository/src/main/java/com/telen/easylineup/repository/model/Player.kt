@@ -51,7 +51,8 @@ data class Player(
         return result
     }
 
-    fun toPlayerExport(): PlayerExport {
-        return PlayerExport(hash ?: UUID.randomUUID().toString(), name, image, shirtNumber, licenseNumber.toString(), positions)
-    }
+}
+
+fun Player.toPlayerExport(): PlayerExport {
+    return PlayerExport(hash ?: UUID.randomUUID().toString(), name, image, shirtNumber, licenseNumber.toString(), positions)
 }

@@ -18,7 +18,7 @@ data class TeamExport (
 
         @SerializedName("id") val id : String,
         @SerializedName("name") val name : String,
-        @SerializedName("image") val image : String?,
+        @SerializedName("image") var image : String?,
         @SerializedName("type") val type : Int,
         @SerializedName("main") val main : Boolean,
         @SerializedName("players") val players : List<PlayerExport>,

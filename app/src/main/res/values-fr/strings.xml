@@ -128,4 +128,10 @@
 
     <string name="login_create">Créez votre première équipe!</string>
     <string name="login_import">Importez une équipe existante.</string>
+
+    <string name="settings_export_success">Données exportées avec succès vers le stockage exterene dans le dossier %s </string>
+    <string name="settings_import_success">Données importées avec succès dans l\'application</string>
+    <string name="settings_export_error">Un problème est survenu durant l\'export. Veuillez réessayer et vérifiez si l\'application a bien accès à la mémoire externe.</string>
+    <string name="settings_import_error">Un problème est survenu durant l\'import. Veuillez réessayer et vérifiez si l\'application a bien accès à la mémoire externe.</string>
+
 </resources>

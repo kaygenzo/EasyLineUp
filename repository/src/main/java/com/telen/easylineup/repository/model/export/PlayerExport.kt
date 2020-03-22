@@ -18,7 +18,7 @@ data class PlayerExport (
 
         @SerializedName("id") val id : String,
         @SerializedName("name") val name : String,
-        @SerializedName("image") val image : String?,
+        @SerializedName("image") var image : String?,
         @SerializedName("shirtNumber") val shirtNumber : Int,
         @SerializedName("licenseNumber") val licenseNumber : String,
         @SerializedName("positions") val positions : Int

@@ -1,14 +1,15 @@
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.repository.data.*
+import com.telen.easylineup.repository.model.*
 import com.telen.easylineup.repository.model.export.*
-import com.telen.easylineup.repository.model.toLineupExport
-import com.telen.easylineup.repository.model.toPlayerFieldPositionsExport
-import com.telen.easylineup.repository.model.toTeamExport
-import com.telen.easylineup.repository.model.toTournamentExport
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+
+interface UriChecker {
+    fun isNetworkUrl(url: String?): Boolean
+}
 
 class ExportData(val teamDao: TeamDao, val playerDao: PlayerDao, val tournamentDao: TournamentDao, val lineupDao: LineupDao,
                  val playerFieldPositionsDao: PlayerFieldPositionsDao): UseCase<ExportData.RequestValues, ExportData.ResponseValue>() {
@@ -23,6 +24,10 @@ class ExportData(val teamDao: TeamDao, val playerDao: PlayerDao, val tournamentD
                     val tournamentsExport = mutableListOf<TournamentExport>()
                     val playersExport = mutableListOf<PlayerExport>()
                     val teamExport = team.toTeamExport(playersExport, tournamentsExport)
+
+                    if(!requestValues.uriChecker.isNetworkUrl(teamExport.image))
+                        teamExport.image = null
+
                     teams.add(teamExport)
 
                     val playersUUIDMap = mutableMapOf<Long, String?>()
@@ -32,6 +37,10 @@ class ExportData(val teamDao: TeamDao, val playerDao: PlayerDao, val tournamentD
                             .flatMapCompletable { player ->
 
                                 val playerExport = player.toPlayerExport()
+
+                                if(!requestValues.uriChecker.isNetworkUrl(playerExport.image))
+                                    playerExport.image = null
+
                                 playersExport.add(playerExport)
 
                                 playersUUIDMap[player.id] = player.hash
@@ -66,5 +75,5 @@ class ExportData(val teamDao: TeamDao, val playerDao: PlayerDao, val tournamentD
     }
 
     class ResponseValue(val exportBase: ExportBase): UseCase.ResponseValue
-    class RequestValues: UseCase.RequestValues
+    class RequestValues(val uriChecker: UriChecker): UseCase.RequestValues
 }

@@ -1,12 +1,14 @@
 package com.telen.easylineup.settings
 
 import android.os.Environment
+import android.webkit.URLUtil
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import com.telen.easylineup.UseCaseHandler
 import com.telen.easylineup.domain.CheckHashData
 import com.telen.easylineup.domain.DeleteAllData
 import com.telen.easylineup.domain.ExportData
+import com.telen.easylineup.domain.UriChecker
 import com.telen.easylineup.repository.model.Constants
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -36,7 +38,11 @@ class SettingsViewModel: ViewModel(), KoinComponent {
         return UseCaseHandler.execute(checkHashUseCase, CheckHashData.RequestValues()).flatMapCompletable {
                     Timber.d("update result is ${it.updateResult}")
                     Completable.complete()
-                }.andThen(UseCaseHandler.execute(exportDataUseCase, ExportData.RequestValues()))
+                }.andThen(UseCaseHandler.execute(exportDataUseCase, ExportData.RequestValues(object : UriChecker {
+                    override fun isNetworkUrl(url: String?): Boolean {
+                        return URLUtil.isNetworkUrl(url)
+                    }
+                })))
                 .flatMap {
                     val storageDirectoryName = Constants.EXPORTS_DIRECTORY
                     val json = Gson().toJson(it.exportBase)
