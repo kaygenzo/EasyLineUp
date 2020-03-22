@@ -12,6 +12,9 @@ interface TournamentDao {
     @Query("SELECT * from tournaments ORDER BY createdAt DESC")
     fun getTournaments(): Single<List<Tournament>>
 
+    @Query("SELECT * from tournaments where hash = :hash")
+    fun getTournamentByHash(hash: String): Single<Tournament>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTournament(tournament: Tournament): Single<Long>
 

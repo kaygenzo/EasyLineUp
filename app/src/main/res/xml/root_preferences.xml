@@ -22,9 +22,9 @@
             app:title="@string/setting_export_data_description"
             app:key="@string/key_export_data"/>
 
-<!--        <Preference-->
-<!--            app:title="@string/setting_import_data_description"-->
-<!--            app:key="@string/key_import_data"/>-->
+        <Preference
+            app:title="@string/setting_import_data_description"
+            app:key="@string/key_import_data"/>
 
         <Preference
             app:title="@string/setting_delete_data_description"

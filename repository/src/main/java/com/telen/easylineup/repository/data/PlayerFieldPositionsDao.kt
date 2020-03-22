@@ -33,6 +33,9 @@ interface PlayerFieldPositionsDao {
     @Query("SELECT * from playerFieldPosition")
     fun getAllPlayerFieldPositions(): LiveData<List<PlayerFieldPosition>>
 
+    @Query("SELECT * from playerFieldPosition where hash = :hash")
+    fun getPlayerFieldPositionByHash(hash: String): Single<PlayerFieldPosition>
+
     @Query("SELECT * from playerFieldPosition")
     fun getPlayerFieldPositions(): Single<List<PlayerFieldPosition>>
 

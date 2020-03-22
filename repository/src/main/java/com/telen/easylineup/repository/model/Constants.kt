@@ -3,7 +3,9 @@ package com.telen.easylineup.repository.model
 class Constants {
     companion object {
 
-        const val BASE_ROOT_DIRECTORY = "LineupKeeper"
+        private const val BASE_ROOT_DIRECTORY = "LineupKeeper"
+        const val EXPORTS_DIRECTORY = "$BASE_ROOT_DIRECTORY/exports/"
+        const val LINEUPS_DIRECTORY = "$BASE_ROOT_DIRECTORY/lineups/"
 
         const val APPLICATION_PREFERENCES = "easylineup_prefs"
         const val PREF_FEATURE_SHOW_NEW_SWAP_TEAM = "pref_show_new_swap_team"

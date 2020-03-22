@@ -20,7 +20,7 @@ class SavePlayer(val dao: PlayerDao): UseCase<SavePlayer.RequestValues, SavePlay
                         licenseNumber = requestValues.licenseNumber, image = requestValues.imageUri?.toString(), positions = requestValues.positions)
 
                 val task = if(player.id == 0L) {
-                    dao.insertPlayer(player)
+                    dao.insertPlayer(player).ignoreElement()
                 }
                 else {
                     dao.updatePlayer(player)

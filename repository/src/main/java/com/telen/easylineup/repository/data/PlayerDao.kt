@@ -11,7 +11,7 @@ import io.reactivex.Single
 interface PlayerDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertPlayer(player: Player): Completable
+    fun insertPlayer(player: Player): Single<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPlayers(players: List<Player>): Completable
@@ -24,6 +24,9 @@ interface PlayerDao {
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun updatePlayersWithRowCount(players: List<Player>): Single<Int>
+
+    @Query("SELECT * from players WHERE hash = :hash" )
+    fun getPlayerByHash(hash: String): Single<Player>
 
     @Query("SELECT * from players WHERE id = :playerID" )
     fun getPlayerById(playerID: Long): LiveData<Player>

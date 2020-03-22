@@ -6,16 +6,20 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.obsez.android.lib.filechooser.ChooserDialog
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.login.LoginActivity
+import com.telen.easylineup.login.LoginViewModel
+import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.utils.DialogFactory
 import io.reactivex.Completable
+import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -24,9 +28,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     companion object {
         const val REQUEST_WRITE_EXTERNAL_STORAGE = 0
+        const val REQUEST_READ_EXTERNAL_STORAGE = 1
     }
 
     lateinit var viewModel: SettingsViewModel
+    private var operationsDisposable: CompositeDisposable = CompositeDisposable()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -36,12 +42,22 @@ class SettingsFragment : PreferenceFragmentCompat() {
         viewModel = ViewModelProviders.of(this)[SettingsViewModel::class.java]
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        operationsDisposable.clear()
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when(requestCode) {
             REQUEST_WRITE_EXTERNAL_STORAGE -> {
                 if(grantResults.none { it == PackageManager.PERMISSION_DENIED }) {
                     exportData()
+                }
+            }
+            REQUEST_READ_EXTERNAL_STORAGE -> {
+                if(grantResults.none { it == PackageManager.PERMISSION_DENIED }) {
+                    importData()
                 }
             }
         }
@@ -84,10 +100,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
             getString(R.string.key_export_data) -> {
                 activity?.run {
                     if(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                        requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_EXTERNAL_STORAGE)
+                        this@SettingsFragment.requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_EXTERNAL_STORAGE)
                     }
                     else {
                         exportData()
+                    }
+                }
+                return true
+            }
+            getString(R.string.key_import_data) -> {
+                activity?.run {
+                    if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        this@SettingsFragment.requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_READ_EXTERNAL_STORAGE)
+                    }
+                    else {
+                        importData()
                     }
                 }
                 return true
@@ -97,7 +124,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun exportData() {
-        viewModel.exportDataOnExternalMemory().subscribe({ directoryName ->
+        val disposable = viewModel.exportDataOnExternalMemory().subscribe({ directoryName ->
             activity?.run {
                 DialogFactory.getSimpleDialog(this, getString(R.string.settings_export_success, directoryName))
                         .show()
@@ -111,5 +138,35 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             Timber.e(it)
         })
+        operationsDisposable.add(disposable)
+    }
+
+    private fun importData() {
+        //TODO later, make a view model to manage import/export
+        val loginViewModel = ViewModelProviders.of(this)[LoginViewModel::class.java]
+
+        activity?.run {
+            ChooserDialog(this)
+                    .withFilter(false, false, "elu")
+                    .withIcon(R.mipmap.ic_launcher)
+                    .withStartFile("${Environment.getExternalStorageDirectory().path}/${Constants.EXPORTS_DIRECTORY}")
+                    .withChosenListener { path, _ ->
+                        val disposable = loginViewModel.importData(path)
+                                .subscribe({
+                                    DialogFactory.getSimpleDialog(this, getString(R.string.settings_import_success))
+                                            .setConfirmClickListener { it.dismiss() }
+                                            .show()
+                                }, {
+                                    Timber.e(it)
+                                    DialogFactory.getErrorDialog(this, getString(R.string.settings_import_error))
+                                            .setConfirmClickListener { it.dismiss() }
+                                            .show()
+                                })
+                        operationsDisposable.add(disposable)
+                    }
+                    .withOnCancelListener { dialog -> dialog.cancel() }
+                    .build()
+                    .show()
+        }
     }
 }

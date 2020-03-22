@@ -32,6 +32,9 @@ interface LineupDao {
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
     fun getLineupById(lineupId: Long): LiveData<Lineup>
 
+    @Query("SELECT * FROM lineups WHERE hash = :hash")
+    fun getLineupByHash(hash: String): Single<Lineup>
+
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
     fun getLineupByIdSingle(lineupId: Long): Single<Lineup>
 

@@ -192,7 +192,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                 return@SingleOnSubscribe
             }
 
-            val tmpSDPath = StringBuilder(Environment.getExternalStorageDirectory().absolutePath).append("/${Constants.BASE_ROOT_DIRECTORY}/lineups/").toString()
+            val tmpSDPath = StringBuilder(Environment.getExternalStorageDirectory().absolutePath).append("/${Constants.LINEUPS_DIRECTORY}").toString()
             if(!File(tmpSDPath).exists())
                 File(tmpSDPath).mkdirs()
 

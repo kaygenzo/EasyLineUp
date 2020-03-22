@@ -16,5 +16,5 @@ For support, please feel free to contact me at https://www.linkedin.com/in/syeda
 
 data class ExportBase (
 
-	@SerializedName("team") val team : List<TeamExport>
+	@SerializedName("teams") val teams : List<TeamExport>
 )

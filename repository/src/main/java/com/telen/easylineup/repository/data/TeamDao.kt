@@ -29,6 +29,9 @@ interface TeamDao {
     @Query("SELECT * FROM teams WHERE id = :teamId")
     fun getTeamById(teamId: Long): Single<Team>
 
+    @Query("SELECT * FROM teams WHERE hash = :hash")
+    fun getTeamByHash(hash: String): Single<Team>
+
     @Query("SELECT * FROM teams")
     fun getTeams(): LiveData<List<Team>>
 

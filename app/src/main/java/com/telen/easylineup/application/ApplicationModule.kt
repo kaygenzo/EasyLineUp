@@ -46,4 +46,5 @@ val appModules = module {
     single { GetTournamentStatsForPositionTable(get()) }
     single { CheckHashData(get(), get(), get(), get(), get()) }
     single { ExportData(get(), get(), get(), get(), get()) }
+    single { ImportData(get(), get(), get(), get(), get()) }
 }

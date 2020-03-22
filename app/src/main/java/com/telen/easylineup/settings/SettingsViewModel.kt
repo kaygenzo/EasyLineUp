@@ -38,7 +38,7 @@ class SettingsViewModel: ViewModel(), KoinComponent {
                     Completable.complete()
                 }.andThen(UseCaseHandler.execute(exportDataUseCase, ExportData.RequestValues()))
                 .flatMap {
-                    val storageDirectoryName = "${Constants.BASE_ROOT_DIRECTORY}/exports"
+                    val storageDirectoryName = Constants.EXPORTS_DIRECTORY
                     val json = Gson().toJson(it.exportBase)
 
                     val rootDirectory = File(Environment.getExternalStorageDirectory().path

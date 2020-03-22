@@ -145,6 +145,8 @@
     <string name="login_import">Import an existing team.</string>
 
     <string name="settings_export_success">Successfully exported to external storage in the directory %s </string>
+    <string name="settings_import_success">Successfully imported data into the application </string>
     <string name="settings_export_error">Something wrong happened during export. Please try again and check if the application has access to the external storage. </string>
+    <string name="settings_import_error">Something wrong happened during import. Please try again and check if the application has access to the external storage. </string>
 
 </resources>
