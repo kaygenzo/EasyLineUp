@@ -5,6 +5,7 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.repository.data.PlayerDao
 import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Before
 import org.junit.Test
@@ -26,7 +27,7 @@ class SavePlayerTests {
         MockitoAnnotations.initMocks(this)
         mSavePlayer = SavePlayer(playerDao)
         Mockito.`when`(playerDao.updatePlayer(any())).thenReturn(Completable.complete())
-        Mockito.`when`(playerDao.insertPlayer(any())).thenReturn(Completable.complete())
+        Mockito.`when`(playerDao.insertPlayer(any())).thenReturn(Single.just(1))
     }
 
     @Test
