@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProviders
+import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.obsez.android.lib.filechooser.ChooserDialog
@@ -151,7 +152,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     .withIcon(R.mipmap.ic_launcher)
                     .withStartFile("${Environment.getExternalStorageDirectory().path}/${Constants.EXPORTS_DIRECTORY}")
                     .withChosenListener { path, _ ->
-                        val disposable = loginViewModel.importData(path)
+                        val updateIfExists = findPreference<CheckBoxPreference>(getString(R.string.key_import_data_update_object))?.isChecked ?: false
+                        val disposable = loginViewModel.importData(path, updateIfExists)
                                 .subscribe({
                                     DialogFactory.getSimpleDialog(this, getString(R.string.settings_import_success))
                                             .setConfirmClickListener { it.dismiss() }

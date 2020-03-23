@@ -93,11 +93,6 @@ class TeamCreationActivity: AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        viewModel.backPressed(intent.extras)
-                .subscribe({
-                    finish()
-                }, {
-                    Timber.d("Cannot quit")
-                })
+        viewModel.previousButtonClicked(stepLayout.currentStep)
     }
 }

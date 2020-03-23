@@ -14,34 +14,33 @@
   ~ limitations under the License.
   -->
 
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="@string/setting_category_data_title">
+    <PreferenceCategory app:title="@string/settings_category_export">
 
         <Preference
             app:title="@string/setting_export_data_description"
             app:key="@string/key_export_data"/>
+    </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/settings_category_import">
         <Preference
             app:title="@string/setting_import_data_description"
             app:key="@string/key_import_data"/>
 
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/key_import_data_update_object"
+            android:title="@string/setting_import_data_update_object_description"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/settings_category_delete">
+
         <Preference
             app:title="@string/setting_delete_data_description"
             app:key="@string/key_delete_data"/>
-
-<!--        <EditTextPreference-->
-<!--            app:key="signature"-->
-<!--            app:title="@string/signature_title"-->
-<!--            app:useSimpleSummaryProvider="true" />-->
-
-<!--        <ListPreference-->
-<!--            app:defaultValue="reply"-->
-<!--            app:entries="@array/reply_entries"-->
-<!--            app:entryValues="@array/reply_values"-->
-<!--            app:key="reply"-->
-<!--            app:title="@string/reply_title"-->
-<!--            app:useSimpleSummaryProvider="true" />-->
 
     </PreferenceCategory>
 
@@ -54,17 +53,6 @@
         <Preference
             app:title="@string/setting_play_store_title"
             app:key="@string/key_play_store"/>
-
-<!--        <SwitchPreferenceCompat-->
-<!--            app:key="sync"-->
-<!--            app:title="@string/sync_title" />-->
-
-<!--        <SwitchPreferenceCompat-->
-<!--            app:dependency="sync"-->
-<!--            app:key="attachment"-->
-<!--            app:summaryOff="@string/attachment_summary_off"-->
-<!--            app:summaryOn="@string/attachment_summary_on"-->
-<!--            app:title="@string/attachment_title" />-->
 
     </PreferenceCategory>
 

@@ -65,7 +65,7 @@ class LoginActivity: AppCompatActivity() {
                 .withIcon(R.mipmap.ic_launcher)
                 .withStartFile("${Environment.getExternalStorageDirectory().path}/${Constants.EXPORTS_DIRECTORY}")
                 .withChosenListener { path, _ ->
-                    viewModel.importData(path)
+                    viewModel.importData(path, true)
                             .subscribe({
                                 DialogFactory.getSimpleDialog(this@LoginActivity, getString(R.string.settings_import_success))
                                         .setConfirmClickListener {

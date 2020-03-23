@@ -130,6 +130,7 @@
     <string name="setting_category_data_title">Data</string>
     <string name="setting_category_about_title">About</string>
     <string name="setting_import_data_description">Import data from file</string>
+    <string name="setting_import_data_update_object_description">Update data if already exists ?</string>
     <string name="setting_export_data_description">Export data to file</string>
     <string name="setting_delete_data_description">Delete all data</string>
     <string name="setting_version_title">Version</string>
@@ -137,6 +138,7 @@
 
     <string name="key_export_data" translatable="false">key_export_data</string>
     <string name="key_import_data" translatable="false">key_import_data</string>
+    <string name="key_import_data_update_object" translatable="false">key_import_data_update_object</string>
     <string name="key_delete_data" translatable="false">key_delete_data</string>
     <string name="key_app_version" translatable="false">key_app_version</string>
     <string name="key_play_store" translatable="false">key_play_store</string>
@@ -149,4 +151,7 @@
     <string name="settings_export_error">Something wrong happened during export. Please try again and check if the application has access to the external storage. </string>
     <string name="settings_import_error">Something wrong happened during import. Please try again and check if the application has access to the external storage. </string>
 
+    <string name="settings_category_export">Export</string>
+    <string name="settings_category_import">Import</string>
+    <string name="settings_category_delete">Delete</string>
 </resources>

@@ -89,6 +89,14 @@ class SetupViewModel: ViewModel(), KoinComponent {
         saveDisposable =
                 UseCaseHandler.execute(checkTeamUseCase, CheckTeam.RequestValues(team)).ignoreElement()
                         .doOnComplete { errorLiveData.value = Error.NONE }
+                        .onErrorResumeNext {
+                            if(it is NameEmptyException && currentStep == TeamCreationStep.TEAM.id) {
+                                Completable.complete()
+                            }
+                            else {
+                                Completable.error(it)
+                            }
+                        }
                         .andThen(UseCaseHandler.execute(getTeamCreationPreviousStep, requestValue))
                         .subscribe({
                             stepLiveData.value = it
@@ -104,9 +112,4 @@ class SetupViewModel: ViewModel(), KoinComponent {
         }
     }
 
-    fun backPressed(bundle: Bundle?): Completable {
-        return bundle?.getBoolean(Constants.EXTRA_CAN_EXIT)?.takeIf { it }?.let {
-            Completable.complete()
-        } ?: Completable.error(UnsupportedOperationException())
-    }
 }
