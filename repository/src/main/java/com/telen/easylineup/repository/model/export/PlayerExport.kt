@@ -22,4 +22,30 @@ data class PlayerExport (
         @SerializedName("shirtNumber") val shirtNumber : Int,
         @SerializedName("licenseNumber") val licenseNumber : String,
         @SerializedName("positions") val positions : Int
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PlayerExport
+
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (image != other.image) return false
+        if (shirtNumber != other.shirtNumber) return false
+        if (licenseNumber != other.licenseNumber) return false
+        if (positions != other.positions) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + (image?.hashCode() ?: 0)
+        result = 31 * result + shirtNumber
+        result = 31 * result + licenseNumber.hashCode()
+        result = 31 * result + positions
+        return result
+    }
+}

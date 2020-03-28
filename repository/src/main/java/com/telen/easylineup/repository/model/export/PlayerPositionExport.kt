@@ -22,4 +22,30 @@ data class PlayerPositionExport (
 		@SerializedName("x") val x : Float,
 		@SerializedName("y") val y : Float,
 		@SerializedName("order") val order : Int
-)
+) {
+	override fun equals(other: Any?): Boolean {
+		if (this === other) return true
+		if (javaClass != other?.javaClass) return false
+
+		other as PlayerPositionExport
+
+		if (id != other.id) return false
+		if (playerID != other.playerID) return false
+		if (position != other.position) return false
+		if (x != other.x) return false
+		if (y != other.y) return false
+		if (order != other.order) return false
+
+		return true
+	}
+
+	override fun hashCode(): Int {
+		var result = id.hashCode()
+		result = 31 * result + (playerID?.hashCode() ?: 0)
+		result = 31 * result + position
+		result = 31 * result + x.hashCode()
+		result = 31 * result + y.hashCode()
+		result = 31 * result + order
+		return result
+	}
+}

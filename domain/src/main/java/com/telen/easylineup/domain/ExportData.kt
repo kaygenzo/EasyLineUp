@@ -52,10 +52,14 @@ class ExportData(val teamDao: TeamDao, val playerDao: PlayerDao, val tournamentD
 
                                 val lineupsExport = mutableListOf<LineupExport>()
                                 val tournamentExport = tournament.toTournamentExport(lineupsExport)
-                                tournamentsExport.add(tournamentExport)
 
                                 lineupDao.getLineupsForTournamentRx(tournament.id, team.id)
-                                        .flatMapObservable { Observable.fromIterable(it) }
+                                        .flatMapObservable {
+                                            if(it.isNotEmpty()) {
+                                                tournamentsExport.add(tournamentExport)
+                                            }
+                                            Observable.fromIterable(it)
+                                        }
                                         .flatMapCompletable { lineup ->
 
                                             val positionsExport = mutableListOf<PlayerPositionExport>()

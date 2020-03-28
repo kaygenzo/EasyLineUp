@@ -17,4 +17,19 @@ For support, please feel free to contact me at https://www.linkedin.com/in/syeda
 data class ExportBase (
 
 	@SerializedName("teams") val teams : List<TeamExport>
-)
+) {
+	override fun equals(other: Any?): Boolean {
+		if (this === other) return true
+		if (javaClass != other?.javaClass) return false
+
+		other as ExportBase
+
+		if (teams != other.teams) return false
+
+		return true
+	}
+
+	override fun hashCode(): Int {
+		return teams.hashCode()
+	}
+}
