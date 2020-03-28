@@ -31,6 +31,7 @@
 
         <CheckBoxPreference
             android:defaultValue="false"
+            app:singleLineTitle="false"
             android:key="@string/key_import_data_update_object"
             android:title="@string/setting_import_data_update_object_description"/>
 
