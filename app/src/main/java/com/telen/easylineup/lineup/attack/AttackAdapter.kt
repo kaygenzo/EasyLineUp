@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.MODE_DH
-import com.telen.easylineup.repository.model.MODE_NONE
+import com.telen.easylineup.repository.model.MODE_DISABLED
+import com.telen.easylineup.repository.model.MODE_ENABLED
 import com.telen.easylineup.repository.model.PlayerWithPosition
 import com.telen.easylineup.views.PlayerPositionFilterView
 import timber.log.Timber
@@ -29,7 +29,7 @@ interface OnDataChangedListener {
 class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, val dataListener: OnDataChangedListener?, val isEditable: Boolean): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
 
     private var positionDescriptions: Array<String>? = null
-    var lineupMode = MODE_NONE
+    var lineupMode = MODE_DISABLED
 
     override fun onDragStart() {
 
@@ -44,11 +44,11 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
     }
 
     override fun onMoved(fromPosition: Int, toPosition: Int) {
-        val canMoveFrom = if(lineupMode == MODE_NONE)
+        val canMoveFrom = if(lineupMode == MODE_DISABLED)
             FieldPosition.isDefensePlayer(players[fromPosition].position)
         else
             FieldPosition.canBeBatterWhenDH(players[fromPosition].position)
-        val canMoveTo = if(lineupMode == MODE_NONE)
+        val canMoveTo = if(lineupMode == MODE_DISABLED)
             FieldPosition.isDefensePlayer(players[toPosition].position)
         else
             FieldPosition.canBeBatterWhenDH(players[toPosition].position)
@@ -113,14 +113,14 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
                 positionDesc.setTextColor(R.color.tile_team_size_background_color)
             }
 
-            if(!isEditable || isSubstitute || (lineupMode == MODE_DH && FieldPosition.getFieldPosition(player.position) == FieldPosition.PITCHER)) {
+            if(!isEditable || isSubstitute || (lineupMode == MODE_ENABLED && FieldPosition.getFieldPosition(player.position) == FieldPosition.PITCHER)) {
                 reorderImage.visibility = View.GONE
             }
             else {
                 reorderImage.visibility = View.VISIBLE
             }
 
-            if(!isEditable || isSubstitute || (lineupMode == MODE_DH && FieldPosition.getFieldPosition(player.position) == FieldPosition.DH)) {
+            if(!isEditable || isSubstitute || (lineupMode == MODE_ENABLED && FieldPosition.getFieldPosition(player.position) == FieldPosition.DP_DH)) {
                 positionDesc.visibility = View.VISIBLE
             }
             else {

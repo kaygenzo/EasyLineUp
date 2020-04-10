@@ -5,8 +5,9 @@ import com.telen.easylineup.repository.model.export.LineupExport
 import com.telen.easylineup.repository.model.export.PlayerPositionExport
 import java.util.*
 
-const val MODE_NONE = 0
-const val MODE_DH = 1
+const val MODE_DISABLED = 0
+const val MODE_ENABLED = 1
+
 
 @Entity(
         tableName = "lineups",
@@ -58,5 +59,5 @@ data class Lineup(
 }
 
 fun Lineup.toLineupExport(playerPositions: MutableList<PlayerPositionExport>): LineupExport {
-    return LineupExport(hash ?: UUID.randomUUID().toString(), name, createdTimeInMillis, editedTimeInMillis, mode, roaster, playerPositions)
+    return LineupExport(hash ?: UUID.randomUUID().toString(), name, createdTimeInMillis, editedTimeInMillis, mode, null, playerPositions)
 }

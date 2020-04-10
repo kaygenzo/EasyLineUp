@@ -29,7 +29,7 @@ class GetPositionsSummaryForPlayerTests {
         mGetPositionsSummaryForPlayer = GetPositionsSummaryForPlayer(playerFieldPositionsDao)
 
         val position1 = PositionWithLineup(position = FieldPosition.CATCHER.position)
-        val position2 = PositionWithLineup(position = FieldPosition.DH.position)
+        val position2 = PositionWithLineup(position = FieldPosition.DP_DH.position)
         val position3 = PositionWithLineup(position = FieldPosition.PITCHER.position)
         val position4 = PositionWithLineup(position = FieldPosition.CATCHER.position)
         val position5 = PositionWithLineup(position = FieldPosition.CATCHER.position)
@@ -61,7 +61,7 @@ class GetPositionsSummaryForPlayerTests {
         Assert.assertEquals(5, observer.values().first().summary.count())
 
         Assert.assertEquals(1, observer.values().first().summary[FieldPosition.SUBSTITUTE])
-        Assert.assertEquals(1, observer.values().first().summary[FieldPosition.DH])
+        Assert.assertEquals(1, observer.values().first().summary[FieldPosition.DP_DH])
         Assert.assertEquals(5, observer.values().first().summary[FieldPosition.CATCHER])
         Assert.assertEquals(2, observer.values().first().summary[FieldPosition.PITCHER])
         Assert.assertEquals(1, observer.values().first().summary[FieldPosition.RIGHT_FIELD])

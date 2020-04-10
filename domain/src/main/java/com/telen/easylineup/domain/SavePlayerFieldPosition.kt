@@ -1,38 +1,49 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.MODE_NONE
-import com.telen.easylineup.repository.model.Player
-import com.telen.easylineup.repository.model.PlayerFieldPosition
-import com.telen.easylineup.repository.model.PlayerWithPosition
-import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
+import com.telen.easylineup.repository.model.*
 import io.reactivex.Single
 
 class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositionsDao): UseCase<SavePlayerFieldPosition.RequestValues, SavePlayerFieldPosition.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return requestValues.lineupID?.let { lineupID ->
-            val playerPosition: PlayerFieldPosition = if (requestValues.isNewPosition) {
-                val order = when (requestValues.position) {
-                    FieldPosition.SUBSTITUTE -> Constants.SUBSTITUTE_ORDER_VALUE
-                    FieldPosition.PITCHER -> {
-                        if (requestValues.lineupMode == MODE_NONE)
-                            getNextAvailableOrder(requestValues.players)
-                        else
-                            Constants.ORDER_PITCHER_WHEN_DH
+            val playerPosition = requestValues.players.firstOrNull {
+                p -> p.position == requestValues.position.position  && p.position != FieldPosition.SUBSTITUTE.position
+            }?.run {
+                this.toPlayerFieldPosition()
+            } ?: run {
+                PlayerFieldPosition(playerId = 0, lineupId = lineupID, position = requestValues.position.position, order = 0)
+            }
+
+            playerPosition.apply {
+                when (requestValues.position) {
+                    FieldPosition.SUBSTITUTE -> {
+                        order = Constants.SUBSTITUTE_ORDER_VALUE
                     }
-                    else -> getNextAvailableOrder(requestValues.players)
+                    FieldPosition.PITCHER -> {
+                        if (requestValues.lineupMode == MODE_DISABLED)
+                            order = PlayerWithPosition.getNextAvailableOrder(requestValues.players)
+                        else {
+                            if(requestValues.teamType == TeamType.BASEBALL.id) {
+                                order = Constants.ORDER_PITCHER_WHEN_DH
+                                flags = PlayerFieldPosition.FLAG_FLEX
+                            }
+                            else {
+                                order = PlayerWithPosition.getNextAvailableOrder(requestValues.players)
+                            }
+                        }
+                    }
+                    else -> {
+                        order = PlayerWithPosition.getNextAvailableOrder(requestValues.players)
+                    }
                 }
-                PlayerFieldPosition(playerId = requestValues.player.id, lineupId = lineupID, position = requestValues.position.position, order = order)
-            } else {
-                requestValues.players.first { p -> p.position == requestValues.position.position }.toPlayerFieldPosition()
             }
 
             playerPosition.apply {
                 playerId = requestValues.player.id
-                x = requestValues.x
-                y = requestValues.y
+                x = requestValues.position.xPercent
+                y = requestValues.position.yPercent
             }
 
             val task = if (playerPosition.id > 0) {
@@ -45,28 +56,12 @@ class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositionsDao): U
         } ?: Single.error(Exception("Lineup id is null!"))
     }
 
-    private fun getNextAvailableOrder(players: List<PlayerWithPosition>): Int {
-        var availableOrder = 1
-        players
-                .filter { it.fieldPositionID > 0 && it.order > 0 }
-                .sortedBy { it.order }
-                .forEach {
-                    if(it.order == availableOrder)
-                        availableOrder++
-                    else
-                        return availableOrder
-                }
-        return availableOrder
-    }
-
     class RequestValues(val lineupID: Long?,
                         val player: Player,
                         val position: FieldPosition,
-                        val x: Float,
-                        val y: Float,
                         val players: List<PlayerWithPosition>,
-                        val lineupMode: Int,
-                        val isNewPosition: Boolean
+                        val teamType: Int,
+                        val lineupMode: Int
     ): UseCase.RequestValues
     inner class ResponseValue: UseCase.ResponseValue
 }

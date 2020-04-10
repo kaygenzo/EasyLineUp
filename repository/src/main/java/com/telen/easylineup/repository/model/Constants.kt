@@ -44,6 +44,6 @@ class Constants {
         const val TYPE_SHAKE_BETA = 3
 
         const val STATUS_ALL = 0
-        const val STATUS_NONE = 1
+        const val STATUS_PARTIAL = 1
     }
 }

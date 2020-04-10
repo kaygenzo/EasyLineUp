@@ -60,8 +60,8 @@ class ExportDataTests {
         lineup1 = Lineup(1L, "A", 1L, 1L, 0, 1L, 1L, null, "E")
         lineup2 = Lineup(2L, "B", 2L, 2L, 0, 1L, 1L, null, "F")
 
-        playerPosition1 = PlayerFieldPosition(1L, 1L, 1L, 0, 0f, 0f, 1, "G")
-        playerPosition2 = PlayerFieldPosition(2L, 2L, 2L, 0, 0f, 0f, 1, "H")
+        playerPosition1 = PlayerFieldPosition(1L, 1L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"G")
+        playerPosition2 = PlayerFieldPosition(2L, 2L, 2L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"H")
 
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team1, team2)))
 
@@ -184,8 +184,8 @@ class ExportDataTests {
         val player3 = Player(3L, 1L, "A", 3, 3L, null, 1, "hash3")
         val player4 = Player(4L, 1L, "B", 4, 4L, null, 1, "hash4")
 
-        val playerPosition3 = PlayerFieldPosition(3L, 3L, 1L, 0, 0f, 0f, 1, "hash3")
-        val playerPosition4 = PlayerFieldPosition(4L, 4L, 1L, 0, 0f, 0f, 1, "hash4")
+        val playerPosition3 = PlayerFieldPosition(3L, 3L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"hash3")
+        val playerPosition4 = PlayerFieldPosition(4L, 4L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"hash4")
 
         Mockito.`when`(playerDao.getPlayers(1L)).thenReturn(Single.just(listOf(player1, player3, player4)))
         Mockito.`when`(playerPositionsDao.getAllPlayerFieldPositionsForLineup(1L))

@@ -49,7 +49,7 @@ class PlayerListView: ConstraintLayout, OnPlayerClickListener {
         }
     }
 
-    fun setPlayers(players: List<Player>, position: FieldPosition) {
+    fun setPlayers(players: List<Player>, position: FieldPosition? = null) {
         listPlayers.clear()
         listPlayers.addAll(players)
         mAdapter.setFilter(position)
@@ -120,7 +120,7 @@ class PlayerListAdapter(val list: List<Player>, val playerListener: OnPlayerClic
         }
     }
 
-    fun setFilter(filter: FieldPosition) {
+    fun setFilter(filter: FieldPosition?) {
         this.filter = filter
     }
 

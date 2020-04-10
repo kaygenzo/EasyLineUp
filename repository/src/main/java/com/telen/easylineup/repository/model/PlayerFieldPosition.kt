@@ -24,9 +24,15 @@ data class PlayerFieldPosition(
         @ColumnInfo(name = "x") var x: Float = 0f,
         @ColumnInfo(name = "y") var y: Float = 0f,
         @ColumnInfo(name = "order") var order: Int = 0,
+        @ColumnInfo(name = "flags") var flags: Int = 0,
         @ColumnInfo(name = "hash") var hash: String? = null
-)
+) {
+    companion object {
+        const val FLAG_FLEX = 0x01
+        const val FLAG_NONE = 0x00
+    }
+}
 
 fun PlayerFieldPosition.toPlayerFieldPositionsExport(playerUUID: String?): PlayerPositionExport {
-    return PlayerPositionExport(hash ?: UUID.randomUUID().toString(), playerUUID, position,x, y, order)
+    return PlayerPositionExport(hash ?: UUID.randomUUID().toString(), playerUUID, position,x, y, flags, order)
 }

@@ -97,7 +97,7 @@ class LineupViewModel: ViewModel(), KoinComponent {
             val areSameSize = it.players.filter { it.status }.size == it.players.size
             it.status = when(areSameSize) {
                 true -> Constants.STATUS_ALL
-                false -> Constants.STATUS_NONE
+                false -> Constants.STATUS_PARTIAL
             }
         }
 

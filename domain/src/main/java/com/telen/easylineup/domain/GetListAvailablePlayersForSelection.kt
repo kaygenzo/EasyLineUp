@@ -1,9 +1,6 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.model.FieldPosition
-import com.telen.easylineup.repository.model.Player
-import com.telen.easylineup.repository.model.PlayerWithPosition
-import com.telen.easylineup.repository.model.RoasterPlayerStatus
+import com.telen.easylineup.repository.model.*
 import io.reactivex.Single
 
 class GetListAvailablePlayersForSelection: UseCase<GetListAvailablePlayersForSelection.RequestValues, GetListAvailablePlayersForSelection.ResponseValue>() {
@@ -16,8 +13,10 @@ class GetListAvailablePlayersForSelection: UseCase<GetListAvailablePlayersForSel
                 }
                 .map { it.toPlayer() }
 
-        if (FieldPosition.isDefensePlayer(requestValues.position.position))
-            listAvailablePlayers = listAvailablePlayers.sortedWith(getPlayerComparator(requestValues.position))
+        requestValues.position?.run {
+            if (FieldPosition.isDefensePlayer(this.position))
+                listAvailablePlayers = listAvailablePlayers.sortedWith(getPlayerComparator(this))
+        }
 
         return if(listAvailablePlayers.isNotEmpty())
             Single.just(ResponseValue(listAvailablePlayers))
@@ -38,6 +37,6 @@ class GetListAvailablePlayersForSelection: UseCase<GetListAvailablePlayersForSel
         }
     }
 
-    class RequestValues(val players: List<PlayerWithPosition>, val position: FieldPosition, val roasterPlayers: List<RoasterPlayerStatus>?): UseCase.RequestValues
+    class RequestValues(val players: List<PlayerWithPosition>, val position: FieldPosition?, val roasterPlayers: List<RoasterPlayerStatus>?): UseCase.RequestValues
     class ResponseValue(val players: List<Player>): UseCase.ResponseValue
 }

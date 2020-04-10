@@ -1,11 +1,11 @@
 package com.telen.easylineup.lineup
 
 import android.Manifest
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.PointF
 import android.net.Uri
 import android.os.Environment
 import androidx.core.content.ContextCompat
@@ -16,12 +16,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.*
 import com.telen.easylineup.R
+import com.telen.easylineup.UseCaseHandler
 import com.telen.easylineup.application.App
 import com.telen.easylineup.domain.*
 import com.telen.easylineup.repository.model.*
 import com.telen.easylineup.repository.model.FieldPosition
+import com.telen.easylineup.utils.DialogFactory
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
@@ -32,14 +33,7 @@ import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.lang.Exception
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.MutableList
-import kotlin.collections.forEach
-import kotlin.collections.mutableListOf
 
 data class InsufficientPermissions(val permissionsNeeded: Array<String>): Exception() {
     override fun equals(other: Any?): Boolean {
@@ -66,27 +60,36 @@ enum class ErrorCase {
     SAVE_BATTING_ORDER_FAILED,
     DELETE_LINEUP_FAILED,
     SAVE_LINEUP_MODE_FAILED,
-    UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED
+    UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED,
+    GET_TEAM_FAILED
 }
 
 sealed class EventCase
 object SavePlayerPositionSuccess: EventCase()
 object DeletePlayerPositionSuccess: EventCase()
-data class GetAllAvailablePlayersSuccess(val players: List<Player>, val position: FieldPosition, val isNewPlayer: Boolean): EventCase()
 object SaveBattingOrderSuccess: EventCase()
 object DeleteLineupSuccess: EventCase()
 object SaveLineupModeSuccess: EventCase()
 object UpdatePlayersWithLineupModeSuccess: EventCase()
+data class GetAllAvailablePlayersSuccess(val players: List<Player>, val position: FieldPosition): EventCase()
+data class NeedLinkDpFlex(val initialData: Pair<Player?, Player?>, val dpLocked: Boolean, val flexLocked: Boolean, val teamType: Int): EventCase()
 
 class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
     var lineupID: Long? = 0
     var lineupTitle: String? = null
-    var lineupMode = MODE_NONE
+    var lineupMode = MODE_DISABLED
     var editable = false
 
     val errorHandler = MutableLiveData<ErrorCase>()
     val eventHandler = MutableLiveData<EventCase>()
+
+    private val _linkPlayersInField = MutableLiveData<List<Player>?>()
+    val linkPlayersInField: LiveData<List<Player>?> = _linkPlayersInField
+
+    private val _lineupTitle = MutableLiveData<String>()
+
+    private val _designatedPlayerTitle = MutableLiveData<String>()
 
     private val listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
 
@@ -100,21 +103,26 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     private val getRoasterUseCase: GetRoaster by inject()
     private val getTeamUseCase: GetTeam by inject()
     private val switchPlayersPositionUseCase: SwitchPlayersPosition by inject()
-    private val reassignPlayerPosition: ReassignPlayerPosition by inject()
+    private val getPlayersInField: GetOnlyPlayersInField by inject()
+    private val getDpAndFlexFromPlayersInFieldUseCase: GetDPAndFlexFromPlayersInField by inject()
+    private val saveDpAndFlexUseCase: SaveDpAndFlex by inject()
 
-    fun savePlayerFieldPosition(player: Player, point: PointF, position: FieldPosition, isNewObject: Boolean) {
+    private fun savePlayerFieldPosition(player: Player, position: FieldPosition): Completable {
+        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+                .flatMapCompletable {
+                    val requestValues = SavePlayerFieldPosition.RequestValues(
+                            lineupID = lineupID,
+                            player = player,
+                            position = position,
+                            players = listPlayersWithPosition,
+                            lineupMode = lineupMode,
+                            teamType = it.type)
 
-        val requestValues = SavePlayerFieldPosition.RequestValues(
-                lineupID, player, position, point.x, point.y, listPlayersWithPosition, lineupMode, isNewObject)
-
-        val disposable = UseCaseHandler.execute(savePlayerFieldPositionUseCase, requestValues).subscribe({
-            eventHandler.value = SavePlayerPositionSuccess
-        }, {
-            errorHandler.value = ErrorCase.SAVE_PLAYER_FIELD_POSITION_FAILED
-        })
+                    UseCaseHandler.execute(savePlayerFieldPositionUseCase, requestValues).ignoreElement()
+                }
     }
 
-    fun deletePosition(player: Player, position: FieldPosition) {
+    fun onDeletePosition(player: Player, position: FieldPosition) {
 
         val requestValues = DeletePlayerFieldPosition.RequestValues(listPlayersWithPosition, player, position)
 
@@ -125,15 +133,40 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         })
     }
 
-    fun getAllAvailablePlayers(position: FieldPosition, isNewPlayer: Boolean) {
-        val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+    private fun getNotSelectedPlayers(sortBy: FieldPosition? = null): Single<List<Player>> {
+        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
                 .flatMap { UseCaseHandler.execute(getRoasterUseCase, GetRoaster.RequestValues(it.id, lineupID)) }
                 .flatMap {
-                    val requestValues = GetListAvailablePlayersForSelection.RequestValues(listPlayersWithPosition, position, it.players)
+                    val requestValues = GetListAvailablePlayersForSelection.RequestValues(listPlayersWithPosition, sortBy, it.players)
                     UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues)
                 }
+                .map { it.players }
+    }
+
+    private fun getAllAvailablePlayers(position: FieldPosition) {
+        val disposable = getNotSelectedPlayers(position)
                 .subscribe({
-                    eventHandler.value = GetAllAvailablePlayersSuccess(it.players, position, isNewPlayer)
+                    eventHandler.value = GetAllAvailablePlayersSuccess(it, position)
+                }, {
+                    errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
+                })
+    }
+
+    fun getPlayerSelectionForDp() {
+
+        val disposable = getNotSelectedPlayers()
+                .subscribe({
+                    _linkPlayersInField.value = it
+                }, {
+                    errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
+                })
+    }
+
+    fun getPlayerSelectionForFlex() {
+
+        val disposable = UseCaseHandler.execute(getPlayersInField, GetOnlyPlayersInField.RequestValues(listPlayersWithPosition)).map { it.playersInField }
+                .subscribe({
+                    _linkPlayersInField.value = it
                 }, {
                     errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
                 })
@@ -149,7 +182,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         })
     }
 
-    fun deleteLineup() {
+    private fun deleteLineup() {
 
         val requestValues = DeleteLineup.RequestValues(lineupID)
 
@@ -165,16 +198,19 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         return UseCaseHandler.execute(saveLineupMode, requestValues)
     }
 
-    fun onDesignatedPlayerChanged(isEnabled: Boolean) {
+    fun onLineupModeChanged(isEnabled: Boolean) {
 
-        lineupMode = if(isEnabled) MODE_DH else MODE_NONE
+        lineupMode = if(isEnabled) MODE_ENABLED else MODE_DISABLED
 
         val disposable = saveMode().doOnError {
             errorHandler.value = ErrorCase.SAVE_LINEUP_MODE_FAILED
         }.flatMap {
             eventHandler.value = SaveLineupModeSuccess
-            val requestValues = UpdatePlayersWithLineupMode.RequestValues(listPlayersWithPosition, isEnabled)
-            UseCaseHandler.execute(updatePlayersWithLineupMode, requestValues)
+            UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+                    .flatMap {
+                        val requestValues = UpdatePlayersWithLineupMode.RequestValues(listPlayersWithPosition, isEnabled, it.type)
+                        UseCaseHandler.execute(updatePlayersWithLineupMode, requestValues)
+                    }
         }.subscribe({
             eventHandler.value = UpdatePlayersWithLineupModeSuccess
         }, {
@@ -240,11 +276,78 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun switchPlayersPosition(p1: PlayerWithPosition, p2: PlayerWithPosition): Completable {
-        return UseCaseHandler.execute(switchPlayersPositionUseCase, SwitchPlayersPosition.RequestValues(p1, p2)).ignoreElement()
+        val position1 = FieldPosition.getFieldPosition(p1.position) ?: FieldPosition.FIRST_BASE
+        val position2 = FieldPosition.getFieldPosition(p2.position) ?: FieldPosition.FIRST_BASE
+        return switchPlayersPosition(position1, position2)
     }
 
-    fun changePlayerPosition(p: PlayerWithPosition, newPosition: FieldPosition): Completable {
-        return UseCaseHandler.execute(reassignPlayerPosition, ReassignPlayerPosition.RequestValues(p, newPosition)).ignoreElement()
+    fun switchPlayersPosition(p1: PlayerWithPosition, position2: FieldPosition): Completable {
+        val position1 = FieldPosition.getFieldPosition(p1.position) ?: FieldPosition.FIRST_BASE
+        return switchPlayersPosition(position1, position2)
+    }
+
+    private fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition): Completable {
+        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+                .flatMapCompletable {
+                    UseCaseHandler.execute(switchPlayersPositionUseCase, SwitchPlayersPosition.RequestValues(
+                            players = listPlayersWithPosition,
+                            position1 = p1,
+                            position2 = p2,
+                            teamType = it.type,
+                            lineupMode = lineupMode
+                    )).ignoreElement()
+                }
+    }
+
+    fun onPlayerSelected(player: Player, position: FieldPosition) {
+        val disposable = savePlayerFieldPosition(player, position)
+                .subscribe({
+                    eventHandler.value = SavePlayerPositionSuccess
+                }, {
+                    errorHandler.value = ErrorCase.SAVE_PLAYER_FIELD_POSITION_FAILED
+                })
+    }
+
+    fun onPlayerClicked(position: FieldPosition) {
+        val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+                .flatMap {
+                    UseCaseHandler.execute(getDpAndFlexFromPlayersInFieldUseCase, GetDPAndFlexFromPlayersInField.RequestValues(listPlayersWithPosition, it.type))
+                }
+                .subscribe({
+                    if(position == FieldPosition.DP_DH) {
+                        _linkPlayersInField.value = null
+                        eventHandler.value = NeedLinkDpFlex(Pair(it.dp, it.flex), it.dpLocked, it.flexLocked, it.teamType)
+                    }
+                    else {
+                        getAllAvailablePlayers(position)
+                    }
+                }, {
+                    errorHandler.value = ErrorCase.GET_TEAM_FAILED
+                })
+    }
+
+    /**
+     * @return boolean to indicate arguments are validated.
+     */
+    fun linkDpAndFlex(dp: Player?, flex: Player?): Completable {
+        _linkPlayersInField.value = null
+        return if(dp != null && flex != null) {
+            UseCaseHandler.execute(saveDpAndFlexUseCase, SaveDpAndFlex.RequestValues(
+                    lineupID = lineupID, dp = dp, flex = flex, players = listPlayersWithPosition
+            )).ignoreElement()
+        }
+        else
+            Completable.error(IllegalArgumentException())
+    }
+
+    /**
+     * @return @LayoutRes of the layout
+     */
+    fun getLayout(): Int {
+        return when(editable) {
+            true -> R.layout.fragment_lineup_edition
+            false -> R.layout.fragment_lineup_fixed
+        }
     }
 
     ///////////// LIVE DATA OBSERVER //////////////
@@ -273,5 +376,34 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
     fun registerLineupChange(): LiveData<Lineup> {
         return App.database.lineupDao().getLineupById(lineupID ?: 0)
+    }
+
+    fun getLineupName(): LiveData<String> {
+        _lineupTitle.value = lineupTitle ?: ""
+        return _lineupTitle
+    }
+
+    fun getDesignatedPlayerLabel(context: Context): LiveData<String> {
+        val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
+                .subscribe({
+                    _designatedPlayerTitle.value = when(it.team.type) {
+                        TeamType.SOFTBALL.id -> context.getString(R.string.action_add_dp_flex)
+                        else -> context.getString(R.string.action_add_dh)
+                    }
+                }, {
+                    errorHandler.value = ErrorCase.GET_TEAM_FAILED
+                })
+        return _designatedPlayerTitle
+    }
+
+    //TODO move in view
+    fun getUserDeleteConsentDialog(context: Context): Dialog {
+        return DialogFactory.getWarningDialog(context,
+                context.getString(R.string.dialog_delete_lineup_title),
+                context.getString(R.string.dialog_delete_cannot_undo_message),
+                Completable.create { emitter ->
+                    deleteLineup()
+                    emitter.onComplete()
+                })
     }
 }

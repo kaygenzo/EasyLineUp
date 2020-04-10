@@ -11,18 +11,28 @@ data class PlayerWithPosition(
         @ColumnInfo(name = "position") var position: Int = 0,
         @ColumnInfo(name = "x") var x: Float = 0f,
         @ColumnInfo(name = "y") var y: Float = 0f,
+        @ColumnInfo(name = "flags") var flags: Int = 0,
         @ColumnInfo(name = "order") var order: Int = 0,
         @ColumnInfo(name = "fieldPositionID") var fieldPositionID: Long = 0,
         @ColumnInfo(name = "playerID") val playerID: Long,
         @ColumnInfo(name = "lineupID") val lineupId: Long,
         @ColumnInfo(name = "playerPositions") val playerPositions: Int
 ) {
-    fun toPlayer(): Player {
-        return Player(id = playerID, teamId = teamId, name = playerName, shirtNumber = shirtNumber, licenseNumber = licenseNumber, image = image, positions = playerPositions)
-    }
 
-    fun toPlayerFieldPosition(): PlayerFieldPosition {
-        return PlayerFieldPosition(id = fieldPositionID, playerId = playerID, position = position, x = x, y = y, order = order, lineupId = lineupId)
+    companion object {
+        fun getNextAvailableOrder(players: List<PlayerWithPosition>): Int {
+            var availableOrder = 1
+            players
+                    .filter { it.fieldPositionID > 0 && it.order > 0 }
+                    .sortedBy { it.order }
+                    .forEach {
+                        if(it.order == availableOrder)
+                            availableOrder++
+                        else
+                            return availableOrder
+                    }
+            return availableOrder
+        }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -39,6 +49,7 @@ data class PlayerWithPosition(
         if (position != other.position) return false
         if (x != other.x) return false
         if (y != other.y) return false
+        if (flags != other.flags) return false
         if (order != other.order) return false
         if (fieldPositionID != other.fieldPositionID) return false
         if (playerID != other.playerID) return false
@@ -62,6 +73,15 @@ data class PlayerWithPosition(
         result = 31 * result + playerID.hashCode()
         result = 31 * result + lineupId.hashCode()
         result = 31 * result + playerPositions
+        result = 31 * result + flags
         return result
     }
+}
+
+fun PlayerWithPosition.toPlayer(): Player {
+    return Player(id = playerID, teamId = teamId, name = playerName, shirtNumber = shirtNumber, licenseNumber = licenseNumber, image = image, positions = playerPositions)
+}
+
+fun PlayerWithPosition.toPlayerFieldPosition(): PlayerFieldPosition {
+    return PlayerFieldPosition(id = fieldPositionID, playerId = playerID, position = position, x = x, y = y, order = order, lineupId = lineupId, flags = flags)
 }

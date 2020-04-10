@@ -172,7 +172,7 @@ class ImportData(private val teamDao: TeamDao, private val playerDao: PlayerDao,
                                            insertedArray: Array<Int>, updatedArray: Array<Int>,
                                            updateIfExists: Boolean): Completable {
         val p = PlayerFieldPosition(0L, players[export.playerID] ?: 0L, lineupID,
-                export.position, export.x, export.y, export.order, export.id)
+                export.position, export.x, export.y, export.order, export.flags, export.id)
 
         return playerFieldPositionsDao.getPlayerFieldPositionByHash(export.id)
                 .flatMapCompletable {

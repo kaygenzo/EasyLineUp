@@ -15,8 +15,6 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
-import java.lang.Exception
-import java.lang.IllegalArgumentException
 
 
 @RunWith(MockitoJUnitRunner::class)
@@ -76,7 +74,7 @@ class GetRosterTests {
         observer.await()
         observer.assertComplete()
         Assert.assertEquals(0, observer.values().first().players.filter { it.status }.size)
-        Assert.assertEquals(Constants.STATUS_NONE, observer.values().first().status)
+        Assert.assertEquals(Constants.STATUS_PARTIAL, observer.values().first().status)
     }
 
     @Test
@@ -99,6 +97,6 @@ class GetRosterTests {
         observer.assertComplete()
         Assert.assertEquals(2, observer.values().first().players.filter { it.status }.size)
         Assert.assertEquals(false, observer.values().first().players.filter { it.player.id == 2L }.first().status)
-        Assert.assertEquals(Constants.STATUS_NONE, observer.values().first().status)
+        Assert.assertEquals(Constants.STATUS_PARTIAL, observer.values().first().status)
     }
 }

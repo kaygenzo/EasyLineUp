@@ -1,9 +1,7 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
-import com.telen.easylineup.repository.model.PlayerWithPosition
+import com.telen.easylineup.repository.model.*
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -13,15 +11,30 @@ class UpdatePlayersWithLineupMode(private val lineupDao: PlayerFieldPositionsDao
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         val playerTask: Completable = when(requestValues.isDesignatedPlayerEnabled) {
             true -> {
-                requestValues.players.firstOrNull { it.position == FieldPosition.PITCHER.position }?.let {
-                    val playerFieldPosition = it.toPlayerFieldPosition()
-                    playerFieldPosition.order = Constants.ORDER_PITCHER_WHEN_DH
-                    lineupDao.updatePlayerFieldPosition(playerFieldPosition)
-                } ?: Completable.complete()
+                when(requestValues.teamType) {
+                    TeamType.SOFTBALL.id -> {
+                        Completable.complete()
+                    }
+                    TeamType.BASEBALL.id -> {
+                        // find the pitcher if exists and set him at position 10 in lineup
+                        requestValues.players.firstOrNull { it.position == FieldPosition.PITCHER.position }?.let {
+                            val playerFieldPosition = it.toPlayerFieldPosition()
+                            playerFieldPosition.order = Constants.ORDER_PITCHER_WHEN_DH
+                            lineupDao.updatePlayerFieldPosition(playerFieldPosition)
+                        } ?: Completable.complete()
+                    }
+                    else -> {
+                        Completable.error(IllegalArgumentException())
+                    }
+                }
             }
             false -> {
                 requestValues.players.filter {
-                    it.position == FieldPosition.DH.position || it.position == FieldPosition.PITCHER.position
+                    it.position == FieldPosition.DP_DH.position
+                            // if softball, find the DP and Flex and remove their positions into the lineup
+                            || (requestValues.teamType == TeamType.SOFTBALL.id && it.flags and PlayerFieldPosition.FLAG_FLEX != 0)
+                            // if baseball, find the DH and Pitcher and remove their positions into the lineup
+                            || (requestValues.teamType == TeamType.BASEBALL.id && it.position == FieldPosition.PITCHER.position)
                 }.let { list ->
                     Observable.fromIterable(list).flatMapCompletable { playerPosition ->
                         lineupDao.deletePosition(playerPosition.toPlayerFieldPosition())
@@ -32,6 +45,6 @@ class UpdatePlayersWithLineupMode(private val lineupDao: PlayerFieldPositionsDao
         return playerTask.andThen(Single.just(ResponseValue()))
     }
 
-    class RequestValues(val players: List<PlayerWithPosition>, val isDesignatedPlayerEnabled: Boolean): UseCase.RequestValues
+    class RequestValues(val players: List<PlayerWithPosition>, val isDesignatedPlayerEnabled: Boolean, val teamType: Int): UseCase.RequestValues
     class ResponseValue: UseCase.ResponseValue
 }

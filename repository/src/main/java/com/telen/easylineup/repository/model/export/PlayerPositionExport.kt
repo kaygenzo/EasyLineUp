@@ -21,6 +21,7 @@ data class PlayerPositionExport (
 		@SerializedName("position") val position : Int,
 		@SerializedName("x") val x : Float,
 		@SerializedName("y") val y : Float,
+		@SerializedName("flags") val flags: Int,
 		@SerializedName("order") val order : Int
 ) {
 	override fun equals(other: Any?): Boolean {
@@ -34,6 +35,7 @@ data class PlayerPositionExport (
 		if (position != other.position) return false
 		if (x != other.x) return false
 		if (y != other.y) return false
+		if (flags != other.flags) return false
 		if (order != other.order) return false
 
 		return true
@@ -46,6 +48,7 @@ data class PlayerPositionExport (
 		result = 31 * result + x.hashCode()
 		result = 31 * result + y.hashCode()
 		result = 31 * result + order
+		result = 31 * result + flags
 		return result
 	}
 }

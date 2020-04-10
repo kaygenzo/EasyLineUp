@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.telen.easylineup.R
 import com.telen.easylineup.repository.model.FieldPosition
+import com.telen.easylineup.repository.model.PlayerFieldPosition
 import com.telen.easylineup.repository.model.PlayerWithPosition
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.field_view.view.*
@@ -46,15 +47,14 @@ class DefenseFixedView: DefenseView {
 
                             val playerView = PlayerFieldIcon(context).run {
                                 layoutParams = LayoutParams(iconSize, iconSize)
-                                if(players.any { pos -> pos.position == FieldPosition.DH.position }) {
-                                    when (position) {
-                                        FieldPosition.DH, FieldPosition.PITCHER -> {
-                                            setPlayerImage(player.image, player.playerName, iconSize, Color.RED, 3f)
-                                        }
-                                        else -> {
-                                            setPlayerImage(player.image, player.playerName, iconSize)
-                                        }
+                                if(players.any { pos -> pos.position == FieldPosition.DP_DH.position }) {
+                                    if(player.flags and PlayerFieldPosition.FLAG_FLEX > 0 || player.position == FieldPosition.DP_DH.position) {
+                                        setPlayerImage(player.image, player.playerName, iconSize, Color.RED, 3f)
                                     }
+                                    else {
+                                        setPlayerImage(player.image, player.playerName, iconSize)
+                                    }
+
                                 }
                                 else
                                     setPlayerImage(player.image, player.playerName, iconSize)

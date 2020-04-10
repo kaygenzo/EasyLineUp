@@ -54,8 +54,8 @@ class CheckHashDataTests {
         )
 
         val mPlayerPosition = mutableListOf<PlayerFieldPosition>(
-                PlayerFieldPosition(1L, 1L, 1L, 0, 0f, 0f, 1, null),
-                PlayerFieldPosition(2L, 2L, 2L, 0, 0f, 0f, 1, null)
+                PlayerFieldPosition(1L, 1L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,null),
+                PlayerFieldPosition(2L, 2L, 2L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,null)
         )
 
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(teams))

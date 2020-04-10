@@ -4,6 +4,7 @@ import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
 import com.telen.easylineup.repository.model.Player
 import com.telen.easylineup.repository.model.PlayerWithPosition
+import com.telen.easylineup.repository.model.toPlayerFieldPosition
 import io.reactivex.Single
 
 class DeletePlayerFieldPosition(private val dao: PlayerFieldPositionsDao): UseCase<DeletePlayerFieldPosition.RequestValues, DeletePlayerFieldPosition.ResponseValue>() {

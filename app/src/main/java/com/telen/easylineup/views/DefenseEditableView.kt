@@ -13,10 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
-import com.telen.easylineup.repository.model.FieldPosition
-import com.telen.easylineup.repository.model.MODE_DH
-import com.telen.easylineup.repository.model.Player
-import com.telen.easylineup.repository.model.PlayerWithPosition
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
@@ -27,11 +23,12 @@ import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.view.animation.DecelerateInterpolator
 import com.telen.easylineup.R
+import com.telen.easylineup.repository.model.*
 
 const val TAG_TRASH = "_trash"
 
 interface OnPlayerButtonCallback {
-    fun onPlayerButtonClicked(position: FieldPosition, isNewPlayer: Boolean)
+    fun onPlayerButtonClicked(position: FieldPosition)
     fun onPlayerButtonLongClicked(player: Player, position: FieldPosition)
     fun onPlayerSentToTrash(player: Player, position: FieldPosition)
     fun onPlayersSwitched(player1: PlayerWithPosition, player2: PlayerWithPosition)
@@ -85,15 +82,14 @@ class DefenseEditableView: DefenseView {
 
                     val playerView = PlayerFieldIcon(context).run {
                         layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-                        if(lineupMode == MODE_DH) {
-                            when(pos) {
-                                FieldPosition.DH, FieldPosition.PITCHER -> {
-                                    setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
-                                }
-                                else -> {
-                                    setPlayerImage(player.image, player.name, iconSize)
-                                }
+                        if(lineupMode == MODE_ENABLED) {
+                            if(entry.flags and PlayerFieldPosition.FLAG_FLEX > 0 || entry.position == FieldPosition.DP_DH.position) {
+                                setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
                             }
+                            else {
+                                setPlayerImage(player.image, player.name, iconSize)
+                            }
+
                         }
                         else {
                             setPlayerImage(player.image, player.name, iconSize)
@@ -126,7 +122,7 @@ class DefenseEditableView: DefenseView {
                     addPlayerOnFieldWithPercentage(playerView, pos.xPercent, pos.yPercent, loadingCallback)
 
                     playerView.setOnClickListener { view ->
-                        playerListener?.onPlayerButtonClicked(pos, false)
+                        playerListener?.onPlayerButtonClicked(pos)
                     }
 
                     playerView.setOnLongClickListener {
@@ -214,7 +210,7 @@ class DefenseEditableView: DefenseView {
                 layoutParams = LayoutParams(iconSize, iconSize)
                 setScaleType(ImageView.ScaleType.CENTER)
                 setOnClickListener {
-                    playerListener?.onPlayerButtonClicked(position, true)
+                    playerListener?.onPlayerButtonClicked(position)
                 }
 
                 setOnDragListener { v, event ->
@@ -256,7 +252,7 @@ class DefenseEditableView: DefenseView {
             setImageResource(R.drawable.ic_person_add_black_24dp)
 
             setOnClickListener {
-                playerListener?.onPlayerButtonClicked(FieldPosition.SUBSTITUTE, true)
+                playerListener?.onPlayerButtonClicked(FieldPosition.SUBSTITUTE)
             }
 
             this
@@ -282,13 +278,13 @@ class DefenseEditableView: DefenseView {
     }
 
     private fun addDesignatedPlayerIfExists(players: List<PlayerWithPosition>, lineupMode: Int) {
-         if(lineupMode == MODE_DH) {
+         if(lineupMode == MODE_ENABLED) {
             val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
-            players.filter { it.position == FieldPosition.DH.position }.let { listPlayers ->
+            players.filter { it.position == FieldPosition.DP_DH.position }.let { listPlayers ->
                 var view: View?
                 try {
                     val player = listPlayers.first().toPlayer()
-                    val position = FieldPosition.DH
+                    val position = FieldPosition.DP_DH
                     val playerView = PlayerFieldIcon(context).run {
                         layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
                         setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
@@ -345,9 +341,9 @@ class DefenseEditableView: DefenseView {
                                 DragEvent.ACTION_DROP -> {
                                     val id: ClipData.Item = event.clipData.getItemAt(0)
                                     val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
-                                    Timber.d( "action=ACTION_DROP reassigned ${playerFound?.playerName} to ${FieldPosition.DH}")
+                                    Timber.d( "action=ACTION_DROP reassigned ${playerFound?.playerName} to ${FieldPosition.DP_DH}")
                                     playerFound?.let {
-                                        playerListener?.onPlayerReassigned(it, FieldPosition.DH)
+                                        playerListener?.onPlayerReassigned(it, FieldPosition.DP_DH)
                                     }
                                     true
                                 }
@@ -364,10 +360,10 @@ class DefenseEditableView: DefenseView {
 
                 view?.apply {
                     setOnClickListener {
-                        playerListener?.onPlayerButtonClicked(FieldPosition.DH, view is AddDesignatedPlayerButton)
+                        playerListener?.onPlayerButtonClicked(FieldPosition.DP_DH)
                     }
 
-                    addPlayerOnFieldWithPercentage(this, FieldPosition.DH.xPercent, FieldPosition.DH.yPercent, null)
+                    addPlayerOnFieldWithPercentage(this, FieldPosition.DP_DH.xPercent, FieldPosition.DP_DH.yPercent, null)
                 }
 
             }

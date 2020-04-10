@@ -14,11 +14,9 @@ import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.MODE_DH
-import com.telen.easylineup.repository.model.MODE_NONE
-import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.repository.model.MODE_DISABLED
+import com.telen.easylineup.repository.model.MODE_ENABLED
 import com.telen.easylineup.utils.NavigationUtils
-import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_lineup_edition.view.*
 import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.lineupTabLayout
@@ -46,43 +44,45 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = when(viewModel.editable) {
-            true -> inflater.inflate(R.layout.fragment_lineup_edition, container, false)
-            false -> inflater.inflate(R.layout.fragment_lineup_fixed, container, false)
-        }
+        val view = inflater.inflate(viewModel.getLayout(), container, false)
 
-        activity?.let { activity ->
-            pagerAdapter = LineupPagerAdapter(activity, childFragmentManager, viewModel.editable)
+        activity?.run {
+            pagerAdapter = LineupPagerAdapter(this, childFragmentManager, viewModel.editable)
             view.viewpager?.let { pager ->
                 pager.adapter = pagerAdapter
                 view.lineupTabLayout?.setupWithViewPager(view.viewpager)
             }
 
-            viewModel.lineupTitle?.let {
-                (activity as HomeActivity).supportActionBar?.title = it
-            }
+            viewModel.getLineupName().observe(viewLifecycleOwner, Observer {
+                (this as HomeActivity).supportActionBar?.title = it
+            })
 
-            view.useDhCheckbox?.let { _ ->
-                viewModel.registerLineupChange().observe(this,  Observer {
-                    view.useDhCheckbox.apply {
+            viewModel.registerLineupChange().observe(viewLifecycleOwner,  Observer {
+                //some layouts don't have this checkbox
+                view.changeModeCheckBox?.let { view ->
+                    view.apply {
                         setOnCheckedChangeListener(null)
                         when(it.mode) {
-                            MODE_NONE -> {
+                            MODE_DISABLED -> {
                                 isChecked = false
                             }
-                            MODE_DH -> {
+                            MODE_ENABLED -> {
                                 isChecked = true
                             }
                         }
                         setOnCheckedChangeListener(this@LineupFragment)
                     }
-                })
-            }
+                }
+            })
 
-            viewModel.eventHandler.observe(this, Observer {
+            viewModel.getDesignatedPlayerLabel(this).observe(viewLifecycleOwner, Observer {
+                view.changeModeCheckBox?.text = it
+            })
+
+            viewModel.eventHandler.observe(viewLifecycleOwner, Observer {
                 when(it) {
                     DeleteLineupSuccess -> {
-                        activity.runOnUiThread {
+                        this.runOnUiThread {
                             findNavController().popBackStack(R.id.navigation_lineups, false)
                         }
                     }
@@ -90,10 +90,10 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
                 }
             })
 
-            viewModel.errorHandler.observe(this, Observer {
+            viewModel.errorHandler.observe(viewLifecycleOwner, Observer {
                 when(it) {
                     ErrorCase.DELETE_LINEUP_FAILED -> {
-                        Toast.makeText(activity, "Something wrong happened when deleting lineup", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Something wrong happened when deleting lineup", Toast.LENGTH_LONG).show()
                     }
                     else -> {}
                 }
@@ -143,21 +143,14 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
 
     private fun askUserConsentForDelete() {
         activity?.let {
-            DialogFactory.getWarningDialog(it,
-                    it.getString(R.string.dialog_delete_lineup_title),
-                    it.getString(R.string.dialog_delete_cannot_undo_message),
-                    Completable.create { emitter ->
-                        viewModel.deleteLineup()
-                        emitter.onComplete()
-                    })
-                    .show()
+            viewModel.getUserDeleteConsentDialog(it).show()
         }
     }
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
         if(BuildConfig.DEBUG)
-            Toast.makeText(activity, "Dh is $isChecked", Toast.LENGTH_SHORT).show()
-        viewModel.onDesignatedPlayerChanged(isChecked)
+            Toast.makeText(activity, "Mode is $isChecked", Toast.LENGTH_SHORT).show()
+        viewModel.onLineupModeChanged(isChecked)
     }
 
     private fun exportLineupToExternalStorage() {

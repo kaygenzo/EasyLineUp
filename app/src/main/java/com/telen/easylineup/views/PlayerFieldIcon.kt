@@ -29,18 +29,22 @@ class PlayerFieldIcon: LinearLayout {
         setPlayerImage(url, fallbackName, size, Color.BLACK, 2f)
     }
 
-    fun setPlayerImage(url: String?, fallbackName: String, size: Int, @ColorInt borderColor: Int, borderWidth: Float) {
-        val nameFallback = StringUtils().nameToLetters(fallbackName)
-        playerNameFallback.text = nameFallback
-        playerNameFallback.visibility = View.VISIBLE
-        playerImage.visibility = View.INVISIBLE
-
+    fun setBorderColor(@ColorInt borderColor: Int) {
         if(borderColor == Color.RED) {
             playerNameFallback.setBackgroundResource(R.drawable.circle_shape_letters_border_red)
         }
         else {
             playerNameFallback.setBackgroundResource(R.drawable.circle_shape_letters_border_black)
         }
+    }
+
+    fun setPlayerImage(url: String?, fallbackName: String, size: Int, @ColorInt borderColor: Int, borderWidth: Float) {
+        val nameFallback = StringUtils().nameToLetters(fallbackName)
+        playerNameFallback.text = nameFallback
+        playerNameFallback.visibility = View.VISIBLE
+        playerImage.visibility = View.INVISIBLE
+
+        setBorderColor(borderColor)
 
         url?.let {
             playerImage.post {

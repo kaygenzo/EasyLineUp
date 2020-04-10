@@ -1,11 +1,9 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.*
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.repository.data.LineupDao
 import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
-import com.telen.easylineup.repository.model.PlayerWithPosition
+import com.telen.easylineup.repository.model.*
 import io.reactivex.Completable
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
@@ -32,15 +30,15 @@ class UpdatePlayersWithLineupModeTests {
         updatePlayersWithLineupMode = UpdatePlayersWithLineupMode(lineupDao)
         players = mutableListOf()
         players.add(PlayerWithPosition("toto", 1, 1, 1, null,
-                FieldPosition.SECOND_BASE.position, 0f, 0f, 0, 1, 1, 1, 1))
+                FieldPosition.SECOND_BASE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,0, 1, 1, 1, 1))
         players.add(PlayerWithPosition("tata", 2, 2, 1, null,
-                FieldPosition.CATCHER.position, 0f, 0f, 2, 2, 2, 1, 2))
+                FieldPosition.CATCHER.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 2, 2, 1, 2))
         players.add(PlayerWithPosition("titi", 3, 3, 1, null,
-                FieldPosition.CENTER_FIELD.position, 0f, 0f, 4, 3, 3, 1, 4))
+                FieldPosition.CENTER_FIELD.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,4, 3, 3, 1, 4))
         players.add(PlayerWithPosition("tutu", 4, 4, 1, null,
-                FieldPosition.FIRST_BASE.position, 0f, 0f, 6, 4, 4, 1, 8))
+                FieldPosition.FIRST_BASE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,6, 4, 4, 1, 8))
         players.add(PlayerWithPosition("tete", 5, 5, 1, null,
-                FieldPosition.SUBSTITUTE.position, 0f, 0f, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
+                FieldPosition.SUBSTITUTE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
 
         Mockito.`when`(lineupDao.updatePlayerFieldPosition(any())).thenReturn(Completable.complete())
         Mockito.`when`(lineupDao.deletePosition(any())).thenReturn(Completable.complete())
@@ -48,7 +46,7 @@ class UpdatePlayersWithLineupModeTests {
 
     @Test
     fun shouldDoNothingIfListEmptyAndDHEnabled() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true, TeamType.BASEBALL.id))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -58,7 +56,7 @@ class UpdatePlayersWithLineupModeTests {
 
     @Test
     fun shouldDoNothingIfListEmptyAndDHDisabled() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), false))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), false, TeamType.BASEBALL.id))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -68,7 +66,7 @@ class UpdatePlayersWithLineupModeTests {
 
     @Test
     fun shouldDoNothingIfDHEnabledAndNoPitcherAssigned() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, true))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, true, TeamType.BASEBALL.id))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -78,7 +76,7 @@ class UpdatePlayersWithLineupModeTests {
 
     @Test
     fun shouldDoNothingIfDHDisabledAndNoPitcherOrDHAssigned() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, false))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, false, TeamType.BASEBALL.id))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -90,7 +88,7 @@ class UpdatePlayersWithLineupModeTests {
     fun shouldUpdatePitcherOrderTo_10_ifAssignedAndDHEnabled() {
         players[0].position = FieldPosition.PITCHER.position
 
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, true))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, true, TeamType.BASEBALL.id))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -105,15 +103,15 @@ class UpdatePlayersWithLineupModeTests {
     @Test
     fun shouldDeletePitcherAndDHifAssignedAndDHDisabled() {
         players[0].position = FieldPosition.PITCHER.position
-        players[1].position = FieldPosition.DH.position
+        players[1].position = FieldPosition.DP_DH.position
 
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, false))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, false, TeamType.BASEBALL.id))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
 
         verify(lineupDao, times(2)).deletePosition(check {
-            Assert.assertEquals(true, it.position == FieldPosition.PITCHER.position || it.position == FieldPosition.DH.position)
+            Assert.assertEquals(true, it.position == FieldPosition.PITCHER.position || it.position == FieldPosition.DP_DH.position)
         })
         verify(lineupDao, never()).updatePlayerFieldPosition(any())
     }

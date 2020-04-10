@@ -47,7 +47,7 @@ interface PlayerDao {
 //    fun getPlayersForTeamRx(teamId: Long): Single<List<Player>>
 
     @Query("""
-        SELECT result.*, position, x, y, `order`, playerFieldPosition.id as fieldPositionID
+        SELECT result.*, position, x, y, `order`, playerFieldPosition.id as fieldPositionID, flags
         FROM (
             SELECT lineups.id as lineupID, 
                 players.name as playerName, 

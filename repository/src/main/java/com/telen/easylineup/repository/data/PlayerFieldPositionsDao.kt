@@ -55,6 +55,7 @@ interface PlayerFieldPositionsDao {
         playerFieldPosition.x, playerFieldPosition.y,
         playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID,
         playerFieldPosition.lineupID,
+        playerFieldPosition.flags,
         players.id as playerID,
         players.teamID, players.image,
         players.positions as playerPositions

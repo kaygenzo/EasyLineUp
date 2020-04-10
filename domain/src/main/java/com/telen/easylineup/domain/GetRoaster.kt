@@ -16,7 +16,7 @@ class GetRoaster(private val dao: PlayerDao, private val lineupDao: LineupDao): 
                         dao.getPlayers(requestValues.teamID).map { players ->
                             // if roasterIds is null, it means that all players are selected
                             val status = roasterIds?.let {
-                                if(it.size == players.size) Constants.STATUS_ALL else Constants.STATUS_NONE
+                                if(it.size == players.size) Constants.STATUS_ALL else Constants.STATUS_PARTIAL
                             } ?: Constants.STATUS_ALL
                             ResponseValue(status, players.map { RoasterPlayerStatus(it, roasterIds?.contains(it.id) ?: true) })
                         }

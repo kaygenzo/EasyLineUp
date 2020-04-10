@@ -12,7 +12,7 @@ interface UriChecker {
 }
 
 class ExportData(val teamDao: TeamDao, val playerDao: PlayerDao, val tournamentDao: TournamentDao, val lineupDao: LineupDao,
-                 val playerFieldPositionsDao: PlayerFieldPositionsDao): UseCase<ExportData.RequestValues, ExportData.ResponseValue>() {
+                 private val playerFieldPositionsDao: PlayerFieldPositionsDao): UseCase<ExportData.RequestValues, ExportData.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         val teams: MutableList<TeamExport> = mutableListOf()

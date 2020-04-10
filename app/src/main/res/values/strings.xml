@@ -75,6 +75,7 @@
     <string name="field_position_dp" translatable="false">DP</string>
     <string name="field_position_dh" translatable="false">DH</string>
     <string name="field_position_flex" translatable="false">FLEX</string>
+    <string name="field_position_pitcher" translatable="false">PITCHER</string>
 
     <string name="action_add_dp_flex">Use DP/Flex</string>
     <string name="action_add_dh">Use DH</string>

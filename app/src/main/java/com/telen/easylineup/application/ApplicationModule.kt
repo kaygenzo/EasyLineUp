@@ -41,10 +41,12 @@ val appModules = module {
     single { GetRoaster(get(), get()) }
     single { DeleteTeam(get()) }
     single { SwitchPlayersPosition(get()) }
-    single { ReassignPlayerPosition(get()) }
     single { DeleteAllData(get(), get()) }
     single { GetTournamentStatsForPositionTable(get()) }
     single { CheckHashData(get(), get(), get(), get(), get()) }
     single { ExportData(get(), get(), get(), get(), get()) }
     single { ImportData(get(), get(), get(), get(), get()) }
+    single { GetOnlyPlayersInField() }
+    single { GetDPAndFlexFromPlayersInField() }
+    single { SaveDpAndFlex(get()) }
 }

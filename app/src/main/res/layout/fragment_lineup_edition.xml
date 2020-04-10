@@ -24,10 +24,9 @@
     </com.google.android.material.tabs.TabLayout>
 
     <CheckBox
-        android:id="@+id/useDhCheckbox"
+        android:id="@+id/changeModeCheckBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/action_add_dh"
         app:layout_constraintTop_toBottomOf="@+id/lineupTabLayout"/>
 
     <androidx.viewpager.widget.ViewPager
@@ -35,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/useDhCheckbox"
+        app:layout_constraintTop_toBottomOf="@+id/changeModeCheckBox"
         android:layout_marginBottom="5dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
