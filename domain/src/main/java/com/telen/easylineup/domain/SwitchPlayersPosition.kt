@@ -54,7 +54,7 @@ class SwitchPlayersPosition(val dao: PlayerFieldPositionsDao): UseCase<SwitchPla
                             if(it.order == Constants.ORDER_PITCHER_WHEN_DH) {
                                 //we were a pitcher but not anymore.
                                 it.order = playerPositions.firstOrNull { it.order != Constants.ORDER_PITCHER_WHEN_DH }?.order
-                                        ?: PlayerWithPosition.getNextAvailableOrder(requestValues.players)
+                                        ?: PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
                             }
 
                         }
@@ -63,7 +63,7 @@ class SwitchPlayersPosition(val dao: PlayerFieldPositionsDao): UseCase<SwitchPla
                 else { //softball
                     when(newPosition) {
                         FieldPosition.DP_DH -> {
-                            it.order = PlayerWithPosition.getNextAvailableOrder(requestValues.players)
+                            it.order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
                             it.flags = PlayerFieldPosition.FLAG_NONE
                         }
                     }

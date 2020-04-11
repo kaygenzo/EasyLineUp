@@ -20,10 +20,10 @@ data class PlayerWithPosition(
 ) {
 
     companion object {
-        fun getNextAvailableOrder(players: List<PlayerWithPosition>): Int {
+        fun getNextAvailableOrder(players: List<PlayerWithPosition>, exclude: List<Int>? = null): Int {
             var availableOrder = 1
             players
-                    .filter { it.fieldPositionID > 0 && it.order > 0 }
+                    .filter { it.fieldPositionID > 0 && it.order > 0 && !(exclude?.contains(it.order) ?: false)}
                     .sortedBy { it.order }
                     .forEach {
                         if(it.order == availableOrder)

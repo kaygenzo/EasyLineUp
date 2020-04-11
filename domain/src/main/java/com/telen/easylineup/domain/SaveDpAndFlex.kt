@@ -15,7 +15,7 @@ class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPositionsDao)
             requestValues.players.firstOrNull { p -> p.position == FieldPosition.DP_DH.position }?.run {
                 toUpdate.add(this.toPlayerFieldPosition().apply {
                     playerId = requestValues.dp.id
-                    order = PlayerWithPosition.getNextAvailableOrder(requestValues.players)
+                    order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
                 })
             } ?: run {
                 val newPosition = PlayerFieldPosition(playerId = requestValues.dp.id, lineupId = lineupID, position = FieldPosition.DP_DH.position,

@@ -23,19 +23,19 @@ class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositionsDao): U
                     }
                     FieldPosition.PITCHER -> {
                         if (requestValues.lineupMode == MODE_DISABLED)
-                            order = PlayerWithPosition.getNextAvailableOrder(requestValues.players)
+                            order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
                         else {
                             if(requestValues.teamType == TeamType.BASEBALL.id) {
                                 order = Constants.ORDER_PITCHER_WHEN_DH
                                 flags = PlayerFieldPosition.FLAG_FLEX
                             }
                             else {
-                                order = PlayerWithPosition.getNextAvailableOrder(requestValues.players)
+                                order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
                             }
                         }
                     }
                     else -> {
-                        order = PlayerWithPosition.getNextAvailableOrder(requestValues.players)
+                        order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
                     }
                 }
             }
