@@ -291,6 +291,29 @@ class SavePlayerFieldPositionTests {
         verify(lineupDao, never()).updatePlayerFieldPosition(any())
     }
 
+    @Test
+    fun shouldKeepOrderOfOtherPlayer() {
+        val fieldPosition = FieldPosition.CENTER_FIELD
+        val teamType = TeamType.BASEBALL.id
+        val mode = MODE_DISABLED
+        val request = SavePlayerFieldPosition.RequestValues(
+                lineupID = 1,
+                player = newPlayer,
+                position = fieldPosition,
+                players = players,
+                teamType = teamType,
+                lineupMode = mode
+        )
+
+        savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
+        observer.await()
+        observer.assertComplete()
+
+        verify(lineupDao).updatePlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
+            Assert.assertEquals(4, it.order)
+        })
+    }
+
     //// FLAGS /////
 
     @Test

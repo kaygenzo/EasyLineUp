@@ -36,9 +36,13 @@ class SwitchPlayersPosition(val dao: PlayerFieldPositionsDao): UseCase<SwitchPla
             playerPositions.add(it)
         }
 
+        // just keep reference of the first order different of 10
+        val tmpOrder = playerPositions.firstOrNull { it.order != Constants.ORDER_PITCHER_WHEN_DH }?.order
+        val oneIsFlex = playerPositions.any {it.flags and PlayerFieldPosition.FLAG_FLEX > 0}
+        val oneIsDp = playerPositions.any {it.position == FieldPosition.DP_DH.position}
+
         // if at least one player has a flag flex and it is a baseball team, the pitcher is always
         // the flex. Otherwise, the flex can be any other player. The only exception is the DP/DH
-
         playerPositions.forEach {
             if(requestValues.lineupMode == MODE_ENABLED) {
                 val newPosition = FieldPosition.getFieldPosition(it.position)
@@ -53,18 +57,34 @@ class SwitchPlayersPosition(val dao: PlayerFieldPositionsDao): UseCase<SwitchPla
                             //if possible, just keep order, but in case of a swap with a pitcher, exchange orders
                             if(it.order == Constants.ORDER_PITCHER_WHEN_DH) {
                                 //we were a pitcher but not anymore.
-                                it.order = playerPositions.firstOrNull { it.order != Constants.ORDER_PITCHER_WHEN_DH }?.order
-                                        ?: PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
+                                it.order = tmpOrder ?: PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
                             }
 
                         }
                     }
                 }
                 else { //softball
-                    when(newPosition) {
-                        FieldPosition.DP_DH -> {
-                            it.order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
+                    /*
+                    * Rules:
+                    * - Flex can be anyone except DP.
+                    * - If FLEX exists, its order is 10
+                    * - If 2 players switch their positions:
+                    *   if it is 2 normal players, only positions change
+                    *   if it is a FLEX and a normal player, only positions change
+                    *   if it is the DP and a normal player, only positions change
+                    *   if is is the DP and the FLEX, switch position, flags and order
+                    */
+                    if(oneIsFlex && oneIsDp) {
+                        if(newPosition == FieldPosition.DP_DH) {
                             it.flags = PlayerFieldPosition.FLAG_NONE
+                            if(it.order == Constants.ORDER_PITCHER_WHEN_DH) {
+                                //we were a pitcher but not anymore.
+                                it.order = tmpOrder ?: PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
+                            }
+                        }
+                        else {
+                            it.order = Constants.ORDER_PITCHER_WHEN_DH
+                            it.flags = PlayerFieldPosition.FLAG_FLEX
                         }
                     }
                 }

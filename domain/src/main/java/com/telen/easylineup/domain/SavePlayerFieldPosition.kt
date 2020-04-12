@@ -22,26 +22,22 @@ class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositionsDao): U
                         order = Constants.SUBSTITUTE_ORDER_VALUE
                     }
                     FieldPosition.PITCHER -> {
-                        if (requestValues.lineupMode == MODE_DISABLED)
-                            order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
-                        else {
-                            if(requestValues.teamType == TeamType.BASEBALL.id) {
-                                order = Constants.ORDER_PITCHER_WHEN_DH
-                                flags = PlayerFieldPosition.FLAG_FLEX
-                            }
-                            else {
-                                order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
-                            }
+                        if (requestValues.lineupMode == MODE_ENABLED && requestValues.teamType == TeamType.BASEBALL.id) {
+                            order = Constants.ORDER_PITCHER_WHEN_DH
+                            flags = PlayerFieldPosition.FLAG_FLEX
                         }
                     }
-                    else -> {
-                        order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
-                    }
+                    else -> { }
                 }
             }
 
             playerPosition.apply {
                 playerId = requestValues.player.id
+
+                // we keep the order of the previous position, except if there wasn't
+                if(order <= 0)
+                    order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
+
                 x = requestValues.position.xPercent
                 y = requestValues.position.yPercent
             }

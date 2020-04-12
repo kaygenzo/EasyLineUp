@@ -20,6 +20,9 @@ data class PlayerWithPosition(
 ) {
 
     companion object {
+        // here we exclude the position itself because it's also a candidate for the order.
+        // For instance, if the order is 1, order 1 is a new candidate as well as others because it will
+        // be a free order
         fun getNextAvailableOrder(players: List<PlayerWithPosition>, exclude: List<Int>? = null): Int {
             var availableOrder = 1
             players
