@@ -101,7 +101,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     private val deleteLineup: DeleteLineup by inject()
     private val saveLineupMode: SaveLineupMode by inject()
     private val updatePlayersWithLineupMode: UpdatePlayersWithLineupMode by inject()
-    private val getRoasterUseCase: GetRoaster by inject()
+    private val getRosterUseCase: GetRoster by inject()
     private val getTeamUseCase: GetTeam by inject()
     private val switchPlayersPositionUseCase: SwitchPlayersPosition by inject()
     private val getPlayersInField: GetOnlyPlayersInField by inject()
@@ -136,7 +136,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
     private fun getNotSelectedPlayers(sortBy: FieldPosition? = null): Single<List<Player>> {
         return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
-                .flatMap { UseCaseHandler.execute(getRoasterUseCase, GetRoaster.RequestValues(it.id, lineupID)) }
+                .flatMap { UseCaseHandler.execute(getRosterUseCase, GetRoster.RequestValues(it.id, lineupID)) }
                 .flatMap {
                     val requestValues = GetListAvailablePlayersForSelection.RequestValues(listPlayersWithPosition, sortBy, it.players)
                     UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues)

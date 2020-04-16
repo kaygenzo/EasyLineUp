@@ -6,10 +6,10 @@ import io.reactivex.Single
 class GetListAvailablePlayersForSelection: UseCase<GetListAvailablePlayersForSelection.RequestValues, GetListAvailablePlayersForSelection.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        val roasterIDs = requestValues.roasterPlayers?.filter { it.status }?.map { it.player.id }
+        val rosterIDs = requestValues.rosterPlayers?.filter { it.status }?.map { it.player.id }
         var listAvailablePlayers = requestValues.players
                 .filter { player ->
-                    player.fieldPositionID <= 0 && roasterIDs?.contains(player.playerID) ?: true
+                    player.fieldPositionID <= 0 && rosterIDs?.contains(player.playerID) ?: true
                 }
                 .map { it.toPlayer() }
 
@@ -37,6 +37,6 @@ class GetListAvailablePlayersForSelection: UseCase<GetListAvailablePlayersForSel
         }
     }
 
-    class RequestValues(val players: List<PlayerWithPosition>, val position: FieldPosition?, val roasterPlayers: List<RoasterPlayerStatus>?): UseCase.RequestValues
+    class RequestValues(val players: List<PlayerWithPosition>, val position: FieldPosition?, val rosterPlayers: List<RosterPlayerStatus>?): UseCase.RequestValues
     class ResponseValue(val players: List<Player>): UseCase.ResponseValue
 }

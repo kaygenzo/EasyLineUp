@@ -23,7 +23,7 @@ data class SaveSuccess(val lineupID: Long, val lineupName: String): SaveResult()
 class LineupViewModel: ViewModel(), KoinComponent {
 
     private val filterLiveData: MutableLiveData<String> = MutableLiveData()
-    private var chosenRoaster: GetRoaster.ResponseValue? = null
+    private var chosenRoster: GetRoster.ResponseValue? = null
 
     private val saveResult = MutableLiveData<SaveResult>()
 
@@ -32,7 +32,7 @@ class LineupViewModel: ViewModel(), KoinComponent {
     private val deleteTournamentUseCase: DeleteTournament by inject()
     private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineups by inject()
     private val getTournamentsUseCase: GetTournaments by inject()
-    private val getRoasterUseCase: GetRoaster by inject()
+    private val getRosterUseCase: GetRoster by inject()
 
     fun setFilter(filter: String) {
         filterLiveData.value = filter
@@ -60,13 +60,13 @@ class LineupViewModel: ViewModel(), KoinComponent {
         return UseCaseHandler.execute(deleteTournamentUseCase, DeleteTournament.RequestValues(tournament)).ignoreElement()
     }
 
-    fun getRoaster(): Single<GetRoaster.ResponseValue> {
-        return chosenRoaster?.let {
+    fun getRoster(): Single<GetRoster.ResponseValue> {
+        return chosenRoster?.let {
             Single.just(it)
         } ?: UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
-                .flatMap { UseCaseHandler.execute(getRoasterUseCase, GetRoaster.RequestValues(it.id, null)) }
+                .flatMap { UseCaseHandler.execute(getRosterUseCase, GetRoster.RequestValues(it.id, null)) }
                 .map {
-                    chosenRoaster = it
+                    chosenRoster = it
                     it
                 }
     }
@@ -74,8 +74,8 @@ class LineupViewModel: ViewModel(), KoinComponent {
     fun saveLineup(tournament: Tournament, lineupTitle: String) {
         UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
                 .flatMap { team ->
-                    getRoaster().map { it.players }.flatMap { roaster ->
-                        UseCaseHandler.execute(createLineupUseCase, CreateLineup.RequestValues(team.id, tournament, lineupTitle, roaster))
+                    getRoster().map { it.players }.flatMap { roster ->
+                        UseCaseHandler.execute(createLineupUseCase, CreateLineup.RequestValues(team.id, tournament, lineupTitle, roster))
                     }
                 }
                 .map { it.lineupID }
@@ -91,8 +91,8 @@ class LineupViewModel: ViewModel(), KoinComponent {
                 })
     }
 
-    fun roasterPlayerStatusChanged(position: Int, status: Boolean) {
-        chosenRoaster?.let {
+    fun rosterPlayerStatusChanged(position: Int, status: Boolean) {
+        chosenRoster?.let {
             it.players[position].status = status
             val areSameSize = it.players.filter { it.status }.size == it.players.size
             it.status = when(areSameSize) {
@@ -103,11 +103,11 @@ class LineupViewModel: ViewModel(), KoinComponent {
 
     }
 
-    fun showNewRoasterFeature(context: Context): Single<Boolean> {
+    fun showNewRosterFeature(context: Context): Single<Boolean> {
         val prefs = context.getSharedPreferences(Constants.APPLICATION_PREFERENCES, 0)
-        val show = prefs.getBoolean(Constants.PREF_FEATURE_SHOW_NEW_ROASTER, true)
+        val show = prefs.getBoolean(Constants.PREF_FEATURE_SHOW_NEW_ROSTER, true)
         if(show) {
-            prefs.edit().putBoolean(Constants.PREF_FEATURE_SHOW_NEW_ROASTER, false).apply()
+            prefs.edit().putBoolean(Constants.PREF_FEATURE_SHOW_NEW_ROSTER, false).apply()
         }
         return Single.just(show)
     }

@@ -60,8 +60,8 @@
     <string name="header_batting_order_player_position">Pos.</string>
 
     <string name="form_lineup_creation_date_label">Date</string>
-    <string name="form_lineup_creation_roaster_label">Joueurs</string>
-    <string name="form_lineup_creation_roaster_change_button">Changer</string>
+    <string name="form_lineup_creation_roster_label">Joueurs</string>
+    <string name="form_lineup_creation_roster_change_button">Changer</string>
 
     <string name="lineup_list_empty_label">Vide</string>
     <string name="lineup_list_filter_focused_hint">Tapez un nom</string>
@@ -96,8 +96,8 @@
     <string name="team_list_dialog_title">Vos équipes</string>
     <string name="team_list_dialog_create">Nouveau</string>
 
-    <string name="roaster_size_status_all">Tous les joueurs</string>
-    <plurals name="roaster_size_status_selection">
+    <string name="roster_size_status_all">Tous les joueurs</string>
+    <plurals name="roster_size_status_selection">
         <item quantity="one">%d joueur</item>
         <item quantity="other">%d joueurs</item>
     </plurals>
@@ -105,10 +105,10 @@
     <string name="feature_manage_teams_title">Gérez vos équipes</string>
     <string name="feature_manage_teams_description">Cliquez ici pour accéder au menu vous permettant de créer ou de changer d\'équipe</string>
 
-    <string name="feature_roaster_title">Gérez votre composition initiale</string>
-    <string name="feature_roaster_description">Vous pouvez changer les joueurs qui participeront au match</string>
+    <string name="feature_roster_title">Gérez votre composition initiale</string>
+    <string name="feature_roster_description">Vous pouvez changer les joueurs qui participeront au match</string>
 
-    <string name="roaster_list_player_dialog_title">Liste des joueurs de l\'équipe</string>
+    <string name="roster_list_player_dialog_title">Liste des joueurs de l\'équipe</string>
 
     <string name="team_details_type_baseball">Equipe de Baseball</string>
     <string name="team_details_type_softball">Equipe de Softball</string>

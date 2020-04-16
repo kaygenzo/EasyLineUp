@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.getkeepsafe.taptargetview.TapTargetView
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.GetRoaster
+import com.telen.easylineup.domain.GetRoster
 import com.telen.easylineup.lineup.list.InvalidLineupName
 import com.telen.easylineup.lineup.list.InvalidTournamentName
 import com.telen.easylineup.lineup.list.LineupViewModel
@@ -49,8 +49,8 @@ class LineupCreationFragment: Fragment() {
         })
 
         view.lineupCreationForm.setOnActionClickListener(object: OnActionButtonListener {
-            override fun onRoasterChangeClicked() {
-                showRoasterDialog(view.lineupCreationForm)
+            override fun onRosterChangeClicked() {
+                showRosterDialog(view.lineupCreationForm)
             }
 
             override fun onSaveClicked(lineupName: String, tournament: Tournament) {
@@ -62,8 +62,8 @@ class LineupCreationFragment: Fragment() {
             }
         })
 
-        lineupViewModel.getRoaster().subscribe({
-            updateRoasterSize(view.playerCount, it)
+        lineupViewModel.getRoster().subscribe({
+            updateRosterSize(view.playerCount, it)
         }, {
             Timber.e(it)
         })
@@ -92,8 +92,8 @@ class LineupCreationFragment: Fragment() {
         return view
     }
 
-    private fun showRoasterDialog(formView: LineupCreationFormView) {
-        val disposable = lineupViewModel.getRoaster()
+    private fun showRosterDialog(formView: LineupCreationFormView) {
+        val disposable = lineupViewModel.getRoster()
                 .subscribe({ response ->
                     activity?.let { activity ->
                         val names = mutableListOf<CharSequence>()
@@ -108,10 +108,10 @@ class LineupCreationFragment: Fragment() {
                         checked.addAll(response.players.map { it.status })
 
                         AlertDialog.Builder(activity)
-                                .setTitle(R.string.roaster_list_player_dialog_title)
+                                .setTitle(R.string.roster_list_player_dialog_title)
                                 .setMultiChoiceItems(names.toTypedArray(), checked.toBooleanArray()) { dialog, which, isChecked ->
-                                    lineupViewModel.roasterPlayerStatusChanged(which, isChecked)
-                                    updateRoasterSize(formView.playerCount, response)
+                                    lineupViewModel.rosterPlayerStatusChanged(which, isChecked)
+                                    updateRosterSize(formView.playerCount, response)
                                 }
                                 .setPositiveButton(android.R.string.ok, null)
                                 .create()
@@ -126,19 +126,19 @@ class LineupCreationFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         activity?.let { activity ->
-            lineupViewModel.showNewRoasterFeature(activity)
+            lineupViewModel.showNewRosterFeature(activity)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ show ->
                         if(show) {
                             view?.lineupCreationForm?.let { form ->
-                                form.roasterExpandableView.expand()
+                                form.rosterExpandableView.expand()
                                 FeatureViewFactory.apply(form.addPlayerFilter,
                                         activity as AppCompatActivity,
-                                        getString(R.string.feature_roaster_title),
-                                        getString(R.string.feature_roaster_description),
+                                        getString(R.string.feature_roster_title),
+                                        getString(R.string.feature_roster_description),
                                         object : TapTargetView.Listener() {
                                             override fun onTargetClick(view: TapTargetView?) {
-                                                showRoasterDialog(form)
+                                                showRosterDialog(form)
                                                 view?.dismiss(true)
                                             }
 
@@ -154,14 +154,14 @@ class LineupCreationFragment: Fragment() {
         }
     }
 
-    private fun updateRoasterSize(view: TextView, response: GetRoaster.ResponseValue) {
+    private fun updateRosterSize(view: TextView, response: GetRoster.ResponseValue) {
         when(response.status) {
             Constants.STATUS_ALL -> {
-                view.text = getString(R.string.roaster_size_status_all)
+                view.text = getString(R.string.roster_size_status_all)
             }
             else -> {
                 val size = response.players.filter { it.status }.size
-                view.text = resources.getQuantityString(R.plurals.roaster_size_status_selection, size, size)
+                view.text = resources.getQuantityString(R.plurals.roster_size_status_selection, size, size)
             }
         }
     }

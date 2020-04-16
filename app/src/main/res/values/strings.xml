@@ -63,8 +63,8 @@
     <string name="header_batting_order_player_position">Pos.</string>
 
     <string name="form_lineup_creation_date_label">Date</string>
-    <string name="form_lineup_creation_roaster_label">Roaster</string>
-    <string name="form_lineup_creation_roaster_change_button">Change</string>
+    <string name="form_lineup_creation_roster_label">Roster</string>
+    <string name="form_lineup_creation_roster_change_button">Change</string>
 
     <string name="lineup_list_empty_label">Empty</string>
     <string name="lineup_list_filter_focused_hint">Enter name</string>
@@ -104,8 +104,8 @@
     <string name="team_list_dialog_title">Your teams</string>
     <string name="team_list_dialog_create">Create</string>
 
-    <string name="roaster_size_status_all">All players</string>
-    <plurals name="roaster_size_status_selection">
+    <string name="roster_size_status_all">All players</string>
+    <plurals name="roster_size_status_selection">
         <item quantity="one">%d player</item>
         <item quantity="other">%d players</item>
     </plurals>
@@ -113,10 +113,10 @@
     <string name="feature_manage_teams_title">Manage your teams</string>
     <string name="feature_manage_teams_description">Click here to access a menu to let you create and change the main team</string>
 
-    <string name="feature_roaster_title">Setup your roaster</string>
-    <string name="feature_roaster_description">You can now change players who will play the game!</string>
+    <string name="feature_roster_title">Setup your roster</string>
+    <string name="feature_roster_description">You can now change players who will play the game!</string>
 
-    <string name="roaster_list_player_dialog_title">List of all team players</string>
+    <string name="roster_list_player_dialog_title">List of all team players</string>
 
     <string name="team_details_type_baseball">Baseball team</string>
     <string name="team_details_type_softball">Softball team</string>

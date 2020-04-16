@@ -17,7 +17,7 @@ import java.util.*
 interface OnActionButtonListener {
     fun onSaveClicked(lineupName: String, tournament: Tournament)
     fun onCancelClicked()
-    fun onRoasterChangeClicked()
+    fun onRosterChangeClicked()
 }
 
 class LineupCreationFormView: ConstraintLayout, TextWatcher {
@@ -87,15 +87,15 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
             }
         }
 
-        roasterExpandableButton.setOnClickListener {
-            when(roasterExpandableView.isExpanded) {
+        rosterExpandableButton.setOnClickListener {
+            when(rosterExpandableView.isExpanded) {
                 true -> {
-                    roasterExpandableView.collapse()
-                    roasterExpandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp)
+                    rosterExpandableView.collapse()
+                    rosterExpandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp)
                 }
                 else -> {
-                    roasterExpandableView.expand()
-                    roasterExpandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp)
+                    rosterExpandableView.expand()
+                    rosterExpandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp)
                 }
             }
         }
@@ -105,7 +105,7 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         }
 
         addPlayerFilter.setOnClickListener {
-            actionClickListener?.onRoasterChangeClicked()
+            actionClickListener?.onRosterChangeClicked()
         }
 
         cancel.setOnClickListener {

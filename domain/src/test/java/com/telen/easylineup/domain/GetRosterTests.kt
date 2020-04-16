@@ -22,7 +22,7 @@ class GetRosterTests {
 
     @Mock lateinit var lineupDao: LineupDao
     @Mock lateinit var playerDao: PlayerDao
-    lateinit var mGetRoster: GetRoaster
+    lateinit var mGetRoster: GetRoster
 
     private val lineup = Lineup(1L, "A", 1L, 1L,
             1, 1L,1L,null, "hash")
@@ -39,7 +39,7 @@ class GetRosterTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        mGetRoster = GetRoaster(playerDao, lineupDao)
+        mGetRoster = GetRoster(playerDao, lineupDao)
 
         Mockito.`when`(lineupDao.getLineupByIdSingle(1L)).thenReturn(Single.just(lineup))
         Mockito.`when`(playerDao.getPlayers(1L)).thenReturn(Single.just(listOf(player1, player2, player3)))
@@ -47,8 +47,8 @@ class GetRosterTests {
 
     @Test
     fun shouldReturnAllPlayersIfLineupIdIsNull() {
-        val observer = TestObserver<GetRoaster.ResponseValue>()
-        mGetRoster.executeUseCase(GetRoaster.RequestValues(1L, null)).subscribe(observer)
+        val observer = TestObserver<GetRoster.ResponseValue>()
+        mGetRoster.executeUseCase(GetRoster.RequestValues(1L, null)).subscribe(observer)
         observer.await()
         observer.assertComplete()
         Assert.assertEquals(3, observer.values().first().players.filter { it.status }.size)
@@ -57,9 +57,9 @@ class GetRosterTests {
 
     @Test
     fun shouldReturnAllPlayersIfLineupRosterIsNull() {
-        lineup.roaster = null
-        val observer = TestObserver<GetRoaster.ResponseValue>()
-        mGetRoster.executeUseCase(GetRoaster.RequestValues(1L, 1L)).subscribe(observer)
+        lineup.roster = null
+        val observer = TestObserver<GetRoster.ResponseValue>()
+        mGetRoster.executeUseCase(GetRoster.RequestValues(1L, 1L)).subscribe(observer)
         observer.await()
         observer.assertComplete()
         Assert.assertEquals(3, observer.values().first().players.filter { it.status }.size)
@@ -68,9 +68,9 @@ class GetRosterTests {
 
     @Test
     fun shouldReturnNoPlayersIfLineupRosterIsEmpty() {
-        lineup.roaster = ""
-        val observer = TestObserver<GetRoaster.ResponseValue>()
-        mGetRoster.executeUseCase(GetRoaster.RequestValues(1L, 1L)).subscribe(observer)
+        lineup.roster = ""
+        val observer = TestObserver<GetRoster.ResponseValue>()
+        mGetRoster.executeUseCase(GetRoster.RequestValues(1L, 1L)).subscribe(observer)
         observer.await()
         observer.assertComplete()
         Assert.assertEquals(0, observer.values().first().players.filter { it.status }.size)
@@ -79,9 +79,9 @@ class GetRosterTests {
 
     @Test
     fun shouldReturnAllPlayersIfLineupRosterIsFull() {
-        lineup.roaster = "1;2;3"
-        val observer = TestObserver<GetRoaster.ResponseValue>()
-        mGetRoster.executeUseCase(GetRoaster.RequestValues(1L, 1L)).subscribe(observer)
+        lineup.roster = "1;2;3"
+        val observer = TestObserver<GetRoster.ResponseValue>()
+        mGetRoster.executeUseCase(GetRoster.RequestValues(1L, 1L)).subscribe(observer)
         observer.await()
         observer.assertComplete()
         Assert.assertEquals(3, observer.values().first().players.filter { it.status }.size)
@@ -89,10 +89,10 @@ class GetRosterTests {
     }
 
     @Test
-    fun shouldReturn2PlayersInRoasterSelection() {
-        lineup.roaster = "1;3"
-        val observer = TestObserver<GetRoaster.ResponseValue>()
-        mGetRoster.executeUseCase(GetRoaster.RequestValues(1L, 1L)).subscribe(observer)
+    fun shouldReturn2PlayersInRosterSelection() {
+        lineup.roster = "1;3"
+        val observer = TestObserver<GetRoster.ResponseValue>()
+        mGetRoster.executeUseCase(GetRoster.RequestValues(1L, 1L)).subscribe(observer)
         observer.await()
         observer.assertComplete()
         Assert.assertEquals(2, observer.values().first().players.filter { it.status }.size)

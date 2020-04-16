@@ -1,16 +1,11 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.data.LineupDao
 import com.telen.easylineup.repository.model.*
-import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -18,7 +13,7 @@ class GetListAvailablePlayersForSelectionTests {
 
     lateinit var getListAvailablePlayersForSelection: GetListAvailablePlayersForSelection
     lateinit var players: MutableList<PlayerWithPosition>
-    lateinit var roaster: MutableList<RoasterPlayerStatus>
+    lateinit var roster: MutableList<RosterPlayerStatus>
 
     @Before
     fun init() {
@@ -39,18 +34,18 @@ class GetListAvailablePlayersForSelectionTests {
         players.add(PlayerWithPosition("tete", 5, 5, teamID, null,
                 FieldPosition.SUBSTITUTE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
 
-        roaster = mutableListOf()
-        roaster.add(RoasterPlayerStatus(Player(id = 1L, teamId = teamID, name = "toto", shirtNumber =  1, licenseNumber = 1, image = null, positions = 1), true))
-        roaster.add(RoasterPlayerStatus(Player(id = 2L, teamId = teamID, name = "tata", shirtNumber = 2, licenseNumber =  2, image = null, positions =1), true))
-        roaster.add(RoasterPlayerStatus(Player(id = 3L, teamId = teamID, name = "titi", shirtNumber = 3, licenseNumber = 3, image = null, positions =4), true))
-        roaster.add(RoasterPlayerStatus(Player(id = 4L, teamId = teamID, name = "tutu", shirtNumber = 4, licenseNumber = 4, image = null, positions =8), true))
-        roaster.add(RoasterPlayerStatus(Player(id = 5L, teamId = teamID, name = "tete", shirtNumber = 5, licenseNumber = 5, image = null, positions =16), true))
+        roster = mutableListOf()
+        roster.add(RosterPlayerStatus(Player(id = 1L, teamId = teamID, name = "toto", shirtNumber =  1, licenseNumber = 1, image = null, positions = 1), true))
+        roster.add(RosterPlayerStatus(Player(id = 2L, teamId = teamID, name = "tata", shirtNumber = 2, licenseNumber =  2, image = null, positions =1), true))
+        roster.add(RosterPlayerStatus(Player(id = 3L, teamId = teamID, name = "titi", shirtNumber = 3, licenseNumber = 3, image = null, positions =4), true))
+        roster.add(RosterPlayerStatus(Player(id = 4L, teamId = teamID, name = "tutu", shirtNumber = 4, licenseNumber = 4, image = null, positions =8), true))
+        roster.add(RosterPlayerStatus(Player(id = 5L, teamId = teamID, name = "tete", shirtNumber = 5, licenseNumber = 5, image = null, positions =16), true))
     }
 
     @Test
     fun shouldTriggerAnErrorIfListEmpty() {
         val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
-        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(mutableListOf(), FieldPosition.PITCHER, roaster))
+        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(mutableListOf(), FieldPosition.PITCHER, roster))
                 .subscribe(observer)
         observer.await()
         observer.assertError(NoSuchElementException::class.java)
@@ -59,7 +54,7 @@ class GetListAvailablePlayersForSelectionTests {
     @Test
     fun shouldOnlyReturnPlayersWithoutFieldPosition() {
         val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
-        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.PITCHER, roaster))
+        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.PITCHER, roster))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -71,7 +66,7 @@ class GetListAvailablePlayersForSelectionTests {
     @Test
     fun shouldSortPlayersByFieldPositionCatcher() {
         val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
-        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.CATCHER, roaster))
+        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.CATCHER, roster))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -82,7 +77,7 @@ class GetListAvailablePlayersForSelectionTests {
     @Test
     fun shouldSortPlayersByFieldPositionSecondBase() {
         val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
-        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.SECOND_BASE, roaster))
+        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.SECOND_BASE, roster))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -91,7 +86,7 @@ class GetListAvailablePlayersForSelectionTests {
     }
 
     @Test
-    fun shouldReturnAllPlayersWhenRoasterIsNull() {
+    fun shouldReturnAllPlayersWhenRosterIsNull() {
         val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
         getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.SECOND_BASE, null))
                 .subscribe(observer)
@@ -101,7 +96,7 @@ class GetListAvailablePlayersForSelectionTests {
     }
 
     @Test
-    fun shouldRTriggerAnExceptionWhenRoasterIsEmpty() {
+    fun shouldRTriggerAnExceptionWhenRosterIsEmpty() {
         val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
         getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.SECOND_BASE, mutableListOf()))
                 .subscribe(observer)
@@ -110,11 +105,11 @@ class GetListAvailablePlayersForSelectionTests {
     }
 
     @Test
-    fun shouldReturnSomePlayersWhenRoasterIsNotNullAndNotEmpty() {
-        roaster.removeAt(4)
-        roaster.removeAt(3)
+    fun shouldReturnSomePlayersWhenRosterIsNotNullAndNotEmpty() {
+        roster.removeAt(4)
+        roster.removeAt(3)
         val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
-        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.SECOND_BASE, roaster))
+        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.SECOND_BASE, roster))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()

@@ -27,7 +27,7 @@ data class Lineup(
         @ColumnInfo(name = "mode") var mode: Int = 0,
         @ColumnInfo(name = "createdAt") var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         @ColumnInfo(name = "editedAt") var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
-        @ColumnInfo(name = "roaster") var roaster: String? = null,
+        @ColumnInfo(name = "roaster") var roster: String? = null,
         @ColumnInfo(name = "hash") var hash: String? = null,
         @Ignore val playerPositions: MutableList<FieldPosition> = mutableListOf()) {
 
@@ -42,7 +42,7 @@ data class Lineup(
         if (teamId != other.teamId) return false
         if (tournamentId != other.tournamentId) return false
         if (mode != other.mode) return false
-        if (roaster != other.roaster) return false
+        if (roster != other.roster) return false
 
         return true
     }
@@ -53,7 +53,7 @@ data class Lineup(
         result = 31 * result + teamId.hashCode()
         result = 31 * result + tournamentId.hashCode()
         result = 31 * result + mode
-        result = 31 * result + (roaster?.hashCode() ?: 0)
+        result = 31 * result + (roster?.hashCode() ?: 0)
         return result
     }
 }

@@ -3,7 +3,7 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.repository.data.LineupDao
 import com.telen.easylineup.repository.data.TournamentDao
 import com.telen.easylineup.repository.model.Lineup
-import com.telen.easylineup.repository.model.RoasterPlayerStatus
+import com.telen.easylineup.repository.model.RosterPlayerStatus
 import com.telen.easylineup.repository.model.Tournament
 import io.reactivex.Single
 import java.lang.Exception
@@ -28,17 +28,17 @@ class CreateLineup(private val tournamentDao: TournamentDao, private val lineups
                     }
                 }
                 .flatMap {
-                    val roaster = if(requestValues.roaster.none { !it.status }) null else roasterToString(requestValues.roaster)
-                    val newLineup = Lineup(name = requestValues.lineupTitle, teamId = requestValues.teamID, tournamentId = it, roaster = roaster)
+                    val roster = if(requestValues.roster.none { !it.status }) null else rosterToString(requestValues.roster)
+                    val newLineup = Lineup(name = requestValues.lineupTitle, teamId = requestValues.teamID, tournamentId = it, roster = roster)
                     lineupsDao.insertLineup(newLineup)
                 }
                 .map { ResponseValue(it) }
     }
 
     class ResponseValue(val lineupID: Long): UseCase.ResponseValue
-    class RequestValues(val teamID: Long, val tournament: Tournament, val lineupTitle: String, val roaster: List<RoasterPlayerStatus>): UseCase.RequestValues
+    class RequestValues(val teamID: Long, val tournament: Tournament, val lineupTitle: String, val roster: List<RosterPlayerStatus>): UseCase.RequestValues
 
-    private fun roasterToString(list: List<RoasterPlayerStatus>): String {
+    private fun rosterToString(list: List<RosterPlayerStatus>): String {
         val builder = StringBuilder()
         list.forEach {
             if(it.status) {
