@@ -95,6 +95,7 @@ class UpdatePlayersWithLineupModeTests {
 
         verify(lineupDao).updatePlayerFieldPosition(check {
             Assert.assertEquals(Constants.ORDER_PITCHER_WHEN_DH, it.order)
+            Assert.assertEquals(PlayerFieldPosition.FLAG_FLEX, it.flags)
             Assert.assertEquals(FieldPosition.PITCHER.position, it.position)
         })
         verify(lineupDao, never()).deletePosition(any())
@@ -102,7 +103,10 @@ class UpdatePlayersWithLineupModeTests {
 
     @Test
     fun shouldDeletePitcherAndDHifAssignedAndDHDisabled() {
-        players[0].position = FieldPosition.PITCHER.position
+        players[0].apply {
+            position = FieldPosition.PITCHER.position
+            flags = PlayerFieldPosition.FLAG_FLEX
+        }
         players[1].position = FieldPosition.DP_DH.position
 
         updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, false, TeamType.BASEBALL.id))
@@ -111,7 +115,7 @@ class UpdatePlayersWithLineupModeTests {
         observer.assertComplete()
 
         verify(lineupDao, times(2)).deletePosition(check {
-            Assert.assertEquals(true, it.position == FieldPosition.PITCHER.position || it.position == FieldPosition.DP_DH.position)
+            Assert.assertEquals(true, it.flags and PlayerFieldPosition.FLAG_FLEX > 0 || it.position == FieldPosition.DP_DH.position)
         })
         verify(lineupDao, never()).updatePlayerFieldPosition(any())
     }

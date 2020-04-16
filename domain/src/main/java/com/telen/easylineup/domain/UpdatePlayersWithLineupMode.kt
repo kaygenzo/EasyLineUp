@@ -20,6 +20,7 @@ class UpdatePlayersWithLineupMode(private val lineupDao: PlayerFieldPositionsDao
                         requestValues.players.firstOrNull { it.position == FieldPosition.PITCHER.position }?.let {
                             val playerFieldPosition = it.toPlayerFieldPosition()
                             playerFieldPosition.order = Constants.ORDER_PITCHER_WHEN_DH
+                            playerFieldPosition.flags = PlayerFieldPosition.FLAG_FLEX
                             lineupDao.updatePlayerFieldPosition(playerFieldPosition)
                         } ?: Completable.complete()
                     }
@@ -30,7 +31,7 @@ class UpdatePlayersWithLineupMode(private val lineupDao: PlayerFieldPositionsDao
             }
             false -> {
                 requestValues.players.filter {
-                    it.position == FieldPosition.DP_DH.position || (it.flags and PlayerFieldPosition.FLAG_FLEX != 0)
+                    it.position == FieldPosition.DP_DH.position || (it.flags and PlayerFieldPosition.FLAG_FLEX > 0)
                 }.let { list ->
                     Observable.fromIterable(list).flatMapCompletable { playerPosition ->
                         lineupDao.deletePosition(playerPosition.toPlayerFieldPosition())

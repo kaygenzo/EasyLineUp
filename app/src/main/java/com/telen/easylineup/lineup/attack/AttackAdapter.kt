@@ -47,11 +47,11 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
         val canMoveFrom = if(lineupMode == MODE_DISABLED)
             FieldPosition.isDefensePlayer(players[fromPosition].position)
         else
-            FieldPosition.canBeBatterWhenDH(players[fromPosition].position)
+            FieldPosition.canBeBatterWhenModeEnabled(players[fromPosition].position, players[fromPosition].flags)
         val canMoveTo = if(lineupMode == MODE_DISABLED)
             FieldPosition.isDefensePlayer(players[toPosition].position)
         else
-            FieldPosition.canBeBatterWhenDH(players[toPosition].position)
+            FieldPosition.canBeBatterWhenModeEnabled(players[toPosition].position, players[fromPosition].flags)
         if(canMoveFrom && canMoveTo) {
             val fromOrder = players[fromPosition].order
             val toOrder = players[toPosition].order

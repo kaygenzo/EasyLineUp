@@ -36,8 +36,8 @@ enum class FieldPosition(val position: Int, val mask: Int, val xPercent: Float, 
         }
 
         //TODO move in domain
-        fun canBeBatterWhenDH(position: Int): Boolean {
-            return !isSubstitute(position) && position != PITCHER.position
+        fun canBeBatterWhenModeEnabled(position: Int, flags: Int): Boolean {
+            return !isSubstitute(position) && (flags and PlayerFieldPosition.FLAG_FLEX > 0)
         }
     }
 }
