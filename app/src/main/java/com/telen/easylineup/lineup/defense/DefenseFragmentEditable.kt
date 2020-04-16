@@ -52,6 +52,9 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
                 ErrorCase.DELETE_PLAYER_FIELD_POSITION_FAILED -> Timber.e(Exception("Delete player field position failed"))
                 ErrorCase.UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED -> Timber.e(Exception("Update players with lineup mode failed"))
                 ErrorCase.SAVE_LINEUP_MODE_FAILED -> Timber.e(Exception("Save lineup mode failed"))
+                ErrorCase.NEED_ASSIGN_PITCHER_FIRST -> {
+                    context?.run { DialogFactory.getErrorDialog(this, getString(R.string.error_need_assign_pitcher_first)).show() }
+                }
                 else -> {}
             }
         })

@@ -61,7 +61,8 @@ enum class ErrorCase {
     DELETE_LINEUP_FAILED,
     SAVE_LINEUP_MODE_FAILED,
     UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED,
-    GET_TEAM_FAILED
+    GET_TEAM_FAILED,
+    NEED_ASSIGN_PITCHER_FIRST
 }
 
 sealed class EventCase
@@ -124,7 +125,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
     fun onDeletePosition(player: Player, position: FieldPosition) {
 
-        val requestValues = DeletePlayerFieldPosition.RequestValues(listPlayersWithPosition, player, position)
+        val requestValues = DeletePlayerFieldPosition.RequestValues(listPlayersWithPosition, position, lineupMode)
 
         val disposable = UseCaseHandler.execute(deletePlayerFieldPositionUseCase, requestValues).subscribe({
             eventHandler.value = DeletePlayerPositionSuccess
@@ -309,21 +310,27 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun onPlayerClicked(position: FieldPosition) {
-        val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
-                .flatMap {
-                    UseCaseHandler.execute(getDpAndFlexFromPlayersInFieldUseCase, GetDPAndFlexFromPlayersInField.RequestValues(listPlayersWithPosition, it.type))
-                }
-                .subscribe({
-                    if(position == FieldPosition.DP_DH) {
+
+        if(position != FieldPosition.DP_DH) {
+            getAllAvailablePlayers(position)
+        }
+        else {
+            val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+                    .flatMap {
+                        UseCaseHandler.execute(getDpAndFlexFromPlayersInFieldUseCase, GetDPAndFlexFromPlayersInField.RequestValues(listPlayersWithPosition, it.type))
+                    }
+                    .subscribe({
                         _linkPlayersInField.value = null
                         eventHandler.value = NeedLinkDpFlex(Pair(it.dp, it.flex), it.dpLocked, it.flexLocked, it.teamType)
-                    }
-                    else {
-                        getAllAvailablePlayers(position)
-                    }
-                }, {
-                    errorHandler.value = ErrorCase.GET_TEAM_FAILED
-                })
+                    }, {
+                        if(it is NeedAssignPitcherFirstException) {
+                            errorHandler.value = ErrorCase.NEED_ASSIGN_PITCHER_FIRST
+                        }
+                        else {
+                            errorHandler.value = ErrorCase.GET_TEAM_FAILED
+                        }
+                    })
+        }
     }
 
     /**

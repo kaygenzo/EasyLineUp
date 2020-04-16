@@ -24,6 +24,9 @@ interface PlayerFieldPositionsDao {
     @Delete
     fun deletePosition(position: PlayerFieldPosition): Completable
 
+    @Delete
+    fun deletePositions(position: List<PlayerFieldPosition>): Completable
+
     @Update
     fun updatePlayerFieldPosition(fieldPosition: PlayerFieldPosition): Completable
 

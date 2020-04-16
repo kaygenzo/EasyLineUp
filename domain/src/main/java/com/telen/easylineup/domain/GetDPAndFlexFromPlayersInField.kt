@@ -2,6 +2,9 @@ package com.telen.easylineup.domain
 
 import com.telen.easylineup.repository.model.*
 import io.reactivex.Single
+import java.lang.Exception
+
+class NeedAssignPitcherFirstException : Exception()
 
 class GetDPAndFlexFromPlayersInField: UseCase<GetDPAndFlexFromPlayersInField.RequestValues, GetDPAndFlexFromPlayersInField.ResponseValue>() {
 
@@ -13,7 +16,7 @@ class GetDPAndFlexFromPlayersInField: UseCase<GetDPAndFlexFromPlayersInField.Req
                     }
                 }
                 .map { players ->
-                    var dpLocked = false
+                    val dpLocked = false
                     var flexLocked = false
                     val dp: Player? = players.filter { it.position == FieldPosition.DP_DH.position }
                             .map { it.toPlayer() }
@@ -31,6 +34,9 @@ class GetDPAndFlexFromPlayersInField: UseCase<GetDPAndFlexFromPlayersInField.Req
                                     .map { it.toPlayer() }
                                     .firstOrNull()
                         }
+                    }
+                    if(flex == null && requestValues.teamType == TeamType.BASEBALL.id) {
+                        throw NeedAssignPitcherFirstException()
                     }
                     ResponseValue(dp, flex, dpLocked, flexLocked, requestValues.teamType)
                 }

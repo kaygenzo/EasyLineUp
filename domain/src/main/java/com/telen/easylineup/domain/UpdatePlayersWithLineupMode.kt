@@ -30,11 +30,7 @@ class UpdatePlayersWithLineupMode(private val lineupDao: PlayerFieldPositionsDao
             }
             false -> {
                 requestValues.players.filter {
-                    it.position == FieldPosition.DP_DH.position
-                            // if softball, find the DP and Flex and remove their positions into the lineup
-                            || (requestValues.teamType == TeamType.SOFTBALL.id && it.flags and PlayerFieldPosition.FLAG_FLEX != 0)
-                            // if baseball, find the DH and Pitcher and remove their positions into the lineup
-                            || (requestValues.teamType == TeamType.BASEBALL.id && it.position == FieldPosition.PITCHER.position)
+                    it.position == FieldPosition.DP_DH.position || (it.flags and PlayerFieldPosition.FLAG_FLEX != 0)
                 }.let { list ->
                     Observable.fromIterable(list).flatMapCompletable { playerPosition ->
                         lineupDao.deletePosition(playerPosition.toPlayerFieldPosition())

@@ -155,4 +155,6 @@
     <string name="settings_category_export">Export</string>
     <string name="settings_category_import">Import</string>
     <string name="settings_category_delete">Delete</string>
+
+    <string name="error_need_assign_pitcher_first">Please select your pitcher first</string>
 </resources>
