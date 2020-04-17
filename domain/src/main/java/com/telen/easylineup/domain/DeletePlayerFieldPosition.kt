@@ -8,8 +8,12 @@ class DeletePlayerFieldPosition(private val dao: PlayerFieldPositionsDao): UseCa
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return try {
-            val player = requestValues.players.first { it.position == requestValues.position.position }
             val toDelete = mutableListOf<PlayerFieldPosition>()
+            //substitutes have the same position, let's use player to get the good one
+            val player = requestValues.players.first {
+                it.position == requestValues.position.position && it.playerID == requestValues.playerToDelete.id
+            }
+
             if(requestValues.lineupMode == MODE_ENABLED &&
                     (requestValues.position == FieldPosition.DP_DH || player.flags and PlayerFieldPosition.FLAG_FLEX > 0)) {
                 toDelete.addAll(requestValues.players
@@ -29,6 +33,6 @@ class DeletePlayerFieldPosition(private val dao: PlayerFieldPositionsDao): UseCa
     }
 
 
-    class RequestValues(val players: List<PlayerWithPosition>, val position: FieldPosition, val lineupMode: Int): UseCase.RequestValues
+    class RequestValues(val players: List<PlayerWithPosition>, val playerToDelete: Player, val position: FieldPosition, val lineupMode: Int): UseCase.RequestValues
     class ResponseValue: UseCase.ResponseValue
 }

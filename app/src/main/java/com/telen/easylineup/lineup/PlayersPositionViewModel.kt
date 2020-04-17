@@ -125,7 +125,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
     fun onDeletePosition(player: Player, position: FieldPosition) {
 
-        val requestValues = DeletePlayerFieldPosition.RequestValues(listPlayersWithPosition, position, lineupMode)
+        val requestValues = DeletePlayerFieldPosition.RequestValues(listPlayersWithPosition, player, position, lineupMode)
 
         val disposable = UseCaseHandler.execute(deletePlayerFieldPositionUseCase, requestValues).subscribe({
             eventHandler.value = DeletePlayerPositionSuccess

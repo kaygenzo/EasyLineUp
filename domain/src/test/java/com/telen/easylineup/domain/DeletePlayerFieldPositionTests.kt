@@ -46,7 +46,8 @@ class DeletePlayerFieldPositionTests {
     fun shouldTriggerAnExceptionIfListIsEmpty() {
         val lineupMode = MODE_ENABLED
         val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
-        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(mutableListOf(), FieldPosition.PITCHER, lineupMode))
+        val player = Player(1, 1,"", 1, 1L, null, 1)
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(mutableListOf(), player, FieldPosition.PITCHER, lineupMode))
                 .subscribe(observer)
         observer.await()
         observer.assertError(NoSuchElementException::class.java)
@@ -56,7 +57,8 @@ class DeletePlayerFieldPositionTests {
     fun shouldTriggerAnExceptionIfNoMatchingPlayerAndPosition() {
         val lineupMode = MODE_ENABLED
         val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
-        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, FieldPosition.SECOND_BASE, lineupMode))
+        val player = Player(7, 1,"", 7, 7L, null, 1)
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.SECOND_BASE, lineupMode))
                 .subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
@@ -67,7 +69,8 @@ class DeletePlayerFieldPositionTests {
         val lineupMode = MODE_ENABLED
         Mockito.`when`(lineupDao.deletePositions(any())).thenReturn(Completable.error(Exception()))
         val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
-        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, FieldPosition.PITCHER, lineupMode))
+        val player = Player(1, 1,"", 1, 1L, null, 1)
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.PITCHER, lineupMode))
                 .subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
@@ -77,7 +80,8 @@ class DeletePlayerFieldPositionTests {
     fun shouldDeletePlayerFieldPositions_dp_and_flex_if_flex() {
         val lineupMode = MODE_ENABLED
         val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
-        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, FieldPosition.PITCHER, lineupMode))
+        val player = Player(1, 1,"", 1, 1L, null, 1)
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.PITCHER, lineupMode))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -92,7 +96,8 @@ class DeletePlayerFieldPositionTests {
     fun shouldDeletePlayerFieldPositions_dp_and_flex_if_dp() {
         val lineupMode = MODE_ENABLED
         val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
-        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, FieldPosition.DP_DH, lineupMode))
+        val player = Player(6, 1,"", 6, 6L, null, 1)
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.DP_DH, lineupMode))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -107,13 +112,34 @@ class DeletePlayerFieldPositionTests {
     fun shouldDeletePlayerFieldPosition_one_position_if_not_dp_nor_flex() {
         val lineupMode = MODE_ENABLED
         val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
-        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, FieldPosition.CATCHER, lineupMode))
+        val player = Player(2, 1,"", 2, 2L, null, 1)
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.CATCHER, lineupMode))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
 
         verify(lineupDao).deletePositions(com.nhaarman.mockitokotlin2.check {
             Assert.assertEquals(0, it[0].id)
+            Assert.assertEquals(1, it.size)
+        })
+    }
+
+    @Test
+    fun shouldDeletePlayerFieldPosition_if_multiple_substitutes_player_not_first() {
+        val lineupMode = MODE_ENABLED
+        val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
+
+        players.add(PlayerWithPosition("poupou", 9, 9, 1, null,
+                FieldPosition.SUBSTITUTE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 9, 9, 1, 16))
+
+        val player = Player(9, 1,"", 9, 9L, null, 1)
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.SUBSTITUTE, lineupMode))
+                .subscribe(observer)
+        observer.await()
+        observer.assertComplete()
+
+        verify(lineupDao).deletePositions(com.nhaarman.mockitokotlin2.check {
+            Assert.assertEquals(9, it[0].id)
             Assert.assertEquals(1, it.size)
         })
     }

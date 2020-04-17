@@ -9,7 +9,6 @@ import bugbattle.io.bugbattle.BugBattle
 import bugbattle.io.bugbattle.controller.BugBattleActivationMethod
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
-import com.facebook.stetho.Stetho
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.repository.data.AppDatabase
 import io.fabric.sdk.android.Fabric
