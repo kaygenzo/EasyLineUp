@@ -9,6 +9,7 @@ import bugbattle.io.bugbattle.BugBattle
 import bugbattle.io.bugbattle.controller.BugBattleActivationMethod
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
+import com.facebook.stetho.Stetho
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.repository.data.AppDatabase
 import io.fabric.sdk.android.Fabric
@@ -31,6 +32,7 @@ class App: MultiDexApplication() {
                 .addMigrations(migration_4_5())
                 .addMigrations(migration_5_6())
                 .addMigrations(migration_6_7())
+                .addMigrations(migration_7_8())
                 .build()
 
         if (BuildConfig.DEBUG) {
@@ -53,7 +55,7 @@ class App: MultiDexApplication() {
             modules(appModules)
         }
 
-        //Stetho.initializeWithDefaults(this)
+//        Stetho.initializeWithDefaults(this)
     }
 
     private fun migration_1_2(): Migration {
@@ -124,6 +126,25 @@ class App: MultiDexApplication() {
         return object: Migration(6,7) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE playerFieldPosition ADD COLUMN flags INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+    }
+
+    private fun migration_7_8(): Migration {
+        return object: Migration(7,8) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+//                database.execSQL("UPDATE playerFieldPosition set flags=1 where position=10")
+                database.execSQL("""
+                    update playerFieldPosition 
+                    set flags=1 
+                    where id in (
+                        select playerFieldPosition.id 
+                        from playerFieldPosition 
+                        left join lineups on lineups.id=playerFieldPosition.lineupID 
+                        left join teams on lineups.teamID=teams.id 
+                        where position=1 and mode=1
+                    )
+                    """)
             }
         }
     }
