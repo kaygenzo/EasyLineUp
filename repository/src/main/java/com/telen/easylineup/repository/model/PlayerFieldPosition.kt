@@ -25,7 +25,7 @@ data class PlayerFieldPosition(
         @ColumnInfo(name = "y") var y: Float = 0f,
         @ColumnInfo(name = "order") var order: Int = 0,
         @ColumnInfo(name = "flags") var flags: Int = 0,
-        @ColumnInfo(name = "hash") var hash: String? = null
+        @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
 ) {
     companion object {
         const val FLAG_FLEX = 0x01

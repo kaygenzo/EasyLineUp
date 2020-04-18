@@ -15,7 +15,7 @@ data class Tournament (
         @PrimaryKey(autoGenerate = true) var id: Long = 0,
         @ColumnInfo(name = "name") val name: String,
         @ColumnInfo(name = "createdAt") var createdAt: Long,
-        @ColumnInfo(name = "hash") var hash: String? = null
+        @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
 ): Serializable {
 
     override fun equals(other: Any?): Boolean {

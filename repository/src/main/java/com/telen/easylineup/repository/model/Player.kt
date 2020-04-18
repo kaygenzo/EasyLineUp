@@ -20,7 +20,7 @@ data class Player(
         @ColumnInfo(name = "licenseNumber") var licenseNumber: Long,
         @ColumnInfo(name = "image") var image: String? = null,
         @ColumnInfo(name = "positions") var positions: Int = 0,
-        @ColumnInfo(name = "hash") var hash: String? = null
+        @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
 ) {
 
     override fun equals(other: Any?): Boolean {

@@ -20,7 +20,7 @@ data class Team(
         @ColumnInfo(name = "image") var image: String? = null,
         @ColumnInfo(name = "type") var type: Int = 0,
         @ColumnInfo(name = "main") var main: Boolean = false,
-        @ColumnInfo(name = "hash") var hash: String? = null): Serializable {
+        @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()): Serializable {
 
     override fun toString(): String {
         val builder = StringBuffer().apply {

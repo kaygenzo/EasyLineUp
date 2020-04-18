@@ -28,7 +28,7 @@ data class Lineup(
         @ColumnInfo(name = "createdAt") var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         @ColumnInfo(name = "editedAt") var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         @ColumnInfo(name = "roaster") var roster: String? = null,
-        @ColumnInfo(name = "hash") var hash: String? = null,
+        @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString(),
         @Ignore val playerPositions: MutableList<FieldPosition> = mutableListOf()) {
 
     override fun equals(other: Any?): Boolean {
