@@ -18,7 +18,7 @@ buildscript {
         junitVersion = "4.12"
         lifecycle_version = "2.2.0"
         room_version = "2.2.5"
-        nav_version_ktx = "2.2.0-beta01"
+        nav_version_ktx = "2.2.2"
         koinVersion = "2.0.1"
         detektVersion = "1.7.0-beta1"
         picassoVersion = "2.71828"
