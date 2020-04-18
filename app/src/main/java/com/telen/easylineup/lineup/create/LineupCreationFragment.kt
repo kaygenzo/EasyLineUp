@@ -68,7 +68,7 @@ class LineupCreationFragment: Fragment() {
             Timber.e(it)
         })
 
-        lineupViewModel.registerSaveResults().observe(this, Observer {
+        lineupViewModel.registerSaveResults().observe(viewLifecycleOwner, Observer {
             when(it) {
                 is InvalidLineupName -> {
                     view.lineupCreationForm.setLineupNameError(getString(it.errorRes))

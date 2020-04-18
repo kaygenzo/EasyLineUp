@@ -81,7 +81,7 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
             }
         }
 
-        viewModel.registerFormErrorResult().observe(this, Observer { error ->
+        viewModel.registerFormErrorResult().observe(viewLifecycleOwner, Observer { error ->
             when(error) {
                 FormErrorResult.INVALID_NAME -> {
                     view.editPlayerForm.displayInvalidName()

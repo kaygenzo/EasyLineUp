@@ -72,6 +72,7 @@
     <string name="title_baseball">Baseball</string>
     <string name="title_softball">Softball</string>
 
+    <string name="action_add_dp_flex">Utiliser un DP/Flex</string>
     <string name="action_add_dh">Utiliser un DH</string>
 
     <string name="tournaments_summary_header">%s / %s</string>
@@ -141,4 +142,6 @@
     <string name="settings_category_export">Exportation</string>
     <string name="settings_category_import">Importation</string>
     <string name="settings_category_delete">Suppression</string>
+
+    <string name="error_need_assign_pitcher_first">Selectionnez un Pitcher avant.</string>
 </resources>

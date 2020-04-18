@@ -56,7 +56,7 @@ class AttackFragment: Fragment(), OnDataChangedListener {
             view.header.setIsEditable(isEditable)
 
             viewModel.lineupID?.let {
-                viewModel.registerLineupBatters().observe(this, Observer { items ->
+                viewModel.registerLineupBatters().observe(viewLifecycleOwner, Observer { items ->
                     Timber.d("PlayerWithPositions list changed!")
 
                     val diffCallback = BattersDiffCallback(adapterDataList, items)
@@ -68,7 +68,7 @@ class AttackFragment: Fragment(), OnDataChangedListener {
                     diffResult.dispatchUpdatesTo(playerAdapter)
                 })
 
-                viewModel.registerLineupChange().observe(this, Observer { lineup ->
+                viewModel.registerLineupChange().observe(viewLifecycleOwner, Observer { lineup ->
                     lineup?.let {
                         playerAdapter.lineupMode = lineup.mode
                         playerAdapter.notifyDataSetChanged()
@@ -85,7 +85,7 @@ class AttackFragment: Fragment(), OnDataChangedListener {
                 }
             }
 
-            viewModel.eventHandler.observe(this, lifecycleObserver)
+            viewModel.eventHandler.observe(viewLifecycleOwner, lifecycleObserver)
         }
 
         return view

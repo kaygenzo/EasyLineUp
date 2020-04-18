@@ -81,7 +81,7 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
             findNavController().navigate(R.id.lineupCreationFragment, null, NavigationUtils().getOptions())
         }
 
-        viewModel.registerFilterChanged().observe(this, Observer {
+        viewModel.registerFilterChanged().observe(viewLifecycleOwner, Observer {
             loadTournaments(it)
         })
 

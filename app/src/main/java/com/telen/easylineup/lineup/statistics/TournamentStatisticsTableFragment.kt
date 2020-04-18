@@ -44,19 +44,19 @@ class TournamentStatisticsTableFragment: Fragment() {
                 leftHeaderWidth = R.dimen.table_multiple_scroll_left_header_width
         ))
 
-        viewModel.leftHeadersData.observe(this, Observer {
+        viewModel.leftHeadersData.observe(viewLifecycleOwner, Observer {
             view.tableMultiScroll.setLeftHeaderData(it)
         })
 
-        viewModel.topHeadersData.observe(this, Observer {
+        viewModel.topHeadersData.observe(viewLifecycleOwner, Observer {
             view.tableMultiScroll.setTopHeaderData(it)
         })
 
-        viewModel.mainTableData.observe(this, Observer {
+        viewModel.mainTableData.observe(viewLifecycleOwner, Observer {
             view.tableMultiScroll.setMainData(it)
         })
 
-        viewModel.columnHighlights.observe(this, Observer {
+        viewModel.columnHighlights.observe(viewLifecycleOwner, Observer {
             view.tableMultiScroll.setColumnHighlights(it)
         })
 

@@ -61,7 +61,7 @@ class DashboardFragment: Fragment(), TileClickListener {
 
     override fun onResume() {
         super.onResume()
-        dashboardViewModel.registerTilesLiveData().observe(this, dataObserver)
+        dashboardViewModel.registerTilesLiveData().observe(viewLifecycleOwner, dataObserver)
         dashboardViewModel.registerTeamChange().observe(this, Observer {
             dashboardViewModel.loadTiles()
         })

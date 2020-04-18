@@ -69,7 +69,7 @@ class TeamEditFragment: Fragment() , TeamFormListener {
 
         view.editTeamForm.setListener(this)
 
-        viewModel.errorLiveData.observe(this, Observer {
+        viewModel.errorLiveData.observe(viewLifecycleOwner, Observer {
             when(it) {
                 SetupViewModel.Error.NAME_EMPTY -> {
                     teamNameInputLayout.error = getString(R.string.team_creation_error_name_empty)
