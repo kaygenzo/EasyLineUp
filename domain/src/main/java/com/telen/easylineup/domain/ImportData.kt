@@ -47,7 +47,7 @@ class ImportData(private val teamDao: TeamDao, private val playerDao: PlayerDao,
                                                                 .flatMapCompletable { tournament ->
                                                                     Observable.fromIterable(tournamentExport.lineups)
                                                                             .flatMapCompletable { lineupExport ->
-                                                                                processLineup(lineupExport, team.id, tournament.id, insertedArray, updatedArray, updateIfExists)
+                                                                                processLineup(lineupExport, team.id, tournament.id, playerIdMap, insertedArray, updatedArray, updateIfExists)
                                                                                         .flatMapCompletable { lineup ->
                                                                                             Observable.fromIterable(lineupExport.playerPositions)
                                                                                                     .flatMapCompletable { processPlayerFieldPosition(it, playerIdMap, lineup.id,
@@ -143,11 +143,12 @@ class ImportData(private val teamDao: TeamDao, private val playerDao: PlayerDao,
     }
 
     private fun processLineup(lineup: LineupExport, teamID: Long, tournamentID: Long,
+                              players: Map<String, Long>,
                               insertedArray: Array<Int>, updatedArray: Array<Int>,
                               updateIfExists: Boolean): Single<Lineup> {
         val l = Lineup(0L, lineup.name, teamID, tournamentID,
                 lineup.mode, lineup.createdAt, lineup.editedAt,
-                lineup.roster, lineup.id)
+                rosterToString(lineup.roster, players), lineup.id)
 
         return lineupDao.getLineupByHash(lineup.id)
                 .flatMap { lineupDB ->
@@ -166,6 +167,18 @@ class ImportData(private val teamDao: TeamDao, private val playerDao: PlayerDao,
                         l
                     }
                 }
+    }
+
+    private fun rosterToString(roster: List<String>?, players: Map<String, Long>): String {
+        val builder = StringBuilder()
+        roster?.forEach { hash ->
+            players[hash]?.let { playerID ->
+                if(builder.isNotEmpty())
+                    builder.append(";")
+                builder.append(playerID)
+            }
+        }
+        return builder.toString()
     }
 
     private fun processPlayerFieldPosition(export: PlayerPositionExport, players: Map<String, Long>, lineupID: Long,

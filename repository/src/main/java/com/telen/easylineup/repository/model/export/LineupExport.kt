@@ -21,7 +21,7 @@ data class LineupExport (
 		@SerializedName("createdAt") val createdAt : Long,
 		@SerializedName("editedAt") val editedAt : Long,
 		@SerializedName("mode") val mode : Int,
-		@SerializedName("roster") val roster : String?,
+		@SerializedName("roster") val roster : List<String>?,
 		@SerializedName("playerPositions") val playerPositions : List<PlayerPositionExport>
 ) {
 	override fun equals(other: Any?): Boolean {

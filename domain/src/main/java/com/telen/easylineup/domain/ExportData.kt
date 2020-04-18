@@ -7,8 +7,10 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
-interface UriChecker {
+interface ValidationCallback {
     fun isNetworkUrl(url: String?): Boolean
+    fun isDigitsOnly(value: String): Boolean
+    fun isBlank(value: String): Boolean
 }
 
 class ExportData(val teamDao: TeamDao, val playerDao: PlayerDao, val tournamentDao: TournamentDao, val lineupDao: LineupDao,
@@ -25,7 +27,7 @@ class ExportData(val teamDao: TeamDao, val playerDao: PlayerDao, val tournamentD
                     val playersExport = mutableListOf<PlayerExport>()
                     val teamExport = team.toTeamExport(playersExport, tournamentsExport)
 
-                    if(!requestValues.uriChecker.isNetworkUrl(teamExport.image))
+                    if(!requestValues.validator.isNetworkUrl(teamExport.image))
                         teamExport.image = null
 
                     teams.add(teamExport)
@@ -38,7 +40,7 @@ class ExportData(val teamDao: TeamDao, val playerDao: PlayerDao, val tournamentD
 
                                 val playerExport = player.toPlayerExport()
 
-                                if(!requestValues.uriChecker.isNetworkUrl(playerExport.image))
+                                if(!requestValues.validator.isNetworkUrl(playerExport.image))
                                     playerExport.image = null
 
                                 playersExport.add(playerExport)
@@ -63,7 +65,8 @@ class ExportData(val teamDao: TeamDao, val playerDao: PlayerDao, val tournamentD
                                         .flatMapCompletable { lineup ->
 
                                             val positionsExport = mutableListOf<PlayerPositionExport>()
-                                            val lineupExport = lineup.toLineupExport(positionsExport)
+                                            val roster = rosterToUUID(playersUUIDMap, lineup.roster, requestValues.validator)
+                                            val lineupExport = lineup.toLineupExport(positionsExport, roster)
                                             lineupsExport.add(lineupExport)
 
                                             playerFieldPositionsDao.getAllPlayerFieldPositionsForLineup(lineup.id)
@@ -78,6 +81,18 @@ class ExportData(val teamDao: TeamDao, val playerDao: PlayerDao, val tournamentD
                 }.andThen(Single.just(ResponseValue(root)))
     }
 
+    private fun rosterToUUID(players: Map<Long, String?>, roaster: String?, validator: ValidationCallback): List<String>? {
+        return roaster?.run {
+            this.split(";")
+                    .filter { validator.isDigitsOnly(it) && !validator.isBlank(it) }
+                    .map {
+                        it.toLong()
+                    }
+                    .map { players[it] ?: "" }
+                    .filter { it.isNotEmpty() }
+        }
+    }
+
     class ResponseValue(val exportBase: ExportBase): UseCase.ResponseValue
-    class RequestValues(val uriChecker: UriChecker): UseCase.RequestValues
+    class RequestValues(val validator: ValidationCallback): UseCase.RequestValues
 }

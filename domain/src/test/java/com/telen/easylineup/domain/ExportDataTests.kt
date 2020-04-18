@@ -1,9 +1,9 @@
 package com.telen.easylineup.domain
 
+import com.nhaarman.mockitokotlin2.any
 import com.telen.easylineup.repository.data.*
 import com.telen.easylineup.repository.model.*
 import com.telen.easylineup.repository.model.export.ExportBase
-import com.telen.easylineup.repository.model.export.PlayerPositionExport
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
@@ -14,7 +14,6 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
-import java.lang.Exception
 
 
 @RunWith(MockitoJUnitRunner::class)
@@ -26,7 +25,7 @@ class ExportDataTests {
     @Mock lateinit var lineupDao: LineupDao
     @Mock lateinit var playerPositionsDao: PlayerFieldPositionsDao
 
-    @Mock lateinit var uriChecker: UriChecker
+    @Mock lateinit var validator: ValidationCallback
 
     private lateinit var mExport: ExportData
 
@@ -57,8 +56,8 @@ class ExportDataTests {
         tournament1 = Tournament(1L, "A", 1L, "C")
         tournament2 = Tournament(2L, "B", 2L, "D")
 
-        lineup1 = Lineup(1L, "A", 1L, 1L, 0, 1L, 1L, null, "E")
-        lineup2 = Lineup(2L, "B", 2L, 2L, 0, 1L, 1L, null, "F")
+        lineup1 = Lineup(1L, "A", 1L, 1L, 0, 1L, 1L, "1", "E")
+        lineup2 = Lineup(2L, "B", 2L, 2L, 0, 1L, 1L, "2", "F")
 
         playerPosition1 = PlayerFieldPosition(1L, 1L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"G")
         playerPosition2 = PlayerFieldPosition(2L, 2L, 2L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"H")
@@ -84,13 +83,16 @@ class ExportDataTests {
                 .thenReturn(Single.just(listOf(playerPosition1)))
         Mockito.`when`(playerPositionsDao.getAllPlayerFieldPositionsForLineup(2L))
                 .thenReturn(Single.just(listOf(playerPosition2)))
+
+        Mockito.`when`(validator.isDigitsOnly(any())).thenReturn(true)
+        Mockito.`when`(validator.isBlank(any())).thenReturn(false)
     }
 
     @Test
     fun shouldExportAllData() {
 
         val observer = TestObserver<ExportData.ResponseValue>()
-        mExport.executeUseCase(ExportData.RequestValues(uriChecker))
+        mExport.executeUseCase(ExportData.RequestValues(validator))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -99,21 +101,27 @@ class ExportDataTests {
                 team1.toTeamExport(
                         listOf(player1).map { it.toPlayerExport() },
                         listOf(tournament1).map { it.toTournamentExport(
-                            listOf(lineup1).map { it.toLineupExport(
-                                    listOf(playerPosition1)
-                                            .map { it.toPlayerFieldPositionsExport(player1.hash) }
-                                            .toMutableList()
-                            ) }
+                                listOf(lineup1).map {
+                                    it.toLineupExport(
+                                            listOf(playerPosition1)
+                                                    .map { it.toPlayerFieldPositionsExport(player1.hash) }
+                                                    .toMutableList(),
+                                            listOf("A")
+                                    )
+                                }
                         ) }
                 ),
                 team2.toTeamExport(
                         listOf(player2).map { it.toPlayerExport() },
                         listOf(tournament2).map { it.toTournamentExport(
-                                listOf(lineup2).map { it.toLineupExport(
-                                        listOf(playerPosition2)
-                                                .map { it.toPlayerFieldPositionsExport(player2.hash) }
-                                                .toMutableList()
-                                ) }
+                                listOf(lineup2).map {
+                                    it.toLineupExport(
+                                            listOf(playerPosition2)
+                                                    .map { it.toPlayerFieldPositionsExport(player2.hash) }
+                                                    .toMutableList(),
+                                            listOf("B")
+                                    )
+                                }
                         ) }
                 )
         ))
@@ -128,7 +136,7 @@ class ExportDataTests {
         Mockito.`when`(lineupDao.getLineupsForTournamentRx(2L, 2L)).thenReturn(Single.just(listOf()))
 
         val observer = TestObserver<ExportData.ResponseValue>()
-        mExport.executeUseCase(ExportData.RequestValues(uriChecker))
+        mExport.executeUseCase(ExportData.RequestValues(validator))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -137,11 +145,14 @@ class ExportDataTests {
                 team1.toTeamExport(
                         listOf(player1).map { it.toPlayerExport() },
                         listOf(tournament1).map { it.toTournamentExport(
-                                listOf(lineup1).map { it.toLineupExport(
-                                        listOf(playerPosition1)
-                                                .map { it.toPlayerFieldPositionsExport(player1.hash) }
-                                                .toMutableList()
-                                ) }
+                                listOf(lineup1).map {
+                                    it.toLineupExport(
+                                            listOf(playerPosition1)
+                                                    .map { it.toPlayerFieldPositionsExport(player1.hash) }
+                                                    .toMutableList(),
+                                            listOf("A")
+                                    )
+                                }
                         ) }
                 ),
                 team2.toTeamExport(
@@ -161,13 +172,13 @@ class ExportDataTests {
         player1.image = "http://test.com"
         player2.image = "https://test.com"
 
-        Mockito.`when`(uriChecker.isNetworkUrl(team1.image)).thenReturn(false)
-        Mockito.`when`(uriChecker.isNetworkUrl(team2.image)).thenReturn(false)
-        Mockito.`when`(uriChecker.isNetworkUrl(player1.image)).thenReturn(true)
-        Mockito.`when`(uriChecker.isNetworkUrl(player2.image)).thenReturn(true)
+        Mockito.`when`(validator.isNetworkUrl(team1.image)).thenReturn(false)
+        Mockito.`when`(validator.isNetworkUrl(team2.image)).thenReturn(false)
+        Mockito.`when`(validator.isNetworkUrl(player1.image)).thenReturn(true)
+        Mockito.`when`(validator.isNetworkUrl(player2.image)).thenReturn(true)
 
         val observer = TestObserver<ExportData.ResponseValue>()
-        mExport.executeUseCase(ExportData.RequestValues(uriChecker))
+        mExport.executeUseCase(ExportData.RequestValues(validator))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -183,6 +194,7 @@ class ExportDataTests {
 
         val player3 = Player(3L, 1L, "A", 3, 3L, null, 1, "hash3")
         val player4 = Player(4L, 1L, "B", 4, 4L, null, 1, "hash4")
+        lineup1.roster = "1;3;4"
 
         val playerPosition3 = PlayerFieldPosition(3L, 3L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"hash3")
         val playerPosition4 = PlayerFieldPosition(4L, 4L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"hash4")
@@ -192,7 +204,7 @@ class ExportDataTests {
                 .thenReturn(Single.just(listOf(playerPosition1, playerPosition3, playerPosition4)))
 
         val observer = TestObserver<ExportData.ResponseValue>()
-        mExport.executeUseCase(ExportData.RequestValues(uriChecker))
+        mExport.executeUseCase(ExportData.RequestValues(validator))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -201,35 +213,41 @@ class ExportDataTests {
                 team1.toTeamExport(
                         listOf(player1, player3, player4).map { it.toPlayerExport() },
                         listOf(tournament1).map { it.toTournamentExport(
-                                listOf(lineup1).map { it.toLineupExport(
-                                        listOf(playerPosition1, playerPosition3, playerPosition4)
-                                                .map {
-                                                    when(it.playerId) {
-                                                        player1.id -> {
-                                                            it.toPlayerFieldPositionsExport(player1.hash)
+                                listOf(lineup1).map {
+                                    it.toLineupExport(
+                                            listOf(playerPosition1, playerPosition3, playerPosition4)
+                                                    .map {
+                                                        when(it.playerId) {
+                                                            player1.id -> {
+                                                                it.toPlayerFieldPositionsExport(player1.hash)
+                                                            }
+                                                            player3.id -> {
+                                                                it.toPlayerFieldPositionsExport(player3.hash)
+                                                            }
+                                                            player4.id -> {
+                                                                it.toPlayerFieldPositionsExport(player4.hash)
+                                                            }
+                                                            else -> throw Exception("Not planned into test cases")
                                                         }
-                                                        player3.id -> {
-                                                            it.toPlayerFieldPositionsExport(player3.hash)
-                                                        }
-                                                        player4.id -> {
-                                                            it.toPlayerFieldPositionsExport(player4.hash)
-                                                        }
-                                                        else -> throw Exception("Not planned into test cases")
-                                                    }
 
-                                                }
-                                                .toMutableList()
-                                ) }
+                                                    }
+                                                    .toMutableList(),
+                                            listOf("A", "hash3", "hash4")
+                                    )
+                                }
                         ) }
                 ),
                 team2.toTeamExport(
                         listOf(player2).map { it.toPlayerExport() },
                         listOf(tournament2).map { it.toTournamentExport(
-                                listOf(lineup2).map { it.toLineupExport(
-                                        listOf(playerPosition2)
-                                                .map { it.toPlayerFieldPositionsExport(player2.hash) }
-                                                .toMutableList()
-                                ) }
+                                listOf(lineup2).map {
+                                    it.toLineupExport(
+                                            listOf(playerPosition2)
+                                                    .map { it.toPlayerFieldPositionsExport(player2.hash) }
+                                                    .toMutableList(),
+                                            listOf("B")
+                                    )
+                                }
                         ) }
                 )
         ))

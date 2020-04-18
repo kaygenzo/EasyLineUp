@@ -58,6 +58,6 @@ data class Lineup(
     }
 }
 
-fun Lineup.toLineupExport(playerPositions: MutableList<PlayerPositionExport>): LineupExport {
-    return LineupExport(hash ?: UUID.randomUUID().toString(), name, createdTimeInMillis, editedTimeInMillis, mode, null, playerPositions)
+fun Lineup.toLineupExport(playerPositions: MutableList<PlayerPositionExport>, rosterUUID: List<String>?): LineupExport {
+    return LineupExport(hash ?: UUID.randomUUID().toString(), name, createdTimeInMillis, editedTimeInMillis, mode, rosterUUID, playerPositions)
 }

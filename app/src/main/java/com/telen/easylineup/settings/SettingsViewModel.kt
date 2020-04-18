@@ -2,13 +2,11 @@ package com.telen.easylineup.settings
 
 import android.os.Environment
 import android.webkit.URLUtil
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import com.telen.easylineup.UseCaseHandler
-import com.telen.easylineup.domain.CheckHashData
-import com.telen.easylineup.domain.DeleteAllData
-import com.telen.easylineup.domain.ExportData
-import com.telen.easylineup.domain.UriChecker
+import com.telen.easylineup.domain.*
 import com.telen.easylineup.repository.model.Constants
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -38,9 +36,17 @@ class SettingsViewModel: ViewModel(), KoinComponent {
         return UseCaseHandler.execute(checkHashUseCase, CheckHashData.RequestValues()).flatMapCompletable {
                     Timber.d("update result is ${it.updateResult}")
                     Completable.complete()
-                }.andThen(UseCaseHandler.execute(exportDataUseCase, ExportData.RequestValues(object : UriChecker {
+                }.andThen(UseCaseHandler.execute(exportDataUseCase, ExportData.RequestValues(object : ValidationCallback {
                     override fun isNetworkUrl(url: String?): Boolean {
                         return URLUtil.isNetworkUrl(url)
+                    }
+
+                    override fun isDigitsOnly(value: String): Boolean {
+                        return value.isDigitsOnly()
+                    }
+
+                    override fun isBlank(value: String): Boolean {
+                        return value.isBlank()
                     }
                 })))
                 .flatMap {
