@@ -59,21 +59,8 @@ class TeamItemView: LinearLayout {
         name.text = teamName
     }
 
-    fun setImage(stringUri: String?) {
+    fun setImage(stringUri: String?, teamName: String) {
         val size = resources.getDimensionPixelSize(R.dimen.teams_list_icon_size)
-        teamIcon.ready {
-            try {
-                Picasso.get().load(stringUri)
-                        .resize(size, size)
-                        .centerCrop()
-                        .transform(RoundedTransformationBuilder()
-                                .cornerRadiusDp(16f)
-                                .oval(true)
-                                .build())
-                        .into(teamIcon)
-            } catch (e: IllegalArgumentException) {
-                Timber.e(e)
-            }
-        }
+        teamIcon.setPlayerImage(stringUri, teamName, size)
     }
 }

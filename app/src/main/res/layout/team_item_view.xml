@@ -20,7 +20,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <ImageView
+    <com.telen.easylineup.views.PlayerFieldIcon
         android:id="@+id/teamIcon"
         android:layout_width="@dimen/teams_list_icon_size"
         android:layout_height="@dimen/teams_list_icon_size"

@@ -21,7 +21,7 @@ class SwapTeamsListAdapter(private val teams: List<Team>, private val hostInterf
     override fun onBindViewHolder(holder: TeamsListViewHolder, position: Int) {
         val team = teams[position]
         holder.view.setTeamName(team.name)
-        holder.view.setImage(team.image)
+        holder.view.setImage(team.image, team.name)
         holder.view.setOnClickListener {
             hostInterface.onTeamClicked(team)
         }
