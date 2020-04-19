@@ -157,4 +157,5 @@
     <string name="settings_category_delete">Delete</string>
 
     <string name="error_need_assign_pitcher_first">Please select your pitcher first</string>
+    <string name="team_creation_cancel_message">Are you sure you really want to cancel ? You will loose all your modifications.</string>
 </resources>

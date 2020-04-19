@@ -59,7 +59,7 @@ class TeamCreationActivity: AppCompatActivity() {
                 }
                 TeamCreationStep.CANCEL -> {
                     AlertDialog.Builder(this)
-                            .setMessage("TODO Are you sure you really want to cancel ? You will loose all your modifications.")
+                            .setMessage(R.string.team_creation_cancel_message)
                             .setPositiveButton(android.R.string.ok) { dialog, which ->
                                 finish()
                             }
