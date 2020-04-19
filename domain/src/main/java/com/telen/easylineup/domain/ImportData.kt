@@ -169,7 +169,7 @@ class ImportData(private val teamDao: TeamDao, private val playerDao: PlayerDao,
                 }
     }
 
-    private fun rosterToString(roster: List<String>?, players: Map<String, Long>): String {
+    private fun rosterToString(roster: List<String>?, players: Map<String, Long>): String? {
         val builder = StringBuilder()
         roster?.forEach { hash ->
             players[hash]?.let { playerID ->
@@ -177,7 +177,7 @@ class ImportData(private val teamDao: TeamDao, private val playerDao: PlayerDao,
                     builder.append(";")
                 builder.append(playerID)
             }
-        }
+        } ?: return null
         return builder.toString()
     }
 
