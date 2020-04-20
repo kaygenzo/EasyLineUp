@@ -3,10 +3,15 @@ package com.telen.easylineup.settings
 import android.os.Environment
 import android.webkit.URLUtil
 import androidx.core.text.isDigitsOnly
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import com.telen.easylineup.UseCaseHandler
-import com.telen.easylineup.domain.*
+import com.telen.easylineup.domain.CheckHashData
+import com.telen.easylineup.domain.DeleteAllData
+import com.telen.easylineup.domain.ExportData
+import com.telen.easylineup.domain.ValidationCallback
 import com.telen.easylineup.repository.model.Constants
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -19,20 +24,32 @@ import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
 
+data class ExportDataObject(val fallbackName: String)
+
 class SettingsViewModel: ViewModel(), KoinComponent {
 
     private val deleteAllDataUseCase: DeleteAllData by inject()
     private val checkHashUseCase: CheckHashData by inject()
     private val exportDataUseCase: ExportData by inject()
 
+    private val _exportDataObjectLiveData = MutableLiveData<ExportDataObject>()
+    val exportDataObjectLiveData: LiveData<ExportDataObject> = _exportDataObjectLiveData
+
     fun deleteAllData(): Completable {
         return UseCaseHandler.execute(deleteAllDataUseCase, DeleteAllData.RequestValues()).ignoreElement()
+    }
+
+    fun exportDataTriggered() {
+        val now = Calendar.getInstance().time
+        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ROOT)
+        val dateTime = formatter.format(now)
+        _exportDataObjectLiveData.value = ExportDataObject(dateTime)
     }
 
     /**
      * @return The directory name where the file is exported
      */
-    fun exportDataOnExternalMemory(): Single<String> {
+    fun exportDataOnExternalMemory(name: String, fallbackName: String): Single<String> {
         return UseCaseHandler.execute(checkHashUseCase, CheckHashData.RequestValues()).flatMapCompletable {
                     Timber.d("update result is ${it.updateResult}")
                     Completable.complete()
@@ -58,9 +75,8 @@ class SettingsViewModel: ViewModel(), KoinComponent {
                     if(!rootDirectory.exists())
                         rootDirectory.mkdirs()
 
-                    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ROOT)
-                    val dateTime = formatter.format(Calendar.getInstance().time)
-                    val file = File(rootDirectory.absolutePath + "/$dateTime.elu")
+                    val fileName = if(name.isNotBlank()) name else fallbackName
+                    val file = File(rootDirectory.absolutePath + "/$fileName.elu")
                     if(!file.exists())
                         file.createNewFile()
 

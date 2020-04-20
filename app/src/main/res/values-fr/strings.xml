@@ -145,4 +145,7 @@
 
     <string name="error_need_assign_pitcher_first">Selectionnez un Pitcher avant.</string>
     <string name="team_creation_cancel_message">Voulez-vous vraiment annuler ? Vous perdrez toutes vos modifications.</string>
+
+    <string name="export_data_to_file_dialog_message">Nom du fichier:</string>
+    <string name="export_button">Exporter</string>
 </resources>

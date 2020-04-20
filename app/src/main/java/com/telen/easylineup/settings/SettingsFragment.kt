@@ -1,6 +1,7 @@
 package com.telen.easylineup.settings
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -8,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
@@ -19,9 +21,11 @@ import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.login.LoginViewModel
 import com.telen.easylineup.repository.model.Constants
 import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.views.CustomEditTextView
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -125,21 +129,43 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun exportData() {
-        val disposable = viewModel.exportDataOnExternalMemory().subscribe({ directoryName ->
-            activity?.run {
-                DialogFactory.getSimpleDialog(this, getString(R.string.settings_export_success, directoryName))
-                        .show()
-            }
 
-            Timber.d("Successfully exported data!")
-        }, {
-            activity?.run {
-                DialogFactory.getErrorDialog(this, getString(R.string.settings_export_error))
+        viewModel.exportDataObjectLiveData.observe(viewLifecycleOwner, Observer {
+            viewModel.exportDataObjectLiveData.removeObservers(viewLifecycleOwner)
+            context?.run {
+                val input = CustomEditTextView(this)
+                input.setHint(it.fallbackName)
+
+                AlertDialog.Builder(this)
+                        .setMessage(R.string.export_data_to_file_dialog_message)
+                        .setView(input)
+                        .setPositiveButton(R.string.export_button) { dialog, which ->
+                            val name = input.getName()
+                            val disposable = viewModel.exportDataOnExternalMemory(name, it.fallbackName).subscribe({ directoryName ->
+                                activity?.run {
+                                    DialogFactory.getSimpleDialog(this, getString(R.string.settings_export_success, directoryName))
+                                            .show()
+                                }
+
+                                Timber.d("Successfully exported data!")
+                            }, {
+                                activity?.run {
+                                    DialogFactory.getErrorDialog(this, getString(R.string.settings_export_error))
+                                            .show()
+                                }
+                                Timber.e(it)
+                            })
+                            operationsDisposable.add(disposable)
+                        }
+                        .setNegativeButton(R.string.cancel_button) { dialog, which ->
+
+                        }
+                        .create()
                         .show()
             }
-            Timber.e(it)
         })
-        operationsDisposable.add(disposable)
+
+        viewModel.exportDataTriggered()
     }
 
     private fun importData() {

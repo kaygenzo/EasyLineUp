@@ -158,4 +158,6 @@
 
     <string name="error_need_assign_pitcher_first">Please select your pitcher first</string>
     <string name="team_creation_cancel_message">Are you sure you really want to cancel ? You will loose all your modifications.</string>
+    <string name="export_data_to_file_dialog_message">File name:</string>
+    <string name="export_button">Export</string>
 </resources>
