@@ -12,6 +12,14 @@ class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPositionsDao)
             val toUpdate = mutableListOf<PlayerFieldPosition>()
             val toInsert = mutableListOf<PlayerFieldPosition>()
 
+            // just find the player field position corresponding to the flexFieldPosition in which
+            // we will update the flag, and by the way, free the batting order
+            requestValues.players.firstOrNull { p -> p.playerID == requestValues.flex.id }?.run {
+                flags = PlayerFieldPosition.FLAG_FLEX
+                order = Constants.ORDER_PITCHER_WHEN_DH
+                toUpdate.add(this.toPlayerFieldPosition())
+            }
+
             //check if there are flex flags and reset them because there can be only one flex
             requestValues.players.filter {
                 player -> player.flags and PlayerFieldPosition.FLAG_FLEX > 0 && player.playerID != requestValues.flex.id
@@ -19,13 +27,6 @@ class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPositionsDao)
                 it.flags = PlayerFieldPosition.FLAG_NONE
                 it.order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
                 toUpdate.add(it.toPlayerFieldPosition())
-            }
-
-            //just find the player field position corresponding to the flexFieldPosition in which we will update the flag,
-            requestValues.players.firstOrNull { p -> p.playerID == requestValues.flex.id }?.run {
-                flags = PlayerFieldPosition.FLAG_FLEX
-                order = Constants.ORDER_PITCHER_WHEN_DH
-                toUpdate.add(this.toPlayerFieldPosition())
             }
 
             requestValues.players.firstOrNull { p -> p.position == FieldPosition.DP_DH.position }?.run {
