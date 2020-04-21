@@ -42,6 +42,21 @@ class PlayersDetailsContainerFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_players_details_container, container, false)
         pager = view.viewPagerPlayersDetails
         view.viewPagerPlayersDetails.adapter = mAdapter
+        view.viewPagerPlayersDetails.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) { }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) { }
+
+            override fun onPageSelected(position: Int) {
+                if(position < playersIds.size) {
+                    teamViewModel.setPlayerId(playersIds[position])
+                }
+                else {
+                    Timber.e("player position is greater than the list size: position=$position but list size is ${playersIds.size} ")
+                }
+            }
+
+        })
         return view
     }
 
