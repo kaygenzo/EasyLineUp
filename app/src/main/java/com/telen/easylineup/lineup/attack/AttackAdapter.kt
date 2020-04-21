@@ -99,8 +99,16 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
                 fieldPosition.text = ""
 
             order.text = player.order.toString()
-            if(BuildConfig.DEBUG)
+
+            if(player.position >= FieldPosition.PITCHER.position && player.position <= FieldPosition.DP_DH.position) {
                 order.visibility = View.VISIBLE
+            }
+            else if(BuildConfig.DEBUG) {
+                order.visibility = View.VISIBLE
+            }
+            else {
+                order.visibility = View.GONE
+            }
 
             positionDescriptions?.let { descs ->
                 FieldPosition.getFieldPosition(player.position)?.let {
