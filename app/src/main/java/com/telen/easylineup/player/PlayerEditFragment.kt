@@ -33,7 +33,7 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
     private var playerForm: PlayerFormView? = null
 
     override fun onCancel() {
-        findNavController().popBackStack(R.id.navigation_team, false)
+        findNavController().navigateUp()
     }
 
     override fun onImagePickerRequested() {
