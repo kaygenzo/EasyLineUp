@@ -2,7 +2,6 @@ package com.telen.easylineup.domain
 
 import com.telen.easylineup.repository.model.*
 import io.reactivex.Single
-import java.lang.Exception
 
 class NeedAssignPitcherFirstException : Exception()
 

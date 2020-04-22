@@ -118,11 +118,11 @@ class DpFlexLinkView: ConstraintLayout {
         })
     }
 
-    fun DP(): Player? {
+    fun getDp(): Player? {
         return dp
     }
 
-    fun FLEX(): Player? {
+    fun getFlex(): Player? {
         return flex
     }
 }

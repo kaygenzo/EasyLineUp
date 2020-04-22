@@ -62,7 +62,8 @@ enum class ErrorCase {
     SAVE_LINEUP_MODE_FAILED,
     UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED,
     GET_TEAM_FAILED,
-    NEED_ASSIGN_PITCHER_FIRST
+    NEED_ASSIGN_PITCHER_FIRST,
+    DP_OR_FLEX_NOT_ASSIGNED
 }
 
 sealed class EventCase
@@ -338,13 +339,15 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
      */
     fun linkDpAndFlex(dp: Player?, flex: Player?): Completable {
         _linkPlayersInField.value = null
-        return if(dp != null && flex != null) {
-            UseCaseHandler.execute(saveDpAndFlexUseCase, SaveDpAndFlex.RequestValues(
-                    lineupID = lineupID, dp = dp, flex = flex, players = listPlayersWithPosition
-            )).ignoreElement()
-        }
-        else
-            Completable.error(IllegalArgumentException())
+        return UseCaseHandler.execute(saveDpAndFlexUseCase, SaveDpAndFlex.RequestValues(
+                lineupID = lineupID, dp = dp, flex = flex, players = listPlayersWithPosition
+        ))
+                .ignoreElement()
+                .doOnError {
+                    if(it is NeedAssignBothPlayersException) {
+                        errorHandler.postValue(ErrorCase.DP_OR_FLEX_NOT_ASSIGNED)
+                    }
+                }
     }
 
     /**

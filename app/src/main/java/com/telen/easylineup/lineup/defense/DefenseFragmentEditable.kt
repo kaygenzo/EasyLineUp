@@ -55,6 +55,9 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
                 ErrorCase.NEED_ASSIGN_PITCHER_FIRST -> {
                     context?.run { DialogFactory.getErrorDialog(this, getString(R.string.error_need_assign_pitcher_first)).show() }
                 }
+                ErrorCase.DP_OR_FLEX_NOT_ASSIGNED -> {
+                    context?.run { DialogFactory.getErrorDialog(this, getString(R.string.error_need_assign_both_players)).show() }
+                }
                 else -> {}
             }
         })
@@ -131,8 +134,8 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
                 .setView(dpFlexLinkView)
                 .setTitle("TODO Link your DP and you Flex")
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
-                    val dp = dpFlexLinkView.DP()
-                    val flex = dpFlexLinkView.FLEX()
+                    val dp = dpFlexLinkView.getDp()
+                    val flex = dpFlexLinkView.getFlex()
                     viewModel.linkDpAndFlex(dp, flex)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({

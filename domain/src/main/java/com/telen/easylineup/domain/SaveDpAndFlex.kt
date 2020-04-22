@@ -2,8 +2,9 @@ package com.telen.easylineup.domain
 
 import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
 import com.telen.easylineup.repository.model.*
-import io.reactivex.Completable
 import io.reactivex.Single
+
+class NeedAssignBothPlayersException : Exception()
 
 class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPositionsDao): UseCase<SaveDpAndFlex.RequestValues, SaveDpAndFlex.ResponseValue>() {
 
@@ -12,9 +13,12 @@ class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPositionsDao)
             val toUpdate = mutableListOf<PlayerFieldPosition>()
             val toInsert = mutableListOf<PlayerFieldPosition>()
 
+            val dp = requestValues.dp ?: return Single.error(NeedAssignBothPlayersException())
+            val flex = requestValues.flex ?: return Single.error(NeedAssignBothPlayersException())
+
             // just find the player field position corresponding to the flexFieldPosition in which
             // we will update the flag, and by the way, free the batting order
-            requestValues.players.firstOrNull { p -> p.playerID == requestValues.flex.id }?.run {
+            requestValues.players.firstOrNull { p -> p.playerID == flex.id }?.run {
                 flags = PlayerFieldPosition.FLAG_FLEX
                 order = Constants.ORDER_PITCHER_WHEN_DH
                 toUpdate.add(this.toPlayerFieldPosition())
@@ -22,7 +26,7 @@ class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPositionsDao)
 
             //check if there are flex flags and reset them because there can be only one flex
             requestValues.players.filter {
-                player -> player.flags and PlayerFieldPosition.FLAG_FLEX > 0 && player.playerID != requestValues.flex.id
+                player -> player.flags and PlayerFieldPosition.FLAG_FLEX > 0 && player.playerID != flex.id
             }.forEach {
                 it.flags = PlayerFieldPosition.FLAG_NONE
                 it.order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
@@ -32,10 +36,10 @@ class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPositionsDao)
             requestValues.players.firstOrNull { p -> p.position == FieldPosition.DP_DH.position }?.run {
                 order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
                 toUpdate.add(this.toPlayerFieldPosition().apply {
-                    playerId = requestValues.dp.id
+                    playerId = dp.id
                 })
             } ?: run {
-                val newPosition = PlayerFieldPosition(playerId = requestValues.dp.id, lineupId = lineupID, position = FieldPosition.DP_DH.position,
+                val newPosition = PlayerFieldPosition(playerId = dp.id, lineupId = lineupID, position = FieldPosition.DP_DH.position,
                         order = PlayerWithPosition.getNextAvailableOrder(requestValues.players))
                 toInsert.add(newPosition)
             }
@@ -48,8 +52,8 @@ class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPositionsDao)
     }
 
     class RequestValues(val lineupID: Long?,
-                        val dp: Player,
-                        val flex: Player,
+                        val dp: Player?,
+                        val flex: Player?,
                         val players: List<PlayerWithPosition>
     ): UseCase.RequestValues
     inner class ResponseValue: UseCase.ResponseValue
