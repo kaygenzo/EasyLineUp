@@ -22,6 +22,7 @@ class DpFlexLinkView: ConstraintLayout {
     private var playerTypeChoice = TYPE_NONE
     private var dp: Player? = null
     private var flex: Player? = null
+    private val iconeSize: Int
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -30,6 +31,7 @@ class DpFlexLinkView: ConstraintLayout {
     init {
         LayoutInflater.from(context).inflate(R.layout.view_dp_flex_link, this)
         linkDpFlexPlayerList.visibility = View.GONE
+        iconeSize = resources.getDimensionPixelSize(R.dimen.link_dp_flex_icon_size)
     }
 
     fun setTeamType(type: Int) {
@@ -90,12 +92,12 @@ class DpFlexLinkView: ConstraintLayout {
 
     private fun setDpPlayer(player: Player) {
         this.dp = player
-        player_dp.setPlayerImage(player.image, player.name, 100)
+        player_dp.setPlayerImage(player.image, player.name, iconeSize)
     }
 
     private fun setFlexPlayer(player: Player) {
         this.flex = player
-        player_flex.setPlayerImage(player.image, player.name, 100)
+        player_flex.setPlayerImage(player.image, player.name, iconeSize)
     }
 
     fun setPlayerList(players: List<Player>) {
