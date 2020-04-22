@@ -49,7 +49,7 @@ assembleProdReleaseAndDeployAppDistribution:
   artifacts:
     paths:
       - app/build/outputs/apk/prod/release
-      - app/build/outputs/mapping/prod/release
+      - app/build/outputs/mapping/prodRelease
 
 lintProdDebug:
   stage: test
@@ -75,6 +75,7 @@ dependencyCheckTests:
   script:
     - ./gradlew -Pci --console=plain dependencyCheckAnalyze --info
   artifacts:
+    name: "dependency-check-report"
     paths:
       - app/build/reports/dependency-check-report.html
       - domain/build/reports/dependency-check-report.html
