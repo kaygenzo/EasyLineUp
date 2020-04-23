@@ -127,8 +127,8 @@
     <string name="setting_version_title">Version</string>
     <string name="setting_play_store_title">Page officielle du Google Play store</string>
 
-    <string name="login_create">Créez votre première équipe!</string>
-    <string name="login_import">Importez une équipe existante.</string>
+    <string name="login_create">Créez votre première équipe</string>
+    <string name="login_import">Importez une équipe existante</string>
 
     <string name="settings_export_success">Données exportées avec succès vers le stockage externe dans le dossier %s </string>
     <string name="settings_import_success">Données importées avec succès dans l\'application</string>
@@ -150,4 +150,7 @@
 
     <string name="export_data_to_file_dialog_message">Nom du fichier:</string>
     <string name="export_button">Exporter</string>
+
+    <string name="link_dp_and_flex_dialog_title">Associez votre DP et votre Flex</string>
+    <string name="link_dh_and_pitcher_dialog_title">Associez votre DH et votre Pitcher</string>
 </resources>

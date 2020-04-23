@@ -144,8 +144,8 @@
     <string name="key_app_version" translatable="false">key_app_version</string>
     <string name="key_play_store" translatable="false">key_play_store</string>
 
-    <string name="login_create">Create your first team!</string>
-    <string name="login_import">Import an existing team.</string>
+    <string name="login_create">Create your first team</string>
+    <string name="login_import">Import an existing team</string>
 
     <string name="settings_export_success">Successfully exported to external storage in the directory %s </string>
     <string name="settings_import_success">Successfully imported data into the application </string>
@@ -161,4 +161,7 @@
     <string name="team_creation_cancel_message">Are you sure you really want to cancel ? You will loose all your modifications.</string>
     <string name="export_data_to_file_dialog_message">File name:</string>
     <string name="export_button">Export</string>
+
+    <string name="link_dp_and_flex_dialog_title">Link your DP and your Flex</string>
+    <string name="link_dh_and_pitcher_dialog_title">Link your DH and your Pitcher</string>
 </resources>

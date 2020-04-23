@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -70,7 +71,7 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
                     getDialogListAvailablePlayers(this, event.players, event.position).show()
                 }
                 is NeedLinkDpFlex -> activity?.run {
-                    getDialogLinkDpAndFlex(this, event.initialData, event.dpLocked, event.flexLocked, event.teamType).show()
+                    getDialogLinkDpAndFlex(this, event.initialData, event.dpLocked, event.flexLocked, event.teamType, event.title).show()
                 }
                 else -> {}
             }
@@ -113,7 +114,7 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
     }
 
     private fun getDialogLinkDpAndFlex(context: Context, initialData: Pair<Player?, Player?>,
-                                       dpLocked: Boolean, flexLocked: Boolean, teamType: Int): Dialog {
+                                       dpLocked: Boolean, flexLocked: Boolean, teamType: Int, @StringRes title: Int): Dialog {
 
         val dpFlexLinkView = DpFlexLinkView(context)
         dpFlexLinkView.setDpAndFlex(initialData.first, initialData.second)
@@ -132,7 +133,7 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
 
         return AlertDialog.Builder(context)
                 .setView(dpFlexLinkView)
-                .setTitle("TODO Link your DP and you Flex")
+                .setTitle(title)
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     val dp = dpFlexLinkView.getDp()
                     val flex = dpFlexLinkView.getFlex()

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.drawToBitmap
@@ -74,7 +75,7 @@ object DeleteLineupSuccess: EventCase()
 object SaveLineupModeSuccess: EventCase()
 object UpdatePlayersWithLineupModeSuccess: EventCase()
 data class GetAllAvailablePlayersSuccess(val players: List<Player>, val position: FieldPosition): EventCase()
-data class NeedLinkDpFlex(val initialData: Pair<Player?, Player?>, val dpLocked: Boolean, val flexLocked: Boolean, val teamType: Int): EventCase()
+data class NeedLinkDpFlex(val initialData: Pair<Player?, Player?>, val dpLocked: Boolean, val flexLocked: Boolean, val teamType: Int, @StringRes val title: Int): EventCase()
 
 class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
@@ -322,7 +323,13 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                     }
                     .subscribe({
                         _linkPlayersInField.value = null
-                        eventHandler.value = NeedLinkDpFlex(Pair(it.dp, it.flex), it.dpLocked, it.flexLocked, it.teamType)
+                        val title = if(it.teamType == TeamType.SOFTBALL.id) {
+                            R.string.link_dp_and_flex_dialog_title
+                        }
+                        else {
+                            R.string.link_dh_and_pitcher_dialog_title
+                        }
+                        eventHandler.value = NeedLinkDpFlex(Pair(it.dp, it.flex), it.dpLocked, it.flexLocked, it.teamType, title)
                     }, {
                         if(it is NeedAssignPitcherFirstException) {
                             errorHandler.value = ErrorCase.NEED_ASSIGN_PITCHER_FIRST

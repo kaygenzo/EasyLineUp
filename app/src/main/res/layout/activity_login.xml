@@ -14,11 +14,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/login_background"
+        app:srcCompat="@drawable/login_background"
         android:layout_margin="15dp"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="300dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -27,14 +27,18 @@
 
         <Button
             android:id="@+id/login_create"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@drawable/background_negative_button"
             android:textColor="@color/colorAccent"
             android:text="@string/login_create"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/login_import"
-            android:layout_marginBottom="40dp"/>
+            app:layout_constraintRight_toRightOf="@id/login_import"
+            app:layout_constraintLeft_toLeftOf="@id/login_import"
+            android:layout_marginBottom="40dp"
+            android:paddingStart="@dimen/default_margin"
+            android:paddingEnd="@dimen/default_margin"/>
 
         <Button
             android:id="@+id/login_import"
@@ -44,7 +48,9 @@
             android:textColor="@color/colorAccent"
             android:text="@string/login_import"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/login_create"/>
+            app:layout_constraintTop_toBottomOf="@+id/login_create"
+            android:paddingStart="@dimen/default_margin"
+            android:paddingEnd="@dimen/default_margin"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
