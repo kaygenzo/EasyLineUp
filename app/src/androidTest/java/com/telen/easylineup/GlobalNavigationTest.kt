@@ -131,8 +131,38 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
-        //click on save
+        // 1. Check save button come back on details
         BaristaClickInteractions.clickOn("Save")
+
+        Thread.sleep(delay)
+
+        //check name is albert
+        BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
+
+        Thread.sleep(delay)
+
+        onView(withId(R.id.action_edit))
+                .perform(click())
+
+        Thread.sleep(delay)
+
+        // 2. Check cancel button come back on details
+        BaristaClickInteractions.clickOn("Cancel")
+
+        Thread.sleep(delay)
+
+        //check name is albert
+        BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
+
+        Thread.sleep(delay)
+
+        onView(withId(R.id.action_edit))
+                .perform(click())
+
+        Thread.sleep(delay)
+
+        // 3. Check back button come back on details
+        pressBack()
 
         Thread.sleep(delay)
 
@@ -343,33 +373,11 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
-        //choose softball type
-        BaristaViewPagerInteractions.swipeViewPagerForward()
-
-        Thread.sleep(delay)
-
-        //click on next
-        BaristaClickInteractions.clickOn(R.id.buttonNext)
-
-        Thread.sleep(delay)
-
         //assert button name is Finish
         BaristaVisibilityAssertions.assertContains(R.id.buttonNext, "Finish")
 
-        //click on add player
-        BaristaClickInteractions.clickOn(R.id.fab)
-
-        Thread.sleep(delay)
-
-        //add new player information
-        BaristaEditTextInteractions.writeTo(R.id.playerNameInput, "test")
-        BaristaEditTextInteractions.writeTo(R.id.playerShirtNumberInput, "42")
-        BaristaEditTextInteractions.writeTo(R.id.playerLicenseNumberInput, "42")
-
-        Thread.sleep(delay)
-
-        //save player
-        BaristaClickInteractions.clickOn(R.id.playerSave)
+        //choose softball type
+        BaristaViewPagerInteractions.swipeViewPagerForward()
 
         Thread.sleep(delay)
 
@@ -389,7 +397,7 @@ class GlobalNavigationTest {
         BaristaVisibilityAssertions.assertContains(R.id.teamTypeDescription, "Softball team")
 
         // check team size is 21
-        BaristaVisibilityAssertions.assertContains(R.id.teamPlayersDescription, "Your team is composed of 21 members")
+        BaristaVisibilityAssertions.assertContains(R.id.teamPlayersDescription, "Your team is composed of 20 members")
 
         // check team tournaments stats is 3T/8L
         BaristaVisibilityAssertions.assertContains(R.id.teamTournamentsDescription, "3 tournaments / 8 lineups")
@@ -653,13 +661,6 @@ class GlobalNavigationTest {
         //call the new team toto
         BaristaEditTextInteractions.writeTo(R.id.teamNameInput, "toto")
 
-        Thread.sleep(delay)
-
-        //click next
-        BaristaClickInteractions.clickOn(R.id.buttonNext)
-
-        Thread.sleep(delay)
-
         //click next again
         BaristaClickInteractions.clickOn(R.id.buttonNext)
 
@@ -744,6 +745,8 @@ class GlobalNavigationTest {
         Thread.sleep(2000)
 
         device.setOrientationNatural()
+
+        Thread.sleep(2000)
     }
 
     private fun childAtPosition(

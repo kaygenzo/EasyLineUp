@@ -1,31 +1,31 @@
 package com.telen.easylineup
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
-import androidx.test.rule.ActivityTestRule
-import org.junit.Before
-import org.junit.Rule
-import org.junit.runner.RunWith
-import tools.fastlane.screengrab.Screengrab
-
-
-/**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-@RunWith(AndroidJUnit4::class)
-@LargeTest
-class NavigationTests {
-
-    @get:Rule
-    var activityRule: ActivityTestRule<HomeActivity> = ActivityTestRule(HomeActivity::class.java)
-
-    companion object {
-        @Before fun init() {
-
-        }
-    }
+//import androidx.test.ext.junit.runners.AndroidJUnit4
+//import androidx.test.filters.LargeTest
+//import androidx.test.rule.ActivityTestRule
+//import org.junit.Before
+//import org.junit.Rule
+//import org.junit.runner.RunWith
+//import tools.fastlane.screengrab.Screengrab
+//
+//
+///**
+// * Instrumented test, which will execute on an Android device.
+// *
+// * See [testing documentation](http://d.android.com/tools/testing).
+// */
+//@RunWith(AndroidJUnit4::class)
+//@LargeTest
+//class NavigationTests {
+//
+//    @get:Rule
+//    var activityRule: ActivityTestRule<HomeActivity> = ActivityTestRule(HomeActivity::class.java)
+//
+//    companion object {
+//        @Before fun init() {
+//
+//        }
+//    }
 
     //@ClassRule var localeTestRule: LocaleTestRule = LocaleTestRule()
 
@@ -123,8 +123,8 @@ class NavigationTests {
 ////        activityRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 ////        UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).pressBack()
 //    }
-
-    private fun takeScreenshot(name: String) {
-        Screengrab.screenshot(name)
-    }
-}
+//
+//    private fun takeScreenshot(name: String) {
+//        Screengrab.screenshot(name)
+//    }
+//}
