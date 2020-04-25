@@ -1,6 +1,7 @@
 package com.telen.easylineup
 
 
+import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -16,6 +17,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import androidx.test.uiautomator.UiDevice
+import com.google.android.libraries.cloudtesting.screenshots.ScreenShotter
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions
 import com.schibsted.spain.barista.interaction.BaristaDrawerInteractions.openDrawer
@@ -30,9 +32,12 @@ import org.hamcrest.Matcher
 import org.hamcrest.Matchers.*
 import org.hamcrest.TypeSafeMatcher
 import org.hamcrest.core.IsInstanceOf
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import tools.fastlane.screengrab.Screengrab
+import tools.fastlane.screengrab.UiAutomatorScreenshotStrategy
 
 
 @LargeTest
@@ -57,13 +62,23 @@ class GlobalNavigationTest {
 //    @JvmField
 //    var clearDatabaseRule = ClearDatabaseRule()
 
-    @Test
-    fun globalNavigationTest() {
-        
+    @Before
+    fun init() {
+        Screengrab.setDefaultScreenshotStrategy(UiAutomatorScreenshotStrategy())
+    }
+
+    private fun takeScreenshot(name: String, activity: Activity) {
+        ScreenShotter.takeScreenshot(name, activity)
+        //Screengrab.screenshot(name)
+    }
+
+    private fun initialization() {
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:
         // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
         Thread.sleep(5000)
+
+        takeScreenshot("dashboard", mHomeTestRule.activity)
 
         openDrawer()
 
@@ -75,32 +90,24 @@ class GlobalNavigationTest {
         tapTargetView.perform(click())
 
         Thread.sleep(delay)
-
-        applyPlayersManagementTests()
-
-        Thread.sleep(delay)
-
-        applyTeamManagementTests()
-
-        Thread.sleep(delay)
-
-        applyLineupManagementTests()
-
-        Thread.sleep(delay)
-
-        applySwitchTeamManagementTests()
     }
 
-    private fun applyPlayersManagementTests() {
+    @Test
+    fun applyPlayersManagementTests() {
+
+        initialization()
+
         //go to team players
         onView(withId(R.id.nav_view))
                 .perform(
                         NavigationViewActions.navigateTo(R.id.navigation_team)
                 )
 
+        takeScreenshot("players", mHomeTestRule.activity)
+
         Thread.sleep(delay)
 
-        applyRotation()
+        applyRotation("players")
 
         Thread.sleep(delay)
 
@@ -112,12 +119,14 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
+        takeScreenshot("albert_details", mHomeTestRule.activity)
+
         //check name is ALBERT
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
 
         Thread.sleep(delay)
 
-        applyRotation()
+        applyRotation("albert_details")
 
         Thread.sleep(delay)
 
@@ -127,7 +136,9 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
-        applyRotation()
+        takeScreenshot("albert_edit", mHomeTestRule.activity)
+
+        applyRotation("albert_edit")
 
         Thread.sleep(delay)
 
@@ -177,6 +188,8 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
+        takeScreenshot("albert_delete_dialog", mHomeTestRule.activity)
+
         //confirm delete with dialog ok button
         BaristaClickInteractions.clickOn(R.id.confirm_button)
 
@@ -201,7 +214,7 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
-        applyRotation()
+        applyRotation("bernard_edit")
 
         Thread.sleep(delay)
 
@@ -259,6 +272,8 @@ class GlobalNavigationTest {
         BaristaClickInteractions.clickOn(R.id.fab)
 
         Thread.sleep(delay)
+
+        takeScreenshot("add_new_player", mHomeTestRule.activity)
 
         //fill name with NewPlayer
         BaristaEditTextInteractions.writeTo(R.id.playerNameInput, "NewPlayer")
@@ -331,13 +346,19 @@ class GlobalNavigationTest {
         onView(withId(R.id.tile_player_most_used_name)).check(matches(withText("BERNARD")))
     }
 
-    private fun applyTeamManagementTests() {
+    @Test
+    fun applyTeamManagementTests() {
+
+        initialization()
+
         openDrawer()
 
         onView(allOf(withId(R.id.drawerImage), withParent(withId(R.id.navDrawerRootContainer))))
                 .perform(click())
 
         Thread.sleep(delay)
+
+        takeScreenshot("team_details", mHomeTestRule.activity)
 
         // check team name is "DC UNIVERS"
         BaristaVisibilityAssertions.assertContains(R.id.teamName, "DC UNIVERS")
@@ -359,7 +380,9 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
-        applyRotation()
+        takeScreenshot("team_edit_name", mHomeTestRule.activity)
+
+        applyRotation("team_edit_name")
 
         Thread.sleep(delay)
 
@@ -372,6 +395,8 @@ class GlobalNavigationTest {
         BaristaClickInteractions.clickOn(R.id.buttonNext)
 
         Thread.sleep(delay)
+
+        takeScreenshot("team_edit_team_type", mHomeTestRule.activity)
 
         //assert button name is Finish
         BaristaVisibilityAssertions.assertContains(R.id.buttonNext, "Finish")
@@ -386,7 +411,7 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
-        applyRotation()
+        applyRotation("new_team_details")
 
         Thread.sleep(delay)
 
@@ -427,7 +452,10 @@ class GlobalNavigationTest {
                 .check(matches(withText("NewTeamName")))
     }
 
-    private fun applyLineupManagementTests() {
+    @Test
+    fun applyLineupManagementTests() {
+
+        initialization()
 
         openDrawer()
 
@@ -439,20 +467,20 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
+        takeScreenshot("lineups_list", mHomeTestRule.activity)
+
         //click on stats tournament of the first tournament
-        val appCompatImageButton9 = onView(
-                allOf(withId(R.id.statsTournament),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.material_timeline_view),
-                                        0),
-                                3),
-                        isDisplayed()))
+        val appCompatImageButton9 = onView(allOf(
+                withId(R.id.statsTournament),
+                hasSibling(withText("Paris Series")),
+                isDisplayed()))
         appCompatImageButton9.perform(click())
 
         Thread.sleep(delay)
 
-        applyRotation()
+        takeScreenshot("lineups_list_tournament_stats", mHomeTestRule.activity)
+
+        applyRotation("lineups_list_tournament_stats")
 
         Thread.sleep(delay)
 
@@ -470,23 +498,21 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
-        applyRotation()
+        applyRotation("lineups_list")
 
         Thread.sleep(delay)
 
         //click on the first lineup
         val constraintLayout = onView(
                 allOf(withId(R.id.rootView),
-                        childAtPosition(
-                                allOf(withId(R.id.lineupsOfTournamentRecycler),
-                                        childAtPosition(
-                                                withClassName(`is`("androidx.cardview.widget.CardView")),
-                                                0)),
-                                0),
+                        isDescendantOfA(withId(R.id.lineupsOfTournamentRecycler)),
+                        hasDescendant(withText("DC vs DC 1")),
                         isDisplayed()))
         constraintLayout.perform(click())
 
         Thread.sleep(delay)
+
+        takeScreenshot("lineup_defense_fixed", mHomeTestRule.activity)
 
         //click on attack
         onView(allOf(withText("ATTACK"), isDescendantOfA(withId(R.id.lineupTabLayout))))
@@ -494,13 +520,15 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
+        takeScreenshot("lineup_attack_fixed", mHomeTestRule.activity)
+
         //click on defense
         onView(allOf(withText("DEFENSE"), isDescendantOfA(withId(R.id.lineupTabLayout))))
                 .perform(click())
 
         Thread.sleep(delay)
 
-        applyRotation()
+        applyRotation("lineup_defense_fixed")
 
         Thread.sleep(delay)
 
@@ -510,9 +538,13 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
+        takeScreenshot("lineup_defense_editable", mHomeTestRule.activity)
+
         //click on attack
         onView(allOf(withText("ATTACK"), isDescendantOfA(withId(R.id.lineupTabLayout))))
                 .perform(click())
+
+        takeScreenshot("lineup_attack_editable", mHomeTestRule.activity)
 
         Thread.sleep(delay)
 
@@ -522,7 +554,7 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
-        applyRotation()
+        applyRotation("lineup_defense_editable")
 
         Thread.sleep(delay)
 
@@ -561,6 +593,8 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
+        takeScreenshot("lineup_delete_popup", mHomeTestRule.activity)
+
         //confirm delete with dialog ok button
         BaristaClickInteractions.clickOn(R.id.confirm_button)
 
@@ -585,6 +619,8 @@ class GlobalNavigationTest {
         BaristaEditTextInteractions.writeTo(R.id.tournamentChoiceAutoComplete, "NewTournament")
 
         Thread.sleep(delay)
+
+        takeScreenshot("lineups_create_lineup", mHomeTestRule.activity)
 
         //TODO think something to perform click on calendar view
 
@@ -640,7 +676,10 @@ class GlobalNavigationTest {
 //                isDisplayed())).check(matches(withText("01/01/2020")))
     }
 
-    private fun applySwitchTeamManagementTests() {
+    @Test
+    fun applySwitchTeamManagementTests() {
+
+        initialization()
 
         openDrawer()
 
@@ -649,12 +688,14 @@ class GlobalNavigationTest {
 
         Thread.sleep(delay)
 
+        takeScreenshot("swap_team_dialog", mHomeTestRule.activity)
+
         //click on create
         BaristaClickInteractions.clickOn(android.R.id.button1)
 
         Thread.sleep(delay)
 
-        applyRotation()
+        applyRotation("create_team")
 
         Thread.sleep(delay)
 
@@ -670,10 +711,6 @@ class GlobalNavigationTest {
         BaristaVisibilityAssertions.assertContains(R.id.buttonNext, "Finish")
         //click finish
         BaristaClickInteractions.clickOn(R.id.buttonNext)
-
-        Thread.sleep(delay)
-
-        applyRotation()
 
         Thread.sleep(delay)
 
@@ -715,7 +752,8 @@ class GlobalNavigationTest {
 
         //check first entry is NewTeam
         val textView20 = onView(
-                allOf(withId(R.id.name), withText("NewTeamName"),
+                allOf(withId(R.id.name),
+                        withText("DC Univers"),
                         childAtPosition(
                                 allOf(withId(R.id.details_container),
                                         childAtPosition(
@@ -723,7 +761,7 @@ class GlobalNavigationTest {
                                                 1)),
                                 0),
                         isDisplayed()))
-        textView20.check(matches(withText("NewTeamName")))
+        textView20.check(matches(withText("DC Univers")))
 
 //        val textView21 = onView(
 //                allOf(withId(R.id.name), withText("toto"),
@@ -737,12 +775,16 @@ class GlobalNavigationTest {
 //        textView21.check(matches(withText("toto")))
     }
 
-    private fun applyRotation() {
+    private fun applyRotation(name: String) {
+
+        takeScreenshot("${name}_portrait", mHomeTestRule.activity)
 
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         device.setOrientationLeft()
 
         Thread.sleep(2000)
+
+        takeScreenshot("${name}_landscape", mHomeTestRule.activity)
 
         device.setOrientationNatural()
 
