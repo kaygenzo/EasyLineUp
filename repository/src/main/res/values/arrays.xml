@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="field_positions_list">
+    <string-array name="field_positions_baseball_list" translatable="false">
         <item>SUB</item>
         <item>P</item>
         <item>C</item>
@@ -12,5 +12,19 @@
         <item>CF</item>
         <item>RF</item>
         <item>DH</item>
+    </string-array>
+
+    <string-array name="field_positions_softball_list" translatable="false">
+        <item>SUB</item>
+        <item>P</item>
+        <item>C</item>
+        <item>1B</item>
+        <item>2B</item>
+        <item>3B</item>
+        <item>SS</item>
+        <item>LF</item>
+        <item>CF</item>
+        <item>RF</item>
+        <item>DP</item>
     </string-array>
 </resources>

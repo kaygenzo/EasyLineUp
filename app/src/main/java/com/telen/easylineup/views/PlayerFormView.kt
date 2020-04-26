@@ -16,6 +16,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.view_create_player.view.*
 import timber.log.Timber
+import java.lang.reflect.Field
 
 interface PlayerFormListener {
     fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int)
@@ -174,7 +175,7 @@ class PlayerFormView: ConstraintLayout {
         this.playerPositions = positions
         this.positionState.clear()
 
-        val positionShortDescription = resources.getStringArray(R.array.field_positions_list)
+        val positionShortDescription = FieldPosition.getPositionShortNames(context, 0)
 
         favoritePositionsContainer.removeAllViews()
 

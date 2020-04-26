@@ -22,11 +22,24 @@ import kotlinx.android.synthetic.main.view_bar_chart.view.*
 
 
 class PositionsBarChart: ConstraintLayout {
-    constructor(context: Context?) : super(context) {init(context)}
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {init(context)}
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {init(context)}
+    constructor(context: Context) : super(context) {init(context)}
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {init(context)}
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {init(context)}
 
-    private fun init(context: Context?) {
+    fun setTeamType(teamType: Int) {
+        val xAxis = playerPositionsChart.xAxis
+        xAxis.valueFormatter = object : ValueFormatter() {
+
+            private val mPositions = FieldPosition.getPositionShortNames(context, teamType)
+
+            override fun getFormattedValue(value: Float): String {
+                return mPositions[value.toInt()]
+            }
+        }
+        playerPositionsChart.invalidate()
+    }
+
+    private fun init(context: Context) {
         LayoutInflater.from(context).inflate(R.layout.view_bar_chart, this)
 
         val chart: BarChart = playerPositionsChart
@@ -50,13 +63,10 @@ class PositionsBarChart: ConstraintLayout {
         val xAxis = chart.xAxis
         xAxis.valueFormatter = object : ValueFormatter() {
 
-            private val mPositions = context?.resources?.getStringArray(R.array.field_positions_list)
+            private val mPositions = FieldPosition.getPositionShortNames(context, 0)
 
             override fun getFormattedValue(value: Float): String {
-                return if(mPositions!=null)
-                    mPositions[value.toInt()]
-                else
-                    "XX"
+                return mPositions[value.toInt()]
             }
         }
         xAxis.textSize = 10f

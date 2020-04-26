@@ -82,7 +82,7 @@ class PlayerListAdapter(val list: List<Player>, val playerListener: OnPlayerClic
             val isMatchingPosition = player.positions and it.mask > 0
             if(isMatchingPosition) {
                 holder.position.visibility = View.VISIBLE
-                val positionShortDescription = holder.position.context.resources.getStringArray(R.array.field_positions_list)
+                val positionShortDescription = FieldPosition.getPositionShortNames(holder.position.context, 0)
                 holder.position.setText(positionShortDescription[it.ordinal])
                 holder.position.setBackground(R.drawable.position_selected_background)
                 holder.position.setTextColor(R.color.white)

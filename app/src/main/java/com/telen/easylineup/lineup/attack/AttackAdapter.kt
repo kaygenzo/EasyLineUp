@@ -23,7 +23,10 @@ interface OnDataChangedListener {
     fun onOrderChanged()
 }
 
-class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, val dataListener: OnDataChangedListener?, val isEditable: Boolean): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
+class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>,
+                          private val dataListener: OnDataChangedListener?,
+                          private val isEditable: Boolean,
+                          private val teamType: Int): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
 
     private var positionDescriptions: Array<String>? = null
     var lineupMode = MODE_DISABLED
@@ -76,14 +79,14 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>, 
     }
 
     override fun getItemCount(): Int {
-       return players.size
+        return players.size
     }
 
     override fun onBindViewHolder(holder: BatterViewHolder, position: Int) {
         val player = players[position]
 
         if(positionDescriptions == null)
-            positionDescriptions = holder.positionDesc.context.resources.getStringArray(R.array.field_positions_list)
+            positionDescriptions = FieldPosition.getPositionShortNames(holder.positionDesc.context, teamType)
 
         with(holder) {
 

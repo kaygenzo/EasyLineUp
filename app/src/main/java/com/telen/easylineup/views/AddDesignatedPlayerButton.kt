@@ -5,7 +5,8 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
-import kotlinx.android.synthetic.main.view_add_player_button.view.*
+import kotlinx.android.synthetic.main.view_add_designated_player_button.view.*
+import kotlinx.android.synthetic.main.view_add_player_button.view.fab
 
 class AddDesignatedPlayerButton: ConstraintLayout {
 
@@ -19,5 +20,9 @@ class AddDesignatedPlayerButton: ConstraintLayout {
 
     override fun setOnClickListener(l: OnClickListener?) {
         fab.setOnClickListener(l)
+    }
+
+    fun setLabel(label: String) {
+        designatedPlayerLabel.text = label
     }
 }
