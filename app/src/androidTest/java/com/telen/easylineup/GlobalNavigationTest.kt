@@ -69,6 +69,7 @@ class GlobalNavigationTest {
     }
 
     private fun takeScreenshot(name: String, activity: Activity) {
+        Thread.sleep(delay)
         val testLabSetting = Settings.System.getString(activity.contentResolver, "firebase.test.lab")
         if ("true" == testLabSetting) {
             ScreenShotter.takeScreenshot(name, activity)
