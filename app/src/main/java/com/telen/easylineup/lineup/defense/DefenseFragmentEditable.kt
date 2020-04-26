@@ -77,9 +77,14 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
             }
         })
 
-        viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer {
-            view.cardDefenseView.setListPlayer(it, viewModel.lineupMode)
+        viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer { players ->
             view.cardDefenseView.setPlayerStateListener(this)
+            viewModel.getTeamType()
+                    .subscribe({
+                        view.cardDefenseView.setListPlayer(players, viewModel.lineupMode, it)
+                    }, {
+                        Timber.e(it)
+                    })
         })
 
         return view

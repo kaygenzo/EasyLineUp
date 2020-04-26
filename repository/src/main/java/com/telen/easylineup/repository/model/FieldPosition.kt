@@ -1,5 +1,6 @@
 package com.telen.easylineup.repository.model
 
+import android.content.Context
 import androidx.annotation.ColorRes
 import com.telen.easylineup.repository.R
 
@@ -38,6 +39,17 @@ enum class FieldPosition(val position: Int, val mask: Int, val xPercent: Float, 
         //TODO move in domain
         fun canBeBatterWhenModeEnabled(position: Int, flags: Int): Boolean {
             return !isSubstitute(position) && (flags and PlayerFieldPosition.FLAG_FLEX == 0)
+        }
+
+        fun getPositionShortNames(context: Context, teamType: Int): Array<String> {
+            return when(teamType) {
+                TeamType.SOFTBALL.id -> {
+                    context.resources.getStringArray(R.array.field_positions_softball_list)
+                }
+                else -> { //apply baseball rule
+                    context.resources.getStringArray(R.array.field_positions_baseball_list)
+                }
+            }
         }
     }
 }

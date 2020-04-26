@@ -33,7 +33,7 @@ class GetTournamentStatsForPositionTable(val dao: LineupDao): UseCase<GetTournam
                         }
                     }
 
-                    val positionsArray = requestValues.context.resources.getStringArray(R.array.field_positions_list)
+                    val positionsArray = FieldPosition.getPositionShortNames(requestValues.context, requestValues.team.type)
 
                     topHeaderData.add(Pair(requestValues.context.getString(R.string.tournament_stats_label_games_played), -1))
                     FieldPosition.values().forEach { fieldPosition ->

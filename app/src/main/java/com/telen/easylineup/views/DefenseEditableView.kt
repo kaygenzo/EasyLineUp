@@ -51,7 +51,7 @@ class DefenseEditableView: DefenseView {
         LayoutInflater.from(context).inflate(R.layout.baseball_field_with_players, this)
     }
 
-    fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int, loadingCallback: LoadingCallback?) {
+    fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int, loadingCallback: LoadingCallback?) {
         cleanPlayerIcons()
 
         if(fieldFrameLayout==null || fieldFrameLayout.width <= 0)
@@ -143,7 +143,7 @@ class DefenseEditableView: DefenseView {
 
         addEmptyPositionMarker(players, emptyPositions)
         addSubstitutePlayers(players)
-        addDesignatedPlayerIfExists(players, lineupMode)
+        addDesignatedPlayerIfExists(players, lineupMode, teamType)
         addTrashButton(players)
     }
 
@@ -277,7 +277,7 @@ class DefenseEditableView: DefenseView {
                 }
     }
 
-    private fun addDesignatedPlayerIfExists(players: List<PlayerWithPosition>, lineupMode: Int) {
+    private fun addDesignatedPlayerIfExists(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int) {
          if(lineupMode == MODE_ENABLED) {
             val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
             players.filter { it.position == FieldPosition.DP_DH.position }.let { listPlayers ->
@@ -329,6 +329,15 @@ class DefenseEditableView: DefenseView {
                     view = playerView
                 } catch (e: NoSuchElementException) {
                     val positionView = AddDesignatedPlayerButton(context).run {
+                        when(teamType) {
+                            TeamType.SOFTBALL.id -> {
+                                setLabel(context.getString(R.string.field_position_dp))
+                            }
+                            else -> {
+                                setLabel(context.getString(R.string.field_position_dh))
+                            }
+                        }
+
                         layoutParams = LayoutParams(iconSize, iconSize)
 
                         setOnDragListener { v, event ->

@@ -62,4 +62,8 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     fun registerFormErrorResult(): LiveData<FormErrorResult> {
         return errorResult
     }
+
+    fun getTeamType(): Single<Int> {
+        return UseCaseHandler.execute(getTeamUseCase,GetTeam.RequestValues()).map { it.team.type }
+    }
 }

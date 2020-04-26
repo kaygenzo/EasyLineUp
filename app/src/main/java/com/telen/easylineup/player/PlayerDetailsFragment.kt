@@ -28,7 +28,7 @@ class PlayerDetailsFragment: Fragment() {
         val playerID = arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
         viewModel.playerID = playerID
 
-        val disposable = viewModel.getPlayer().subscribe({
+        val disposable1 = viewModel.getPlayer().subscribe({
             view.playerLicenseValue.text = it.licenseNumber.toString()
             view.shirtNumberValue.text = it.shirtNumber.toString()
             view.playerName.text = it.name.trim()
@@ -50,12 +50,19 @@ class PlayerDetailsFragment: Fragment() {
             Timber.e(it)
         })
 
-        viewModel.getAllLineupsForPlayer().subscribe({
+        val disposable2 = viewModel.getAllLineupsForPlayer().subscribe({
             view.gamesPlayedValue.text = it.values.sum().toString()
             view.positionsBarChart.setData(it)
         }, {
             Timber.e(it)
         })
+
+        val disposable3 = viewModel.getTeamType()
+                .subscribe({
+                    view.positionsBarChart.setTeamType(it)
+                }, {
+                    Timber.e(it)
+                })
 
         return view
     }

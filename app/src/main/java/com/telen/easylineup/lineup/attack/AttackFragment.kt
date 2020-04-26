@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.R
-import com.telen.easylineup.lineup.EventCase
 import com.telen.easylineup.lineup.PlayersPositionViewModel
 import com.telen.easylineup.lineup.SaveBattingOrderSuccess
 import com.telen.easylineup.repository.model.PlayerWithPosition
@@ -39,19 +38,24 @@ class AttackFragment: Fragment(), OnDataChangedListener {
             viewModel = ViewModelProviders.of(parent).get(PlayersPositionViewModel::class.java)
             val isEditable = viewModel.editable
 
-            playerAdapter = BattingOrderAdapter(adapterDataList, this, isEditable)
-            itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
-            itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
+            viewModel.getTeamType()
+                    .subscribe({ teamType ->
+                        playerAdapter = BattingOrderAdapter(adapterDataList, this, isEditable, teamType)
+                        itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
+                        itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
 
-            view.recyclerView.apply {
-                layoutManager = linearLayoutManager
-                addItemDecoration(dividerItemDecoration)
-                adapter = playerAdapter
-            }
+                        view.recyclerView.apply {
+                            layoutManager = linearLayoutManager
+                            addItemDecoration(dividerItemDecoration)
+                            adapter = playerAdapter
+                        }
 
-            isEditable.takeIf { it }?.let {
-                itemTouchedHelper.attachToRecyclerView(view.recyclerView)
-            }
+                        isEditable.takeIf { it }?.let {
+                            itemTouchedHelper.attachToRecyclerView(view.recyclerView)
+                        }
+                    }, {
+                        Timber.e(it)
+                    })
 
             view.header.setIsEditable(isEditable)
 
@@ -77,15 +81,11 @@ class AttackFragment: Fragment(), OnDataChangedListener {
 
             }
 
-            val lifecycleObserver = object: Observer<EventCase> {
-                override fun onChanged(t: EventCase?) {
-                    when(t) {
-                        SaveBattingOrderSuccess -> Timber.d("Successfully saved!")
-                    }
+            viewModel.eventHandler.observe(viewLifecycleOwner, Observer {
+                when(it) {
+                    SaveBattingOrderSuccess -> Timber.d("Successfully saved!")
                 }
-            }
-
-            viewModel.eventHandler.observe(viewLifecycleOwner, lifecycleObserver)
+            })
         }
 
         return view

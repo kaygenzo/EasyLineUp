@@ -32,8 +32,8 @@ class CardDefenseEditable: CardView, LoadingCallback {
         }
     }
 
-    fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int) {
-        fieldAndPlayersRootView.setListPlayer(players, lineupMode, this)
+    fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int) {
+        fieldAndPlayersRootView.setListPlayer(players, lineupMode, teamType, this)
     }
 
     fun setPlayerStateListener(playerButtonCallback: OnPlayerButtonCallback) {

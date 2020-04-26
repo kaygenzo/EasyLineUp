@@ -201,6 +201,10 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         return UseCaseHandler.execute(saveLineupMode, requestValues)
     }
 
+    fun getTeamType(): Single<Int> {
+        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team.type }
+    }
+
     fun onLineupModeChanged(isEnabled: Boolean) {
 
         lineupMode = if(isEnabled) MODE_ENABLED else MODE_DISABLED
