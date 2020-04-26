@@ -223,7 +223,7 @@ dependencies {
 
     implementation 'com.github.hedzr:android-file-chooser:master-SNAPSHOT'
 
-    //implementation 'com.facebook.stetho:stetho:1.5.1'
+    debugImplementation "com.facebook.stetho:stetho:$stethoVersion"
 
 }
 

@@ -16,7 +16,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
 
-class App: MultiDexApplication() {
+open class App: MultiDexApplication() {
 
     companion object {
         lateinit var database: AppDatabase
@@ -53,8 +53,6 @@ class App: MultiDexApplication() {
             androidContext(this@App)
             modules(appModules)
         }
-
-//        Stetho.initializeWithDefaults(this)
     }
 
     private fun migration_1_2(): Migration {
