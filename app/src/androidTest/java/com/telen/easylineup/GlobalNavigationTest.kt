@@ -2,6 +2,7 @@ package com.telen.easylineup
 
 
 import android.app.Activity
+import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -68,7 +69,10 @@ class GlobalNavigationTest {
     }
 
     private fun takeScreenshot(name: String, activity: Activity) {
-        ScreenShotter.takeScreenshot(name, activity)
+        val testLabSetting = Settings.System.getString(activity.contentResolver, "firebase.test.lab")
+        if ("true" == testLabSetting) {
+            ScreenShotter.takeScreenshot(name, activity)
+        }
         //Screengrab.screenshot(name)
     }
 
