@@ -40,7 +40,7 @@ assembleProdRelease:
   artifacts:
     paths:
       - app/build/outputs/apk/prod/release
-      - app/build/outputs/mapping/prod/release
+      - app/build/outputs/mapping/prodRelease/mapping.txt
 
 assembleProdReleaseAndDeployAppDistribution:
   stage: develop
@@ -49,14 +49,14 @@ assembleProdReleaseAndDeployAppDistribution:
   artifacts:
     paths:
       - app/build/outputs/apk/prod/release
-      - app/build/outputs/mapping/prodRelease
+      - app/build/outputs/mapping/prodRelease/mapping.txt
 
 lintProdDebug:
   stage: test
   script:
     - ./gradlew -Pci --console=plain lintProdDebug -PbuildDir=lint
   artifacts:
-    name: "reports"
+    name: "lint-reports"
     paths:
       - app/build/reports/lint-results-prodDebug.html
       - app/lint/reports/lint-results-prodDebug.html
@@ -80,6 +80,17 @@ dependencyCheckTests:
       - app/build/reports/dependency-check-report.html
       - domain/build/reports/dependency-check-report.html
       - repository/build/reports/dependency-check-report.html
+
+assembleAndroidTests:
+  stage: test
+  script:
+    - ./gradlew assembleDemoDebug
+    - ./gradlew assembleDemoDebugAndroidTest
+  artifacts:
+    name: "androidTestBinaries"
+    paths:
+      - app/build/outputs/apk/demo/debug
+      - app/build/outputs/apk/androidTest/demo/debug
 
 #coverageTests:
 #  stage: test
