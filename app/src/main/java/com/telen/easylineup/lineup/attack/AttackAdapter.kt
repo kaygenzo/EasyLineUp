@@ -26,7 +26,7 @@ interface OnDataChangedListener {
 class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>,
                           private val dataListener: OnDataChangedListener?,
                           private val isEditable: Boolean,
-                          private val teamType: Int): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
+                          var teamType: Int): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
 
     private var positionDescriptions: Array<String>? = null
     var lineupMode = MODE_DISABLED

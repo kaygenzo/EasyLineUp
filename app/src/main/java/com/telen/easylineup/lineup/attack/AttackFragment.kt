@@ -15,6 +15,7 @@ import com.telen.easylineup.lineup.EventCase
 import com.telen.easylineup.lineup.PlayersPositionViewModel
 import com.telen.easylineup.lineup.SaveBattingOrderSuccess
 import com.telen.easylineup.repository.model.PlayerWithPosition
+import com.telen.easylineup.repository.model.TeamType
 import com.telen.easylineup.views.ItemDecoratorAttackRecycler
 import kotlinx.android.synthetic.main.fragment_list_batter.view.*
 import timber.log.Timber
@@ -36,23 +37,31 @@ class AttackFragment: Fragment(), OnDataChangedListener {
         val dividerItemDecoration = ItemDecoratorAttackRecycler(context, linearLayoutManager.orientation)
 
         parentFragment?.let { parent ->
+
             viewModel = ViewModelProviders.of(parent).get(PlayersPositionViewModel::class.java)
+
             val isEditable = viewModel.editable
+
+            playerAdapter = BattingOrderAdapter(adapterDataList, this, isEditable, TeamType.BASEBALL.id)
+
+            itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
+            itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
+
+            view.recyclerView.apply {
+                layoutManager = linearLayoutManager
+                addItemDecoration(dividerItemDecoration)
+                adapter = playerAdapter
+            }
+
+            isEditable.takeIf { it }?.let {
+                itemTouchedHelper.attachToRecyclerView(view.recyclerView)
+            }
 
             viewModel.getTeamType()
                     .subscribe({ teamType ->
-                        playerAdapter = BattingOrderAdapter(adapterDataList, this, isEditable, teamType)
-                        itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
-                        itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
-
-                        view.recyclerView.apply {
-                            layoutManager = linearLayoutManager
-                            addItemDecoration(dividerItemDecoration)
-                            adapter = playerAdapter
-                        }
-
-                        isEditable.takeIf { it }?.let {
-                            itemTouchedHelper.attachToRecyclerView(view.recyclerView)
+                        playerAdapter.apply {
+                            this.teamType = teamType
+                            notifyDataSetChanged()
                         }
                     }, {
                         Timber.e(it)
