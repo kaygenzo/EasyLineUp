@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.R
+import com.telen.easylineup.lineup.EventCase
 import com.telen.easylineup.lineup.PlayersPositionViewModel
 import com.telen.easylineup.lineup.SaveBattingOrderSuccess
 import com.telen.easylineup.repository.model.PlayerWithPosition
@@ -81,11 +82,17 @@ class AttackFragment: Fragment(), OnDataChangedListener {
 
             }
 
-            viewModel.eventHandler.observe(viewLifecycleOwner, Observer {
-                when(it) {
-                    SaveBattingOrderSuccess -> Timber.d("Successfully saved!")
+            // Fix because if i use directly the observer into the live data observe,
+            // it will trigger a IllegalArgumentException: Cannot add the same observer with different lifecycles
+            val lifecycleObserver = object: Observer<EventCase> {
+                override fun onChanged(t: EventCase?) {
+                    when(t) {
+                        SaveBattingOrderSuccess -> Timber.d("Successfully saved!")
+                    }
                 }
-            })
+            }
+
+            viewModel.eventHandler.observe(viewLifecycleOwner, lifecycleObserver)
         }
 
         return view
