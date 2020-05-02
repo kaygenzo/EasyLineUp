@@ -152,5 +152,6 @@ class TournamentsAdapter(private val itemClickListener: OnItemClickedListener): 
 
             index++
         }
+        notifyDataSetChanged()
     }
 }

@@ -10,10 +10,11 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.telen.easylineup.R
-import com.telen.easylineup.dashboard.*
-import com.telen.easylineup.repository.tiles.ITileData
-import com.telen.easylineup.repository.tiles.LastLineupData
+import com.telen.easylineup.dashboard.DashboardTileAdapter
+import com.telen.easylineup.dashboard.DashboardViewModel
+import com.telen.easylineup.dashboard.TileClickListener
 import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.tiles.ITileData
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
 
@@ -39,17 +40,7 @@ class DashboardFragment: Fragment(), TileClickListener {
         val view = inflater.inflate(R.layout.fragment_dashboard, container, false)
 
         val columnCount = resources.getInteger(R.integer.dashboard_tile_count)
-
         val gridLayoutManager = GridLayoutManager(context, columnCount)
-        gridLayoutManager.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return if(tileList[position] is LastLineupData) {
-                    columnCount
-                } else {
-                    1
-                }
-            }
-        }
 
         view.tileRecyclerView.apply {
             layoutManager = gridLayoutManager

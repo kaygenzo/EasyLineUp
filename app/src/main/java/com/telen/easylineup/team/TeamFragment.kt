@@ -6,28 +6,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Player
 import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.model.Player
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_player_list.view.*
-import timber.log.Timber
 
 class TeamFragment: Fragment(), OnPlayerClickListener {
 
     private lateinit var playersAdapter: TeamAdapter
-    private lateinit var players: MutableList<Player>
     private lateinit var viewModel: TeamViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        players = mutableListOf()
         val clickable = arguments?.getBoolean(Constants.EXTRA_CLICKABLE) ?: true
         activity?.let {
-            playersAdapter = TeamAdapter(it, players, when(clickable) {
+            playersAdapter = TeamAdapter(it, when(clickable) {
                 true -> this
                 false -> null
             })
@@ -42,24 +40,23 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
         }
 
         viewModel = ViewModelProviders.of(this).get(TeamViewModel::class.java)
-        viewModel.getPlayers().subscribe({ playerList ->
-            players.apply {
-                clear()
-                addAll(playerList)
-            }
-            playersAdapter.notifyDataSetChanged()
+
+        viewModel.observePlayers().observe(viewLifecycleOwner, Observer {
+            playersAdapter.setPlayers(it)
 
             view.fab.setOnClickListener {
                 context?.let {
-                    val bundle = Bundle()
-                    findNavController().navigate(R.id.playerEditFragment, bundle, NavigationUtils().getOptions())
+                    findNavController().navigate(R.id.playerEditFragment, null, NavigationUtils().getOptions())
                 }
             }
-        }, { throwable ->
-            Timber.e(throwable)
         })
 
         return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.clear()
     }
 
     override fun onPlayerSelected(player: Player) {

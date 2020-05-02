@@ -6,8 +6,29 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.PagerAdapter
 import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.repository.model.Player
 
-class PlayersDetailsPagerAdapter(private val playersIds: List<Long>, fm: FragmentManager): FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+class PlayersDetailsPagerAdapter(fm: FragmentManager, private var playersIds: MutableList<Long> = mutableListOf()): FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+
+    fun setPlayerIDs(players: List<Player>) {
+        this.playersIds.clear()
+        this.playersIds.addAll(players.map { it.id })
+        notifyDataSetChanged()
+    }
+
+    fun getPlayerIndex(playerID: Long): Int {
+        return if(playersIds.indexOf(playerID) >= 0) {
+            playersIds.indexOf(playerID)
+        } else  0 // not supposed to happen...
+    }
+
+    fun getPlayerID(index: Int): Long {
+        return playersIds[index]
+    }
+
+    fun getPlayersSize(): Int {
+        return playersIds.size
+    }
 
     override fun getItem(position: Int): Fragment {
         val fragment = PlayerDetailsFragment()

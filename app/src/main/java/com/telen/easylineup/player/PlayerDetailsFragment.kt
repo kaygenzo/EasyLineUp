@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
@@ -28,7 +29,8 @@ class PlayerDetailsFragment: Fragment() {
         val playerID = arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
         viewModel.playerID = playerID
 
-        val disposable1 = viewModel.getPlayer().subscribe({
+        viewModel.observePlayer().observe(viewLifecycleOwner, Observer {
+
             view.playerLicenseValue.text = it.licenseNumber.toString()
             view.shirtNumberValue.text = it.shirtNumber.toString()
             view.playerName.text = it.name.trim()
@@ -45,25 +47,22 @@ class PlayerDetailsFragment: Fragment() {
                     Timber.e(e)
                 }
             }
-
-        }, {
-            Timber.e(it)
         })
 
-        val disposable2 = viewModel.getAllLineupsForPlayer().subscribe({
+        viewModel.observeLineups().observe(viewLifecycleOwner, Observer {
             view.gamesPlayedValue.text = it.values.sum().toString()
             view.positionsBarChart.setData(it)
-        }, {
-            Timber.e(it)
         })
 
-        val disposable3 = viewModel.getTeamType()
-                .subscribe({
-                    view.positionsBarChart.setTeamType(it)
-                }, {
-                    Timber.e(it)
-                })
+        viewModel.observeTeamType().observe(viewLifecycleOwner, Observer {
+            view.positionsBarChart.setTeamType(it)
+        })
 
         return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.clear()
     }
 }

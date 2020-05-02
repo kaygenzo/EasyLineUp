@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager.widget.ViewPager
@@ -16,17 +17,16 @@ import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_players_details_container.view.*
 import timber.log.Timber
 
-class PlayersDetailsContainerFragment: Fragment() {
+class PlayersDetailsContainerFragment: Fragment(), ViewPager.OnPageChangeListener {
 
     private lateinit var mAdapter: PlayersDetailsPagerAdapter
-    private val playersIds = mutableListOf<Long>()
     private lateinit var teamViewModel: TeamViewModel
     private lateinit var pager: ViewPager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        mAdapter = PlayersDetailsPagerAdapter(playersIds, childFragmentManager)
+        mAdapter = PlayersDetailsPagerAdapter(childFragmentManager)
         teamViewModel = ViewModelProviders.of(this)[TeamViewModel::class.java]
 
         val playerID = savedInstanceState?.getLong(Constants.PLAYER_ID) ?: arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
@@ -40,43 +40,27 @@ class PlayersDetailsContainerFragment: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_players_details_container, container, false)
-        pager = view.viewPagerPlayersDetails
-        view.viewPagerPlayersDetails.adapter = mAdapter
-        view.viewPagerPlayersDetails.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(state: Int) { }
 
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) { }
+        view.viewPagerPlayersDetails.apply {
+            pager = this
+            adapter = mAdapter
+            addOnPageChangeListener(this@PlayersDetailsContainerFragment)
+        }
 
-            override fun onPageSelected(position: Int) {
-                if(position < playersIds.size) {
-                    teamViewModel.setPlayerId(playersIds[position])
-                }
-                else {
-                    Timber.e("player position is greater than the list size: position=$position but list size is ${playersIds.size} ")
-                }
-            }
-
-        })
         return view
     }
 
-    @SuppressLint("CheckResult")
     override fun onResume() {
         super.onResume()
-        teamViewModel.getPlayers()
-                .subscribe({ players ->
-                    playersIds.clear()
-                    playersIds.addAll(players.map { it.id })
-                    mAdapter.notifyDataSetChanged()
+        teamViewModel.observePlayers().observe(viewLifecycleOwner, Observer { players ->
+            mAdapter.setPlayerIDs(players)
+            pager.setCurrentItem(mAdapter.getPlayerIndex(teamViewModel.getPlayerId()), false)
+        })
+    }
 
-                    val index = if(playersIds.indexOf(teamViewModel.getPlayerId()) >= 0) {
-                        playersIds.indexOf(teamViewModel.getPlayerId())
-                    } else  0 // not supposed to happen...
-
-                    pager.setCurrentItem(index, false)
-                }, {
-                    Timber.e(it)
-                })
+    override fun onPause() {
+        super.onPause()
+        teamViewModel.clear()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -86,7 +70,7 @@ class PlayersDetailsContainerFragment: Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        val selectedPlayerId = playersIds[pager.currentItem]
+        val selectedPlayerId = mAdapter.getPlayerID(pager.currentItem)
         teamViewModel.setPlayerId(selectedPlayerId)
 
         return when (item.itemId) {
@@ -120,6 +104,18 @@ class PlayersDetailsContainerFragment: Fragment() {
                                 Toast.makeText(activity, "Something wrong happened: ${it.message}", Toast.LENGTH_LONG).show()
                             })
                     .show()
+        }
+    }
+
+    override fun onPageScrollStateChanged(state: Int) { }
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) { }
+
+    override fun onPageSelected(position: Int) {
+        if(position < mAdapter.getPlayersSize()) {
+            teamViewModel.setPlayerId(mAdapter.getPlayerID(position))
+        }
+        else {
+            Timber.e("player position is greater than the list size: position=$position but list size is ${mAdapter.getPlayersSize()} ")
         }
     }
 }

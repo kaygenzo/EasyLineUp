@@ -103,6 +103,11 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
         return view
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.clear()
+    }
+
     override fun onDestroy() {
         exportDisposable?.takeIf { !it.isDisposed }?.dispose()
         super.onDestroy()

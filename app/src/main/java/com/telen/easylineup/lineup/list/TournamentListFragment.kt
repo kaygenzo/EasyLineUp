@@ -1,8 +1,6 @@
 package com.telen.easylineup.lineup.list
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mancj.materialsearchbar.MaterialSearchBar
 import com.telen.easylineup.R
 import com.telen.easylineup.repository.model.Constants
@@ -20,17 +19,26 @@ import com.telen.easylineup.repository.model.Lineup
 import com.telen.easylineup.repository.model.Tournament
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
+import com.telen.easylineup.utils.hideSoftKeyboard
 import io.reactivex.Completable
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_list_tournaments.view.*
-import timber.log.Timber
+
+
+class LineupsScrollListener(private val view: FloatingActionButton): RecyclerView.OnScrollListener() {
+    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+        super.onScrolled(recyclerView, dx, dy)
+        if (dy > 0 && view.visibility == View.VISIBLE) {
+            view.hide()
+        } else if (dy < 0 && view.visibility != View.VISIBLE) {
+            view.show()
+        }
+    }
+}
 
 class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchBar.OnSearchActionListener {
 
     private lateinit var tournamentsAdapter: TournamentsAdapter
     private lateinit var viewModel: LineupViewModel
-    private val listTournaments: MutableList<Pair<Tournament, List<Lineup>>> = mutableListOf()
-    private var loadTournamentsDisposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,65 +49,27 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_list_tournaments, container, false)
 
-        val tournamentLayoutManager = GridLayoutManager(view.context, 1)
-
         view.recyclerView.apply {
-            layoutManager = tournamentLayoutManager
+            layoutManager = GridLayoutManager(view.context, 1)
             adapter = tournamentsAdapter
 
             //display or hide the fab when scrolling
-            addOnScrollListener(object: RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-                    if (dy > 0 && view.fab.visibility == View.VISIBLE) {
-                        view.fab.hide()
-                    } else if (dy < 0 && view.fab.visibility != View.VISIBLE) {
-                        view.fab.show()
-                    }
-                }
-            })
+            addOnScrollListener(LineupsScrollListener(view.fab))
         }
 
         view.searchBar.setOnSearchActionListener(this)
-        view.searchBar.addTextChangeListener(object: TextWatcher {
-
-            override fun afterTextChanged(s: Editable?) {
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                if((before > count + 1) && (count == 0)) {
-//                    onFilterCallback?.onSearchConfirmed("")
-//                }
-            }
-
-        })
 
         view.fab.setOnClickListener {
             findNavController().navigate(R.id.lineupCreationFragment, null, NavigationUtils().getOptions())
         }
 
-        viewModel.registerFilterChanged().observe(viewLifecycleOwner, Observer {
-            loadTournaments(it)
+        viewModel.observeCategorizedLineups().observe(viewLifecycleOwner, Observer {
+            tournamentsAdapter.setList(it)
         })
 
         viewModel.setFilter("")
 
         return view
-    }
-
-    private fun loadTournaments(filter: String) {
-        loadTournamentsDisposable?.dispose()
-        loadTournamentsDisposable = viewModel.getCategorizedLineups(filter).subscribe({
-            listTournaments.clear()
-            listTournaments.addAll(it)
-            tournamentsAdapter.setList(listTournaments)
-            tournamentsAdapter.notifyDataSetChanged()
-        }, {
-            Timber.e(it)
-        })
     }
 
     override fun onDeleteTournamentClicked(tournament: Tournament) {
@@ -140,17 +110,16 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
     }
 
     override fun onSearchStateChanged(enabled: Boolean) {
-        if(!enabled)
-            onSearch("")
+        if(!enabled) {
+            viewModel.setFilter("")
+            hideSoftKeyboard()
+        }
     }
 
     override fun onSearchConfirmed(text: CharSequence?) {
         text?.let {
-            onSearch(it.toString())
+            viewModel.setFilter(it.toString())
+            hideSoftKeyboard()
         }
-    }
-
-    fun onSearch(text: String) {
-        viewModel.setFilter(text)
     }
 }

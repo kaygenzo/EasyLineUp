@@ -3,6 +3,7 @@ package com.telen.easylineup.lineup.list
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.R
 import com.telen.easylineup.UseCaseHandler
@@ -12,8 +13,10 @@ import com.telen.easylineup.repository.model.Lineup
 import com.telen.easylineup.repository.model.Tournament
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import timber.log.Timber
 
 sealed class SaveResult
 data class InvalidLineupName(val errorRes: Int): SaveResult()
@@ -22,7 +25,11 @@ data class SaveSuccess(val lineupID: Long, val lineupName: String): SaveResult()
 
 class LineupViewModel: ViewModel(), KoinComponent {
 
-    private val filterLiveData: MutableLiveData<String> = MutableLiveData()
+    private val _categorizedLineupsLiveData = MutableLiveData<List<Pair<Tournament, List<Lineup>>>>()
+
+    private val filterLiveData: MutableLiveData<String> by lazy {
+        MutableLiveData("")
+    }
     private var chosenRoster: GetRoster.ResponseValue? = null
 
     private val saveResult = MutableLiveData<SaveResult>()
@@ -33,6 +40,8 @@ class LineupViewModel: ViewModel(), KoinComponent {
     private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineups by inject()
     private val getTournamentsUseCase: GetTournaments by inject()
     private val getRosterUseCase: GetRoster by inject()
+
+    private val disposables = CompositeDisposable()
 
     fun setFilter(filter: String) {
         filterLiveData.value = filter
@@ -50,10 +59,23 @@ class LineupViewModel: ViewModel(), KoinComponent {
         return UseCaseHandler.execute(getTournamentsUseCase, GetTournaments.RequestValues()).map { it.tournaments }
     }
 
-    fun getCategorizedLineups(filter: String): Single<List<Pair<Tournament, List<Lineup>>>> {
-        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
-                .flatMap { UseCaseHandler.execute(getAllTournamentsWithLineupsUseCase, GetAllTournamentsWithLineups.RequestValues(filter, it.team.id)) }
-                .map { it.result }
+    fun observeCategorizedLineups(): LiveData<List<Pair<Tournament, List<Lineup>>>> {
+        return Transformations.switchMap(filterLiveData) { filter ->
+            val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
+                    .flatMap { UseCaseHandler.execute(getAllTournamentsWithLineupsUseCase, GetAllTournamentsWithLineups.RequestValues(filter, it.team.id)) }
+                    .map { it.result }
+                    .subscribe({
+                        _categorizedLineupsLiveData.value = it
+                    }, {
+                        Timber.e(it)
+                    })
+            disposables.add(disposable)
+            _categorizedLineupsLiveData
+        }
+    }
+
+    fun clear() {
+        disposables.clear()
     }
 
     fun deleteTournament(tournament: Tournament) : Completable {

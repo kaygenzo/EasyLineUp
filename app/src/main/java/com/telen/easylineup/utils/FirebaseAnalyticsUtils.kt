@@ -33,6 +33,10 @@ object FirebaseAnalyticsUtils {
         logInvalidParameter(context, KEY_EMPTY_FIELD, "player_number", EVENT_NAME_EXCEPTION)
     }
 
+    fun emptyPlayerID(context: Context?) {
+        logInvalidParameter(context, KEY_EMPTY_FIELD, "player_id", EVENT_NAME_EXCEPTION)
+    }
+
     fun emptyTournamentName(context: Context?) {
         logInvalidParameter(context, KEY_EMPTY_FIELD, "tournament_name", EVENT_NAME_EXCEPTION)
     }

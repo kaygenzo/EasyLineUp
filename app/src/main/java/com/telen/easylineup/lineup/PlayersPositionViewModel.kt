@@ -28,6 +28,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
@@ -84,6 +85,9 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     var lineupMode = MODE_DISABLED
     var editable = false
 
+    private var team: Team? = null
+
+    // live data observables
     val errorHandler = MutableLiveData<ErrorCase>()
     val eventHandler = MutableLiveData<EventCase>()
 
@@ -91,11 +95,10 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     val linkPlayersInField: LiveData<List<Player>?> = _linkPlayersInField
 
     private val _lineupTitle = MutableLiveData<String>()
-
     private val _designatedPlayerTitle = MutableLiveData<String>()
+    private val _listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
 
-    private val listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
-
+    //Rx use cases
     private val savePlayerFieldPositionUseCase: SavePlayerFieldPosition by inject()
     private val deletePlayerFieldPositionUseCase: DeletePlayerFieldPosition by inject()
     private val getListAvailablePlayersForLineup: GetListAvailablePlayersForSelection by inject()
@@ -110,14 +113,20 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     private val getDpAndFlexFromPlayersInFieldUseCase: GetDPAndFlexFromPlayersInField by inject()
     private val saveDpAndFlexUseCase: SaveDpAndFlex by inject()
 
+    private val disposables = CompositeDisposable()
+
+    fun clear() {
+        disposables.clear()
+    }
+
     private fun savePlayerFieldPosition(player: Player, position: FieldPosition): Completable {
-        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+        return getTeam()
                 .flatMapCompletable {
                     val requestValues = SavePlayerFieldPosition.RequestValues(
                             lineupID = lineupID,
                             player = player,
                             position = position,
-                            players = listPlayersWithPosition,
+                            players = _listPlayersWithPosition,
                             lineupMode = lineupMode,
                             teamType = it.type)
 
@@ -127,20 +136,21 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
     fun onDeletePosition(player: Player, position: FieldPosition) {
 
-        val requestValues = DeletePlayerFieldPosition.RequestValues(listPlayersWithPosition, player, position, lineupMode)
+        val requestValues = DeletePlayerFieldPosition.RequestValues(_listPlayersWithPosition, player, position, lineupMode)
 
         val disposable = UseCaseHandler.execute(deletePlayerFieldPositionUseCase, requestValues).subscribe({
             eventHandler.value = DeletePlayerPositionSuccess
         }, {
             errorHandler.value = ErrorCase.DELETE_PLAYER_FIELD_POSITION_FAILED
         })
+        disposables.add(disposable)
     }
 
     private fun getNotSelectedPlayers(sortBy: FieldPosition? = null): Single<List<Player>> {
-        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+        return getTeam()
                 .flatMap { UseCaseHandler.execute(getRosterUseCase, GetRoster.RequestValues(it.id, lineupID)) }
                 .flatMap {
-                    val requestValues = GetListAvailablePlayersForSelection.RequestValues(listPlayersWithPosition, sortBy, it.players)
+                    val requestValues = GetListAvailablePlayersForSelection.RequestValues(_listPlayersWithPosition, sortBy, it.players)
                     UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues)
                 }
                 .map { it.players }
@@ -153,6 +163,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                 }, {
                     errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
                 })
+        disposables.add(disposable)
     }
 
     fun getPlayerSelectionForDp() {
@@ -163,16 +174,18 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                 }, {
                     errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
                 })
+        disposables.add(disposable)
     }
 
     fun getPlayerSelectionForFlex() {
 
-        val disposable = UseCaseHandler.execute(getPlayersInField, GetOnlyPlayersInField.RequestValues(listPlayersWithPosition)).map { it.playersInField }
+        val disposable = UseCaseHandler.execute(getPlayersInField, GetOnlyPlayersInField.RequestValues(_listPlayersWithPosition)).map { it.playersInField }
                 .subscribe({
                     _linkPlayersInField.value = it
                 }, {
                     errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
                 })
+        disposables.add(disposable)
     }
 
     fun saveNewBattingOrder(players: List<PlayerWithPosition>) {
@@ -183,6 +196,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         }, {
             errorHandler.value = ErrorCase.SAVE_BATTING_ORDER_FAILED
         })
+        disposables.add(disposable)
     }
 
     private fun deleteLineup() {
@@ -194,6 +208,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         }, {
             errorHandler.value = ErrorCase.DELETE_LINEUP_FAILED
         })
+        disposables.add(disposable)
     }
 
     private fun saveMode(): Single<SaveLineupMode.ResponseValue> {
@@ -202,7 +217,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun getTeamType(): Single<Int> {
-        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team.type }
+        return getTeam().map { it.type }
     }
 
     fun onLineupModeChanged(isEnabled: Boolean) {
@@ -213,9 +228,9 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
             errorHandler.value = ErrorCase.SAVE_LINEUP_MODE_FAILED
         }.flatMap {
             eventHandler.value = SaveLineupModeSuccess
-            UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+            getTeam()
                     .flatMap {
-                        val requestValues = UpdatePlayersWithLineupMode.RequestValues(listPlayersWithPosition, isEnabled, it.type)
+                        val requestValues = UpdatePlayersWithLineupMode.RequestValues(_listPlayersWithPosition, isEnabled, it.type)
                         UseCaseHandler.execute(updatePlayersWithLineupMode, requestValues)
                     }
         }.subscribe({
@@ -223,6 +238,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         }, {
             errorHandler.value = ErrorCase.UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED
         })
+        disposables.add(disposable)
     }
 
     //TODO use case ?
@@ -294,10 +310,10 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     private fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition): Completable {
-        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+        return getTeam()
                 .flatMapCompletable {
                     UseCaseHandler.execute(switchPlayersPositionUseCase, SwitchPlayersPosition.RequestValues(
-                            players = listPlayersWithPosition,
+                            players = _listPlayersWithPosition,
                             position1 = p1,
                             position2 = p2,
                             teamType = it.type,
@@ -313,6 +329,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                 }, {
                     errorHandler.value = ErrorCase.SAVE_PLAYER_FIELD_POSITION_FAILED
                 })
+        disposables.add(disposable)
     }
 
     fun onPlayerClicked(position: FieldPosition) {
@@ -321,9 +338,9 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
             getAllAvailablePlayers(position)
         }
         else {
-            val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+            val disposable = getTeam()
                     .flatMap {
-                        UseCaseHandler.execute(getDpAndFlexFromPlayersInFieldUseCase, GetDPAndFlexFromPlayersInField.RequestValues(listPlayersWithPosition, it.type))
+                        UseCaseHandler.execute(getDpAndFlexFromPlayersInFieldUseCase, GetDPAndFlexFromPlayersInField.RequestValues(_listPlayersWithPosition, it.type))
                     }
                     .subscribe({
                         _linkPlayersInField.value = null
@@ -342,6 +359,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                             errorHandler.value = ErrorCase.GET_TEAM_FAILED
                         }
                     })
+            disposables.add(disposable)
         }
     }
 
@@ -351,7 +369,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     fun linkDpAndFlex(dp: Player?, flex: Player?): Completable {
         _linkPlayersInField.value = null
         return UseCaseHandler.execute(saveDpAndFlexUseCase, SaveDpAndFlex.RequestValues(
-                lineupID = lineupID, dp = dp, flex = flex, players = listPlayersWithPosition
+                lineupID = lineupID, dp = dp, flex = flex, players = _listPlayersWithPosition
         ))
                 .ignoreElement()
                 .doOnError {
@@ -382,8 +400,8 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         }
 
         return Transformations.map(getPositions) {
-            listPlayersWithPosition.clear()
-            listPlayersWithPosition.addAll(it)
+            _listPlayersWithPosition.clear()
+            _listPlayersWithPosition.addAll(it)
             it
         }
     }
@@ -405,15 +423,16 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun getDesignatedPlayerLabel(context: Context): LiveData<String> {
-        val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
+        val disposable = getTeam()
                 .subscribe({
-                    _designatedPlayerTitle.value = when(it.team.type) {
+                    _designatedPlayerTitle.value = when(it.type) {
                         TeamType.SOFTBALL.id -> context.getString(R.string.action_add_dp_flex)
                         else -> context.getString(R.string.action_add_dh)
                     }
                 }, {
                     errorHandler.value = ErrorCase.GET_TEAM_FAILED
                 })
+        disposables.add(disposable)
         return _designatedPlayerTitle
     }
 
@@ -426,5 +445,13 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                     deleteLineup()
                     emitter.onComplete()
                 })
+    }
+
+    private fun getTeam(): Single<Team> {
+        return team?.let {
+            Single.just(it)
+        } ?: UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }.doOnSuccess {
+            this.team = it
+        }
     }
 }
