@@ -1,14 +1,12 @@
 package com.telen.easylineup.splashscreen
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
-import com.telen.easylineup.UseCaseHandler
-import com.telen.easylineup.domain.GetTeam
+import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.mock.DatabaseMockProvider
 import io.reactivex.Completable
@@ -21,14 +19,13 @@ import java.util.concurrent.TimeUnit
 
 class SplashScreenActivity: AppCompatActivity(), KoinComponent {
 
-    private val getTeamUseCase: GetTeam by inject()
+    private val domain: ApplicationPort by inject()
     private var disposable: Disposable? = null
 
     companion object {
         const val REQUEST_CREATE_TEAM = 0
     }
 
-    @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splashscreen)
@@ -37,7 +34,7 @@ class SplashScreenActivity: AppCompatActivity(), KoinComponent {
         if(BuildConfig.usePrefilledDatabase) {
             commands = commands.andThen(DatabaseMockProvider().createMockDatabase(this))
         }
-        disposable = commands.andThen(UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()))
+        disposable = commands.andThen(domain.getTeam())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     launchHome()

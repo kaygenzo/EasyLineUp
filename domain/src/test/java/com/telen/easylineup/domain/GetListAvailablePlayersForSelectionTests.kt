@@ -1,5 +1,7 @@
 package com.telen.easylineup.domain
 
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
 import com.telen.easylineup.repository.model.*
 import io.reactivex.observers.TestObserver
 import org.junit.Assert

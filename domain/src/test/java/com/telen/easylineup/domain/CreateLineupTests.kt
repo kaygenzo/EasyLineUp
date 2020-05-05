@@ -3,8 +3,11 @@ package com.telen.easylineup.domain
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.repository.data.LineupDao
-import com.telen.easylineup.repository.data.TournamentDao
+import com.telen.easylineup.domain.usecases.CreateLineup
+import com.telen.easylineup.domain.usecases.LineupNameEmptyException
+import com.telen.easylineup.domain.usecases.TournamentNameEmptyException
+import com.telen.easylineup.repository.dao.LineupDao
+import com.telen.easylineup.repository.dao.TournamentDao
 import com.telen.easylineup.repository.model.Lineup
 import com.telen.easylineup.repository.model.Player
 import com.telen.easylineup.repository.model.RosterPlayerStatus

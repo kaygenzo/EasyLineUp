@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.TeamType
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.team.createTeam.SetupViewModel
 import kotlinx.android.synthetic.main.fragment_team_type.view.*
 import timber.log.Timber

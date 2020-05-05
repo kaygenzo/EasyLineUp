@@ -1,10 +1,8 @@
 package com.telen.easylineup.domain
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.repository.data.PlayerDao
-import com.telen.easylineup.repository.data.TeamDao
+import com.telen.easylineup.domain.usecases.SaveCurrentTeam
+import com.telen.easylineup.repository.dao.TeamDao
 import com.telen.easylineup.repository.model.Team
 import io.reactivex.Completable
 import io.reactivex.Single

@@ -1,6 +1,7 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.data.PlayerDao
+import com.telen.easylineup.domain.usecases.GetPlayer
+import com.telen.easylineup.repository.dao.PlayerDao
 import com.telen.easylineup.repository.model.Player
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver

@@ -37,20 +37,6 @@ android {
         targetCompatibility = 1.8
     }
 
-    flavorDimensions 'version'
-
-    productFlavors {
-        dev {
-            dimension 'version'
-        }
-        prod {
-            dimension 'version'
-        }
-        demo {
-            dimension 'version'
-        }
-    }
-
     buildTypes {
         debug {
             testCoverageEnabled true
@@ -83,7 +69,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
     implementation "io.reactivex.rxjava2:rxjava:2.2.14"
-    implementation project(path: ':repository')
+    implementation "com.google.code.gson:gson:$googleGsonVersion"
+    implementation "org.koin:koin-android:$koinVersion"
 }
 
 apply from: '../jacoco.gradle'

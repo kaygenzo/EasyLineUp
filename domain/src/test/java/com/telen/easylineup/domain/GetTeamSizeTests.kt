@@ -1,10 +1,11 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.data.PlayerDao
+import com.telen.easylineup.repository.dao.PlayerDao
 import com.telen.easylineup.repository.model.Player
 import com.telen.easylineup.repository.model.Team
-import com.telen.easylineup.repository.tiles.KEY_DATA_SIZE
-import com.telen.easylineup.repository.tiles.KEY_DATA_TEAM_IMAGE
+import com.telen.easylineup.domain.model.tiles.KEY_DATA_SIZE
+import com.telen.easylineup.domain.model.tiles.KEY_DATA_TEAM_IMAGE
+import com.telen.easylineup.domain.usecases.GetTeamSize
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Assert

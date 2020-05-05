@@ -3,15 +3,20 @@ package com.telen.easylineup.mock
 import android.content.Context
 import com.google.gson.JsonParser
 import com.telen.easylineup.application.App
-import com.telen.easylineup.repository.model.*
+import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.lang.Exception
 
 
-class DatabaseMockProvider {
+class DatabaseMockProvider: KoinComponent {
+
+    private val domain: ApplicationPort by inject()
 
     fun createMockDatabase(context: Context): Completable {
          return Single.create<String> { emitter ->
@@ -81,31 +86,31 @@ class DatabaseMockProvider {
     }
 
     private fun insertTeam(team: Team): Completable {
-        return App.database.teamDao().insertTeam(team).ignoreElement()
+        return domain.insertTeam(team).ignoreElement()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     private fun insertPlayers(list: List<Player>): Completable {
-        return App.database.playerDao().insertPlayers(list)
+        return domain.insertPlayers(list)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     private fun insertLineups(list: List<Lineup>): Completable {
-        return App.database.lineupDao().insertLineups(list)
+        return domain.insertLineups(list)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     private fun insertPlayerFieldPositions(list: List<PlayerFieldPosition>): Completable {
-        return App.database.playerFieldPositionsDao().insertPlayerFieldPositions(list)
+        return domain.insertPlayerFieldPositions(list)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     private fun insertTournaments(list: List<Tournament>): Completable {
-        return App.database.tournamentDao().insertTournaments(list)
+        return domain.insertTournaments(list)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

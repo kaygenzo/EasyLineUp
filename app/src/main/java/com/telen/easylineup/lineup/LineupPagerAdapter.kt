@@ -7,10 +7,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.lineup.defense.DefenseFragmentFixed
 import com.telen.easylineup.lineup.defense.DefenseFragmentEditable
 import com.telen.easylineup.lineup.attack.AttackFragment
-import com.telen.easylineup.repository.model.Constants
 
 const val FRAGMENT_DEFENSE_INDEX = 0
 const val FRAGMENT_ATTACK_INDEX = 1

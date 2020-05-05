@@ -1,14 +1,15 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.data.PlayerDao
-import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
+import com.telen.easylineup.repository.dao.PlayerDao
+import com.telen.easylineup.repository.dao.PlayerFieldPositionsDao
 import com.telen.easylineup.repository.model.Player
 import com.telen.easylineup.repository.model.PlayerGamesCount
 import com.telen.easylineup.repository.model.Team
-import com.telen.easylineup.repository.tiles.KEY_DATA_IMAGE
-import com.telen.easylineup.repository.tiles.KEY_DATA_MATCH_PLAYED
-import com.telen.easylineup.repository.tiles.KEY_DATA_NAME
-import com.telen.easylineup.repository.tiles.KEY_DATA_SHIRT_NUMBER
+import com.telen.easylineup.domain.model.tiles.KEY_DATA_IMAGE
+import com.telen.easylineup.domain.model.tiles.KEY_DATA_MATCH_PLAYED
+import com.telen.easylineup.domain.model.tiles.KEY_DATA_NAME
+import com.telen.easylineup.domain.model.tiles.KEY_DATA_SHIRT_NUMBER
+import com.telen.easylineup.domain.usecases.GetMostUsedPlayer
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Assert

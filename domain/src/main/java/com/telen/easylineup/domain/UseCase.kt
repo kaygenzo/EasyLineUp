@@ -2,7 +2,7 @@ package com.telen.easylineup.domain
 
 import io.reactivex.Single
 
-abstract class UseCase<Q: UseCase.RequestValues, P: UseCase.ResponseValue> {
+internal abstract class UseCase<Q: UseCase.RequestValues, P: UseCase.ResponseValue> {
 
     interface RequestValues
     interface ResponseValue

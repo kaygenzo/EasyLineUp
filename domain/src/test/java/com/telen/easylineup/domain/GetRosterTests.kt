@@ -1,8 +1,8 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.data.LineupDao
-import com.telen.easylineup.repository.data.PlayerDao
-import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.domain.usecases.GetRoster
+import com.telen.easylineup.repository.dao.LineupDao
+import com.telen.easylineup.repository.dao.PlayerDao
 import com.telen.easylineup.repository.model.Lineup
 import com.telen.easylineup.repository.model.Player
 import io.reactivex.Single

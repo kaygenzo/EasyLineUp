@@ -13,13 +13,13 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.getkeepsafe.taptargetview.TapTargetView
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.GetRoster
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.TeamRosterSummary
+import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.lineup.list.InvalidLineupName
 import com.telen.easylineup.lineup.list.InvalidTournamentName
 import com.telen.easylineup.lineup.list.LineupViewModel
 import com.telen.easylineup.lineup.list.SaveSuccess
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.Tournament
 import com.telen.easylineup.utils.FeatureViewFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
@@ -154,7 +154,7 @@ class LineupCreationFragment: Fragment() {
         }
     }
 
-    private fun updateRosterSize(view: TextView, response: GetRoster.ResponseValue) {
+    private fun updateRosterSize(view: TextView, response: TeamRosterSummary) {
         when(response.status) {
             Constants.STATUS_ALL -> {
                 view.text = getString(R.string.roster_size_status_all)

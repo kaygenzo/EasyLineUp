@@ -15,10 +15,11 @@ import androidx.lifecycle.ViewModelProviders
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.ViewHolder
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.DomainErrors
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.lineup.*
-import com.telen.easylineup.repository.model.FieldPosition
-import com.telen.easylineup.repository.model.Player
-import com.telen.easylineup.repository.model.PlayerWithPosition
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.views.DpFlexLinkView
 import com.telen.easylineup.views.OnPlayerButtonCallback
@@ -44,19 +45,19 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
 
         viewModel.errorHandler.observe(viewLifecycleOwner, Observer {
             when(it) {
-                ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY -> {
+                DomainErrors.LIST_AVAILABLE_PLAYERS_EMPTY -> {
                     activity?.let { activity ->
                         DialogFactory.getSimpleDialog(activity, activity.getString(R.string.players_list_empty)).show()
                     }
                 }
-                ErrorCase.SAVE_PLAYER_FIELD_POSITION_FAILED ->  Timber.e(Exception("Save player field position failed"))
-                ErrorCase.DELETE_PLAYER_FIELD_POSITION_FAILED -> Timber.e(Exception("Delete player field position failed"))
-                ErrorCase.UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED -> Timber.e(Exception("Update players with lineup mode failed"))
-                ErrorCase.SAVE_LINEUP_MODE_FAILED -> Timber.e(Exception("Save lineup mode failed"))
-                ErrorCase.NEED_ASSIGN_PITCHER_FIRST -> {
+                DomainErrors.SAVE_PLAYER_FIELD_POSITION_FAILED ->  Timber.e(Exception("Save player field position failed"))
+                DomainErrors.DELETE_PLAYER_FIELD_POSITION_FAILED -> Timber.e(Exception("Delete player field position failed"))
+                DomainErrors.UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED -> Timber.e(Exception("Update players with lineup mode failed"))
+                DomainErrors.SAVE_LINEUP_MODE_FAILED -> Timber.e(Exception("Save lineup mode failed"))
+                DomainErrors.NEED_ASSIGN_PITCHER_FIRST -> {
                     context?.run { DialogFactory.getErrorDialog(this, getString(R.string.error_need_assign_pitcher_first)).show() }
                 }
-                ErrorCase.DP_OR_FLEX_NOT_ASSIGNED -> {
+                DomainErrors.DP_OR_FLEX_NOT_ASSIGNED -> {
                     context?.run { DialogFactory.getErrorDialog(this, getString(R.string.error_need_assign_both_players)).show() }
                 }
                 else -> {}

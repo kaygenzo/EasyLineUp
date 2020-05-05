@@ -5,10 +5,10 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.tiles.ITileData
-import com.telen.easylineup.repository.tiles.KEY_LINEUP_NAME
-import com.telen.easylineup.repository.tiles.KEY_LINEUP_PLAYERS
-import com.telen.easylineup.repository.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.tiles.ITileData
+import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_NAME
+import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_PLAYERS
 import kotlinx.android.synthetic.main.tile_last_lineup.view.*
 
 class LastLineupTile: ConstraintLayout{

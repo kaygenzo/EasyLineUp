@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.telen.easylineup.currentLineup.DashboardFragment"
+        android:name="com.telen.easylineup.dashboard.DashboardFragment"
         android:label="@string/title_last_lineup"
         tools:layout="@layout/fragment_dashboard" />
 

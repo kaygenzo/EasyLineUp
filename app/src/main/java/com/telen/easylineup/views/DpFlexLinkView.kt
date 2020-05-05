@@ -7,8 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Player
-import com.telen.easylineup.repository.model.TeamType
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.TeamType
 import kotlinx.android.synthetic.main.view_dp_flex_link.view.*
 
 class DpFlexLinkView: ConstraintLayout {

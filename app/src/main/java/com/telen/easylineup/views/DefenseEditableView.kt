@@ -23,7 +23,7 @@ import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.view.animation.DecelerateInterpolator
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.*
+import com.telen.easylineup.domain.model.*
 
 const val TAG_TRASH = "_trash"
 

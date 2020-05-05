@@ -2,10 +2,9 @@ package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.FieldPosition
-import com.telen.easylineup.repository.data.LineupDao
-import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.usecases.SaveBattingOrder
+import com.telen.easylineup.repository.dao.PlayerFieldPositionsDao
 import com.telen.easylineup.repository.model.PlayerFieldPosition
 import com.telen.easylineup.repository.model.PlayerWithPosition
 import io.reactivex.Completable

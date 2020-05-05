@@ -7,7 +7,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Lineup
+import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.lineup.list.LineupsAdapter
 import com.telen.easylineup.lineup.list.OnItemClickedListener
 import kotlinx.android.synthetic.main.item_adapter_tournaments.view.*

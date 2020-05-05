@@ -1,7 +1,8 @@
 package com.telen.easylineup.domain
 
+import com.telen.easylineup.domain.usecases.DeleteLineup
 import com.telen.easylineup.repository.model.Lineup
-import com.telen.easylineup.repository.data.LineupDao
+import com.telen.easylineup.repository.dao.LineupDao
 import com.telen.easylineup.repository.model.MODE_DISABLED
 import io.reactivex.Completable
 import io.reactivex.Single

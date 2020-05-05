@@ -9,8 +9,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.Team
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.views.ListEmptyView
 import kotlinx.android.synthetic.main.teams_list_view.view.*
 

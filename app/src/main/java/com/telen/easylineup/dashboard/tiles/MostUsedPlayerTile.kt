@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.tiles.*
+import com.telen.easylineup.domain.model.tiles.*
 import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.tile_most_used_player.view.*
 import timber.log.Timber

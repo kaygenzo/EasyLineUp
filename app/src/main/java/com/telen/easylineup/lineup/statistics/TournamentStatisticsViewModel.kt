@@ -1,13 +1,10 @@
 package com.telen.easylineup.lineup.statistics
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.R
-import com.telen.easylineup.UseCaseHandler
-import com.telen.easylineup.domain.GetTeam
-import com.telen.easylineup.domain.GetTournamentStatsForPositionTable
-import com.telen.easylineup.repository.model.Tournament
+import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.model.Tournament
 import com.telen.library.widget.tablemultiscroll.views.CellConfiguration
 import com.telen.library.widget.tablemultiscroll.views.Highlight
 import com.telen.library.widget.tablemultiscroll.views.StyleConfiguration
@@ -18,9 +15,6 @@ import timber.log.Timber
 
 class TournamentStatisticsViewModel: ViewModel(), KoinComponent {
 
-    private val getTeamUseCase: GetTeam by inject()
-    private val tableDataUseCase: GetTournamentStatsForPositionTable by inject()
-
     var disposable: Disposable? = null
 
     val topHeadersData = MutableLiveData<List<CellConfiguration>>()
@@ -28,9 +22,10 @@ class TournamentStatisticsViewModel: ViewModel(), KoinComponent {
     val mainTableData = MutableLiveData<List<List<CellConfiguration>>>()
     val columnHighlights = MutableLiveData<List<Highlight>>()
 
-    fun getPlayersPositionForTournament(context: Context, tournament: Tournament) {
-        disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
-                .flatMap { UseCaseHandler.execute(tableDataUseCase, GetTournamentStatsForPositionTable.RequestValues(tournament, it.team, context)) }
+    private val domain: ApplicationPort by inject()
+
+    fun getPlayersPositionForTournament(tournament: Tournament) {
+        disposable = domain.getPlayersPositionForTournament(tournament)
                 .subscribe({
                     val leftHeaderDataList = mutableListOf<CellConfiguration>()
                     it.leftHeader.forEach {

@@ -13,9 +13,10 @@ import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.MODE_DISABLED
-import com.telen.easylineup.repository.model.MODE_ENABLED
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.DomainErrors
+import com.telen.easylineup.domain.model.MODE_DISABLED
+import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.utils.NavigationUtils
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_lineup_edition.view.*
@@ -92,7 +93,7 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
 
             viewModel.errorHandler.observe(viewLifecycleOwner, Observer {
                 when(it) {
-                    ErrorCase.DELETE_LINEUP_FAILED -> {
+                    DomainErrors.DELETE_LINEUP_FAILED -> {
                         Toast.makeText(this, "Something wrong happened when deleting lineup", Toast.LENGTH_LONG).show()
                     }
                     else -> {}

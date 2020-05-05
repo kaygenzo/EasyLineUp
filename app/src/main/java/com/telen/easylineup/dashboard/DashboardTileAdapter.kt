@@ -3,12 +3,12 @@ package com.telen.easylineup.dashboard
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.telen.easylineup.repository.tiles.ITileData
 import com.telen.easylineup.dashboard.tiles.LastLineupTile
 import com.telen.easylineup.dashboard.tiles.MostUsedPlayerTile
 import com.telen.easylineup.dashboard.tiles.ShakeBetaTile
 import com.telen.easylineup.dashboard.tiles.TeamSizeTile
-import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.tiles.ITileData
 
 interface TileClickListener {
     fun onTileClicked(type: Int)

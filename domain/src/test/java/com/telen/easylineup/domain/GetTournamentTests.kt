@@ -1,6 +1,7 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.data.TournamentDao
+import com.telen.easylineup.domain.usecases.GetTournaments
+import com.telen.easylineup.repository.dao.TournamentDao
 import com.telen.easylineup.repository.model.Tournament
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver

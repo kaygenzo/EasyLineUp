@@ -1,8 +1,9 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.verify
+import com.telen.easylineup.domain.usecases.SaveLineupMode
 import com.telen.easylineup.repository.model.Lineup
-import com.telen.easylineup.repository.data.LineupDao
+import com.telen.easylineup.repository.dao.LineupDao
 import com.telen.easylineup.repository.model.MODE_DISABLED
 import com.telen.easylineup.repository.model.MODE_ENABLED
 import io.reactivex.Completable

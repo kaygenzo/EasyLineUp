@@ -4,10 +4,10 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.repository.data.PlayerDao
-import com.telen.easylineup.repository.data.TeamDao
+import com.telen.easylineup.repository.dao.TeamDao
 import com.telen.easylineup.repository.model.Team
-import com.telen.easylineup.repository.model.TeamType
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.usecases.DeleteTeam
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver

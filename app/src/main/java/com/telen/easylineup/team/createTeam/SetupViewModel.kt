@@ -1,13 +1,12 @@
 package com.telen.easylineup.team.createTeam
 
-import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.UseCaseHandler
-import com.telen.easylineup.domain.*
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.Team
-import com.telen.easylineup.repository.model.TeamType
+import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.model.StepConfiguration
+import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
@@ -16,16 +15,12 @@ import org.koin.core.inject
 
 class SetupViewModel: ViewModel(), KoinComponent {
 
-    private val saveTeamUseCase: SaveTeam by inject()
-    private val checkTeamUseCase: CheckTeam by inject()
-    private val saveCurrentTeamUseCase: SaveCurrentTeam by inject()
-    private val getTeamCreationNextStep: GetTeamCreationNextStep by inject()
-    private val getTeamCreationPreviousStep: GetTeamCreationPreviousStep by inject()
+   private val domain: ApplicationPort by inject()
 
     var team = Team(0, "", null, TeamType.BASEBALL.id, true)
 
     private var saveDisposable: Disposable? = null
-    var stepLiveData: MutableLiveData<GetTeamCreationStep.ResponseValue> = MutableLiveData()
+    var stepLiveData: MutableLiveData<StepConfiguration> = MutableLiveData()
     var errorLiveData: MutableLiveData<Error> = MutableLiveData(Error.NONE)
 
     enum class Error {
@@ -49,10 +44,9 @@ class SetupViewModel: ViewModel(), KoinComponent {
     }
 
     fun saveTeam(): Completable {
-        return UseCaseHandler.execute(checkTeamUseCase, CheckTeam.RequestValues(team)).ignoreElement()
-                .andThen(UseCaseHandler.execute(saveTeamUseCase, SaveTeam.RequestValues(team)).map { it.team })
-                .flatMapCompletable { UseCaseHandler.execute(saveCurrentTeamUseCase, SaveCurrentTeam.RequestValues(it)).ignoreElement() }
-                .doOnComplete { errorLiveData.value = Error.NONE }
+        return domain.saveTeam(team).doOnComplete {
+            errorLiveData.value = Error.NONE
+        }
     }
 
     fun getTeam(): Single<Team> {
@@ -61,14 +55,9 @@ class SetupViewModel: ViewModel(), KoinComponent {
 
     fun nextButtonClicked(currentStep: Int) {
         dispose(saveDisposable)
-
-        val requestValue = GetTeamCreationStep.RequestValues(
-                TeamCreationStep.getStepById(currentStep) ?: TeamCreationStep.TEAM)
-
-        saveDisposable = UseCaseHandler.execute(checkTeamUseCase, CheckTeam.RequestValues(team)).ignoreElement()
-                .doOnComplete { errorLiveData.value = Error.NONE }
-                .andThen(UseCaseHandler.execute(getTeamCreationNextStep, requestValue))
+        saveDisposable = domain.getTeamCreationNextStep(currentStep, team)
                 .subscribe({
+                    errorLiveData.value = Error.NONE
                     stepLiveData.value = it
                 }, {
                     if(it is NameEmptyException) {
@@ -82,23 +71,9 @@ class SetupViewModel: ViewModel(), KoinComponent {
 
     fun previousButtonClicked(currentStep: Int) {
         dispose(saveDisposable)
-
-        val requestValue = GetTeamCreationStep.RequestValues(
-                TeamCreationStep.getStepById(currentStep) ?: TeamCreationStep.TEAM)
-
-        saveDisposable =
-                UseCaseHandler.execute(checkTeamUseCase, CheckTeam.RequestValues(team)).ignoreElement()
-                        .doOnComplete { errorLiveData.value = Error.NONE }
-                        .onErrorResumeNext {
-                            if(it is NameEmptyException && currentStep == TeamCreationStep.TEAM.id) {
-                                Completable.complete()
-                            }
-                            else {
-                                Completable.error(it)
-                            }
-                        }
-                        .andThen(UseCaseHandler.execute(getTeamCreationPreviousStep, requestValue))
+        saveDisposable = domain.getTeamCreationPreviousStep(currentStep, team)
                         .subscribe({
+                            errorLiveData.value = Error.NONE
                             stepLiveData.value = it
                         }, {
                             errorLiveData.value = Error.UNKNOWN

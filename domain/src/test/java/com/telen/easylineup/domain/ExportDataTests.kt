@@ -1,9 +1,10 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
-import com.telen.easylineup.repository.data.*
-import com.telen.easylineup.repository.model.*
-import com.telen.easylineup.repository.model.export.ExportBase
+import com.telen.easylineup.repository.dao.*
+import com.telen.easylineup.domain.model.export.ExportBase
+import com.telen.easylineup.domain.usecases.ExportData
+import com.telen.easylineup.domain.usecases.ValidationCallback
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Assert

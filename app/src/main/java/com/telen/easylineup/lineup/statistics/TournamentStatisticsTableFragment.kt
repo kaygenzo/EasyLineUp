@@ -9,8 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.Tournament
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.Tournament
 import com.telen.library.widget.tablemultiscroll.views.StyleConfiguration
 import com.telen.library.widget.tablemultiscroll.views.TableConfiguration
 import kotlinx.android.synthetic.main.fragment_tournament_statistics_table.view.*
@@ -62,7 +62,7 @@ class TournamentStatisticsTableFragment: Fragment() {
 
         arguments?.getSerializable(Constants.EXTRA_TOURNAMENT)?.let { tournament ->
             context?.let { context ->
-                viewModel.getPlayersPositionForTournament(context, tournament as Tournament)
+                viewModel.getPlayersPositionForTournament(tournament as Tournament)
             }
         }
 

@@ -1,5 +1,7 @@
 package com.telen.easylineup.domain
 
+import com.telen.easylineup.domain.usecases.CheckTeam
+import com.telen.easylineup.domain.usecases.NameEmptyException
 import com.telen.easylineup.repository.model.Team
 import io.reactivex.observers.TestObserver
 import org.junit.Before

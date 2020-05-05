@@ -3,12 +3,9 @@ package com.telen.easylineup.team
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.UseCaseHandler
-import com.telen.easylineup.domain.DeleteTeam
-import com.telen.easylineup.domain.GetPlayers
-import com.telen.easylineup.domain.GetTeam
-import com.telen.easylineup.repository.model.Player
-import com.telen.easylineup.repository.model.Team
+import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.Team
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import org.koin.core.KoinComponent
@@ -17,12 +14,10 @@ import timber.log.Timber
 
 class TeamViewModel: ViewModel(), KoinComponent {
 
+    private val domain: ApplicationPort by inject()
+
     private var playerSelectedID = 0L
     var team: Team? = null
-
-    private val getTeamUseCase: GetTeam by inject()
-    private val getPlayersUseCase: GetPlayers by inject()
-    private val deleteTeamUseCase: DeleteTeam by inject()
 
     private val _playersLiveData = MutableLiveData<List<Player>>()
     private val _teamLiveData = MutableLiveData<Team>()
@@ -30,8 +25,7 @@ class TeamViewModel: ViewModel(), KoinComponent {
     private val disposables = CompositeDisposable()
 
     fun observePlayers(): LiveData<List<Player>> {
-        val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
-                .flatMap { team -> UseCaseHandler.execute(getPlayersUseCase, GetPlayers.RequestValues(team.id)).map { it.players } }
+        val disposable = domain.getPlayers()
                 .subscribe({
                     _playersLiveData.postValue(it)
                 }, {
@@ -46,8 +40,7 @@ class TeamViewModel: ViewModel(), KoinComponent {
     }
 
     fun observeTeam(): LiveData<Team> {
-        val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
-                .map { it.team }
+        val disposable = domain.getTeam()
                 .subscribe({
                     this.team = it
                     _teamLiveData.postValue(it)
@@ -59,7 +52,7 @@ class TeamViewModel: ViewModel(), KoinComponent {
     }
 
     fun deleteTeam(team: Team): Completable {
-        return UseCaseHandler.execute(deleteTeamUseCase, DeleteTeam.RequestValues(team)).ignoreElement()
+        return domain.deleteTeam(team)
     }
 
     fun getPlayerId() : Long {

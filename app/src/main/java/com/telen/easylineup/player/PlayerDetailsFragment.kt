@@ -9,7 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.fragment_player_details.view.*
 import timber.log.Timber

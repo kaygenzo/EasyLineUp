@@ -3,14 +3,10 @@ package com.telen.easylineup.dashboard
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.UseCaseHandler
-import com.telen.easylineup.application.App
-import com.telen.easylineup.repository.tiles.ITileData
-import com.telen.easylineup.repository.tiles.ShakeBetaData
-import com.telen.easylineup.domain.GetMostUsedPlayer
-import com.telen.easylineup.domain.GetTeam
-import com.telen.easylineup.domain.GetTeamSize
-import com.telen.easylineup.repository.model.Team
+import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.tiles.ITileData
+import com.telen.easylineup.domain.model.tiles.ShakeBetaData
+import com.telen.easylineup.domain.application.ApplicationPort
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -24,16 +20,14 @@ class DashboardViewModel: ViewModel(), KoinComponent {
     private val tilesLiveData = MutableLiveData<List<ITileData>>()
     private var loadDisposable: Disposable? = null
 
-    private val getTeamUseCase: GetTeam by inject()
-    private val getTeamSizeUseCase:  GetTeamSize by inject()
-    private val getMostUsedPlayerUseCase: GetMostUsedPlayer by inject()
+    private val domain: ApplicationPort by inject()
 
     fun registerTilesLiveData(): LiveData<List<ITileData>> {
         return tilesLiveData
     }
 
     fun registerTeamChange(): LiveData<List<Team>> {
-        return App.database.teamDao().getTeams()
+        return domain.observeTeams()
     }
 
     fun loadTiles() {
@@ -55,7 +49,7 @@ class DashboardViewModel: ViewModel(), KoinComponent {
     }
 
     private fun getTeam(): Single<Team> {
-        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+        return domain.getTeam()
     }
 
     private fun getShakeBeta(): Maybe<ITileData> {
@@ -63,17 +57,11 @@ class DashboardViewModel: ViewModel(), KoinComponent {
     }
 
     private fun getTeamSize(team: Team): Maybe<ITileData> {
-        return UseCaseHandler.execute(getTeamSizeUseCase, GetTeamSize.RequestValues(team))
-                .flatMapMaybe { Maybe.just(it.data) }
+        return domain.getTeamSize(team)
     }
 
     private fun getMostUsedPlayer(team: Team): Maybe<ITileData> {
-        return UseCaseHandler.execute(getMostUsedPlayerUseCase, GetMostUsedPlayer.RequestValues(team))
-                .flatMapMaybe {
-                    it.data?.let { data ->
-                        Maybe.just(data)
-                    } ?: Maybe.empty<ITileData>()
-                }
+        return domain.getMostUsedPlayer(team)
     }
 
     private fun getLastLineup(team: Team): Maybe<ITileData> {

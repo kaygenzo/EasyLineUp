@@ -11,12 +11,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.nguyenhoanglam.imagepicker.model.Image
 import com.squareup.picasso.Picasso
-import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.view_create_player.view.*
 import timber.log.Timber
-import java.lang.reflect.Field
 
 interface PlayerFormListener {
     fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int)

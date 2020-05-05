@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.obsez.android.lib.filechooser.ChooserDialog
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.splashscreen.SplashScreenActivity
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.utils.DialogFactory

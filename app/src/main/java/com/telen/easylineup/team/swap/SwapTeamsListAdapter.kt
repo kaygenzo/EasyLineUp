@@ -1,11 +1,10 @@
 package com.telen.easylineup.team.swap
 
-import android.net.Uri
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.telen.easylineup.repository.model.Team
-import android.view.LayoutInflater
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.Team
 
 
 class SwapTeamsListAdapter(private val teams: List<Team>, private val hostInterface: HostInterface): RecyclerView.Adapter<SwapTeamsListAdapter.TeamsListViewHolder>() {

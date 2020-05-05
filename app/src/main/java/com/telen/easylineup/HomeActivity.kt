@@ -15,8 +15,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.android.material.navigation.NavigationView
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.Team
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.team.swap.HostInterface
 import com.telen.easylineup.team.swap.SwapTeamFragment

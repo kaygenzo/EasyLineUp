@@ -1,4 +1,4 @@
-package com.telen.easylineup.currentLineup
+package com.telen.easylineup.dashboard
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,11 +10,8 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.telen.easylineup.R
-import com.telen.easylineup.dashboard.DashboardTileAdapter
-import com.telen.easylineup.dashboard.DashboardViewModel
-import com.telen.easylineup.dashboard.TileClickListener
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.tiles.ITileData
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.tiles.ITileData
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
 

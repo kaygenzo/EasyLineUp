@@ -4,8 +4,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Lineup
-import com.telen.easylineup.repository.model.Tournament
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.views.*
 import pl.hypeapp.materialtimelineview.MaterialTimelineView
 

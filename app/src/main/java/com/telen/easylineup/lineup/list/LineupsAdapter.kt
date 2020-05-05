@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Lineup
+import com.telen.easylineup.domain.model.Lineup
 
 class LineupsAdapter(val lineups: List<Lineup>, private val itemClickedListener: OnItemClickedListener?): RecyclerView.Adapter<LineupsViewHolder>() {
 

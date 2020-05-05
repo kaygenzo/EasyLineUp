@@ -2,22 +2,20 @@ package com.telen.easylineup.views
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.charts.Chart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
-import com.telen.easylineup.repository.model.FieldPosition
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.FieldPosition
 import kotlinx.android.synthetic.main.view_bar_chart.view.*
 
 

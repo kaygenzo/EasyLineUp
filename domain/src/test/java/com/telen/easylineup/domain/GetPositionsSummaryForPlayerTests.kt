@@ -1,7 +1,8 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.data.PlayerFieldPositionsDao
-import com.telen.easylineup.repository.model.FieldPosition
+import com.telen.easylineup.repository.dao.PlayerFieldPositionsDao
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.usecases.GetPositionsSummaryForPlayer
 import com.telen.easylineup.repository.model.PositionWithLineup
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver

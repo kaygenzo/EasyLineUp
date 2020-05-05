@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.FieldPosition
-import com.telen.easylineup.repository.model.Player
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Player
 import kotlinx.android.synthetic.main.view_bottom_sheet_player_list.view.*
 import timber.log.Timber
 

@@ -1,8 +1,8 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.data.TeamDao
+import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.repository.dao.TeamDao
 import com.telen.easylineup.repository.model.Team
-import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Assert

@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.lineup.EventCase
 import com.telen.easylineup.lineup.PlayersPositionViewModel
 import com.telen.easylineup.lineup.SaveBattingOrderSuccess
-import com.telen.easylineup.repository.model.PlayerWithPosition
-import com.telen.easylineup.repository.model.TeamType
 import com.telen.easylineup.views.ItemDecoratorAttackRecycler
 import kotlinx.android.synthetic.main.fragment_list_batter.view.*
 import timber.log.Timber

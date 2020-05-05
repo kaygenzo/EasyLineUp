@@ -6,11 +6,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.R
-import com.telen.easylineup.UseCaseHandler
 import com.telen.easylineup.domain.*
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.Lineup
-import com.telen.easylineup.repository.model.Tournament
+import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.TeamRosterSummary
+import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
+import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -25,21 +27,16 @@ data class SaveSuccess(val lineupID: Long, val lineupName: String): SaveResult()
 
 class LineupViewModel: ViewModel(), KoinComponent {
 
+    private val domain: ApplicationPort by inject()
+
     private val _categorizedLineupsLiveData = MutableLiveData<List<Pair<Tournament, List<Lineup>>>>()
 
     private val filterLiveData: MutableLiveData<String> by lazy {
         MutableLiveData("")
     }
-    private var chosenRoster: GetRoster.ResponseValue? = null
+    private var chosenRoster: TeamRosterSummary? = null
 
     private val saveResult = MutableLiveData<SaveResult>()
-
-    private val createLineupUseCase: CreateLineup by inject()
-    private val getTeamUseCase: GetTeam by inject()
-    private val deleteTournamentUseCase: DeleteTournament by inject()
-    private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineups by inject()
-    private val getTournamentsUseCase: GetTournaments by inject()
-    private val getRosterUseCase: GetRoster by inject()
 
     private val disposables = CompositeDisposable()
 
@@ -47,23 +44,17 @@ class LineupViewModel: ViewModel(), KoinComponent {
         filterLiveData.value = filter
     }
 
-    fun registerFilterChanged() : LiveData<String> {
-        return filterLiveData
-    }
-
     fun registerSaveResults(): LiveData<SaveResult> {
         return saveResult
     }
 
     fun getTournaments(): Single<List<Tournament>>{
-        return UseCaseHandler.execute(getTournamentsUseCase, GetTournaments.RequestValues()).map { it.tournaments }
+        return domain.getTournaments()
     }
 
     fun observeCategorizedLineups(): LiveData<List<Pair<Tournament, List<Lineup>>>> {
         return Transformations.switchMap(filterLiveData) { filter ->
-            val disposable = UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
-                    .flatMap { UseCaseHandler.execute(getAllTournamentsWithLineupsUseCase, GetAllTournamentsWithLineups.RequestValues(filter, it.team.id)) }
-                    .map { it.result }
+            val disposable = domain.getCategorizedLineups(filter)
                     .subscribe({
                         _categorizedLineupsLiveData.value = it
                     }, {
@@ -79,28 +70,17 @@ class LineupViewModel: ViewModel(), KoinComponent {
     }
 
     fun deleteTournament(tournament: Tournament) : Completable {
-        return UseCaseHandler.execute(deleteTournamentUseCase, DeleteTournament.RequestValues(tournament)).ignoreElement()
+        return domain.deleteTournament(tournament)
     }
 
-    fun getRoster(): Single<GetRoster.ResponseValue> {
+    fun getRoster(): Single<TeamRosterSummary> {
         return chosenRoster?.let {
             Single.just(it)
-        } ?: UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
-                .flatMap { UseCaseHandler.execute(getRosterUseCase, GetRoster.RequestValues(it.id, null)) }
-                .map {
-                    chosenRoster = it
-                    it
-                }
+        } ?: domain.getRoster().doOnSuccess { chosenRoster = it }
     }
 
     fun saveLineup(tournament: Tournament, lineupTitle: String) {
-        UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
-                .flatMap { team ->
-                    getRoster().map { it.players }.flatMap { roster ->
-                        UseCaseHandler.execute(createLineupUseCase, CreateLineup.RequestValues(team.id, tournament, lineupTitle, roster))
-                    }
-                }
-                .map { it.lineupID }
+        val disposable = domain.saveLineup(tournament, lineupTitle)
                 .subscribe({
                     saveResult.value = SaveSuccess(it, lineupTitle)
                 }, {
@@ -111,6 +91,7 @@ class LineupViewModel: ViewModel(), KoinComponent {
                         saveResult.value = InvalidTournamentName(R.string.lineup_creation_error_tournament_empty)
                     }
                 })
+        disposables.add(disposable)
     }
 
     fun rosterPlayerStatusChanged(position: Int, status: Boolean) {
@@ -122,7 +103,6 @@ class LineupViewModel: ViewModel(), KoinComponent {
                 false -> Constants.STATUS_PARTIAL
             }
         }
-
     }
 
     fun showNewRosterFeature(context: Context): Single<Boolean> {

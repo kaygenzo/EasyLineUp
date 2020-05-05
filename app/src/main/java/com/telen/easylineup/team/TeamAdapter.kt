@@ -3,7 +3,7 @@ package com.telen.easylineup.team
 import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.telen.easylineup.repository.model.Player
+import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.views.PlayerCard
 
 interface OnPlayerClickListener {

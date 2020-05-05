@@ -14,9 +14,9 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.lineup.list.LineupViewModel
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.TeamType
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.utils.DialogFactory

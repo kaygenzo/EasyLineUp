@@ -15,8 +15,8 @@ import androidx.lifecycle.ViewModelProviders
 import com.nguyenhoanglam.imagepicker.model.Config
 import com.nguyenhoanglam.imagepicker.model.Image
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.Team
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.team.createTeam.SetupViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils

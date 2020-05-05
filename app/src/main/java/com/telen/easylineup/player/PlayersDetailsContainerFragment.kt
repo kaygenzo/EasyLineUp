@@ -1,6 +1,5 @@
 package com.telen.easylineup.player
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -10,7 +9,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager.widget.ViewPager
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils

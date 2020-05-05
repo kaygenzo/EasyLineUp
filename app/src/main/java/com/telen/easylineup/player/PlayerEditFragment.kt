@@ -15,7 +15,8 @@ import androidx.navigation.fragment.findNavController
 import com.nguyenhoanglam.imagepicker.model.Config
 import com.nguyenhoanglam.imagepicker.model.Image
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.PlayerFormListener
@@ -72,19 +73,19 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
 
         viewModel.registerFormErrorResult().observe(viewLifecycleOwner, Observer { error ->
             when(error) {
-                FormErrorResult.INVALID_NAME -> {
+                DomainErrors.INVALID_PLAYER_NAME -> {
                     view.editPlayerForm.displayInvalidName()
                     FirebaseAnalyticsUtils.emptyPlayerName(activity)
                 }
-                FormErrorResult.INVALID_LICENSE -> {
+                DomainErrors.INVALID_PLAYER_LICENSE -> {
                     view.editPlayerForm.displayInvalidLicense()
                     FirebaseAnalyticsUtils.emptyPlayerLicense(activity)
                 }
-                FormErrorResult.INVALID_NUMBER -> {
+                DomainErrors.INVALID_PLAYER_NUMBER -> {
                     view.editPlayerForm.displayInvalidNumber()
                     FirebaseAnalyticsUtils.emptyPlayerNumber(activity)
                 }
-                FormErrorResult.INVALID_ID -> {
+                DomainErrors.INVALID_PLAYER_ID -> {
                     //case of a player creation
                     view.editPlayerForm.enableSaveButton()
                     FirebaseAnalyticsUtils.emptyPlayerID(activity)

@@ -2,9 +2,8 @@ package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.repository.data.*
-import com.telen.easylineup.repository.model.*
-import io.reactivex.Completable
+import com.telen.easylineup.domain.usecases.CheckHashData
+import com.telen.easylineup.repository.dao.*
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Assert

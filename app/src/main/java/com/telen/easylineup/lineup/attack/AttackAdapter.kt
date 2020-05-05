@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.model.*
+import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.views.PlayerPositionFilterView
 import timber.log.Timber
 

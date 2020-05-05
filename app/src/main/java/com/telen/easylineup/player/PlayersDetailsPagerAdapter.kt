@@ -5,8 +5,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.PagerAdapter
-import com.telen.easylineup.repository.model.Constants
-import com.telen.easylineup.repository.model.Player
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.Player
 
 class PlayersDetailsPagerAdapter(fm: FragmentManager, private var playersIds: MutableList<Long> = mutableListOf()): FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 

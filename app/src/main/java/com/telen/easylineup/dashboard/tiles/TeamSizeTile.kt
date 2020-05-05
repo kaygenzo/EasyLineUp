@@ -9,10 +9,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
-import com.telen.easylineup.repository.tiles.ITileData
-import com.telen.easylineup.repository.tiles.KEY_DATA_SIZE
-import com.telen.easylineup.repository.tiles.KEY_DATA_TEAM_IMAGE
-import com.telen.easylineup.repository.model.Constants
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.tiles.ITileData
+import com.telen.easylineup.domain.model.tiles.KEY_DATA_SIZE
+import com.telen.easylineup.domain.model.tiles.KEY_DATA_TEAM_IMAGE
 import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.tile_team_size.view.*
 

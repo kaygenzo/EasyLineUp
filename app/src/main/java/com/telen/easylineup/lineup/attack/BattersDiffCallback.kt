@@ -1,7 +1,7 @@
 package com.telen.easylineup.lineup.attack
 
 import androidx.recyclerview.widget.DiffUtil
-import com.telen.easylineup.repository.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
 
 class BattersDiffCallback(private val mOldBatters: List<PlayerWithPosition>, private val mNewBatters: List<PlayerWithPosition>): DiffUtil.Callback() {
 

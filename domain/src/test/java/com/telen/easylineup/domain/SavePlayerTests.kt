@@ -3,7 +3,11 @@ package com.telen.easylineup.domain
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.repository.data.PlayerDao
+import com.telen.easylineup.domain.usecases.LicenseNumberEmptyException
+import com.telen.easylineup.domain.usecases.NameEmptyException
+import com.telen.easylineup.domain.usecases.SavePlayer
+import com.telen.easylineup.domain.usecases.ShirtNumberEmptyException
+import com.telen.easylineup.repository.dao.PlayerDao
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver

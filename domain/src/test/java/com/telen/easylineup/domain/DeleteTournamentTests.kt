@@ -1,12 +1,11 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.data.TournamentDao
+import com.telen.easylineup.domain.usecases.DeleteTournament
+import com.telen.easylineup.repository.dao.TournamentDao
 import com.telen.easylineup.repository.model.Player
 import com.telen.easylineup.repository.model.Tournament
 import io.reactivex.Completable
-import io.reactivex.Single
 import io.reactivex.observers.TestObserver
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

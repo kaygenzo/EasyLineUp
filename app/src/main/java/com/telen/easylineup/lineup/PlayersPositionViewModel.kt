@@ -18,11 +18,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.R
-import com.telen.easylineup.UseCaseHandler
-import com.telen.easylineup.application.App
-import com.telen.easylineup.domain.*
-import com.telen.easylineup.repository.model.*
-import com.telen.easylineup.repository.model.FieldPosition
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.utils.DialogFactory
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -55,25 +53,11 @@ data class InsufficientPermissions(val permissionsNeeded: Array<String>): Except
 
 }
 
-enum class ErrorCase {
-    SAVE_PLAYER_FIELD_POSITION_FAILED,
-    DELETE_PLAYER_FIELD_POSITION_FAILED,
-    LIST_AVAILABLE_PLAYERS_EMPTY,
-    SAVE_BATTING_ORDER_FAILED,
-    DELETE_LINEUP_FAILED,
-    SAVE_LINEUP_MODE_FAILED,
-    UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED,
-    GET_TEAM_FAILED,
-    NEED_ASSIGN_PITCHER_FIRST,
-    DP_OR_FLEX_NOT_ASSIGNED
-}
-
 sealed class EventCase
 object SavePlayerPositionSuccess: EventCase()
 object DeletePlayerPositionSuccess: EventCase()
 object SaveBattingOrderSuccess: EventCase()
 object DeleteLineupSuccess: EventCase()
-object SaveLineupModeSuccess: EventCase()
 object UpdatePlayersWithLineupModeSuccess: EventCase()
 data class GetAllAvailablePlayersSuccess(val players: List<Player>, val position: FieldPosition): EventCase()
 data class NeedLinkDpFlex(val initialData: Pair<Player?, Player?>, val dpLocked: Boolean, val flexLocked: Boolean, val teamType: Int, @StringRes val title: Int): EventCase()
@@ -88,30 +72,17 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     private var team: Team? = null
 
     // live data observables
-    val errorHandler = MutableLiveData<ErrorCase>()
+    val errorHandler = MutableLiveData<DomainErrors>()
     val eventHandler = MutableLiveData<EventCase>()
 
     private val _linkPlayersInField = MutableLiveData<List<Player>?>()
     val linkPlayersInField: LiveData<List<Player>?> = _linkPlayersInField
 
+    private val domain: ApplicationPort by inject()
+
     private val _lineupTitle = MutableLiveData<String>()
     private val _designatedPlayerTitle = MutableLiveData<String>()
     private val _listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
-
-    //Rx use cases
-    private val savePlayerFieldPositionUseCase: SavePlayerFieldPosition by inject()
-    private val deletePlayerFieldPositionUseCase: DeletePlayerFieldPosition by inject()
-    private val getListAvailablePlayersForLineup: GetListAvailablePlayersForSelection by inject()
-    private val saveBattingOrder: SaveBattingOrder by inject()
-    private val deleteLineup: DeleteLineup by inject()
-    private val saveLineupMode: SaveLineupMode by inject()
-    private val updatePlayersWithLineupMode: UpdatePlayersWithLineupMode by inject()
-    private val getRosterUseCase: GetRoster by inject()
-    private val getTeamUseCase: GetTeam by inject()
-    private val switchPlayersPositionUseCase: SwitchPlayersPosition by inject()
-    private val getPlayersInField: GetOnlyPlayersInField by inject()
-    private val getDpAndFlexFromPlayersInFieldUseCase: GetDPAndFlexFromPlayersInField by inject()
-    private val saveDpAndFlexUseCase: SaveDpAndFlex by inject()
 
     private val disposables = CompositeDisposable()
 
@@ -120,40 +91,21 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     private fun savePlayerFieldPosition(player: Player, position: FieldPosition): Completable {
-        return getTeam()
-                .flatMapCompletable {
-                    val requestValues = SavePlayerFieldPosition.RequestValues(
-                            lineupID = lineupID,
-                            player = player,
-                            position = position,
-                            players = _listPlayersWithPosition,
-                            lineupMode = lineupMode,
-                            teamType = it.type)
-
-                    UseCaseHandler.execute(savePlayerFieldPositionUseCase, requestValues).ignoreElement()
-                }
+        return domain.savePlayerFieldPosition(player, position, _listPlayersWithPosition, lineupID, lineupMode)
     }
 
     fun onDeletePosition(player: Player, position: FieldPosition) {
-
-        val requestValues = DeletePlayerFieldPosition.RequestValues(_listPlayersWithPosition, player, position, lineupMode)
-
-        val disposable = UseCaseHandler.execute(deletePlayerFieldPositionUseCase, requestValues).subscribe({
-            eventHandler.value = DeletePlayerPositionSuccess
-        }, {
-            errorHandler.value = ErrorCase.DELETE_PLAYER_FIELD_POSITION_FAILED
-        })
+        val disposable = domain.deletePlayerPosition(player, position, _listPlayersWithPosition, lineupMode)
+                .subscribe({
+                    eventHandler.value = DeletePlayerPositionSuccess
+                }, {
+                    Timber.e(it)
+                })
         disposables.add(disposable)
     }
 
     private fun getNotSelectedPlayers(sortBy: FieldPosition? = null): Single<List<Player>> {
-        return getTeam()
-                .flatMap { UseCaseHandler.execute(getRosterUseCase, GetRoster.RequestValues(it.id, lineupID)) }
-                .flatMap {
-                    val requestValues = GetListAvailablePlayersForSelection.RequestValues(_listPlayersWithPosition, sortBy, it.players)
-                    UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues)
-                }
-                .map { it.players }
+        return domain.getNotSelectedPlayersFromList(_listPlayersWithPosition, lineupID, sortBy)
     }
 
     private fun getAllAvailablePlayers(position: FieldPosition) {
@@ -161,83 +113,64 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                 .subscribe({
                     eventHandler.value = GetAllAvailablePlayersSuccess(it, position)
                 }, {
-                    errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
+                    Timber.e(it)
                 })
         disposables.add(disposable)
     }
 
     fun getPlayerSelectionForDp() {
-
         val disposable = getNotSelectedPlayers()
                 .subscribe({
                     _linkPlayersInField.value = it
                 }, {
-                    errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
+                    Timber.e(it)
                 })
         disposables.add(disposable)
     }
 
     fun getPlayerSelectionForFlex() {
-
-        val disposable = UseCaseHandler.execute(getPlayersInField, GetOnlyPlayersInField.RequestValues(_listPlayersWithPosition)).map { it.playersInField }
+        val disposable = domain.getPlayersInFieldFromList(_listPlayersWithPosition)
                 .subscribe({
                     _linkPlayersInField.value = it
                 }, {
-                    errorHandler.value = ErrorCase.LIST_AVAILABLE_PLAYERS_EMPTY
+                    Timber.e(it)
                 })
         disposables.add(disposable)
     }
 
     fun saveNewBattingOrder(players: List<PlayerWithPosition>) {
-        val requestValues = SaveBattingOrder.RequestValues(players)
-
-        val disposable = UseCaseHandler.execute(saveBattingOrder, requestValues).subscribe({
-            eventHandler.value = SaveBattingOrderSuccess
-        }, {
-            errorHandler.value = ErrorCase.SAVE_BATTING_ORDER_FAILED
-        })
+        val disposable = domain.saveBattingOrder(players)
+                .subscribe({
+                    eventHandler.value = SaveBattingOrderSuccess
+                }, {
+                    Timber.e(it)
+                })
         disposables.add(disposable)
     }
 
     private fun deleteLineup() {
-
-        val requestValues = DeleteLineup.RequestValues(lineupID)
-
-        val disposable = UseCaseHandler.execute(deleteLineup, requestValues).subscribe({
-            eventHandler.value = DeleteLineupSuccess
-        }, {
-            errorHandler.value = ErrorCase.DELETE_LINEUP_FAILED
-        })
+        val disposable = domain.deleteLineup(lineupID)
+                .subscribe({
+                    eventHandler.value = DeleteLineupSuccess
+                }, {
+                    Timber.e(it)
+                })
         disposables.add(disposable)
     }
 
-    private fun saveMode(): Single<SaveLineupMode.ResponseValue> {
-        val requestValues = SaveLineupMode.RequestValues(lineupID, lineupMode)
-        return UseCaseHandler.execute(saveLineupMode, requestValues)
-    }
-
     fun getTeamType(): Single<Int> {
-        return getTeam().map { it.type }
+        return domain.getTeamType()
     }
 
     fun onLineupModeChanged(isEnabled: Boolean) {
-
         lineupMode = if(isEnabled) MODE_ENABLED else MODE_DISABLED
 
-        val disposable = saveMode().doOnError {
-            errorHandler.value = ErrorCase.SAVE_LINEUP_MODE_FAILED
-        }.flatMap {
-            eventHandler.value = SaveLineupModeSuccess
-            getTeam()
-                    .flatMap {
-                        val requestValues = UpdatePlayersWithLineupMode.RequestValues(_listPlayersWithPosition, isEnabled, it.type)
-                        UseCaseHandler.execute(updatePlayersWithLineupMode, requestValues)
-                    }
-        }.subscribe({
-            eventHandler.value = UpdatePlayersWithLineupModeSuccess
-        }, {
-            errorHandler.value = ErrorCase.UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED
-        })
+        val disposable = domain.updateLineupMode(isEnabled, lineupID, lineupMode, _listPlayersWithPosition)
+                .subscribe({
+                    eventHandler.value = UpdatePlayersWithLineupModeSuccess
+                }, {
+                    Timber.e(it)
+                })
         disposables.add(disposable)
     }
 
@@ -245,47 +178,47 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     fun exportLineupToExternalStorage(context: Context, map: Map<Int, Fragment>): Single<Intent> {
         return Single.create(SingleOnSubscribe<ArrayList<Uri>> {
 
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                it.onError(InsufficientPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)))
-                return@SingleOnSubscribe
-            }
-
-            val tmpSDPath = StringBuilder(Environment.getExternalStorageDirectory().absolutePath).append("/${Constants.LINEUPS_DIRECTORY}").toString()
-            if(!File(tmpSDPath).exists())
-                File(tmpSDPath).mkdirs()
-
-            val timeInMillis = Calendar.getInstance().timeInMillis
-
-            val uris = arrayListOf<Uri>()
-
-            map.forEach {
-                val filePath = when(it.key) {
-                    FRAGMENT_DEFENSE_INDEX -> {
-                        StringBuilder(tmpSDPath).append(timeInMillis).append("_defense.png").toString()
+                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        it.onError(InsufficientPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)))
+                        return@SingleOnSubscribe
                     }
-                    FRAGMENT_ATTACK_INDEX -> {
-                        StringBuilder(tmpSDPath).append(timeInMillis).append("_attack.png").toString()
-                    }
-                    else -> StringBuilder(tmpSDPath).append(timeInMillis).append("unknown.png").toString()
-                }
-                val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", File(filePath))
 
-                val fos = FileOutputStream(filePath)
-                try {
-                    val success = it.value.view?.drawToBitmap()?.compress(Bitmap.CompressFormat.PNG, 100, fos)
-                    fos.flush()
-                    fos.close()
-                    success?.takeIf { true }.let {
-                        uris.add(uri)
-                    }
-                } catch (e: IOException) {
-                    Timber.e(e)
-                }
-            }
+                    val tmpSDPath = StringBuilder(Environment.getExternalStorageDirectory().absolutePath).append("/${Constants.LINEUPS_DIRECTORY}").toString()
+                    if(!File(tmpSDPath).exists())
+                        File(tmpSDPath).mkdirs()
 
-            it.onSuccess(uris)
-        })
+                    val timeInMillis = Calendar.getInstance().timeInMillis
+
+                    val uris = arrayListOf<Uri>()
+
+                    map.forEach {
+                        val filePath = when(it.key) {
+                            FRAGMENT_DEFENSE_INDEX -> {
+                                StringBuilder(tmpSDPath).append(timeInMillis).append("_defense.png").toString()
+                            }
+                            FRAGMENT_ATTACK_INDEX -> {
+                                StringBuilder(tmpSDPath).append(timeInMillis).append("_attack.png").toString()
+                            }
+                            else -> StringBuilder(tmpSDPath).append(timeInMillis).append("unknown.png").toString()
+                        }
+                        val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", File(filePath))
+
+                        val fos = FileOutputStream(filePath)
+                        try {
+                            val success = it.value.view?.drawToBitmap()?.compress(Bitmap.CompressFormat.PNG, 100, fos)
+                            fos.flush()
+                            fos.close()
+                            success?.takeIf { true }.let {
+                                uris.add(uri)
+                            }
+                        } catch (e: IOException) {
+                            Timber.e(e)
+                        }
+                    }
+
+                    it.onSuccess(uris)
+                })
                 .map {
                     val title: String = lineupTitle.toString()
                     Intent(Intent.ACTION_SEND_MULTIPLE).run {
@@ -310,16 +243,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     private fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition): Completable {
-        return getTeam()
-                .flatMapCompletable {
-                    UseCaseHandler.execute(switchPlayersPositionUseCase, SwitchPlayersPosition.RequestValues(
-                            players = _listPlayersWithPosition,
-                            position1 = p1,
-                            position2 = p2,
-                            teamType = it.type,
-                            lineupMode = lineupMode
-                    )).ignoreElement()
-                }
+        return domain.switchPlayersPosition(p1, p2,_listPlayersWithPosition, lineupMode)
     }
 
     fun onPlayerSelected(player: Player, position: FieldPosition) {
@@ -327,7 +251,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                 .subscribe({
                     eventHandler.value = SavePlayerPositionSuccess
                 }, {
-                    errorHandler.value = ErrorCase.SAVE_PLAYER_FIELD_POSITION_FAILED
+                    Timber.e(it)
                 })
         disposables.add(disposable)
     }
@@ -338,10 +262,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
             getAllAvailablePlayers(position)
         }
         else {
-            val disposable = getTeam()
-                    .flatMap {
-                        UseCaseHandler.execute(getDpAndFlexFromPlayersInFieldUseCase, GetDPAndFlexFromPlayersInField.RequestValues(_listPlayersWithPosition, it.type))
-                    }
+            val disposable = domain.getDpAndFlexFromPlayersInField(_listPlayersWithPosition)
                     .subscribe({
                         _linkPlayersInField.value = null
                         val title = if(it.teamType == TeamType.SOFTBALL.id) {
@@ -352,12 +273,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                         }
                         eventHandler.value = NeedLinkDpFlex(Pair(it.dp, it.flex), it.dpLocked, it.flexLocked, it.teamType, title)
                     }, {
-                        if(it is NeedAssignPitcherFirstException) {
-                            errorHandler.value = ErrorCase.NEED_ASSIGN_PITCHER_FIRST
-                        }
-                        else {
-                            errorHandler.value = ErrorCase.GET_TEAM_FAILED
-                        }
+                        Timber.e(it)
                     })
             disposables.add(disposable)
         }
@@ -368,15 +284,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
      */
     fun linkDpAndFlex(dp: Player?, flex: Player?): Completable {
         _linkPlayersInField.value = null
-        return UseCaseHandler.execute(saveDpAndFlexUseCase, SaveDpAndFlex.RequestValues(
-                lineupID = lineupID, dp = dp, flex = flex, players = _listPlayersWithPosition
-        ))
-                .ignoreElement()
-                .doOnError {
-                    if(it is NeedAssignBothPlayersException) {
-                        errorHandler.postValue(ErrorCase.DP_OR_FLEX_NOT_ASSIGNED)
-                    }
-                }
+        return domain.linkDpAndFlex(dp,flex, lineupID, _listPlayersWithPosition)
     }
 
     /**
@@ -393,10 +301,10 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
     fun registerLineupAndPositionsChanged(): LiveData<List<PlayerWithPosition>> {
 
-        val getLineup = App.database.lineupDao().getLineupById(lineupID ?: 0)
+        val getLineup = domain.observeLineupById(lineupID ?: 0)
         val getPositions = Transformations.switchMap(getLineup) {
             this.lineupMode = it?.mode ?: 0
-            App.database.playerDao().getTeamPlayersAndMaybePositions(it?.id ?: 0)
+            domain.observeTeamPlayersAndMaybePositionsForLineup(it?.id ?: 0)
         }
 
         return Transformations.map(getPositions) {
@@ -414,7 +322,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun registerLineupChange(): LiveData<Lineup> {
-        return App.database.lineupDao().getLineupById(lineupID ?: 0)
+        return domain.observeLineupById(lineupID ?: 0)
     }
 
     fun getLineupName(): LiveData<String> {
@@ -430,7 +338,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                         else -> context.getString(R.string.action_add_dh)
                     }
                 }, {
-                    errorHandler.value = ErrorCase.GET_TEAM_FAILED
+                    Timber.e(it)
                 })
         disposables.add(disposable)
         return _designatedPlayerTitle
@@ -450,7 +358,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     private fun getTeam(): Single<Team> {
         return team?.let {
             Single.just(it)
-        } ?: UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }.doOnSuccess {
+        } ?: domain.getTeam().doOnSuccess {
             this.team = it
         }
     }
