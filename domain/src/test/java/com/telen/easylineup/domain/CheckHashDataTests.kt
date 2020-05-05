@@ -2,8 +2,9 @@ package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
+import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.repository.*
 import com.telen.easylineup.domain.usecases.CheckHashData
-import com.telen.easylineup.repository.dao.*
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
@@ -17,13 +18,13 @@ import org.mockito.junit.MockitoJUnitRunner
 
 
 @RunWith(MockitoJUnitRunner::class)
-class CheckHashDataTests {
+internal class CheckHashDataTests {
 
-    @Mock lateinit var teamDao: TeamDao
-    @Mock lateinit var playerDao: PlayerDao
-    @Mock lateinit var tournamentDao: TournamentDao
-    @Mock lateinit var lineupDao: LineupDao
-    @Mock lateinit var playerPositionsDao: PlayerFieldPositionsDao
+    @Mock lateinit var teamDao: TeamRepository
+    @Mock lateinit var playerDao: PlayerRepository
+    @Mock lateinit var tournamentDao: TournamentRepository
+    @Mock lateinit var lineupDao: LineupRepository
+    @Mock lateinit var playerPositionsDao: PlayerFieldPositionRepository
 
     private lateinit var mCheckHash: CheckHashData
 
@@ -32,27 +33,27 @@ class CheckHashDataTests {
         MockitoAnnotations.initMocks(this)
         mCheckHash = CheckHashData(teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao)
 
-        val teams = mutableListOf<Team>(
+        val teams = mutableListOf(
                 Team(1L, "A", null, 0, true, null),
                 Team(2L, "B", null, 0, false, null)
         )
 
-        val mPlayers = mutableListOf<Player>(
+        val mPlayers = mutableListOf(
                 Player(1L, 1L, "A", 1, 1L, null, 1, null),
                 Player(2L, 2L, "B", 2, 2L, null, 1, null)
         )
 
-        val mTournaments = mutableListOf<Tournament>(
+        val mTournaments = mutableListOf(
                 Tournament(1L, "A", 1L, null),
                 Tournament(2L, "B", 2L, null)
         )
 
-        val mLineups = mutableListOf<Lineup>(
+        val mLineups = mutableListOf(
                 Lineup(1L, "A", 1L, 1L, 0, 1L, 1L, null, null),
                 Lineup(2L, "B", 2L, 2L, 0, 1L, 1L, null, null)
         )
 
-        val mPlayerPosition = mutableListOf<PlayerFieldPosition>(
+        val mPlayerPosition = mutableListOf(
                 PlayerFieldPosition(1L, 1L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,null),
                 PlayerFieldPosition(2L, 2L, 2L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,null)
         )

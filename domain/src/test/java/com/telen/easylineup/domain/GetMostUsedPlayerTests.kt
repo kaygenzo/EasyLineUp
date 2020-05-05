@@ -1,14 +1,14 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.dao.PlayerDao
-import com.telen.easylineup.repository.dao.PlayerFieldPositionsDao
-import com.telen.easylineup.repository.model.Player
-import com.telen.easylineup.repository.model.PlayerGamesCount
-import com.telen.easylineup.repository.model.Team
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerGamesCount
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.tiles.KEY_DATA_IMAGE
 import com.telen.easylineup.domain.model.tiles.KEY_DATA_MATCH_PLAYED
 import com.telen.easylineup.domain.model.tiles.KEY_DATA_NAME
 import com.telen.easylineup.domain.model.tiles.KEY_DATA_SHIRT_NUMBER
+import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.GetMostUsedPlayer
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -23,10 +23,10 @@ import org.mockito.junit.MockitoJUnitRunner
 
 
 @RunWith(MockitoJUnitRunner::class)
-class GetMostUsedPlayerTests {
+internal class GetMostUsedPlayerTests {
 
-    @Mock lateinit var playerDao: PlayerDao
-    @Mock lateinit var playerFieldPositionsDao: PlayerFieldPositionsDao
+    @Mock lateinit var playerDao: PlayerRepository
+    @Mock lateinit var playerFieldPositionsDao: PlayerFieldPositionRepository
     lateinit var mGetMostUsedPlayer: GetMostUsedPlayer
 
     lateinit var mPlayerGameCounts: MutableList<PlayerGamesCount>

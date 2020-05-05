@@ -1,8 +1,9 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
-import com.telen.easylineup.repository.dao.*
+import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.model.export.ExportBase
+import com.telen.easylineup.domain.repository.*
 import com.telen.easylineup.domain.usecases.ExportData
 import com.telen.easylineup.domain.usecases.ValidationCallback
 import io.reactivex.Single
@@ -18,13 +19,13 @@ import org.mockito.junit.MockitoJUnitRunner
 
 
 @RunWith(MockitoJUnitRunner::class)
-class ExportDataTests {
+internal class ExportDataTests {
 
-    @Mock lateinit var teamDao: TeamDao
-    @Mock lateinit var playerDao: PlayerDao
-    @Mock lateinit var tournamentDao: TournamentDao
-    @Mock lateinit var lineupDao: LineupDao
-    @Mock lateinit var playerPositionsDao: PlayerFieldPositionsDao
+    @Mock lateinit var teamDao: TeamRepository
+    @Mock lateinit var playerDao: PlayerRepository
+    @Mock lateinit var tournamentDao: TournamentRepository
+    @Mock lateinit var lineupDao: LineupRepository
+    @Mock lateinit var playerPositionsDao: PlayerFieldPositionRepository
 
     @Mock lateinit var validator: ValidationCallback
 

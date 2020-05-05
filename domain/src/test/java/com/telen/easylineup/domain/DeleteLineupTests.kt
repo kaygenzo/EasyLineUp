@@ -1,9 +1,9 @@
 package com.telen.easylineup.domain
 
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.MODE_DISABLED
+import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.DeleteLineup
-import com.telen.easylineup.repository.model.Lineup
-import com.telen.easylineup.repository.dao.LineupDao
-import com.telen.easylineup.repository.model.MODE_DISABLED
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -14,10 +14,10 @@ import org.mockito.junit.*
 import org.mockito.*
 
 @RunWith(MockitoJUnitRunner::class)
-class DeleteLineupTests {
+internal class DeleteLineupTests {
 
     @Mock
-    lateinit var dao: LineupDao
+    lateinit var dao: LineupRepository
 
     lateinit var mDeleteLineup: DeleteLineup
     lateinit var lineup1: Lineup

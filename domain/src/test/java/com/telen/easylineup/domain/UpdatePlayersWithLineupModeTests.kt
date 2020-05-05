@@ -2,10 +2,11 @@ package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.*
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithLineupMode
-import com.telen.easylineup.repository.dao.PlayerFieldPositionsDao
-import com.telen.easylineup.repository.model.*
 import io.reactivex.Completable
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
@@ -18,13 +19,13 @@ import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-class UpdatePlayersWithLineupModeTests {
+internal class UpdatePlayersWithLineupModeTests {
 
     lateinit var updatePlayersWithLineupMode: UpdatePlayersWithLineupMode
     lateinit var players: MutableList<PlayerWithPosition>
     var observer = TestObserver<UpdatePlayersWithLineupMode.ResponseValue>()
 
-    @Mock lateinit var lineupDao: PlayerFieldPositionsDao
+    @Mock lateinit var lineupDao: PlayerFieldPositionRepository
 
     @Before
     fun init() {

@@ -1,8 +1,8 @@
 package com.telen.easylineup.domain
 
+import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.GetTournaments
-import com.telen.easylineup.repository.dao.TournamentDao
-import com.telen.easylineup.repository.model.Tournament
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
@@ -16,9 +16,9 @@ import org.mockito.junit.MockitoJUnitRunner
 
 
 @RunWith(MockitoJUnitRunner::class)
-class GetTournamentTests {
+internal class GetTournamentTests {
 
-    @Mock lateinit var tournamentDao: TournamentDao
+    @Mock lateinit var tournamentDao: TournamentRepository
     lateinit var mGetTournaments: GetTournaments
     lateinit var tournaments: MutableList<Tournament>
 

@@ -1,9 +1,9 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.verify
+import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
-import com.telen.easylineup.repository.dao.TeamDao
-import com.telen.easylineup.repository.model.Team
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -16,11 +16,10 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
-
 @RunWith(MockitoJUnitRunner::class)
-class SaveCurrentTeamTests {
+internal class SaveCurrentTeamTests {
 
-    @Mock lateinit var teamDao: TeamDao
+    @Mock lateinit var teamDao: TeamRepository
     lateinit var mSaveCurrentTeam: SaveCurrentTeam
     lateinit var newTeam: Team
     private var teams = mutableListOf<Team>()

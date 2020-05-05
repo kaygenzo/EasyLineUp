@@ -3,15 +3,15 @@ package com.telen.easylineup.domain
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.RosterPlayerStatus
+import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.repository.LineupRepository
+import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.CreateLineup
-import com.telen.easylineup.domain.usecases.LineupNameEmptyException
-import com.telen.easylineup.domain.usecases.TournamentNameEmptyException
-import com.telen.easylineup.repository.dao.LineupDao
-import com.telen.easylineup.repository.dao.TournamentDao
-import com.telen.easylineup.repository.model.Lineup
-import com.telen.easylineup.repository.model.Player
-import com.telen.easylineup.repository.model.RosterPlayerStatus
-import com.telen.easylineup.repository.model.Tournament
+import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
+import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -26,10 +26,10 @@ import org.mockito.junit.MockitoJUnitRunner
 
 
 @RunWith(MockitoJUnitRunner::class)
-class CreateLineupTests {
+internal class CreateLineupTests {
 
-    @Mock lateinit var tournamentDao: TournamentDao
-    @Mock lateinit var lineupDao: LineupDao
+    @Mock lateinit var tournamentDao: TournamentRepository
+    @Mock lateinit var lineupDao: LineupRepository
     lateinit var mCreateLineup: CreateLineup
     lateinit var roster: MutableList<RosterPlayerStatus>
 

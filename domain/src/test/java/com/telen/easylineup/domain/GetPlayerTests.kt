@@ -1,8 +1,8 @@
 package com.telen.easylineup.domain
 
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.GetPlayer
-import com.telen.easylineup.repository.dao.PlayerDao
-import com.telen.easylineup.repository.model.Player
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
@@ -18,9 +18,9 @@ import java.lang.IllegalArgumentException
 
 
 @RunWith(MockitoJUnitRunner::class)
-class GetPlayerTests {
+internal class GetPlayerTests {
 
-    @Mock lateinit var playerDao: PlayerDao
+    @Mock lateinit var playerDao: PlayerRepository
     lateinit var mGetPlayer: GetPlayer
     lateinit var player: Player
 

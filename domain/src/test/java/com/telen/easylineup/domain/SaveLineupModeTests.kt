@@ -1,11 +1,11 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.verify
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.MODE_DISABLED
+import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.SaveLineupMode
-import com.telen.easylineup.repository.model.Lineup
-import com.telen.easylineup.repository.dao.LineupDao
-import com.telen.easylineup.repository.model.MODE_DISABLED
-import com.telen.easylineup.repository.model.MODE_ENABLED
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -16,12 +16,10 @@ import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.*
 
-
-
 @RunWith(MockitoJUnitRunner::class)
-class SaveLineupModeTests {
+internal class SaveLineupModeTests {
 
-    @Mock lateinit var lineupDao: LineupDao
+    @Mock lateinit var lineupDao: LineupRepository
     lateinit var mSaveLineupMode: SaveLineupMode
     lateinit var lineup: Lineup
 

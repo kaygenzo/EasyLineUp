@@ -3,9 +3,9 @@ package com.telen.easylineup.domain
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.repository.dao.TeamDao
-import com.telen.easylineup.repository.model.Team
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.SaveTeam
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -21,9 +21,9 @@ import org.mockito.junit.MockitoJUnitRunner
 
 
 @RunWith(MockitoJUnitRunner::class)
-class SaveTeamTests {
+internal class SaveTeamTests {
 
-    @Mock lateinit var teamDao: TeamDao
+    @Mock lateinit var teamDao: TeamRepository
     lateinit var mSaveTeam: SaveTeam
     lateinit var mTeam: Team
 

@@ -3,10 +3,10 @@ package com.telen.easylineup.domain
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.SaveBattingOrder
-import com.telen.easylineup.repository.dao.PlayerFieldPositionsDao
-import com.telen.easylineup.repository.model.PlayerFieldPosition
-import com.telen.easylineup.repository.model.PlayerWithPosition
 import io.reactivex.Completable
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
@@ -18,9 +18,9 @@ import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-class SaveBattingOrderTests {
+internal class SaveBattingOrderTests {
 
-    @Mock lateinit var lineupDao: PlayerFieldPositionsDao
+    @Mock lateinit var lineupDao: PlayerFieldPositionRepository
     lateinit var mSaveBattingOrder: SaveBattingOrder
     lateinit var players: MutableList<PlayerWithPosition>
 

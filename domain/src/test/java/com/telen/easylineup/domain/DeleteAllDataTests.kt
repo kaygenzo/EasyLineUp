@@ -1,11 +1,11 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.dao.TeamDao
-import com.telen.easylineup.repository.dao.TournamentDao
-import com.telen.easylineup.repository.model.Team
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.DeleteAllData
-import com.telen.easylineup.repository.model.Tournament
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -19,10 +19,10 @@ import org.mockito.junit.MockitoJUnitRunner
 
 
 @RunWith(MockitoJUnitRunner::class)
-class DeleteAllDataTests {
+internal class DeleteAllDataTests {
 
-    @Mock lateinit var teamDao: TeamDao
-    @Mock lateinit var tournamentDao: TournamentDao
+    @Mock lateinit var teamDao: TeamRepository
+    @Mock lateinit var tournamentDao: TournamentRepository
     lateinit var mDeleteAllData: DeleteAllData
 
     private val tournaments = mutableListOf<Tournament>()

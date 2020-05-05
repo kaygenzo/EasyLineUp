@@ -3,11 +3,9 @@ package com.telen.easylineup.domain
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.domain.model.FieldPosition
-import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.SavePlayerFieldPosition
-import com.telen.easylineup.repository.dao.PlayerFieldPositionsDao
-import com.telen.easylineup.repository.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -21,10 +19,10 @@ import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-class SavePlayerFieldPositionTests {
+internal class SavePlayerFieldPositionTests {
 
     lateinit var savePlayerFieldPosition: SavePlayerFieldPosition
-    @Mock lateinit var lineupDao: PlayerFieldPositionsDao
+    @Mock lateinit var lineupDao: PlayerFieldPositionRepository
     lateinit var players: MutableList<PlayerWithPosition>
     var observer = TestObserver<SavePlayerFieldPosition.ResponseValue>()
     var newPlayer = Player(6, 1, "tyty", 6, 6, null, 128)

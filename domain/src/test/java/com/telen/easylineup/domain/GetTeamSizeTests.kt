@@ -1,10 +1,10 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.dao.PlayerDao
-import com.telen.easylineup.repository.model.Player
-import com.telen.easylineup.repository.model.Team
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.tiles.KEY_DATA_SIZE
 import com.telen.easylineup.domain.model.tiles.KEY_DATA_TEAM_IMAGE
+import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.GetTeamSize
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -19,9 +19,9 @@ import org.mockito.junit.MockitoJUnitRunner
 
 
 @RunWith(MockitoJUnitRunner::class)
-class GetTeamSizeTests {
+internal class GetTeamSizeTests {
 
-    @Mock lateinit var playerDao: PlayerDao
+    @Mock lateinit var playerDao: PlayerRepository
     lateinit var mGetTeamSize: GetTeamSize
     private var players = mutableListOf<Player>()
     lateinit var team: Team

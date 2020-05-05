@@ -1,9 +1,8 @@
 package com.telen.easylineup.domain
 
+import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.DeleteTournament
-import com.telen.easylineup.repository.dao.TournamentDao
-import com.telen.easylineup.repository.model.Player
-import com.telen.easylineup.repository.model.Tournament
 import io.reactivex.Completable
 import io.reactivex.observers.TestObserver
 import org.junit.Before
@@ -17,9 +16,9 @@ import java.util.*
 
 
 @RunWith(MockitoJUnitRunner::class)
-class DeleteTournamentTests {
+internal class DeleteTournamentTests {
 
-    @Mock lateinit var tournamentDao: TournamentDao
+    @Mock lateinit var tournamentDao: TournamentRepository
     lateinit var mDeleteTournament: DeleteTournament
     lateinit var tournament: Tournament
 

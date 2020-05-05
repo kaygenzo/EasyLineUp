@@ -1,9 +1,9 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.verify
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.DeletePlayer
-import com.telen.easylineup.repository.dao.PlayerDao
-import com.telen.easylineup.repository.model.Player
 import io.reactivex.Completable
 import io.reactivex.observers.TestObserver
 import org.junit.Before
@@ -16,9 +16,9 @@ import org.mockito.junit.MockitoJUnitRunner
 
 
 @RunWith(MockitoJUnitRunner::class)
-class DeletePlayerTests {
+internal class DeletePlayerTests {
 
-    @Mock lateinit var playerDao: PlayerDao
+    @Mock lateinit var playerDao: PlayerRepository
     lateinit var mDeletePlayer: DeletePlayer
 
     private lateinit var player: Player

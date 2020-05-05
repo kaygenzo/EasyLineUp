@@ -1,9 +1,9 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.repository.dao.PlayerFieldPositionsDao
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.PositionWithLineup
+import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.GetPositionsSummaryForPlayer
-import com.telen.easylineup.repository.model.PositionWithLineup
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
@@ -17,9 +17,9 @@ import org.mockito.junit.MockitoJUnitRunner
 
 
 @RunWith(MockitoJUnitRunner::class)
-class GetPositionsSummaryForPlayerTests {
+internal class GetPositionsSummaryForPlayerTests {
 
-    @Mock lateinit var playerFieldPositionsDao: PlayerFieldPositionsDao
+    @Mock lateinit var playerFieldPositionsDao: PlayerFieldPositionRepository
     lateinit var mGetPositionsSummaryForPlayer: GetPositionsSummaryForPlayer
 
     lateinit var mPositions: List<PositionWithLineup>

@@ -4,9 +4,9 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.repository.dao.TeamDao
-import com.telen.easylineup.repository.model.Team
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.DeleteTeam
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -22,9 +22,9 @@ import org.mockito.junit.MockitoJUnitRunner
 
 
 @RunWith(MockitoJUnitRunner::class)
-class DeleteTeamTests {
+internal class DeleteTeamTests {
 
-    @Mock lateinit var teamDao: TeamDao
+    @Mock lateinit var teamDao: TeamRepository
     lateinit var mDeleteTeam: DeleteTeam
     lateinit var mTeam: Team
     lateinit var mTeam2: Team
