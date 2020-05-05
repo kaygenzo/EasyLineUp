@@ -91,7 +91,7 @@ class LineupFragment: Fragment(), CompoundButton.OnCheckedChangeListener {
                 }
             })
 
-            viewModel.errorHandler.observe(viewLifecycleOwner, Observer {
+            viewModel.observeErrors().observe(viewLifecycleOwner, Observer {
                 when(it) {
                     DomainErrors.DELETE_LINEUP_FAILED -> {
                         Toast.makeText(this, "Something wrong happened when deleting lineup", Toast.LENGTH_LONG).show()

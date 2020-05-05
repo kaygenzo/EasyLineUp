@@ -43,7 +43,7 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_lineup_defense_editable, container, false)
 
-        viewModel.errorHandler.observe(viewLifecycleOwner, Observer {
+        viewModel.observeErrors().observe(viewLifecycleOwner, Observer {
             when(it) {
                 DomainErrors.LIST_AVAILABLE_PLAYERS_EMPTY -> {
                     activity?.let { activity ->

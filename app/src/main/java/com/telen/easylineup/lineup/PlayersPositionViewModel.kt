@@ -72,7 +72,6 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     private var team: Team? = null
 
     // live data observables
-    val errorHandler = MutableLiveData<DomainErrors>()
     val eventHandler = MutableLiveData<EventCase>()
 
     private val _linkPlayersInField = MutableLiveData<List<Player>?>()
@@ -362,4 +361,6 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
             this.team = it
         }
     }
+
+    fun observeErrors() = domain.observeErrors()
 }

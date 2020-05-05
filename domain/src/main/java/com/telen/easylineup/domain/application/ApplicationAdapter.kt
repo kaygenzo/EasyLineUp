@@ -26,9 +26,7 @@ import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 
-internal class ApplicationAdapter(
-        private val _errors: MutableLiveData<DomainErrors> = MutableLiveData<DomainErrors>(),
-        val errorObserver: LiveData<DomainErrors> = _errors): ApplicationPort, KoinComponent {
+internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErrors> = MutableLiveData<DomainErrors>()): ApplicationPort, KoinComponent {
 
     private val context: Context by inject()
 
@@ -75,6 +73,10 @@ internal class ApplicationAdapter(
     private val getPlayersInField: GetOnlyPlayersInField by inject()
     private val getDpAndFlexFromPlayersInFieldUseCase: GetDPAndFlexFromPlayersInField by inject()
     private val saveDpAndFlexUseCase: SaveDpAndFlex by inject()
+
+    override fun observeErrors(): LiveData<DomainErrors> {
+        return _errors
+    }
 
     //teams
 

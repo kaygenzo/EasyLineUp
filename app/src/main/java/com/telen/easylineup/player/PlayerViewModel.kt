@@ -18,8 +18,6 @@ class PlayerViewModel: ViewModel(), KoinComponent {
 
     private val domain: ApplicationPort by inject()
 
-    private val errorResult = MutableLiveData<DomainErrors>()
-
     private val disposables = CompositeDisposable()
 
     private val _teamTypeLiveData = MutableLiveData<Int>()
@@ -75,6 +73,6 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     }
 
     fun registerFormErrorResult(): LiveData<DomainErrors> {
-        return errorResult
+        return domain.observeErrors()
     }
 }

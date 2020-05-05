@@ -11,6 +11,9 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 
 interface ApplicationPort {
+
+    fun observeErrors(): LiveData<DomainErrors>
+
     ///////////////////////////////
     ////////// LiveData ///////////
     ///////////////////////////////
