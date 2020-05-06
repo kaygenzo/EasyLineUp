@@ -22,8 +22,8 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
     }
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        val insertedArray = arrayOf(0, 0, 0, 0, 0)
-        val updatedArray = arrayOf(0, 0, 0, 0, 0)
+        val insertedArray = intArrayOf(0, 0, 0, 0, 0)
+        val updatedArray = intArrayOf(0, 0, 0, 0, 0)
         val updateIfExists = requestValues.updateIfExists
         return Single.just(requestValues.exportBase)
                 .flatMapObservable { Observable.fromIterable(it.teams) }
@@ -64,7 +64,7 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
                 .andThen(Single.just(ResponseValue(insertedArray, updatedArray)))
     }
 
-    private fun processTeam(teamExport: TeamExport, insertedArray: Array<Int>, updatedArray: Array<Int>,
+    private fun processTeam(teamExport: TeamExport, insertedArray: IntArray, updatedArray: IntArray,
                             updateIfExists: Boolean): Single<Team> {
         val t = Team(0L, teamExport.name, teamExport.image, teamExport.type, teamExport.main, teamExport.id)
 
@@ -87,7 +87,7 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
                 }
     }
 
-    private fun processPlayer(playerExport: PlayerExport, teamID: Long, insertedArray: Array<Int>, updatedArray: Array<Int>,
+    private fun processPlayer(playerExport: PlayerExport, teamID: Long, insertedArray: IntArray, updatedArray: IntArray,
                               updateIfExists: Boolean): Single<Player> {
         val licenseNumber = try {
             playerExport.licenseNumber.toLong()
@@ -119,7 +119,7 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
                 }
     }
 
-    private fun processTournament(export: TournamentExport, insertedArray: Array<Int>, updatedArray: Array<Int>,
+    private fun processTournament(export: TournamentExport, insertedArray: IntArray, updatedArray: IntArray,
                                   updateIfExists: Boolean): Single<Tournament> {
         val t = Tournament(0L, export.name,export.createdAt, export.id)
 
@@ -145,7 +145,7 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
 
     private fun processLineup(lineup: LineupExport, teamID: Long, tournamentID: Long,
                               players: Map<String, Long>,
-                              insertedArray: Array<Int>, updatedArray: Array<Int>,
+                              insertedArray: IntArray, updatedArray: IntArray,
                               updateIfExists: Boolean): Single<Lineup> {
         val l = Lineup(0L, lineup.name, teamID, tournamentID,
                 lineup.mode, lineup.createdAt, lineup.editedAt,
@@ -183,7 +183,7 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
     }
 
     private fun processPlayerFieldPosition(export: PlayerPositionExport, players: Map<String, Long>, lineupID: Long,
-                                           insertedArray: Array<Int>, updatedArray: Array<Int>,
+                                           insertedArray: IntArray, updatedArray: IntArray,
                                            updateIfExists: Boolean): Completable {
         val p = PlayerFieldPosition(0L, players[export.playerID] ?: 0L, lineupID,
                 export.position, export.x, export.y, export.order, export.flags, export.id)
@@ -204,6 +204,6 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
                 }
     }
 
-    class ResponseValue(val inserted: Array<Int>, val updated: Array<Int>): UseCase.ResponseValue
+    class ResponseValue(val inserted: IntArray, val updated: IntArray): UseCase.ResponseValue
     class RequestValues(val exportBase: ExportBase, val updateIfExists: Boolean): UseCase.RequestValues
 }

@@ -1,8 +1,8 @@
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.UseCase
-import com.telen.easylineup.domain.repository.*
 import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.repository.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
@@ -11,7 +11,7 @@ internal class CheckHashData(val teamDao: TeamRepository, val playerDao: PlayerR
                 val playerFieldPositionsDao: PlayerFieldPositionRepository): UseCase<CheckHashData.RequestValues, CheckHashData.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        val result = arrayOf(0, 0, 0, 0, 0)
+        val result = intArrayOf(0, 0, 0, 0, 0)
         return updateTeams().flatMapCompletable {
                     result[0] = it
                     Completable.complete()
@@ -105,6 +105,6 @@ internal class CheckHashData(val teamDao: TeamRepository, val playerDao: PlayerR
         }
     }
 
-    class ResponseValue(val updateResult: Array<Int>): UseCase.ResponseValue
+    class ResponseValue(val updateResult: IntArray): UseCase.ResponseValue
     class RequestValues: UseCase.RequestValues
 }
