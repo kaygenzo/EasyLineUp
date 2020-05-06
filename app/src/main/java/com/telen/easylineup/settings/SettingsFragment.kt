@@ -18,11 +18,11 @@ import com.obsez.android.lib.filechooser.ChooserDialog
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.login.LoginActivity
-import com.telen.easylineup.login.LoginViewModel
+import com.telen.easylineup.login.*
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.views.CustomEditTextView
 import io.reactivex.Completable
+import io.reactivex.CompletableOnSubscribe
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -36,7 +36,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     lateinit var viewModel: SettingsViewModel
-    private var operationsDisposable: CompositeDisposable = CompositeDisposable()
+    lateinit var loginViewModel: LoginViewModel
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -44,11 +44,53 @@ class SettingsFragment : PreferenceFragmentCompat() {
         about?.summary = BuildConfig.VERSION_NAME
 
         viewModel = ViewModelProviders.of(this)[SettingsViewModel::class.java]
+        loginViewModel = ViewModelProviders.of(this)[LoginViewModel::class.java]
+
+        viewModel.observeEvent().observe(viewLifecycleOwner, Observer {
+            when(it) {
+                DeleteAllDataEventSuccess -> {
+                    val intent = Intent(activity, LoginActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                }
+                is ExportDataEventSuccess -> {
+                    activity?.run {
+                        DialogFactory.getSimpleDialog(this, getString(R.string.settings_export_success, it.pathDirectory)).show()
+                    }
+
+                    Timber.d("Successfully exported data!")
+                }
+                ExportDataEventFailure -> {
+                    activity?.run {
+                        DialogFactory.getErrorDialog(this, getString(R.string.settings_export_error)).show()
+                    }
+                }
+                else -> {}
+            }
+        })
+
+        loginViewModel.loginEvent.observe(viewLifecycleOwner, Observer {
+            activity?.run {
+                when(it) {
+                    ImportSuccessfulEvent -> {
+                        DialogFactory.getSimpleDialog(this, getString(R.string.settings_import_success))
+                                .setConfirmClickListener { it.dismiss() }
+                                .show()
+                    }
+                    ImportFailure -> {
+                        DialogFactory.getErrorDialog(this, getString(R.string.settings_import_error))
+                                .setConfirmClickListener { it.dismiss() }
+                                .show()
+                    }
+                    else -> {}
+                }
+            }
+        })
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        operationsDisposable.clear()
+        viewModel.clear()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -86,16 +128,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
             getString(R.string.key_delete_data) -> {
                 activity?.let {
                     DialogFactory.getWarningDialog(it, "", getString(R.string.dialog_delete_cannot_undo_message),
-                            viewModel.deleteAllData().doOnComplete {
-                                Completable.timer(1000, TimeUnit.MILLISECONDS).subscribe({
-                                    val intent = Intent(activity, LoginActivity::class.java)
-                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                    startActivity(intent)
-                                }, {
-
-                                })
-                            }.doOnError {
-                                Timber.e(it)
+                            Completable.create { emitter ->
+                                viewModel.deleteAllData()
+                                emitter.onComplete()
                             }
                     ).show()
                 }
@@ -140,21 +175,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         .setView(input)
                         .setPositiveButton(R.string.export_button) { dialog, which ->
                             val name = input.getName()
-                            val disposable = viewModel.exportDataOnExternalMemory(name, it.fallbackName).subscribe({ directoryName ->
-                                activity?.run {
-                                    DialogFactory.getSimpleDialog(this, getString(R.string.settings_export_success, directoryName))
-                                            .show()
-                                }
-
-                                Timber.d("Successfully exported data!")
-                            }, {
-                                activity?.run {
-                                    DialogFactory.getErrorDialog(this, getString(R.string.settings_export_error))
-                                            .show()
-                                }
-                                Timber.e(it)
-                            })
-                            operationsDisposable.add(disposable)
+                            viewModel.exportDataOnExternalMemory(name, it.fallbackName)
                         }
                         .setNegativeButton(R.string.cancel_button) { dialog, which ->
 
@@ -168,8 +189,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun importData() {
-        //TODO later, make a view model to manage import/export
-        val loginViewModel = ViewModelProviders.of(this)[LoginViewModel::class.java]
 
         activity?.run {
             ChooserDialog(this)
@@ -178,18 +197,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     .withStartFile("${Environment.getExternalStorageDirectory().path}/${Constants.EXPORTS_DIRECTORY}")
                     .withChosenListener { path, _ ->
                         val updateIfExists = findPreference<CheckBoxPreference>(getString(R.string.key_import_data_update_object))?.isChecked ?: false
-                        val disposable = loginViewModel.importData(path, updateIfExists)
-                                .subscribe({
-                                    DialogFactory.getSimpleDialog(this, getString(R.string.settings_import_success))
-                                            .setConfirmClickListener { it.dismiss() }
-                                            .show()
-                                }, {
-                                    Timber.e(it)
-                                    DialogFactory.getErrorDialog(this, getString(R.string.settings_import_error))
-                                            .setConfirmClickListener { it.dismiss() }
-                                            .show()
-                                })
-                        operationsDisposable.add(disposable)
+                        loginViewModel.importData(path, updateIfExists)
                     }
                     .withOnCancelListener { dialog -> dialog.cancel() }
                     .build()

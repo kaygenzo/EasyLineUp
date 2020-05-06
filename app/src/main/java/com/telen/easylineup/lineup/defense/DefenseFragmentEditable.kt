@@ -27,6 +27,7 @@ import com.telen.easylineup.views.OnPlayerClickListener
 import com.telen.easylineup.views.PlayerListView
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_lineup_defense_editable.view.*
 import timber.log.Timber
 
@@ -34,6 +35,8 @@ import timber.log.Timber
 class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
 
     lateinit var viewModel: PlayersPositionViewModel
+
+    private val disposables = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,6 +113,7 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
         val disposable = viewModel.switchPlayersPosition(player1, player2).subscribe({}, {
             Timber.e("Cannot switch players: ${it.message}")
         })
+        disposables.add(disposable)
     }
 
     override fun onPlayerReassigned(player: PlayerWithPosition, newPosition: FieldPosition) {
@@ -117,6 +121,7 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
         val disposable = viewModel.switchPlayersPosition(player, newPosition).subscribe({}, {
             Timber.e("Cannot change player position: ${it.message}")
         })
+        disposables.add(disposable)
     }
 
     private fun getDialogLinkDpAndFlex(context: Context, initialData: Pair<Player?, Player?>,
@@ -189,5 +194,10 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
                     viewModel.onDeletePosition(player, position)
                     emitter.onComplete()
                 })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposables.clear()
     }
 }

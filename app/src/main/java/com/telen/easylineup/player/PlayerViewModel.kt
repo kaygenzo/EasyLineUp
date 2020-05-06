@@ -10,9 +10,17 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.Action
+import io.reactivex.functions.Consumer
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
+
+sealed class Event
+object SavePlayerSuccess: Event()
+object SavePlayerFailure: Event()
+object DeletePlayerSuccess: Event()
+data class DeletePlayerFailure(val message: String?): Event()
 
 class PlayerViewModel: ViewModel(), KoinComponent {
 
@@ -23,6 +31,7 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     private val _teamTypeLiveData = MutableLiveData<Int>()
     private val _playerLiveData = MutableLiveData<Player>()
     private val _lineupsLiveData = MutableLiveData<Map<FieldPosition, Int>>()
+    private val _event = MutableLiveData<Event>()
 
     var playerID: Long? = 0
 
@@ -64,12 +73,29 @@ class PlayerViewModel: ViewModel(), KoinComponent {
         disposables.clear()
     }
 
-    fun savePlayer(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int): Completable {
-        return domain.savePlayer(playerID, name, shirtNumber, licenseNumber, imageUri, positions)
+    fun savePlayer(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int) {
+        val disposable = domain.savePlayer(playerID, name, shirtNumber, licenseNumber, imageUri, positions)
+                .subscribe({
+                    _event.postValue(SavePlayerSuccess)
+                }, {
+                    Timber.e(it)
+                    _event.postValue(SavePlayerFailure)
+                })
+        disposables.add(disposable)
     }
 
-    fun deletePlayer(): Completable {
-        return domain.deletePlayer(playerID)
+    fun deletePlayer() {
+        val disposable = domain.deletePlayer(playerID)
+                .subscribe({
+                    _event.postValue(DeletePlayerSuccess)
+                }, {
+                    _event.postValue(DeletePlayerFailure(it.message))
+                })
+        disposables.add(disposable)
+    }
+
+    fun registerEvent(): LiveData<Event> {
+        return _event
     }
 
     fun registerFormErrorResult(): LiveData<DomainErrors> {

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Environment
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.obsez.android.lib.filechooser.ChooserDialog
 import com.telen.easylineup.HomeActivity
@@ -46,6 +47,38 @@ class LoginActivity: AppCompatActivity() {
                 importData()
             }
         }
+
+        viewModel.loginEvent.observe(this,  Observer {
+            when(it) {
+                ImportSuccessfulEvent -> {
+                    DialogFactory.getSimpleDialog(this@LoginActivity, getString(R.string.settings_import_success))
+                            .setConfirmClickListener {
+                                //check teams
+                                viewModel.getMainTeam()
+                                it.dismiss()
+                            }
+                            .show()
+                }
+                ImportFailure -> {
+                    DialogFactory.getErrorDialog(this@LoginActivity, getString(R.string.settings_import_error))
+                            .setConfirmClickListener { it.dismiss() }
+                            .show()
+                }
+                is GetTeamSuccess -> {
+                    //the file contains at least one main team
+                    launchHome()
+                }
+                GetTeamFailed -> {
+                    // no main team selected, let's create new one
+                    launchTeamCreation()
+                }
+            }
+        })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.clear()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -64,29 +97,7 @@ class LoginActivity: AppCompatActivity() {
                 .withFilter(false, false, "elu")
                 .withIcon(R.mipmap.ic_launcher)
                 .withStartFile("${Environment.getExternalStorageDirectory().path}/${Constants.EXPORTS_DIRECTORY}")
-                .withChosenListener { path, _ ->
-                    viewModel.importData(path, true)
-                            .subscribe({
-                                DialogFactory.getSimpleDialog(this@LoginActivity, getString(R.string.settings_import_success))
-                                        .setConfirmClickListener {
-                                            //check teams
-                                            viewModel.getMainTeam().subscribe({
-                                                //the file contains at least one main team
-                                                launchHome()
-                                            }, {
-                                                // no main team selected, let's create new one
-                                                launchTeamCreation()
-                                            })
-                                            it.dismiss()
-                                        }
-                                        .show()
-                            }, {
-                                Timber.e(it)
-                                DialogFactory.getErrorDialog(this@LoginActivity, getString(R.string.settings_import_error))
-                                        .setConfirmClickListener { it.dismiss() }
-                                        .show()
-                            })
-                }
+                .withChosenListener { path, _ -> viewModel.importData(path, true) }
                 .withOnCancelListener { dialog -> dialog.cancel() }
                 .build()
                 .show()

@@ -13,6 +13,8 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
+import io.reactivex.Completable
+import io.reactivex.CompletableOnSubscribe
 import kotlinx.android.synthetic.main.fragment_players_details_container.view.*
 import timber.log.Timber
 
@@ -20,6 +22,7 @@ class PlayersDetailsContainerFragment: Fragment(), ViewPager.OnPageChangeListene
 
     private lateinit var mAdapter: PlayersDetailsPagerAdapter
     private lateinit var teamViewModel: TeamViewModel
+    private lateinit var playerViewModel: PlayerViewModel
     private lateinit var pager: ViewPager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +30,7 @@ class PlayersDetailsContainerFragment: Fragment(), ViewPager.OnPageChangeListene
         setHasOptionsMenu(true)
         mAdapter = PlayersDetailsPagerAdapter(childFragmentManager)
         teamViewModel = ViewModelProviders.of(this)[TeamViewModel::class.java]
-
+        playerViewModel = ViewModelProviders.of(this)[PlayerViewModel::class.java]
         val playerID = savedInstanceState?.getLong(Constants.PLAYER_ID) ?: arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
         teamViewModel.setPlayerId(playerID)
     }
@@ -51,15 +54,29 @@ class PlayersDetailsContainerFragment: Fragment(), ViewPager.OnPageChangeListene
 
     override fun onResume() {
         super.onResume()
+
         teamViewModel.observePlayers().observe(viewLifecycleOwner, Observer { players ->
             mAdapter.setPlayerIDs(players)
             pager.setCurrentItem(mAdapter.getPlayerIndex(teamViewModel.getPlayerId()), false)
+        })
+
+        playerViewModel.registerEvent().observe(viewLifecycleOwner, Observer {
+            when(it) {
+                DeletePlayerSuccess -> {
+                    findNavController().popBackStack(R.id.navigation_team, false)
+                }
+                is DeletePlayerFailure -> {
+                    Toast.makeText(activity, "Something wrong happened: ${it.message}", Toast.LENGTH_LONG).show()
+                }
+                else -> {}
+            }
         })
     }
 
     override fun onPause() {
         super.onPause()
         teamViewModel.clear()
+        playerViewModel.clear()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -89,18 +106,13 @@ class PlayersDetailsContainerFragment: Fragment(), ViewPager.OnPageChangeListene
 
     private fun askUserConsentForDeletePlayerWithId(playerID: Long) {
         activity?.let {
-            val playerViewModel = ViewModelProviders.of(this)[PlayerViewModel::class.java]
             playerViewModel.playerID = playerID
             DialogFactory.getWarningDialog(it,
-                    it.getString(R.string.dialog_delete_player_title),
-                    it.getString(R.string.dialog_delete_cannot_undo_message),
-                    playerViewModel.deletePlayer()
-                            .doOnComplete {
-                                FragmentActivity@it.runOnUiThread {
-                                    findNavController().popBackStack(R.id.navigation_team, false)
-                                }
-                            }.doOnError {
-                                Toast.makeText(activity, "Something wrong happened: ${it.message}", Toast.LENGTH_LONG).show()
+                            it.getString(R.string.dialog_delete_player_title),
+                            it.getString(R.string.dialog_delete_cannot_undo_message),
+                            Completable.create { emitter ->
+                                playerViewModel.deletePlayer()
+                                emitter.onComplete()
                             })
                     .show()
         }

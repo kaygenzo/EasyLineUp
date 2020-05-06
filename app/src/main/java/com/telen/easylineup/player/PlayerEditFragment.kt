@@ -20,16 +20,12 @@ import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.PlayerFormListener
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_player_edit.view.*
 import timber.log.Timber
 
 class PlayerEditFragment: Fragment(), PlayerFormListener {
 
     private lateinit var viewModel: PlayerViewModel
-    private var saveDisposable: Disposable? = null
 
     override fun onCancel() {
         findNavController().navigateUp()
@@ -96,6 +92,17 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
             }
         })
 
+        viewModel.registerEvent().observe(viewLifecycleOwner, Observer {
+            when(it) {
+                SavePlayerSuccess -> {
+                    findNavController().navigateUp()
+                }
+                else -> {
+
+                }
+            }
+        })
+
         return view
     }
 
@@ -133,22 +140,7 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
     }
 
     override fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int) {
-        dispose(saveDisposable)
-        saveDisposable = viewModel.savePlayer(name, shirtNumber, licenseNumber, imageUri, positions)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    findNavController().navigateUp()
-                }, {
-                    Timber.e(it)
-                })
-    }
-
-    private fun dispose(disposable: Disposable?) {
-        disposable?.let {
-            if(!it.isDisposed)
-                it.dispose()
-        }
+        viewModel.savePlayer(name, shirtNumber, licenseNumber, imageUri, positions)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
