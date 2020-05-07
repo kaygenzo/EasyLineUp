@@ -8,10 +8,8 @@ import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
-import io.reactivex.Completable
+import com.telen.easylineup.utils.SingleLiveEvent
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Action
-import io.reactivex.functions.Consumer
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
@@ -31,7 +29,7 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     private val _teamTypeLiveData = MutableLiveData<Int>()
     private val _playerLiveData = MutableLiveData<Player>()
     private val _lineupsLiveData = MutableLiveData<Map<FieldPosition, Int>>()
-    private val _event = MutableLiveData<Event>()
+    private val _event = SingleLiveEvent<Event>()
 
     var playerID: Long? = 0
 

@@ -8,6 +8,9 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -45,6 +48,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         viewModel = ViewModelProviders.of(this)[SettingsViewModel::class.java]
         loginViewModel = ViewModelProviders.of(this)[LoginViewModel::class.java]
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val v = super.onCreateView(inflater, container, savedInstanceState)
 
         viewModel.observeEvent().observe(viewLifecycleOwner, Observer {
             when(it) {
@@ -86,10 +93,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
             }
         })
+
+        return v
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         viewModel.clear()
     }
 

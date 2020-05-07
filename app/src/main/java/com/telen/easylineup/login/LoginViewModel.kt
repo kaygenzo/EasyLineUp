@@ -1,12 +1,12 @@
 package com.telen.easylineup.login
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.export.ExportBase
+import com.telen.easylineup.utils.SingleLiveEvent
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import org.koin.core.KoinComponent
@@ -26,7 +26,7 @@ class LoginViewModel : ViewModel(), KoinComponent {
 
     private val domain: ApplicationPort by inject()
 
-    private val _loginEvent = MutableLiveData<LoginEvent>()
+    private val _loginEvent = SingleLiveEvent<LoginEvent>()
     val loginEvent: LiveData<LoginEvent> = _loginEvent
 
     val disposables = CompositeDisposable()

@@ -4,11 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.utils.SingleLiveEvent
 import io.reactivex.Completable
-import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Action
-import io.reactivex.functions.Consumer
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
@@ -28,7 +26,7 @@ class SettingsViewModel: ViewModel(), KoinComponent {
 
     private val domain: ApplicationPort by inject()
 
-    private val _event = MutableLiveData<Event>()
+    private val _event = SingleLiveEvent<Event>()
     private val disposables = CompositeDisposable()
 
     private val _exportDataObjectLiveData = MutableLiveData<ExportDataObject>()

@@ -51,13 +51,12 @@ class LoginActivity: AppCompatActivity() {
         viewModel.loginEvent.observe(this,  Observer {
             when(it) {
                 ImportSuccessfulEvent -> {
-                    DialogFactory.getSimpleDialog(this@LoginActivity, getString(R.string.settings_import_success))
-                            .setConfirmClickListener {
-                                //check teams
-                                viewModel.getMainTeam()
-                                it.dismiss()
-                            }
-                            .show()
+                    val dialog = DialogFactory.getSimpleDialog(this@LoginActivity, getString(R.string.settings_import_success))
+                    dialog.setOnDismissListener {
+                        //check teams
+                        viewModel.getMainTeam()
+                    }
+                    dialog.show()
                 }
                 ImportFailure -> {
                     DialogFactory.getErrorDialog(this@LoginActivity, getString(R.string.settings_import_error))

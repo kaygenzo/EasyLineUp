@@ -24,7 +24,6 @@ import com.telen.easylineup.utils.FeatureViewFactory
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.DrawerHeader
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.nav_drawer_header.view.*
 import timber.log.Timber
 import java.io.Serializable
@@ -32,7 +31,6 @@ import java.io.Serializable
 class HomeActivity : AppCompatActivity(), HostInterface {
 
     private lateinit var viewModel: HomeViewModel
-    private var swapDialogDisposable: Disposable? = null
 
     private val drawerLayout by lazy { findViewById<DrawerLayout>(R.id.drawer_layout) }
     private val navController by lazy { findNavController(R.id.nav_host_fragment) }
@@ -59,14 +57,7 @@ class HomeActivity : AppCompatActivity(), HostInterface {
         navigationView.addHeaderView(drawerHeader)
 
         drawerHeader.setOnImageClickListener(View.OnClickListener {
-            viewModel.getTeamsCount().subscribe({
-                val argument = Bundle()
-                argument.putInt(Constants.EXTRA_TEAM_COUNT, it)
-                navController.navigate(R.id.teamDetailsFragment, argument, NavigationUtils().getOptions())
-                closeDrawer()
-            }, {
-                Timber.e(it)
-            })
+            viewModel.getTeamsCount()
         })
 
         drawerHeader.setOnSwapTeamClickListener(View.OnClickListener {
@@ -84,6 +75,39 @@ class HomeActivity : AppCompatActivity(), HostInterface {
                         })
             }
         })
+
+        viewModel.observeEvents().observe(this, Observer {
+            when(it) {
+                is GetTeamSuccess -> {
+                    drawerHeader.setImage(it.team.image)
+                    drawerHeader.setTitle(it.team.name)
+                }
+                is GetTeamsCountSuccess -> {
+                    val argument = Bundle()
+                    argument.putInt(Constants.EXTRA_TEAM_COUNT, it.count)
+                    navController.navigate(R.id.teamDetailsFragment, argument, NavigationUtils().getOptions())
+                    closeDrawer()
+                }
+                UpdateCurrentTeamSuccess -> {
+                    navController.popBackStack(R.id.navigation_home, false)
+                    closeDrawer()
+                }
+                is SwapButtonSuccess -> {
+                    val argument = Bundle()
+                    argument.putSerializable(Constants.EXTRA_TEAM, it.team as Serializable)
+                    val dialog = SwapTeamFragment()
+                    dialog.arguments = argument
+                    dialog.setHostInterface(this)
+                    dialog.show(supportFragmentManager, "SwapTeamFragment")
+                }
+                else -> {}
+            }
+        })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.clear()
     }
 
     private fun showFeatureTargetView(show: Boolean) {
@@ -103,17 +127,7 @@ class HomeActivity : AppCompatActivity(), HostInterface {
     }
 
     private fun showSwapDialog() {
-        swapDialogDisposable?.dispose()
-        swapDialogDisposable = viewModel.onSwapButtonClicked().subscribe({
-            val argument = Bundle()
-            argument.putSerializable(Constants.EXTRA_TEAM, it as Serializable)
-            val dialog = SwapTeamFragment()
-            dialog.arguments = argument
-            dialog.setHostInterface(this)
-            dialog.show(supportFragmentManager, "SwapTeamFragment")
-        }, {
-            Timber.e(it)
-        })
+        viewModel.onSwapButtonClicked()
     }
 
     override fun onResume() {
@@ -143,12 +157,7 @@ class HomeActivity : AppCompatActivity(), HostInterface {
     }
 
     override fun onTeamClick(team: Team) {
-        val disposable = viewModel.updateCurrentTeam(team).subscribe({
-            navController.popBackStack(R.id.navigation_home, false)
-            closeDrawer()
-        }, {
-            Timber.e(it)
-        })
+        viewModel.updateCurrentTeam(team)
     }
 
     private fun closeDrawer() {
@@ -158,11 +167,6 @@ class HomeActivity : AppCompatActivity(), HostInterface {
     }
 
     private fun loadTeamData() {
-        val disposable = viewModel.getTeam().subscribe({
-            drawerHeader.setImage(it.image)
-            drawerHeader.setTitle(it.name)
-        }, { throwable ->
-            Timber.d(throwable)
-        })
+        viewModel.getTeam()
     }
 }
