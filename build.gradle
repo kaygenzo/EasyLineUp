@@ -68,7 +68,11 @@ buildscript {
 
         // firebase related classpath
         classpath 'com.google.firebase:firebase-appdistribution-gradle:1.3.1'
-        classpath 'com.google.firebase:perf-plugin:1.3.1'
+
+        if (!project.hasProperty("disable-performance-plugin")) {
+            classpath 'com.google.firebase:perf-plugin:1.3.1'
+        }
+
         classpath "io.fabric.tools:gradle:$fabricGradleVersion"
     }
 }
