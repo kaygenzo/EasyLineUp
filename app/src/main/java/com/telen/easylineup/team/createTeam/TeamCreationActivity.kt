@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
+import com.telen.easylineup.BaseActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
@@ -15,7 +16,7 @@ import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.activity_team_creation.*
 import timber.log.Timber
 
-class TeamCreationActivity: AppCompatActivity() {
+class TeamCreationActivity: BaseActivity() {
 
     lateinit var viewModel: SetupViewModel
 
@@ -49,13 +50,14 @@ class TeamCreationActivity: AppCompatActivity() {
                     }
                 }
                 TeamCreationStep.FINISH -> {
-                    viewModel.saveTeam()
+                    val disposable = viewModel.saveTeam()
                             .subscribe({
                                 setResult(Activity.RESULT_OK)
                                 finish()
                             }, {  error ->
                                 Timber.e(error)
                             })
+                    disposables.add(disposable)
                 }
                 TeamCreationStep.CANCEL -> {
                     AlertDialog.Builder(this)

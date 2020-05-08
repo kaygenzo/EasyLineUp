@@ -21,14 +21,14 @@ import com.obsez.android.lib.filechooser.ChooserDialog
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.login.*
+import com.telen.easylineup.login.ImportFailure
+import com.telen.easylineup.login.ImportSuccessfulEvent
+import com.telen.easylineup.login.LoginActivity
+import com.telen.easylineup.login.LoginViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.views.CustomEditTextView
 import io.reactivex.Completable
-import io.reactivex.CompletableOnSubscribe
-import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 
 class SettingsFragment : PreferenceFragmentCompat() {

@@ -13,6 +13,7 @@ import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
+import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.TeamType
@@ -27,7 +28,7 @@ import timber.log.Timber
 
 const val REQUEST_EDIT_TEAM = 0
 
-class TeamDetailsFragment: Fragment() {
+class TeamDetailsFragment: BaseFragment() {
 
     private lateinit var teamViewModel: TeamViewModel
     private lateinit var lineupViewModel: LineupViewModel
@@ -123,12 +124,13 @@ class TeamDetailsFragment: Fragment() {
                                 it.getString(R.string.dialog_delete_team_title, team.name),
                                 it.getString(R.string.dialog_delete_cannot_undo_message),
                                 Completable.create { emitter ->
-                                    teamViewModel.deleteTeam(team)
+                                    val disposable = teamViewModel.deleteTeam(team)
                                             .subscribe({
                                                 findNavController().popBackStack()
                                             }, {
                                                 Timber.e(it)
                                             })
+                                    disposables.add(disposable)
                                     emitter.onComplete()
                                 })
                                 .show()

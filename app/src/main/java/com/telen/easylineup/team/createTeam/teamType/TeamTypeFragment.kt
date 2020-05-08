@@ -7,14 +7,16 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
+import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.team.createTeam.SetupViewModel
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_team_type.view.*
 import timber.log.Timber
 
 
-class TeamTypeFragment: Fragment(), ViewPager.OnPageChangeListener {
+class TeamTypeFragment: BaseFragment(), ViewPager.OnPageChangeListener {
 
     private lateinit var viewModel: SetupViewModel
     private lateinit var mViewPager: ViewPager
@@ -61,6 +63,7 @@ class TeamTypeFragment: Fragment(), ViewPager.OnPageChangeListener {
         }, {
             Timber.e(it)
         })
+        disposables.add(disposable)
 
         return view
     }

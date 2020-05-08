@@ -9,11 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.nguyenhoanglam.imagepicker.model.Config
 import com.nguyenhoanglam.imagepicker.model.Image
+import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.fragment_team_edit.view.*
 import kotlinx.android.synthetic.main.view_create_team.*
 import timber.log.Timber
 
-class TeamEditFragment: Fragment() , TeamFormListener {
+class TeamEditFragment: BaseFragment() , TeamFormListener {
 
     private lateinit var viewModel: SetupViewModel
     private var teamForm: TeamFormView? = null
@@ -66,6 +66,7 @@ class TeamEditFragment: Fragment() , TeamFormListener {
         }, { throwable ->
             Timber.e(throwable)
         })
+        disposables.add(disposable)
 
         view.editTeamForm.setListener(this)
 

@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.ViewHolder
+import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.FieldPosition
@@ -32,11 +33,9 @@ import kotlinx.android.synthetic.main.fragment_lineup_defense_editable.view.*
 import timber.log.Timber
 
 
-class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
+class DefenseFragmentEditable: BaseFragment(), OnPlayerButtonCallback {
 
     lateinit var viewModel: PlayersPositionViewModel
-
-    private val disposables = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,12 +82,13 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
 
         viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer { players ->
             view.cardDefenseView.setPlayerStateListener(this)
-            viewModel.getTeamType()
+            val disposable = viewModel.getTeamType()
                     .subscribe({
                         view.cardDefenseView.setListPlayer(players, viewModel.lineupMode, it)
                     }, {
                         Timber.e(it)
                     })
+            disposables.add(disposable)
         })
 
         return view
@@ -148,13 +148,14 @@ class DefenseFragmentEditable: Fragment(), OnPlayerButtonCallback {
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     val dp = dpFlexLinkView.getDp()
                     val flex = dpFlexLinkView.getFlex()
-                    viewModel.linkDpAndFlex(dp, flex)
+                    val disposable = viewModel.linkDpAndFlex(dp, flex)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
                                 dialog.dismiss()
                             }, {
                                 Timber.e(it)
                             })
+                    disposables.add(disposable)
                 }
                 .setNegativeButton(android.R.string.cancel) { dialog, _ ->
                     dialog.dismiss()

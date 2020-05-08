@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.getkeepsafe.taptargetview.TapTargetView
+import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.TeamRosterSummary
@@ -30,7 +31,7 @@ import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
 import kotlinx.android.synthetic.main.fragment_lineup_creation.view.*
 import timber.log.Timber
 
-class LineupCreationFragment: Fragment() {
+class LineupCreationFragment: BaseFragment() {
 
     private lateinit var lineupViewModel: LineupViewModel
 
@@ -42,11 +43,12 @@ class LineupCreationFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_lineup_creation, container, false)
 
-        lineupViewModel.getTournaments().subscribe({
+        val getTournamentsDisposable = lineupViewModel.getTournaments().subscribe({
             view.lineupCreationForm.setList(it)
         }, {
             Timber.e(it)
         })
+        disposables.add(getTournamentsDisposable)
 
         view.lineupCreationForm.setOnActionClickListener(object: OnActionButtonListener {
             override fun onRosterChangeClicked() {
@@ -62,11 +64,12 @@ class LineupCreationFragment: Fragment() {
             }
         })
 
-        lineupViewModel.getRoster().subscribe({
+        val getRosterDisposable = lineupViewModel.getRoster().subscribe({
             updateRosterSize(view.playerCount, it)
         }, {
             Timber.e(it)
         })
+        disposables.add(getRosterDisposable)
 
         lineupViewModel.registerSaveResults().observe(viewLifecycleOwner, Observer {
             when(it) {
@@ -121,12 +124,13 @@ class LineupCreationFragment: Fragment() {
                 }, {
                     Timber.e(it)
                 })
+        disposables.add(disposable)
     }
 
     override fun onResume() {
         super.onResume()
         activity?.let { activity ->
-            lineupViewModel.showNewRosterFeature(activity)
+            val disposable = lineupViewModel.showNewRosterFeature(activity)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ show ->
                         if(show) {
@@ -151,6 +155,7 @@ class LineupCreationFragment: Fragment() {
                     }, {
                         Timber.e(it)
                     })
+            disposables.add(disposable)
         }
     }
 

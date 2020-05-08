@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamType
@@ -20,7 +21,7 @@ import com.telen.easylineup.views.ItemDecoratorAttackRecycler
 import kotlinx.android.synthetic.main.fragment_list_batter.view.*
 import timber.log.Timber
 
-class AttackFragment: Fragment(), OnDataChangedListener {
+class AttackFragment: BaseFragment(), OnDataChangedListener {
 
     private lateinit var playerAdapter: BattingOrderAdapter
     private val adapterDataList = mutableListOf<PlayerWithPosition>()
@@ -57,7 +58,7 @@ class AttackFragment: Fragment(), OnDataChangedListener {
                 itemTouchedHelper.attachToRecyclerView(view.recyclerView)
             }
 
-            viewModel.getTeamType()
+            val disposable = viewModel.getTeamType()
                     .subscribe({ teamType ->
                         playerAdapter.apply {
                             this.teamType = teamType
@@ -66,6 +67,7 @@ class AttackFragment: Fragment(), OnDataChangedListener {
                     }, {
                         Timber.e(it)
                     })
+            disposables.add(disposable)
 
             view.header.setIsEditable(isEditable)
 

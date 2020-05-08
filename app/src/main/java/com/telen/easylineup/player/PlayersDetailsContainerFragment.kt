@@ -14,7 +14,6 @@ import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
 import io.reactivex.Completable
-import io.reactivex.CompletableOnSubscribe
 import kotlinx.android.synthetic.main.fragment_players_details_container.view.*
 import timber.log.Timber
 
