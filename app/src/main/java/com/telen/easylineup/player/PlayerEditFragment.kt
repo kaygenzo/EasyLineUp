@@ -42,7 +42,6 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
 
         view.editPlayerForm.apply {
             setListener(this@PlayerEditFragment)
-            disableSaveButton()
         }
 
         viewModel.observePlayer().observe(viewLifecycleOwner, Observer { player ->
@@ -62,8 +61,6 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
                 imagePath?.let { imageUriString ->
                     setImage(imageUriString)
                 }
-
-                enableSaveButton()
             }
         })
 
@@ -83,7 +80,6 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
                 }
                 DomainErrors.INVALID_PLAYER_ID -> {
                     //case of a player creation
-                    view.editPlayerForm.enableSaveButton()
                     FirebaseAnalyticsUtils.emptyPlayerID(activity)
                 }
                 else -> {

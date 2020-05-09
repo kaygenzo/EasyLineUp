@@ -5,14 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.R
-import com.telen.easylineup.domain.*
+import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.Tournament
-import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
-import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -21,8 +19,6 @@ import org.koin.core.inject
 import timber.log.Timber
 
 sealed class SaveResult
-data class InvalidLineupName(val errorRes: Int): SaveResult()
-data class InvalidTournamentName(val errorRes: Int): SaveResult()
 data class SaveSuccess(val lineupID: Long, val lineupName: String): SaveResult()
 
 class LineupViewModel: ViewModel(), KoinComponent {
@@ -84,12 +80,7 @@ class LineupViewModel: ViewModel(), KoinComponent {
                 .subscribe({
                     saveResult.value = SaveSuccess(it, lineupTitle)
                 }, {
-                    if (it is LineupNameEmptyException) {
-                        saveResult.value = InvalidLineupName(R.string.lineup_creation_error_name_empty)
-                    }
-                    else if(it is TournamentNameEmptyException) {
-                        saveResult.value = InvalidTournamentName(R.string.lineup_creation_error_tournament_empty)
-                    }
+                    Timber.e(it)
                 })
         disposables.add(disposable)
     }
@@ -112,5 +103,9 @@ class LineupViewModel: ViewModel(), KoinComponent {
             prefs.edit().putBoolean(Constants.PREF_FEATURE_SHOW_NEW_ROSTER, false).apply()
         }
         return Single.just(show)
+    }
+
+    fun observeErrors(): LiveData<DomainErrors> {
+        return domain.observeErrors()
     }
 }

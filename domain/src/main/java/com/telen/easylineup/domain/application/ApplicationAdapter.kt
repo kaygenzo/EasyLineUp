@@ -253,6 +253,14 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
                     }
                 }
                 .map { it.lineupID }
+                .doOnError {
+                    if (it is LineupNameEmptyException) {
+                        _errors.postValue(DomainErrors.INVALID_LINEUP_NAME)
+                    }
+                    else if(it is TournamentNameEmptyException) {
+                        _errors.postValue(DomainErrors.INVALID_TOURNAMENT_NAME)
+                    }
+                }
     }
 
     override fun deleteLineup(lineupID: Long?): Completable {

@@ -21,7 +21,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/lineupTitleInputLayout"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="wrap_content"
                 android:hint="@string/dialog_create_lineup_name">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -30,7 +30,7 @@
                     tools:text="The lineup name"
                     android:textSize="@dimen/text_size_big"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="60dp"
                     android:lines="1"/>
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -38,13 +38,13 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tournamentTitleInputLayout"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="wrap_content"
                 android:hint="@string/dialog_create_lineup_tournament">
 
                 <androidx.appcompat.widget.AppCompatAutoCompleteTextView
                     android:id="@+id/tournamentChoiceAutoComplete"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="60dp"
                     android:textSize="@dimen/text_size_big"
                     tools:text="The tournament"
                     android:lines="1"

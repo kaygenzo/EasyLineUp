@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
@@ -15,10 +14,9 @@ import com.getkeepsafe.taptargetview.TapTargetView
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.Tournament
-import com.telen.easylineup.lineup.list.InvalidLineupName
-import com.telen.easylineup.lineup.list.InvalidTournamentName
 import com.telen.easylineup.lineup.list.LineupViewModel
 import com.telen.easylineup.lineup.list.SaveSuccess
 import com.telen.easylineup.utils.FeatureViewFactory
@@ -71,16 +69,22 @@ class LineupCreationFragment: BaseFragment() {
         })
         disposables.add(getRosterDisposable)
 
-        lineupViewModel.registerSaveResults().observe(viewLifecycleOwner, Observer {
+        lineupViewModel.observeErrors().observe(viewLifecycleOwner, Observer {
             when(it) {
-                is InvalidLineupName -> {
-                    view.lineupCreationForm.setLineupNameError(getString(it.errorRes))
-                    FirebaseAnalyticsUtils.emptyLineupName(activity)
-                }
-                is InvalidTournamentName -> {
-                    view.lineupCreationForm.setTournamentNameError(getString(it.errorRes))
+                DomainErrors.INVALID_TOURNAMENT_NAME -> {
+                    view.lineupCreationForm.setTournamentNameError(getString(R.string.lineup_creation_error_name_empty))
                     FirebaseAnalyticsUtils.emptyTournamentName(activity)
                 }
+                DomainErrors.INVALID_LINEUP_NAME -> {
+                    view.lineupCreationForm.setLineupNameError(getString(R.string.lineup_creation_error_tournament_empty))
+                    FirebaseAnalyticsUtils.emptyLineupName(activity)
+                }
+                else -> {}
+            }
+        })
+
+        lineupViewModel.registerSaveResults().observe(viewLifecycleOwner, Observer {
+            when(it) {
                 is SaveSuccess -> {
                     Timber.d("successfully inserted new lineup, new id: ${it.lineupID}")
                     val extras = Bundle()
