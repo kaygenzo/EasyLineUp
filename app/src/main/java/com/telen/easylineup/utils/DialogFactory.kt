@@ -54,5 +54,12 @@ class DialogFactory {
                     .setTitleText(title)
             return dialog
         }
+
+        fun getWarningDialogYesNo(context: Context, title: String): SweetAlertDialog {
+            val dialog = SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText(title)
+                    .setCancelText(context.getString(R.string.cancel_button))
+            return dialog
+        }
     }
 }

@@ -6,7 +6,7 @@ import com.google.gson.Gson
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.export.ExportBase
-import com.telen.easylineup.utils.SingleLiveEvent
+import com.telen.easylineup.domain.utils.SingleLiveEvent
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import org.koin.core.KoinComponent

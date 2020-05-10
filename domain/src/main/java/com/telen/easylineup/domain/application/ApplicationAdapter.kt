@@ -10,23 +10,23 @@ import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCaseHandler
-import com.telen.easylineup.domain.repository.*
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.model.tiles.ITileData
+import com.telen.easylineup.domain.repository.*
 import com.telen.easylineup.domain.usecases.*
 import com.telen.easylineup.domain.usecases.exceptions.*
+import com.telen.easylineup.domain.utils.SingleLiveEvent
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import io.reactivex.functions.Consumer
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 
-internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErrors> = MutableLiveData<DomainErrors>()): ApplicationPort, KoinComponent {
+internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErrors> = SingleLiveEvent()): ApplicationPort, KoinComponent {
 
     private val context: Context by inject()
 

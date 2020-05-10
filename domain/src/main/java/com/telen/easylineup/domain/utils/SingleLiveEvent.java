@@ -1,4 +1,4 @@
-package com.telen.easylineup.utils;
+package com.telen.easylineup.domain.utils;
 
 /*
  *  Copyright 2017 Google Inc.
@@ -15,6 +15,8 @@ package com.telen.easylineup.utils;
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+import android.util.Log;
+
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,8 +25,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import timber.log.Timber;
 
 /**
  * A lifecycle-aware observable that sends only new updates after subscription, used for events like
@@ -46,11 +46,11 @@ public class SingleLiveEvent<T> extends MutableLiveData<T> {
     @Override
     public void observe(@NonNull LifecycleOwner owner, @NonNull Observer<? super T> observer) {
         if (hasActiveObservers()) {
-            Timber.w("Multiple observers registered but only one will be notified of changes.");
+            Log.w(TAG, "Multiple observers registered but only one will be notified of changes.");
         }
 
         // Observe the internal MutableLiveData
-        super.observe(owner, new androidx.lifecycle.Observer<T>() {
+        super.observe(owner, new Observer<T>() {
             @Override
             public void onChanged(T t) {
                 if (mPending.compareAndSet(true, false)) {

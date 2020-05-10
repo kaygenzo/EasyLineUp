@@ -8,7 +8,7 @@ import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
-import com.telen.easylineup.utils.SingleLiveEvent
+import com.telen.easylineup.domain.utils.SingleLiveEvent
 import io.reactivex.disposables.CompositeDisposable
 import org.koin.core.KoinComponent
 import org.koin.core.inject

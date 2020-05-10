@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -17,6 +18,7 @@ import com.nguyenhoanglam.imagepicker.model.Image
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DomainErrors
+import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.PlayerFormListener
@@ -28,11 +30,20 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
     private lateinit var viewModel: PlayerViewModel
 
     override fun onCancel() {
-        findNavController().navigateUp()
+        cancel()
     }
 
     override fun onImagePickerRequested() {
         ImagePickerUtils.launchPicker(this)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        activity?.onBackPressedDispatcher?.addCallback(this, object: OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                cancel()
+            }
+        })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -149,5 +160,19 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    fun cancel() {
+        activity?.run {
+            DialogFactory.getWarningDialogYesNo(this, getString(R.string.cancel_message))
+                    .setConfirmClickListener {
+                        findNavController().navigateUp()
+                        it.dismissWithAnimation()
+                    }
+                    .setCancelClickListener {
+                        it.dismissWithAnimation()
+                    }
+                    .show()
+        }
     }
 }

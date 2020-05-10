@@ -3,7 +3,6 @@ package com.telen.easylineup.team.createTeam
 import android.app.Activity
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
@@ -61,7 +60,7 @@ class TeamCreationActivity: BaseActivity() {
                 }
                 TeamCreationStep.CANCEL -> {
                     AlertDialog.Builder(this)
-                            .setMessage(R.string.team_creation_cancel_message)
+                            .setMessage(R.string.cancel_message)
                             .setPositiveButton(android.R.string.ok) { dialog, which ->
                                 finish()
                             }

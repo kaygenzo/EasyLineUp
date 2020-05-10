@@ -12,6 +12,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.Tournament
 import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
 import timber.log.Timber
+import java.text.DateFormat
 import java.util.*
 
 interface OnActionButtonListener {
@@ -57,11 +58,12 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
 
         calendar = Calendar.getInstance()
 
-        calendarView.setDate(calendar.timeInMillis, true, true)
+        setTournamentDate(calendar.timeInMillis)
         calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
             calendar.set(Calendar.YEAR, year)
             calendar.set(Calendar.MONTH, month)
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            setTournamentDateHeader(calendar.timeInMillis)
         }
 
         adapter = ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
@@ -71,7 +73,7 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
             val truePosition = tournamentsNames.indexOf(selected)
             val tournament = tournaments[truePosition]
             calendar.timeInMillis = tournament.createdAt
-            calendarView.setDate(calendar.timeInMillis, true, true)
+            setTournamentDate(calendar.timeInMillis)
         }
 
         dateExpandableButton.setOnClickListener {
@@ -87,30 +89,27 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
             }
         }
 
-        rosterExpandableButton.setOnClickListener {
-            when(rosterExpandableView.isExpanded) {
-                true -> {
-                    rosterExpandableView.collapse()
-                    rosterExpandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp)
-                }
-                else -> {
-                    rosterExpandableView.expand()
-                    rosterExpandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp)
-                }
-            }
+        rosterExpandableEdit.setOnClickListener {
+            actionClickListener?.onRosterChangeClicked()
         }
 
         save.setOnClickListener {
             actionClickListener?.onSaveClicked(lineupTitleInput.text.toString(), getSelectedTournament())
         }
 
-        addPlayerFilter.setOnClickListener {
-            actionClickListener?.onRosterChangeClicked()
-        }
-
         cancel.setOnClickListener {
             actionClickListener?.onCancelClicked()
         }
+    }
+
+    private fun setTournamentDate(date: Long) {
+        calendarView.setDate(date, true, true)
+        setTournamentDateHeader(date)
+    }
+
+    private fun setTournamentDateHeader(date: Long) {
+        val formattedDate = DateFormat.getDateInstance().format(date)
+        dateSummary.text = formattedDate
     }
 
     fun setOnActionClickListener(listener: OnActionButtonListener) {

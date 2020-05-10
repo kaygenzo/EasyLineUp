@@ -139,8 +139,7 @@ class LineupCreationFragment: BaseFragment() {
                     .subscribe({ show ->
                         if(show) {
                             view?.lineupCreationForm?.let { form ->
-                                form.rosterExpandableView.expand()
-                                FeatureViewFactory.apply(form.addPlayerFilter,
+                                FeatureViewFactory.apply(form.rosterExpandableEdit,
                                         activity as AppCompatActivity,
                                         getString(R.string.feature_roster_title),
                                         getString(R.string.feature_roster_description),
