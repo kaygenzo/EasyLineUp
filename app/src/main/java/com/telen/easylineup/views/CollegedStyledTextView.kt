@@ -9,12 +9,12 @@ import com.telen.easylineup.R
 
 class CollegedStyledTextView: AppCompatTextView {
 
-    constructor(context: Context?) : super(context) {initView(context)}
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {initView(context)}
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {initView(context)}
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    private fun initView(context: Context?) {
-        setTextColor(ContextCompat.getColor(getContext(), R.color.text_orange))
+    init {
+        setTextColor(ContextCompat.getColor(context, R.color.text_orange))
         isAllCaps = true
     }
 

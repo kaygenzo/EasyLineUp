@@ -27,11 +27,11 @@ abstract class DefenseView: ConstraintLayout {
             val positionX = ((x * layoutWidth) / 100f)
             val positionY = ((y * layoutHeight) / 100f)
 
-            addPlayerOnFieldWithCoordinate(view, layoutWidth, layoutHeight, positionX, positionY, loadingCallback)
+            addPlayerOnFieldWithCoordinate(view, layoutWidth, positionX, positionY, loadingCallback)
         }
     }
 
-    protected fun addPlayerOnFieldWithCoordinate(view: View, parentWidth: Int, parentHeight: Int, x: Float, y: Float,
+    protected fun addPlayerOnFieldWithCoordinate(view: View, parentWidth: Int, x: Float, y: Float,
                                                  loadingCallback: LoadingCallback?) {
         if(fieldFrameLayout.findViewWithTag<PlayerFieldIcon>(view.tag)!=null)
             fieldFrameLayout.removeView(view)

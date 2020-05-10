@@ -2,5 +2,4 @@ package com.telen.easylineup.utils
 
 import androidx.core.content.FileProvider
 
-class LineupFileProvider: FileProvider() {
-}
+class LineupFileProvider: FileProvider()

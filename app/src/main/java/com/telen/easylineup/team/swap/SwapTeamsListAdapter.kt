@@ -31,8 +31,6 @@ class SwapTeamsListAdapter(private val teams: List<Team>, private val hostInterf
         return TeamsListViewHolder(itemView)
     }
 
-    inner class TeamsListViewHolder(val view: TeamItemView): RecyclerView.ViewHolder(view) {
-
-    }
+    inner class TeamsListViewHolder(val view: TeamItemView): RecyclerView.ViewHolder(view)
 
 }

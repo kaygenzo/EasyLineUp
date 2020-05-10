@@ -28,7 +28,7 @@ import kotlinx.android.synthetic.main.nav_drawer_header.view.*
 import timber.log.Timber
 import java.io.Serializable
 
-class HomeActivity : AppCompatActivity(), HostInterface {
+class HomeActivity : BaseActivity(), HostInterface {
 
     private lateinit var viewModel: HomeViewModel
 
@@ -73,6 +73,7 @@ class HomeActivity : AppCompatActivity(), HostInterface {
                         }, {
                             Timber.e(it)
                         })
+                disposables.add(disposable)
             }
         })
 
