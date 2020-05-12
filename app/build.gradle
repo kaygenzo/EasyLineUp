@@ -50,10 +50,9 @@ android {
         targetSdkVersion 28
         versionCode appVersionCode
         versionName appVersionName
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.telen.easylineup.EasylineupAndroidTestRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary true
-        buildConfigField("boolean", "usePrefilledDatabase", "false")
         buildConfigField("String", "ReportToolApiKey", reportProperties['apiKey'])
     }
 
@@ -82,6 +81,7 @@ android {
     productFlavors {
         dev {
             dimension 'version'
+            matchingFallbacks = ['prod']
         }
         prod {
             dimension 'version'
@@ -89,11 +89,11 @@ android {
                 serviceCredentialsFile="easylineup-services.json"
                 testersFile="testers.txt"
             }
-
+            matchingFallbacks = ['prod']
         }
         demo {
             dimension 'version'
-            buildConfigField("boolean", "usePrefilledDatabase", "true")
+            matchingFallbacks = ['demo']
         }
     }
 
@@ -152,15 +152,15 @@ dependencies {
     implementation 'androidx.annotation:annotation:' + rootProject.androidxLibVersion
 
     // Testing-only dependencies
-    androidTestImplementation 'androidx.test:core:' + rootProject.coreVersion
-    androidTestImplementation 'androidx.test:core-ktx:' + rootProject.coreVersion
-    androidTestImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion
-    androidTestImplementation 'androidx.test.ext:junit-ktx:' + rootProject.extJUnitVersion
-    androidTestImplementation 'androidx.test:runner:' + rootProject.runnerVersion
-    androidTestImplementation 'androidx.test:rules:' + rootProject.runnerVersion
+    androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.coreVersion
+    androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoCoreVersion
+    androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:' + rootProject.espressoCoreVersion
+
     androidTestImplementation (name:'cloudtestingscreenshotter_lib', ext:'aar')
 
+    androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.10.0'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+
     androidTestImplementation('tools.fastlane:screengrab:1.2.0') {
         exclude group: 'com.android.support.test.uiautomator', module: 'uiautomator-v18'
     }

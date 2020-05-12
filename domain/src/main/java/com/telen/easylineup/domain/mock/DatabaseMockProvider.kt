@@ -1,17 +1,14 @@
-package com.telen.easylineup.mock
+package com.telen.easylineup.domain.mock
 
 import android.content.Context
 import com.google.gson.JsonParser
-import com.telen.easylineup.application.App
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import java.lang.Exception
 
 
 class DatabaseMockProvider: KoinComponent {
@@ -88,30 +85,25 @@ class DatabaseMockProvider: KoinComponent {
     private fun insertTeam(team: Team): Completable {
         return domain.insertTeam(team).ignoreElement()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
     }
 
     private fun insertPlayers(list: List<Player>): Completable {
         return domain.insertPlayers(list)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
     }
 
     private fun insertLineups(list: List<Lineup>): Completable {
         return domain.insertLineups(list)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
     }
 
     private fun insertPlayerFieldPositions(list: List<PlayerFieldPosition>): Completable {
         return domain.insertPlayerFieldPositions(list)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
     }
 
     private fun insertTournaments(list: List<Tournament>): Completable {
         return domain.insertTournaments(list)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
     }
 }

@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCaseHandler
+import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.model.tiles.ITileData
@@ -445,6 +446,10 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
                     }
                     Single.just(storageDirectoryName)
                 }
+    }
+
+    override fun generateMockedData(): Completable {
+        return DatabaseMockProvider().createMockDatabase(context)
     }
 
 

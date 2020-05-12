@@ -10,6 +10,9 @@ import io.reactivex.Single
 @Dao
 internal interface PlayerDao {
 
+    @Query("DELETE FROM players")
+    fun deleteAll(): Completable
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPlayer(player: RoomPlayer): Single<Long>
 

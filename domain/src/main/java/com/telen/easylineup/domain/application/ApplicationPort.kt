@@ -9,6 +9,7 @@ import com.telen.easylineup.domain.usecases.*
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import io.reactivex.internal.operators.completable.CompletableAmb
 
 interface ApplicationPort {
 
@@ -79,4 +80,6 @@ interface ApplicationPort {
     fun importData(root: ExportBase, updateIfExists: Boolean): Completable
     fun deleteAllData(): Completable
     fun exportDataOnExternalMemory(name: String, fallbackName: String): Single<String>
+
+    fun generateMockedData(): Completable
 }

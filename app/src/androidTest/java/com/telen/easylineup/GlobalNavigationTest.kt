@@ -2,6 +2,7 @@ package com.telen.easylineup
 
 
 import android.app.Activity
+import android.content.Intent
 import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup
@@ -14,25 +15,23 @@ import androidx.test.espresso.contrib.NavigationViewActions
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
-import androidx.test.uiautomator.UiDevice
 import com.google.android.libraries.cloudtesting.screenshots.ScreenShotter
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions
 import com.schibsted.spain.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions
+import com.schibsted.spain.barista.interaction.BaristaListInteractions
 import com.schibsted.spain.barista.interaction.BaristaViewPagerInteractions
 import com.schibsted.spain.barista.rule.cleardata.ClearPreferencesRule
 import com.telen.easylineup.dashboard.DashboardTileAdapter
-import com.telen.easylineup.splashscreen.SplashScreenActivity
 import com.telen.easylineup.team.TeamAdapter
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.*
 import org.hamcrest.TypeSafeMatcher
 import org.hamcrest.core.IsInstanceOf
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -49,11 +48,7 @@ class GlobalNavigationTest {
 
     @Rule
     @JvmField
-    var mSplashScreenTestRule = ActivityTestRule(SplashScreenActivity::class.java)
-
-    @Rule
-    @JvmField
-    var mHomeTestRule = ActivityTestRule(HomeActivity::class.java)
+    var mHomeTestRule = EasyLineupActivityTestRule(HomeActivity::class.java, initialTouchMode = true, launchActivity = false)
 
     @Rule
     @JvmField
@@ -66,10 +61,14 @@ class GlobalNavigationTest {
     @Before
     fun init() {
         Screengrab.setDefaultScreenshotStrategy(UiAutomatorScreenshotStrategy())
+        mHomeTestRule.launchActivity(Intent())
+    }
+
+    @After
+    fun clear() {
     }
 
     private fun takeScreenshot(name: String, activity: Activity) {
-        Thread.sleep(delay)
         val testLabSetting = Settings.System.getString(activity.contentResolver, "firebase.test.lab")
         if ("true" == testLabSetting) {
             ScreenShotter.takeScreenshot(name, activity)
@@ -77,16 +76,24 @@ class GlobalNavigationTest {
         //Screengrab.screenshot(name)
     }
 
-    private fun initialization() {
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        Thread.sleep(5000)
+    private fun applyRotation(name: String) {
 
-        takeScreenshot("dashboard", mHomeTestRule.activity)
+        takeScreenshot("${name}_portrait", mHomeTestRule.activity)
 
-        openDrawer()
+//        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+//        device.setOrientationLeft()
 
+        onView(isRoot()).perform(OrientationChangeAction.orientationLandscape())
+
+        takeScreenshot("${name}_landscape", mHomeTestRule.activity)
+
+//        device.setOrientationNatural()
+        onView(isRoot()).perform(OrientationChangeAction.orientationPortrait())
+
+        Thread.sleep(2000)
+    }
+
+    private fun validateTapTarget() {
         Thread.sleep(delay)
 
         //click on tap tap view button
@@ -95,6 +102,15 @@ class GlobalNavigationTest {
         tapTargetView.perform(click())
 
         Thread.sleep(delay)
+    }
+
+    private fun initialization() {
+
+        takeScreenshot("dashboard", mHomeTestRule.activity)
+
+        openDrawer()
+
+        validateTapTarget()
     }
 
     @Test
@@ -110,11 +126,7 @@ class GlobalNavigationTest {
 
         takeScreenshot("players", mHomeTestRule.activity)
 
-        Thread.sleep(delay)
-
         applyRotation("players")
-
-        Thread.sleep(delay)
 
         //click on first player Albert
         onView(withId(R.id.teamPlayersRecyclerView))
@@ -122,83 +134,59 @@ class GlobalNavigationTest {
                         RecyclerViewActions.actionOnItemAtPosition<TeamAdapter.PlayerViewHolder>(0, click())
                 )
 
-        Thread.sleep(delay)
-
         takeScreenshot("albert_details", mHomeTestRule.activity)
 
         //check name is ALBERT
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
 
-        Thread.sleep(delay)
-
         applyRotation("albert_details")
-
-        Thread.sleep(delay)
 
         //click on edit action button
         onView(withId(R.id.action_edit))
                 .perform(click())
 
-        Thread.sleep(delay)
-
         takeScreenshot("albert_edit", mHomeTestRule.activity)
 
         applyRotation("albert_edit")
 
-        Thread.sleep(delay)
-
         // 1. Check save button come back on details
         BaristaClickInteractions.clickOn("Save")
-
-        Thread.sleep(delay)
 
         //check name is albert
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
 
-        Thread.sleep(delay)
-
         onView(withId(R.id.action_edit))
                 .perform(click())
-
-        Thread.sleep(delay)
 
         // 2. Check cancel button come back on details
         BaristaClickInteractions.clickOn("Cancel")
 
-        Thread.sleep(delay)
+        //confirm discard changes with dialog ok button
+        BaristaClickInteractions.clickOn(R.id.confirm_button)
 
         //check name is albert
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
-
-        Thread.sleep(delay)
 
         onView(withId(R.id.action_edit))
                 .perform(click())
 
-        Thread.sleep(delay)
-
         // 3. Check back button come back on details
         pressBack()
 
-        Thread.sleep(delay)
+        //confirm discard changes with dialog ok button
+        BaristaClickInteractions.clickOn(R.id.confirm_button)
 
         //check name is albert
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
-
-        Thread.sleep(delay)
 
         //click on delete action button
         onView(withId(R.id.action_delete))
                 .perform(click())
 
-        Thread.sleep(delay)
-
         takeScreenshot("albert_delete_dialog", mHomeTestRule.activity)
 
         //confirm delete with dialog ok button
         BaristaClickInteractions.clickOn(R.id.confirm_button)
-
-        Thread.sleep(delay)
 
         //click on the new first player Bernard
         onView(withId(R.id.teamPlayersRecyclerView))
@@ -206,22 +194,14 @@ class GlobalNavigationTest {
                         RecyclerViewActions.actionOnItemAtPosition<TeamAdapter.PlayerViewHolder>(0, click())
                 )
 
-        Thread.sleep(delay)
-
         //check new first name is bernard
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "BERNARD")
-
-        Thread.sleep(delay)
 
         //click on edit action button
         onView(withId(R.id.action_edit))
                 .perform(click())
 
-        Thread.sleep(delay)
-
         applyRotation("bernard_edit")
-
-        Thread.sleep(delay)
 
         //go back to bernard details
         val appCompatImageButton2 = onView(
@@ -235,16 +215,10 @@ class GlobalNavigationTest {
                         isDisplayed()))
         appCompatImageButton2.perform(click())
 
-        Thread.sleep(delay)
-
         //slide in pager to estelle
         BaristaViewPagerInteractions.swipeViewPagerForward()
-        Thread.sleep(300)
         BaristaViewPagerInteractions.swipeViewPagerForward()
-        Thread.sleep(300)
         BaristaViewPagerInteractions.swipeViewPagerForward()
-
-        Thread.sleep(delay)
 
         val textView4 = onView(
                 allOf(withId(R.id.playerName), withText("ESTELLE"),
@@ -256,8 +230,6 @@ class GlobalNavigationTest {
                                 1),
                         isDisplayed()))
         textView4.check(matches(withText("ESTELLE")))
-
-        Thread.sleep(delay)
 
         //go back to list players
         val appCompatImageButton3 = onView(
@@ -271,12 +243,8 @@ class GlobalNavigationTest {
                         isDisplayed()))
         appCompatImageButton3.perform(click())
 
-        Thread.sleep(delay)
-
         //add new player button clicked
         BaristaClickInteractions.clickOn(R.id.fab)
-
-        Thread.sleep(delay)
 
         takeScreenshot("add_new_player", mHomeTestRule.activity)
 
@@ -294,16 +262,10 @@ class GlobalNavigationTest {
         BaristaClickInteractions.clickOn("CF")
         BaristaClickInteractions.clickOn("RF")
 
-        Thread.sleep(delay)
-
         //save and go back to the list of players
         BaristaClickInteractions.clickOn("Save")
 
-        Thread.sleep(delay)
-
         //TODO check new player is at the end of the list
-
-        Thread.sleep(delay)
 
         //go back to the dashboard
         val appCompatImageButton4 = onView(
@@ -317,21 +279,15 @@ class GlobalNavigationTest {
                         isDisplayed()))
         appCompatImageButton4.perform(click())
 
-        Thread.sleep(delay)
-
         //click on the tile team size
         onView(withId(R.id.tileRecyclerView))
                 .perform(
                         RecyclerViewActions.actionOnItemAtPosition<DashboardTileAdapter.TileViewHolder>(1, click())
                 )
 
-        Thread.sleep(delay)
-
         //check title Team Roster
         onView(allOf(instanceOf(TextView::class.java), withParent(withId(R.id.toolbar))))
                 .check(matches(withText("Team Roster")))
-
-        Thread.sleep(delay)
 
         //go back to dashboard
         val appCompatImageButton5 = onView(
@@ -344,8 +300,6 @@ class GlobalNavigationTest {
                                 1),
                         isDisplayed()))
         appCompatImageButton5.perform(click())
-
-        Thread.sleep(delay)
 
         //check now the most used player is Bernard
         onView(withId(R.id.tile_player_most_used_name)).check(matches(withText("BERNARD")))
@@ -361,8 +315,6 @@ class GlobalNavigationTest {
         onView(allOf(withId(R.id.drawerImage), withParent(withId(R.id.navDrawerRootContainer))))
                 .perform(click())
 
-        Thread.sleep(delay)
-
         takeScreenshot("team_details", mHomeTestRule.activity)
 
         // check team name is "DC UNIVERS"
@@ -377,29 +329,19 @@ class GlobalNavigationTest {
         // check team tournaments stats is 3T/8L
         BaristaVisibilityAssertions.assertContains(R.id.teamTournamentsDescription, "3 tournaments / 8 lineups")
 
-        Thread.sleep(delay)
-
         //click on edit action button
         onView(withId(R.id.action_edit))
                 .perform(click())
-
-        Thread.sleep(delay)
 
         takeScreenshot("team_edit_name", mHomeTestRule.activity)
 
         applyRotation("team_edit_name")
 
-        Thread.sleep(delay)
-
         //fill name with NewTeamName
         BaristaEditTextInteractions.writeTo(R.id.teamNameInput, "NewTeamName")
 
-        Thread.sleep(delay)
-
         //click next
         BaristaClickInteractions.clickOn(R.id.buttonNext)
-
-        Thread.sleep(delay)
 
         takeScreenshot("team_edit_team_type", mHomeTestRule.activity)
 
@@ -409,16 +351,10 @@ class GlobalNavigationTest {
         //choose softball type
         BaristaViewPagerInteractions.swipeViewPagerForward()
 
-        Thread.sleep(delay)
-
         //finish edit flow
         BaristaClickInteractions.clickOn(R.id.buttonNext)
 
-        Thread.sleep(delay)
-
         applyRotation("new_team_details")
-
-        Thread.sleep(delay)
 
         // check team new name is "NewTeamName"
         BaristaVisibilityAssertions.assertContains(R.id.teamName, "NewTeamName")
@@ -432,8 +368,6 @@ class GlobalNavigationTest {
         // check team tournaments stats is 3T/8L
         BaristaVisibilityAssertions.assertContains(R.id.teamTournamentsDescription, "3 tournaments / 8 lineups")
 
-        Thread.sleep(delay)
-
         // click back on top left button
         val appCompatImageButton7 = onView(
                 allOf(withContentDescription("Navigate up"),
@@ -446,11 +380,7 @@ class GlobalNavigationTest {
                         isDisplayed()))
         appCompatImageButton7.perform(click())
 
-        Thread.sleep(delay)
-
         openDrawer()
-
-        Thread.sleep(delay)
 
         //check team name is "NewTeamName"
         onView(allOf(instanceOf(TextView::class.java), withParent(withId(R.id.navDrawerRootContainer))))
@@ -470,8 +400,6 @@ class GlobalNavigationTest {
                         NavigationViewActions.navigateTo(R.id.navigation_lineups)
                 )
 
-        Thread.sleep(delay)
-
         takeScreenshot("lineups_list", mHomeTestRule.activity)
 
         //click on stats tournament of the first tournament
@@ -481,13 +409,9 @@ class GlobalNavigationTest {
                 isDisplayed()))
         appCompatImageButton9.perform(click())
 
-        Thread.sleep(delay)
-
         takeScreenshot("lineups_list_tournament_stats", mHomeTestRule.activity)
 
         applyRotation("lineups_list_tournament_stats")
-
-        Thread.sleep(delay)
 
         // go back to the list of tournaments
         val appCompatImageButton10 = onView(
@@ -501,11 +425,7 @@ class GlobalNavigationTest {
                         isDisplayed()))
         appCompatImageButton10.perform(click())
 
-        Thread.sleep(delay)
-
         applyRotation("lineups_list")
-
-        Thread.sleep(delay)
 
         //click on the first lineup
         val constraintLayout = onView(
@@ -515,15 +435,11 @@ class GlobalNavigationTest {
                         isDisplayed()))
         constraintLayout.perform(click())
 
-        Thread.sleep(delay)
-
         takeScreenshot("lineup_defense_fixed", mHomeTestRule.activity)
 
         //click on attack
         onView(allOf(withText("ATTACK"), isDescendantOfA(withId(R.id.lineupTabLayout))))
                 .perform(click())
-
-        Thread.sleep(delay)
 
         takeScreenshot("lineup_attack_fixed", mHomeTestRule.activity)
 
@@ -531,17 +447,11 @@ class GlobalNavigationTest {
         onView(allOf(withText("DEFENSE"), isDescendantOfA(withId(R.id.lineupTabLayout))))
                 .perform(click())
 
-        Thread.sleep(delay)
-
         applyRotation("lineup_defense_fixed")
-
-        Thread.sleep(delay)
 
         //click on edit button
         onView(withId(R.id.action_edit))
                 .perform(click())
-
-        Thread.sleep(delay)
 
         takeScreenshot("lineup_defense_editable", mHomeTestRule.activity)
 
@@ -551,17 +461,11 @@ class GlobalNavigationTest {
 
         takeScreenshot("lineup_attack_editable", mHomeTestRule.activity)
 
-        Thread.sleep(delay)
-
         //click on defense
         onView(allOf(withText("DEFENSE"), isDescendantOfA(withId(R.id.lineupTabLayout))))
                 .perform(click())
 
-        Thread.sleep(delay)
-
         applyRotation("lineup_defense_editable")
-
-        Thread.sleep(delay)
 
         //go back to the lineup fixed
         val appCompatImageButton11 = onView(
@@ -575,18 +479,14 @@ class GlobalNavigationTest {
                         isDisplayed()))
         appCompatImageButton11.perform(click())
 
-        Thread.sleep(delay)
-
         //click on edit button
         onView(withId(R.id.action_delete))
                 .perform(click())
 
-        Thread.sleep(delay)
-
         //confirm delete with dialog ok button
         BaristaClickInteractions.clickOn(R.id.confirm_button)
 
-        Thread.sleep(delay)
+        BaristaListInteractions.scrollListToPosition(R.id.recyclerView, 0)
 
         BaristaVisibilityAssertions.assertDisplayed(R.id.headerText, "3 TOURNAMENTS / 7 LINEUPS")
 
@@ -596,14 +496,10 @@ class GlobalNavigationTest {
                 hasSibling(withText("PARIS SERIES")),
                 isDisplayed())).perform(click())
 
-        Thread.sleep(delay)
-
         takeScreenshot("lineup_delete_popup", mHomeTestRule.activity)
 
         //confirm delete with dialog ok button
         BaristaClickInteractions.clickOn(R.id.confirm_button)
-
-        Thread.sleep(delay)
 
         //check new summary header
         BaristaVisibilityAssertions.assertDisplayed(R.id.headerText, "2 TOURNAMENTS / 3 LINEUPS")
@@ -611,19 +507,10 @@ class GlobalNavigationTest {
         //click on add lineup
         BaristaClickInteractions.clickOn(R.id.fab)
 
-        Thread.sleep(delay)
-
-        //hide the tap ta view
-        val tapTargetView2 = onView(
-                allOf(withClassName(`is`("com.getkeepsafe.taptargetview.TapTargetView")), isDisplayed()))
-        tapTargetView2.perform(click())
-
-        Thread.sleep(delay)
+        validateTapTarget()
 
         BaristaEditTextInteractions.writeTo(R.id.lineupTitleInput, "NewLineup")
         BaristaEditTextInteractions.writeTo(R.id.tournamentChoiceAutoComplete, "NewTournament")
-
-        Thread.sleep(delay)
 
         takeScreenshot("lineups_create_lineup", mHomeTestRule.activity)
 
@@ -640,15 +527,11 @@ class GlobalNavigationTest {
 //                                0)))
 //        constraintLayout2.perform(scrollTo(), click())
 //
-//        Thread.sleep(delay)
-//
 //
 //        //choose 01/01/2020
 //
 //        onView(allOf(withContentDescription("Previous month"),
 //                isDisplayed())).perform(click())
-//
-//        Thread.sleep(delay)
 //
 //        val appCompatImageButton13 = onView(
 //                allOf(withClassName(`is`("androidx.appcompat.widget.AppCompatImageButton")), withContentDescription("Previous month"),
@@ -661,17 +544,11 @@ class GlobalNavigationTest {
 //                        isDisplayed()))
 //        appCompatImageButton13.perform(click())
 //
-//        Thread.sleep(delay)
-
         //save the new lineup
         BaristaClickInteractions.clickOn(R.id.save)
 
-        Thread.sleep(delay)
-
         //go to the list of lineups
         pressBack()
-
-        Thread.sleep(delay)
 
         //check header
         BaristaVisibilityAssertions.assertDisplayed(R.id.headerText, "3 TOURNAMENTS / 4 LINEUPS")
@@ -691,18 +568,12 @@ class GlobalNavigationTest {
         //click on switch team
         BaristaClickInteractions.clickOn(R.id.changeTeam)
 
-        Thread.sleep(delay)
-
         takeScreenshot("swap_team_dialog", mHomeTestRule.activity)
 
         //click on create
         BaristaClickInteractions.clickOn(android.R.id.button1)
 
-        Thread.sleep(delay)
-
         applyRotation("create_team")
-
-        Thread.sleep(delay)
 
         //call the new team toto
         BaristaEditTextInteractions.writeTo(R.id.teamNameInput, "toto")
@@ -710,24 +581,16 @@ class GlobalNavigationTest {
         //click next again
         BaristaClickInteractions.clickOn(R.id.buttonNext)
 
-        Thread.sleep(delay)
-
         //assert button name is Finish
         BaristaVisibilityAssertions.assertContains(R.id.buttonNext, "Finish")
         //click finish
         BaristaClickInteractions.clickOn(R.id.buttonNext)
 
-        Thread.sleep(delay)
-
         openDrawer()
-
-        Thread.sleep(delay)
 
         //click on image in drawer header
         onView(allOf(withId(R.id.drawerImage), withParent(withId(R.id.navDrawerRootContainer))))
                 .perform(click())
-
-        Thread.sleep(delay)
 
         // check team name is "TOTO"
         BaristaVisibilityAssertions.assertContains(R.id.teamName, "TOTO")
@@ -741,19 +604,11 @@ class GlobalNavigationTest {
         // check team tournaments stats is 3T/8L
         BaristaVisibilityAssertions.assertContains(R.id.teamTournamentsDescription, "0 tournaments / 0 lineups")
 
-        Thread.sleep(delay)
-
         pressBack()
-
-        Thread.sleep(delay)
 
         openDrawer()
 
-        Thread.sleep(delay)
-
         BaristaClickInteractions.clickOn(R.id.changeTeam)
-
-        Thread.sleep(delay)
 
         //check first entry is NewTeam
         val textView20 = onView(
@@ -778,22 +633,6 @@ class GlobalNavigationTest {
 //                                0),
 //                        isDisplayed()))
 //        textView21.check(matches(withText("toto")))
-    }
-
-    private fun applyRotation(name: String) {
-
-        takeScreenshot("${name}_portrait", mHomeTestRule.activity)
-
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        device.setOrientationLeft()
-
-        Thread.sleep(2000)
-
-        takeScreenshot("${name}_landscape", mHomeTestRule.activity)
-
-        device.setOrientationNatural()
-
-        Thread.sleep(2000)
     }
 
     private fun childAtPosition(

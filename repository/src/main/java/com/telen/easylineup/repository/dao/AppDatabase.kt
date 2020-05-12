@@ -4,6 +4,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.telen.easylineup.repository.model.*
 
+const val DATABASE_NAME = "easylineup_database"
+
 @Database(entities = [RoomPlayer::class, RoomTeam::class, RoomLineup::class, RoomPlayerFieldPosition::class, RoomTournament::class], version = 8)
 internal abstract class AppDatabase: RoomDatabase() {
     abstract fun playerDao(): PlayerDao

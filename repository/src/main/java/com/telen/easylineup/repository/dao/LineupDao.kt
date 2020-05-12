@@ -8,6 +8,10 @@ import io.reactivex.Single
 
 @Dao
 internal interface LineupDao {
+
+    @Query("DELETE FROM lineups")
+    fun deleteAll(): Completable
+
     @Insert
     fun insertLineup(lineup: RoomLineup): Single<Long>
 

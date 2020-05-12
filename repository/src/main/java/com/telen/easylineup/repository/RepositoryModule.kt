@@ -4,8 +4,9 @@ import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.telen.easylineup.domain.repository.*
-import com.telen.easylineup.repository.dao.AppDatabase
 import com.telen.easylineup.repository.adapters.impl.*
+import com.telen.easylineup.repository.dao.AppDatabase
+import com.telen.easylineup.repository.dao.DATABASE_NAME
 import org.koin.dsl.module
 
 object RepositoryModule {
@@ -13,15 +14,19 @@ object RepositoryModule {
     val repositoryModules = module {
 
         single {
-            Room.databaseBuilder(get(), AppDatabase::class.java, "easylineup_database")
-                .addMigrations(migration_1_2())
-                .addMigrations(migration_2_3())
-                .addMigrations(migration_3_4())
-                .addMigrations(migration_4_5())
-                .addMigrations(migration_5_6())
-                .addMigrations(migration_6_7())
-                .addMigrations(migration_7_8())
-                .build()
+            val builder = Room.databaseBuilder(get(), AppDatabase::class.java, DATABASE_NAME)
+                    .addMigrations(migration_1_2())
+                    .addMigrations(migration_2_3())
+                    .addMigrations(migration_3_4())
+                    .addMigrations(migration_4_5())
+                    .addMigrations(migration_5_6())
+                    .addMigrations(migration_6_7())
+                    .addMigrations(migration_7_8())
+            if(BuildConfig.usePrefilledDatabase) {
+                builder.createFromAsset("demo_database")
+                        .fallbackToDestructiveMigration()
+            }
+            builder.build()
         }
 
         single {

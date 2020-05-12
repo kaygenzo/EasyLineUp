@@ -8,7 +8,6 @@ import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.login.LoginActivity
-import com.telen.easylineup.mock.DatabaseMockProvider
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -31,9 +30,6 @@ class SplashScreenActivity: AppCompatActivity(), KoinComponent {
         setContentView(R.layout.splashscreen)
         appVersion.text = BuildConfig.VERSION_NAME
         var commands: Completable = Completable.timer(3000, TimeUnit.MILLISECONDS)
-        if(BuildConfig.usePrefilledDatabase) {
-            commands = commands.andThen(DatabaseMockProvider().createMockDatabase(this))
-        }
         disposable = commands.andThen(domain.getTeam())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({

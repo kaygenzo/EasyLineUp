@@ -8,6 +8,9 @@ import io.reactivex.Single
 @Dao
 internal interface TournamentDao {
 
+    @Query("DELETE FROM tournaments")
+    fun deleteAll(): Completable
+
     @Query("SELECT * from tournaments ORDER BY createdAt DESC")
     fun getTournaments(): Single<List<RoomTournament>>
 

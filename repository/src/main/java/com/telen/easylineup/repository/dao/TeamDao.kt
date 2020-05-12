@@ -8,6 +8,10 @@ import io.reactivex.Single
 
 @Dao
 internal interface TeamDao {
+
+    @Query("DELETE FROM teams")
+    fun deleteAll(): Completable
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTeam(team: RoomTeam): Single<Long>
 

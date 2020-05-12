@@ -12,6 +12,10 @@ import io.reactivex.Single
 
 @Dao
 internal interface PlayerFieldPositionsDao {
+
+    @Query("DELETE FROM playerFieldPosition")
+    fun deleteAll(): Completable
+
     @Insert
     fun insertPlayerFieldPositions(fieldPositions: List<RoomPlayerFieldPosition>): Completable
 
