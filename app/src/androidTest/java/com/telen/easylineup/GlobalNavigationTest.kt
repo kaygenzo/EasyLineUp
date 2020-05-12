@@ -69,6 +69,8 @@ class GlobalNavigationTest {
     }
 
     private fun takeScreenshot(name: String, activity: Activity) {
+
+        Thread.sleep(delay)
         val testLabSetting = Settings.System.getString(activity.contentResolver, "firebase.test.lab")
         if ("true" == testLabSetting) {
             ScreenShotter.takeScreenshot(name, activity)
@@ -85,12 +87,14 @@ class GlobalNavigationTest {
 
         onView(isRoot()).perform(OrientationChangeAction.orientationLandscape())
 
+        Thread.sleep(1000)
+
         takeScreenshot("${name}_landscape", mHomeTestRule.activity)
 
 //        device.setOrientationNatural()
         onView(isRoot()).perform(OrientationChangeAction.orientationPortrait())
 
-        Thread.sleep(2000)
+        Thread.sleep(1000)
     }
 
     private fun validateTapTarget() {
