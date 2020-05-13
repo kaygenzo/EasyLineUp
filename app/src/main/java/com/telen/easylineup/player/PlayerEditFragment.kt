@@ -81,10 +81,6 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
                     view.editPlayerForm.displayInvalidName()
                     FirebaseAnalyticsUtils.emptyPlayerName(activity)
                 }
-                DomainErrors.INVALID_PLAYER_LICENSE -> {
-                    view.editPlayerForm.displayInvalidLicense()
-                    FirebaseAnalyticsUtils.emptyPlayerLicense(activity)
-                }
                 DomainErrors.INVALID_PLAYER_NUMBER -> {
                     view.editPlayerForm.displayInvalidNumber()
                     FirebaseAnalyticsUtils.emptyPlayerNumber(activity)

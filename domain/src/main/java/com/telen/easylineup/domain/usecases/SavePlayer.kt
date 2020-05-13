@@ -4,7 +4,6 @@ import android.net.Uri
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
-import com.telen.easylineup.domain.usecases.exceptions.LicenseNumberEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.ShirtNumberEmptyException
 import io.reactivex.Single
@@ -15,10 +14,9 @@ internal class SavePlayer(val dao: PlayerRepository): UseCase<SavePlayer.Request
         return when {
             requestValues.name.isNullOrBlank() -> Single.error(NameEmptyException())
             requestValues.shirtNumber == null -> Single.error(ShirtNumberEmptyException())
-            requestValues.licenseNumber == null -> Single.error(LicenseNumberEmptyException())
             else -> {
                 val player = Player(id = requestValues.playerID, teamId = requestValues.teamID, name = requestValues.name.trim(), shirtNumber = requestValues.shirtNumber,
-                        licenseNumber = requestValues.licenseNumber, image = requestValues.imageUri?.toString(), positions = requestValues.positions)
+                        licenseNumber = requestValues.licenseNumber ?: 0L, image = requestValues.imageUri?.toString(), positions = requestValues.positions)
 
                 val task = if(player.id == 0L) {
                     dao.insertPlayer(player).ignoreElement()
@@ -36,7 +34,7 @@ internal class SavePlayer(val dao: PlayerRepository): UseCase<SavePlayer.Request
                               val teamID: Long,
                               val name: String?,
                               val shirtNumber: Int?,
-                              val licenseNumber: Long?,
+                              val licenseNumber: Long? = 0,
                               val imageUri: Uri?,
                               val positions: Int
     ): UseCase.RequestValues

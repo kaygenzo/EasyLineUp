@@ -202,7 +202,6 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
                     when (it) {
                         is NameEmptyException -> _errors.postValue(DomainErrors.INVALID_PLAYER_NAME)
                         is ShirtNumberEmptyException -> _errors.postValue(DomainErrors.INVALID_PLAYER_NUMBER)
-                        is LicenseNumberEmptyException -> _errors.postValue(DomainErrors.INVALID_PLAYER_LICENSE)
                     }
                 }
     }
