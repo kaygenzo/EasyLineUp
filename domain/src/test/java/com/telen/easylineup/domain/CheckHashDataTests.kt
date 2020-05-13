@@ -102,6 +102,6 @@ internal class CheckHashDataTests {
             Assert.assertEquals(0, it.filter { it.hash == null }.size)
         })
 
-        Assert.assertArrayEquals(arrayOf(2,2,2,2,2), observer.values().first().updateResult)
+        Assert.assertArrayEquals(intArrayOf(2,2,2,2,2), observer.values().first().updateResult)
     }
 }
