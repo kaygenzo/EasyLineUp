@@ -3,6 +3,7 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.GetPlayer
+import com.telen.easylineup.domain.usecases.exceptions.NotExistingPlayer
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
@@ -13,8 +14,6 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
-import java.lang.Exception
-import java.lang.IllegalArgumentException
 
 
 @RunWith(MockitoJUnitRunner::class)
@@ -42,6 +41,14 @@ internal class GetPlayerTests {
         observer.await()
         observer.assertComplete()
         Assert.assertEquals(player, observer.values().first().player)
+    }
+
+    @Test
+    fun shouldTriggerAnExceptionIfIdIsLessOrEqualsTo0() {
+        val observer = TestObserver<GetPlayer.ResponseValue>()
+        mGetPlayer.executeUseCase(GetPlayer.RequestValues(0L)).subscribe(observer)
+        observer.await()
+        observer.assertError(NotExistingPlayer::class.java)
     }
 
     @Test

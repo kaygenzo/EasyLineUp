@@ -12,7 +12,7 @@ data class PlayerWithPosition(
         var flags: Int = 0,
         var order: Int = 0,
         var fieldPositionID: Long = 0,
-        val playerID: Long,
+        var playerID: Long = 0,
         val lineupId: Long,
         val playerPositions: Int
 ) {

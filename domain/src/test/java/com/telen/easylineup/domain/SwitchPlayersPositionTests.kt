@@ -5,6 +5,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
+import com.telen.easylineup.domain.usecases.exceptions.FirstPositionEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.SamePlayerException
 import io.reactivex.Completable
 import io.reactivex.observers.TestObserver
@@ -63,6 +64,18 @@ internal class SwitchPlayersPositionTests {
                 lineupMode = lineupMode, teamType = teamType)).subscribe(observer)
         observer.await()
         observer.assertError(SamePlayerException::class.java)
+    }
+
+    @Test
+    fun shouldTriggerFirstPositionEmptyIfFirstPositionIsNotAssigned() {
+        val lineupMode = MODE_DISABLED
+        val teamType = TeamType.BASEBALL.id
+        val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
+        mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
+                position1 = FieldPosition.SHORT_STOP, position2 = FieldPosition.PITCHER,
+                lineupMode = lineupMode, teamType = teamType)).subscribe(observer)
+        observer.await()
+        observer.assertError(FirstPositionEmptyException::class.java)
     }
 
     /////// BASEBALL TESTS /////////

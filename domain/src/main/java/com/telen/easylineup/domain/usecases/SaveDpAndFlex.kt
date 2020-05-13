@@ -13,7 +13,7 @@ internal class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPosi
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return requestValues.lineupID?.let { lineupID ->
-            val toUpdate = mutableListOf<PlayerFieldPosition>()
+            val toUpdate = mutableListOf<PlayerWithPosition>()
             val toInsert = mutableListOf<PlayerFieldPosition>()
 
             val dp = requestValues.dp ?: return Single.error(NeedAssignBothPlayersException())
@@ -24,7 +24,8 @@ internal class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPosi
             requestValues.players.firstOrNull { p -> p.playerID == flex.id }?.run {
                 flags = PlayerFieldPosition.FLAG_FLEX
                 order = Constants.ORDER_PITCHER_WHEN_DH
-                toUpdate.add(this.toPlayerFieldPosition())
+                if(!toUpdate.contains(this))
+                    toUpdate.add(this)
             }
 
             //check if there are flex flags and reset them because there can be only one flex
@@ -33,21 +34,22 @@ internal class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPosi
             }.forEach {
                 it.flags = PlayerFieldPosition.FLAG_NONE
                 it.order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
-                toUpdate.add(it.toPlayerFieldPosition())
+                if(!toUpdate.contains(it))
+                    toUpdate.add(it)
             }
 
             requestValues.players.firstOrNull { p -> p.position == FieldPosition.DP_DH.position }?.run {
                 order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
-                toUpdate.add(this.toPlayerFieldPosition().apply {
-                    playerId = dp.id
-                })
+                playerID = dp.id
+                if(!toUpdate.contains(this))
+                    toUpdate.add(this)
             } ?: run {
                 val newPosition = PlayerFieldPosition(playerId = dp.id, lineupId = lineupID, position = FieldPosition.DP_DH.position,
                         order = PlayerWithPosition.getNextAvailableOrder(requestValues.players))
                 toInsert.add(newPosition)
             }
 
-            return playerFieldPositionDao.updatePlayerFieldPositions(toUpdate)
+            return playerFieldPositionDao.updatePlayerFieldPositions(toUpdate.map { it.toPlayerFieldPosition() })
                     .andThen(playerFieldPositionDao.insertPlayerFieldPositions(toInsert))
                     .andThen(Single.just(ResponseValue()))
 

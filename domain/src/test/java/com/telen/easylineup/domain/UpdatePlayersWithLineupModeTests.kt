@@ -48,7 +48,16 @@ internal class UpdatePlayersWithLineupModeTests {
     }
 
     @Test
-    fun shouldDoNothingIfListEmptyAndDHEnabled() {
+    fun shouldTriggerAnExceptionIfTeamTypeIsUnknown() {
+        val teamType = 10
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true, teamType))
+                .subscribe(observer)
+        observer.await()
+        observer.assertError(IllegalArgumentException::class.java)
+    }
+
+    @Test
+    fun shouldDoNothingIfListEmptyAndDPEnabled() {
         updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true, TeamType.BASEBALL.id))
                 .subscribe(observer)
         observer.await()
@@ -58,7 +67,7 @@ internal class UpdatePlayersWithLineupModeTests {
     }
 
     @Test
-    fun shouldDoNothingIfListEmptyAndDHDisabled() {
+    fun shouldDoNothingIfListEmptyAndDPDisabled() {
         updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), false, TeamType.BASEBALL.id))
                 .subscribe(observer)
         observer.await()
@@ -68,7 +77,17 @@ internal class UpdatePlayersWithLineupModeTests {
     }
 
     @Test
-    fun shouldDoNothingIfDHEnabledAndNoPitcherAssigned() {
+    fun shouldDoNothingIfDesignatedPlayerEnabledAndSoftballTeam() {
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true, TeamType.SOFTBALL.id))
+                .subscribe(observer)
+        observer.await()
+        observer.assertComplete()
+
+        verifyZeroInteractions(lineupDao)
+    }
+
+    @Test
+    fun shouldDoNothingIfDPEnabledAndNoPitcherAssigned() {
         updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, true, TeamType.BASEBALL.id))
                 .subscribe(observer)
         observer.await()
@@ -78,7 +97,7 @@ internal class UpdatePlayersWithLineupModeTests {
     }
 
     @Test
-    fun shouldDoNothingIfDHDisabledAndNoPitcherOrDHAssigned() {
+    fun shouldDoNothingIfDPDisabledAndNoPitcherOrDPAssigned() {
         updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, false, TeamType.BASEBALL.id))
                 .subscribe(observer)
         observer.await()
@@ -88,7 +107,7 @@ internal class UpdatePlayersWithLineupModeTests {
     }
 
     @Test
-    fun shouldUpdatePitcherOrderTo_10_ifAssignedAndDHEnabled() {
+    fun shouldUpdatePitcherOrderTo_10_ifAssignedAndDPEnabled() {
         players[0].position = FieldPosition.PITCHER.position
 
         updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, true, TeamType.BASEBALL.id))
@@ -105,7 +124,7 @@ internal class UpdatePlayersWithLineupModeTests {
     }
 
     @Test
-    fun shouldDeletePitcherAndDHifAssignedAndDHDisabled() {
+    fun shouldDeletePitcherAndDPifAssignedAndDPDisabled() {
         players[0].apply {
             position = FieldPosition.PITCHER.position
             flags = PlayerFieldPosition.FLAG_FLEX
