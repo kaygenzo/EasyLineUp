@@ -36,7 +36,7 @@ class DashboardViewModel: ViewModel(), KoinComponent {
             getShakeBeta()
                     .concatWith(getTeamSize(it))
                     .concatWith(getMostUsedPlayer(it))
-                    .concatWith(getLastLineup(it))
+                    .concatWith(getLastLineup())
                     .toList()
         }
                 .subscribeOn(Schedulers.io())
@@ -64,7 +64,7 @@ class DashboardViewModel: ViewModel(), KoinComponent {
         return domain.getMostUsedPlayer(team)
     }
 
-    private fun getLastLineup(team: Team): Maybe<ITileData> {
+    private fun getLastLineup(): Maybe<ITileData> {
 //        return App.database.lineupDao().getLastLineup()
 //                .flatMapMaybe { Maybe.just(it) }
 //                .flatMap {

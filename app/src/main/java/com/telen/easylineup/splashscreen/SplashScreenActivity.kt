@@ -29,8 +29,8 @@ class SplashScreenActivity: AppCompatActivity(), KoinComponent {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splashscreen)
         appVersion.text = BuildConfig.VERSION_NAME
-        var commands: Completable = Completable.timer(3000, TimeUnit.MILLISECONDS)
-        disposable = commands.andThen(domain.getTeam())
+        disposable = Completable.timer(3000, TimeUnit.MILLISECONDS)
+                .andThen(domain.getTeam())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     launchHome()

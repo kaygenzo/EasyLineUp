@@ -26,6 +26,7 @@ import org.koin.core.inject
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
+import java.io.IOException
 
 internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErrors> = SingleLiveEvent()): ApplicationPort, KoinComponent {
 
@@ -438,8 +439,9 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
                         out.write(json)
                         out.flush()
                     }
-                    catch (e: Exception) {
+                    catch (e: IOException) {
                         println(e)
+                        _errors.postValue(DomainErrors.CANNOT_EXPORT_DATA)
                     }
                     finally {
                         out?.close()

@@ -19,6 +19,8 @@ interface HostInterface {
     fun onCreateTeamClick()
 }
 
+data class ActivityNullException(override val message: String): Exception(message)
+
 class SwapTeamFragment: DialogFragment() {
 
     private var mAdapter: SwapTeamsListAdapter? = null
@@ -76,6 +78,6 @@ class SwapTeamFragment: DialogFragment() {
             return dialogBuilder.setNegativeButton(android.R.string.cancel, null)
                     .create()
 
-        } ?: throw Exception("Activity is null, it's not allowed at this step")
+        } ?: throw ActivityNullException("Activity is null, it's not allowed at this step")
     }
 }
