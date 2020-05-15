@@ -11,7 +11,7 @@
     android:paddingTop="@dimen/default_margin"
     android:paddingRight="@dimen/default_margin"
     android:paddingBottom="@dimen/default_margin"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:theme="@style/ThemeOverlay.MaterialComponents.Dark">
 
     <ImageView
         android:id="@+id/drawerImage"
@@ -30,7 +30,7 @@
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:textSize="@dimen/text_size_big"
         app:normalUppercaseStyledTextColor="@color/white"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/drawerImage"
         app:layout_constraintBottom_toBottomOf="parent"

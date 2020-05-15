@@ -25,7 +25,7 @@
         app:autoSizeTextType="uniform"
         tools:text="JC"
         android:textStyle="bold"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="?attr/colorPrimaryVariant"
         android:background="@drawable/circle_shape_letters_border_black"
         android:padding="8dp"
         android:gravity="center"/>

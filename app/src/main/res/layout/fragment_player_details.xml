@@ -23,7 +23,7 @@
 
         <ImageView
             android:id="@+id/playerImage"
-            tools:src="@color/colorAccent"
+            tools:src="@color/colorSecondary"
             android:layout_width="@dimen/player_details_picture_width"
             android:layout_height="@dimen/player_details_picture_height"
             app:layout_constraintTop_toTopOf="parent"

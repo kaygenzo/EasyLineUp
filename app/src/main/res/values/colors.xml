@@ -2,9 +2,9 @@
 <resources>
     <color name="colorPrimary">#5a7e2d</color>
     <color name="colorPrimaryLight">#89ad59</color>
-    <color name="colorPrimaryDark">#2d5100</color>
-    <color name="primaryTextColor">#ffffff</color>
-    <color name="colorAccent">#2d5100</color>
+    <color name="colorPrimaryVariant">#2d5100</color>
+    <color name="colorSecondary">#2d5100</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
 
     <color name="number_blue">#FF2D3783</color>
     <color name="text_orange">#FFd37240</color>
@@ -34,7 +34,7 @@
     <color name="tile_player_size_warning">#CC0000</color>
 
     <color name="baseball_field_color">@color/colorPrimary</color>
-    <color name="tournaments_timeline_color">@color/colorPrimaryDark</color>
+    <color name="tournaments_timeline_color">@color/colorPrimaryVariant</color>
 
     <color name="list_empty_text">#6d6d6d</color>
     <color name="teams_list_text_primary">#4d4d4d</color>

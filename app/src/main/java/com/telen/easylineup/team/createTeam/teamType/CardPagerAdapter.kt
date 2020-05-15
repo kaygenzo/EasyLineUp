@@ -1,6 +1,5 @@
 package com.telen.easylineup.team.createTeam.teamType
 
-import androidx.cardview.widget.CardView
 import androidx.viewpager.widget.PagerAdapter
 
 import android.view.LayoutInflater
@@ -10,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import com.google.android.material.card.MaterialCardView
 import com.telen.easylineup.R
 
 const val MAX_ELEVATION_FACTOR = 8
@@ -19,7 +19,7 @@ data class TeamTypeCardItem(@StringRes val title: Int, @DrawableRes val resource
 class CardPagerAdapter : PagerAdapter() {
 
     val mData: MutableList<TeamTypeCardItem> = mutableListOf()
-    val mViews: MutableList<CardView?> = mutableListOf()
+    val mViews: MutableList<MaterialCardView?> = mutableListOf()
 
     var baseElevation: Float = 0.toFloat()
         private set
@@ -29,7 +29,7 @@ class CardPagerAdapter : PagerAdapter() {
         mData.add(item)
     }
 
-    fun getCardViewAt(position: Int): CardView? {
+    fun getCardViewAt(position: Int): MaterialCardView? {
         return mViews[position]
     }
 
@@ -45,7 +45,7 @@ class CardPagerAdapter : PagerAdapter() {
         val view = LayoutInflater.from(container.context).inflate(R.layout.item_card_team_type, container, false)
         container.addView(view)
         bind(mData[position], view)
-        val cardView = view.findViewById(R.id.cardView) as CardView
+        val cardView = view.findViewById(R.id.cardView) as MaterialCardView
 
         if (baseElevation == 0f) {
             baseElevation = cardView.cardElevation

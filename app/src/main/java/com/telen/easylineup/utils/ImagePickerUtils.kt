@@ -13,7 +13,7 @@ class ImagePickerUtils {
             fragment.context?.let {
                 ImagePicker.with(fragment)             //  Initialize ImagePicker with activity or fragment context
                         .setToolbarColor(colorToHexString(ContextCompat.getColor(it, R.color.colorPrimary)))         //  Toolbar color
-                        .setStatusBarColor(colorToHexString(ContextCompat.getColor(it, R.color.colorPrimaryDark)))       //  StatusBar color (works with SDK >= 21  )
+                        .setStatusBarColor(colorToHexString(ContextCompat.getColor(it, R.color.colorPrimaryVariant)))       //  StatusBar color (works with SDK >= 21  )
                         .setToolbarTextColor(colorToHexString(ContextCompat.getColor(it, R.color.white)))     //  Toolbar text color (Title and Done button)
                         .setToolbarIconColor(colorToHexString(ContextCompat.getColor(it, R.color.white)))     //  Toolbar icon color (Back and Camera button)
                         .setProgressBarColor("#4CAF50")     //  ProgressBar color

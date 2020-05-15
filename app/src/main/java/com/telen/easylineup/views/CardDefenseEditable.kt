@@ -4,14 +4,14 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import com.google.android.material.card.MaterialCardView
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.card_defense_editable.view.*
 
-class CardDefenseEditable: CardView, LoadingCallback {
+class CardDefenseEditable: MaterialCardView, LoadingCallback {
 
     override fun onStartLoading() {
         progressBar.visibility = View.VISIBLE

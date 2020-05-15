@@ -13,7 +13,7 @@
     app:timeline_radio_outline_radius="@integer/timeline_radio_radius_outline"
     app:timeline_radio_radius="@integer/timeline_radio_radius">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="60dp"
         app:cardCornerRadius="6dp"
@@ -28,6 +28,6 @@
             android:gravity="center_vertical"
             android:layout_marginStart="@dimen/default_margin"/>
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 </pl.hypeapp.materialtimelineview.MaterialTimelineView>

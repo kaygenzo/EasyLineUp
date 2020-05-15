@@ -20,12 +20,12 @@
 
         app:sv_nextTextColor="@color/selected_step_text"
         app:sv_nextStepLineColor="@color/selected_step_text"
-        app:sv_selectedCircleColor="@color/colorPrimaryDark"
+        app:sv_selectedCircleColor="@color/colorPrimaryVariant"
         app:sv_selectedTextColor="#FF000000"
         app:sv_selectedStepNumberColor="@color/selected_step_circle"
         app:sv_doneStepLineColor="#FF000000"
         app:sv_doneStepMarkColor="@color/selected_step_circle"
-        app:sv_doneCircleColor="@color/colorPrimaryDark"
+        app:sv_doneCircleColor="@color/colorPrimaryVariant"
         app:sv_doneTextColor="@color/selected_step_text"
 
         app:sv_doneCircleRadius="12dp"
@@ -52,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:background="@color/colorPrimaryDark">
+        android:background="@color/colorPrimaryVariant">
 
         <TextView
             android:id="@+id/buttonNext"
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintRight_toLeftOf="@+id/arrowRight"
             android:text="@string/team_creation_label_next"
-            android:textColor="#FFFFFFFF"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -82,7 +82,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toRightOf="@+id/arrowLeft"
             android:text="@string/team_creation_label_cancel"
-            android:textColor="#FFFFFFFF"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
