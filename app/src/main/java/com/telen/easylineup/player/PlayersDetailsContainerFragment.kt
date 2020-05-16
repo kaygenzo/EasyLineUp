@@ -106,10 +106,10 @@ class PlayersDetailsContainerFragment: Fragment(), ViewPager.OnPageChangeListene
     private fun askUserConsentForDeletePlayerWithId(playerID: Long) {
         activity?.let {
             playerViewModel.playerID = playerID
-            DialogFactory.getWarningDialog(it,
-                            it.getString(R.string.dialog_delete_player_title),
-                            it.getString(R.string.dialog_delete_cannot_undo_message),
-                            Completable.create { emitter ->
+            DialogFactory.getWarningTaskDialog(context = it,
+                            title = R.string.dialog_delete_player_title,
+                            message = R.string.dialog_delete_cannot_undo_message,
+                            task = Completable.create { emitter ->
                                 playerViewModel.deletePlayer()
                                 emitter.onComplete()
                             })

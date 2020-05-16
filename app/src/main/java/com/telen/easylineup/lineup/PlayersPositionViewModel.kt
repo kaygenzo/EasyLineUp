@@ -345,10 +345,10 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
     //TODO move in view
     fun getUserDeleteConsentDialog(context: Context): Dialog {
-        return DialogFactory.getWarningDialog(context,
-                context.getString(R.string.dialog_delete_lineup_title),
-                context.getString(R.string.dialog_delete_cannot_undo_message),
-                Completable.create { emitter ->
+        return DialogFactory.getWarningTaskDialog(context = context,
+                title = R.string.dialog_delete_lineup_title,
+                message = R.string.dialog_delete_cannot_undo_message,
+                task = Completable.create { emitter ->
                     deleteLineup()
                     emitter.onComplete()
                 })

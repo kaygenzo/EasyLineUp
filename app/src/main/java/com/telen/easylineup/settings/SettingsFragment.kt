@@ -1,8 +1,8 @@
 package com.telen.easylineup.settings
 
 import android.Manifest
-import android.app.AlertDialog
 import android.content.ActivityNotFoundException
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -62,14 +62,18 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
                 is ExportDataEventSuccess -> {
                     activity?.run {
-                        DialogFactory.getSimpleDialog(this, getString(R.string.settings_export_success, it.pathDirectory)).show()
+                        DialogFactory.getSuccessDialog(
+                                context = this,
+                                title = R.string.settings_export_success,
+                                titleArgs = arrayOf(it.pathDirectory)
+                        ).show()
                     }
 
                     Timber.d("Successfully exported data!")
                 }
                 ExportDataEventFailure -> {
                     activity?.run {
-                        DialogFactory.getErrorDialog(this, getString(R.string.settings_export_error)).show()
+                        DialogFactory.getErrorDialog(this, title = R.string.settings_export_error_title, message = R.string.settings_export_error_message).show()
                     }
                 }
                 else -> {}
@@ -80,14 +84,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             activity?.run {
                 when(it) {
                     ImportSuccessfulEvent -> {
-                        DialogFactory.getSimpleDialog(this, getString(R.string.settings_import_success))
-                                .setConfirmClickListener { it.dismiss() }
-                                .show()
+                        DialogFactory.getSuccessDialog(this, R.string.settings_import_success).show()
                     }
                     ImportFailure -> {
-                        DialogFactory.getErrorDialog(this, getString(R.string.settings_import_error))
-                                .setConfirmClickListener { it.dismiss() }
-                                .show()
+                        DialogFactory.getErrorDialog(this, title = R.string.settings_import_error_title, message = R.string.settings_import_error_message).show()
                     }
                     else -> {}
                 }
@@ -136,8 +136,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             getString(R.string.key_delete_data) -> {
                 activity?.let {
-                    DialogFactory.getWarningDialog(it, "", getString(R.string.dialog_delete_cannot_undo_message),
-                            Completable.create { emitter ->
+                    DialogFactory.getWarningTaskDialog(context = it,
+                            message = R.string.dialog_delete_cannot_undo_message,
+                            task = Completable.create { emitter ->
                                 viewModel.deleteAllData()
                                 emitter.onComplete()
                             }
@@ -179,18 +180,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 val input = CustomEditTextView(this)
                 input.setHint(it.fallbackName)
 
-                AlertDialog.Builder(this)
-                        .setMessage(R.string.export_data_to_file_dialog_message)
-                        .setView(input)
-                        .setPositiveButton(R.string.export_button) { dialog, which ->
+                DialogFactory.getSimpleDialog(
+                        context = this,
+                        message = R.string.export_data_to_file_dialog_message,
+                        view = input,
+                        confirmText = R.string.export_button,
+                        confirmClick = DialogInterface.OnClickListener { dialog, which ->
                             val name = input.getName()
                             viewModel.exportDataOnExternalMemory(name, it.fallbackName)
                         }
-                        .setNegativeButton(R.string.cancel_button) { dialog, which ->
-
-                        }
-                        .create()
-                        .show()
+                ).show()
             }
         })
 

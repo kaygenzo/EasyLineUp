@@ -120,10 +120,11 @@ class TeamDetailsFragment: BaseFragment() {
             R.id.action_delete -> {
                 activity?.let {
                     teamViewModel.team?.let { team ->
-                        DialogFactory.getWarningDialog(it,
-                                it.getString(R.string.dialog_delete_team_title, team.name),
-                                it.getString(R.string.dialog_delete_cannot_undo_message),
-                                Completable.create { emitter ->
+                        DialogFactory.getWarningTaskDialog(context = it,
+                                title = R.string.dialog_delete_team_title,
+                                titleArgs = arrayOf(team.name),
+                                message = R.string.dialog_delete_cannot_undo_message,
+                                task = Completable.create { emitter ->
                                     val disposable = teamViewModel.deleteTeam(team)
                                             .subscribe({
                                                 findNavController().popBackStack()

@@ -1,8 +1,8 @@
 package com.telen.easylineup.team.createTeam
 
 import android.app.Activity
+import android.content.DialogInterface
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
@@ -11,6 +11,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamCreationStep
+import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.activity_team_creation.*
 import timber.log.Timber
@@ -59,16 +60,12 @@ class TeamCreationActivity: BaseActivity() {
                     disposables.add(disposable)
                 }
                 TeamCreationStep.CANCEL -> {
-                    AlertDialog.Builder(this)
-                            .setMessage(R.string.cancel_message)
-                            .setPositiveButton(android.R.string.ok) { dialog, which ->
+                    DialogFactory.getWarningDialog(context = this,
+                            title = R.string.discard_title,
+                            message = R.string.discard_message,
+                            confirmClick = DialogInterface.OnClickListener { dialog, which ->
                                 finish()
-                            }
-                            .setNegativeButton(android.R.string.cancel) { dialog, which ->
-                                dialog.dismiss()
-                            }
-                            .create()
-                            .show()
+                            }, confirmText = R.string.generic_discard).show()
                     return@Observer
                 }
                 else -> {}

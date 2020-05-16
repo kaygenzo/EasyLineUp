@@ -8,6 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
@@ -65,7 +66,7 @@ class SwapTeamFragment: DialogFragment() {
                 adapter = mAdapter
             }
 
-            val dialogBuilder = AlertDialog.Builder(activity)
+            val dialogBuilder = MaterialAlertDialogBuilder(activity)
                     .setCancelable(true)
                     .setView(view)
                     .setTitle(R.string.team_list_dialog_title)

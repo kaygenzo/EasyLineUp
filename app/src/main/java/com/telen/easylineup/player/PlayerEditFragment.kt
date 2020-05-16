@@ -1,6 +1,7 @@
 package com.telen.easylineup.player
 
 import android.app.Activity
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -160,15 +161,16 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
 
     fun cancel() {
         activity?.run {
-            DialogFactory.getWarningDialogYesNo(this, getString(R.string.cancel_message))
-                    .setConfirmClickListener {
+            DialogFactory.getWarningDialog(
+                    context = this,
+                    title = R.string.discard_title,
+                    message = R.string.discard_message,
+                    confirmText = R.string.generic_discard,
+                    confirmClick = DialogInterface.OnClickListener { dialog, which ->
                         findNavController().navigateUp()
-                        it.dismissWithAnimation()
+                        dialog.dismiss()
                     }
-                    .setCancelClickListener {
-                        it.dismissWithAnimation()
-                    }
-                    .show()
+            ).show()
         }
     }
 }

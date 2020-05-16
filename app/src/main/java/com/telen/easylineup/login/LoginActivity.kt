@@ -51,7 +51,7 @@ class LoginActivity: AppCompatActivity() {
         viewModel.loginEvent.observe(this,  Observer {
             when(it) {
                 ImportSuccessfulEvent -> {
-                    val dialog = DialogFactory.getSimpleDialog(this@LoginActivity, getString(R.string.settings_import_success))
+                    val dialog = DialogFactory.getSuccessDialog(this@LoginActivity, R.string.settings_import_success)
                     dialog.setOnDismissListener {
                         //check teams
                         viewModel.getMainTeam()
@@ -59,9 +59,7 @@ class LoginActivity: AppCompatActivity() {
                     dialog.show()
                 }
                 ImportFailure -> {
-                    DialogFactory.getErrorDialog(this@LoginActivity, getString(R.string.settings_import_error))
-                            .setConfirmClickListener { it.dismiss() }
-                            .show()
+                    DialogFactory.getErrorDialog(this@LoginActivity, title = R.string.settings_import_error_title, message = R.string.settings_import_error_message).show()
                 }
                 is GetTeamSuccess -> {
                     //the file contains at least one main team

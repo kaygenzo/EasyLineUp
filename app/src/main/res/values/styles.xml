@@ -1,43 +1,12 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
-        <item name="colorSecondary">@color/colorSecondary</item>
-        <item name="colorOnSecondary">@color/colorOnSecondary</item>
-        <item name="android:statusBarColor">@color/colorPrimaryVariant</item>
-        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.App.SmallComponent</item>
-        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.App.MediumComponent</item>
-        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.App.LargeComponent</item>
-        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
-    </style>
-
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-    </style>
-
-    <style name="AppTheme.NoActionBar.FullScreen" parent="AppTheme.NoActionBar">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
-
     <style name="BaseballTextStyled" parent="AppTheme">
         <item name="android:fontFamily">@font/krinkes_decor_personal</item>
         <item name="android:textSize">22sp</item>
         <item name="android:textColor">#000000</item>
     </style>
 
-    <style name="Tile" parent="CardView">
+    <style name="Tile" parent="Widget.MaterialComponents.CardView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/dashboard_tile_height</item>
         <item name="cardCornerRadius">6dp</item>
@@ -136,7 +105,7 @@
 
     <!-- DRAWER -->
 
-    <style name="AppTheme.Drawer" parent="Widget.Design.NavigationView">
+    <style name="AppTheme.Drawer" parent="Widget.MaterialComponents.NavigationView">
         <item name="android:background">@color/normal_uppercase_style_text_color</item>
         <item name="itemTextColor">@color/white</item>
         <item name="itemIconTint">@color/white</item>
@@ -146,6 +115,8 @@
         <item name="android:background">@color/white</item>
         <item name="android:padding">3dp</item>
     </style>
+
+    <!-- Swap team dialog begin-->
 
     <style name="ListEmptyText">
         <item name="android:textSize">@dimen/list_empty_text_size</item>
@@ -168,6 +139,21 @@
         <item name="android:paddingLeft">24dp</item>
     </style>
 
+    <!-- Swap team dialog end-->
+
+    <style name="ButtonConfirm">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="ButtonCancel">
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="android:textColor">@color/colorPrimaryVariant</item>
+        <item name="strokeColor">@color/colorPrimaryVariant</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <!-- Material components theming -->
+
     <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">8dp</item>
@@ -181,17 +167,15 @@
         <item name="cornerSize">16dp</item>
     </style>
 
-    <style name="ButtonConfirm">
-        <item name="android:textColor">?attr/colorOnPrimary</item>
-    </style>
-
-    <style name="ButtonCancel">
-        <item name="android:backgroundTint">@color/white</item>
-        <item name="android:textColor">@color/colorPrimaryVariant</item>
-        <item name="strokeColor">@color/colorPrimaryVariant</item>
-        <item name="strokeWidth">1dp</item>
-    </style>
-
     <style name="Widget.App.TextInputLayout" parent="Widget.Design.TextInputLayout"/>
 
+    <style name="MaterialAlertDialog.App" parent="MaterialAlertDialog.MaterialComponents">
+        <item name="shapeAppearance">@style/ShapeAppearance.App.SmallComponent</item>
+    </style>
+
+    <style name="MaterialAlertDialog.App.Title.Text" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+<!--        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Headline3</item>-->
+    </style>
+    <style name="MaterialAlertDialog.App.Body.Text" parent="TextAppearance.MaterialComponents.Subtitle1">
+    </style>
 </resources>

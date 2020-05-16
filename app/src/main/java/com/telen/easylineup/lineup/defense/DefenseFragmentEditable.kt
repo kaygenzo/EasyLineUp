@@ -2,14 +2,13 @@ package com.telen.easylineup.lineup.defense
 
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.orhanobut.dialogplus.DialogPlus
@@ -28,7 +27,6 @@ import com.telen.easylineup.views.OnPlayerClickListener
 import com.telen.easylineup.views.PlayerListView
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_lineup_defense_editable.view.*
 import timber.log.Timber
 
@@ -49,7 +47,7 @@ class DefenseFragmentEditable: BaseFragment(), OnPlayerButtonCallback {
             when(it) {
                 DomainErrors.LIST_AVAILABLE_PLAYERS_EMPTY -> {
                     activity?.let { activity ->
-                        DialogFactory.getSimpleDialog(activity, activity.getString(R.string.players_list_empty)).show()
+                        DialogFactory.getSimpleDialog(activity, R.string.players_list_empty).show()
                     }
                 }
                 DomainErrors.SAVE_PLAYER_FIELD_POSITION_FAILED ->  Timber.e(Exception("Save player field position failed"))
@@ -57,12 +55,24 @@ class DefenseFragmentEditable: BaseFragment(), OnPlayerButtonCallback {
                 DomainErrors.UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED -> Timber.e(Exception("Update players with lineup mode failed"))
                 DomainErrors.SAVE_LINEUP_MODE_FAILED -> Timber.e(Exception("Save lineup mode failed"))
                 DomainErrors.NEED_ASSIGN_PITCHER_FIRST -> {
-                    context?.run { DialogFactory.getErrorDialog(this, getString(R.string.error_need_assign_pitcher_first)).show() }
+                    context?.run {
+                        DialogFactory.getErrorDialog(
+                                context = this,
+                                title = R.string.error_need_assign_pitcher_first_title,
+                                message = R.string.error_need_assign_pitcher_first_message).show()
+                    }
                 }
                 DomainErrors.DP_OR_FLEX_NOT_ASSIGNED -> {
-                    context?.run { DialogFactory.getErrorDialog(this, getString(R.string.error_need_assign_both_players)).show() }
+                    context?.run {
+                        DialogFactory.getErrorDialog(
+                                context = this,
+                                title = R.string.error_need_assign_both_players_title,
+                                message = R.string.error_need_assign_both_players_message).show()
+                    }
                 }
-                else -> {}
+                else -> {
+                    Timber.e("Not managed error")
+                }
             }
         })
 
@@ -142,10 +152,11 @@ class DefenseFragmentEditable: BaseFragment(), OnPlayerButtonCallback {
             it?.run { dpFlexLinkView.setPlayerList(this) }
         })
 
-        return AlertDialog.Builder(context)
-                .setView(dpFlexLinkView)
-                .setTitle(title)
-                .setPositiveButton(android.R.string.ok) { dialog, _ ->
+        val dialog = DialogFactory.getSimpleDialog(
+                context = context,
+                title = title,
+                view = dpFlexLinkView,
+                confirmClick = DialogInterface.OnClickListener { dialog, which ->
                     val dp = dpFlexLinkView.getDp()
                     val flex = dpFlexLinkView.getFlex()
                     val disposable = viewModel.linkDpAndFlex(dp, flex)
@@ -157,14 +168,12 @@ class DefenseFragmentEditable: BaseFragment(), OnPlayerButtonCallback {
                             })
                     disposables.add(disposable)
                 }
-                .setNegativeButton(android.R.string.cancel) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setOnDismissListener {
-                    viewModel.linkPlayersInField.removeObservers(viewLifecycleOwner)
-                }
-                .setCancelable(false)
-                .create()
+        )
+        dialog.setOnDismissListener {
+            viewModel.linkPlayersInField.removeObservers(viewLifecycleOwner)
+        }
+        dialog.setCancelable(false)
+        return dialog
     }
 
     private fun getDialogListAvailablePlayers(context: Context, players: List<Player>, position: FieldPosition): DialogPlus {
@@ -188,10 +197,10 @@ class DefenseFragmentEditable: BaseFragment(), OnPlayerButtonCallback {
     }
 
     private fun getDialogDeletePosition(context: Context, player: Player, position: FieldPosition): Dialog {
-        return DialogFactory.getWarningDialog(context,
-                context.getString(R.string.dialog_delete_position_title),
-                context.getString(R.string.dialog_delete_cannot_undo_message),
-                Completable.create { emitter ->
+        return DialogFactory.getWarningTaskDialog(context = context,
+                title = R.string.dialog_delete_position_title,
+                message = R.string.dialog_delete_cannot_undo_message,
+                task = Completable.create { emitter ->
                     viewModel.onDeletePosition(player, position)
                     emitter.onComplete()
                 })

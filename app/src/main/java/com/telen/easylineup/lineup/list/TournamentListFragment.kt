@@ -81,8 +81,13 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
                     .doOnComplete {
                         viewModel.setFilter("")
                     }
-            DialogFactory.getWarningDialog(it, it.getString(R.string.dialog_delete_tournament_title, tournament.name),
-                    it.getString(R.string.dialog_delete_cannot_undo_message), task).show()
+            DialogFactory.getWarningTaskDialog(
+                    context = it,
+                    title = R.string.dialog_delete_tournament_title,
+                    titleArgs = arrayOf(tournament.name),
+                    message = R.string.dialog_delete_cannot_undo_message,
+                    task = task
+            ).show()
         }
     }
 
