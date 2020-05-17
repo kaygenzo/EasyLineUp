@@ -18,6 +18,8 @@ import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.utils.NavigationUtils
+import io.reactivex.functions.Action
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_lineup_edition.view.*
 import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.lineupTabLayout
 import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.viewpager
@@ -40,6 +42,20 @@ class LineupFragment: BaseFragment(), CompoundButton.OnCheckedChangeListener {
         viewModel.lineupID = arguments?.getLong(Constants.LINEUP_ID, 0) ?: 0
         viewModel.lineupTitle = arguments?.getString(Constants.LINEUP_TITLE) ?: ""
         viewModel.editable = arguments?.getBoolean(Constants.EXTRA_EDITABLE, false) ?: false
+
+        val disposable = viewModel.observeErrors().subscribe({
+            when(it) {
+                DomainErrors.DELETE_LINEUP_FAILED -> {
+                    activity?.run {
+                        Toast.makeText(this, R.string.error_when_deleting_lineup, Toast.LENGTH_LONG).show()
+                    }
+                }
+                else -> {}
+            }
+        }, {
+            Timber.e(it)
+        })
+        disposables.add(disposable)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -84,15 +100,6 @@ class LineupFragment: BaseFragment(), CompoundButton.OnCheckedChangeListener {
                         this.runOnUiThread {
                             findNavController().popBackStack(R.id.navigation_lineups, false)
                         }
-                    }
-                    else -> {}
-                }
-            })
-
-            viewModel.observeErrors().observe(viewLifecycleOwner, Observer {
-                when(it) {
-                    DomainErrors.DELETE_LINEUP_FAILED -> {
-                        Toast.makeText(this, "Something wrong happened when deleting lineup", Toast.LENGTH_LONG).show()
                     }
                     else -> {}
                 }

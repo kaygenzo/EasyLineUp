@@ -75,7 +75,8 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     val eventHandler = MutableLiveData<EventCase>()
 
     private val _linkPlayersInField = MutableLiveData<List<Player>?>()
-    val linkPlayersInField: LiveData<List<Player>?> = _linkPlayersInField
+    val linkPlayersInField: LiveData<List<Player>?>
+        get() = _linkPlayersInField
 
     private val domain: ApplicationPort by inject()
 

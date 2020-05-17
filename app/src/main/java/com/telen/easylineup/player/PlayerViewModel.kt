@@ -3,6 +3,7 @@ package com.telen.easylineup.player
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.DomainErrors
@@ -96,7 +97,5 @@ class PlayerViewModel: ViewModel(), KoinComponent {
         return _event
     }
 
-    fun registerFormErrorResult(): LiveData<DomainErrors> {
-        return domain.observeErrors()
-    }
+    fun registerFormErrorResult() = domain.observeErrors()
 }

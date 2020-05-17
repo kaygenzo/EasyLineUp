@@ -164,4 +164,6 @@
 
     <string name="link_dp_and_flex_dialog_title">Link your DP and your Flex</string>
     <string name="link_dh_and_pitcher_dialog_title">Link your DH and your Pitcher</string>
+
+    <string name="error_when_deleting_lineup">"Something wrong happened when deleting lineup"</string>
 </resources>
