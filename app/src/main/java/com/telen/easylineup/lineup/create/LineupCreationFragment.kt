@@ -1,5 +1,6 @@
 package com.telen.easylineup.lineup.create
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.getkeepsafe.taptargetview.TapTargetView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
@@ -19,6 +21,7 @@ import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.lineup.list.LineupViewModel
 import com.telen.easylineup.lineup.list.SaveSuccess
+import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FeatureViewFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
@@ -117,15 +120,16 @@ class LineupCreationFragment: BaseFragment() {
 //                        }
                         checked.addAll(response.players.map { it.status })
 
-                        AlertDialog.Builder(activity)
-                                .setTitle(R.string.roster_list_player_dialog_title)
-                                .setMultiChoiceItems(names.toTypedArray(), checked.toBooleanArray()) { dialog, which, isChecked ->
+                        DialogFactory.getMultiChoiceDialog(
+                                context = activity,
+                                title = R.string.roster_list_player_dialog_title,
+                                items = names.toTypedArray(),
+                                checkedItems = checked.toBooleanArray(),
+                                listener = DialogInterface.OnMultiChoiceClickListener { _, which, isChecked ->
                                     lineupViewModel.rosterPlayerStatusChanged(which, isChecked)
                                     updateRosterSize(formView.playerCount, response)
                                 }
-                                .setPositiveButton(android.R.string.ok, null)
-                                .create()
-                                .show()
+                        ).show()
                     }
 
                 }, {

@@ -140,5 +140,14 @@ class DialogFactory {
             }
             return dialog.create()
         }
+
+        fun getMultiChoiceDialog(context: Context, @StringRes title: Int, items: Array<CharSequence>, checkedItems: BooleanArray,
+                                 listener: DialogInterface.OnMultiChoiceClickListener? = null): Dialog {
+            return MaterialAlertDialogBuilder(context)
+                    .setTitle(title)
+                    .setMultiChoiceItems(items, checkedItems, listener)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .create()
+        }
     }
 }
