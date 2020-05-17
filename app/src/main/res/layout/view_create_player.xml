@@ -57,7 +57,6 @@
                         android:id="@+id/playerNameInput"
                         android:inputType="textPersonName"
                         tools:text="The player name"
-                        android:textSize="@dimen/text_size_big"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
@@ -72,7 +71,6 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/playerShirtNumberInput"
                         android:inputType="number"
-                        android:textSize="@dimen/text_size_big"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
@@ -88,7 +86,6 @@
                         android:id="@+id/playerLicenseNumberInput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="@dimen/text_size_big"
                         android:inputType="number"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -97,33 +94,128 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+                    <View android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#1E000000"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginTop="@dimen/default_margin"
+                        android:layout_marginBottom="@dimen/default_margin"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/handLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toLeftOf="@+id/handButtonGroup"
+                        android:text="@string/create_player_pitching_side"
+                        />
+
                     <com.google.android.material.button.MaterialButtonToggleGroup
-                        android:id="@+id/toggleButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:id="@+id/handButtonGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toRightOf="parent">
                         <Button
-                            android:id="@+id/button1"
+                            android:id="@+id/handLeft"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Button 1"
+                            android:text="@string/generic_left"
                             style="?attr/materialButtonOutlinedStyle" />
                         <Button
-                            android:id="@+id/button2"
+                            android:id="@+id/handRight"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Button 2"
+                            android:text="@string/generic_right"
                             style="?attr/materialButtonOutlinedStyle" />
                     </com.google.android.material.button.MaterialButtonToggleGroup>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <GridLayout
-                    android:id="@+id/favoritePositionsContainer"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:columnCount="5"
-                    android:rowCount="2"/>
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/battingSideLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toLeftOf="@+id/battingSideButtonGroup"
+                        android:text="@string/create_player_batting_side"
+                        />
+
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/battingSideButtonGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toRightOf="parent">
+                        <Button
+                            android:id="@+id/battingSideLeft"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/generic_left"
+                            style="?attr/materialButtonOutlinedStyle" />
+                        <Button
+                            android:id="@+id/battingSideRight"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/generic_right"
+                            style="?attr/materialButtonOutlinedStyle" />
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <View android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#1E000000"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginTop="@dimen/default_margin"
+                        android:layout_marginBottom="@dimen/default_margin"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/favoritePositionsLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:text="@string/create_player_favorite_positions"
+                        />
+
+                    <GridLayout
+                        android:id="@+id/favoritePositionsContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@+id/favoritePositionsLabel"
+                        android:layout_marginTop="@dimen/default_margin"
+                        android:columnCount="5"
+                        android:rowCount="2"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 

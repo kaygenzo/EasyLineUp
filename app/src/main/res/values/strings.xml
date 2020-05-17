@@ -170,10 +170,15 @@
     <string name="settings_import_error_message">Something wrong happened during import. Please try again and check if the application has access to the external storage. </string>
 
 
-    <string name="error_need_assign_pitcher_first_title">Not saved!</string>
-    <string name="error_need_assign_both_players_title">Not saved!</string>
+    <string name="error_need_assign_pitcher_first_title">Not saved</string>
+    <string name="error_need_assign_both_players_title">Not saved</string>
     <string name="error_need_assign_pitcher_first_message">Please select your pitcher first</string>
     <string name="error_need_assign_both_players_message">Please select both your DP and Flex</string>
 
     <string name="error_when_deleting_lineup">"Something wrong happened when deleting lineup"</string>
+    <string name="create_player_favorite_positions">Favorite positions: (Max 3)</string>
+    <string name="create_player_pitching_side">Pitching</string>
+    <string name="create_player_batting_side">Batting</string>
+    <string name="generic_left">Left</string>
+    <string name="generic_right">Right</string>
 </resources>
