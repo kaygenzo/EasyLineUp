@@ -149,15 +149,10 @@
 
     <string name="settings_export_success">Successfully exported to external storage in the directory %s </string>
     <string name="settings_import_success">Successfully imported data into the application </string>
-    <string name="settings_export_error_message">Something wrong happened during export. Please try again and check if the application has access to the external storage. </string>
-    <string name="settings_import_error_message">Something wrong happened during import. Please try again and check if the application has access to the external storage. </string>
 
     <string name="settings_category_export">Export</string>
     <string name="settings_category_import">Import</string>
     <string name="settings_category_delete">Delete</string>
-
-    <string name="error_need_assign_pitcher_first_message">Please select your pitcher first</string>
-    <string name="error_need_assign_both_players_message">Please select both your DP and Flex</string>
 
     <string name="export_data_to_file_dialog_message">File name:</string>
     <string name="export_button">Export</string>
@@ -171,7 +166,14 @@
 
     <string name="settings_export_error_title">Cannot export</string>
     <string name="settings_import_error_title">Cannot import</string>
+    <string name="settings_export_error_message">Something wrong happened during export. Please try again and check if the application has access to the external storage. </string>
+    <string name="settings_import_error_message">Something wrong happened during import. Please try again and check if the application has access to the external storage. </string>
+
 
     <string name="error_need_assign_pitcher_first_title">Not saved!</string>
     <string name="error_need_assign_both_players_title">Not saved!</string>
+    <string name="error_need_assign_pitcher_first_message">Please select your pitcher first</string>
+    <string name="error_need_assign_both_players_message">Please select both your DP and Flex</string>
+
+    <string name="error_when_deleting_lineup">"Something wrong happened when deleting lineup"</string>
 </resources>

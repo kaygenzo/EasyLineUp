@@ -6,7 +6,6 @@ import android.os.Environment
 import android.webkit.URLUtil
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCaseHandler
@@ -17,10 +16,10 @@ import com.telen.easylineup.domain.model.tiles.ITileData
 import com.telen.easylineup.domain.repository.*
 import com.telen.easylineup.domain.usecases.*
 import com.telen.easylineup.domain.usecases.exceptions.*
-import com.telen.easylineup.domain.utils.SingleLiveEvent
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import io.reactivex.subjects.PublishSubject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.io.BufferedWriter
@@ -28,7 +27,7 @@ import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 
-internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErrors> = SingleLiveEvent()): ApplicationPort, KoinComponent {
+internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErrors> = PublishSubject.create()): ApplicationPort, KoinComponent {
 
     private val context: Context by inject()
 
@@ -76,7 +75,7 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
     private val getDpAndFlexFromPlayersInFieldUseCase: GetDPAndFlexFromPlayersInField by inject()
     private val saveDpAndFlexUseCase: SaveDpAndFlex by inject()
 
-    override fun observeErrors(): LiveData<DomainErrors> {
+    override fun observeErrors(): PublishSubject<DomainErrors> {
         return _errors
     }
 
@@ -104,7 +103,7 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
                     it.team
                 }
                 .doOnError {
-                    _errors.postValue(DomainErrors.GET_TEAM_FAILED)
+                    _errors.onNext(DomainErrors.GET_TEAM_FAILED)
                 }
     }
 
@@ -182,7 +181,7 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
                 .map { it.player }
                 .doOnError {
                     if(it is NotExistingPlayer) {
-                        _errors.postValue(DomainErrors.INVALID_PLAYER_ID)
+                        _errors.onNext(DomainErrors.INVALID_PLAYER_ID)
                     }
                 }
     }
@@ -200,8 +199,8 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
                 }
                 .doOnError {
                     when (it) {
-                        is NameEmptyException -> _errors.postValue(DomainErrors.INVALID_PLAYER_NAME)
-                        is ShirtNumberEmptyException -> _errors.postValue(DomainErrors.INVALID_PLAYER_NUMBER)
+                        is NameEmptyException -> _errors.onNext(DomainErrors.INVALID_PLAYER_NAME)
+                        is ShirtNumberEmptyException -> _errors.onNext(DomainErrors.INVALID_PLAYER_NUMBER)
                     }
                 }
     }
@@ -225,14 +224,14 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
                 }
                 .map { it.players }
                 .doOnError {
-                    _errors.postValue(DomainErrors.LIST_AVAILABLE_PLAYERS_EMPTY)
+                    _errors.onNext(DomainErrors.LIST_AVAILABLE_PLAYERS_EMPTY)
                 }
     }
 
     override fun getPlayersInFieldFromList(list: List<PlayerWithPosition>): Single<List<Player>> {
         return UseCaseHandler.execute(getPlayersInField, GetOnlyPlayersInField.RequestValues(list)).map { it.playersInField }
                 .doOnError {
-                    _errors.postValue(DomainErrors.LIST_AVAILABLE_PLAYERS_EMPTY)
+                    _errors.onNext(DomainErrors.LIST_AVAILABLE_PLAYERS_EMPTY)
                 }
     }
 
@@ -256,10 +255,10 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
                 .map { it.lineupID }
                 .doOnError {
                     if (it is LineupNameEmptyException) {
-                        _errors.postValue(DomainErrors.INVALID_LINEUP_NAME)
+                        _errors.onNext(DomainErrors.INVALID_LINEUP_NAME)
                     }
                     else if(it is TournamentNameEmptyException) {
-                        _errors.postValue(DomainErrors.INVALID_TOURNAMENT_NAME)
+                        _errors.onNext(DomainErrors.INVALID_TOURNAMENT_NAME)
                     }
                 }
     }
@@ -268,14 +267,14 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
         val requestValues = DeleteLineup.RequestValues(lineupID)
         return UseCaseHandler.execute(deleteLineup, requestValues).ignoreElement()
                 .doOnError {
-                    _errors.postValue(DomainErrors.DELETE_LINEUP_FAILED)
+                    _errors.onNext(DomainErrors.DELETE_LINEUP_FAILED)
                 }
     }
 
     override fun updateLineupMode(isEnabled: Boolean, lineupID: Long?, lineupMode: Int, list: List<PlayerWithPosition>): Completable {
         return UseCaseHandler.execute(saveLineupMode, SaveLineupMode.RequestValues(lineupID, lineupMode))
                 .doOnError {
-                    _errors.postValue(DomainErrors.SAVE_LINEUP_MODE_FAILED)
+                    _errors.onNext(DomainErrors.SAVE_LINEUP_MODE_FAILED)
                 }
                 .flatMapCompletable {
 //            eventHandler.value = SaveLineupModeSuccess
@@ -305,7 +304,7 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
                     UseCaseHandler.execute(savePlayerFieldPositionUseCase, requestValues).ignoreElement()
                 }
                 .doOnError {
-                    _errors.postValue(DomainErrors.SAVE_PLAYER_FIELD_POSITION_FAILED)
+                    _errors.onNext(DomainErrors.SAVE_PLAYER_FIELD_POSITION_FAILED)
                 }
     }
 
@@ -313,7 +312,7 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
         val requestValues = DeletePlayerFieldPosition.RequestValues(list, player, position, lineupMode)
         return UseCaseHandler.execute(deletePlayerFieldPositionUseCase, requestValues).ignoreElement()
                 .doOnError {
-                    _errors.postValue(DomainErrors.DELETE_PLAYER_FIELD_POSITION_FAILED)
+                    _errors.onNext(DomainErrors.DELETE_PLAYER_FIELD_POSITION_FAILED)
                 }
     }
 
@@ -321,7 +320,7 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
         val requestValues = SaveBattingOrder.RequestValues(players)
         return UseCaseHandler.execute(saveBattingOrder, requestValues).ignoreElement()
                 .doOnError {
-                    _errors.postValue(DomainErrors.SAVE_BATTING_ORDER_FAILED)
+                    _errors.onNext(DomainErrors.SAVE_BATTING_ORDER_FAILED)
                 }
     }
 
@@ -346,10 +345,10 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
         }
                 .doOnError {
                     if(it is NeedAssignPitcherFirstException) {
-                        _errors.postValue(DomainErrors.NEED_ASSIGN_PITCHER_FIRST)
+                        _errors.onNext(DomainErrors.NEED_ASSIGN_PITCHER_FIRST)
                     }
                     else {
-                        _errors.postValue(DomainErrors.GET_TEAM_FAILED)
+                        _errors.onNext(DomainErrors.GET_TEAM_FAILED)
                     }
                 }
     }
@@ -361,7 +360,7 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
                 .ignoreElement()
                 .doOnError {
                     if(it is NeedAssignBothPlayersException) {
-                        _errors.postValue(DomainErrors.DP_OR_FLEX_NOT_ASSIGNED)
+                        _errors.onNext(DomainErrors.DP_OR_FLEX_NOT_ASSIGNED)
                     }
                 }
     }
@@ -440,7 +439,7 @@ internal class ApplicationAdapter(private val _errors: MutableLiveData<DomainErr
                     }
                     catch (e: IOException) {
                         println(e)
-                        _errors.postValue(DomainErrors.CANNOT_EXPORT_DATA)
+                        _errors.onNext(DomainErrors.CANNOT_EXPORT_DATA)
                     }
                     finally {
                         out?.close()

@@ -36,6 +36,23 @@ class LineupCreationFragment: BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lineupViewModel = ViewModelProviders.of(this).get(LineupViewModel::class.java)
+
+        val disposable = lineupViewModel.observeErrors().subscribe({
+            when(it) {
+                DomainErrors.INVALID_TOURNAMENT_NAME -> {
+                    view?.lineupCreationForm?.setTournamentNameError(getString(R.string.lineup_creation_error_name_empty))
+                    FirebaseAnalyticsUtils.emptyTournamentName(activity)
+                }
+                DomainErrors.INVALID_LINEUP_NAME -> {
+                    view?.lineupCreationForm?.setLineupNameError(getString(R.string.lineup_creation_error_tournament_empty))
+                    FirebaseAnalyticsUtils.emptyLineupName(activity)
+                }
+                else -> {}
+            }
+        }, {
+           Timber.e(it)
+        })
+        disposables.add(disposable)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -68,20 +85,6 @@ class LineupCreationFragment: BaseFragment() {
             Timber.e(it)
         })
         disposables.add(getRosterDisposable)
-
-        lineupViewModel.observeErrors().observe(viewLifecycleOwner, Observer {
-            when(it) {
-                DomainErrors.INVALID_TOURNAMENT_NAME -> {
-                    view.lineupCreationForm.setTournamentNameError(getString(R.string.lineup_creation_error_name_empty))
-                    FirebaseAnalyticsUtils.emptyTournamentName(activity)
-                }
-                DomainErrors.INVALID_LINEUP_NAME -> {
-                    view.lineupCreationForm.setLineupNameError(getString(R.string.lineup_creation_error_tournament_empty))
-                    FirebaseAnalyticsUtils.emptyLineupName(activity)
-                }
-                else -> {}
-            }
-        })
 
         lineupViewModel.registerSaveResults().observe(viewLifecycleOwner, Observer {
             when(it) {

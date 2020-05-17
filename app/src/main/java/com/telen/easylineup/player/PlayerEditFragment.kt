@@ -10,12 +10,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.nguyenhoanglam.imagepicker.model.Config
 import com.nguyenhoanglam.imagepicker.model.Image
+import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DomainErrors
@@ -26,7 +26,7 @@ import com.telen.easylineup.views.PlayerFormListener
 import kotlinx.android.synthetic.main.fragment_player_edit.view.*
 import timber.log.Timber
 
-class PlayerEditFragment: Fragment(), PlayerFormListener {
+class PlayerEditFragment: BaseFragment(), PlayerFormListener {
 
     private lateinit var viewModel: PlayerViewModel
 
@@ -45,12 +45,36 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
                 cancel()
             }
         })
+
+        viewModel = ViewModelProviders.of(this).get(PlayerViewModel::class.java)
+        viewModel.playerID = arguments?.getLong(Constants.PLAYER_ID)
+
+        val disposable = viewModel.registerFormErrorResult().subscribe({ error ->
+            when(error) {
+                DomainErrors.INVALID_PLAYER_NAME -> {
+                    view?.editPlayerForm?.displayInvalidName()
+                    FirebaseAnalyticsUtils.emptyPlayerName(activity)
+                }
+                DomainErrors.INVALID_PLAYER_NUMBER -> {
+                    view?.editPlayerForm?.displayInvalidNumber()
+                    FirebaseAnalyticsUtils.emptyPlayerNumber(activity)
+                }
+                DomainErrors.INVALID_PLAYER_ID -> {
+                    //case of a player creation
+                    FirebaseAnalyticsUtils.emptyPlayerID(activity)
+                }
+                else -> {
+                    Timber.e("Unknown error: $error")
+                }
+            }
+        }, {
+            Timber.e(it)
+        })
+        disposables.add(disposable)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_player_edit, container, false)
-        viewModel = ViewModelProviders.of(this).get(PlayerViewModel::class.java)
-        viewModel.playerID = arguments?.getLong(Constants.PLAYER_ID)
 
         view.editPlayerForm.apply {
             setListener(this@PlayerEditFragment)
@@ -72,26 +96,6 @@ class PlayerEditFragment: Fragment(), PlayerFormListener {
                 val imagePath = savedImage ?: player.image
                 imagePath?.let { imageUriString ->
                     setImage(imageUriString)
-                }
-            }
-        })
-
-        viewModel.registerFormErrorResult().observe(viewLifecycleOwner, Observer { error ->
-            when(error) {
-                DomainErrors.INVALID_PLAYER_NAME -> {
-                    view.editPlayerForm.displayInvalidName()
-                    FirebaseAnalyticsUtils.emptyPlayerName(activity)
-                }
-                DomainErrors.INVALID_PLAYER_NUMBER -> {
-                    view.editPlayerForm.displayInvalidNumber()
-                    FirebaseAnalyticsUtils.emptyPlayerNumber(activity)
-                }
-                DomainErrors.INVALID_PLAYER_ID -> {
-                    //case of a player creation
-                    FirebaseAnalyticsUtils.emptyPlayerID(activity)
-                }
-                else -> {
-                    Timber.e("Unknown error: $error")
                 }
             }
         })

@@ -14,6 +14,7 @@ import com.telen.easylineup.domain.model.Tournament
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
@@ -105,7 +106,7 @@ class LineupViewModel: ViewModel(), KoinComponent {
         return Single.just(show)
     }
 
-    fun observeErrors(): LiveData<DomainErrors> {
+    fun observeErrors(): PublishSubject<DomainErrors> {
         return domain.observeErrors()
     }
 }
