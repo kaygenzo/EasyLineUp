@@ -57,7 +57,6 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/playerNameInput"
                         android:inputType="textPersonName"
-                        android:textSize="@dimen/text_size_big"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
@@ -72,7 +71,6 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/playerShirtNumberInput"
                         android:inputType="number"
-                        android:textSize="@dimen/text_size_big"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
@@ -88,7 +86,6 @@
                         android:id="@+id/playerLicenseNumberInput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="@dimen/text_size_big"
                         android:inputType="number"/>
 
                 </com.google.android.material.textfield.TextInputLayout>

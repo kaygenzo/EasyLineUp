@@ -9,7 +9,7 @@
     tools:background="@drawable/position_selected_background"
     android:layout_margin="5dp">
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/playerPositionFilterView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

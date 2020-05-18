@@ -26,8 +26,7 @@
         app:layout_constraintTop_toTopOf="@+id/lineupField"
         app:layout_constraintBottom_toTopOf="@+id/lineupName"
         android:gravity="center_vertical"
-        android:layout_marginStart="10dp"
-        android:textSize="20sp"/>
+        android:layout_marginStart="10dp"/>
 
     <com.telen.easylineup.views.MLBStyledTextView
         android:id="@+id/lineupName"
@@ -39,7 +38,6 @@
         app:layout_constraintTop_toBottomOf="@+id/tournamentName"
         app:layout_constraintBottom_toBottomOf="@+id/lineupField"
         android:gravity="center_vertical"
-        android:layout_marginStart="10dp"
-        android:textSize="@dimen/item_lineup_list_title_size"/>
+        android:layout_marginStart="10dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

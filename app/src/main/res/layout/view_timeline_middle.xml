@@ -30,11 +30,10 @@
             app:layout_constraintBottom_toTopOf="@+id/tournamentDate"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/statsTournament"
-            android:textSize="@dimen/text_size_middle"
             tools:text="Name"
             app:layout_constraintVertical_chainStyle="packed"/>
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tournamentDate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -43,8 +42,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/statsTournament"
-            tools:text="31/12/2019"
-            android:textSize="@dimen/text_size_middle"/>
+            tools:text="31/12/2019"/>
 
         <ImageButton
             android:id="@+id/deleteTournament"

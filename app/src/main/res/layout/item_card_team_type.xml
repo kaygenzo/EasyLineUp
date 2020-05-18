@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:padding="24dp">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/teamTypeTitle"
             style="@style/TextAppearance.AppCompat.Title"
             android:layout_width="wrap_content"

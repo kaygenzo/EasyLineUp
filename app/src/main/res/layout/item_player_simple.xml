@@ -23,7 +23,6 @@
         app:layout_constraintLeft_toRightOf="@+id/playerImage"
         app:layout_constraintRight_toLeftOf="@+id/filterPosition"
         tools:text="Player"
-        android:textSize="@dimen/text_size_middle"
         android:gravity="center_vertical"
         android:layout_marginStart="@dimen/default_margin" />
 

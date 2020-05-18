@@ -28,9 +28,8 @@
                     android:id="@+id/lineupTitleInput"
                     android:inputType="textPersonName"
                     tools:text="The lineup name"
-                    android:textSize="@dimen/text_size_big"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="wrap_content"
                     android:lines="1"/>
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -44,8 +43,7 @@
                 <androidx.appcompat.widget.AppCompatAutoCompleteTextView
                     android:id="@+id/tournamentChoiceAutoComplete"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:textSize="@dimen/text_size_big"
+                    android:layout_height="wrap_content"
                     tools:text="The tournament"
                     android:lines="1"
                     android:inputType="textPersonName"/>
@@ -63,7 +61,7 @@
                     android:layout_height="60dp"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/dateExpandableLabel"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -71,10 +69,9 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintRight_toLeftOf="@+id/dateSummary"
-                        android:text="@string/form_lineup_creation_date_label"
-                        android:textSize="20sp"/>
+                        android:text="@string/form_lineup_creation_date_label"/>
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/dateSummary"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -119,7 +116,7 @@
                 android:layout_height="60dp"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/rosterExpandableLabel"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -127,10 +124,9 @@
                     app:layout_constraintRight_toLeftOf="@+id/playerCount"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    android:text="@string/form_lineup_creation_roster_label"
-                    android:textSize="20sp"/>
+                    android:text="@string/form_lineup_creation_roster_label"/>
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/playerCount"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

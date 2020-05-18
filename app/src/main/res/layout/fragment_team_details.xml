@@ -40,7 +40,6 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@+id/teamImage"
                 tools:text="Team Name"
-                android:textSize="@dimen/text_size_big"
                 android:gravity="center"
                 android:layout_marginTop="@dimen/default_margin"/>
 
@@ -60,7 +59,7 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/teamTypeDescription"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -69,7 +68,6 @@
                     app:layout_constraintLeft_toRightOf="@+id/teamTypeImage"
                     app:layout_constraintRight_toRightOf="parent"
                     tools:text="You are a softball team"
-                    android:textSize="@dimen/text_size_big"
                     android:layout_marginStart="@dimen/default_margin"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -90,7 +88,7 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/teamPlayersDescription"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -99,7 +97,6 @@
                     app:layout_constraintLeft_toRightOf="@+id/teamPlayersImage"
                     app:layout_constraintRight_toRightOf="parent"
                     tools:text="You have 42 players"
-                    android:textSize="@dimen/text_size_big"
                     android:layout_marginStart="@dimen/default_margin"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -120,7 +117,7 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/teamTournamentsDescription"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -129,7 +126,6 @@
                     app:layout_constraintLeft_toRightOf="@+id/teamTournamentsImage"
                     app:layout_constraintRight_toRightOf="parent"
                     tools:text="Your team participated to 32 tournaments and 98 games"
-                    android:textSize="@dimen/text_size_big"
                     android:layout_marginStart="@dimen/default_margin"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>

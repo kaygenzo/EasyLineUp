@@ -13,6 +13,7 @@
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.App.LargeComponent</item>
         <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
+        <item name="android:textViewStyle">@style/AppTheme.MaterialTextView</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">

@@ -5,13 +5,15 @@ import android.graphics.Typeface
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import com.google.android.material.textview.MaterialTextView
 import com.telen.easylineup.R
 
-class NormalUppercaseStyledTextView: AppCompatTextView {
+class NormalUppercaseStyledTextView: MaterialTextView {
 
     constructor(context: Context) : super(context) {initView(context, null, 0)}
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {initView(context, attrs, 0)}
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {initView(context, attrs, defStyleAttr)}
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {initView(context, attrs, defStyleAttr)}
 
     private fun initView(context: Context, attrs: AttributeSet?, defStyle: Int) {
         isAllCaps = true

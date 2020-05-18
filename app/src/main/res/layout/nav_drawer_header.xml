@@ -28,7 +28,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:textSize="@dimen/text_size_big"
         app:normalUppercaseStyledTextColor="@color/white"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         app:layout_constraintLeft_toLeftOf="parent"
