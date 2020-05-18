@@ -5,7 +5,6 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.SavePlayer
-import com.telen.easylineup.domain.usecases.exceptions.LicenseNumberEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.ShirtNumberEmptyException
 import io.reactivex.Completable
@@ -68,15 +67,6 @@ internal class SavePlayerTests {
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()
         observer.assertError(ShirtNumberEmptyException::class.java)
-    }
-
-    @Test
-    fun shouldTriggerLicenseNumberEmptyExceptionIfLicenseNumberIsNull() {
-        val request = SavePlayer.RequestValues(playerID = 1L, teamID = 1, name = "Test", positions = 1, licenseNumber = null, shirtNumber = 1, imageUri = null)
-        val observer = TestObserver<SavePlayer.ResponseValue>()
-        mSavePlayer.executeUseCase(request).subscribe(observer)
-        observer.await()
-        observer.assertError(LicenseNumberEmptyException::class.java)
     }
 
     @Test
