@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:drawable="@color/tile_player_most_used_background_color_light"/>
-
-    <item
-        android:drawable="@drawable/shape_tile_small_border"
-        android:id="@+id/background_add_image"/>
-</layer-list>

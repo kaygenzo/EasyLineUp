@@ -2,7 +2,6 @@
 <resources>
     <string name="action_edit">Editer</string>
     <string name="action_delete">Supprimer</string>
-    <string name="action_submit">Valider</string>
     <string name="action_share">Partager</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>
@@ -16,7 +15,6 @@
     <string name="dialog_create_lineup_tournament">Tournoi</string>
     <string name="player_hint_name">Nom</string>
     <string name="player_hint_shirt_number">Numéro de maillot</string>
-    <string name="player_hint_shirt_number_short">Maillot N°</string>
     <string name="player_hint_license_number">Numéro de Licence</string>
     <string name="player_hint_license_number_short">Licence N°</string>
 
@@ -27,8 +25,6 @@
     <string name="title_tournament_summary">Résumé</string>
     <string name="title_player_details">Statistiques</string>
     <string name="title_player_edition">Modification de joueur</string>
-    <string name="title_lineup_edition">Modification de lineup</string>
-    <string name="title_team_edition">Modification de l\'équipe</string>
     <string name="title_team_details">Infos d\'équipe</string>
 
     <string name="team_creation_error_name_empty">Le nom de l\'équipe ne peut pas être vide</string>
@@ -61,7 +57,6 @@
 
     <string name="form_lineup_creation_date_label">Date</string>
     <string name="form_lineup_creation_roster_label">Joueurs</string>
-    <string name="form_lineup_creation_roster_change_button">Editer</string>
 
     <string name="lineup_list_empty_label">Vide</string>
     <string name="lineup_list_filter_focused_hint">Tapez un nom</string>
@@ -118,8 +113,6 @@
         <item quantity="other">Votre équipe est composée de %d membres</item>
     </plurals>
 
-    <string name="setting_category_display_title">Affichage</string>
-    <string name="setting_category_data_title">Données</string>
     <string name="setting_category_about_title">A propos</string>
     <string name="setting_delete_data_description">Supprimer toutes les données</string>
     <string name="setting_version_title">Version</string>

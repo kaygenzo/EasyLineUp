@@ -142,7 +142,7 @@
                     android:layout_height="match_parent"
                     app:layout_constraintRight_toRightOf="parent"
                     android:gravity="center_vertical"
-                    app:srcCompat="@drawable/ic_edit_black_24dp"/>
+                    app:srcCompat="@drawable/ic_edition_black_24dp"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

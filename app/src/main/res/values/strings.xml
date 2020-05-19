@@ -5,7 +5,6 @@
 
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
-    <string name="action_submit">Submit</string>
     <string name="action_share">Share</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>
@@ -19,7 +18,6 @@
     <string name="dialog_create_lineup_tournament">Tournament</string>
     <string name="player_hint_name">Name</string>
     <string name="player_hint_shirt_number">Shirt number</string>
-    <string name="player_hint_shirt_number_short">Shirt N°</string>
     <string name="player_hint_license_number">License number</string>
     <string name="player_hint_license_number_short">License N°</string>
 
@@ -30,8 +28,6 @@
     <string name="title_tournament_summary">Summary</string>
     <string name="title_player_details">Statistics</string>
     <string name="title_player_edition">Player edition</string>
-    <string name="title_lineup_edition">Lineup edition</string>
-    <string name="title_team_edition">Team edition</string>
     <string name="title_team_details">Team details</string>
 
     <string name="team_creation_error_name_empty">Team name cannot be empty</string>
@@ -64,7 +60,6 @@
 
     <string name="form_lineup_creation_date_label">Date</string>
     <string name="form_lineup_creation_roster_label">Roster</string>
-    <string name="form_lineup_creation_roster_change_button">Edit</string>
 
     <string name="lineup_list_empty_label">Empty</string>
     <string name="lineup_list_filter_focused_hint">Enter name</string>
@@ -127,8 +122,6 @@
         <item quantity="other">Your team is composed of %d members</item>
     </plurals>
 
-    <string name="setting_category_display_title">Display</string>
-    <string name="setting_category_data_title">Data</string>
     <string name="setting_category_about_title">About</string>
     <string name="setting_import_data_description">Import data from file</string>
     <string name="setting_import_data_update_object_description">Update data if already exists ?</string>
