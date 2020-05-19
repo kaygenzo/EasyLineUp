@@ -51,7 +51,10 @@ class LoginActivity: AppCompatActivity() {
         viewModel.loginEvent.observe(this,  Observer {
             when(it) {
                 ImportSuccessfulEvent -> {
-                    val dialog = DialogFactory.getSuccessDialog(this@LoginActivity, R.string.settings_import_success)
+                    val dialog = DialogFactory.getSuccessDialog(context = this@LoginActivity,
+                            title = R.string.settings_import_success_title,
+                            message = R.string.settings_import_success_message
+                    )
                     dialog.setOnDismissListener {
                         //check teams
                         viewModel.getMainTeam()

@@ -147,9 +147,6 @@
     <string name="login_create">Create your first team</string>
     <string name="login_import">Import an existing team</string>
 
-    <string name="settings_export_success">Successfully exported to external storage in the directory %s </string>
-    <string name="settings_import_success">Successfully imported data into the application </string>
-
     <string name="settings_category_export">Export</string>
     <string name="settings_category_import">Import</string>
     <string name="settings_category_delete">Delete</string>
@@ -183,4 +180,10 @@
     <string name="generic_right">Right</string>
     <string name="generic_both">Both</string>
     <string name="generic_unknown">Unknown</string>
+
+    <string name="settings_export_success_title">Success</string>
+    <string name="settings_export_success_message">Successfully exported to external storage in the directory %s </string>
+
+    <string name="settings_import_success_title">Success</string>
+    <string name="settings_import_success_message">Successfully imported data into the application</string>
 </resources>

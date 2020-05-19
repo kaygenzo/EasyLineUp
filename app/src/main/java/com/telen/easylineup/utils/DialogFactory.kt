@@ -123,11 +123,10 @@ class DialogFactory {
                     .setIcon(resIcon)
 
             if (title != 0) {
-                dialog.setTitle(context.getString(title, titleArgs))
-                dialog.setTitle(title)
+                dialog.setTitle(context.getString(title, *titleArgs))
             }
             if(content != 0) {
-                dialog.setMessage(context.getString(content, contentArgs))
+                dialog.setMessage(context.getString(content, *contentArgs))
             }
             if(resConfirmText != 0) {
                 dialog.setPositiveButton(resConfirmText, confirmClick)

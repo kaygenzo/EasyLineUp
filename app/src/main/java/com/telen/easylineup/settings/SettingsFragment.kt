@@ -64,8 +64,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     activity?.run {
                         DialogFactory.getSuccessDialog(
                                 context = this,
-                                title = R.string.settings_export_success,
-                                titleArgs = arrayOf(it.pathDirectory)
+                                title = R.string.settings_export_success_title,
+                                message = R.string.settings_export_success_message,
+                                messageArgs = arrayOf(it.pathDirectory)
                         ).show()
                     }
 
@@ -84,7 +85,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             activity?.run {
                 when(it) {
                     ImportSuccessfulEvent -> {
-                        DialogFactory.getSuccessDialog(this, R.string.settings_import_success).show()
+                        DialogFactory.getSuccessDialog(context = this,
+                                title = R.string.settings_import_success_title,
+                                message = R.string.settings_import_success_message
+                        ).show()
                     }
                     ImportFailure -> {
                         DialogFactory.getErrorDialog(this, title = R.string.settings_import_error_title, message = R.string.settings_import_error_message).show()
