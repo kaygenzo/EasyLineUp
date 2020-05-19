@@ -124,6 +124,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                     _linkPlayersInField.value = it
                 }, {
                     Timber.e(it)
+                    _linkPlayersInField.value = listOf()
                 })
         disposables.add(disposable)
     }
@@ -134,6 +135,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                     _linkPlayersInField.value = it
                 }, {
                     Timber.e(it)
+                    _linkPlayersInField.value = listOf()
                 })
         disposables.add(disposable)
     }
