@@ -28,13 +28,13 @@ internal class GetRosterTests {
             1, 1L,1L,null, "hash")
 
     private val player1 = Player(1L, 1L, "A", 1,
-            1, null, 1, "hash")
+            1, null, 1, 0, 0, "hash")
 
     private val player2 = Player(2L, 1L, "B", 2,
-            2, null, 1, "hash")
+            2, null, 1, 0, 0, "hash")
 
     private val player3 = Player(3L, 1L, "C", 3,
-            3, null, 1, "hash")
+            3, null, 1, 0, 0, "hash")
 
     @Before
     fun init() {

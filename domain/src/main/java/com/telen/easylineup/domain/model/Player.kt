@@ -30,7 +30,6 @@ data class Player(
         if (positions != other.positions) return false
         if (pitching != other.pitching) return false
         if (batting != other.batting) return false
-        if (hash != other.hash) return false
 
         return true
     }
@@ -45,7 +44,6 @@ data class Player(
         result = 31 * result + positions
         result = 31 * result + pitching
         result = 31 * result + batting
-        result = 31 * result + (hash?.hashCode() ?: 0)
         return result
     }
 

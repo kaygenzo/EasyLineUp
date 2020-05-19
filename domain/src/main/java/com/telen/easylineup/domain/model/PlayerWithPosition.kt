@@ -80,9 +80,11 @@ data class PlayerWithPosition(
 }
 
 fun PlayerWithPosition.toPlayer(): Player {
-    return Player(id = playerID, teamId = teamId, name = playerName, shirtNumber = shirtNumber, licenseNumber = licenseNumber, image = image, positions = playerPositions)
+    return Player(id = playerID, teamId = teamId, name = playerName, shirtNumber = shirtNumber, licenseNumber = licenseNumber,
+            image = image, positions = playerPositions)
 }
 
 fun PlayerWithPosition.toPlayerFieldPosition(): PlayerFieldPosition {
-    return PlayerFieldPosition(id = fieldPositionID, playerId = playerID, position = position, x = x, y = y, order = order, lineupId = lineupId, flags = flags)
+    return PlayerFieldPosition(id = fieldPositionID, playerId = playerID, position = position, x = x, y = y,
+            order = order, lineupId = lineupId, flags = flags)
 }
