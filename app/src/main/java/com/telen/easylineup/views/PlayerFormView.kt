@@ -13,12 +13,13 @@ import com.nguyenhoanglam.imagepicker.model.Image
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.view_create_player.view.*
 import timber.log.Timber
 
 interface PlayerFormListener {
-    fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int)
+    fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int)
     fun onCancel()
     fun onImagePickerRequested()
 }
@@ -52,8 +53,10 @@ class PlayerFormView: ConstraintLayout {
             val shirtNumber = getShirtNumber()
             val licenseNumber = getLicenseNumber()
             val positions = getPlayerPositions()
+            val pitching = getPitchingSide()?.flag ?: 0
+            val batting = getBattingSide()?.flag ?: 0
 
-            listener?.onSaveClicked(name, shirtNumber, licenseNumber, imageUri, positions)
+            listener?.onSaveClicked(name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting)
         }
 
         cancel.setOnClickListener {
@@ -249,5 +252,65 @@ class PlayerFormView: ConstraintLayout {
         playerNameInputLayout.error = null
         playerLicenseNumberInputLayout.error = null
         playerShirtNumberInputLayout.error = resources.getString(R.string.player_creation_error_shirt_empty)
+    }
+
+    fun getPitchingSide(): PlayerSide? {
+        var pitching = 0
+        if(pitchingSideLeft.isChecked)
+            pitching = pitching or PlayerSide.LEFT.flag
+        if(pitchingSideRight.isChecked)
+            pitching = pitching or PlayerSide.RIGHT.flag
+        return PlayerSide.getSideByValue(pitching)
+    }
+
+    fun getBattingSide(): PlayerSide? {
+        var batting = 0
+        if(battingSideLeft.isChecked)
+            batting = batting or PlayerSide.LEFT.flag
+        if(battingSideRight.isChecked)
+            batting = batting or PlayerSide.RIGHT.flag
+        return PlayerSide.getSideByValue(batting)
+    }
+
+    fun setPitchingSide(side: PlayerSide?) {
+        when(side) {
+            PlayerSide.LEFT -> {
+                pitchingSideLeft.isChecked = true
+                pitchingSideRight.isChecked = false
+            }
+            PlayerSide.RIGHT -> {
+                pitchingSideLeft.isChecked = false
+                pitchingSideRight.isChecked = true
+            }
+            PlayerSide.BOTH -> {
+                pitchingSideLeft.isChecked = true
+                pitchingSideRight.isChecked = true
+            }
+            null -> {
+                pitchingSideLeft.isChecked = false
+                pitchingSideRight.isChecked = false
+            }
+        }
+    }
+
+    fun setBattingSide(side: PlayerSide?) {
+        when(side) {
+            PlayerSide.LEFT -> {
+                battingSideLeft.isChecked = true
+                battingSideRight.isChecked = false
+            }
+            PlayerSide.RIGHT -> {
+                battingSideLeft.isChecked = false
+                battingSideRight.isChecked = true
+            }
+            PlayerSide.BOTH -> {
+                battingSideLeft.isChecked = true
+                battingSideRight.isChecked = true
+            }
+            null -> {
+                battingSideLeft.isChecked = false
+                battingSideRight.isChecked = false
+            }
+        }
     }
 }

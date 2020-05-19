@@ -11,9 +11,10 @@ data class Player(
         var licenseNumber: Long,
         var image: String? = null,
         var positions: Int = 0,
+        var pitching: Int = 0,
+        var batting: Int = 0,
         var hash: String? = UUID.randomUUID().toString()
 ) {
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -27,6 +28,9 @@ data class Player(
         if (licenseNumber != other.licenseNumber) return false
         if (image != other.image) return false
         if (positions != other.positions) return false
+        if (pitching != other.pitching) return false
+        if (batting != other.batting) return false
+        if (hash != other.hash) return false
 
         return true
     }
@@ -39,11 +43,14 @@ data class Player(
         result = 31 * result + licenseNumber.hashCode()
         result = 31 * result + (image?.hashCode() ?: 0)
         result = 31 * result + positions
+        result = 31 * result + pitching
+        result = 31 * result + batting
+        result = 31 * result + (hash?.hashCode() ?: 0)
         return result
     }
 
 }
 
 fun Player.toPlayerExport(): PlayerExport {
-    return PlayerExport(hash ?: UUID.randomUUID().toString(), name, image, shirtNumber, licenseNumber.toString(), positions)
+    return PlayerExport(hash ?: UUID.randomUUID().toString(), name, image, shirtNumber, licenseNumber.toString(), positions, pitching, batting)
 }

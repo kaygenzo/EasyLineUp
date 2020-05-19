@@ -21,7 +21,9 @@ data class PlayerExport (
         @SerializedName("image") var image : String?,
         @SerializedName("shirtNumber") val shirtNumber : Int,
         @SerializedName("licenseNumber") val licenseNumber : String,
-        @SerializedName("positions") val positions : Int
+        @SerializedName("positions") val positions : Int,
+        @SerializedName("pitching") val pitching : Int,
+        @SerializedName("batting") val batting : Int
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -35,6 +37,8 @@ data class PlayerExport (
         if (shirtNumber != other.shirtNumber) return false
         if (licenseNumber != other.licenseNumber) return false
         if (positions != other.positions) return false
+        if (pitching != other.pitching) return false
+        if (batting != other.batting) return false
 
         return true
     }
@@ -46,6 +50,8 @@ data class PlayerExport (
         result = 31 * result + shirtNumber
         result = 31 * result + licenseNumber.hashCode()
         result = 31 * result + positions
+        result = 31 * result + pitching
+        result = 31 * result + batting
         return result
     }
 }

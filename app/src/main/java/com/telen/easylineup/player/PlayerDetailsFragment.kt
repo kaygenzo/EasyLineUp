@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.fragment_player_details.view.*
 import timber.log.Timber
@@ -45,6 +46,36 @@ class PlayerDetailsFragment: Fragment() {
                             .into(view.playerImage)
                 } catch (e: IllegalArgumentException) {
                     Timber.e(e)
+                }
+            }
+
+            when(PlayerSide.getSideByValue(it.pitching)) {
+                PlayerSide.LEFT -> {
+                    view.pitchingSideValue.text = getString(R.string.generic_left)
+                }
+                PlayerSide.RIGHT -> {
+                    view.pitchingSideValue.text = getString(R.string.generic_right)
+                }
+                PlayerSide.BOTH -> {
+                    view.pitchingSideValue.text = getString(R.string.generic_both)
+                }
+                null -> {
+                    view.pitchingSideValue.text = getString(R.string.generic_unknown)
+                }
+            }
+
+            when(PlayerSide.getSideByValue(it.batting)) {
+                PlayerSide.LEFT -> {
+                    view.battingSideValue.text = getString(R.string.generic_left)
+                }
+                PlayerSide.RIGHT -> {
+                    view.battingSideValue.text = getString(R.string.generic_right)
+                }
+                PlayerSide.BOTH -> {
+                    view.battingSideValue.text = getString(R.string.generic_both)
+                }
+                null -> {
+                    view.battingSideValue.text = getString(R.string.generic_unknown)
                 }
             }
         })

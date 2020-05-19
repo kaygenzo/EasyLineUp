@@ -90,12 +90,131 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <View android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#1E000000"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginTop="@dimen/default_margin"
+                        android:layout_marginBottom="@dimen/default_margin"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/handLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toLeftOf="@+id/handButtonGroup"
+                        android:text="@string/create_player_pitching_side"
+                        />
+
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/handButtonGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toRightOf="parent">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/pitchingSideLeft"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/generic_left"
+                            style="?attr/materialButtonOutlinedStyle" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/pitchingSideRight"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/generic_right"
+                            style="?attr/materialButtonOutlinedStyle" />
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/battingSideLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toLeftOf="@+id/battingSideButtonGroup"
+                        android:text="@string/create_player_batting_side"
+                        />
+
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/battingSideButtonGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toRightOf="parent">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/battingSideLeft"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/generic_left"
+                            style="?attr/materialButtonOutlinedStyle" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/battingSideRight"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/generic_right"
+                            style="?attr/materialButtonOutlinedStyle" />
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <View android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#1E000000"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_marginTop="@dimen/default_margin"
+                        android:layout_marginBottom="@dimen/default_margin"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/favoritePositionsLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:text="@string/create_player_favorite_positions"
+                    />
+
                 <GridLayout
                     android:id="@+id/favoritePositionsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/favoritePositionsLabel"
                     android:columnCount="5"
                     android:rowCount="2"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 

@@ -191,10 +191,10 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                 .map { it.summary }
     }
 
-    override fun savePlayer(playerID: Long?, name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int): Completable {
+    override fun savePlayer(playerID: Long?, name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int): Completable {
         return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
                 .flatMapCompletable {
-                    val req = SavePlayer.RequestValues(playerID ?: 0, it.id, name, shirtNumber, licenseNumber, imageUri, positions)
+                    val req = SavePlayer.RequestValues(playerID ?: 0, it.id, name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting)
                     UseCaseHandler.execute(savePlayerUseCase, req).ignoreElement()
                 }
                 .doOnError {

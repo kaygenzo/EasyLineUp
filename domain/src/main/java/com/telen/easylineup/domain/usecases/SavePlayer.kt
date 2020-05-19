@@ -16,13 +16,18 @@ internal class SavePlayer(val dao: PlayerRepository): UseCase<SavePlayer.Request
             requestValues.shirtNumber == null -> Single.error(ShirtNumberEmptyException())
             else -> {
                 val player = Player(id = requestValues.playerID, teamId = requestValues.teamID, name = requestValues.name.trim(), shirtNumber = requestValues.shirtNumber,
-                        licenseNumber = requestValues.licenseNumber ?: 0L, image = requestValues.imageUri?.toString(), positions = requestValues.positions)
+                        licenseNumber = requestValues.licenseNumber ?: 0L, image = requestValues.imageUri?.toString(), positions = requestValues.positions,
+                        pitching = requestValues.pitching, batting = requestValues.batting
+                )
 
                 val task = if(player.id == 0L) {
                     dao.insertPlayer(player).ignoreElement()
                 }
                 else {
-                    dao.updatePlayer(player)
+                    dao.getPlayerByIdAsSingle(player.id).flatMapCompletable {
+                        player.hash = it.hash
+                        dao.updatePlayer(player)
+                    }
                 }
 
                 task.andThen(Single.just(ResponseValue()))
@@ -31,12 +36,14 @@ internal class SavePlayer(val dao: PlayerRepository): UseCase<SavePlayer.Request
     }
 
     class RequestValues(val playerID: Long,
-                              val teamID: Long,
-                              val name: String?,
-                              val shirtNumber: Int?,
-                              val licenseNumber: Long? = 0,
-                              val imageUri: Uri?,
-                              val positions: Int
+                        val teamID: Long,
+                        val name: String?,
+                        val shirtNumber: Int?,
+                        val licenseNumber: Long? = 0,
+                        val imageUri: Uri?,
+                        val positions: Int,
+                        val pitching: Int,
+                        val batting: Int
     ): UseCase.RequestValues
 
     class ResponseValue: UseCase.ResponseValue

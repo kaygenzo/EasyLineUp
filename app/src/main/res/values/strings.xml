@@ -181,4 +181,6 @@
     <string name="create_player_batting_side">Batting</string>
     <string name="generic_left">Left</string>
     <string name="generic_right">Right</string>
+    <string name="generic_both">Both</string>
+    <string name="generic_unknown">Unknown</string>
 </resources>

@@ -46,7 +46,7 @@ interface ApplicationPort {
     /** @deprecated **/ fun insertPlayers(players: List<Player>): Completable
     fun getPlayer(playerID: Long?): Single<Player>
     fun getPlayerPositionsSummary(playerID: Long?): Single<Map<FieldPosition, Int>>
-    fun savePlayer(playerID: Long?, name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int): Completable
+    fun savePlayer(playerID: Long?, name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int): Completable
     fun deletePlayer(playerID: Long?): Completable
     fun getPlayers(): Single<List<Player>>
     fun getNotSelectedPlayersFromList(list: List<PlayerWithPosition>, lineupID: Long?, sortBy: FieldPosition? = null): Single<List<Player>>

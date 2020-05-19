@@ -19,6 +19,7 @@ import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DomainErrors
+import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
@@ -87,6 +88,8 @@ class PlayerEditFragment: BaseFragment(), PlayerFormListener {
             val savedLicenseNumber = savedInstanceState?.getLong(Constants.PLAYER_LICENSE)
             val savedImage = savedInstanceState?.getString(Constants.IMAGE)
             val savedPositions = savedInstanceState?.getInt(Constants.PLAYER_POSITIONS)
+            val savedPitching = savedInstanceState?.getInt(Constants.PLAYER_PITCHING_SIDE)
+            val savedBatting = savedInstanceState?.getInt(Constants.PLAYER_BATTING_SIDE)
 
             view.editPlayerForm.apply {
                 setName(savedName ?: player.name)
@@ -97,6 +100,8 @@ class PlayerEditFragment: BaseFragment(), PlayerFormListener {
                 imagePath?.let { imageUriString ->
                     setImage(imageUriString)
                 }
+                setPitchingSide(PlayerSide.getSideByValue(savedPitching ?: player.pitching))
+                setBattingSide(PlayerSide.getSideByValue(savedBatting ?: player.batting))
             }
         })
 
@@ -126,6 +131,8 @@ class PlayerEditFragment: BaseFragment(), PlayerFormListener {
         val license = view?.editPlayerForm?.getLicenseNumber()
         val shirt = view?.editPlayerForm?.getShirtNumber()
         val positions = view?.editPlayerForm?.getPlayerPositions()
+        val pitching = view?.editPlayerForm?.getPitchingSide()
+        val batting = view?.editPlayerForm?.getBattingSide()
 
         if(!TextUtils.isEmpty(name))
             outState.putString(Constants.NAME, name)
@@ -145,10 +152,18 @@ class PlayerEditFragment: BaseFragment(), PlayerFormListener {
         image?.let {
             outState.putString(Constants.IMAGE, it.toString())
         }
+
+        pitching?.let {
+            outState.putInt(Constants.PLAYER_PITCHING_SIDE, it.flag)
+        }
+
+        batting?.let {
+            outState.putInt(Constants.PLAYER_BATTING_SIDE, it.flag)
+        }
     }
 
-    override fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int) {
-        viewModel.savePlayer(name, shirtNumber, licenseNumber, imageUri, positions)
+    override fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int) {
+        viewModel.savePlayer(name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

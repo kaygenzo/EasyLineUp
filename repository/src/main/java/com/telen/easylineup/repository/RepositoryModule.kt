@@ -22,6 +22,7 @@ object RepositoryModule {
                     .addMigrations(migration_5_6())
                     .addMigrations(migration_6_7())
                     .addMigrations(migration_7_8())
+                    .addMigrations(migration_8_9())
             if(BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
                         .fallbackToDestructiveMigration()
@@ -144,6 +145,15 @@ object RepositoryModule {
                         where position=1 and mode=1
                     )
                     """)
+            }
+        }
+    }
+
+    private fun migration_8_9(): Migration {
+        return object: Migration(8,9) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE players ADD COLUMN pitching INTEGER NOT NULL DEFAULT 0")
+                database.execSQL("ALTER TABLE players ADD COLUMN batting INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

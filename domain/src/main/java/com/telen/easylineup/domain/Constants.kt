@@ -29,6 +29,8 @@ class Constants {
         const val PLAYER_SHIRT = "player_shirtNumber"
         const val PLAYER_LICENSE = "player_licenseNumber"
         const val PLAYER_POSITIONS = "player_positions"
+        const val PLAYER_PITCHING_SIDE = "player_pitchingSide"
+        const val PLAYER_BATTING_SIDE = "player_battingSide"
 
         const val EXTRA_TOURNAMENT = "com.telen.extra.tournament"
 

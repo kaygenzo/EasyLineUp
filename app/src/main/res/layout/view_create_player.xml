@@ -126,14 +126,14 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintRight_toRightOf="parent">
-                        <Button
-                            android:id="@+id/handLeft"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/pitchingSideLeft"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/generic_left"
                             style="?attr/materialButtonOutlinedStyle" />
-                        <Button
-                            android:id="@+id/handRight"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/pitchingSideRight"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/generic_right"
@@ -164,13 +164,13 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintRight_toRightOf="parent">
-                        <Button
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/battingSideLeft"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/generic_left"
                             style="?attr/materialButtonOutlinedStyle" />
-                        <Button
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/battingSideRight"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
