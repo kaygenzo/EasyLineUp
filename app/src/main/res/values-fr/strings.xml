@@ -61,11 +61,11 @@
 
     <string name="form_lineup_creation_date_label">Date</string>
     <string name="form_lineup_creation_roster_label">Joueurs</string>
-    <string name="form_lineup_creation_roster_change_button">Changer</string>
+    <string name="form_lineup_creation_roster_change_button">Editer</string>
 
     <string name="lineup_list_empty_label">Vide</string>
     <string name="lineup_list_filter_focused_hint">Tapez un nom</string>
-    <string name="lineup_list_filter_unfocused_hint">Filtrer par nom&#8230;</string>
+    <string name="lineup_list_filter_unfocused_hint">Filtrer par nom</string>
 
     <string name="shake_beta_description">Un problème ? Secouez votre périphérique et envoyez un rapport!</string>
 
@@ -74,8 +74,6 @@
 
     <string name="action_add_dp_flex">Utiliser un DP/Flex</string>
     <string name="action_add_dh">Utiliser un DH</string>
-
-    <string name="tournaments_summary_header">%s / %s</string>
 
     <plurals name="tournaments_quantity">
         <item quantity="one">%d tournoi</item>
@@ -130,11 +128,6 @@
     <string name="login_create">Créez votre première équipe</string>
     <string name="login_import">Importez une équipe existante</string>
 
-    <string name="settings_export_success">Données exportées avec succès vers le stockage externe dans le dossier %s </string>
-    <string name="settings_import_success">Données importées avec succès dans l\'application</string>
-    <string name="settings_export_error">Un problème est survenu durant l\'export. Veuillez réessayer et vérifiez si l\'application a bien accès à la mémoire externe.</string>
-    <string name="settings_import_error">Un problème est survenu durant l\'import. Veuillez réessayer et vérifiez si l\'application a bien accès à la mémoire externe.</string>
-
     <string name="setting_import_data_description">Importer les données à partir d\'un fichier</string>
     <string name="setting_import_data_update_object_description">Mettre à jour les données si elles existent ?</string>
     <string name="setting_export_data_description">Exporter les données vers un fichier</string>
@@ -143,14 +136,32 @@
     <string name="settings_category_import">Importation</string>
     <string name="settings_category_delete">Suppression</string>
 
-    <string name="error_need_assign_pitcher_first">Selectionnez un Pitcher avant.</string>
-    <string name="error_need_assign_both_players">Non sauvergardé! Selectionnez à la fois le DP et le Flex</string>
-
-    <string name="cancel_message">Voulez-vous vraiment annuler ? Vous perdrez toutes vos modifications.</string>
-
     <string name="export_data_to_file_dialog_message">Nom du fichier:</string>
     <string name="export_button">Exporter</string>
 
     <string name="link_dp_and_flex_dialog_title">Associez votre DP et votre Flex</string>
     <string name="link_dh_and_pitcher_dialog_title">Associez votre DH et votre Pitcher</string>
+    <string name="settings_export_success_message">"Données exportées avec succès vers le stockage externe dans le dossier %s "</string>
+    <string name="settings_import_success_message">Données importées avec succès dans l\'application</string>
+    <string name="settings_export_error_message">Un problème est survenu durant l\'export. Veuillez réessayer et vérifiez si l\'application a bien accès à la mémoire externe.</string>
+    <string name="settings_import_error_message">Un problème est survenu durant l\'import. Veuillez réessayer et vérifiez si l\'application a bien accès à la mémoire externe.</string>
+    <string name="error_need_assign_pitcher_first_message">Selectionnez un Pitcher avant.</string>
+    <string name="error_need_assign_both_players_message">Non sauvergardé! Selectionnez à la fois le DP et le Flex</string>
+    <string name="discard_message">Voulez-vous vraiment annuler ? Vous perdrez toutes vos modifications.</string>
+    <string name="discard_title">Annuler les modifications ?</string>
+    <string name="generic_discard">Annuler</string>
+    <string name="settings_export_error_title">Impossible d\'exporter</string>
+    <string name="settings_import_error_title">Impossible d\'importer</string>
+    <string name="error_need_assign_pitcher_first_title">Non sauvergardé</string>
+    <string name="error_need_assign_both_players_title">Non sauvergardé</string>
+    <string name="create_player_favorite_positions">Positions préférées: (Max 3)</string>
+    <string name="create_player_pitching_side">Lancer</string>
+    <string name="create_player_batting_side">Batting</string>
+    <string name="generic_left">Gaucher</string>
+    <string name="generic_right">Droitier</string>
+    <string name="generic_both">Les deux</string>
+    <string name="generic_unknown">Inconnu</string>
+    <string name="settings_export_success_title">Succès</string>
+    <string name="settings_import_success_title">Succès</string>
+    <string name="error_when_deleting_lineup">Une erreur s\'est produite pendant la suppression du lineup</string>
 </resources>
