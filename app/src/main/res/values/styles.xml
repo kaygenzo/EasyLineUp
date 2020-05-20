@@ -180,6 +180,5 @@
     </style>
 
     <style name="AppTheme.MaterialTextView" parent="Widget.MaterialComponents.TextView">
-        <item name="android:textSize">16sp</item>
     </style>
 </resources>

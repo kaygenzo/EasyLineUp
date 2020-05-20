@@ -61,21 +61,21 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@+id/sideContainerValues">
 
-                <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                <ImageView
                     android:id="@+id/pitchingSideLabel"
-                    android:layout_width="wrap_content"
+                    android:layout_width="30dp"
                     android:layout_height="0dp"
-                    android:text="@string/create_player_pitching_side"
+                    app:srcCompat="@drawable/ic_pitching_black_24dp"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintBottom_toTopOf="@+id/battingSideLabel"
                     android:layout_marginBottom="5dp"/>
 
-                <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                <ImageView
                     android:id="@+id/battingSideLabel"
-                    android:layout_width="wrap_content"
+                    android:layout_width="30dp"
                     android:layout_height="0dp"
-                    android:text="@string/create_player_batting_side"
+                    app:srcCompat="@drawable/ic_batting_black_24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/pitchingSideLabel"
@@ -94,6 +94,7 @@
                     android:id="@+id/pitchingSideValue"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
+                    tools:text="Left"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintBottom_toTopOf="@+id/battingSideValue"
@@ -103,6 +104,7 @@
                     android:id="@+id/battingSideValue"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
+                    tools:text="Right"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/pitchingSideValue"
