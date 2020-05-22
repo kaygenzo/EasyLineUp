@@ -50,7 +50,7 @@ class PlayerEditFragment: BaseFragment(), PlayerFormListener {
         viewModel = ViewModelProviders.of(this).get(PlayerViewModel::class.java)
         viewModel.playerID = arguments?.getLong(Constants.PLAYER_ID)
 
-        val disposable = viewModel.registerFormErrorResult().subscribe({ error ->
+        val errorsDisposable = viewModel.registerFormErrorResult().subscribe({ error ->
             when(error) {
                 DomainErrors.INVALID_PLAYER_NAME -> {
                     view?.editPlayerForm?.displayInvalidName()
@@ -71,7 +71,21 @@ class PlayerEditFragment: BaseFragment(), PlayerFormListener {
         }, {
             Timber.e(it)
         })
-        disposables.add(disposable)
+        disposables.add(errorsDisposable)
+
+        val eventsDisposable = viewModel.registerEvent().subscribe({
+            when(it) {
+                SavePlayerSuccess -> {
+                    findNavController().navigateUp()
+                }
+                else -> {
+
+                }
+            }
+        }, {
+            Timber.e(it)
+        })
+        disposables.add(eventsDisposable)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -102,17 +116,6 @@ class PlayerEditFragment: BaseFragment(), PlayerFormListener {
                 }
                 setPitchingSide(PlayerSide.getSideByValue(savedPitching ?: player.pitching))
                 setBattingSide(PlayerSide.getSideByValue(savedBatting ?: player.batting))
-            }
-        })
-
-        viewModel.registerEvent().observe(viewLifecycleOwner, Observer {
-            when(it) {
-                SavePlayerSuccess -> {
-                    findNavController().navigateUp()
-                }
-                else -> {
-
-                }
             }
         })
 

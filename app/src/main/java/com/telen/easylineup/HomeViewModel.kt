@@ -6,9 +6,10 @@ import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.Team
-import com.telen.easylineup.domain.utils.SingleLiveEvent
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.Subject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
@@ -27,7 +28,7 @@ class HomeViewModel: ViewModel(), KoinComponent {
 
     private val domain: ApplicationPort by inject()
 
-    private val _event = SingleLiveEvent<Event>()
+    private val _event = PublishSubject.create<Event>()
 
     val disposables = CompositeDisposable()
 
@@ -39,17 +40,17 @@ class HomeViewModel: ViewModel(), KoinComponent {
         disposables.clear()
     }
 
-    fun observeEvents(): LiveData<Event> {
+    fun observeEvents(): Subject<Event> {
         return _event
     }
 
     fun getTeam() {
         val disposable = domain.getTeam()
                 .subscribe({
-                    _event.postValue(GetTeamSuccess(it))
+                    _event.onNext(GetTeamSuccess(it))
                 }, {
                     Timber.e(it)
-                    _event.postValue(GetTeamFailure)
+                    _event.onNext(GetTeamFailure)
                 })
         disposables.add(disposable)
     }
@@ -57,10 +58,10 @@ class HomeViewModel: ViewModel(), KoinComponent {
     fun getTeamsCount() {
         val disposable = domain.getTeamsCount()
                 .subscribe({
-                    _event.postValue(GetTeamsCountSuccess(it))
+                    _event.onNext(GetTeamsCountSuccess(it))
                 }, {
                     Timber.e(it)
-                    _event.postValue(GetTeamsCountFailure)
+                    _event.onNext(GetTeamsCountFailure)
                 })
         disposables.add(disposable)
     }
@@ -68,10 +69,10 @@ class HomeViewModel: ViewModel(), KoinComponent {
     fun onSwapButtonClicked() {
         val disposable = domain.getAllTeams()
                 .subscribe({
-                    _event.postValue(SwapButtonSuccess(it))
+                    _event.onNext(SwapButtonSuccess(it))
                 }, {
                     Timber.e(it)
-                    _event.postValue(SwapButtonFailure)
+                    _event.onNext(SwapButtonFailure)
                 })
         disposables.add(disposable)
     }
@@ -79,10 +80,10 @@ class HomeViewModel: ViewModel(), KoinComponent {
     fun updateCurrentTeam(currentTeam: Team) {
         val disposable = domain.updateCurrentTeam(currentTeam)
                 .subscribe({
-                    _event.postValue(UpdateCurrentTeamSuccess)
+                    _event.onNext(UpdateCurrentTeamSuccess)
                 }, {
                     Timber.e(it)
-                    _event.postValue(UpdateCurrentTeamFailure)
+                    _event.onNext(UpdateCurrentTeamFailure)
                 })
         disposables.add(disposable)
     }

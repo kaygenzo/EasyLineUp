@@ -4,9 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.application.ApplicationPort
-import com.telen.easylineup.domain.utils.SingleLiveEvent
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.Subject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
@@ -26,7 +27,7 @@ class SettingsViewModel: ViewModel(), KoinComponent {
 
     private val domain: ApplicationPort by inject()
 
-    private val _event = SingleLiveEvent<Event>()
+    private val _event = PublishSubject.create<Event>()
     private val disposables = CompositeDisposable()
 
     private val _exportDataObjectLiveData = MutableLiveData<ExportDataObject>()
@@ -40,10 +41,10 @@ class SettingsViewModel: ViewModel(), KoinComponent {
         val disposable = domain.deleteAllData()
                 .andThen(Completable.timer(1000, TimeUnit.MILLISECONDS))
                 .subscribe({
-                    _event.postValue(DeleteAllDataEventSuccess)
+                    _event.onNext(DeleteAllDataEventSuccess)
                 }, {
                     Timber.e(it)
-                    _event.postValue(DeleteAllDataEventFailure)
+                    _event.onNext(DeleteAllDataEventFailure)
                 })
         disposables.add(disposable)
     }
@@ -61,15 +62,15 @@ class SettingsViewModel: ViewModel(), KoinComponent {
     fun exportDataOnExternalMemory(name: String, fallbackName: String) {
         val disposable = domain.exportDataOnExternalMemory(name, fallbackName)
                 .subscribe({
-                    _event.postValue(ExportDataEventSuccess(it))
+                    _event.onNext(ExportDataEventSuccess(it))
                 }, {
                     Timber.e(it)
-                    _event.postValue(ExportDataEventFailure)
+                    _event.onNext(ExportDataEventFailure)
                 })
         disposables.add(disposable)
     }
 
-    fun observeEvent(): LiveData<Event> {
+    fun observeEvent(): Subject<Event> {
         return _event
     }
 }

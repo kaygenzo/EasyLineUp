@@ -1,6 +1,5 @@
 package com.telen.easylineup.team.createTeam
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.StepConfiguration
@@ -10,6 +9,7 @@ import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
+import io.reactivex.subjects.PublishSubject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -20,8 +20,8 @@ class SetupViewModel: ViewModel(), KoinComponent {
     var team = Team(0, "", null, TeamType.BASEBALL.id, true)
 
     private var saveDisposable: Disposable? = null
-    var stepLiveData: MutableLiveData<StepConfiguration> = MutableLiveData()
-    var errorLiveData: MutableLiveData<Error> = MutableLiveData(Error.NONE)
+    var stepLiveData = PublishSubject.create<StepConfiguration>()
+    var errorLiveData = PublishSubject.create<Error>()
 
     enum class Error {
         NAME_EMPTY,
@@ -45,7 +45,7 @@ class SetupViewModel: ViewModel(), KoinComponent {
 
     fun saveTeam(): Completable {
         return domain.saveTeam(team).doOnComplete {
-            errorLiveData.value = Error.NONE
+            errorLiveData.onNext(Error.NONE)
         }
     }
 
@@ -57,14 +57,14 @@ class SetupViewModel: ViewModel(), KoinComponent {
         dispose(saveDisposable)
         saveDisposable = domain.getTeamCreationNextStep(currentStep, team)
                 .subscribe({
-                    errorLiveData.value = Error.NONE
-                    stepLiveData.value = it
+                    errorLiveData.onNext(Error.NONE)
+                    stepLiveData.onNext(it)
                 }, {
                     if(it is NameEmptyException) {
-                        errorLiveData.value = Error.NAME_EMPTY
+                        errorLiveData.onNext(Error.NAME_EMPTY)
                     }
                     else {
-                        errorLiveData.value = Error.UNKNOWN
+                        errorLiveData.onNext(Error.UNKNOWN)
                     }
                 })
     }
@@ -73,10 +73,10 @@ class SetupViewModel: ViewModel(), KoinComponent {
         dispose(saveDisposable)
         saveDisposable = domain.getTeamCreationPreviousStep(currentStep, team)
                         .subscribe({
-                            errorLiveData.value = Error.NONE
-                            stepLiveData.value = it
+                            errorLiveData.onNext(Error.NONE)
+                            stepLiveData.onNext(it)
                         }, {
-                            errorLiveData.value = Error.UNKNOWN
+                            errorLiveData.onNext(Error.UNKNOWN)
                         })
     }
 

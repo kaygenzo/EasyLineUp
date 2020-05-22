@@ -1,14 +1,14 @@
 package com.telen.easylineup.login
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.export.ExportBase
-import com.telen.easylineup.domain.utils.SingleLiveEvent
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.Subject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
@@ -26,10 +26,13 @@ class LoginViewModel : ViewModel(), KoinComponent {
 
     private val domain: ApplicationPort by inject()
 
-    private val _loginEvent = SingleLiveEvent<LoginEvent>()
-    val loginEvent: LiveData<LoginEvent> = _loginEvent
+    private val _loginEvent = PublishSubject.create<LoginEvent>()
 
     val disposables = CompositeDisposable()
+
+    fun observeEvents(): Subject<LoginEvent> {
+        return _loginEvent
+    }
 
     fun importData(dataPath: String, updateIfExists: Boolean) {
         var input : BufferedReader? = null
@@ -46,10 +49,10 @@ class LoginViewModel : ViewModel(), KoinComponent {
         }
 
         val disposable = task.subscribe({
-            _loginEvent.postValue(ImportSuccessfulEvent)
+            _loginEvent.onNext(ImportSuccessfulEvent)
         }, {
             Timber.e(it)
-            _loginEvent.postValue(ImportFailure)
+            _loginEvent.onNext(ImportFailure)
         })
         disposables.add(disposable)
     }
@@ -61,10 +64,10 @@ class LoginViewModel : ViewModel(), KoinComponent {
     fun getMainTeam() {
         val disposable = domain.getTeam()
                 .subscribe({
-                    _loginEvent.postValue(GetTeamSuccess(it))
+                    _loginEvent.onNext(GetTeamSuccess(it))
                 }, {
                     Timber.e(it)
-                    _loginEvent.postValue(GetTeamFailed)
+                    _loginEvent.onNext(GetTeamFailed)
                 })
         disposables.add(disposable)
     }

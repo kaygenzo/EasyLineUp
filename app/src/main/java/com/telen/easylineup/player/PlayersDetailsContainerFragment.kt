@@ -3,11 +3,11 @@ package com.telen.easylineup.player
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager.widget.ViewPager
+import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.team.TeamViewModel
@@ -17,7 +17,7 @@ import io.reactivex.Completable
 import kotlinx.android.synthetic.main.fragment_players_details_container.view.*
 import timber.log.Timber
 
-class PlayersDetailsContainerFragment: Fragment(), ViewPager.OnPageChangeListener {
+class PlayersDetailsContainerFragment: BaseFragment(), ViewPager.OnPageChangeListener {
 
     private lateinit var mAdapter: PlayersDetailsPagerAdapter
     private lateinit var teamViewModel: TeamViewModel
@@ -32,6 +32,21 @@ class PlayersDetailsContainerFragment: Fragment(), ViewPager.OnPageChangeListene
         playerViewModel = ViewModelProviders.of(this)[PlayerViewModel::class.java]
         val playerID = savedInstanceState?.getLong(Constants.PLAYER_ID) ?: arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
         teamViewModel.setPlayerId(playerID)
+
+        val disposable = playerViewModel.registerEvent().subscribe({
+            when(it) {
+                DeletePlayerSuccess -> {
+                    findNavController().popBackStack(R.id.navigation_team, false)
+                }
+                is DeletePlayerFailure -> {
+                    Toast.makeText(activity, "Something wrong happened: ${it.message}", Toast.LENGTH_LONG).show()
+                }
+                else -> {}
+            }
+        }, {
+            Timber.e(it)
+        })
+        disposables.add(disposable)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -57,18 +72,6 @@ class PlayersDetailsContainerFragment: Fragment(), ViewPager.OnPageChangeListene
         teamViewModel.observePlayers().observe(viewLifecycleOwner, Observer { players ->
             mAdapter.setPlayerIDs(players)
             pager.setCurrentItem(mAdapter.getPlayerIndex(teamViewModel.getPlayerId()), false)
-        })
-
-        playerViewModel.registerEvent().observe(viewLifecycleOwner, Observer {
-            when(it) {
-                DeletePlayerSuccess -> {
-                    findNavController().popBackStack(R.id.navigation_team, false)
-                }
-                is DeletePlayerFailure -> {
-                    Toast.makeText(activity, "Something wrong happened: ${it.message}", Toast.LENGTH_LONG).show()
-                }
-                else -> {}
-            }
         })
     }
 

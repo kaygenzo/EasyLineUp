@@ -28,6 +28,7 @@ import com.telen.easylineup.login.LoginViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.views.CustomEditTextView
 import io.reactivex.Completable
+import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 
 
@@ -41,6 +42,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
     lateinit var viewModel: SettingsViewModel
     lateinit var loginViewModel: LoginViewModel
 
+    private val disposables = CompositeDisposable()
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
         val about = findPreference<Preference>(getString(R.string.key_app_version))
@@ -53,7 +56,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v = super.onCreateView(inflater, container, savedInstanceState)
 
-        viewModel.observeEvent().observe(viewLifecycleOwner, Observer {
+        val eventsDisposable = viewModel.observeEvent().subscribe({
             when(it) {
                 DeleteAllDataEventSuccess -> {
                     val intent = Intent(activity, LoginActivity::class.java)
@@ -79,9 +82,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
                 else -> {}
             }
+        }, {
+            Timber.e(it)
         })
 
-        loginViewModel.loginEvent.observe(viewLifecycleOwner, Observer {
+        disposables.add(eventsDisposable)
+
+        val errorsDisposable = loginViewModel.observeEvents().subscribe({
             activity?.run {
                 when(it) {
                     ImportSuccessfulEvent -> {
@@ -96,7 +103,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     else -> {}
                 }
             }
+        }, {
+            Timber.e(it)
         })
+
+        disposables.add(errorsDisposable)
 
         return v
     }
@@ -104,6 +115,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.clear()
+        disposables.clear()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

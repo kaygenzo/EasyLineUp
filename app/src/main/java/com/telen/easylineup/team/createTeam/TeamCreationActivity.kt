@@ -3,7 +3,6 @@ package com.telen.easylineup.team.createTeam
 import android.app.Activity
 import android.content.DialogInterface
 import android.os.Bundle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import com.telen.easylineup.BaseActivity
@@ -32,8 +31,7 @@ class TeamCreationActivity: BaseActivity() {
             viewModel.team = it as Team
         }
 
-        viewModel.stepLiveData.observe(this, Observer {
-
+        val disposable = viewModel.stepLiveData.subscribe({
             val isNext = stepLayout.currentStep < it.nextStep.id
 
             when(it.nextStep) {
@@ -66,7 +64,7 @@ class TeamCreationActivity: BaseActivity() {
                             confirmClick = DialogInterface.OnClickListener { dialog, which ->
                                 finish()
                             }, confirmText = R.string.generic_discard).show()
-                    return@Observer
+                    return@subscribe
                 }
                 else -> {}
             }
@@ -82,9 +80,13 @@ class TeamCreationActivity: BaseActivity() {
 
             if(it.previousButtonLabel > 0)
                 buttonPrevious.setText(it.previousButtonLabel)
-            
+
             stepLayout.go(it.nextStep.id, true)
+        }, {
+            Timber.d(it)
         })
+
+        disposables.add(disposable)
 
         buttonNext.setOnClickListener { viewModel.nextButtonClicked(stepLayout.currentStep) }
         buttonPrevious.setOnClickListener { viewModel.previousButtonClicked(stepLayout.currentStep) }

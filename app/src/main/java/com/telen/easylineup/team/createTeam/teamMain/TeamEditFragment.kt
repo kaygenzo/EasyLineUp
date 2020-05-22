@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.nguyenhoanglam.imagepicker.model.Config
 import com.nguyenhoanglam.imagepicker.model.Image
@@ -43,12 +42,33 @@ class TeamEditFragment: BaseFragment() , TeamFormListener {
         imageUri?.let {
             viewModel.setTeamImage(it.toString())
         } ?: viewModel.setTeamImage(null)
+    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        viewModel = ViewModelProviders.of(activity as AppCompatActivity).get(SetupViewModel::class.java)
+
+        val errorsDisposable = viewModel.errorLiveData.subscribe({
+            when(it) {
+                SetupViewModel.Error.NAME_EMPTY -> {
+                    teamNameInputLayout.error = getString(R.string.team_creation_error_name_empty)
+                    FirebaseAnalyticsUtils.emptyTeamName(activity)
+                }
+                SetupViewModel.Error.NONE -> {
+                    teamNameInputLayout.error = ""
+                }
+                else -> Toast.makeText(activity, "Something wrong happened, please try again", Toast.LENGTH_SHORT).show()
+            }
+        }, {
+            Timber.e(it)
+        })
+
+        disposables.add(errorsDisposable)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_team_edit, container, false)
-        viewModel = ViewModelProviders.of(activity as AppCompatActivity).get(SetupViewModel::class.java)
 
         arguments?.getSerializable(Constants.EXTRA_TEAM)?.let {
             viewModel.team = it as Team
@@ -69,19 +89,6 @@ class TeamEditFragment: BaseFragment() , TeamFormListener {
         disposables.add(disposable)
 
         view.editTeamForm.setListener(this)
-
-        viewModel.errorLiveData.observe(viewLifecycleOwner, Observer {
-            when(it) {
-                SetupViewModel.Error.NAME_EMPTY -> {
-                    teamNameInputLayout.error = getString(R.string.team_creation_error_name_empty)
-                    FirebaseAnalyticsUtils.emptyTeamName(activity)
-                }
-                SetupViewModel.Error.NONE -> {
-                    teamNameInputLayout.error = ""
-                }
-                else -> Toast.makeText(activity, "Something wrong happened, please try again", Toast.LENGTH_SHORT).show()
-            }
-        })
 
         return view
     }

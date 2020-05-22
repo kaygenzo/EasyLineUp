@@ -3,7 +3,6 @@ package com.telen.easylineup
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -77,7 +76,7 @@ class HomeActivity : BaseActivity(), HostInterface {
             }
         })
 
-        viewModel.observeEvents().observe(this, Observer {
+        val disposable = viewModel.observeEvents().subscribe({
             when(it) {
                 is GetTeamSuccess -> {
                     drawerHeader.setImage(it.team.image)
@@ -103,7 +102,11 @@ class HomeActivity : BaseActivity(), HostInterface {
                 }
                 else -> {}
             }
+        }, {
+            Timber.e(it)
         })
+
+        disposables.add(disposable)
     }
 
     override fun onDestroy() {

@@ -27,6 +27,7 @@ import io.reactivex.Single
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
@@ -71,9 +72,9 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
     private var team: Team? = null
 
-    // live data observables
-    val eventHandler = MutableLiveData<EventCase>()
+    val eventHandler = PublishSubject.create<EventCase>()
 
+    // live data observables
     private val _linkPlayersInField = MutableLiveData<List<Player>?>()
     val linkPlayersInField: LiveData<List<Player>?>
         get() = _linkPlayersInField
@@ -97,7 +98,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     fun onDeletePosition(player: Player, position: FieldPosition) {
         val disposable = domain.deletePlayerPosition(player, position, _listPlayersWithPosition, lineupMode)
                 .subscribe({
-                    eventHandler.value = DeletePlayerPositionSuccess
+                    eventHandler.onNext(DeletePlayerPositionSuccess)
                 }, {
                     Timber.e(it)
                 })
@@ -111,7 +112,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     private fun getAllAvailablePlayers(position: FieldPosition) {
         val disposable = getNotSelectedPlayers(position)
                 .subscribe({
-                    eventHandler.value = GetAllAvailablePlayersSuccess(it, position)
+                    eventHandler.onNext(GetAllAvailablePlayersSuccess(it, position))
                 }, {
                     Timber.e(it)
                 })
@@ -143,7 +144,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     fun saveNewBattingOrder(players: List<PlayerWithPosition>) {
         val disposable = domain.saveBattingOrder(players)
                 .subscribe({
-                    eventHandler.value = SaveBattingOrderSuccess
+                    eventHandler.onNext(SaveBattingOrderSuccess)
                 }, {
                     Timber.e(it)
                 })
@@ -153,7 +154,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     private fun deleteLineup() {
         val disposable = domain.deleteLineup(lineupID)
                 .subscribe({
-                    eventHandler.value = DeleteLineupSuccess
+                    eventHandler.onNext(DeleteLineupSuccess)
                 }, {
                     Timber.e(it)
                 })
@@ -169,7 +170,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
         val disposable = domain.updateLineupMode(isEnabled, lineupID, lineupMode, _listPlayersWithPosition)
                 .subscribe({
-                    eventHandler.value = UpdatePlayersWithLineupModeSuccess
+                    eventHandler.onNext(UpdatePlayersWithLineupModeSuccess)
                 }, {
                     Timber.e(it)
                 })
@@ -251,7 +252,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     fun onPlayerSelected(player: Player, position: FieldPosition) {
         val disposable = savePlayerFieldPosition(player, position)
                 .subscribe({
-                    eventHandler.value = SavePlayerPositionSuccess
+                    eventHandler.onNext(SavePlayerPositionSuccess)
                 }, {
                     Timber.e(it)
                 })
@@ -273,7 +274,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                         else {
                             R.string.link_dh_and_pitcher_dialog_title
                         }
-                        eventHandler.value = NeedLinkDpFlex(Pair(it.dp, it.flex), it.dpLocked, it.flexLocked, it.teamType, title)
+                        eventHandler.onNext(NeedLinkDpFlex(Pair(it.dp, it.flex), it.dpLocked, it.flexLocked, it.teamType, title))
                     }, {
                         Timber.e(it)
                     })

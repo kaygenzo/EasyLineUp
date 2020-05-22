@@ -18,8 +18,6 @@ import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.utils.NavigationUtils
-import io.reactivex.functions.Action
-import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_lineup_edition.view.*
 import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.lineupTabLayout
 import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.viewpager
@@ -56,6 +54,22 @@ class LineupFragment: BaseFragment(), CompoundButton.OnCheckedChangeListener {
             Timber.e(it)
         })
         disposables.add(disposable)
+
+        val eventDisposable = viewModel.eventHandler.subscribe({
+            when(it) {
+                DeleteLineupSuccess -> {
+                    activity?.run {
+                        this.runOnUiThread {
+                            findNavController().popBackStack(R.id.navigation_lineups, false)
+                        }
+                    }
+                }
+                else -> {}
+            }
+        }, {
+            Timber.e(it)
+        })
+        disposables.add(eventDisposable)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -92,17 +106,6 @@ class LineupFragment: BaseFragment(), CompoundButton.OnCheckedChangeListener {
 
             viewModel.getDesignatedPlayerLabel(this).observe(viewLifecycleOwner, Observer {
                 view.changeModeCheckBox?.text = it
-            })
-
-            viewModel.eventHandler.observe(viewLifecycleOwner, Observer {
-                when(it) {
-                    DeleteLineupSuccess -> {
-                        this.runOnUiThread {
-                            findNavController().popBackStack(R.id.navigation_lineups, false)
-                        }
-                    }
-                    else -> {}
-                }
             })
         }
 

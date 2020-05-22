@@ -3,14 +3,13 @@ package com.telen.easylineup.player
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.application.ApplicationPort
-import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
-import com.telen.easylineup.domain.utils.SingleLiveEvent
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.Subject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
@@ -30,7 +29,7 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     private val _teamTypeLiveData = MutableLiveData<Int>()
     private val _playerLiveData = MutableLiveData<Player>()
     private val _lineupsLiveData = MutableLiveData<Map<FieldPosition, Int>>()
-    private val _event = SingleLiveEvent<Event>()
+    private val _event = PublishSubject.create<Event>()
 
     var playerID: Long? = 0
 
@@ -75,10 +74,10 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     fun savePlayer(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int) {
         val disposable = domain.savePlayer(playerID, name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting)
                 .subscribe({
-                    _event.postValue(SavePlayerSuccess)
+                    _event.onNext(SavePlayerSuccess)
                 }, {
                     Timber.e(it)
-                    _event.postValue(SavePlayerFailure)
+                    _event.onNext(SavePlayerFailure)
                 })
         disposables.add(disposable)
     }
@@ -86,14 +85,14 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     fun deletePlayer() {
         val disposable = domain.deletePlayer(playerID)
                 .subscribe({
-                    _event.postValue(DeletePlayerSuccess)
+                    _event.onNext(DeletePlayerSuccess)
                 }, {
-                    _event.postValue(DeletePlayerFailure(it.message))
+                    _event.onNext(DeletePlayerFailure(it.message))
                 })
         disposables.add(disposable)
     }
 
-    fun registerEvent(): LiveData<Event> {
+    fun registerEvent(): Subject<Event> {
         return _event
     }
 

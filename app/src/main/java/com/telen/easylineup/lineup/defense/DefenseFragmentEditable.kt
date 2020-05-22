@@ -73,12 +73,8 @@ class DefenseFragmentEditable: BaseFragment(), OnPlayerButtonCallback {
             Timber.e(it)
         })
         disposables.add(disposable)
-    }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_lineup_defense_editable, container, false)
-
-        viewModel.eventHandler.observe(viewLifecycleOwner, Observer { event ->
+        val eventsDisposable = viewModel.eventHandler.subscribe({ event ->
             when(event) {
                 SavePlayerPositionSuccess -> Timber.d("Successfully saved player field position")
                 DeletePlayerPositionSuccess -> Timber.d("Successfully deleted player field position")
@@ -90,7 +86,15 @@ class DefenseFragmentEditable: BaseFragment(), OnPlayerButtonCallback {
                 }
                 else -> {}
             }
+        }, {
+            Timber.e(it)
         })
+
+        disposables.add(eventsDisposable)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.fragment_lineup_defense_editable, container, false)
 
         viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer { players ->
             view.cardDefenseView.setPlayerStateListener(this)

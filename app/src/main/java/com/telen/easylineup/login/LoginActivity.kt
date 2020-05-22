@@ -6,11 +6,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.obsez.android.lib.filechooser.ChooserDialog
+import com.telen.easylineup.BaseActivity
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
@@ -21,7 +20,7 @@ import kotlinx.android.synthetic.main.activity_login.*
 import timber.log.Timber
 
 
-class LoginActivity: AppCompatActivity() {
+class LoginActivity: BaseActivity() {
 
     companion object {
         const val REQUEST_READ_EXTERNAL_STORAGE = 0
@@ -48,7 +47,7 @@ class LoginActivity: AppCompatActivity() {
             }
         }
 
-        viewModel.loginEvent.observe(this,  Observer {
+        val disposable = viewModel.observeEvents().subscribe({
             when(it) {
                 ImportSuccessfulEvent -> {
                     val dialog = DialogFactory.getSuccessDialog(context = this@LoginActivity,
@@ -73,7 +72,11 @@ class LoginActivity: AppCompatActivity() {
                     launchTeamCreation()
                 }
             }
+        }, {
+            Timber.e(it)
         })
+
+        disposables.add(disposable)
     }
 
     override fun onDestroy() {
