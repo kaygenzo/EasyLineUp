@@ -3,6 +3,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -23,11 +24,16 @@
 
     </com.google.android.material.tabs.TabLayout>
 
-    <CheckBox
+    <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/changeModeCheckBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/lineupTabLayout"/>
+        tools:text="@string/action_add_dp_flex"
+        tools:checked="true"
+        app:switchPadding="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/lineupTabLayout"
+        android:layout_marginStart="@dimen/default_margin"
+        android:layout_marginEnd="@dimen/default_margin"/>
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewpager"

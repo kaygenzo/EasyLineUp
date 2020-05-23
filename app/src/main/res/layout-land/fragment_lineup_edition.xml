@@ -1,40 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
-    <CheckBox
-        android:id="@+id/changeModeCheckBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/action_add_dh"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <fragment
-        android:id="@+id/fragment_defense_edition"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:name="com.telen.easylineup.lineup.defense.DefenseFragmentEditable"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/separator"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/changeModeCheckBox"/>
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/separator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5"/>
-
-    <fragment
-        android:id="@+id/fragment_attack_fixed"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewpager"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:name="com.telen.easylineup.lineup.attack.AttackFragment"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/separator"
-        android:layout_margin="10dp"/>
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/guideline"
+        android:layout_marginBottom="5dp"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:orientation="vertical"
+        android:layout_width="3dp"
+        android:layout_height="match_parent"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toRightOf="@+id/guideline"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/lineupTabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/new_lineup_tab_field_defense"/>
+            <com.google.android.material.tabs.TabItem
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/new_lineup_tab_field_attack"/>
+
+        </com.google.android.material.tabs.TabLayout>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/changeModeCheckBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="@string/action_add_dp_flex"
+            tools:checked="true"
+            app:layout_constraintTop_toBottomOf="@+id/lineupTabLayout"
+            android:layout_marginStart="@dimen/default_margin"
+            android:layout_marginEnd="@dimen/default_margin"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
