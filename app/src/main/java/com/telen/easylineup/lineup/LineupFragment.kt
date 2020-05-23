@@ -15,10 +15,12 @@ import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DomainErrors
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_lineup_edition.view.*
+import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.*
 import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.lineupTabLayout
 import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.viewpager
 import timber.log.Timber
@@ -102,6 +104,12 @@ class LineupFragment: BaseFragment(), CompoundButton.OnCheckedChangeListener {
                         setOnCheckedChangeListener(this@LineupFragment)
                     }
                 }
+            })
+
+            viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer {
+                val size = it.filter { item -> item.position == FieldPosition.SUBSTITUTE.position
+                        && item.fieldPositionID > 0 }.size
+                view.substitutesIndication?.text = resources.getQuantityString(R.plurals.lineups_substitutes_size, size, size)
             })
 
             viewModel.getDesignatedPlayerLabel(this).observe(viewLifecycleOwner, Observer {

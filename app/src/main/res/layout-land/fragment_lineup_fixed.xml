@@ -46,6 +46,15 @@
 
         </com.google.android.material.tabs.TabLayout>
 
+        <com.telen.easylineup.views.NormalUppercaseStyledTextView
+            android:id="@+id/substitutesIndication"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/lineupTabLayout"
+            tools:text="Substitutes size: 8"
+            android:layout_marginStart="@dimen/default_margin"
+            android:layout_marginTop="@dimen/default_margin"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

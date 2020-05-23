@@ -157,4 +157,9 @@
     <string name="settings_export_success_title">Succès</string>
     <string name="settings_import_success_title">Succès</string>
     <string name="error_when_deleting_lineup">Une erreur s\'est produite pendant la suppression du lineup</string>
+
+    <plurals name="lineups_substitutes_size">
+        <item quantity="one">Remplaçant: %d</item>
+        <item quantity="other">Remplaçants: %d</item>
+    </plurals>
 </resources>

@@ -179,4 +179,9 @@
 
     <string name="settings_import_success_title">Success</string>
     <string name="settings_import_success_message">Successfully imported data into the application</string>
+
+    <plurals name="lineups_substitutes_size">
+        <item quantity="one">Substitute: %d</item>
+        <item quantity="other">Substitutes: %d</item>
+    </plurals>
 </resources>
