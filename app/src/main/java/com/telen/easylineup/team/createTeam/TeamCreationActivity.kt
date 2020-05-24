@@ -11,6 +11,7 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamCreationStep
 import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.activity_team_creation.*
 import timber.log.Timber
@@ -48,6 +49,7 @@ class TeamCreationActivity: BaseActivity() {
                     }
                 }
                 TeamCreationStep.FINISH -> {
+                    FirebaseAnalyticsUtils.endTutorial(this)
                     val disposable = viewModel.saveTeam()
                             .subscribe({
                                 setResult(Activity.RESULT_OK)

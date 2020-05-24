@@ -21,6 +21,7 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.lineup.*
 import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.views.DpFlexLinkView
 import com.telen.easylineup.views.OnPlayerButtonCallback
 import com.telen.easylineup.views.OnPlayerClickListener
@@ -51,6 +52,7 @@ class DefenseFragmentEditable: BaseFragment(), OnPlayerButtonCallback {
                 DomainErrors.SAVE_LINEUP_MODE_FAILED -> Timber.e(Exception("Save lineup mode failed"))
                 DomainErrors.NEED_ASSIGN_PITCHER_FIRST -> {
                     context?.run {
+                        FirebaseAnalyticsUtils.missingPitcher(this)
                         DialogFactory.getErrorDialog(
                                 context = this,
                                 title = R.string.error_need_assign_pitcher_first_title,
@@ -59,6 +61,7 @@ class DefenseFragmentEditable: BaseFragment(), OnPlayerButtonCallback {
                 }
                 DomainErrors.DP_OR_FLEX_NOT_ASSIGNED -> {
                     context?.run {
+                        FirebaseAnalyticsUtils.missingDpFlex(this)
                         DialogFactory.getErrorDialog(
                                 context = this,
                                 title = R.string.error_need_assign_both_players_title,

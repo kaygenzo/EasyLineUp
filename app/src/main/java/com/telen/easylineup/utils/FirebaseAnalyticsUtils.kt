@@ -9,10 +9,33 @@ object FirebaseAnalyticsUtils {
     const val EVENT_NAME_EXCEPTION = "elu_exception"
     const val KEY_EMPTY_FIELD = "empty_field"
 
-    fun logInvalidParameter(context: Context?, paramKey: String, paramValue: String, eventName: String) {
+    const val EVENT_MISSING_PITCHER = "elu_exception_missing_pitcher"
+    const val EVENT_MISSING_DP_FLEX = "elu_exception_missing_dp_flex"
+
+    const val EVENT_IMPORT_DATA = "elu_import_data"
+    const val EVENT_EXPORT_DATA = "elu_export_data"
+    const val EVENT_DELETE_DATA = "elu_delete_data"
+
+    const val KEY_FIRST_TEAM = "first_team"
+
+    private fun logInvalidParameter(context: Context?, eventName: String) {
+        context?.run {
+            FirebaseAnalytics.getInstance(this).logEvent(eventName, null)
+        }
+    }
+
+    private fun logInvalidParameter(context: Context?, paramKey: String, paramValue: String, eventName: String) {
         context?.run {
             val params = Bundle()
             params.putString(paramKey, paramValue)
+            FirebaseAnalytics.getInstance(this).logEvent(eventName, params)
+        }
+    }
+
+    private fun logInvalidParameter(context: Context?, paramKey: String, paramValue: Boolean, eventName: String) {
+        context?.run {
+            val params = Bundle()
+            params.putBoolean(paramKey, paramValue)
             FirebaseAnalytics.getInstance(this).logEvent(eventName, params)
         }
     }
@@ -23,10 +46,6 @@ object FirebaseAnalyticsUtils {
 
     fun emptyPlayerName(context: Context?) {
         logInvalidParameter(context, KEY_EMPTY_FIELD, "player_name", EVENT_NAME_EXCEPTION)
-    }
-
-    fun emptyPlayerLicense(context: Context?) {
-        logInvalidParameter(context, KEY_EMPTY_FIELD, "player_license", EVENT_NAME_EXCEPTION)
     }
 
     fun emptyPlayerNumber(context: Context?) {
@@ -43,5 +62,35 @@ object FirebaseAnalyticsUtils {
 
     fun emptyLineupName(context: Context?) {
         logInvalidParameter(context, KEY_EMPTY_FIELD, "lineup_name", EVENT_NAME_EXCEPTION)
+    }
+
+    fun missingPitcher(context: Context?) {
+        logInvalidParameter(context, EVENT_MISSING_PITCHER)
+    }
+
+    fun missingDpFlex(context: Context?) {
+        logInvalidParameter(context, EVENT_MISSING_DP_FLEX)
+    }
+
+    /* ACTIONS */
+
+    fun importData(context: Context?) {
+        logInvalidParameter(context, EVENT_IMPORT_DATA)
+    }
+
+    fun exportData(context: Context?) {
+        logInvalidParameter(context, EVENT_EXPORT_DATA)
+    }
+
+    fun deleteData(context: Context?) {
+        logInvalidParameter(context, EVENT_DELETE_DATA)
+    }
+
+    fun startTutorial(context: Context?, firstTeam: Boolean) {
+        logInvalidParameter(context, KEY_FIRST_TEAM, firstTeam, FirebaseAnalytics.Event.TUTORIAL_BEGIN)
+    }
+
+    fun endTutorial(context: Context?) {
+        logInvalidParameter(context, FirebaseAnalytics.Event.TUTORIAL_COMPLETE)
     }
 }

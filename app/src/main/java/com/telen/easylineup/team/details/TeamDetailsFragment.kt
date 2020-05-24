@@ -20,6 +20,7 @@ import com.telen.easylineup.lineup.list.LineupViewModel
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ready
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.fragment_team_details.*
@@ -109,6 +110,7 @@ class TeamDetailsFragment: BaseFragment() {
         return when (item.itemId) {
             R.id.action_edit -> {
                 teamViewModel.team?.let {
+                    FirebaseAnalyticsUtils.startTutorial(activity, false)
                     val intent = Intent(activity, TeamCreationActivity::class.java)
                     intent.putExtra(Constants.EXTRA_CAN_EXIT, true)
                     intent.putExtra(Constants.EXTRA_TEAM, it)

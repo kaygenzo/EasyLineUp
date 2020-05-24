@@ -16,6 +16,7 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.splashscreen.SplashScreenActivity
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import kotlinx.android.synthetic.main.activity_login.*
 import timber.log.Timber
 
@@ -50,6 +51,7 @@ class LoginActivity: BaseActivity() {
         val disposable = viewModel.observeEvents().subscribe({
             when(it) {
                 ImportSuccessfulEvent -> {
+                    FirebaseAnalyticsUtils.importData(this)
                     val dialog = DialogFactory.getSuccessDialog(context = this@LoginActivity,
                             title = R.string.settings_import_success_title,
                             message = R.string.settings_import_success_message
@@ -107,6 +109,7 @@ class LoginActivity: BaseActivity() {
     }
 
     private fun launchTeamCreation() {
+        FirebaseAnalyticsUtils.startTutorial(this, true)
         val intent = Intent(this, TeamCreationActivity::class.java)
         startActivityForResult(intent, SplashScreenActivity.REQUEST_CREATE_TEAM)
     }

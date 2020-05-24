@@ -26,6 +26,7 @@ import com.telen.easylineup.login.ImportSuccessfulEvent
 import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.login.LoginViewModel
 import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.views.CustomEditTextView
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
@@ -59,12 +60,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val eventsDisposable = viewModel.observeEvent().subscribe({
             when(it) {
                 DeleteAllDataEventSuccess -> {
+                    FirebaseAnalyticsUtils.deleteData(activity)
                     val intent = Intent(activity, LoginActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                 }
                 is ExportDataEventSuccess -> {
                     activity?.run {
+                        FirebaseAnalyticsUtils.exportData(this)
                         DialogFactory.getSuccessDialog(
                                 context = this,
                                 title = R.string.settings_export_success_title,
@@ -92,6 +95,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             activity?.run {
                 when(it) {
                     ImportSuccessfulEvent -> {
+                        FirebaseAnalyticsUtils.importData(this)
                         DialogFactory.getSuccessDialog(context = this,
                                 title = R.string.settings_import_success_title,
                                 message = R.string.settings_import_success_message

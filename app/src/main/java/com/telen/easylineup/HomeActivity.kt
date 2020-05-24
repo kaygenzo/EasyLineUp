@@ -20,6 +20,7 @@ import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.team.swap.HostInterface
 import com.telen.easylineup.team.swap.SwapTeamFragment
 import com.telen.easylineup.utils.FeatureViewFactory
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.DrawerHeader
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -155,6 +156,7 @@ class HomeActivity : BaseActivity(), HostInterface {
 
     override fun onCreateTeamClick() {
         closeDrawer()
+        FirebaseAnalyticsUtils.startTutorial(this, false)
         val intent = Intent(this, TeamCreationActivity::class.java)
         intent.putExtra(Constants.EXTRA_CAN_EXIT, true)
         startActivity(intent)
