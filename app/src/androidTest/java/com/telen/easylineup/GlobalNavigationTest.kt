@@ -98,14 +98,14 @@ class GlobalNavigationTest {
     }
 
     private fun validateTapTarget() {
-        Thread.sleep(delay)
-
-        //click on tap tap view button
-        val tapTargetView = onView(
-                allOf(withClassName(`is`("com.getkeepsafe.taptargetview.TapTargetView")), isDisplayed()))
-        tapTargetView.perform(click())
-
-        Thread.sleep(delay)
+//        Thread.sleep(delay)
+//
+//        //click on tap tap view button
+//        val tapTargetView = onView(
+//                allOf(withClassName(`is`("com.getkeepsafe.taptargetview.TapTargetView")), isDisplayed()))
+//        tapTargetView.perform(click())
+//
+//        Thread.sleep(delay)
     }
 
     private fun initialization() {
@@ -166,7 +166,7 @@ class GlobalNavigationTest {
         BaristaClickInteractions.clickOn("Cancel")
 
         //confirm discard changes with dialog ok button
-        BaristaClickInteractions.clickOn(R.id.confirm_button)
+        BaristaClickInteractions.clickOn(android.R.id.button1)
 
         //check name is albert
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
@@ -178,7 +178,7 @@ class GlobalNavigationTest {
         pressBack()
 
         //confirm discard changes with dialog ok button
-        BaristaClickInteractions.clickOn(R.id.confirm_button)
+        BaristaClickInteractions.clickOn(android.R.id.button1)
 
         //check name is albert
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
@@ -190,7 +190,7 @@ class GlobalNavigationTest {
         takeScreenshot("albert_delete_dialog", mHomeTestRule.activity)
 
         //confirm delete with dialog ok button
-        BaristaClickInteractions.clickOn(R.id.confirm_button)
+        BaristaClickInteractions.clickOn(android.R.id.button1)
 
         //click on the new first player Bernard
         onView(withId(R.id.teamPlayersRecyclerView))
@@ -291,7 +291,7 @@ class GlobalNavigationTest {
 
         //check title Team Roster
         onView(allOf(instanceOf(TextView::class.java), withParent(withId(R.id.toolbar))))
-                .check(matches(withText("Team Roster")))
+                .check(matches(withText("Roster")))
 
         //go back to dashboard
         val appCompatImageButton5 = onView(
@@ -488,7 +488,7 @@ class GlobalNavigationTest {
                 .perform(click())
 
         //confirm delete with dialog ok button
-        BaristaClickInteractions.clickOn(R.id.confirm_button)
+        BaristaClickInteractions.clickOn(android.R.id.button1)
 
         BaristaListInteractions.scrollListToPosition(R.id.recyclerView, 0)
 
@@ -503,7 +503,7 @@ class GlobalNavigationTest {
         takeScreenshot("lineup_delete_popup", mHomeTestRule.activity)
 
         //confirm delete with dialog ok button
-        BaristaClickInteractions.clickOn(R.id.confirm_button)
+        BaristaClickInteractions.clickOn(android.R.id.button1)
 
         //check new summary header
         BaristaVisibilityAssertions.assertDisplayed(R.id.headerText, "2 TOURNAMENTS / 3 LINEUPS")

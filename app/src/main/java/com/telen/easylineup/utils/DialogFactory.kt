@@ -53,15 +53,16 @@ class DialogFactory {
 
                         dialog.dismiss()
 
-                        val loadingDialog = getLoadingDialog(context, messageLoading)
-                        loadingDialog.show()
+//                        val loadingDialog = getLoadingDialog(context, messageLoading)
+//                        loadingDialog.show()
 
                         task.subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({
                                     Completable.timer(1000, TimeUnit.MILLISECONDS)
                                             .subscribe {
-                                                loadingDialog.dismiss()
+                                                //loadingDialog.dismiss()
+                                                dialog.dismiss()
                                             }
                                 }, { throwable ->
                                     Timber.e(throwable)
