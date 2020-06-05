@@ -5,4 +5,6 @@
     <dimen name="app_max_text_size_middle">34sp</dimen>
     <dimen name="app_max_text_size_big">48sp</dimen>
     <dimen name="app_max_text_size_biggest">60sp</dimen>
+
+    <dimen name="player_bar_chart_x_axis_size">15dp</dimen>
 </resources>

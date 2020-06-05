@@ -6,4 +6,11 @@
 
     <dimen name="item_attack_height">60dp</dimen>
     <dimen name="item_attack_width">60dp</dimen>
+
+    <dimen name="player_bar_chart_x_axis_size">10dp</dimen>
+
+    <dimen name="app_max_text_size_small">14sp</dimen>
+    <dimen name="app_max_text_size_middle">16sp</dimen>
+    <dimen name="app_max_text_size_big">20sp</dimen>
+    <dimen name="app_max_text_size_biggest">34sp</dimen>
 </resources>

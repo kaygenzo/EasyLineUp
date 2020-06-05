@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<!--    <style name="TextSmall" parent="TextAppearance.MaterialComponents.Body1"/>-->
-<!--    <style name="TextMiddle" parent="TextAppearance.MaterialComponents.Headline5"/>-->
-<!--    <style name="TextBig" parent="TextAppearance.MaterialComponents.Headline3"/>-->
-<!--    <style name="TextBiggest" parent="TextAppearance.MaterialComponents.Headline1"/>-->
+    <style name="TextSmall" parent="TextAppearance.MaterialComponents.Headline6"/>
+    <style name="TextMiddle" parent="TextAppearance.MaterialComponents.Headline5"/>
+    <style name="TextBig" parent="TextAppearance.MaterialComponents.Headline4"/>
+    <style name="TextBiggest" parent="TextAppearance.MaterialComponents.Headline3"/>
 </resources>
