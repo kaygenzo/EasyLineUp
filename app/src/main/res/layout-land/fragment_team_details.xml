@@ -12,127 +12,145 @@
     app:cardUseCompatPadding="true"
     android:layout_margin="@dimen/default_margin">
 
-    <ScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/teamHeader"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.telen.easylineup.views.NormalUppercaseStyledTextView
+            android:id="@+id/teamName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:padding="@dimen/default_margin">
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Team Name"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/default_margin"/>
 
-            <ImageView
-                android:id="@+id/teamImage"
-                android:layout_width="@dimen/image_circle_size"
-                android:layout_height="@dimen/image_circle_size"
-                android:scaleType="centerInside"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_chainStyle="packed"
-                tools:src="@drawable/ic_unknown_team" />
+        <ImageView
+            android:id="@+id/teamImage"
+            android:layout_width="@dimen/image_circle_size"
+            android:layout_height="@dimen/image_circle_size"
+            android:scaleType="centerInside"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/teamName"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:src="@drawable/ic_unknown_team"
+            android:layout_marginStart="@dimen/default_margin"/>
 
-            <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                android:id="@+id/teamName"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@+id/teamImage"
-                app:layout_constraintBottom_toBottomOf="@+id/teamImage"
-                app:layout_constraintLeft_toRightOf="@+id/teamImage"
-                app:layout_constraintRight_toRightOf="parent"
-                tools:text="Team Name"
-                android:gravity="start"
-                android:layout_marginStart="@dimen/default_margin"/>
+        <View
+            android:id="@+id/divider"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="@color/imagepicker_grey"
+            app:layout_constraintLeft_toRightOf="@+id/teamImage"
+            app:layout_constraintTop_toBottomOf="@+id/teamName"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="@dimen/default_margin"
+            android:layout_marginTop="90dp"/>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/teamTypeContainer"
+        <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintLeft_toRightOf="@+id/divider"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/teamName"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="@dimen/default_margin">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/teamImage"
-                android:layout_marginTop="@dimen/default_margin">
+                android:orientation="vertical"
+                android:layout_marginStart="@dimen/default_margin">
 
-                <ImageView
-                    android:id="@+id/teamTypeImage"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    app:srcCompat="@drawable/image_softball_ball"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/teamTypeDescription"
-                    android:layout_width="0dp"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/teamTypeContainer"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@+id/teamTypeImage"
-                    app:layout_constraintRight_toRightOf="parent"
-                    tools:text="You are a softball team"
-                    android:layout_marginStart="@dimen/default_margin"/>
+                    android:layout_marginTop="@dimen/default_margin">
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <ImageView
+                        android:id="@+id/teamTypeImage"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:srcCompat="@drawable/image_softball_ball"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/teamPlayersContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/teamTypeContainer"
-                android:layout_marginTop="@dimen/default_margin">
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/teamTypeDescription"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@+id/teamTypeImage"
+                        app:layout_constraintRight_toRightOf="parent"
+                        tools:text="You are a softball team"
+                        android:layout_marginStart="@dimen/default_margin"/>
 
-                <ImageView
-                    android:id="@+id/teamPlayersImage"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    app:srcCompat="@drawable/ic_team"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/teamPlayersDescription"
-                    android:layout_width="0dp"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/teamPlayersContainer"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@+id/teamPlayersImage"
-                    app:layout_constraintRight_toRightOf="parent"
-                    tools:text="You have 42 players"
-                    android:layout_marginStart="@dimen/default_margin"/>
+                    android:layout_marginTop="@dimen/default_margin">
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <ImageView
+                        android:id="@+id/teamPlayersImage"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:srcCompat="@drawable/ic_team"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/teamTournamentsContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/teamPlayersContainer"
-                android:layout_marginTop="@dimen/default_margin">
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/teamPlayersDescription"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@+id/teamPlayersImage"
+                        app:layout_constraintRight_toRightOf="parent"
+                        tools:text="You have 42 players"
+                        android:layout_marginStart="@dimen/default_margin"/>
 
-                <ImageView
-                    android:id="@+id/teamTournamentsImage"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    app:srcCompat="@drawable/ic_list_black_24dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/teamTournamentsDescription"
-                    android:layout_width="0dp"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/teamTournamentsContainer"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@+id/teamTournamentsImage"
-                    app:layout_constraintRight_toRightOf="parent"
-                    tools:text="Your team participated to 32 tournaments and 98 games"
-                    android:layout_marginStart="@dimen/default_margin"/>
+                    android:layout_marginTop="@dimen/default_margin">
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <ImageView
+                        android:id="@+id/teamTournamentsImage"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:srcCompat="@drawable/ic_list_black_24dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/teamTournamentsDescription"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@+id/teamTournamentsImage"
+                        app:layout_constraintRight_toRightOf="parent"
+                        tools:text="Your team participated to 32 tournaments and 98 games"
+                        android:layout_marginStart="@dimen/default_margin"/>
 
-    </ScrollView>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

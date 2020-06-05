@@ -15,6 +15,7 @@
         app:layout_constraintLeft_toLeftOf="parent"/>
 
     <com.google.android.material.textview.MaterialTextView
+        style="@style/TextSmall"
         android:id="@+id/order"
         android:layout_width="@dimen/item_attack_width"
         android:layout_height="match_parent"
@@ -26,6 +27,7 @@
         android:gravity="center"/>
 
     <com.telen.easylineup.views.HandmadeStyledTextView
+        style="@style/TextSmall"
         android:id="@+id/playerName"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -50,6 +52,7 @@
         android:gravity="center"/>
 
     <com.telen.easylineup.views.HandmadeStyledTextView
+        style="@style/TextSmall"
         android:id="@+id/fieldPosition"
         android:layout_width="@dimen/item_attack_width"
         android:layout_height="match_parent"
@@ -60,6 +63,7 @@
         android:gravity="center"/>
 
     <com.telen.easylineup.views.HandmadeStyledTextView
+        style="@style/TextSmall"
         android:id="@+id/shirtNumber"
         android:layout_width="@dimen/item_attack_width"
         android:layout_height="match_parent"

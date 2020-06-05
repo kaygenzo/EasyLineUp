@@ -27,20 +27,20 @@
             app:layout_constraintTop_toTopOf="parent"/>
 
         <com.telen.easylineup.views.CollegedStyledTextView
-            style="@style/Field.Green.Lighter.Small"
+            style="@style/Field.Green.Lighter.Small.Auto"
             android:id="@+id/playerName"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             app:layout_constraintLeft_toLeftOf="@+id/playerImage"
             app:layout_constraintRight_toRightOf="@+id/playerImage"
             app:layout_constraintTop_toBottomOf="@+id/playerImage"
-            tools:text="Awesome Player"/>
+            tools:text="Awesome Player very long to test multi line name"/>
 
         <com.telen.easylineup.views.NumberedStyledTextView
-            style="@style/Field.Green.Light.Biggest"
+            style="@style/Field.Green.Light.Auto"
             android:id="@+id/playerShirtNumber"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             app:layout_constraintLeft_toLeftOf="@+id/playerImage"
             app:layout_constraintRight_toRightOf="@+id/playerImage"
             app:layout_constraintTop_toBottomOf="@+id/playerName"

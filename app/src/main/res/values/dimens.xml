@@ -10,20 +10,12 @@
 
     <dimen name="item_attack_height">40dp</dimen>
     <dimen name="item_attack_width">40dp</dimen>
-    <dimen name="item_attack_text_size">20sp</dimen>
-    <dimen name="item_attack_name_text_size">15sp</dimen>
 
     <dimen name="card_defense_header_height">20dp</dimen>
 
     <dimen name="player_details_container_separator_width">2dp</dimen>
 
     <dimen name="dashboard_tile_height">300dp</dimen>
-
-    <dimen name="text_size_smallest">15sp</dimen>
-    <dimen name="text_size_small">20sp</dimen>
-    <dimen name="text_size_middle">25sp</dimen>
-    <dimen name="text_size_big">30sp</dimen>
-    <dimen name="text_size_biggest">60sp</dimen>
 
     <dimen name="default_margin">16dp</dimen>
 
@@ -54,5 +46,13 @@
     <dimen name="table_multiple_scroll_top_header_height">30dp</dimen>
 
     <dimen name="link_dp_flex_icon_size">50dp</dimen>
+
+    <dimen name="app_max_text_size_small">14sp</dimen>
+    <dimen name="app_max_text_size_middle">16sp</dimen>
+    <dimen name="app_max_text_size_big">20sp</dimen>
+    <dimen name="app_max_text_size_biggest">34sp</dimen>
+
+    <dimen name="player_bar_chart_x_axis_size">10</dimen>
+
 
 </resources>

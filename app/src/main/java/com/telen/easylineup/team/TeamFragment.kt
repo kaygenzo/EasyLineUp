@@ -57,6 +57,7 @@ class TeamFragment: Fragment(), OnPlayerClickListener {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.clear()
+        view?.teamPlayersRecyclerView?.adapter = null
     }
 
     override fun onPlayerSelected(player: Player) {

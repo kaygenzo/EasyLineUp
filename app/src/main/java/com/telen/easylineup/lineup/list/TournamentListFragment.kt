@@ -72,6 +72,13 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
         return view
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        view?.recyclerView?.apply {
+            adapter = null
+        }
+    }
+
     override fun onDeleteTournamentClicked(tournament: Tournament) {
         activity?.let {
             val task: Completable = viewModel.deleteTournament(tournament)

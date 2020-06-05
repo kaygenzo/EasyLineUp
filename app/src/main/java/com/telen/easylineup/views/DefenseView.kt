@@ -1,6 +1,7 @@
 package com.telen.easylineup.views
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -18,6 +19,10 @@ abstract class DefenseView: ConstraintLayout {
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+
+    fun clear() {
+        cleanPlayerIcons()
+    }
 
     protected fun addPlayerOnFieldWithPercentage(view: View, x: Float, y: Float, loadingCallback: LoadingCallback?) {
         fieldFrameLayout.post {
@@ -81,6 +86,10 @@ abstract class DefenseView: ConstraintLayout {
                         || view is AddDesignatedPlayerButton || view is TrashFieldButton
                         || view is SmallBaseballImageView) {
                     view.clearAnimation()
+                    view.setOnDragListener(null)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        view.cancelDragAndDrop()
+                    }
                     fieldFrameLayout.removeView(fieldFrameLayout.getChildAt(i))
                 }
             }

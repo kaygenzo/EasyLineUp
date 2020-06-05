@@ -31,6 +31,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/statsTournament"
             tools:text="Name"
+            style="@style/TournamentName"
             app:layout_constraintVertical_chainStyle="packed"/>
 
         <com.google.android.material.textview.MaterialTextView

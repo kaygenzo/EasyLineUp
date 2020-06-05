@@ -16,9 +16,9 @@ class FeatureViewFactory {
                             .outerCircleColor(R.color.baseball_field_color)      // Specify a color for the outer circle
                             .outerCircleAlpha(0.93f)            // Specify the alpha amount for the outer circle
                             .targetCircleColor(R.color.infield)   // Specify a color for the target circle
-                            .titleTextDimen(R.dimen.text_size_biggest)                  // Specify the size (in sp) of the title text
+                            .titleTextDimen(R.dimen.app_max_text_size_biggest)                  // Specify the size (in sp) of the title text
                             .titleTypeface(Typeface.DEFAULT_BOLD)
-                            .descriptionTextDimen(R.dimen.text_size_big)            // Specify the size (in sp) of the description text
+                            .descriptionTextDimen(R.dimen.app_max_text_size_big)            // Specify the size (in sp) of the description text
                             .descriptionTypeface(Typeface.SANS_SERIF)
                             .textColor(R.color.white)            // Specify a color for both the title and description text
                             .dimColor(R.color.blue_grey_80)            // If set, will dim behind the view with 30% opacity of the given color

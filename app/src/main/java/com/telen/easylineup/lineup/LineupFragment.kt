@@ -123,6 +123,9 @@ class LineupFragment: BaseFragment(), CompoundButton.OnCheckedChangeListener {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.clear()
+        view?.viewpager?.let { pager ->
+            pager.adapter = null
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

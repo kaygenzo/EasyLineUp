@@ -60,4 +60,8 @@ class LineupPagerAdapter(val context: Context, fm: FragmentManager, private val 
     fun getMapFragment() : MutableMap<Int, Fragment> {
         return map
     }
+
+    fun clear() {
+        map.clear()
+    }
 }

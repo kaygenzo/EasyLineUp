@@ -4,27 +4,40 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
-import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.team.createTeam.SetupViewModel
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_team_type.view.*
 import timber.log.Timber
 
 
-class TeamTypeFragment: BaseFragment(), ViewPager.OnPageChangeListener {
+class TeamTypeFragment: BaseFragment() {
 
     private lateinit var viewModel: SetupViewModel
-    private lateinit var mViewPager: ViewPager
+    private lateinit var mViewPager: ViewPager2
+    private val mCards = mutableListOf<TeamTypeCardItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activity?.let {
             viewModel = ViewModelProviders.of(it)[SetupViewModel::class.java]
+        }
+
+        TeamType.values().forEach { type ->
+            when(type) {
+                TeamType.BASEBALL -> {
+                    mCards.add(TeamTypeCardItem(R.string.title_baseball, R.drawable.image_baseball_ball))
+                }
+                TeamType.SOFTBALL -> {
+                    mCards.add(TeamTypeCardItem(R.string.title_softball, R.drawable.image_softball_ball))
+                }
+                else -> {
+
+                }
+            }
         }
     }
 
@@ -32,29 +45,19 @@ class TeamTypeFragment: BaseFragment(), ViewPager.OnPageChangeListener {
         val view = inflater.inflate(R.layout.fragment_team_type, container, false)
 
         mViewPager = view.teamTypeViewPager
-        val mCardAdapter = CardPagerAdapter()
-
-        TeamType.values().forEach { type ->
-            when(type) {
-                TeamType.BASEBALL -> {
-                    mCardAdapter.addCardItem(TeamTypeCardItem(R.string.title_baseball, R.drawable.image_baseball_ball))
-                }
-                TeamType.SOFTBALL -> {
-                    mCardAdapter.addCardItem(TeamTypeCardItem(R.string.title_softball, R.drawable.image_softball_ball))
-                }
-                else -> {
-
-                }
-            }
-        }
+        val mCardAdapter = CardPagerAdapter(mCards)
 
         mViewPager.adapter = mCardAdapter
-        mViewPager.offscreenPageLimit = 3
-
-        mViewPager.addOnPageChangeListener(this)
-
-        val shadowTransformer = ShadowTransformer(mViewPager, mCardAdapter)
-        mViewPager.addOnPageChangeListener(shadowTransformer)
+        mViewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                Timber.d("onPageSelected position=$position")
+                viewModel.setTeamType(position)
+            }
+        })
+//        mViewPager.offscreenPageLimit = 3
+//        val shadowTransformer = ShadowTransformer(mViewPager, mCardAdapter)
+//        mViewPager.addOnPageChangeListener(shadowTransformer)
+        mViewPager.setPageTransformer(ZoomOutPageTransformer())
 
         val disposable = viewModel.getTeam().subscribe({
             TeamType.getTypeById(it.type).let { type ->
@@ -66,16 +69,5 @@ class TeamTypeFragment: BaseFragment(), ViewPager.OnPageChangeListener {
         disposables.add(disposable)
 
         return view
-    }
-
-    override fun onPageScrollStateChanged(state: Int) {
-    }
-
-    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-    }
-
-    override fun onPageSelected(position: Int) {
-        Timber.d("onPageSelected position=$position")
-        viewModel.setTeamType(position)
     }
 }

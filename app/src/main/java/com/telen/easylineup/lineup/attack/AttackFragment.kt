@@ -108,6 +108,13 @@ class AttackFragment: BaseFragment(), OnDataChangedListener {
         return view
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        view?.recyclerView?.apply {
+            adapter = null
+        }
+    }
+
     override fun onOrderChanged() {
         save()
     }

@@ -39,4 +39,8 @@ class CardDefenseEditable: MaterialCardView, LoadingCallback {
     fun setPlayerStateListener(playerButtonCallback: OnPlayerButtonCallback) {
         fieldAndPlayersRootView.setOnPlayerListener(playerButtonCallback)
     }
+
+    fun clear() {
+        fieldAndPlayersRootView.clear()
+    }
 }

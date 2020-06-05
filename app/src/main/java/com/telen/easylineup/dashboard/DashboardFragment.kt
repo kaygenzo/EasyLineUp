@@ -44,15 +44,19 @@ class DashboardFragment: Fragment(), TileClickListener {
             adapter = tileAdapter
         }
 
+        dashboardViewModel.registerTilesLiveData().observe(viewLifecycleOwner, dataObserver)
+        dashboardViewModel.registerTeamChange().observe(viewLifecycleOwner, Observer {
+            dashboardViewModel.loadTiles()
+        })
+
         return view
     }
 
-    override fun onResume() {
-        super.onResume()
-        dashboardViewModel.registerTilesLiveData().observe(viewLifecycleOwner, dataObserver)
-        dashboardViewModel.registerTeamChange().observe(this, Observer {
-            dashboardViewModel.loadTiles()
-        })
+    override fun onDestroyView() {
+        super.onDestroyView()
+        view?.tileRecyclerView?.apply {
+            adapter = null
+        }
     }
 
     override fun onTileClicked(type: Int) {

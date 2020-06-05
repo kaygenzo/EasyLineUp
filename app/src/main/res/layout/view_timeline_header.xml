@@ -22,6 +22,7 @@
         app:cardBackgroundColor="@color/tile_player_most_used_header_color">
 
         <com.telen.easylineup.views.NormalUppercaseStyledTextView
+            style="@style/TextSmall"
             android:id="@+id/headerText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

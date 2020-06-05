@@ -1,7 +1,5 @@
 package com.telen.easylineup.team.createTeam.teamType
 
-import androidx.viewpager.widget.PagerAdapter
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,63 +7,35 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.google.android.material.card.MaterialCardView
+import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
-
-const val MAX_ELEVATION_FACTOR = 8
 
 data class TeamTypeCardItem(@StringRes val title: Int, @DrawableRes val resourceId: Int)
 
-class CardPagerAdapter : PagerAdapter() {
+class CardPagerAdapter(private val mData: MutableList<TeamTypeCardItem> = mutableListOf()): RecyclerView.Adapter<CardPagerAdapter.CardViewHolder>() {
 
-    val mData: MutableList<TeamTypeCardItem> = mutableListOf()
-    val mViews: MutableList<MaterialCardView?> = mutableListOf()
+    data class CardViewHolder(private val view: View):  RecyclerView.ViewHolder(view) {
 
-    var baseElevation: Float = 0.toFloat()
-        private set
+        private val teamTypeTitle = view.findViewById<View>(R.id.teamTypeTitle) as TextView
+        private val teamTypeImage = view.findViewById<View>(R.id.teamTypeImage) as ImageView
 
-    fun addCardItem(item: TeamTypeCardItem) {
-        mViews.add(null)
-        mData.add(item)
+        internal fun bind(item: TeamTypeCardItem) {
+            teamTypeTitle.setText(item.title)
+            teamTypeImage.setImageResource(item.resourceId)
+        }
     }
 
-    fun getCardViewAt(position: Int): MaterialCardView? {
-        return mViews[position]
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_card_team_type, parent, false)
+        return CardViewHolder(view)
     }
 
-    override fun getCount(): Int {
+    override fun getItemCount(): Int {
         return mData.size
     }
 
-    override fun isViewFromObject(view: View, `object`: Any): Boolean {
-        return view === `object`
-    }
-
-    override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val view = LayoutInflater.from(container.context).inflate(R.layout.item_card_team_type, container, false)
-        container.addView(view)
-        bind(mData[position], view)
-        val cardView = view.findViewById(R.id.cardView) as MaterialCardView
-
-        if (baseElevation == 0f) {
-            baseElevation = cardView.cardElevation
-        }
-
-        cardView.maxCardElevation = baseElevation * MAX_ELEVATION_FACTOR
-        mViews[position] = cardView
-        return view
-    }
-
-    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-        container.removeView(`object` as View)
-        mViews[position] = null
-    }
-
-    private fun bind(item: TeamTypeCardItem, view: View) {
-        val teamTypeTitle = view.findViewById<View>(R.id.teamTypeTitle) as TextView
-        val teamTypeImage = view.findViewById<View>(R.id.teamTypeImage) as ImageView
-        teamTypeTitle.setText(item.title)
-        teamTypeImage.setImageResource(item.resourceId)
+    override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
+        holder.bind(mData[position])
     }
 
 }

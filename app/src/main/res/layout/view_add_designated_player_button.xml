@@ -13,7 +13,7 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/designatedPlayerLabel"
-        style="@style/TextAppearance.AppCompat.Title"
+        style="@style/TextSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -22,7 +22,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:textColor="@color/white"
         android:text="@string/field_position_dh"
-        android:textSize="@dimen/text_size_big"
         android:elevation="6dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

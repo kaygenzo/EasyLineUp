@@ -98,10 +98,7 @@ class DefenseEditableView: DefenseView {
                         setOnDragListener { v, event ->
                             when(event.action) {
                                 DragEvent.ACTION_DRAG_STARTED,
-                                DragEvent.ACTION_DRAG_ENDED,
-                                DragEvent.ACTION_DRAG_EXITED,
-                                DragEvent.ACTION_DRAG_ENTERED,
-                                DragEvent.ACTION_DRAG_LOCATION -> true
+                                DragEvent.ACTION_DRAG_ENDED -> true
                                 DragEvent.ACTION_DROP -> {
                                     val id: ClipData.Item = event.clipData.getItemAt(0)
                                     val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
@@ -113,7 +110,6 @@ class DefenseEditableView: DefenseView {
                                 }
                                 else -> false
                             }
-                            true
                         }
 
                         this
@@ -136,6 +132,7 @@ class DefenseEditableView: DefenseView {
                         } else {
                             playerView.startDrag(dragData, shadowBuilder, null, 0)
                         }
+                        true
                     }
                 }
             }
@@ -159,8 +156,7 @@ class DefenseEditableView: DefenseView {
                 Timber.d( "action=${event.action}")
                 when(event.action) {
                     DragEvent.ACTION_DRAG_STARTED,
-                    DragEvent.ACTION_DRAG_ENDED,
-                    DragEvent.ACTION_DRAG_LOCATION -> true
+                    DragEvent.ACTION_DRAG_ENDED -> true
                     DragEvent.ACTION_DRAG_EXITED -> {
                         val expand = ScaleAnimation(2f, 1f, 2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
                         expand.duration = 100
@@ -191,7 +187,6 @@ class DefenseEditableView: DefenseView {
                     }
                     else -> false
                 }
-                true
             }
 
             this
@@ -216,10 +211,7 @@ class DefenseEditableView: DefenseView {
                 setOnDragListener { v, event ->
                     when(event.action) {
                         DragEvent.ACTION_DRAG_STARTED,
-                        DragEvent.ACTION_DRAG_ENDED,
-                        DragEvent.ACTION_DRAG_EXITED,
-                        DragEvent.ACTION_DRAG_ENTERED,
-                        DragEvent.ACTION_DRAG_LOCATION -> true
+                        DragEvent.ACTION_DRAG_ENDED -> true
                         DragEvent.ACTION_DROP -> {
                             val id: ClipData.Item = event.clipData.getItemAt(0)
                             val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
@@ -231,7 +223,6 @@ class DefenseEditableView: DefenseView {
                         }
                         else -> false
                     }
-                    true
                 }
 
                 this
@@ -300,15 +291,13 @@ class DefenseEditableView: DefenseView {
                             } else {
                                 startDrag(dragData, shadowBuilder, null, 0)
                             }
+                            true
                         }
 
                         setOnDragListener { v, event ->
                             when(event.action) {
                                 DragEvent.ACTION_DRAG_STARTED,
-                                DragEvent.ACTION_DRAG_ENDED,
-                                DragEvent.ACTION_DRAG_EXITED,
-                                DragEvent.ACTION_DRAG_ENTERED,
-                                DragEvent.ACTION_DRAG_LOCATION -> true
+                                DragEvent.ACTION_DRAG_ENDED -> true
                                 DragEvent.ACTION_DROP -> {
                                     val id: ClipData.Item = event.clipData.getItemAt(0)
                                     val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
@@ -320,7 +309,6 @@ class DefenseEditableView: DefenseView {
                                 }
                                 else -> false
                             }
-                            true
                         }
 
                         this
@@ -343,10 +331,7 @@ class DefenseEditableView: DefenseView {
                         setOnDragListener { v, event ->
                             when(event.action) {
                                 DragEvent.ACTION_DRAG_STARTED,
-                                DragEvent.ACTION_DRAG_ENDED,
-                                DragEvent.ACTION_DRAG_EXITED,
-                                DragEvent.ACTION_DRAG_ENTERED,
-                                DragEvent.ACTION_DRAG_LOCATION -> true
+                                DragEvent.ACTION_DRAG_ENDED -> true
                                 DragEvent.ACTION_DROP -> {
                                     val id: ClipData.Item = event.clipData.getItemAt(0)
                                     val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
@@ -358,7 +343,6 @@ class DefenseEditableView: DefenseView {
                                 }
                                 else -> false
                             }
-                            true
                         }
 
                         this

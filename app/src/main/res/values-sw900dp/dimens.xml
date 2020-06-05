@@ -1,3 +1,8 @@
 <resources>
     <dimen name="field_size">700dp</dimen>
+
+    <dimen name="app_max_text_size_small">24sp</dimen>
+    <dimen name="app_max_text_size_middle">34sp</dimen>
+    <dimen name="app_max_text_size_big">48sp</dimen>
+    <dimen name="app_max_text_size_biggest">60sp</dimen>
 </resources>

@@ -10,6 +10,7 @@
     android:layout_margin="5dp">
 
     <com.google.android.material.textview.MaterialTextView
+        style="@style/FavouriteFieldPositionStyle"
         android:id="@+id/playerPositionFilterView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -18,7 +19,6 @@
         tools:text="RF"
         android:textColor="@color/white"
         android:paddingTop="2dp"
-        android:textSize="@dimen/text_size_middle"
         android:paddingBottom="2dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

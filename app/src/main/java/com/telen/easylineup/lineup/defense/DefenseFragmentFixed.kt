@@ -4,14 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.lineup.PlayersPositionViewModel
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_lineup_defense_fixed.view.*
+import java.util.concurrent.TimeUnit
 
-class DefenseFragmentFixed: Fragment() {
+class DefenseFragmentFixed: BaseFragment() {
     lateinit var viewModel: PlayersPositionViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -22,7 +26,15 @@ class DefenseFragmentFixed: Fragment() {
 
             viewModel.lineupID?.let {
                 viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer { players ->
-                    view.cardDefenseView.setListPlayer(players)
+                    val displayDisposable = Completable.timer(100, TimeUnit.MILLISECONDS)
+                            .subscribeOn(Schedulers.computation())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
+                                view.cardDefenseView.setListPlayer(players)
+                            }, {
+
+                            })
+                    disposables.add(displayDisposable)
                 })
             }
         }
@@ -30,4 +42,8 @@ class DefenseFragmentFixed: Fragment() {
         return view
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        disposables.clear()
+    }
 }

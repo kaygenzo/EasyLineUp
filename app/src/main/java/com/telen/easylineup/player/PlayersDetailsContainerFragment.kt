@@ -66,6 +66,13 @@ class PlayersDetailsContainerFragment: BaseFragment(), ViewPager.OnPageChangeLis
         return view
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+//        view?.viewPagerPlayersDetails?.apply {
+//            adapter = null
+//        }
+    }
+
     override fun onResume() {
         super.onResume()
 

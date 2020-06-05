@@ -28,8 +28,10 @@ import com.telen.easylineup.views.OnPlayerClickListener
 import com.telen.easylineup.views.PlayerListView
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_lineup_defense_editable.view.*
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class DefenseFragmentEditable: BaseFragment(), OnPlayerButtonCallback {
 
@@ -101,16 +103,28 @@ class DefenseFragmentEditable: BaseFragment(), OnPlayerButtonCallback {
 
         viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer { players ->
             view.cardDefenseView.setPlayerStateListener(this)
-            val disposable = viewModel.getTeamType()
-                    .subscribe({
-                        view.cardDefenseView.setListPlayer(players, viewModel.lineupMode, it)
-                    }, {
-                        Timber.e(it)
-                    })
+            val disposable = viewModel.getTeamType().subscribe({
+                val displayDisposable = Completable.timer(100, TimeUnit.MILLISECONDS)
+                        .subscribeOn(Schedulers.computation())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            view.cardDefenseView.setListPlayer(players, viewModel.lineupMode, it)
+                        }, {
+
+                        })
+                disposables.add(displayDisposable)
+            }, {
+                Timber.e(it)
+            })
             disposables.add(disposable)
         })
 
         return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        view?.cardDefenseView?.clear()
     }
 
     override fun onPlayerButtonLongClicked(player: Player, position: FieldPosition) {

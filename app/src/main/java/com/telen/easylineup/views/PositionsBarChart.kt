@@ -67,7 +67,7 @@ class PositionsBarChart: ConstraintLayout {
                 return mPositions[value.toInt()]
             }
         }
-        xAxis.textSize = 10f
+        xAxis.textSize = resources.getDimension(R.dimen.player_bar_chart_x_axis_size)
         xAxis.textColor = Color.BLACK
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.setDrawGridLines(false)
@@ -118,8 +118,8 @@ class PositionsBarChart: ConstraintLayout {
         sets.add(set1)
 
         val data = BarData(sets)
-        data.setValueTextSize(10f)
-        data.setValueTypeface(Typeface.DEFAULT_BOLD)
+        data.setValueTextSize(resources.getDimension(R.dimen.player_bar_chart_x_axis_size))
+        data.setValueTypeface(Typeface.DEFAULT)
         data.setDrawValues(true)
         data.setValueTextColor(Color.BLACK)
         data.setValueFormatter(object : ValueFormatter(){
