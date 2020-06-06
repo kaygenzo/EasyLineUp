@@ -41,7 +41,7 @@ class TimeLineMiddleView: ConstraintLayout {
     fun setTournamentDate(createdAt: Long) {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = createdAt
-        tournamentDate.text = SimpleDateFormat("dd/MM/yyyy").format(calendar.timeInMillis)
+        tournamentDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(calendar.timeInMillis)
     }
 
     fun setOnActionsClickListener(listener: OnActionsClickListener) {

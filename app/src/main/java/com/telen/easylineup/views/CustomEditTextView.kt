@@ -20,7 +20,9 @@ class CustomEditTextView: ConstraintLayout {
         return textInputField.text.toString()
     }
 
-    fun setHint(hint: String) {
-        textInputField.hint = hint
+    fun setPlaceholder(placeholder: String) {
+        //textField.pla =
+        textField.isHelperTextEnabled = true
+        textField.helperText = placeholder
     }
 }

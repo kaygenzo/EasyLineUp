@@ -144,7 +144,8 @@
     <string name="settings_category_import">Import</string>
     <string name="settings_category_delete">Delete</string>
 
-    <string name="export_data_to_file_dialog_message">File name:</string>
+    <string name="export_data_to_file_dialog_title">Please choose a file name for exportation</string>
+    <string name="export_data_to_file_dialog_message">File name</string>
     <string name="export_button">Export</string>
 
     <string name="link_dp_and_flex_dialog_title">Link your DP and your Flex</string>

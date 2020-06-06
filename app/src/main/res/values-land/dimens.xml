@@ -1,8 +1,6 @@
 <resources>
     <dimen name="field_size">250dp</dimen>
     <dimen name="image_circle_size">150dp</dimen>
-    <dimen name="lineup_title_size">20sp</dimen>
-    <dimen name="item_lineup_list_title_size">15sp</dimen>
 
     <dimen name="item_attack_height">40dp</dimen>
     <dimen name="item_attack_width">40dp</dimen>

@@ -129,7 +129,8 @@
     <string name="settings_category_import">Importation</string>
     <string name="settings_category_delete">Suppression</string>
 
-    <string name="export_data_to_file_dialog_message">Nom du fichier:</string>
+    <string name="export_data_to_file_dialog_title">Veuillez choisir un nom de fichier pour l\'exportation</string>
+    <string name="export_data_to_file_dialog_message">Nom du fichier</string>
     <string name="export_button">Exporter</string>
 
     <string name="link_dp_and_flex_dialog_title">Associez votre DP et votre Flex</string>

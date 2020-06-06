@@ -198,11 +198,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
             viewModel.exportDataObjectLiveData.removeObservers(viewLifecycleOwner)
             context?.run {
                 val input = CustomEditTextView(this)
-                input.setHint(it.fallbackName)
+                input.setPlaceholder(it.fallbackName)
 
                 DialogFactory.getSimpleDialog(
                         context = this,
-                        message = R.string.export_data_to_file_dialog_message,
+                        message = R.string.export_data_to_file_dialog_title,
                         view = input,
                         confirmText = R.string.export_button,
                         confirmClick = DialogInterface.OnClickListener { dialog, which ->

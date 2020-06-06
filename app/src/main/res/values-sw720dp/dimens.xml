@@ -4,8 +4,6 @@
     <!-- Common values with land -->
 
     <dimen name="image_circle_size">250dp</dimen>
-    <dimen name="lineup_title_size">25sp</dimen>
-    <dimen name="item_lineup_list_title_size">25sp</dimen>
 
     <dimen name="item_attack_height">40dp</dimen>
     <dimen name="item_attack_width">50dp</dimen>

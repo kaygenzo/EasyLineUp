@@ -1,6 +1,6 @@
 <resources xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <style name="Widget.App.TextInputLayout" parent="Widget.Design.TextInputLayout"/>
+    <style name="Widget.App.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox"/>
 
     <style name="MaterialAlertDialog.App.Title.Text" parent="MaterialAlertDialog.MaterialComponents.Title.Text"/>
     <style name="MaterialAlertDialog.App.Body.Text" parent="TextAppearance.MaterialComponents.Subtitle1"/>
@@ -11,6 +11,4 @@
     <style name="TextBig" parent="TextAppearance.MaterialComponents.Headline6"/>
     <style name="TextBiggest" parent="TextAppearance.MaterialComponents.Headline4"/>
 
-    <style name="AppTheme.PreferenceTheme" parent="PreferenceThemeOverlay">
-    </style>
 </resources>
