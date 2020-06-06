@@ -52,7 +52,9 @@
     <dimen name="app_max_text_size_big">20sp</dimen>
     <dimen name="app_max_text_size_biggest">34sp</dimen>
 
-    <dimen name="player_bar_chart_x_axis_size">10</dimen>
+    <dimen name="player_bar_chart_x_axis_size">5dp</dimen>
 
+    <dimen name="card_team_type_margin">40dp</dimen>
+    <dimen name="root_team_type_margin">60dp</dimen>
 
 </resources>

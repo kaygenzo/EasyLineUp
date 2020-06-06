@@ -7,4 +7,7 @@
 
     <dimen name="dashboard_tile_height">220dp</dimen>
     <dimen name="tile_most_used_player_image_size">60dp</dimen>
+
+    <dimen name="card_team_type_margin">5dp</dimen>
+    <dimen name="root_team_type_margin">5dp</dimen>
 </resources>

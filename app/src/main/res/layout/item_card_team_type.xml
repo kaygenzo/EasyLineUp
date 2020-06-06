@@ -24,7 +24,7 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/teamTypeImage"
             app:layout_constraintVertical_chainStyle="packed"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="@dimen/card_team_type_margin"
             android:textAllCaps="true"
             android:textStyle="bold"
             tools:text="The title"/>
@@ -39,7 +39,7 @@
             app:layout_constraintRight_toRightOf="parent"
             android:scaleType="fitCenter"
             tools:srcCompat="@drawable/ic_unknown_field_player"
-            android:layout_margin="40dp"/>
+            android:layout_margin="@dimen/card_team_type_margin"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>
