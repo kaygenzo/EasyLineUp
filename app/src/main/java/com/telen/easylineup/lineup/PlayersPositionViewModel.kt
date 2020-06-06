@@ -8,11 +8,11 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
+import android.view.View
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.drawToBitmap
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -178,50 +178,50 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     //TODO use case ?
-    fun exportLineupToExternalStorage(context: Context, map: Map<Int, Fragment>): Single<Intent> {
+    fun exportLineupToExternalStorage(context: Context, viewToSave: View?, index: Int): Single<Intent> {
         return Single.create(SingleOnSubscribe<ArrayList<Uri>> {
 
-                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                        it.onError(InsufficientPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)))
-                        return@SingleOnSubscribe
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                it.onError(InsufficientPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)))
+                return@SingleOnSubscribe
+            }
+
+            val tmpSDPath = StringBuilder(Environment.getExternalStorageDirectory().absolutePath).append("/${Constants.LINEUPS_DIRECTORY}").toString()
+            if(!File(tmpSDPath).exists())
+                File(tmpSDPath).mkdirs()
+
+            val timeInMillis = Calendar.getInstance().timeInMillis
+
+            val uris = arrayListOf<Uri>()
+
+            viewToSave?.run {
+                val filePath = when(index) {
+                    FRAGMENT_DEFENSE_INDEX -> {
+                        StringBuilder(tmpSDPath).append(timeInMillis).append("_defense.png").toString()
                     }
-
-                    val tmpSDPath = StringBuilder(Environment.getExternalStorageDirectory().absolutePath).append("/${Constants.LINEUPS_DIRECTORY}").toString()
-                    if(!File(tmpSDPath).exists())
-                        File(tmpSDPath).mkdirs()
-
-                    val timeInMillis = Calendar.getInstance().timeInMillis
-
-                    val uris = arrayListOf<Uri>()
-
-                    map.forEach {
-                        val filePath = when(it.key) {
-                            FRAGMENT_DEFENSE_INDEX -> {
-                                StringBuilder(tmpSDPath).append(timeInMillis).append("_defense.png").toString()
-                            }
-                            FRAGMENT_ATTACK_INDEX -> {
-                                StringBuilder(tmpSDPath).append(timeInMillis).append("_attack.png").toString()
-                            }
-                            else -> StringBuilder(tmpSDPath).append(timeInMillis).append("unknown.png").toString()
-                        }
-                        val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", File(filePath))
-
-                        val fos = FileOutputStream(filePath)
-                        try {
-                            val success = it.value.view?.drawToBitmap()?.compress(Bitmap.CompressFormat.PNG, 100, fos)
-                            fos.flush()
-                            fos.close()
-                            success?.takeIf { true }.let {
-                                uris.add(uri)
-                            }
-                        } catch (e: IOException) {
-                            Timber.e(e)
-                        }
+                    FRAGMENT_ATTACK_INDEX -> {
+                        StringBuilder(tmpSDPath).append(timeInMillis).append("_attack.png").toString()
                     }
+                    else -> StringBuilder(tmpSDPath).append(timeInMillis).append("unknown.png").toString()
+                }
+                val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", File(filePath))
 
-                    it.onSuccess(uris)
-                })
+                val fos = FileOutputStream(filePath)
+                try {
+                    val success = drawToBitmap().compress(Bitmap.CompressFormat.PNG, 100, fos)
+                    fos.flush()
+                    fos.close()
+                    success.takeIf { true }.let {
+                        uris.add(uri)
+                    }
+                } catch (e: IOException) {
+                    Timber.e(e)
+                }
+            }
+
+            it.onSuccess(uris)
+        })
                 .map {
                     val title: String = lineupTitle.toString()
                     Intent(Intent.ACTION_SEND_MULTIPLE).run {
@@ -288,16 +288,6 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     fun linkDpAndFlex(dp: Player?, flex: Player?): Completable {
         _linkPlayersInField.value = null
         return domain.linkDpAndFlex(dp,flex, lineupID, _listPlayersWithPosition)
-    }
-
-    /**
-     * @return @LayoutRes of the layout
-     */
-    fun getLayout(): Int {
-        return when(editable) {
-            true -> R.layout.fragment_lineup_edition
-            false -> R.layout.fragment_lineup_fixed
-        }
     }
 
     ///////////// LIVE DATA OBSERVER //////////////

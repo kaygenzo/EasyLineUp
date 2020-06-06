@@ -111,10 +111,9 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
     override fun onLineupClicked(lineup: Lineup) {
         activity?.let {
             val extras = Bundle()
-            extras.putBoolean(Constants.EXTRA_EDITABLE, false)
             extras.putLong(Constants.LINEUP_ID, lineup.id)
             extras.putString(Constants.LINEUP_TITLE, lineup.name)
-            findNavController().navigate(R.id.lineupFragment, extras, NavigationUtils().getOptions())
+            findNavController().navigate(R.id.lineupFragmentFixed, extras, NavigationUtils().getOptions())
         }
     }
 

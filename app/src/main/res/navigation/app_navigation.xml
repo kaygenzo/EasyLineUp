@@ -37,12 +37,6 @@
         tools:layout="@layout/fragment_player_edit"/>
 
     <fragment
-        android:id="@+id/lineupFragment"
-        android:name="com.telen.easylineup.lineup.LineupFragment"
-        android:label="@string/title_lineups"
-        tools:layout="@layout/fragment_lineup_fixed"/>
-
-    <fragment
         android:id="@+id/lineupCreationFragment"
         android:name="com.telen.easylineup.lineup.create.LineupCreationFragment"
         android:label="@string/dialog_create_lineup_title"
@@ -64,5 +58,17 @@
         android:name="com.telen.easylineup.lineup.statistics.TournamentStatisticsTableFragment"
         android:label="@string/title_tournament_summary"
         tools:layout="@layout/view_table_multi_scroll"/>
+
+    <fragment
+        android:id="@+id/lineupFragmentFixed"
+        android:name="com.telen.easylineup.lineup.LineupFragmentFixed"
+        android:label="@string/title_lineups"
+        tools:layout="@layout/fragment_lineup_fixed"/>
+
+    <fragment
+        android:id="@+id/lineupFragmentEditable"
+        android:name="com.telen.easylineup.lineup.LineupFragmentEditable"
+        android:label="@string/title_lineups"
+        tools:layout="@layout/fragment_lineup_edition"/>
 
 </navigation>

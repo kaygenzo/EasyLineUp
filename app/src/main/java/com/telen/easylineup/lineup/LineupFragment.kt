@@ -6,9 +6,15 @@ import android.os.Bundle
 import android.view.*
 import android.widget.CompoundButton
 import android.widget.Toast
+import androidx.annotation.LayoutRes
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
+import com.google.android.material.textview.MaterialTextView
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.HomeActivity
@@ -19,13 +25,18 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.utils.NavigationUtils
-import kotlinx.android.synthetic.main.fragment_lineup_edition.view.*
-import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.*
-import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.lineupTabLayout
-import kotlinx.android.synthetic.main.fragment_lineup_fixed.view.viewpager
 import timber.log.Timber
 
-class LineupFragment: BaseFragment(), CompoundButton.OnCheckedChangeListener {
+class LineupFragmentFixed: LineupFragment(R.layout.fragment_lineup_fixed, false) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_lineup_summary, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+}
+
+class LineupFragmentEditable: LineupFragment(R.layout.fragment_lineup_edition, true)
+
+abstract class LineupFragment(@LayoutRes private val layout: Int, private val isEditable: Boolean): BaseFragment(), CompoundButton.OnCheckedChangeListener {
 
     companion object {
         const val REQUEST_WRITE_EXTERENAL_STORAGE_PERMISSION = 0
@@ -41,7 +52,7 @@ class LineupFragment: BaseFragment(), CompoundButton.OnCheckedChangeListener {
         viewModel = ViewModelProviders.of(this).get(PlayersPositionViewModel::class.java)
         viewModel.lineupID = arguments?.getLong(Constants.LINEUP_ID, 0) ?: 0
         viewModel.lineupTitle = arguments?.getString(Constants.LINEUP_TITLE) ?: ""
-        viewModel.editable = arguments?.getBoolean(Constants.EXTRA_EDITABLE, false) ?: false
+        viewModel.editable = isEditable
 
         val disposable = viewModel.observeErrors().subscribe({
             when(it) {
@@ -75,22 +86,30 @@ class LineupFragment: BaseFragment(), CompoundButton.OnCheckedChangeListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(viewModel.getLayout(), container, false)
+        val view = inflater.inflate(layout, container, false)
 
-        activity?.run {
-            pagerAdapter = LineupPagerAdapter(this, childFragmentManager, viewModel.editable)
-            view.viewpager?.let { pager ->
+        activity?.let { activity ->
+            pagerAdapter = LineupPagerAdapter(this, viewModel.editable)
+            view.findViewById<ViewPager2>(R.id.viewpager)?.let { pager ->
                 pager.adapter = pagerAdapter
-                view.lineupTabLayout?.setupWithViewPager(view.viewpager)
+                val tabLayout = view.findViewById<TabLayout>(R.id.lineupTabLayout)
+                TabLayoutMediator(tabLayout, pager) { tab, position ->
+                    tab.text = when(position) {
+                        FRAGMENT_DEFENSE_INDEX -> getString(R.string.new_lineup_tab_field_defense)
+                        FRAGMENT_ATTACK_INDEX -> getString(R.string.new_lineup_tab_field_attack)
+                        else -> ""
+                    }
+                }.attach()
             }
 
             viewModel.getLineupName().observe(viewLifecycleOwner, Observer {
-                (this as HomeActivity).supportActionBar?.title = it
+                (activity as HomeActivity).supportActionBar?.title = it
             })
 
             viewModel.registerLineupChange().observe(viewLifecycleOwner,  Observer {
                 //some layouts don't have this checkbox
-                view.changeModeCheckBox?.let { view ->
+                val switch = view.findViewById<SwitchMaterial>(R.id.changeModeCheckBox)
+                switch?.let { view ->
                     view.apply {
                         setOnCheckedChangeListener(null)
                         when(it.mode) {
@@ -109,11 +128,13 @@ class LineupFragment: BaseFragment(), CompoundButton.OnCheckedChangeListener {
             viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer {
                 val size = it.filter { item -> item.position == FieldPosition.SUBSTITUTE.position
                         && item.fieldPositionID > 0 }.size
-                view.substitutesIndication?.text = resources.getQuantityString(R.plurals.lineups_substitutes_size, size, size)
+                val substituteIndication = view.findViewById<MaterialTextView>(R.id.substitutesIndication)
+                substituteIndication?.text = resources.getQuantityString(R.plurals.lineups_substitutes_size, size, size)
             })
 
-            viewModel.getDesignatedPlayerLabel(this).observe(viewLifecycleOwner, Observer {
-                view.changeModeCheckBox?.text = it
+            viewModel.getDesignatedPlayerLabel(activity).observe(viewLifecycleOwner, Observer {
+                val switch = view.findViewById<SwitchMaterial>(R.id.changeModeCheckBox)
+                switch?.text = it
             })
         }
 
@@ -123,17 +144,9 @@ class LineupFragment: BaseFragment(), CompoundButton.OnCheckedChangeListener {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.clear()
-        view?.viewpager?.let { pager ->
+        view?.findViewById<ViewPager2>(R.id.viewpager)?.let { pager ->
             pager.adapter = null
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        if(!viewModel.editable)
-            inflater.inflate(R.menu.menu_lineup_summary, menu)
-
-        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -143,10 +156,9 @@ class LineupFragment: BaseFragment(), CompoundButton.OnCheckedChangeListener {
         return when (item.itemId) {
             R.id.action_edit -> {
                 val extras = Bundle()
-                extras.putBoolean(Constants.EXTRA_EDITABLE, true)
                 extras.putLong(Constants.LINEUP_ID, viewModel.lineupID ?: 0)
                 extras.putString(Constants.LINEUP_TITLE, viewModel.lineupTitle)
-                findNavController().navigate(R.id.lineupFragment, extras, NavigationUtils().getOptions())
+                findNavController().navigate(R.id.lineupFragmentEditable, extras, NavigationUtils().getOptions())
                 true
             }
             R.id.action_delete -> {
@@ -175,7 +187,9 @@ class LineupFragment: BaseFragment(), CompoundButton.OnCheckedChangeListener {
 
     private fun exportLineupToExternalStorage() {
         activity?.let {
-            val disposable = viewModel.exportLineupToExternalStorage(it, pagerAdapter.getMapFragment())
+            val index = view?.findViewById<ViewPager2>(R.id.viewpager)?.currentItem ?: 0
+            val currentView = pagerAdapter.getMapFragment()[index]
+            val disposable = viewModel.exportLineupToExternalStorage(it, currentView, index)
                     .subscribe({ intent ->
                         startActivity(Intent.createChooser(intent, ""))
                     }, { error ->

@@ -96,8 +96,7 @@ class LineupCreationFragment: BaseFragment() {
                     val extras = Bundle()
                     extras.putLong(Constants.LINEUP_ID, it.lineupID)
                     extras.putString(Constants.LINEUP_TITLE, it.lineupName)
-                    extras.putBoolean(Constants.EXTRA_EDITABLE, true)
-                    findNavController().navigate(R.id.lineupFragment, extras, NavigationUtils().getOptionsWithPopDestination(R.id.navigation_lineups, false))
+                    findNavController().navigate(R.id.lineupFragmentEditable, extras, NavigationUtils().getOptionsWithPopDestination(R.id.navigation_lineups, false))
                 }
             }
         })
