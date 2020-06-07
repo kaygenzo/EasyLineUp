@@ -7,6 +7,7 @@ import android.view.*
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.annotation.LayoutRes
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
@@ -24,10 +25,18 @@ import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.lineup.attack.AttackFragment
+import com.telen.easylineup.lineup.defense.DefenseFragmentEditable
 import com.telen.easylineup.utils.NavigationUtils
 import timber.log.Timber
 
 class LineupFragmentFixed: LineupFragment(R.layout.fragment_lineup_fixed, false) {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_lineup_summary, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -47,50 +56,31 @@ abstract class LineupFragment(@LayoutRes private val layout: Int, private val is
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
 
         viewModel = ViewModelProviders.of(this).get(PlayersPositionViewModel::class.java)
         viewModel.lineupID = arguments?.getLong(Constants.LINEUP_ID, 0) ?: 0
         viewModel.lineupTitle = arguments?.getString(Constants.LINEUP_TITLE) ?: ""
         viewModel.editable = isEditable
-
-        val disposable = viewModel.observeErrors().subscribe({
-            when(it) {
-                DomainErrors.DELETE_LINEUP_FAILED -> {
-                    activity?.run {
-                        Toast.makeText(this, R.string.error_when_deleting_lineup, Toast.LENGTH_LONG).show()
-                    }
-                }
-                else -> {}
-            }
-        }, {
-            Timber.e(it)
-        })
-        disposables.add(disposable)
-
-        val eventDisposable = viewModel.eventHandler.subscribe({
-            when(it) {
-                DeleteLineupSuccess -> {
-                    activity?.run {
-                        this.runOnUiThread {
-                            findNavController().popBackStack(R.id.navigation_lineups, false)
-                        }
-                    }
-                }
-                else -> {}
-            }
-        }, {
-            Timber.e(it)
-        })
-        disposables.add(eventDisposable)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(layout, container, false)
 
+        initObserver()
+
         activity?.let { activity ->
+
             pagerAdapter = LineupPagerAdapter(this, viewModel.editable)
             view.findViewById<ViewPager2>(R.id.viewpager)?.let { pager ->
+
+                childFragmentManager.fragments.filterIsInstance<DefenseFragmentEditable>().forEach {
+                    childFragmentManager.beginTransaction().remove(it).commit()
+                }
+
+                childFragmentManager.fragments.filterIsInstance<AttackFragment>().forEach {
+                    childFragmentManager.beginTransaction().remove(it).commit()
+                }
+
                 pager.adapter = pagerAdapter
                 val tabLayout = view.findViewById<TabLayout>(R.id.lineupTabLayout)
                 TabLayoutMediator(tabLayout, pager) { tab, position ->
@@ -100,6 +90,38 @@ abstract class LineupFragment(@LayoutRes private val layout: Int, private val is
                         else -> ""
                     }
                 }.attach()
+            }
+
+            view.findViewById<ConstraintLayout>(R.id.fragment_defense_edition)?.let {
+                childFragmentManager.fragments.filterIsInstance<DefenseFragmentEditable>().lastOrNull()?.let {
+                    if (!it.isRemoving) {
+                        childFragmentManager
+                                .beginTransaction()
+                                .replace(R.id.fragment_defense_edition, it)
+                                .commit()
+                    }
+                } ?: run {
+                    childFragmentManager
+                            .beginTransaction()
+                            .replace(R.id.fragment_defense_edition, DefenseFragmentEditable())
+                            .commit()
+                }
+            }
+
+            view.findViewById<ConstraintLayout>(R.id.fragment_attack)?.let {
+                childFragmentManager.fragments.filterIsInstance<AttackFragment>().lastOrNull()?.let {
+                    if (!it.isRemoving) {
+                        childFragmentManager
+                                .beginTransaction()
+                                .replace(R.id.fragment_attack, it)
+                                .commit()
+                    }
+                } ?: run {
+                    childFragmentManager
+                            .beginTransaction()
+                            .replace(R.id.fragment_attack, AttackFragment())
+                            .commit()
+                }
             }
 
             viewModel.getLineupName().observe(viewLifecycleOwner, Observer {
@@ -147,6 +169,39 @@ abstract class LineupFragment(@LayoutRes private val layout: Int, private val is
         view?.findViewById<ViewPager2>(R.id.viewpager)?.let { pager ->
             pager.adapter = null
         }
+        disposables.clear()
+    }
+
+    private fun initObserver() {
+        val disposable = viewModel.observeErrors().subscribe({
+            when(it) {
+                DomainErrors.DELETE_LINEUP_FAILED -> {
+                    activity?.run {
+                        Toast.makeText(this, R.string.error_when_deleting_lineup, Toast.LENGTH_LONG).show()
+                    }
+                }
+                else -> {}
+            }
+        }, {
+            Timber.e(it)
+        })
+        disposables.add(disposable)
+
+        val eventDisposable = viewModel.eventHandler.subscribe({
+            when(it) {
+                DeleteLineupSuccess -> {
+                    activity?.run {
+                        this.runOnUiThread {
+                            findNavController().popBackStack(R.id.navigation_lineups, false)
+                        }
+                    }
+                }
+                else -> {}
+            }
+        }, {
+            Timber.e(it)
+        })
+        disposables.add(eventDisposable)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
