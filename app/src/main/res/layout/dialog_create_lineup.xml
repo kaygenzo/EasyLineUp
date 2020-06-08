@@ -78,36 +78,19 @@
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintLeft_toRightOf="@+id/dateExpandableLabel"
-                        app:layout_constraintRight_toLeftOf="@+id/dateExpandableArrow"
+                        app:layout_constraintRight_toLeftOf="@+id/dateButton"
                         app:layout_constraintBottom_toBottomOf="parent"
                         tools:text="01/10/2020"/>
 
                     <ImageView
-                        android:id="@+id/dateExpandableArrow"
+                        android:id="@+id/dateButton"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         app:layout_constraintRight_toRightOf="parent"
                         android:gravity="center_vertical"
-                        app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp"/>
+                        app:srcCompat="@drawable/ic_date_range_black_24dp"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <net.cachapa.expandablelayout.ExpandableLayout
-                    android:id="@+id/dateExpandableView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@+id/dateExpandableButton"
-                    app:el_duration="300"
-                    app:el_expanded="false"
-                    tools:el_expanded="false"
-                    app:el_parallax="0.5">
-
-                    <CalendarView
-                        android:id="@+id/calendarView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                </net.cachapa.expandablelayout.ExpandableLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

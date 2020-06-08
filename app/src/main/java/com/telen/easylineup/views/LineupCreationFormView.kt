@@ -8,6 +8,8 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.ArrayAdapter
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.FragmentManager
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.Tournament
 import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
@@ -44,6 +46,8 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
     private var actionClickListener: OnActionButtonListener? = null
     private lateinit var calendar: Calendar
 
+    private var fragmentManager: FragmentManager? = null
+
     constructor(context: Context) : super(context) { init(context)}
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init(context)}
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context)}
@@ -57,14 +61,14 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         tournamentsNames = mutableListOf()
 
         calendar = Calendar.getInstance()
+        setTournamentDateHeader(calendar.timeInMillis)
 
-        setTournamentDate(calendar.timeInMillis)
-        calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
-            calendar.set(Calendar.YEAR, year)
-            calendar.set(Calendar.MONTH, month)
-            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            setTournamentDateHeader(calendar.timeInMillis)
-        }
+//        calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
+//            calendar.set(Calendar.YEAR, year)
+//            calendar.set(Calendar.MONTH, month)
+//            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+//
+//        }
 
         adapter = ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
         tournamentChoiceAutoComplete.setAdapter(adapter)
@@ -73,19 +77,20 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
             val truePosition = tournamentsNames.indexOf(selected)
             val tournament = tournaments[truePosition]
             calendar.timeInMillis = tournament.createdAt
-            setTournamentDate(calendar.timeInMillis)
+            setTournamentDateHeader(calendar.timeInMillis)
         }
 
-        dateExpandableButton.setOnClickListener {
-            when(dateExpandableView.isExpanded) {
-                true -> {
-                    dateExpandableView.collapse()
-                    dateExpandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp)
-                }
-                else -> {
-                    dateExpandableView.expand()
-                    dateExpandableArrow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp)
-                }
+        dateButton.setOnClickListener {
+            val datePicker = MaterialDatePicker.Builder
+                    .datePicker()
+                    .setSelection(calendar.timeInMillis)
+                    .build()
+            datePicker.addOnPositiveButtonClickListener {
+                calendar.timeInMillis = it
+            }
+            fragmentManager?.let {
+                datePicker.show(it, "blabla")
+                setTournamentDateHeader(calendar.timeInMillis)
             }
         }
 
@@ -102,9 +107,8 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         }
     }
 
-    private fun setTournamentDate(date: Long) {
-        calendarView.setDate(date, true, true)
-        setTournamentDateHeader(date)
+    fun setFragmentManager(fm: FragmentManager) {
+        this.fragmentManager = fm
     }
 
     private fun setTournamentDateHeader(date: Long) {
@@ -146,13 +150,5 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         }
         else
             Tournament(name = tournamentChoiceAutoComplete.text.toString().trim(), createdAt = calendar.timeInMillis)
-    }
-
-    fun getLineupTitle(): String {
-        return lineupTitleInput.text.toString().trim()
-    }
-
-    fun setSaveButtonEnabled(enabled: Boolean) {
-        save.isEnabled = enabled
     }
 }

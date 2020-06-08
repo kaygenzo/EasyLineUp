@@ -68,6 +68,8 @@ class LineupCreationFragment: BaseFragment() {
         })
         disposables.add(getTournamentsDisposable)
 
+        view.lineupCreationForm.setFragmentManager(childFragmentManager)
+
         view.lineupCreationForm.setOnActionClickListener(object: OnActionButtonListener {
             override fun onRosterChangeClicked() {
                 showRosterDialog(view.lineupCreationForm)
