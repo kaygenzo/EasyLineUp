@@ -32,6 +32,10 @@ class TeamCreationActivity: BaseActivity() {
             viewModel.team = it as Team
         }
 
+        savedInstanceState?.getInt(Constants.EXTRA_CURRENT_STEP)?.let {
+            stepLayout.go(it, true)
+        }
+
         val disposable = viewModel.stepLiveData.subscribe({
             val isNext = stepLayout.currentStep < it.nextStep.id
 
@@ -92,6 +96,11 @@ class TeamCreationActivity: BaseActivity() {
 
         buttonNext.setOnClickListener { viewModel.nextButtonClicked(stepLayout.currentStep) }
         buttonPrevious.setOnClickListener { viewModel.previousButtonClicked(stepLayout.currentStep) }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(Constants.EXTRA_CURRENT_STEP, stepLayout.currentStep)
     }
 
     override fun onBackPressed() {
