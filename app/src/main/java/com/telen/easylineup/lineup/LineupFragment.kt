@@ -41,6 +41,18 @@ class LineupFragmentFixed: LineupFragment(R.layout.fragment_lineup_fixed, false)
         inflater.inflate(R.menu.menu_lineup_summary, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
+
+    override fun getRootScreen(): View? {
+        return view?.findViewById(R.id.lineupFixedRootView) ?: run {
+            val index = getExportType()
+            return pagerAdapter.getMapFragment()[index]
+        }
+    }
+
+    override fun getExportType(): Int {
+        return view?.findViewById<ViewPager2>(R.id.viewpager)?.currentItem ?: -1
+    }
+
 }
 
 class LineupFragmentEditable: LineupFragment(R.layout.fragment_lineup_edition, true)
@@ -53,6 +65,14 @@ abstract class LineupFragment(@LayoutRes private val layout: Int, private val is
 
     lateinit var pagerAdapter: LineupPagerAdapter
     lateinit var viewModel: PlayersPositionViewModel
+
+    open fun getRootScreen(): View? {
+        return null
+    }
+
+    open fun getExportType(): Int {
+        return -1
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -242,9 +262,7 @@ abstract class LineupFragment(@LayoutRes private val layout: Int, private val is
 
     private fun exportLineupToExternalStorage() {
         activity?.let {
-            val index = view?.findViewById<ViewPager2>(R.id.viewpager)?.currentItem ?: 0
-            val currentView = pagerAdapter.getMapFragment()[index]
-            val disposable = viewModel.exportLineupToExternalStorage(it, currentView, index)
+            val disposable = viewModel.exportLineupToExternalStorage(it, getRootScreen(), getExportType())
                     .subscribe({ intent ->
                         startActivity(Intent.createChooser(intent, ""))
                     }, { error ->
