@@ -29,10 +29,10 @@ class TeamTypeFragment: BaseFragment() {
         TeamType.values().forEach { type ->
             when(type) {
                 TeamType.BASEBALL -> {
-                    mCards.add(TeamTypeCardItem(R.string.title_baseball, R.drawable.image_baseball_ball))
+                    mCards.add(TeamTypeCardItem(R.string.title_baseball, R.drawable.image_baseball_ball, R.drawable.ic_baseball_pitcher))
                 }
                 TeamType.SOFTBALL -> {
-                    mCards.add(TeamTypeCardItem(R.string.title_softball, R.drawable.image_softball_ball))
+                    mCards.add(TeamTypeCardItem(R.string.title_softball, R.drawable.image_softball_ball, R.drawable.ic_softball_pitcher))
                 }
                 else -> {
 
@@ -54,9 +54,7 @@ class TeamTypeFragment: BaseFragment() {
                 viewModel.setTeamType(position)
             }
         })
-//        mViewPager.offscreenPageLimit = 3
-//        val shadowTransformer = ShadowTransformer(mViewPager, mCardAdapter)
-//        mViewPager.addOnPageChangeListener(shadowTransformer)
+
         mViewPager.setPageTransformer(ZoomOutPageTransformer())
 
         val disposable = viewModel.getTeam().subscribe({

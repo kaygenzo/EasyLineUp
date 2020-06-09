@@ -63,13 +63,6 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         calendar = Calendar.getInstance()
         setTournamentDateHeader(calendar.timeInMillis)
 
-//        calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
-//            calendar.set(Calendar.YEAR, year)
-//            calendar.set(Calendar.MONTH, month)
-//            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-//
-//        }
-
         adapter = ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
         tournamentChoiceAutoComplete.setAdapter(adapter)
         tournamentChoiceAutoComplete.setOnItemClickListener { parent, view, position, id ->
@@ -89,7 +82,7 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
                 calendar.timeInMillis = it
             }
             fragmentManager?.let {
-                datePicker.show(it, "blabla")
+                datePicker.show(it, "createLineupDatePicker")
                 setTournamentDateHeader(calendar.timeInMillis)
             }
         }

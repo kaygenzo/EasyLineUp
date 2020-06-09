@@ -237,4 +237,8 @@ H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
 
     <style name="FavouriteFieldPositionStyle" parent="TextSmall"/>
 
+    <style name="TeamTypeCardStyle" parent="TextBiggest">
+        <item name="android:gravity">center</item>
+    </style>
+
 </resources>

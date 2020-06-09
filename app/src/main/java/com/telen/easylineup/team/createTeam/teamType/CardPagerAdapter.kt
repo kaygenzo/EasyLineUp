@@ -10,18 +10,20 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
 
-data class TeamTypeCardItem(@StringRes val title: Int, @DrawableRes val resourceId: Int)
+data class TeamTypeCardItem(@StringRes val title: Int, @DrawableRes val resourceId: Int, @DrawableRes val representationId: Int)
 
 class CardPagerAdapter(private val mData: MutableList<TeamTypeCardItem> = mutableListOf()): RecyclerView.Adapter<CardPagerAdapter.CardViewHolder>() {
 
     data class CardViewHolder(private val view: View):  RecyclerView.ViewHolder(view) {
 
-        private val teamTypeTitle = view.findViewById<View>(R.id.teamTypeTitle) as TextView
-        private val teamTypeImage = view.findViewById<View>(R.id.teamTypeImage) as ImageView
+        private val teamTypeTitle = view.findViewById<TextView>(R.id.teamTypeTitle)
+        private val teamTypeImage = view.findViewById<ImageView>(R.id.teamTypeImage)
+        private val teamTypeRepresentation = view.findViewById<ImageView>(R.id.teamTypeRepresentation)
 
         internal fun bind(item: TeamTypeCardItem) {
             teamTypeTitle.setText(item.title)
             teamTypeImage.setImageResource(item.resourceId)
+            teamTypeRepresentation.setImageResource(item.representationId)
         }
     }
 
