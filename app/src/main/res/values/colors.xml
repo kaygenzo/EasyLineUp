@@ -40,4 +40,6 @@
     <color name="teams_list_text_primary">#4d4d4d</color>
 
     <color name="blue_grey_80">#ff37474f</color>
+
+    <color name="team_type_bottom_view">@color/colorPrimaryVariant</color>
 </resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval" >
+
+    <solid
+        android:color="@color/team_type_bottom_view" />
+
+    <corners
+        android:radius="16dp"/>
+
+    <size
+        android:height="@dimen/card_team_type_ball_image_diameter"
+        android:width="@dimen/card_team_type_ball_image_diameter"/>
+</shape>

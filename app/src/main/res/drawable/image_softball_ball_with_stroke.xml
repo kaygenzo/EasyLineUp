@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@drawable/circle_shape_ball"/>
+
+    <item
+        android:drawable="@drawable/image_softball_ball"
+        android:top="@dimen/card_team_type_ball_image_cradle_radius"
+        android:left="@dimen/card_team_type_ball_image_cradle_radius"
+        android:right="@dimen/card_team_type_ball_image_cradle_radius"
+        android:bottom="@dimen/card_team_type_ball_image_cradle_radius"/>
+</layer-list>
