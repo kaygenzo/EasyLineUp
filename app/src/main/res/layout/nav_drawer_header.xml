@@ -23,7 +23,7 @@
         app:layout_constraintBottom_toTopOf="@+id/drawerTitle"
         android:scaleType="centerInside"/>
 
-    <com.telen.easylineup.views.MLBStyledTextView
+    <com.telen.easylineup.views.CollegedStyledTextView
         android:id="@+id/drawerTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
