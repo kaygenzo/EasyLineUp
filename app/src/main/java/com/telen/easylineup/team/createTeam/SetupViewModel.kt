@@ -15,9 +15,11 @@ import org.koin.core.inject
 
 class SetupViewModel: ViewModel(), KoinComponent {
 
-   private val domain: ApplicationPort by inject()
+    private val domain: ApplicationPort by inject()
+    var currentStep: Int = 0
+    var lastConfiguration: StepConfiguration? = null
 
-    var team = Team(0, "", null, TeamType.BASEBALL.id, true)
+    var team = Team(0, "", null, TeamType.UNKNOWN.id, true)
 
     private var saveDisposable: Disposable? = null
     var stepLiveData = PublishSubject.create<StepConfiguration>()
@@ -53,12 +55,13 @@ class SetupViewModel: ViewModel(), KoinComponent {
         return Single.just(team)
     }
 
-    fun nextButtonClicked(currentStep: Int) {
+    fun nextButtonClicked() {
         dispose(saveDisposable)
         saveDisposable = domain.getTeamCreationNextStep(currentStep, team)
                 .subscribe({
                     errorLiveData.onNext(Error.NONE)
                     stepLiveData.onNext(it)
+                    lastConfiguration = it
                 }, {
                     if(it is NameEmptyException) {
                         errorLiveData.onNext(Error.NAME_EMPTY)
@@ -69,15 +72,22 @@ class SetupViewModel: ViewModel(), KoinComponent {
                 })
     }
 
-    fun previousButtonClicked(currentStep: Int) {
+    fun previousButtonClicked() {
         dispose(saveDisposable)
         saveDisposable = domain.getTeamCreationPreviousStep(currentStep, team)
-                        .subscribe({
-                            errorLiveData.onNext(Error.NONE)
-                            stepLiveData.onNext(it)
-                        }, {
-                            errorLiveData.onNext(Error.UNKNOWN)
-                        })
+                .subscribe({
+                    errorLiveData.onNext(Error.NONE)
+                    stepLiveData.onNext(it)
+                    lastConfiguration = it
+                }, {
+                    errorLiveData.onNext(Error.UNKNOWN)
+                })
+    }
+
+    fun refresh() {
+        lastConfiguration?.run {
+            stepLiveData.onNext(this)
+        }
     }
 
     private fun dispose(disposable: Disposable?) {

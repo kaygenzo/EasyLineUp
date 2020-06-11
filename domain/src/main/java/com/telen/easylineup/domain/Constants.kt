@@ -22,6 +22,7 @@ class Constants {
         const val EXTRA_CAN_EXIT = "com.telen.extra.can_exit"
         const val EXTRA_TEAM_COUNT = "com.telen.extra.team_count"
         const val EXTRA_CURRENT_STEP = "com.telen.extra.current_step"
+        const val EXTRA_TEAM_TYPE = "com.telen.extra.team_type"
 
         const val EXTRA_TRAINING_CARD = "com.telen.extra.training_card"
 

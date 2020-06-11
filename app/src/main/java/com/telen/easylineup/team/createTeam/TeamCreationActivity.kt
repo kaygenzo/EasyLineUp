@@ -32,12 +32,8 @@ class TeamCreationActivity: BaseActivity() {
             viewModel.team = it as Team
         }
 
-        savedInstanceState?.getInt(Constants.EXTRA_CURRENT_STEP)?.let {
-            stepLayout.go(it, true)
-        }
-
         val disposable = viewModel.stepLiveData.subscribe({
-            val isNext = stepLayout.currentStep < it.nextStep.id
+            val isNext = viewModel.currentStep < it.nextStep.id
 
             when(it.nextStep) {
                 TeamCreationStep.TYPE -> {
@@ -87,23 +83,20 @@ class TeamCreationActivity: BaseActivity() {
             if(it.previousButtonLabel > 0)
                 buttonPrevious.setText(it.previousButtonLabel)
 
-            stepLayout.go(it.nextStep.id, true)
+            viewModel.currentStep = it.nextStep.id
         }, {
             Timber.d(it)
         })
 
         disposables.add(disposable)
 
-        buttonNext.setOnClickListener { viewModel.nextButtonClicked(stepLayout.currentStep) }
-        buttonPrevious.setOnClickListener { viewModel.previousButtonClicked(stepLayout.currentStep) }
-    }
+        buttonNext.setOnClickListener { viewModel.nextButtonClicked() }
+        buttonPrevious.setOnClickListener { viewModel.previousButtonClicked() }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt(Constants.EXTRA_CURRENT_STEP, stepLayout.currentStep)
+        viewModel.refresh()
     }
 
     override fun onBackPressed() {
-        viewModel.previousButtonClicked(stepLayout.currentStep)
+        viewModel.previousButtonClicked()
     }
 }

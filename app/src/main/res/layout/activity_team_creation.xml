@@ -7,35 +7,6 @@
     android:layout_height="match_parent"
     android:clipToPadding="false">
 
-    <com.shuhart.stepview.StepView
-        android:id="@+id/stepLayout"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        app:sv_steps="@array/createTeamSteps"
-        app:sv_animationType="All"
-        app:sv_stepLineWidth="1dp"
-        app:sv_stepPadding="10dp"
-
-        app:sv_nextTextColor="@color/selected_step_text"
-        app:sv_nextStepLineColor="@color/selected_step_text"
-        app:sv_selectedCircleColor="@color/colorPrimaryVariant"
-        app:sv_selectedTextColor="#FF000000"
-        app:sv_selectedStepNumberColor="@color/selected_step_circle"
-        app:sv_doneStepLineColor="#FF000000"
-        app:sv_doneStepMarkColor="@color/selected_step_circle"
-        app:sv_doneCircleColor="@color/colorPrimaryVariant"
-        app:sv_doneTextColor="@color/selected_step_text"
-
-        app:sv_doneCircleRadius="12dp"
-        app:sv_selectedCircleRadius="15dp"
-
-        app:sv_animationDuration="300"
-
-        app:sv_stepViewStyle="@style/StepView"
-        app:sv_stepNumberTextSize="15sp"/>
-
     <fragment
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -44,7 +15,7 @@
         android:layout_weight="1"
         app:defaultNavHost="true"
         app:navGraph="@navigation/team_creation_navigation"
-        app:layout_constraintTop_toBottomOf="@+id/stepLayout"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/teamCreationActionButtons"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout

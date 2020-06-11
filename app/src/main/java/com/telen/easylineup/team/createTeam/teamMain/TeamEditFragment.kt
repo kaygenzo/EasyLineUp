@@ -70,10 +70,6 @@ class TeamEditFragment: BaseFragment() , TeamFormListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_team_edit, container, false)
 
-        arguments?.getSerializable(Constants.EXTRA_TEAM)?.let {
-            viewModel.team = it as Team
-        }
-
         teamForm = view.editTeamForm
 
         val disposable = viewModel.getTeam().subscribe({ team ->
