@@ -1,5 +1,6 @@
 package com.telen.easylineup.team.createTeam.teamType
 
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,9 +9,11 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.telen.easylineup.R
 
-data class TeamTypeCardItem(@StringRes val title: Int, @DrawableRes val resourceId: Int, @DrawableRes val representationId: Int)
+data class TeamTypeCardItem(@StringRes val title: Int, @DrawableRes val ballResourceId: Int, @DrawableRes val compatBallResourceId: Int,
+                            @DrawableRes val representationId: Int)
 
 class CardPagerAdapter(private val mData: MutableList<TeamTypeCardItem> = mutableListOf()): RecyclerView.Adapter<CardPagerAdapter.CardViewHolder>() {
 
@@ -22,7 +25,12 @@ class CardPagerAdapter(private val mData: MutableList<TeamTypeCardItem> = mutabl
 
         internal fun bind(item: TeamTypeCardItem) {
             teamTypeTitle.setText(item.title)
-            teamTypeImage.setImageResource(item.resourceId)
+            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                teamTypeImage.setImageDrawable(VectorDrawableCompat.create(teamTypeImage.resources, item.ballResourceId, null))
+            }
+            else {
+                teamTypeImage.setImageDrawable(VectorDrawableCompat.create(teamTypeImage.resources, item.compatBallResourceId, null))
+            }
             teamTypeRepresentation.setImageResource(item.representationId)
         }
     }

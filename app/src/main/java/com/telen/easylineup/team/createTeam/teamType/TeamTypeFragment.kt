@@ -29,10 +29,12 @@ class TeamTypeFragment: BaseFragment() {
         TeamType.values().forEach { type ->
             when(type) {
                 TeamType.BASEBALL -> {
-                    mCards.add(TeamTypeCardItem(R.string.title_baseball, R.drawable.image_baseball_ball_with_stroke, R.drawable.baseball_1014px))
+                    mCards.add(TeamTypeCardItem(R.string.title_baseball, R.drawable.image_baseball_ball_with_stroke,
+                            R.drawable.image_baseball_ball, R.drawable.baseball_1014px))
                 }
                 TeamType.SOFTBALL -> {
-                    mCards.add(TeamTypeCardItem(R.string.title_softball, R.drawable.image_softball_ball_with_stroke, R.drawable.softball_1467890_1280))
+                    mCards.add(TeamTypeCardItem(R.string.title_softball, R.drawable.image_softball_ball_with_stroke,
+                            R.drawable.image_softball_ball, R.drawable.softball_1467890_1280))
                 }
                 else -> {
 

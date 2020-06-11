@@ -8,7 +8,10 @@
     app:cardUseCompatPadding="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="15dp">
+    android:layout_marginTop="@dimen/default_margin"
+    android:layout_marginBottom="@dimen/default_margin"
+    android:layout_marginStart="@dimen/card_team_type_margin"
+    android:layout_marginEnd="@dimen/card_team_type_margin">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -29,28 +32,14 @@
             android:background="@color/team_type_bottom_view"
             android:translationZ="1dp"/>
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/topGuideline"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.3"/>
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/bottomGuideline"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.7"/>
-
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/teamTypeImage"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             app:layout_constraintLeft_toLeftOf="@+id/verticalGuideline"
             app:layout_constraintRight_toRightOf="@+id/verticalGuideline"
-            app:layout_constraintTop_toTopOf="@+id/topGuideline"
-            app:layout_constraintBottom_toBottomOf="@+id/bottomGuideline"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:scaleType="fitCenter"
             tools:src="@drawable/image_softball_ball"
             android:translationZ="1dp"/>
