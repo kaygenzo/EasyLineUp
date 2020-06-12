@@ -53,7 +53,7 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/verticalGuideline"
             android:scaleType="centerCrop"
-            tools:src="@drawable/softball_1467890_1280"/>
+            tools:src="@drawable/pitcher_softball_team"/>
 
         <com.telen.easylineup.views.SwashedStyledTextView
             style="@style/TeamTypeCardStyle"

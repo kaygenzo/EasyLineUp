@@ -48,7 +48,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:scaleType="centerCrop"
-            tools:src="@drawable/softball_1467890_1280"/>
+            tools:src="@drawable/pitcher_softball_team"/>
 
         <com.telen.easylineup.views.SwashedStyledTextView
             style="@style/TeamTypeCardStyle"

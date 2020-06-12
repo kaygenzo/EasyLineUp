@@ -31,11 +31,11 @@ class TeamTypeFragment: BaseFragment() {
             when(type) {
                 TeamType.BASEBALL -> {
                     mCards.add(TeamTypeCardItem(R.string.title_baseball, R.drawable.image_baseball_ball_with_stroke,
-                            R.drawable.image_baseball_ball, R.drawable.baseball_1014px))
+                            R.drawable.image_baseball_ball, R.drawable.pitcher_baseball_team))
                 }
                 TeamType.SOFTBALL -> {
                     mCards.add(TeamTypeCardItem(R.string.title_softball, R.drawable.image_softball_ball_with_stroke,
-                            R.drawable.image_softball_ball, R.drawable.softball_1467890_1280))
+                            R.drawable.image_softball_ball, R.drawable.pitcher_softball_team))
                 }
                 else -> {
 
