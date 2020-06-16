@@ -34,8 +34,8 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/teamTypeImage"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/card_team_type_ball_image_diameter"
+            android:layout_height="@dimen/card_team_type_ball_image_diameter"
             app:layout_constraintLeft_toLeftOf="@+id/verticalGuideline"
             app:layout_constraintRight_toRightOf="@+id/verticalGuideline"
             app:layout_constraintTop_toTopOf="parent"
@@ -55,17 +55,56 @@
             android:scaleType="centerCrop"
             tools:src="@drawable/pitcher_softball_team"/>
 
-        <com.telen.easylineup.views.SwashedStyledTextView
-            style="@style/TeamTypeCardStyle"
-            android:id="@+id/teamTypeTitle"
+        <ScrollView
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="match_parent"
+            android:translationZ="1dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/teamTypeImage"
-            tools:text="Baseball"
-            android:translationZ="1dp"/>
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            >
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.telen.easylineup.views.SwashedStyledTextView
+                    style="@style/TeamTypeCardStyle"
+                    android:id="@+id/teamTypeTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Baseball"
+                    android:translationZ="1dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:gravity="center"
+                    app:layout_constraintBottom_toTopOf="@+id/infoContainer"/>
+
+                <LinearLayout
+                    android:id="@+id/infoContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/teamTypeTitle"
+                    android:layout_marginStart="@dimen/default_margin"
+                    android:layout_marginEnd="@dimen/default_margin">
+
+                    <com.telen.easylineup.views.TeamCardItemView
+                        android:id="@+id/teamPlayersItem"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/default_margin"/>
+
+                    <com.telen.easylineup.views.TeamCardItemView
+                        android:id="@+id/teamLineupsItem"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </ScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

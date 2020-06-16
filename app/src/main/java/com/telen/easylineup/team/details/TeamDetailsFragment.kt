@@ -1,27 +1,19 @@
 package com.telen.easylineup.team.details
 
 import android.content.Intent
-import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
-import com.makeramen.roundedimageview.RoundedTransformationBuilder
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.RequestCreator
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.lineup.list.LineupViewModel
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import com.telen.easylineup.utils.ready
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.fragment_team_details.*
 import timber.log.Timber
@@ -48,36 +40,22 @@ class TeamDetailsFragment: BaseFragment() {
 
     private fun load() {
         teamViewModel.observeTeam().observe(viewLifecycleOwner, Observer {
-
-            teamName.text = it.name
-
-            try {
-                val imageUri = Uri.parse(it.image)
-                setImage(Picasso.get().load(imageUri))
-            }
-            catch (e: Exception) {
-                Timber.d("Image is surely null or something bad happened: ${e.message}")
-                setImage(Picasso.get().load(R.drawable.ic_unknown_team))
-            }
-
-            when(it.type) {
-                TeamType.SOFTBALL.id -> {
-                    teamTypeImage.setImageResource(R.drawable.image_softball_ball)
-                    teamTypeDescription.text = getString(R.string.team_details_type_softball)
-                }
-                TeamType.BASEBALL.id -> {
-                    teamTypeImage.setImageResource(R.drawable.image_baseball_ball)
-                    teamTypeDescription.text = getString(R.string.team_details_type_baseball)
-                }
-                else -> {
-                    teamTypeImage.setImageResource(R.drawable.ic_warning_red_24dp)
-                    teamTypeDescription.text = getString(R.string.team_details_type_unknown)
+            view?.run {
+                teamTypeRootView?.run {
+                    setTeamName(it.name)
+                    setTeamType(it.type)
+                    setTeamImage(it.image, it.type)
                 }
             }
         })
 
         teamViewModel.observePlayers().observe(viewLifecycleOwner, Observer {
-            teamPlayersDescription.text = resources.getQuantityString(R.plurals.team_details_team_size, it.size, it.size)
+            val description = resources.getQuantityString(R.plurals.team_details_team_size, it.size, it.size)
+            view?.run {
+                teamTypeRootView?.run {
+                    setPlayersSize(R.drawable.ic_team, description)
+                }
+            }
         })
 
         lineupViewModel.observeCategorizedLineups().observe(viewLifecycleOwner, Observer {
@@ -86,7 +64,11 @@ class TeamDetailsFragment: BaseFragment() {
             val tournamentsQuantity = resources.getQuantityString(R.plurals.tournaments_quantity, tournamentsSize, tournamentsSize)
             val lineupsQuantity = resources.getQuantityString(R.plurals.lineups_quantity, lineupsSize, lineupsSize)
             val headerText = getString(R.string.tournaments_summary_header, tournamentsQuantity, lineupsQuantity)
-            teamTournamentsDescription.text = headerText
+            view?.run {
+                teamTypeRootView?.run {
+                    setLineupsSize(R.drawable.ic_list_black_24dp, headerText)
+                }
+            }
         })
     }
 
@@ -149,35 +131,6 @@ class TeamDetailsFragment: BaseFragment() {
         when(requestCode) {
             REQUEST_EDIT_TEAM -> {
                 load()
-            }
-        }
-    }
-
-    private fun setImage(request: RequestCreator) {
-        teamImage.ready {
-            try {
-                request.resize(teamImage.width, teamImage.height)
-                        .centerCrop()
-                        .transform(RoundedTransformationBuilder()
-                                .borderColor(Color.BLACK)
-                                .borderWidthDp(2f)
-                                .cornerRadiusDp(16f)
-                                .oval(true)
-                                .build())
-                        .placeholder(R.drawable.ic_unknown_team)
-                        .error(R.drawable.ic_unknown_team)
-                        .into(teamImage, object : Callback {
-                            override fun onSuccess() {
-                                Timber.d("Successfully loaded image")
-                            }
-
-                            override fun onError(e: Exception?) {
-                                Timber.e(e)
-                            }
-
-                        })
-            } catch (e: IllegalArgumentException) {
-                Timber.e(e)
             }
         }
     }
