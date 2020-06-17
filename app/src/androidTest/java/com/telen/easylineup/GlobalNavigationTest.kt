@@ -7,22 +7,24 @@ import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.Espresso.pressBack
+import androidx.annotation.IdRes
+import androidx.annotation.StringRes
+import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.NavigationViewActions
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.libraries.cloudtesting.screenshots.ScreenShotter
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions
-import com.schibsted.spain.barista.interaction.BaristaClickInteractions
+import com.schibsted.spain.barista.interaction.*
 import com.schibsted.spain.barista.interaction.BaristaDrawerInteractions.openDrawer
-import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions
-import com.schibsted.spain.barista.interaction.BaristaListInteractions
-import com.schibsted.spain.barista.interaction.BaristaViewPagerInteractions
+import com.schibsted.spain.barista.internal.matcher.DisplayedMatchers
+import com.schibsted.spain.barista.internal.viewaction.SwipeActions.swipeLeft
 import com.schibsted.spain.barista.rule.cleardata.ClearPreferencesRule
 import com.telen.easylineup.dashboard.DashboardTileAdapter
 import com.telen.easylineup.team.TeamAdapter
@@ -322,16 +324,15 @@ class GlobalNavigationTest {
         takeScreenshot("team_details", mHomeTestRule.activity)
 
         // check team name is "DC UNIVERS"
-        BaristaVisibilityAssertions.assertContains(R.id.teamName, "DC UNIVERS")
-
-        // check team type is undefined
-        BaristaVisibilityAssertions.assertContains(R.id.teamTypeDescription, "Team type undefined")
+        BaristaVisibilityAssertions.assertContains(R.id.teamTypeTitle, "DC Univers")
 
         // check team size is 20
-        BaristaVisibilityAssertions.assertContains(R.id.teamPlayersDescription, "Your team is composed of 20 members")
+        BaristaVisibilityAssertions.assertContains( "Your team is composed of 20 members")
+
+        BaristaScrollInteractions.scrollTo(R.id.teamLineupsItem)
 
         // check team tournaments stats is 3T/8L
-        BaristaVisibilityAssertions.assertContains(R.id.teamTournamentsDescription, "3 tournaments / 8 lineups")
+        BaristaVisibilityAssertions.assertContains("3 tournaments / 8 lineups")
 
         //click on edit action button
         onView(withId(R.id.action_edit))
@@ -353,24 +354,22 @@ class GlobalNavigationTest {
         BaristaVisibilityAssertions.assertContains(R.id.buttonNext, "Finish")
 
         //choose softball type
-        BaristaViewPagerInteractions.swipeViewPagerForward()
-
+        onView(DisplayedMatchers.displayedAssignableFrom(ViewPager2::class.java)).perform(swipeLeft())
         //finish edit flow
         BaristaClickInteractions.clickOn(R.id.buttonNext)
 
         applyRotation("new_team_details")
 
         // check team new name is "NewTeamName"
-        BaristaVisibilityAssertions.assertContains(R.id.teamName, "NewTeamName")
-
-        // check team type is softball
-        BaristaVisibilityAssertions.assertContains(R.id.teamTypeDescription, "Softball team")
+        BaristaVisibilityAssertions.assertContains(R.id.teamTypeTitle, "NewTeamName")
 
         // check team size is 21
-        BaristaVisibilityAssertions.assertContains(R.id.teamPlayersDescription, "Your team is composed of 20 members")
+        BaristaVisibilityAssertions.assertContains( "Your team is composed of 20 members")
+
+        BaristaScrollInteractions.scrollTo(R.id.teamLineupsItem)
 
         // check team tournaments stats is 3T/8L
-        BaristaVisibilityAssertions.assertContains(R.id.teamTournamentsDescription, "3 tournaments / 8 lineups")
+        BaristaVisibilityAssertions.assertContains( "3 tournaments / 8 lineups")
 
         // click back on top left button
         val appCompatImageButton7 = onView(
@@ -484,7 +483,7 @@ class GlobalNavigationTest {
         appCompatImageButton11.perform(click())
 
         //click on edit button
-        onView(withId(R.id.action_delete))
+        onView(withMenuIdOrText(R.id.action_delete, R.string.action_delete))
                 .perform(click())
 
         //confirm delete with dialog ok button
@@ -597,16 +596,15 @@ class GlobalNavigationTest {
                 .perform(click())
 
         // check team name is "TOTO"
-        BaristaVisibilityAssertions.assertContains(R.id.teamName, "TOTO")
+        BaristaVisibilityAssertions.assertContains(R.id.teamTypeTitle, "toto")
 
-        // check team type is baseball
-        BaristaVisibilityAssertions.assertContains(R.id.teamTypeDescription, "Baseball team")
+        // check team size is 0
+        BaristaVisibilityAssertions.assertContains("Your team is composed of 0 members")
 
-        // check team size is 20
-        BaristaVisibilityAssertions.assertContains(R.id.teamPlayersDescription, "Your team is composed of 0 members")
+        BaristaScrollInteractions.scrollTo(R.id.teamLineupsItem)
 
-        // check team tournaments stats is 3T/8L
-        BaristaVisibilityAssertions.assertContains(R.id.teamTournamentsDescription, "0 tournaments / 0 lineups")
+        // check team tournaments stats is 0T/0L
+        BaristaVisibilityAssertions.assertContains("0 tournaments / 0 lineups")
 
         pressBack()
 
@@ -653,6 +651,17 @@ class GlobalNavigationTest {
                 return parent is ViewGroup && parentMatcher.matches(parent)
                         && view == parent.getChildAt(position)
             }
+        }
+    }
+
+    fun withMenuIdOrText(@IdRes id: Int, @StringRes menuText: Int): Matcher<View?>? {
+        val matcher = withId(id)
+        return try {
+            onView(matcher).check(matches(isDisplayed()))
+            matcher
+        } catch (NoMatchingViewException: Exception) {
+            openActionBarOverflowOrOptionsMenu(InstrumentationRegistry.getInstrumentation().targetContext)
+            withText(menuText)
         }
     }
 }
