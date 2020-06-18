@@ -11,5 +11,5 @@
     <dimen name="root_team_type_margin">5dp</dimen>
 
     <dimen name="card_team_type_ball_image_diameter">80dp</dimen>
-
+    <dimen name="card_team_type_ball_image_radius">40dp</dimen>
 </resources>

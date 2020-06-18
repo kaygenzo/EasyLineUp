@@ -6,6 +6,7 @@ import android.view.*
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
@@ -44,7 +45,9 @@ class TeamDetailsFragment: BaseFragment() {
                 teamTypeRootView?.run {
                     setTeamName(it.name)
                     setTeamType(it.type)
-                    setTeamImage(it.image, it.type)
+                    setTeamImage(it.image)
+                    setDragEnabled(true)
+                    setDragState(BottomSheetBehavior.STATE_HALF_EXPANDED)
                 }
             }
         })

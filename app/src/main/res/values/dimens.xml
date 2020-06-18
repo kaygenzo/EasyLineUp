@@ -53,6 +53,7 @@
     <dimen name="root_team_type_margin">60dp</dimen>
     
     <dimen name="card_team_type_ball_image_diameter">150dp</dimen>
+    <dimen name="card_team_type_ball_image_radius">75dp</dimen>
     <dimen name="card_team_type_ball_image_cradle_radius">5dp</dimen>
 
 </resources>

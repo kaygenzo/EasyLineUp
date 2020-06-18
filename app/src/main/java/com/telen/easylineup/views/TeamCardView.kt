@@ -4,12 +4,17 @@ import android.content.Context
 import android.net.Uri
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import com.squareup.picasso.RequestCreator
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.ready
@@ -17,24 +22,63 @@ import kotlinx.android.synthetic.main.item_card_team_type.view.*
 import timber.log.Timber
 
 class TeamCardView: ConstraintLayout {
+
+    private var behavior: BottomSheetBehavior<ConstraintLayout>? = null
+
+    private val blockedBottomSheetBehaviour = object : BottomSheetBehavior.BottomSheetCallback() {
+        override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+
+        override fun onStateChanged(bottomSheet: View, newState: Int) {
+            if (newState == BottomSheetBehavior.STATE_DRAGGING) {
+                behavior?.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+    }
+
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     init {
         LayoutInflater.from(context).inflate(R.layout.item_card_team_type, this)
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+
+        bottomSheet?.let {
+            behavior = BottomSheetBehavior.from(bottomSheet)
+            behavior?.isFitToContents = false
+            behavior?.setExpandedOffset(resources.getDimensionPixelOffset(R.dimen.card_team_type_ball_image_radius))
+        }
     }
 
-    fun setTeamImage(image: String?, teamType: Int) {
-        val uri = image?.let { Uri.parse(image) }
-        when(teamType) {
-            TeamType.BASEBALL.id -> {
-                setTeamImage(uri, R.drawable.ic_unknown_team, R.drawable.ic_unknown_team)
-            }
-            TeamType.SOFTBALL.id -> {
-                setTeamImage(uri, R.drawable.ic_unknown_team, R.drawable.ic_unknown_team)
+    fun setDragEnabled(enabled: Boolean) {
+        if(!enabled) {
+            behavior?.addBottomSheetCallback(blockedBottomSheetBehaviour)
+        }
+        else {
+            behavior?.removeBottomSheetCallback(blockedBottomSheetBehaviour)
+            teamTypeImage.setOnClickListener {
+                if(behavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
+                    behavior?.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
+                else {
+                    behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+                }
             }
         }
+    }
+
+    fun setDragState(state: Int) {
+        behavior?.state = state
+    }
+
+    fun setTeamImage(image: String?) {
+        val uri = image?.let { Uri.parse(image) }
+        val request = Picasso.get().load(uri)
+        setTeamImage(request, R.drawable.ic_unknown_team, R.drawable.ic_unknown_team)
+    }
+
+    fun setImage(@DrawableRes image: Int) {
+        teamTypeImage.setImageDrawable(VectorDrawableCompat.create(resources, image, null))
     }
 
     fun setTeamName(name: String) {
@@ -53,12 +97,12 @@ class TeamCardView: ConstraintLayout {
         }
     }
 
-    private fun setTeamImage(image: Uri?, @DrawableRes placeholderRes: Int, @DrawableRes errorRes: Int) {
+    private fun setTeamImage(request: RequestCreator, @DrawableRes placeholderRes: Int, @DrawableRes errorRes: Int) {
         teamTypeImage.ready {
             try {
                 val size = resources.getDimensionPixelSize(R.dimen.card_team_type_ball_image_diameter)
                 val cradleRadius = resources.getDimension(R.dimen.card_team_type_ball_image_cradle_radius)
-                Picasso.get().load(image)
+                request
                         .resize(size, size)
                         .centerCrop()
                         .transform(RoundedTransformationBuilder()
