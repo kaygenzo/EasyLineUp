@@ -107,7 +107,7 @@ class TeamCardView: ConstraintLayout {
                         .centerCrop()
                         .transform(RoundedTransformationBuilder()
                                 .borderColor(ContextCompat.getColor(context, R.color.team_type_bottom_view))
-                                .borderWidthDp(cradleRadius)
+                                .borderWidth(cradleRadius)
                                 .cornerRadiusDp(16f)
                                 .oval(true)
                                 .build())

@@ -75,9 +75,9 @@
                     android:layout_height="wrap_content"
                     tools:text="Baseball"
                     android:translationZ="1dp"
-                    app:layout_constraintTop_toTopOf="parent"
                     android:gravity="center"
-                    app:layout_constraintBottom_toTopOf="@+id/infoContainer"/>
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginTop="@dimen/default_margin"/>
 
                 <LinearLayout
                     android:id="@+id/infoContainer"
@@ -87,7 +87,8 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/teamTypeTitle"
                     android:layout_marginStart="@dimen/default_margin"
-                    android:layout_marginEnd="@dimen/default_margin">
+                    android:layout_marginEnd="@dimen/default_margin"
+                    android:layout_marginTop="@dimen/default_margin">
 
                     <com.telen.easylineup.views.TeamCardItemView
                         android:id="@+id/teamPlayersItem"
