@@ -35,7 +35,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/team_type_bottom_view"
-            app:behavior_peekHeight="100dp"
             app:behavior_hideable="false">
 
             <com.telen.easylineup.views.SwashedStyledTextView

@@ -22,4 +22,7 @@
     <dimen name="app_max_text_size_middle">24sp</dimen>
     <dimen name="app_max_text_size_big">34sp</dimen>
     <dimen name="app_max_text_size_biggest">48sp</dimen>
+
+    <dimen name="card_team_type_ball_image_diameter">160dp</dimen>
+    <dimen name="card_team_type_ball_image_radius">80dp</dimen>
 </resources>

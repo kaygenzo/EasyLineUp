@@ -7,4 +7,8 @@
     <dimen name="app_max_text_size_biggest">60sp</dimen>
 
     <dimen name="player_bar_chart_x_axis_size">15dp</dimen>
+
+    <dimen name="card_team_type_ball_image_diameter">200dp</dimen>
+    <dimen name="card_team_type_ball_image_radius">100dp</dimen>
+    <dimen name="card_team_type_ball_image_cradle_radius">10dp</dimen>
 </resources>

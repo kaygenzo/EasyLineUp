@@ -48,6 +48,13 @@ class TeamCardView: ConstraintLayout {
             behavior?.isFitToContents = false
             behavior?.setExpandedOffset(resources.getDimensionPixelOffset(R.dimen.card_team_type_ball_image_radius))
         }
+
+        teamTypeTitle.ready {
+            val imageRadius = resources.getDimensionPixelSize(R.dimen.card_team_type_ball_image_radius)
+            val textSize = teamTypeTitle.height
+            val margin = resources.getDimensionPixelSize(R.dimen.default_margin)
+            behavior?.peekHeight = imageRadius + textSize + margin
+        }
     }
 
     fun setDragEnabled(enabled: Boolean) {
