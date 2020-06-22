@@ -74,23 +74,24 @@ internal interface PlayerFieldPositionsDao {
     """)
     fun getAllPlayersWithPositionsForLineup(lineupId: Long): LiveData<List<RoomPlayerWithPosition>>
 
-//    @Query("""
-//        SELECT players.name as playerName,
-//        players.shirtNumber, players.licenseNumber,
-//        playerFieldPosition.position,
-//        playerFieldPosition.x, playerFieldPosition.y,
-//        playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID,
-//        playerFieldPosition.lineupID,
-//        players.id as playerID,
-//        players.teamID, players.image,
-//        players.positions as playerPositions
-//        FROM playerFieldPosition
-//        INNER JOIN players ON playerFieldPosition.playerID = players.id
-//        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
-//        WHERE playerFieldPosition.lineupID = :lineupId
-//        ORDER BY playerFieldPosition.`order` ASC
-//    """)
-//    fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): Maybe<List<PlayerWithPosition>>
+    @Query("""
+        SELECT players.name as playerName,
+        players.shirtNumber, players.licenseNumber,
+        playerFieldPosition.position,
+        playerFieldPosition.x, playerFieldPosition.y,
+        playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID,
+        playerFieldPosition.lineupID,
+        playerFieldPosition.flags,
+        players.id as playerID,
+        players.teamID, players.image,
+        players.positions as playerPositions
+        FROM playerFieldPosition
+        INNER JOIN players ON playerFieldPosition.playerID = players.id
+        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
+        WHERE playerFieldPosition.lineupID = :lineupId
+        ORDER BY playerFieldPosition.`order` ASC
+    """)
+    fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): Single<List<RoomPlayerWithPosition>>
 
     @Query("""
         SELECT playerFieldPosition.* FROM playerFieldPosition

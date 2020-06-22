@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.telen.easylineup.R
@@ -13,6 +14,8 @@ import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.field_view.view.*
+import timber.log.Timber
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 class DefenseFixedView: DefenseView {
@@ -23,6 +26,15 @@ class DefenseFixedView: DefenseView {
 
     fun init(context: Context?) {
         LayoutInflater.from(context).inflate(R.layout.baseball_field_only, this)
+        fieldFrameLayout.post {
+            val size = fieldFrameLayout.run {
+                val viewHeight = height
+                val viewWidth = width
+                min(viewHeight, viewWidth)
+            }
+            fieldFrameLayout.layoutParams.height = size
+            fieldFrameLayout.layoutParams.width = size
+        }
     }
 
     fun setListPlayerInField(players: List<PlayerWithPosition>) {
@@ -37,7 +49,9 @@ class DefenseFixedView: DefenseView {
         fieldFrameLayout.post {
             cleanPlayerIcons()
 
-            val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+            val containerSize = getContainerSize()
+            val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
+            Timber.e(Throwable(), "DefenseFixedView: iconSize=$iconSize containerWidth=${containerSize} containerHeight=${fieldFrameLayout.height}")
 
             players.filter { !FieldPosition.isSubstitute(it.position) }
                     .forEach { player ->
@@ -60,7 +74,7 @@ class DefenseFixedView: DefenseView {
                                     setPlayerImage(player.image, player.playerName, iconSize)
                                 this
                             }
-                            addPlayerOnFieldWithPercentage(playerView, coordinatePercent.x, coordinatePercent.y, loadingCallback)
+                            addPlayerOnFieldWithPercentage(containerSize, playerView, coordinatePercent.x, coordinatePercent.y, loadingCallback)
                         }
                     }
         }
@@ -75,6 +89,7 @@ class DefenseFixedView: DefenseView {
             loadingCallback?.onStartLoading()
 
         fieldFrameLayout.post {
+            val containerSize = getContainerSize()
             cleanPlayerIcons()
             positions.filter { FieldPosition.isDefensePlayer(it.position) }
                     .forEach { position ->
@@ -84,9 +99,22 @@ class DefenseFixedView: DefenseView {
                             scaleType = ImageView.ScaleType.CENTER_INSIDE
                             this
                         }
-                        addPlayerOnFieldWithPercentage(iconView, position.xPercent, position.yPercent, loadingCallback)
+                        addPlayerOnFieldWithPercentage(containerSize, iconView, position.xPercent, position.yPercent, loadingCallback)
                     }
 
+        }
+    }
+
+    fun refresh() {
+        refreshView(fieldFrameLayout)
+    }
+
+    private fun refreshView(rootView: View) {
+        rootView.invalidate()
+        if(rootView is ViewGroup) {
+            for (i in 0 until rootView.childCount) {
+                refreshView(rootView.getChildAt(i))
+            }
         }
     }
 }

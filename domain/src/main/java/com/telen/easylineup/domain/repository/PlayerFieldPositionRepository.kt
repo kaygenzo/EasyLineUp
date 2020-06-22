@@ -23,6 +23,7 @@ interface PlayerFieldPositionRepository {
     fun getPlayerFieldPosition(positionID: Long): Single<PlayerFieldPosition>
     fun getAllPlayerFieldPositionsForLineup(lineupId: Long): Single<List<PlayerFieldPosition>>
     fun getAllPlayersWithPositionsForLineup(lineupId: Long): LiveData<List<PlayerWithPosition>>
+    fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): Single<List<PlayerWithPosition>>
     fun getPlayerPositionFor(lineupID: Long, playerID: Long): Maybe<PlayerFieldPosition>
     fun getAllPositionsForPlayer(playerID: Long): Single<List<PositionWithLineup>>
     fun getMostUsedPlayers(teamID: Long): Single<List<PlayerGamesCount>>

@@ -13,12 +13,21 @@ import kotlinx.android.synthetic.main.tile_last_lineup.view.*
 
 class LastLineupTile: ConstraintLayout{
 
-    constructor(context: Context) : super(context) {init(context)}
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs){init(context)}
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr){init(context)}
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    private fun init(context: Context) {
+    init {
         LayoutInflater.from(context).inflate(R.layout.tile_last_lineup, this)
+//        fieldAndPlayersRootView.ready {
+//            val size = fieldAndPlayersRootView.run {
+//                val viewHeight = height
+//                val viewWidth = width
+//                min(viewHeight, viewWidth)
+//            }
+//            fieldAndPlayersRootView.layoutParams.height = size
+//            fieldAndPlayersRootView.layoutParams.width = size
+//        }
     }
 
     fun bind(data: ITileData) {
@@ -29,7 +38,6 @@ class LastLineupTile: ConstraintLayout{
         lineup_name.text = name
         players?.let {
             fieldAndPlayersRootView.setListPlayerInField(it)
-//                setListPlayer(it)
         }
     }
 }

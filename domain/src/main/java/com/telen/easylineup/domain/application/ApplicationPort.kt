@@ -29,6 +29,7 @@ interface ApplicationPort {
     //dashboard
     fun getTeamSize(team: Team): Maybe<ITileData>
     fun getMostUsedPlayer(team: Team): Maybe<ITileData>
+    fun getLastLineup(team: Team): Maybe<ITileData>
 
     //teams
     fun getTeam(): Single<Team>

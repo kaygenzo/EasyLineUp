@@ -20,7 +20,7 @@ interface LineupRepository {
     fun getLineupByIdSingle(lineupId: Long): Single<Lineup>
     fun getLineupsForTournament(tournamentId: Long, teamID: Long): LiveData<List<Lineup>>
     fun getLineupsForTournamentRx(tournamentId: Long, teamID: Long): Single<List<Lineup>>
-    fun getLastLineup(): Single<Lineup>
+    fun getLastLineup(teamID: Long): Single<Lineup>
     fun getAllTournamentsWithLineups(filter: String, teamID: Long): Single<List<TournamentWithLineup>>
     fun getAllPlayerPositionsForTournament(tournamentId: Long, teamID: Long): Single<List<PlayerInLineup>>
 }

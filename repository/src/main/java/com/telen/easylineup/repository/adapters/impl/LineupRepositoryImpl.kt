@@ -72,8 +72,8 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao): LineupRep
         return lineupDao.getLineupsForTournamentRx(tournamentId, teamID).map { it.map { it.toLineup() } }
     }
 
-    override fun getLastLineup(): Single<Lineup> {
-        return lineupDao.getLastLineup().map { it.toLineup() }
+    override fun getLastLineup(teamID: Long): Single<Lineup> {
+        return lineupDao.getLastLineup(teamID).map { it.toLineup() }
     }
 
     override fun getAllTournamentsWithLineups(filter: String, teamID: Long): Single<List<TournamentWithLineup>> {

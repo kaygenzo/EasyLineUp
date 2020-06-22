@@ -3,10 +3,10 @@ package com.telen.easylineup.dashboard
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.tiles.ITileData
 import com.telen.easylineup.domain.model.tiles.ShakeBetaData
-import com.telen.easylineup.domain.application.ApplicationPort
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -36,7 +36,7 @@ class DashboardViewModel: ViewModel(), KoinComponent {
             getShakeBeta()
                     .concatWith(getTeamSize(it))
                     .concatWith(getMostUsedPlayer(it))
-                    .concatWith(getLastLineup())
+                    .concatWith(getLastLineup(it))
                     .toList()
         }
                 .subscribeOn(Schedulers.io())
@@ -64,16 +64,7 @@ class DashboardViewModel: ViewModel(), KoinComponent {
         return domain.getMostUsedPlayer(team)
     }
 
-    private fun getLastLineup(): Maybe<ITileData> {
-//        return App.database.lineupDao().getLastLineup()
-//                .flatMapMaybe { Maybe.just(it) }
-//                .flatMap {
-//                    val name = it.name
-//                    App.database.lineupDao().getAllPlayersWithPositionsForLineupRx(it.id)
-//                            .map { positions ->
-//                                LastLineupData(name, positions)
-//                            }
-//                }
-        return Maybe.empty()
+    private fun getLastLineup(team: Team): Maybe<ITileData> {
+        return domain.getLastLineup(team)
     }
 }

@@ -10,6 +10,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.field_view.view.*
+import timber.log.Timber
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 const val ICON_SIZE_SCALE = 0.12f
@@ -24,20 +26,15 @@ abstract class DefenseView: ConstraintLayout {
         cleanPlayerIcons()
     }
 
-    protected fun addPlayerOnFieldWithPercentage(view: View, x: Float, y: Float, loadingCallback: LoadingCallback?) {
+    protected fun addPlayerOnFieldWithPercentage(containerSize: Float, view: View, x: Float, y: Float, loadingCallback: LoadingCallback?) {
         fieldFrameLayout.post {
-            val layoutHeight = fieldFrameLayout.height
-            val layoutWidth = fieldFrameLayout.width
-
-            val positionX = ((x * layoutWidth) / 100f)
-            val positionY = ((y * layoutHeight) / 100f)
-
-            addPlayerOnFieldWithCoordinate(view, layoutWidth, positionX, positionY, loadingCallback)
+            val positionX = ((x * containerSize) / 100f)
+            val positionY = ((y * containerSize) / 100f)
+            addPlayerOnFieldWithCoordinate(view, containerSize, positionX, positionY, loadingCallback)
         }
     }
 
-    protected fun addPlayerOnFieldWithCoordinate(view: View, parentWidth: Int, x: Float, y: Float,
-                                                 loadingCallback: LoadingCallback?) {
+    protected fun addPlayerOnFieldWithCoordinate(view: View, parentWidth: Float, x: Float, y: Float, loadingCallback: LoadingCallback?) {
         if(fieldFrameLayout.findViewWithTag<PlayerFieldIcon>(view.tag)!=null)
             fieldFrameLayout.removeView(view)
 
@@ -49,10 +46,10 @@ abstract class DefenseView: ConstraintLayout {
             val imageWidth = view.width.toFloat()
             val imageHeight = view.height.toFloat()
 
-            checkBounds(x, y, imageWidth, imageHeight) { correctedX: Float, correctedY: Float ->
-
+            checkBounds(parentWidth, x, y, imageWidth, imageHeight) { correctedX: Float, correctedY: Float ->
                 val positionX = correctedX - imageWidth / 2
                 val positionY = correctedY - imageHeight / 2
+                Timber.d("containerSize=$parentWidth x=$x y=$y correctedX=$correctedX correctedY=$correctedY positionX=$positionX positionY=$positionY")
 
                 val layoutParamCustom = FrameLayout.LayoutParams(iconSize, iconSize).run {
                     leftMargin = positionX.toInt()
@@ -96,23 +93,25 @@ abstract class DefenseView: ConstraintLayout {
         }
     }
 
-    private fun checkBounds(x: Float, y: Float, imageWidth: Float, imageHeight: Float, callback: (x: Float,y: Float) -> Unit) {
-        val containerWidth = fieldFrameLayout.width.toFloat()
-        val containerHeight = fieldFrameLayout.height.toFloat()
+    private fun checkBounds(containerSize: Float, x: Float, y: Float, imageWidth: Float, imageHeight: Float, callback: (x: Float,y: Float) -> Unit) {
 
         var positionX: Float = x
         var positionY: Float = y
 
-        if(positionX + imageWidth/2 > containerWidth)
-            positionX = containerWidth - imageWidth/2
+        if(positionX + imageWidth/2 > containerSize)
+            positionX = containerSize - imageWidth/2
         if(positionX - imageWidth/2 < 0)
             positionX = imageWidth/2
 
         if(positionY - imageHeight/2 < 0)
             positionY = imageHeight/2
-        if(positionY + imageHeight/2 > containerHeight)
-            positionY = containerHeight - imageHeight/2
+        if(positionY + imageHeight/2 > containerSize)
+            positionY = containerSize - imageHeight/2
 
         callback(positionX, positionY)
+    }
+
+    protected fun getContainerSize(): Float {
+        return min(fieldFrameLayout.width, fieldFrameLayout.height).toFloat()
     }
 }

@@ -11,10 +11,10 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.tiles.ITileData
 
 interface TileClickListener {
-    fun onTileClicked(type: Int)
+    fun onTileClicked(type: Int, data: ITileData)
 }
 
-class DashboardTileAdapter(val list: List<ITileData>, val tileClickListener: TileClickListener): RecyclerView.Adapter<DashboardTileAdapter.TileViewHolder>() {
+class DashboardTileAdapter(private val list: List<ITileData>, private val tileClickListener: TileClickListener): RecyclerView.Adapter<DashboardTileAdapter.TileViewHolder>() {
 
     inner class TileViewHolder(val view: View): RecyclerView.ViewHolder(view)
 
@@ -55,7 +55,7 @@ class DashboardTileAdapter(val list: List<ITileData>, val tileClickListener: Til
             holder.view is LastLineupTile -> holder.view.bind(element)
         }
         holder.view.setOnClickListener {
-            tileClickListener.onTileClicked(element.getType())
+            tileClickListener.onTileClicked(element.getType(), element)
         }
     }
 }

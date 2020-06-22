@@ -56,8 +56,8 @@ internal interface LineupDao {
     """)
     fun getLineupsForTournamentRx(tournamentId: Long, teamID: Long): Single<List<RoomLineup>>
 
-    @Query("SELECT * FROM lineups ORDER BY editedAt DESC LIMIT 1")
-    fun getLastLineup(): Single<RoomLineup>
+    @Query("SELECT * FROM lineups WHERE teamID = :teamID ORDER BY editedAt DESC LIMIT 1")
+    fun getLastLineup(teamID: Long): Single<RoomLineup>
 
     @Query("""
         SELECT tournaments.id as tournamentID,

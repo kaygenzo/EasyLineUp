@@ -76,6 +76,10 @@ internal class PlayerFieldPositionRepositoryImpl(private val playerFieldPosition
         }
     }
 
+    override fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): Single<List<PlayerWithPosition>> {
+        return playerFieldPositionsDao.getAllPlayersWithPositionsForLineupRx(lineupId).map { it.map { it.toPlayerWithPosition() } }
+    }
+
     override fun getPlayerPositionFor(lineupID: Long, playerID: Long): Maybe<PlayerFieldPosition> {
         return playerFieldPositionsDao.getPlayerPositionFor(lineupID, playerID).map { it.toPlayerFieldPosition() }
     }

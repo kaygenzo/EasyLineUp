@@ -41,6 +41,7 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
     private val getAllTeamsUseCase: GetAllTeams by inject()
     private val saveCurrentTeam: SaveCurrentTeam by inject()
     private val getTeamSizeUseCase:  GetTeamSize by inject()
+    private val getLastLineupUseCase:  GetLastLineup by inject()
     private val getMostUsedPlayerUseCase: GetMostUsedPlayer by inject()
     private val createLineupUseCase: CreateLineup by inject()
     private val deleteTournamentUseCase: DeleteTournament by inject()
@@ -169,6 +170,11 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
 
     override fun getMostUsedPlayer(team: Team): Maybe<ITileData> {
         return UseCaseHandler.execute(getMostUsedPlayerUseCase, GetMostUsedPlayer.RequestValues(team))
+                .flatMapMaybe { it.data?.let { iData -> Maybe.just(iData) } ?: Maybe.empty() }
+    }
+
+    override fun getLastLineup(team: Team): Maybe<ITileData> {
+        return UseCaseHandler.execute(getLastLineupUseCase, GetLastLineup.RequestValues(team))
                 .flatMapMaybe { it.data?.let { iData -> Maybe.just(iData) } ?: Maybe.empty() }
     }
 

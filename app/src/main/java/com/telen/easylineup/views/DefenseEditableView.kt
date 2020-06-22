@@ -24,6 +24,7 @@ import android.view.animation.ScaleAnimation
 import android.view.animation.DecelerateInterpolator
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.*
+import kotlin.math.min
 
 const val TAG_TRASH = "_trash"
 
@@ -39,25 +40,39 @@ class DefenseEditableView: DefenseView {
 
     private var playerListener: OnPlayerButtonCallback? = null
 
-    constructor(context: Context?) : super(context) { init(context)}
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) { init(context)}
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context)}
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     fun setOnPlayerListener(playerButtonCallback: OnPlayerButtonCallback) {
         playerListener = playerButtonCallback
     }
 
-    private fun init(context: Context?) {
+    init {
         LayoutInflater.from(context).inflate(R.layout.baseball_field_with_players, this)
+        fieldFrameLayout.post {
+            val size = fieldFrameLayout.run {
+                val viewHeight = height
+                val viewWidth = width
+                min(viewHeight, viewWidth)
+            }
+            fieldFrameLayout.layoutParams.height = size
+            fieldFrameLayout.layoutParams.width = size
+        }
     }
 
     fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int, loadingCallback: LoadingCallback?) {
         cleanPlayerIcons()
 
-        if(fieldFrameLayout==null || fieldFrameLayout.width <= 0)
+        if(fieldFrameLayout==null)
             return
 
-        val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+        val containerSize = getContainerSize()
+
+        if(containerSize <= 0)
+            return
+
+        val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
 
         val emptyPositions = mutableListOf<FieldPosition>()
         emptyPositions.addAll(FieldPosition.values().filter { FieldPosition.isDefensePlayer(it.position) })
@@ -115,7 +130,7 @@ class DefenseEditableView: DefenseView {
                         this
                     }
 
-                    addPlayerOnFieldWithPercentage(playerView, pos.xPercent, pos.yPercent, loadingCallback)
+                    addPlayerOnFieldWithPercentage(containerSize, playerView, pos.xPercent, pos.yPercent, loadingCallback)
 
                     playerView.setOnClickListener { view ->
                         playerListener?.onPlayerButtonClicked(pos)
@@ -145,7 +160,8 @@ class DefenseEditableView: DefenseView {
     }
 
     private fun addTrashButton(players: List<PlayerWithPosition>) {
-        val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+        val containerSize = getContainerSize()
+        val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
 
         val trashView = TrashFieldButton(context).run {
             layoutParams = LayoutParams(iconSize, iconSize)
@@ -193,12 +209,13 @@ class DefenseEditableView: DefenseView {
         }
 
         trashView.apply {
-            addPlayerOnFieldWithPercentage(this, 100f, 100f, null)
+            addPlayerOnFieldWithPercentage(containerSize, this, 100f, 100f, null)
         }
     }
 
     private fun addEmptyPositionMarker(players: List<PlayerWithPosition>, positionMarkers: MutableList<FieldPosition>) {
-        val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+        val containerSize = getContainerSize()
+        val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
         positionMarkers.forEach {position ->
 
             val positionView = AddPlayerButton(context).run {
@@ -228,12 +245,13 @@ class DefenseEditableView: DefenseView {
                 this
             }
 
-            addPlayerOnFieldWithPercentage(positionView, position.xPercent, position.yPercent, null)
+            addPlayerOnFieldWithPercentage(containerSize, positionView, position.xPercent, position.yPercent, null)
         }
     }
 
     private fun addSubstitutePlayers(players: List<PlayerWithPosition>) {
-        val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+        val containerSize = getContainerSize()
+        val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
         val columnCount = (substituteContainer.width - substituteContainer.paddingStart - substituteContainer.paddingEnd) / iconSize
         substituteContainer.columnCount = columnCount
         substituteContainer.removeAllViews()
@@ -269,8 +287,9 @@ class DefenseEditableView: DefenseView {
     }
 
     private fun addDesignatedPlayerIfExists(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int) {
-         if(lineupMode == MODE_ENABLED) {
-            val iconSize = (fieldFrameLayout.width * ICON_SIZE_SCALE).roundToInt()
+        if(lineupMode == MODE_ENABLED) {
+            val containerSize = getContainerSize()
+            val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
             players.filter { it.position == FieldPosition.DP_DH.position }.let { listPlayers ->
                 var view: View?
                 try {
@@ -356,7 +375,7 @@ class DefenseEditableView: DefenseView {
                         playerListener?.onPlayerButtonClicked(FieldPosition.DP_DH)
                     }
 
-                    addPlayerOnFieldWithPercentage(this, FieldPosition.DP_DH.xPercent, FieldPosition.DP_DH.yPercent, null)
+                    addPlayerOnFieldWithPercentage(containerSize, this, FieldPosition.DP_DH.xPercent, FieldPosition.DP_DH.yPercent, null)
                 }
 
             }

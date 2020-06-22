@@ -14,6 +14,7 @@ object DomainModule {
         single { GetAllTeams(get()) }
         single { SaveCurrentTeam(get()) }
         single { GetTeamSize(get()) }
+        single { GetLastLineup(get(), get()) }
         single { GetMostUsedPlayer(get(), get()) }
         single { CreateLineup(get(), get()) }
         single { GetTournaments(get()) }

@@ -57,6 +57,7 @@ H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
     </style>
 
     <style name="TileLastLineup" parent="Tile">
+        <item name="android:background">@drawable/border_tile_shake_beta</item>
     </style>
 
     <style name="TilePlayerMostUsed" parent="Tile">
