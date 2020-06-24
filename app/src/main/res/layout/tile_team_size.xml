@@ -68,7 +68,12 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mask"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#c8000000"
+            tools:visibility="invisible"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

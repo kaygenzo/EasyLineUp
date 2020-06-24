@@ -187,4 +187,6 @@
         <item quantity="one">Substitute: %d</item>
         <item quantity="other">Substitutes: %d</item>
     </plurals>
+
+    <string name="dashboard_edit_mode">Dashboard edit mode</string>
 </resources>

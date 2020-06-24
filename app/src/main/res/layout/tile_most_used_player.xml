@@ -9,97 +9,110 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        style="@style/TilePlayerMostUsed">
-
-        <com.telen.easylineup.views.NormalUppercaseStyledTextView
-            style="@style/Field.Header"
-            android:id="@+id/tile_player_most_used_header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            android:text="@string/tile_most_used_player_header"
-            android:padding="@dimen/player_details_container_separator_width"/>
+        android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@+id/tile_player_most_used_header"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginTop="@dimen/player_details_container_separator_width">
+            android:layout_height="match_parent"
+            style="@style/TilePlayerMostUsed">
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guidelineMiddle"
+            <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                style="@style/Field.Header"
+                android:id="@+id/tile_player_most_used_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.5" />
-
-            <ImageView
-                android:id="@+id/tile_player_most_used_image"
-                android:src="@drawable/ic_unknown_field_player"
-                android:layout_width="@dimen/tile_most_used_player_image_size"
-                android:layout_height="@dimen/tile_most_used_player_image_size"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/tile_player_most_used_match_played_container"
-                app:layout_constraintLeft_toLeftOf="parent"/>
-
-            <com.telen.easylineup.views.NumberedStyledTextView
-                android:id="@+id/tile_player_most_used_shirt_number"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintLeft_toRightOf="@+id/tile_player_most_used_image"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tile_player_most_used_image"
-                app:layout_constraintBottom_toBottomOf="@id/tile_player_most_used_image"
-                style="@style/Field.Green.Light.Biggest.Auto"
-                tools:text="20"
-                android:layout_marginStart="@dimen/player_details_container_separator_width"/>
+                android:text="@string/tile_most_used_player_header"
+                android:padding="@dimen/player_details_container_separator_width"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/tile_player_most_used_match_played_container"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:layout_constraintBottom_toTopOf="@+id/tile_player_most_used_name"
-                app:layout_constraintTop_toBottomOf="@+id/tile_player_most_used_image"
+                app:layout_constraintTop_toBottomOf="@+id/tile_player_most_used_header"
+                app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginTop="@dimen/player_details_container_separator_width">
 
-                <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                    style="@style/Field.Green.Small"
-                    android:id="@+id/tile_player_most_used_match_played_label"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:text="@string/tile_most_used_player_games_played"
-                    android:gravity="center"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintRight_toLeftOf="@+id/tile_player_most_used_match_played_value" />
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineMiddle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.5" />
 
-                <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                    style="@style/Field.Green.Light.Biggest.Auto"
-                    android:id="@+id/tile_player_most_used_match_played_value"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    tools:text="42"
+                <ImageView
+                    android:id="@+id/tile_player_most_used_image"
+                    android:src="@drawable/ic_unknown_field_player"
+                    android:layout_width="@dimen/tile_most_used_player_image_size"
+                    android:layout_height="@dimen/tile_most_used_player_image_size"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/tile_player_most_used_match_played_container"
+                    app:layout_constraintLeft_toLeftOf="parent"/>
+
+                <com.telen.easylineup.views.NumberedStyledTextView
+                    android:id="@+id/tile_player_most_used_shirt_number"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintLeft_toRightOf="@+id/tile_player_most_used_image"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintLeft_toRightOf="@+id/tile_player_most_used_match_played_label" />
+                    app:layout_constraintTop_toTopOf="@+id/tile_player_most_used_image"
+                    app:layout_constraintBottom_toBottomOf="@id/tile_player_most_used_image"
+                    style="@style/Field.Green.Light.Biggest.Auto"
+                    tools:text="20"
+                    android:layout_marginStart="@dimen/player_details_container_separator_width"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/tile_player_most_used_match_played_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toTopOf="@+id/tile_player_most_used_name"
+                    app:layout_constraintTop_toBottomOf="@+id/tile_player_most_used_image"
+                    android:layout_marginTop="@dimen/player_details_container_separator_width">
+
+                    <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                        style="@style/Field.Green.Small"
+                        android:id="@+id/tile_player_most_used_match_played_label"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:text="@string/tile_most_used_player_games_played"
+                        android:gravity="center"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toLeftOf="@+id/tile_player_most_used_match_played_value" />
+
+                    <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                        style="@style/Field.Green.Light.Biggest.Auto"
+                        android:id="@+id/tile_player_most_used_match_played_value"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        tools:text="42"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintLeft_toRightOf="@+id/tile_player_most_used_match_played_label" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <com.telen.easylineup.views.CollegedStyledTextView
+                    style="@style/Field.Green.Lighter.Middle.Auto"
+                    android:id="@+id/tile_player_most_used_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tile_player_most_used_match_played_container"
+                    tools:text="Player"
+                    android:layout_marginTop="@dimen/player_details_container_separator_width"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <com.telen.easylineup.views.CollegedStyledTextView
-                style="@style/Field.Green.Lighter.Middle.Auto"
-                android:id="@+id/tile_player_most_used_name"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tile_player_most_used_match_played_container"
-                tools:text="Player"
-                android:layout_marginTop="@dimen/player_details_container_separator_width"/>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mask"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#c8000000"
+            tools:visibility="invisible"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -26,7 +26,7 @@ class TeamSizeTile: ConstraintLayout {
         LayoutInflater.from(context).inflate(R.layout.tile_team_size, this)
     }
 
-    fun bind(data: ITileData) {
+    fun bind(data: ITileData, inEditMode: Boolean) {
         val map = data.getData()
         val size: Int = map[KEY_DATA_SIZE] as Int
         tile_team_size_text.text = resources.getString(R.string.tile_team_size_message, size)
@@ -52,5 +52,6 @@ class TeamSizeTile: ConstraintLayout {
 
         team_size_warning_container.visibility = if (size < Constants.MIN_PLAYER_COUNT) View.VISIBLE else View.GONE
 
+        mask.visibility = if (inEditMode) View.VISIBLE else View.INVISIBLE
     }
 }

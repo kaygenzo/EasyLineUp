@@ -3,6 +3,7 @@ package com.telen.easylineup.dashboard.tiles
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
@@ -21,7 +22,7 @@ class MostUsedPlayerTile: ConstraintLayout {
         LayoutInflater.from(context).inflate(R.layout.tile_most_used_player, this)
     }
 
-    fun bind(data: ITileData) {
+    fun bind(data: ITileData, inEditMode: Boolean) {
         val map = data.getData()
         val iterator = map.entries.iterator()
         while (iterator.hasNext()) {
@@ -57,5 +58,7 @@ class MostUsedPlayerTile: ConstraintLayout {
         if(!map.containsKey(KEY_DATA_IMAGE)) {
             Picasso.get().load(R.drawable.ic_unknown_field_player).into(tile_player_most_used_image)
         }
+
+        mask.visibility = if (inEditMode) View.VISIBLE else View.INVISIBLE
     }
 }

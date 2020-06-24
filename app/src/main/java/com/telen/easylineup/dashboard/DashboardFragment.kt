@@ -1,14 +1,15 @@
 package com.telen.easylineup.dashboard
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.tiles.ITileData
@@ -17,22 +18,27 @@ import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_NAME
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
 
-class DashboardFragment: Fragment(), TileClickListener {
+class DashboardFragment: Fragment(), TileClickListener, ActionMode.Callback {
 
-    private lateinit var tileAdapter: DashboardTileAdapter
     private lateinit var dashboardViewModel: DashboardViewModel
     private val tileList = mutableListOf<ITileData>()
     private lateinit var dataObserver: Observer<List<ITileData>>
 
+    private lateinit var tileAdapter: DashboardTileAdapter
+    private lateinit var itemTouchedCallback: DashboardTileTouchCallback
+    private lateinit var itemTouchedHelper: ItemTouchHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        tileAdapter = DashboardTileAdapter(tileList, this)
         dashboardViewModel = ViewModelProviders.of(this)[DashboardViewModel::class.java]
         dataObserver = Observer {
             tileList.clear()
             tileList.addAll(it)
             tileAdapter.notifyDataSetChanged()
         }
+        tileAdapter = DashboardTileAdapter(tileList, this)
+        itemTouchedCallback = DashboardTileTouchCallback(tileAdapter)
+        itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -78,5 +84,36 @@ class DashboardFragment: Fragment(), TileClickListener {
 
             }
         }
+    }
+
+    override fun onTileLongClicked(type: Int) {
+        activity?.let { activity ->
+            val inEditMode = tileAdapter.inEditMode
+            if (!inEditMode) {
+                val actionMode = (activity as AppCompatActivity).startSupportActionMode(this)
+                actionMode?.title = getString(R.string.dashboard_edit_mode)
+            }
+        }
+    }
+
+    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+        return false
+    }
+
+    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        tileAdapter.inEditMode = true
+        tileAdapter.notifyDataSetChanged()
+        itemTouchedHelper.attachToRecyclerView(view?.tileRecyclerView)
+        return true
+    }
+
+    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        return false
+    }
+
+    override fun onDestroyActionMode(mode: ActionMode?) {
+        tileAdapter.inEditMode = false
+        tileAdapter.notifyDataSetChanged()
+        itemTouchedHelper.attachToRecyclerView(null)
     }
 }

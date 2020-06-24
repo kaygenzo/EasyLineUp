@@ -3,6 +3,7 @@ package com.telen.easylineup.dashboard.tiles
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.PlayerWithPosition
@@ -19,18 +20,9 @@ class LastLineupTile: ConstraintLayout{
 
     init {
         LayoutInflater.from(context).inflate(R.layout.tile_last_lineup, this)
-//        fieldAndPlayersRootView.ready {
-//            val size = fieldAndPlayersRootView.run {
-//                val viewHeight = height
-//                val viewWidth = width
-//                min(viewHeight, viewWidth)
-//            }
-//            fieldAndPlayersRootView.layoutParams.height = size
-//            fieldAndPlayersRootView.layoutParams.width = size
-//        }
     }
 
-    fun bind(data: ITileData) {
+    fun bind(data: ITileData, inEditMode: Boolean) {
         val map = data.getData()
         val name = map[KEY_LINEUP_NAME] as String
         val players = map[KEY_LINEUP_PLAYERS] as? List<PlayerWithPosition>
@@ -39,5 +31,7 @@ class LastLineupTile: ConstraintLayout{
         players?.let {
             fieldAndPlayersRootView.setListPlayerInField(it)
         }
+
+        mask.visibility = if (inEditMode) View.VISIBLE else View.INVISIBLE
     }
 }

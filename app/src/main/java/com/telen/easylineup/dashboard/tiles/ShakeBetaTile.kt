@@ -3,8 +3,11 @@ package com.telen.easylineup.dashboard.tiles
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.tiles.ITileData
+import kotlinx.android.synthetic.main.tile_shake_beta.view.*
 
 class ShakeBetaTile: ConstraintLayout {
 
@@ -14,5 +17,9 @@ class ShakeBetaTile: ConstraintLayout {
 
     private fun init(context: Context) {
         LayoutInflater.from(context).inflate(R.layout.tile_shake_beta, this)
+    }
+
+    fun bind(data: ITileData, inEditMode: Boolean) {
+        mask.visibility = if (inEditMode) View.VISIBLE else View.INVISIBLE
     }
 }
