@@ -9,6 +9,7 @@ import com.telen.easylineup.dashboard.tiles.MostUsedPlayerTile
 import com.telen.easylineup.dashboard.tiles.ShakeBetaTile
 import com.telen.easylineup.dashboard.tiles.TeamSizeTile
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.tiles.ITileData
 import java.util.*
 
@@ -17,7 +18,7 @@ interface TileClickListener {
     fun onTileLongClicked(type: Int)
 }
 
-class DashboardTileAdapter(private val list: List<ITileData>, private val tileClickListener: TileClickListener, var inEditMode: Boolean = false):
+class DashboardTileAdapter(private val list: List<DashboardTile>, private val tileClickListener: TileClickListener, var inEditMode: Boolean = false):
         RecyclerView.Adapter<DashboardTileAdapter.TileViewHolder>(), ItemTouchHelperAdapter {
 
     inner class TileViewHolder(val view: View): RecyclerView.ViewHolder(view)
@@ -47,24 +48,26 @@ class DashboardTileAdapter(private val list: List<ITileData>, private val tileCl
     }
 
     override fun getItemViewType(position: Int): Int {
-        val data = list[position]
-        return data.getType()
+        val tile = list[position]
+        return tile.data?.getType() ?: 0
     }
 
     override fun onBindViewHolder(holder: TileViewHolder, position: Int) {
-        val element = list[position]
-        when(holder.view) {
-            is TeamSizeTile -> holder.view.bind(element, inEditMode)
-            is MostUsedPlayerTile -> holder.view.bind(element, inEditMode)
-            is LastLineupTile -> holder.view.bind(element, inEditMode)
-            is ShakeBetaTile -> holder.view.bind(element, inEditMode)
-        }
-        holder.view.setOnClickListener {
-            tileClickListener.onTileClicked(element.getType(), element)
-        }
-        holder.view.setOnLongClickListener {
-            tileClickListener.onTileLongClicked(element.getType())
-            true
+        val tile = list[position]
+        tile.data?.let { data ->
+            when(holder.view) {
+                is TeamSizeTile -> holder.view.bind(data, inEditMode)
+                is MostUsedPlayerTile -> holder.view.bind(data, inEditMode)
+                is LastLineupTile -> holder.view.bind(data, inEditMode)
+                is ShakeBetaTile -> holder.view.bind(data, inEditMode)
+            }
+            holder.view.setOnClickListener {
+                tileClickListener.onTileClicked(data.getType(), data)
+            }
+            holder.view.setOnLongClickListener {
+                tileClickListener.onTileLongClicked(data.getType())
+                true
+            }
         }
     }
 

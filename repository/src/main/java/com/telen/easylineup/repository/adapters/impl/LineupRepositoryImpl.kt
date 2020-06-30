@@ -9,6 +9,7 @@ import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.repository.dao.LineupDao
 import com.telen.easylineup.repository.model.*
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import timber.log.Timber
 
@@ -72,7 +73,7 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao): LineupRep
         return lineupDao.getLineupsForTournamentRx(tournamentId, teamID).map { it.map { it.toLineup() } }
     }
 
-    override fun getLastLineup(teamID: Long): Single<Lineup> {
+    override fun getLastLineup(teamID: Long): Maybe<Lineup> {
         return lineupDao.getLastLineup(teamID).map { it.toLineup() }
     }
 

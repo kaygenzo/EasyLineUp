@@ -3,6 +3,7 @@ package com.telen.easylineup.repository
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.telen.easylineup.domain.model.tiles.TileType
 import com.telen.easylineup.domain.repository.*
 import com.telen.easylineup.repository.adapters.impl.*
 import com.telen.easylineup.repository.dao.AppDatabase
@@ -23,6 +24,7 @@ object RepositoryModule {
                     .addMigrations(migration_6_7())
                     .addMigrations(migration_7_8())
                     .addMigrations(migration_8_9())
+                    .addMigrations(migration_9_10())
             if(BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
                         .fallbackToDestructiveMigration()
@@ -50,12 +52,17 @@ object RepositoryModule {
             val database: AppDatabase = get()
             database.playerFieldPositionsDao()
         }
+        single {
+            val database: AppDatabase = get()
+            database.tilesDao()
+        }
 
         single<PlayerRepository> { PlayerRepositoryImpl(get()) }
         single<TeamRepository> { TeamRepositoryImpl(get()) }
         single<LineupRepository> { LineupRepositoryImpl(get()) }
         single<TournamentRepository> { TournamentRepositoryImpl(get()) }
         single<PlayerFieldPositionRepository> { PlayerFieldPositionRepositoryImpl(get()) }
+        single<TilesRepository> { TileRepositoryImpl(get()) }
     }
 
     private fun migration_1_2(): Migration {
@@ -154,6 +161,19 @@ object RepositoryModule {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE players ADD COLUMN pitching INTEGER NOT NULL DEFAULT 0")
                 database.execSQL("ALTER TABLE players ADD COLUMN batting INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+    }
+
+    private fun migration_9_10(): Migration {
+        return object: Migration(9,10) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS tiles (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `position` INTEGER NOT NULL, `type` INTEGER NOT NULL, `enabled` INTEGER NOT NULL default 1)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_tiles_position` ON tiles (`position`)")
+                database.execSQL("INSERT INTO tiles (id, position, type) VALUES (1, 0, ${TileType.BETA.type})")
+                database.execSQL("INSERT INTO tiles (id, position, type) VALUES (2, 1, ${TileType.TEAM_SIZE.type})")
+                database.execSQL("INSERT INTO tiles (id, position, type) VALUES (3, 2, ${TileType.MOST_USED_PLAYER.type})")
+                database.execSQL("INSERT INTO tiles (id, position, type) VALUES (4, 3, ${TileType.LAST_LINEUP.type})")
             }
         }
     }

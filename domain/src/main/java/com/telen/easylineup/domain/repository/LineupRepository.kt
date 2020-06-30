@@ -5,6 +5,7 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.PlayerInLineup
 import com.telen.easylineup.domain.model.TournamentWithLineup
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 
 interface LineupRepository {
@@ -20,7 +21,7 @@ interface LineupRepository {
     fun getLineupByIdSingle(lineupId: Long): Single<Lineup>
     fun getLineupsForTournament(tournamentId: Long, teamID: Long): LiveData<List<Lineup>>
     fun getLineupsForTournamentRx(tournamentId: Long, teamID: Long): Single<List<Lineup>>
-    fun getLastLineup(teamID: Long): Single<Lineup>
+    fun getLastLineup(teamID: Long): Maybe<Lineup>
     fun getAllTournamentsWithLineups(filter: String, teamID: Long): Single<List<TournamentWithLineup>>
     fun getAllPlayerPositionsForTournament(tournamentId: Long, teamID: Long): Single<List<PlayerInLineup>>
 }

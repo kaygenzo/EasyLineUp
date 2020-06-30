@@ -2,31 +2,36 @@ package com.telen.easylineup.dashboard
 
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
+import com.telen.easylineup.BaseFragment
+import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.tiles.ITileData
 import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_ID
 import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_NAME
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
+import timber.log.Timber
 
-class DashboardFragment: Fragment(), TileClickListener, ActionMode.Callback {
+class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback {
 
     private lateinit var dashboardViewModel: DashboardViewModel
-    private val tileList = mutableListOf<ITileData>()
-    private lateinit var dataObserver: Observer<List<ITileData>>
+    private val tileList = mutableListOf<DashboardTile>()
+    private lateinit var dataObserver: Observer<List<DashboardTile>>
 
     private lateinit var tileAdapter: DashboardTileAdapter
     private lateinit var itemTouchedCallback: DashboardTileTouchCallback
     private lateinit var itemTouchedHelper: ItemTouchHelper
+    private var actionMode: ActionMode? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,9 +58,6 @@ class DashboardFragment: Fragment(), TileClickListener, ActionMode.Callback {
         }
 
         dashboardViewModel.registerTilesLiveData().observe(viewLifecycleOwner, dataObserver)
-        dashboardViewModel.registerTeamChange().observe(viewLifecycleOwner, Observer {
-            dashboardViewModel.loadTiles()
-        })
 
         return view
     }
@@ -90,7 +92,7 @@ class DashboardFragment: Fragment(), TileClickListener, ActionMode.Callback {
         activity?.let { activity ->
             val inEditMode = tileAdapter.inEditMode
             if (!inEditMode) {
-                val actionMode = (activity as AppCompatActivity).startSupportActionMode(this)
+                actionMode = (activity as AppCompatActivity).startSupportActionMode(this)
                 actionMode?.title = getString(R.string.dashboard_edit_mode)
             }
         }
@@ -115,5 +117,20 @@ class DashboardFragment: Fragment(), TileClickListener, ActionMode.Callback {
         tileAdapter.inEditMode = false
         tileAdapter.notifyDataSetChanged()
         itemTouchedHelper.attachToRecyclerView(null)
+        val disposable = dashboardViewModel.saveTiles(tileList)
+                .subscribe({
+                    activity?.run {
+                        if(BuildConfig.DEBUG)
+                            Toast.makeText(this, "Save dashboard success", Toast.LENGTH_SHORT).show()
+                    }
+                }, {
+                    Timber.e(it)
+                })
+        this.disposables.add(disposable)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        actionMode?.finish()
     }
 }

@@ -21,15 +21,11 @@ interface ApplicationPort {
     fun observeTeams(): LiveData<List<Team>>
     fun observeLineupById(id: Long): LiveData<Lineup>
     fun observeTeamPlayersAndMaybePositionsForLineup(id: Long): LiveData<List<PlayerWithPosition>>
+    fun getTiles(): LiveData<List<DashboardTile>>
 
     ///////////////////////////////
     ///////////// Rx //////////////
     ///////////////////////////////
-
-    //dashboard
-    fun getTeamSize(team: Team): Maybe<ITileData>
-    fun getMostUsedPlayer(team: Team): Maybe<ITileData>
-    fun getLastLineup(team: Team): Maybe<ITileData>
 
     //teams
     fun getTeam(): Single<Team>
@@ -82,4 +78,7 @@ interface ApplicationPort {
     fun exportDataOnExternalMemory(name: String, fallbackName: String): Single<String>
 
     fun generateMockedData(): Completable
+
+    //tiles
+    fun updateTiles(tiles: List<DashboardTile>): Completable
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.telen.easylineup.repository.model.*
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 
 @Dao
@@ -57,7 +58,7 @@ internal interface LineupDao {
     fun getLineupsForTournamentRx(tournamentId: Long, teamID: Long): Single<List<RoomLineup>>
 
     @Query("SELECT * FROM lineups WHERE teamID = :teamID ORDER BY editedAt DESC LIMIT 1")
-    fun getLastLineup(teamID: Long): Single<RoomLineup>
+    fun getLastLineup(teamID: Long): Maybe<RoomLineup>
 
     @Query("""
         SELECT tournaments.id as tournamentID,

@@ -14,6 +14,7 @@ import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.splashscreen.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class SplashScreenActivity: AppCompatActivity(), KoinComponent {
@@ -35,6 +36,7 @@ class SplashScreenActivity: AppCompatActivity(), KoinComponent {
                 .subscribe({
                     launchHome()
                 }, {
+                    it.printStackTrace()
                     launchLoginScreen()
                 })
     }

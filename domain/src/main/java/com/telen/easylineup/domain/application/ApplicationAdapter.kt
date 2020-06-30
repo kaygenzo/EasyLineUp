@@ -6,18 +6,17 @@ import android.os.Environment
 import android.webkit.URLUtil
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.model.export.ExportBase
-import com.telen.easylineup.domain.model.tiles.ITileData
 import com.telen.easylineup.domain.repository.*
 import com.telen.easylineup.domain.usecases.*
 import com.telen.easylineup.domain.usecases.exceptions.*
 import io.reactivex.Completable
-import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 import org.koin.core.KoinComponent
@@ -37,12 +36,13 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
     private val lineupsRepo: LineupRepository by inject()
     private val playerFieldPositionRepo: PlayerFieldPositionRepository by inject()
 
+    private val getDashboardTilesUseCase:  GetDashboardTiles by inject()
+    private val updateTilesUseCase:  SaveDashboardTiles by inject()
+    private val createTilesUseCase:  CreateDashboardTiles by inject()
+
     private val getTeamUseCase: GetTeam by inject()
     private val getAllTeamsUseCase: GetAllTeams by inject()
     private val saveCurrentTeam: SaveCurrentTeam by inject()
-    private val getTeamSizeUseCase:  GetTeamSize by inject()
-    private val getLastLineupUseCase:  GetLastLineup by inject()
-    private val getMostUsedPlayerUseCase: GetMostUsedPlayer by inject()
     private val createLineupUseCase: CreateLineup by inject()
     private val deleteTournamentUseCase: DeleteTournament by inject()
     private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineups by inject()
@@ -96,6 +96,30 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
 
     override fun observeTeamPlayersAndMaybePositionsForLineup(id: Long): LiveData<List<PlayerWithPosition>> {
         return playersRepo.getTeamPlayersAndMaybePositions(id)
+    }
+
+    override fun getTiles(): LiveData<List<DashboardTile>> {
+        val resultLiveData = MutableLiveData<List<DashboardTile>>()
+        val disposable = getTeam()
+                .flatMap { team ->
+                    UseCaseHandler.execute(getDashboardTilesUseCase, GetDashboardTiles.RequestValues(team))
+                            .onErrorResumeNext {
+                                if(it is NoSuchElementException) {
+                                    UseCaseHandler.execute(createTilesUseCase, CreateDashboardTiles.RequestValues()).ignoreElement()
+                                            .andThen(UseCaseHandler.execute(getDashboardTilesUseCase, GetDashboardTiles.RequestValues(team)))
+                                }
+                                else {
+                                    Single.error(it)
+                                }
+                            }
+                            .map { it.tiles }
+                }
+                .subscribe({
+                    resultLiveData.postValue(it)
+                }, {
+                    _errors.onNext(DomainErrors.CANNOT_RETRIEVE_DASHBOARD)
+                })
+        return resultLiveData
     }
 
     override fun getTeam(): Single<Team> {
@@ -162,20 +186,6 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                 }
                 .andThen(UseCaseHandler.execute(getTeamCreationPreviousStep, requestValue))
                 .map { it.config }
-    }
-
-    override fun getTeamSize(team: Team): Maybe<ITileData> {
-        return UseCaseHandler.execute(getTeamSizeUseCase, GetTeamSize.RequestValues(team)).flatMapMaybe { Maybe.just(it.data) }
-    }
-
-    override fun getMostUsedPlayer(team: Team): Maybe<ITileData> {
-        return UseCaseHandler.execute(getMostUsedPlayerUseCase, GetMostUsedPlayer.RequestValues(team))
-                .flatMapMaybe { it.data?.let { iData -> Maybe.just(iData) } ?: Maybe.empty() }
-    }
-
-    override fun getLastLineup(team: Team): Maybe<ITileData> {
-        return UseCaseHandler.execute(getLastLineupUseCase, GetLastLineup.RequestValues(team))
-                .flatMapMaybe { it.data?.let { iData -> Maybe.just(iData) } ?: Maybe.empty() }
     }
 
     override fun insertPlayers(players: List<Player>): Completable {
@@ -361,8 +371,8 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
 
     override fun linkDpAndFlex(dp: Player?, flex: Player?, lineupID: Long?, list: List<PlayerWithPosition>): Completable {
         return UseCaseHandler.execute(saveDpAndFlexUseCase, SaveDpAndFlex.RequestValues(
-                        lineupID = lineupID, dp = dp, flex = flex, players = list
-                ))
+                lineupID = lineupID, dp = dp, flex = flex, players = list
+        ))
                 .ignoreElement()
                 .doOnError {
                     if(it is NeedAssignBothPlayersException) {
@@ -408,21 +418,21 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
 
     override fun exportDataOnExternalMemory(name: String, fallbackName: String): Single<String> {
         return UseCaseHandler.execute(checkHashUseCase, CheckHashData.RequestValues()).flatMapCompletable {
-                    println("update result is ${it.updateResult}")
-                    Completable.complete()
-                }.andThen(UseCaseHandler.execute(exportDataUseCase, ExportData.RequestValues(object : ValidationCallback {
-                    override fun isNetworkUrl(url: String?): Boolean {
-                        return URLUtil.isNetworkUrl(url)
-                    }
+            println("update result is ${it.updateResult}")
+            Completable.complete()
+        }.andThen(UseCaseHandler.execute(exportDataUseCase, ExportData.RequestValues(object : ValidationCallback {
+            override fun isNetworkUrl(url: String?): Boolean {
+                return URLUtil.isNetworkUrl(url)
+            }
 
-                    override fun isDigitsOnly(value: String): Boolean {
-                        return value.isDigitsOnly()
-                    }
+            override fun isDigitsOnly(value: String): Boolean {
+                return value.isDigitsOnly()
+            }
 
-                    override fun isBlank(value: String): Boolean {
-                        return value.isBlank()
-                    }
-                })))
+            override fun isBlank(value: String): Boolean {
+                return value.isBlank()
+            }
+        })))
                 .flatMap {
                     val storageDirectoryName = Constants.EXPORTS_DIRECTORY
                     val json = Gson().toJson(it.exportBase)
@@ -458,5 +468,8 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
         return DatabaseMockProvider().createMockDatabase(context)
     }
 
+    override fun updateTiles(tiles: List<DashboardTile>): Completable {
+        return UseCaseHandler.execute(updateTilesUseCase, SaveDashboardTiles.RequestValues(tiles)).ignoreElement()
+    }
 
 }
