@@ -323,20 +323,6 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         return _lineupTitle
     }
 
-    fun getDesignatedPlayerLabel(context: Context): LiveData<String> {
-        val disposable = getTeam()
-                .subscribe({
-                    _designatedPlayerTitle.value = when(it.type) {
-                        TeamType.SOFTBALL.id -> context.getString(R.string.action_add_dp_flex)
-                        else -> context.getString(R.string.action_add_dh)
-                    }
-                }, {
-                    Timber.e(it)
-                })
-        disposables.add(disposable)
-        return _designatedPlayerTitle
-    }
-
     //TODO move in view
     fun getUserDeleteConsentDialog(context: Context): Dialog {
         return DialogFactory.getWarningTaskDialog(context = context,

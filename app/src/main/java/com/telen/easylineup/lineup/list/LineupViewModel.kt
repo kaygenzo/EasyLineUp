@@ -7,10 +7,7 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationPort
-import com.telen.easylineup.domain.model.DomainErrors
-import com.telen.easylineup.domain.model.Lineup
-import com.telen.easylineup.domain.model.TeamRosterSummary
-import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -108,5 +105,9 @@ class LineupViewModel: ViewModel(), KoinComponent {
 
     fun observeErrors(): PublishSubject<DomainErrors> {
         return domain.observeErrors()
+    }
+
+    fun getTeamType(): Single<Int> {
+        return domain.getTeamType()
     }
 }

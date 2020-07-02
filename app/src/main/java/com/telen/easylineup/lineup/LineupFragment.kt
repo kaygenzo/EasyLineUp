@@ -4,7 +4,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
-import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -12,7 +11,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.textview.MaterialTextView
@@ -23,19 +21,14 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.FieldPosition
-import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.lineup.attack.AttackFragment
 import com.telen.easylineup.lineup.defense.DefenseFragmentEditable
 import com.telen.easylineup.utils.NavigationUtils
 import timber.log.Timber
 
 class LineupFragmentFixed: LineupFragment(R.layout.fragment_lineup_fixed, false) {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_lineup_summary, menu)
@@ -55,12 +48,49 @@ class LineupFragmentFixed: LineupFragment(R.layout.fragment_lineup_fixed, false)
 
 }
 
-class LineupFragmentEditable: LineupFragment(R.layout.fragment_lineup_edition, true)
+class LineupFragmentEditable: LineupFragment(R.layout.fragment_lineup_edition, true) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_lineup_edition, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
 
-abstract class LineupFragment(@LayoutRes private val layout: Int, private val isEditable: Boolean): BaseFragment(), CompoundButton.OnCheckedChangeListener {
+    override fun onPrepareOptionsMenu(menu: Menu) {
+
+        val teamTypeDisposable = viewModel.getTeamType()
+                .subscribe({
+                    val teamType = TeamType.getTypeById(it)
+                    val item = menu.findItem(R.id.action_lineup_mode)
+                    when(teamType) {
+                        TeamType.UNKNOWN -> item.isVisible = false
+                        TeamType.BASEBALL -> {
+                            menu.findItem(R.id.action_lineup_mode).setTitle(R.string.action_add_dh)
+                        }
+                        TeamType.SOFTBALL -> {
+                            menu.findItem(R.id.action_lineup_mode).setTitle(R.string.action_add_dp_flex)
+                        }
+                    }
+                }, {
+                    Timber.e(it)
+                })
+        disposables.add(teamTypeDisposable)
+
+        menu.findItem(R.id.action_lineup_mode).isChecked = viewModel.lineupMode == MODE_ENABLED
+
+        super.onPrepareOptionsMenu(menu)
+    }
+}
+
+abstract class LineupFragment(@LayoutRes private val layout: Int, private val isEditable: Boolean): BaseFragment() {
 
     companion object {
         const val REQUEST_WRITE_EXTERENAL_STORAGE_PERMISSION = 0
+
+        fun getArguments(lineupID: Long, lineupTitle: String): Bundle {
+            val extras = Bundle()
+            extras.putLong(Constants.LINEUP_ID, lineupID)
+            extras.putString(Constants.LINEUP_TITLE, lineupTitle)
+            return extras
+        }
     }
 
     lateinit var pagerAdapter: LineupPagerAdapter
@@ -76,7 +106,7 @@ abstract class LineupFragment(@LayoutRes private val layout: Int, private val is
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        setHasOptionsMenu(true)
         viewModel = ViewModelProviders.of(this).get(PlayersPositionViewModel::class.java)
         viewModel.lineupID = arguments?.getLong(Constants.LINEUP_ID, 0) ?: 0
         viewModel.lineupTitle = arguments?.getString(Constants.LINEUP_TITLE) ?: ""
@@ -148,35 +178,11 @@ abstract class LineupFragment(@LayoutRes private val layout: Int, private val is
                 (activity as HomeActivity).supportActionBar?.title = it
             })
 
-            viewModel.registerLineupChange().observe(viewLifecycleOwner,  Observer {
-                //some layouts don't have this checkbox
-                val switch = view.findViewById<SwitchMaterial>(R.id.changeModeCheckBox)
-                switch?.let { view ->
-                    view.apply {
-                        setOnCheckedChangeListener(null)
-                        when(it.mode) {
-                            MODE_DISABLED -> {
-                                isChecked = false
-                            }
-                            MODE_ENABLED -> {
-                                isChecked = true
-                            }
-                        }
-                        setOnCheckedChangeListener(this@LineupFragment)
-                    }
-                }
-            })
-
             viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer {
                 val size = it.filter { item -> item.position == FieldPosition.SUBSTITUTE.position
                         && item.fieldPositionID > 0 }.size
                 val substituteIndication = view.findViewById<MaterialTextView>(R.id.substitutesIndication)
                 substituteIndication?.text = resources.getQuantityString(R.plurals.lineups_substitutes_size, size, size)
-            })
-
-            viewModel.getDesignatedPlayerLabel(activity).observe(viewLifecycleOwner, Observer {
-                val switch = view.findViewById<SwitchMaterial>(R.id.changeModeCheckBox)
-                switch?.text = it
             })
         }
 
@@ -230,9 +236,7 @@ abstract class LineupFragment(@LayoutRes private val layout: Int, private val is
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_edit -> {
-                val extras = Bundle()
-                extras.putLong(Constants.LINEUP_ID, viewModel.lineupID ?: 0)
-                extras.putString(Constants.LINEUP_TITLE, viewModel.lineupTitle)
+                val extras = Companion.getArguments(viewModel.lineupID ?: 0,  viewModel.lineupTitle ?: "")
                 findNavController().navigate(R.id.lineupFragmentEditable, extras, NavigationUtils().getOptions())
                 true
             }
@@ -244,6 +248,15 @@ abstract class LineupFragment(@LayoutRes private val layout: Int, private val is
                 exportLineupToExternalStorage()
                 true
             }
+            R.id.action_roster -> {
+                true
+            }
+            R.id.action_lineup_mode -> {
+                if(BuildConfig.DEBUG)
+                    Toast.makeText(activity, "Mode is ${item.isChecked}", Toast.LENGTH_SHORT).show()
+                viewModel.onLineupModeChanged(!item.isChecked)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -252,12 +265,6 @@ abstract class LineupFragment(@LayoutRes private val layout: Int, private val is
         activity?.let {
             viewModel.getUserDeleteConsentDialog(it).show()
         }
-    }
-
-    override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-        if(BuildConfig.DEBUG)
-            Toast.makeText(activity, "Mode is $isChecked", Toast.LENGTH_SHORT).show()
-        viewModel.onLineupModeChanged(isChecked)
     }
 
     private fun exportLineupToExternalStorage() {

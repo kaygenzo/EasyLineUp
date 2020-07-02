@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
@@ -13,10 +12,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mancj.materialsearchbar.MaterialSearchBar
+import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.utils.hideSoftKeyboard
@@ -35,7 +36,7 @@ class LineupsScrollListener(private val view: FloatingActionButton): RecyclerVie
     }
 }
 
-class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchBar.OnSearchActionListener {
+class TournamentListFragment: BaseFragment(), OnItemClickedListener, MaterialSearchBar.OnSearchActionListener {
 
     private lateinit var tournamentsAdapter: TournamentsAdapter
     private lateinit var viewModel: LineupViewModel
@@ -110,9 +111,7 @@ class TournamentListFragment: Fragment(), OnItemClickedListener, MaterialSearchB
 
     override fun onLineupClicked(lineup: Lineup) {
         activity?.let {
-            val extras = Bundle()
-            extras.putLong(Constants.LINEUP_ID, lineup.id)
-            extras.putString(Constants.LINEUP_TITLE, lineup.name)
+            val extras = LineupFragment.getArguments(lineup.id, lineup.name)
             findNavController().navigate(R.id.lineupFragmentFixed, extras, NavigationUtils().getOptions())
         }
     }

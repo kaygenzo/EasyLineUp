@@ -6,19 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.getkeepsafe.taptargetview.TapTargetView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.lineup.list.LineupViewModel
 import com.telen.easylineup.lineup.list.SaveSuccess
 import com.telen.easylineup.utils.DialogFactory
@@ -95,9 +94,7 @@ class LineupCreationFragment: BaseFragment() {
             when(it) {
                 is SaveSuccess -> {
                     Timber.d("successfully inserted new lineup, new id: ${it.lineupID}")
-                    val extras = Bundle()
-                    extras.putLong(Constants.LINEUP_ID, it.lineupID)
-                    extras.putString(Constants.LINEUP_TITLE, it.lineupName)
+                    val extras = LineupFragment.getArguments(it.lineupID,  it.lineupName)
                     findNavController().navigate(R.id.lineupFragmentEditable, extras, NavigationUtils().getOptionsWithPopDestination(R.id.navigation_lineups, false))
                 }
             }

@@ -18,6 +18,7 @@ import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.tiles.ITileData
 import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_ID
 import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_NAME
+import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
 import timber.log.Timber
@@ -75,11 +76,9 @@ class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback 
                 findNavController().navigate(R.id.navigation_team, null, NavigationUtils().getOptions())
             }
             Constants.TYPE_LAST_LINEUP -> {
-                val extras = Bundle()
                 val lineupID = data.getData()[KEY_LINEUP_ID] as? Long ?: 0L
                 val lineupName = data.getData()[KEY_LINEUP_NAME] as? String ?: ""
-                extras.putLong(Constants.LINEUP_ID, lineupID)
-                extras.putString(Constants.LINEUP_TITLE, lineupName)
+                val extras = LineupFragment.getArguments(lineupID, lineupName)
                 findNavController().navigate(R.id.lineupFragmentFixed, extras, NavigationUtils().getOptions())
             }
             else -> {
