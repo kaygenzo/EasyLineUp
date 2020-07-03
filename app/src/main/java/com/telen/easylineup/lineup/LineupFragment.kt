@@ -131,6 +131,7 @@ abstract class LineupFragment(@LayoutRes private val layout: Int, private val is
                     childFragmentManager.beginTransaction().remove(it).commit()
                 }
 
+                pager.isSaveEnabled = false
                 pager.adapter = pagerAdapter
                 val tabLayout = view.findViewById<TabLayout>(R.id.lineupTabLayout)
                 TabLayoutMediator(tabLayout, pager) { tab, position ->
