@@ -62,7 +62,8 @@ class DashboardTileAdapter(private val list: List<DashboardTile>, private val ti
                 is ShakeBetaTile -> holder.view.bind(data, inEditMode)
             }
             holder.view.setOnClickListener {
-                tileClickListener.onTileClicked(data.getType(), data)
+                if(!inEditMode)
+                    tileClickListener.onTileClicked(data.getType(), data)
             }
             holder.view.setOnLongClickListener {
                 tileClickListener.onTileLongClicked(data.getType())
