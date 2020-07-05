@@ -47,5 +47,6 @@ object DomainModule {
         single { GetOnlyPlayersInField() }
         single { GetDPAndFlexFromPlayersInField() }
         single { SaveDpAndFlex(get()) }
+        single { SavePlayerNumberOverlay(get()) }
     }
 }

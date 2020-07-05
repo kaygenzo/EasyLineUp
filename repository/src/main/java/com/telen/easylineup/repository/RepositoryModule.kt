@@ -25,6 +25,7 @@ object RepositoryModule {
                     .addMigrations(migration_7_8())
                     .addMigrations(migration_8_9())
                     .addMigrations(migration_9_10())
+                    .addMigrations(migration_10_11())
             if(BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
                         .fallbackToDestructiveMigration()
@@ -56,8 +57,12 @@ object RepositoryModule {
             val database: AppDatabase = get()
             database.tilesDao()
         }
+        single {
+            val database: AppDatabase = get()
+            database.playerNumberOverlaysDao()
+        }
 
-        single<PlayerRepository> { PlayerRepositoryImpl(get()) }
+        single<PlayerRepository> { PlayerRepositoryImpl(get(), get()) }
         single<TeamRepository> { TeamRepositoryImpl(get()) }
         single<LineupRepository> { LineupRepositoryImpl(get()) }
         single<TournamentRepository> { TournamentRepositoryImpl(get()) }
@@ -174,6 +179,27 @@ object RepositoryModule {
                 database.execSQL("INSERT INTO tiles (id, position, type) VALUES (2, 1, ${TileType.TEAM_SIZE.type})")
                 database.execSQL("INSERT INTO tiles (id, position, type) VALUES (3, 2, ${TileType.MOST_USED_PLAYER.type})")
                 database.execSQL("INSERT INTO tiles (id, position, type) VALUES (4, 3, ${TileType.LAST_LINEUP.type})")
+            }
+        }
+    }
+
+    private fun migration_10_11(): Migration {
+        return object: Migration(10,11) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS playerNumberOverlay (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lineupID` INTEGER NOT NULL, `playerID` INTEGER NOT NULL, `number` INTEGER NOT NULL, FOREIGN KEY(`playerID`) REFERENCES `players`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`lineupID`) REFERENCES `lineups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_playerNumberOverlay_number` ON playerNumberOverlay (`number`)")
+
+                //update player indexes
+                database.execSQL("DROP INDEX IF EXISTS index_players_name_licenseNumber")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_players_name_licenseNumber_teamID` ON players (`name`, `licenseNumber`, `teamID`)")
+
+                //update lineups indexes
+                database.execSQL("DROP INDEX IF EXISTS index_lineups_name")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_lineups_name_teamID_tournamentID` ON lineups (`name`, `teamID`, `tournamentID`)")
+
+                //update playerFieldPosition indexes
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_playerFieldPosition_playerID_lineupID` ON playerFieldPosition (`playerID`, `lineupID`)")
+
             }
         }
     }

@@ -7,7 +7,7 @@ import java.util.*
 
 @Entity(
         tableName = "lineups",
-        indices = [Index(value = ["name"])],
+        indices = [Index(value = ["name", "teamID", "tournamentID"])],
         foreignKeys = [
             ForeignKey(entity = RoomTeam::class, parentColumns = ["id"], childColumns = ["teamID"],
                     onDelete = ForeignKey.CASCADE),

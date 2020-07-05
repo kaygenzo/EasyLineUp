@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/actionContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/default_margin">
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/ButtonCancel"
+        android:id="@+id/cancelButton"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:text="@string/cancel_button"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/saveButton"
+        android:layout_marginEnd="10dp" />
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/ButtonConfirm"
+        android:id="@+id/saveButton"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:text="@string/save_button"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/cancelButton" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

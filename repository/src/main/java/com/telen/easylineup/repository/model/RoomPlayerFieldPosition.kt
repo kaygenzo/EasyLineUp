@@ -1,14 +1,12 @@
 package com.telen.easylineup.repository.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
+import androidx.room.*
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import java.util.*
 
 @Entity(
         tableName = "playerFieldPosition",
+        indices = [Index(value = ["playerID", "lineupID"])],
         foreignKeys = [
             ForeignKey(entity = RoomPlayer::class, parentColumns = ["id"], childColumns = ["playerID"],
                     onDelete = ForeignKey.CASCADE),

@@ -2,6 +2,7 @@ package com.telen.easylineup.domain.repository
 
 import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -18,4 +19,9 @@ interface PlayerRepository {
     fun getPlayers(teamID: Long): Single<List<Player>>
     fun getPlayers(): Single<List<Player>>
     fun getTeamPlayersAndMaybePositions(lineupID: Long): LiveData<List<PlayerWithPosition>>
+
+    fun getPlayersNumberOverlay(lineupID: Long): Single<List<PlayerNumberOverlay>>
+    fun deletePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
+    fun updatePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
+    fun createPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
 }

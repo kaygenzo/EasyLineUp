@@ -12,7 +12,7 @@ interface LineupRepository {
     fun insertLineup(lineup: Lineup): Single<Long>
     fun insertLineups(lineups: List<Lineup>): Completable
     fun updateLineup(lineup: Lineup): Completable
-    fun updateLineupsWithRowCount(lineup: List<Lineup>): Single<Int>
+    fun updateLineupsWithRowCount(lineups: List<Lineup>): Single<Int>
     fun deleteLineup(lineup: Lineup): Completable
     fun getAllLineup(): LiveData<List<Lineup>>
     fun getLineups(): Single<List<Lineup>>

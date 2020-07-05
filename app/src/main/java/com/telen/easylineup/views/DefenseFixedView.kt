@@ -51,7 +51,7 @@ class DefenseFixedView: DefenseView {
 
             val containerSize = getContainerSize()
             val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
-            Timber.e(Throwable(), "DefenseFixedView: iconSize=$iconSize containerWidth=${containerSize} containerHeight=${fieldFrameLayout.height}")
+            Timber.d("DefenseFixedView: iconSize=$iconSize containerWidth=${containerSize} containerHeight=${fieldFrameLayout.height}")
 
             players.filter { !FieldPosition.isSubstitute(it.position) }
                     .forEach { player ->

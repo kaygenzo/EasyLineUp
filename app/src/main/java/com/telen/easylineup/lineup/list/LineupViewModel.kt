@@ -28,7 +28,7 @@ class LineupViewModel: ViewModel(), KoinComponent {
     private val filterLiveData: MutableLiveData<String> by lazy {
         MutableLiveData("")
     }
-    private var chosenRoster: TeamRosterSummary? = null
+    private var chosenRoster: TeamRosterSummary = TeamRosterSummary(Constants.STATUS_ALL, mutableListOf())
 
     private val saveResult = MutableLiveData<SaveResult>()
 
@@ -67,14 +67,16 @@ class LineupViewModel: ViewModel(), KoinComponent {
         return domain.deleteTournament(tournament)
     }
 
-    fun getRoster(): Single<TeamRosterSummary> {
-        return chosenRoster?.let {
-            Single.just(it)
-        } ?: domain.getRoster().doOnSuccess { chosenRoster = it }
+    fun getCompleteRoster(): Single<TeamRosterSummary> {
+        return domain.getCompleteRoster().doOnSuccess { chosenRoster = it }
+    }
+
+    fun getChosenRoster(): Single<TeamRosterSummary> {
+        return Single.just(chosenRoster)
     }
 
     fun saveLineup(tournament: Tournament, lineupTitle: String) {
-        val disposable = domain.saveLineup(tournament, lineupTitle)
+        val disposable = domain.saveLineup(tournament, lineupTitle, chosenRoster)
                 .subscribe({
                     saveResult.value = SaveSuccess(it, lineupTitle)
                 }, {
@@ -84,7 +86,7 @@ class LineupViewModel: ViewModel(), KoinComponent {
     }
 
     fun rosterPlayerStatusChanged(position: Int, status: Boolean) {
-        chosenRoster?.let {
+        chosenRoster.let {
             it.players[position].status = status
             val areSameSize = it.players.filter { it.status }.size == it.players.size
             it.status = when(areSameSize) {

@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.model.*
@@ -75,6 +76,8 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
     private val getPlayersInField: GetOnlyPlayersInField by inject()
     private val getDpAndFlexFromPlayersInFieldUseCase: GetDPAndFlexFromPlayersInField by inject()
     private val saveDpAndFlexUseCase: SaveDpAndFlex by inject()
+
+    private val savePlayerNumberOverlayUseCase: SavePlayerNumberOverlay by inject()
 
     override fun observeErrors(): PublishSubject<DomainErrors> {
         return _errors
@@ -251,22 +254,30 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                 }
     }
 
+    override fun saveOrUpdatePlayerNumberOverlays(overlays: List<RosterItem>): Completable {
+        return UseCaseHandler.execute(savePlayerNumberOverlayUseCase, SavePlayerNumberOverlay.RequestValues(overlays)).ignoreElement()
+    }
+
     override fun insertLineups(lineups: List<Lineup>): Completable {
         return lineupsRepo.insertLineups(lineups)
     }
 
-    override fun getRoster(): Single<TeamRosterSummary> {
+    override fun getCompleteRoster(): Single<TeamRosterSummary> {
         return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
                 .flatMap { UseCaseHandler.execute(getRosterUseCase, GetRoster.RequestValues(it.id, null)) }
                 .map { it.summary }
     }
 
-    override fun saveLineup(tournament: Tournament, lineupTitle: String): Single<Long> {
+    override fun getRoster(lineupID: Long): Single<TeamRosterSummary> {
+        return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
+                .flatMap { UseCaseHandler.execute(getRosterUseCase, GetRoster.RequestValues(it.id, lineupID)) }
+                .map { it.summary }
+    }
+
+    override fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary): Single<Long> {
         return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
                 .flatMap { team ->
-                    getRoster().map { it.players }.flatMap { roster ->
-                        UseCaseHandler.execute(createLineupUseCase, CreateLineup.RequestValues(team.id, tournament, lineupTitle, roster))
-                    }
+                    UseCaseHandler.execute(createLineupUseCase, CreateLineup.RequestValues(team.id, tournament, lineupTitle, rosterFilter.players))
                 }
                 .map { it.lineupID }
                 .doOnError {

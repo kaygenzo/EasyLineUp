@@ -83,7 +83,7 @@ class LineupCreationFragment: BaseFragment() {
             }
         })
 
-        val getRosterDisposable = lineupViewModel.getRoster().subscribe({
+        val getRosterDisposable = lineupViewModel.getCompleteRoster().subscribe({
             updateRosterSize(view.playerCount, it)
         }, {
             Timber.e(it)
@@ -104,7 +104,7 @@ class LineupCreationFragment: BaseFragment() {
     }
 
     private fun showRosterDialog(formView: LineupCreationFormView) {
-        val disposable = lineupViewModel.getRoster()
+        val disposable = lineupViewModel.getChosenRoster()
                 .subscribe({ response ->
                     activity?.let { activity ->
                         val names = mutableListOf<CharSequence>()
