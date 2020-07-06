@@ -195,6 +195,8 @@ H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
 
     <style name="ButtonConfirm">
         <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
     <style name="ButtonCancel">
@@ -202,6 +204,8 @@ H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
         <item name="android:textColor">@color/colorPrimaryVariant</item>
         <item name="strokeColor">@color/colorPrimaryVariant</item>
         <item name="strokeWidth">1dp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
     <!-- Material components theming -->
