@@ -128,7 +128,7 @@ class PlayerFormView: ConstraintLayout {
 
         imageUri = Uri.parse(imagePath)
 
-        playerImage.ready {
+        playerImage.post {
             try {
                 Picasso.get().load(imageUri)
                         .resize(playerImage.width, playerImage.height)
