@@ -36,11 +36,11 @@ internal class GetListAvailablePlayersForSelectionTests {
                 FieldPosition.SUBSTITUTE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
 
         roster = mutableListOf()
-        roster.add(RosterPlayerStatus(Player(id = 1L, teamId = teamID, name = "toto", shirtNumber =  1, licenseNumber = 1, image = null, positions = 1), true))
-        roster.add(RosterPlayerStatus(Player(id = 2L, teamId = teamID, name = "tata", shirtNumber = 2, licenseNumber =  2, image = null, positions =1), true))
-        roster.add(RosterPlayerStatus(Player(id = 3L, teamId = teamID, name = "titi", shirtNumber = 3, licenseNumber = 3, image = null, positions =4), true))
-        roster.add(RosterPlayerStatus(Player(id = 4L, teamId = teamID, name = "tutu", shirtNumber = 4, licenseNumber = 4, image = null, positions =8), true))
-        roster.add(RosterPlayerStatus(Player(id = 5L, teamId = teamID, name = "tete", shirtNumber = 5, licenseNumber = 5, image = null, positions =16), true))
+        roster.add(RosterPlayerStatus(Player(id = 1L, teamId = teamID, name = "toto", shirtNumber =  1, licenseNumber = 1, image = null, positions = 1), true, null))
+        roster.add(RosterPlayerStatus(Player(id = 2L, teamId = teamID, name = "tata", shirtNumber = 2, licenseNumber =  2, image = null, positions =1), true, null))
+        roster.add(RosterPlayerStatus(Player(id = 3L, teamId = teamID, name = "titi", shirtNumber = 3, licenseNumber = 3, image = null, positions =4), true, null))
+        roster.add(RosterPlayerStatus(Player(id = 4L, teamId = teamID, name = "tutu", shirtNumber = 4, licenseNumber = 4, image = null, positions =8), true, null))
+        roster.add(RosterPlayerStatus(Player(id = 5L, teamId = teamID, name = "tete", shirtNumber = 5, licenseNumber = 5, image = null, positions =16), true, null))
     }
 
     @Test

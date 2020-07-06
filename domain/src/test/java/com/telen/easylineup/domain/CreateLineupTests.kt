@@ -3,10 +3,7 @@ package com.telen.easylineup.domain
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.domain.model.Lineup
-import com.telen.easylineup.domain.model.Player
-import com.telen.easylineup.domain.model.RosterPlayerStatus
-import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.CreateLineup
@@ -39,9 +36,9 @@ internal class CreateLineupTests {
         mCreateLineup = CreateLineup(tournamentDao, lineupDao)
 
         roster = mutableListOf()
-        roster.add(RosterPlayerStatus(Player(1,1,"toto",1,1), true))
-        roster.add(RosterPlayerStatus(Player(2,1,"tata",1,1), true))
-        roster.add(RosterPlayerStatus(Player(3,1,"titi",1,1), true))
+        roster.add(RosterPlayerStatus(Player(1,1,"toto",1,1), true, null))
+        roster.add(RosterPlayerStatus(Player(2,1,"tata",1,1), true, null))
+        roster.add(RosterPlayerStatus(Player(3,1,"titi",1,1), true, null))
 
         Mockito.`when`(tournamentDao.insertTournament(any())).thenReturn(Single.just(1L))
         Mockito.`when`(tournamentDao.updateTournament(any())).thenReturn(Completable.complete())
@@ -87,7 +84,7 @@ internal class CreateLineupTests {
     @Test
     fun shouldLineupSavedWithRosterNotNullForSelection() {
         val tournament = Tournament(1L, "tata", 1L)
-        roster.add(RosterPlayerStatus(Player(4,1,"tutu",1,1), false))
+        roster.add(RosterPlayerStatus(Player(4,1,"tutu",1,1), false, null))
         val observer = TestObserver<CreateLineup.ResponseValue>()
         mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", roster)).subscribe(observer)
         observer.await()
