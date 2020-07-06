@@ -74,7 +74,7 @@
     <fragment
         android:id="@+id/lineupRosterFragment"
         android:name="com.telen.easylineup.lineup.roster.LineupRosterFragment"
-        android:label="RosterFragment"
+        android:label="@string/title_lineup_roster"
         tools:layout="@layout/fragment_lineup_edition"/>
 
 </navigation>

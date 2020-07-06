@@ -30,6 +30,7 @@
     <string name="title_player_details">Statistics</string>
     <string name="title_player_edition">Player edition</string>
     <string name="title_team_details">Team details</string>
+    <string name="title_lineup_roster">Roster edition</string>
 
     <string name="team_creation_error_name_empty">Team name cannot be empty</string>
 
