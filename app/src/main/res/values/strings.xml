@@ -6,7 +6,7 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_share">Share</string>
-    <string name="action_roster">@string/form_lineup_creation_roster_label</string>
+    <string name="action_roster" translatable="false">@string/form_lineup_creation_roster_label</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_attack">Attack</string>

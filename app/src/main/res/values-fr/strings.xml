@@ -163,4 +163,7 @@
         <item quantity="one">Remplaçant: %d</item>
         <item quantity="other">Remplaçants: %d</item>
     </plurals>
+    <string name="title_lineup_roster">Edition de l\'équipe</string>
+    <string name="tile_last_lineup_header">Dern. lineup</string>
+    <string name="dashboard_edit_mode">Mode d\'édition de l\'accueil</string>
 </resources>
