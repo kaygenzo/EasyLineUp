@@ -294,13 +294,28 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
     fun registerLineupAndPositionsChanged(): LiveData<List<PlayerWithPosition>> {
 
-        val getLineup = domain.observeLineupById(lineupID ?: 0)
+        val currentLineupID = lineupID ?: 0
+
+        val getLineup = domain.observeLineupById(currentLineupID)
         val getPositions = Transformations.switchMap(getLineup) {
             this.lineupMode = it?.mode ?: 0
-            domain.observeTeamPlayersAndMaybePositionsForLineup(it?.id ?: 0)
+            domain.observeTeamPlayersAndMaybePositionsForLineup(currentLineupID)
         }
 
-        return Transformations.map(getPositions) {
+        val getPlayerNumberOverlays = Transformations.switchMap(getPositions) { positions ->
+            val playerMap = mutableMapOf<Long, PlayerWithPosition>()
+            positions.forEach {
+                playerMap[it.playerID] = it
+            }
+            Transformations.map(domain.observePlayerNumberOverlays(currentLineupID)) {
+                it.forEach {  overlay ->
+                    playerMap[overlay.playerID]?.shirtNumber = overlay.number
+                }
+                positions
+            }
+        }
+
+        return Transformations.map(getPlayerNumberOverlays) {
             _listPlayersWithPosition.clear()
             _listPlayersWithPosition.addAll(it)
             it

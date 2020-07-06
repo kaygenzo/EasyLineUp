@@ -71,6 +71,12 @@ internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private va
         }
     }
 
+    override fun observePlayersNumberOverlay(lineupID: Long): LiveData<List<PlayerNumberOverlay>> {
+        return Transformations.map(numberOverlayDao.observePlayerNumberOverlays(lineupID)) {
+            it.map { it.toPlayerNumberOverlay() }
+        }
+    }
+
     override fun getPlayersNumberOverlay(lineupID: Long): Single<List<PlayerNumberOverlay>> {
         return numberOverlayDao.getPlayerNumberOverlays(lineupID).map { it.map { it.toPlayerNumberOverlay() } }
     }

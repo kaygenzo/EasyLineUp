@@ -125,6 +125,10 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
         return resultLiveData
     }
 
+    override fun observePlayerNumberOverlays(lineupID: Long): LiveData<List<PlayerNumberOverlay>> {
+        return playersRepo.observePlayersNumberOverlay(lineupID)
+    }
+
     override fun getTeam(): Single<Team> {
         return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
                 .map {

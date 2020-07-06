@@ -20,6 +20,7 @@ interface PlayerRepository {
     fun getPlayers(): Single<List<Player>>
     fun getTeamPlayersAndMaybePositions(lineupID: Long): LiveData<List<PlayerWithPosition>>
 
+    fun observePlayersNumberOverlay(lineupID: Long): LiveData<List<PlayerNumberOverlay>>
     fun getPlayersNumberOverlay(lineupID: Long): Single<List<PlayerNumberOverlay>>
     fun deletePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
     fun updatePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable

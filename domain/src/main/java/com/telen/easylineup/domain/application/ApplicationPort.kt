@@ -22,6 +22,7 @@ interface ApplicationPort {
     fun observeLineupById(id: Long): LiveData<Lineup>
     fun observeTeamPlayersAndMaybePositionsForLineup(id: Long): LiveData<List<PlayerWithPosition>>
     fun getTiles(): LiveData<List<DashboardTile>>
+    fun observePlayerNumberOverlays(lineupID: Long): LiveData<List<PlayerNumberOverlay>>
 
     ///////////////////////////////
     ///////////// Rx //////////////

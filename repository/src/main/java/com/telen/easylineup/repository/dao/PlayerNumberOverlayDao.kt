@@ -32,4 +32,7 @@ internal interface PlayerNumberOverlayDao {
 
     @Query("SELECT * FROM playerNumberOverlay WHERE lineupID=:lineupID")
     fun getPlayerNumberOverlays(lineupID: Long): Single<List<RoomPlayerNumberOverlay>>
+
+    @Query("SELECT * FROM playerNumberOverlay WHERE lineupID=:lineupID")
+    fun observePlayerNumberOverlays(lineupID: Long): LiveData<List<RoomPlayerNumberOverlay>>
 }

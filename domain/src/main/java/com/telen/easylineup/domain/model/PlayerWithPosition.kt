@@ -2,7 +2,7 @@ package com.telen.easylineup.domain.model
 
 data class PlayerWithPosition(
         val playerName: String,
-        val shirtNumber: Int,
+        var shirtNumber: Int,
         val licenseNumber: Long,
         val teamId: Long,
         val image: String?,
