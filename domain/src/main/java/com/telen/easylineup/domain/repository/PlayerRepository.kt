@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.ShirtNumberEntry
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -25,4 +26,6 @@ interface PlayerRepository {
     fun deletePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
     fun updatePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
     fun createPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
+    fun getShirtNumberFromPlayers(number: Int): Single<List<ShirtNumberEntry>>
+    fun getShirtNumberFromNumberOverlays(number: Int): Single<List<ShirtNumberEntry>>
 }

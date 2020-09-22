@@ -18,6 +18,7 @@ data class LineupExport (
 
 		@SerializedName("id") val id : String,
 		@SerializedName("name") val name : String,
+		@SerializedName("eventTime") val eventTime: Long,
 		@SerializedName("createdAt") val createdAt : Long,
 		@SerializedName("editedAt") val editedAt : Long,
 		@SerializedName("mode") val mode : Int,
@@ -32,6 +33,7 @@ data class LineupExport (
 
 		if (id != other.id) return false
 		if (name != other.name) return false
+		if (eventTime != other.eventTime) return false
 		if (createdAt != other.createdAt) return false
 		if (editedAt != other.editedAt) return false
 		if (mode != other.mode) return false
@@ -44,6 +46,7 @@ data class LineupExport (
 	override fun hashCode(): Int {
 		var result = id.hashCode()
 		result = 31 * result + name.hashCode()
+		result = 31 * result + eventTime.hashCode()
 		result = 31 * result + createdAt.hashCode()
 		result = 31 * result + editedAt.hashCode()
 		result = 31 * result + mode

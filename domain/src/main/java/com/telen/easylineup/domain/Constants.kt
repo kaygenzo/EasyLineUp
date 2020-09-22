@@ -46,6 +46,7 @@ class Constants {
         const val TYPE_TEAM_SIZE = 1
         const val TYPE_MOST_USED_PLAYER = 2
         const val TYPE_SHAKE_BETA = 3
+        const val TYPE_LAST_PLAYER_NUMBER = 4
 
         const val STATUS_ALL = 0
         const val STATUS_PARTIAL = 1

@@ -17,6 +17,12 @@ open class App: MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
 
+//        StrictMode.setVmPolicy(VmPolicy.Builder()
+//                .detectAll()
+//                .penaltyLog()
+//                .penaltyDeath()
+//                .build())
+
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }

@@ -50,12 +50,13 @@ interface ApplicationPort {
     fun getNotSelectedPlayersFromList(list: List<PlayerWithPosition>, lineupID: Long?, sortBy: FieldPosition? = null): Single<List<Player>>
     fun getPlayersInFieldFromList(list: List<PlayerWithPosition>): Single<List<Player>>
     fun saveOrUpdatePlayerNumberOverlays(overlays: List<RosterItem>): Completable
+    fun getShirtNumberHistory(number: Int): Single<List<ShirtNumberEntry>>
 
     //lineups
     /** @deprecated **/ fun insertLineups(lineups: List<Lineup>): Completable
     fun getCompleteRoster(): Single<TeamRosterSummary>
     fun getRoster(lineupID: Long): Single<TeamRosterSummary>
-    fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary): Single<Long>
+    fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary, lineupEventTime: Long): Single<Long>
     fun deleteLineup(lineupID: Long?): Completable
     fun updateLineupMode(isEnabled: Boolean, lineupID: Long?, lineupMode: Int, list: List<PlayerWithPosition>): Completable
 

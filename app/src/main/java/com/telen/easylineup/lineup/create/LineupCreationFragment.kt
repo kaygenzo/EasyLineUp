@@ -74,8 +74,8 @@ class LineupCreationFragment: BaseFragment() {
                 showRosterDialog(view.lineupCreationForm)
             }
 
-            override fun onSaveClicked(lineupName: String, tournament: Tournament) {
-                lineupViewModel.saveLineup(tournament, lineupName)
+            override fun onSaveClicked(lineupName: String, tournament: Tournament, lineupEventTime: Long) {
+                lineupViewModel.saveLineup(tournament, lineupName, lineupEventTime)
             }
 
             override fun onCancelClicked() {

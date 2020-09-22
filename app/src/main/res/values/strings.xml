@@ -55,8 +55,8 @@
     <string name="tile_team_size_warning_message">Not enough players to have a complete team!</string>
     <string name="tile_most_used_player_header">Most used player</string>
     <string name="tile_most_used_player_games_played">Games played</string>
-
     <string name="tile_last_lineup_header">Last lineup</string>
+    <string name="tile_last_player_number_header">Search player n°</string>
 
     <string name="header_batting_order_player_name">Player name</string>
     <string name="header_batting_order_player_shirt">N°</string>
@@ -191,4 +191,5 @@
     </plurals>
 
     <string name="dashboard_edit_mode">Dashboard edit mode</string>
+    <string name="tile_last_player_number_message">Who used last this N° ?</string>
 </resources>

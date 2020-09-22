@@ -29,21 +29,12 @@ class TeamSizeTile: ConstraintLayout {
     fun bind(data: ITileData, inEditMode: Boolean) {
         val map = data.getData()
         val size: Int = map[KEY_DATA_SIZE] as Int
-        tile_team_size_text.text = resources.getString(R.string.tile_team_size_message, size)
+        tile_team_size_text.text = size.toString()
 
         val image = map[KEY_DATA_TEAM_IMAGE] as String?
         image?.let {
             teamImage.ready {
-                val imageSize = teamImage.height
                 Picasso.get().load(it)
-                        .resize(imageSize, imageSize)
-                        .centerCrop()
-                        .transform(RoundedTransformationBuilder()
-                                .borderColor(Color.BLACK)
-                                .borderWidthDp(2f)
-                                .cornerRadiusDp(16f)
-                                .oval(true)
-                                .build())
                         .placeholder(R.drawable.ic_unknown_team)
                         .error(R.drawable.ic_unknown_team)
                         .into(teamImage)

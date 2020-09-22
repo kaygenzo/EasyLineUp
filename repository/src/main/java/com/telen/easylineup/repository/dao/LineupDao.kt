@@ -68,6 +68,7 @@ internal interface LineupDao {
         lineups.name as lineupName,
         lineups.id as lineupID,
         lineups.teamID as teamID,
+        lineups.eventTime as eventTime,
         x, y, position
         FROM tournaments
         LEFT JOIN lineups ON tournaments.id = lineups.tournamentID

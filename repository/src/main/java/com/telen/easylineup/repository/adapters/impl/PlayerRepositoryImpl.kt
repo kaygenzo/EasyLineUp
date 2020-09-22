@@ -5,6 +5,7 @@ import androidx.lifecycle.Transformations
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.repository.dao.PlayerDao
 import com.telen.easylineup.repository.dao.PlayerNumberOverlayDao
@@ -91,5 +92,13 @@ internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private va
 
     override fun createPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable {
         return numberOverlayDao.insertPlayerNumberOverlays(overlays.map { RoomPlayerNumberOverlay().init(it) })
+    }
+
+    override fun getShirtNumberFromPlayers(number: Int): Single<List<ShirtNumberEntry>> {
+        return playerDao.getShirtNumberHistoryFromPlayers(number).map { it.map { it.toShirtNumberEntry() } }
+    }
+
+    override fun getShirtNumberFromNumberOverlays(number: Int): Single<List<ShirtNumberEntry>> {
+        return playerDao.getShirtNumberHistoryFromOverlays(number).map { it.map { it.toShirtNumberEntry() } }
     }
 }

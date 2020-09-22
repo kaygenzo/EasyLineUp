@@ -75,8 +75,8 @@ class LineupViewModel: ViewModel(), KoinComponent {
         return Single.just(chosenRoster)
     }
 
-    fun saveLineup(tournament: Tournament, lineupTitle: String) {
-        val disposable = domain.saveLineup(tournament, lineupTitle, chosenRoster)
+    fun saveLineup(tournament: Tournament, lineupTitle: String, lineupEventTime: Long) {
+        val disposable = domain.saveLineup(tournament, lineupTitle, chosenRoster, lineupEventTime)
                 .subscribe({
                     saveResult.value = SaveSuccess(it, lineupTitle)
                 }, {

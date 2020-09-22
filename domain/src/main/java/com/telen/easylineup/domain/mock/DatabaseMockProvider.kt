@@ -18,7 +18,7 @@ class DatabaseMockProvider: KoinComponent {
     fun createMockDatabase(context: Context): Completable {
          return Single.create<String> { emitter ->
 
-            var json: String? = null
+            var json: String?
             try {
                 val input = context.assets.open("database.json")
                 val size = input.available()
@@ -61,7 +61,7 @@ class DatabaseMockProvider: KoinComponent {
                          for( i in 0 until lineupsJson.size()) {
                              val line = lineupsJson[i].asJsonObject
                              lineupsList.add(Lineup(line["id"].asLong, line["name"].asString, line["teamId"].asLong,
-                                     line["tournamentId"].asLong, line["mode"].asInt, line["createdTimeInMillis"].asLong, line["editedTimeInMillis"].asLong))
+                                     line["tournamentId"].asLong, line["mode"].asInt, line["eventTime"].asLong, line["createdTimeInMillis"].asLong, line["editedTimeInMillis"].asLong))
                          }
 
                          val positionsList = mutableListOf<PlayerFieldPosition>()

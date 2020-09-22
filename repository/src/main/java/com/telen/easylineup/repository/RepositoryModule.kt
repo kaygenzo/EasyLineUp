@@ -9,6 +9,7 @@ import com.telen.easylineup.repository.adapters.impl.*
 import com.telen.easylineup.repository.dao.AppDatabase
 import com.telen.easylineup.repository.dao.DATABASE_NAME
 import org.koin.dsl.module
+import java.util.*
 
 object RepositoryModule {
 
@@ -26,6 +27,8 @@ object RepositoryModule {
                     .addMigrations(migration_8_9())
                     .addMigrations(migration_9_10())
                     .addMigrations(migration_10_11())
+                    .addMigrations(migration_11_12())
+                    .addMigrations(migration_12_13())
             if(BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
                         .fallbackToDestructiveMigration()
@@ -200,6 +203,22 @@ object RepositoryModule {
                 //update playerFieldPosition indexes
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_playerFieldPosition_playerID_lineupID` ON playerFieldPosition (`playerID`, `lineupID`)")
 
+            }
+        }
+    }
+
+    private fun migration_11_12(): Migration {
+        return object: Migration(11,12) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("INSERT INTO tiles (id, position, type, enabled) VALUES (5, 4, ${TileType.LAST_PLAYER_NUMBER.type}, 1)")
+            }
+        }
+    }
+
+    private fun migration_12_13(): Migration {
+        return object: Migration(12,13) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE lineups ADD COLUMN eventTime INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

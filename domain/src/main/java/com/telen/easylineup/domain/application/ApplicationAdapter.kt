@@ -26,6 +26,7 @@ import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
+import java.lang.Exception
 
 internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErrors> = PublishSubject.create()): ApplicationPort, KoinComponent {
 
@@ -262,6 +263,11 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
         return UseCaseHandler.execute(savePlayerNumberOverlayUseCase, SavePlayerNumberOverlay.RequestValues(overlays)).ignoreElement()
     }
 
+    override fun getShirtNumberHistory(number: Int): Single<List<ShirtNumberEntry>> {
+        //return playersRepo.getShirtNumberFromPlayers(number).flatMap {  }
+        return Single.error(Exception("Not implemented"))
+    }
+
     override fun insertLineups(lineups: List<Lineup>): Completable {
         return lineupsRepo.insertLineups(lineups)
     }
@@ -278,10 +284,10 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                 .map { it.summary }
     }
 
-    override fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary): Single<Long> {
+    override fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary, lineupEventTime: Long): Single<Long> {
         return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
                 .flatMap { team ->
-                    UseCaseHandler.execute(createLineupUseCase, CreateLineup.RequestValues(team.id, tournament, lineupTitle, rosterFilter.players))
+                    UseCaseHandler.execute(createLineupUseCase, CreateLineup.RequestValues(team.id, tournament, lineupTitle, lineupEventTime, rosterFilter.players))
                 }
                 .map { it.lineupID }
                 .doOnError {
