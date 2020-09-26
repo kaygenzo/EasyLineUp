@@ -7,7 +7,7 @@ buildscript {
         appVersionCode = 1330
 
         nav_version = "2.1.0-alpha05"
-        kotlin_version = '1.3.70'
+        kotlin_version = '1.3.72'
         androidxLibVersion = "1.0.0"
         robolectricVersion = "4.3"
         extTruthVersion = '1.3.0-alpha02'
@@ -33,7 +33,7 @@ buildscript {
         constraintLayoutVersion = "1.1.3"
         appCompatVersion = "1.1.0"
         googleMaterialVersion = "1.1.0"
-        googleGsonVersion = "2.8.5"
+        googleGsonVersion = "2.8.6"
         firebaseAnalyticsVersion = "17.5.0"
         firebaseCrashlyticsVersion = "17.2.1"
         firebasePerfVersion = "19.0.5"
