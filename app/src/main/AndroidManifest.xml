@@ -54,6 +54,12 @@
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
+        <meta-data
+            android:name="com.shakebugs.APIClientID"
+            android:value="4xDRPX7KsahHkyRAAGFU7CuoQCTke06QDFXvlvzO" />
+        <meta-data
+            android:name="com.shakebugs.APIClientSecret"
+            android:value="AeYdPekPuH5K10FUt2LZYCSppte0WUEnUKBrxLockjNBSBXllllzryO" />
     </application>
 
 </manifest>

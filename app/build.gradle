@@ -43,11 +43,11 @@ else {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.telen.easylineup"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode appVersionCode
         versionName appVersionName
         testInstrumentationRunner "com.telen.easylineup.EasylineupAndroidTestRunner"
@@ -222,7 +222,6 @@ dependencies {
     implementation 'pl.hypeapp:materialtimelineview:1.1'
     implementation "net.cachapa.expandablelayout:expandablelayout:$expandablelayoutVersion"
     implementation "com.github.mancj:MaterialSearchBar:$materialSearchBarVersion"
-    implementation "com.github.BugBattle:BugBattle-Android-SDK:$bugBattleVersion"
     implementation "com.orhanobut:dialogplus:1.11@aar"
 
     implementation "com.github.nguyenhoanglam:ImagePicker:$imagepickerVersion"
@@ -236,6 +235,8 @@ dependencies {
 
     debugImplementation "com.facebook.stetho:stetho:$stethoVersion"
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
+
+    implementation "com.shakebugs.android:shake:$shakeVersion"
 }
 
 apply from: '../jacoco.gradle'

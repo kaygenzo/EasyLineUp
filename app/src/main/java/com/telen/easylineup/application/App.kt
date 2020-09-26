@@ -2,10 +2,9 @@ package com.telen.easylineup.application
 
 import android.util.Log
 import androidx.multidex.MultiDexApplication
-import bugbattle.io.bugbattle.BugBattle
-import bugbattle.io.bugbattle.controller.BugBattleActivationMethod
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
+import com.shakebugs.shake.Shake
 import com.telen.easylineup.BuildConfig
 import io.fabric.sdk.android.Fabric
 import org.koin.android.ext.koin.androidContext
@@ -30,7 +29,7 @@ open class App: MultiDexApplication() {
 
         Fabric.with(this, crashlytics)
 
-        BugBattle.initialise(BuildConfig.ReportToolApiKey, BugBattleActivationMethod.SHAKE, this)
+        Shake.start(this)
 
         startKoin {
             androidContext(this@App)
