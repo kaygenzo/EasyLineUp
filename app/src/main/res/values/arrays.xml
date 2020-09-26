@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="createTeamSteps">
-        <item>Team init</item>
-        <item>Choose type</item>
-    </string-array>
-
     <string-array name="pref_lineup_font_style_labels" translatable="false">
         <item>@string/lineup_style_normal_label</item>
         <item>@string/lineup_style_hand_writing_label</item>
