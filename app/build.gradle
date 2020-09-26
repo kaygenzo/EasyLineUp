@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'io.fabric'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 if (!project.hasProperty("disable-performance-plugin")) {
     apply plugin: 'com.google.firebase.firebase-perf'
 }
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.appdistribution'
+apply plugin: 'com.google.firebase.crashlytics'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -43,11 +43,11 @@ else {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.telen.easylineup"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode appVersionCode
         versionName appVersionName
         testInstrumentationRunner "com.telen.easylineup.EasylineupAndroidTestRunner"
@@ -102,17 +102,18 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled false
             versionNameSuffix "-debug"
-//            manifestPlaceholders = [crashlyticsEnabled: true]
-            ext.enableCrashlytics = false
             testCoverageEnabled true
+            firebaseCrashlytics {
+                // If you don't need crash reporting for your debug build,
+                // you can speed up your build by disabling mapping file uploading.
+                mappingFileUploadEnabled false
+            }
         }
         release {
             signingConfig signingConfigs.release
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//            manifestPlaceholders = [crashlyticsEnabled: false]
-            ext.enableCrashlytics = true
         }
     }
 
@@ -199,10 +200,10 @@ dependencies {
     implementation "com.google.android.material:material:$googleMaterialVersion"
     implementation "com.google.code.gson:gson:$googleGsonVersion"
     implementation "com.google.firebase:firebase-analytics:$firebaseAnalyticsVersion"
+    implementation "com.google.firebase:firebase-crashlytics:$firebaseCrashlyticsVersion"
     if (!project.hasProperty("disable-performance-plugin")) {
         implementation "com.google.firebase:firebase-perf:$firebasePerfVersion"
     }
-    implementation "com.crashlytics.sdk.android:crashlytics:$crashlyticsVersion"
 
     ////////// PRIVATE //////////
 
@@ -222,7 +223,6 @@ dependencies {
     implementation 'pl.hypeapp:materialtimelineview:1.1'
     implementation "net.cachapa.expandablelayout:expandablelayout:$expandablelayoutVersion"
     implementation "com.github.mancj:MaterialSearchBar:$materialSearchBarVersion"
-    implementation "com.github.BugBattle:BugBattle-Android-SDK:$bugBattleVersion"
     implementation "com.orhanobut:dialogplus:1.11@aar"
 
     implementation "com.github.nguyenhoanglam:ImagePicker:$imagepickerVersion"
@@ -236,6 +236,8 @@ dependencies {
 
     debugImplementation "com.facebook.stetho:stetho:$stethoVersion"
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
+
+    implementation "com.shakebugs.android:shake:$shakeVersion"
 }
 
 apply from: '../jacoco.gradle'

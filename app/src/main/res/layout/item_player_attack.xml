@@ -26,7 +26,7 @@
         android:visibility="gone"
         android:gravity="center"/>
 
-    <com.telen.easylineup.views.HandmadeStyledTextView
+    <com.telen.easylineup.views.PreferencesStyledTextView
         style="@style/TextSmall"
         android:id="@+id/playerName"
         android:layout_width="0dp"
@@ -51,7 +51,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:gravity="center"/>
 
-    <com.telen.easylineup.views.HandmadeStyledTextView
+    <com.telen.easylineup.views.PreferencesStyledTextView
         style="@style/TextSmall"
         android:id="@+id/fieldPosition"
         android:layout_width="@dimen/item_attack_width"
@@ -62,7 +62,7 @@
         tools:text="1"
         android:gravity="center"/>
 
-    <com.telen.easylineup.views.HandmadeStyledTextView
+    <com.telen.easylineup.views.PreferencesStyledTextView
         style="@style/TextSmall"
         android:id="@+id/shirtNumber"
         android:layout_width="@dimen/item_attack_width"

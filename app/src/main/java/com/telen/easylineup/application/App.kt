@@ -2,12 +2,9 @@ package com.telen.easylineup.application
 
 import android.util.Log
 import androidx.multidex.MultiDexApplication
-import bugbattle.io.bugbattle.BugBattle
-import bugbattle.io.bugbattle.controller.BugBattleActivationMethod
-import com.crashlytics.android.Crashlytics
-import com.crashlytics.android.core.CrashlyticsCore
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.shakebugs.shake.Shake
 import com.telen.easylineup.BuildConfig
-import io.fabric.sdk.android.Fabric
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
@@ -30,13 +27,10 @@ open class App: MultiDexApplication() {
             Timber.plant(ReleaseTree())
         }
 
-        val crashlytics = Crashlytics.Builder()
-                .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
-                .build()
+        val crashlytics: FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
+        crashlytics.setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
 
-        Fabric.with(this, crashlytics)
-
-        BugBattle.initialise(BuildConfig.ReportToolApiKey, BugBattleActivationMethod.SHAKE, this)
+        Shake.start(this)
 
         startKoin {
             androidContext(this@App)
@@ -47,12 +41,13 @@ open class App: MultiDexApplication() {
     class ReleaseTree: Timber.DebugTree() {
 
         override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+            val crashlytics: FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
             when(priority) {
                 Log.ERROR -> {
-                    Crashlytics.logException(t)
+                    t?.let { crashlytics.recordException(t) }
                 }
                 Log.WARN -> {
-                    Crashlytics.log(priority, tag, message)
+                    crashlytics.log("W/${tag ?: "TAG"}: $message")
                 }
                 else -> {}
             }

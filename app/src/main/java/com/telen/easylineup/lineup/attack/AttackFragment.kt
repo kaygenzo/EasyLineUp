@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +17,7 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.lineup.PlayersPositionViewModel
 import com.telen.easylineup.lineup.SaveBattingOrderSuccess
 import com.telen.easylineup.views.ItemDecoratorAttackRecycler
+import com.telen.easylineup.views.LineupTypeface
 import kotlinx.android.synthetic.main.fragment_list_batter.view.*
 import timber.log.Timber
 
@@ -28,6 +30,8 @@ class AttackFragment: BaseFragment(), OnDataChangedListener {
 
     private lateinit var itemTouchedCallback: AttackItemTouchCallback
     private lateinit var itemTouchedHelper: ItemTouchHelper
+
+    private lateinit var lineupTypeface: LineupTypeface
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +49,10 @@ class AttackFragment: BaseFragment(), OnDataChangedListener {
 
             disposables.add(eventsDisposable)
         }
+
+        val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
+        val lineupValue = preferences.getString(getString(R.string.key_lineup_style), getString(R.string.lineup_style_default_value))
+        lineupTypeface = LineupTypeface.getByValue(lineupValue)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,7 +63,7 @@ class AttackFragment: BaseFragment(), OnDataChangedListener {
 
         val isEditable = viewModel.editable
 
-        playerAdapter = BattingOrderAdapter(adapterDataList, this, isEditable, TeamType.BASEBALL.id)
+        playerAdapter = BattingOrderAdapter(adapterDataList, this, isEditable, TeamType.BASEBALL.id, lineupTypeface)
 
         itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
         itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)

@@ -57,7 +57,7 @@ project.afterEvaluate {
                 excludes: excludes
         )
 
-        classDirectories = files([javaDebugTree], [kotlinDebugTree])
+        classDirectories.setFrom(files([javaDebugTree], [kotlinDebugTree]))
 
         def coverageSourceDirs = [
                 "${project.projectDir}/src/main/java",

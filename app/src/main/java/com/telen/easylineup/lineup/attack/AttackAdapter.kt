@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.views.LineupTypeface
 import com.telen.easylineup.views.PlayerPositionFilterView
+import com.telen.easylineup.views.PreferencesStyledTextView
 import timber.log.Timber
 
 interface OnItemTouchedListener {
@@ -26,7 +28,8 @@ interface OnDataChangedListener {
 class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>,
                           private val dataListener: OnDataChangedListener?,
                           private val isEditable: Boolean,
-                          var teamType: Int): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
+                          var teamType: Int,
+                          private val lineupTypeface: LineupTypeface): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
 
     private var positionDescriptions: Array<String>? = null
     var lineupMode = MODE_DISABLED
@@ -65,9 +68,9 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>,
     }
 
     class BatterViewHolder(view: View): RecyclerView.ViewHolder(view) {
-        val playerName = view.findViewById<TextView>(R.id.playerName)
-        val shirtNumber = view.findViewById<TextView>(R.id.shirtNumber)
-        val fieldPosition = view.findViewById<TextView>(R.id.fieldPosition)
+        val playerName = view.findViewById<PreferencesStyledTextView>(R.id.playerName)
+        val shirtNumber = view.findViewById<PreferencesStyledTextView>(R.id.shirtNumber)
+        val fieldPosition = view.findViewById<PreferencesStyledTextView>(R.id.fieldPosition)
         val order = view.findViewById<TextView>(R.id.order)
         val reorderImage = view.findViewById<ImageView>(R.id.reorderImage)
         val positionDesc = view.findViewById<PlayerPositionFilterView>(R.id.fieldPositionDescription)
@@ -89,6 +92,10 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>,
             positionDescriptions = FieldPosition.getPositionShortNames(holder.positionDesc.context, teamType)
 
         with(holder) {
+
+            playerName.setTypeface(lineupTypeface)
+            fieldPosition.setTypeface(lineupTypeface)
+            shirtNumber.setTypeface(lineupTypeface)
 
             val isSubstitute = FieldPosition.isSubstitute(player.position)
             val isDefensePlayer = FieldPosition.isDefensePlayer(player.position)

@@ -9,7 +9,21 @@ import com.google.android.material.textview.MaterialTextView
 import com.telen.easylineup.R
 import java.lang.StringBuilder
 
-class HandmadeStyledTextView: MaterialTextView {
+enum class LineupTypeface(val valueType: Int) {
+    NORMAL(0),
+    HAND_WRITING(1);
+
+    companion object {
+        fun getByValue(value: String?): LineupTypeface {
+            return when(value) {
+                HAND_WRITING.valueType.toString() -> HAND_WRITING
+                else -> NORMAL
+            }
+        }
+    }
+}
+
+class PreferencesStyledTextView: MaterialTextView {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -20,7 +34,14 @@ class HandmadeStyledTextView: MaterialTextView {
         setTextColor(ContextCompat.getColor(context, R.color.lineup_name))
     }
 
-    override fun setTypeface(tf: Typeface?, style: Int) {
-        super.setTypeface(Typeface.createFromAsset(context.assets, "HomemadeApple-Regular.ttf"))
+    fun setTypeface(typeface: LineupTypeface) {
+        when(typeface) {
+            LineupTypeface.HAND_WRITING -> {
+                super.setTypeface(Typeface.createFromAsset(context.assets, "HomemadeApple-Regular.ttf"))
+            }
+            else -> {
+                // nothing for now
+            }
+        }
     }
 }

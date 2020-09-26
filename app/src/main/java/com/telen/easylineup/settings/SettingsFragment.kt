@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -33,7 +34,7 @@ import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 
 
-class SettingsFragment : PreferenceFragmentCompat() {
+class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     companion object {
         const val REQUEST_WRITE_EXTERNAL_STORAGE = 0
@@ -50,8 +51,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val about = findPreference<Preference>(getString(R.string.key_app_version))
         about?.summary = BuildConfig.VERSION_NAME
 
+        updateLineupStyleSummary()
+
         viewModel = ViewModelProviders.of(this)[SettingsViewModel::class.java]
         loginViewModel = ViewModelProviders.of(this)[LoginViewModel::class.java]
+    }
+
+    override fun onResume() {
+        super.onResume()
+        preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        preferenceManager.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -230,6 +243,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     .withOnCancelListener { dialog -> dialog.cancel() }
                     .build()
                     .show()
+        }
+    }
+
+    private fun updateLineupStyleSummary() {
+        val lineupStylePreference = findPreference<Preference>(getString(R.string.key_lineup_style))
+        preferenceManager.sharedPreferences.getString(getString(R.string.key_lineup_style), getString(R.string.lineup_style_default_value))?.let {
+            val styleValue = it.toInt()
+            lineupStylePreference?.summary = resources.getStringArray(R.array.pref_lineup_font_style_labels)[styleValue]
+        }
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when(key) {
+            getString(R.string.key_lineup_style) -> updateLineupStyleSummary()
         }
     }
 }
