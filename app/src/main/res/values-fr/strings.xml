@@ -51,6 +51,8 @@
     <string name="tile_most_used_player_header">Joueur le plus utilisé</string>
     <string name="tile_most_used_player_games_played">Matchs joués</string>
 
+    <string name="tile_last_lineup_header">Dernier lineup</string>
+
     <string name="header_batting_order_player_name">Nom du joueur</string>
     <string name="header_batting_order_player_shirt">N°</string>
     <string name="header_batting_order_player_position">Pos.</string>
@@ -113,6 +115,7 @@
         <item quantity="other">Votre équipe est composée de %d membres</item>
     </plurals>
 
+    <string name="setting_lineup_style_description">Police d\'écriture des lineups</string>
     <string name="setting_category_about_title">A propos</string>
     <string name="setting_delete_data_description">Supprimer toutes les données</string>
     <string name="setting_version_title">Version</string>
@@ -125,6 +128,7 @@
     <string name="setting_import_data_update_object_description">Mettre à jour les données si elles existent ?</string>
     <string name="setting_export_data_description">Exporter les données vers un fichier</string>
 
+    <string name="settings_category_style">Style</string>
     <string name="settings_category_export">Exportation</string>
     <string name="settings_category_import">Importation</string>
     <string name="settings_category_delete">Suppression</string>
@@ -163,4 +167,6 @@
         <item quantity="one">Remplaçant: %d</item>
         <item quantity="other">Remplaçants: %d</item>
     </plurals>
+
+    <string name="dashboard_edit_mode">Edition du Dashboard</string>
 </resources>

@@ -6,7 +6,7 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_share">Share</string>
-    <string name="action_roster">@string/form_lineup_creation_roster_label</string>
+    <string name="action_roster" translatable="false">@string/form_lineup_creation_roster_label</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_attack">Attack</string>
@@ -125,7 +125,7 @@
         <item quantity="other">Your team is composed of %d members</item>
     </plurals>
 
-    <string name="setting_lineup_style_description">Change style of lineup font</string>
+    <string name="setting_lineup_style_description">Lineup font</string>
     <string name="setting_category_about_title">About</string>
     <string name="setting_import_data_description">Import data from file</string>
     <string name="setting_import_data_update_object_description">Update data if already exists ?</string>
