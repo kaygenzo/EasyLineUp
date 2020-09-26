@@ -27,7 +27,7 @@ internal class DeleteLineupTests {
         MockitoAnnotations.initMocks(this)
         mDeleteLineup = DeleteLineup(dao)
 
-        lineup1 = Lineup(1, "test1", 1, 1, MODE_DISABLED)
+        lineup1 = Lineup(1, "test1", 1, 1, MODE_DISABLED, 3L)
 
         Mockito.`when`(dao.getLineupByIdSingle(1)).thenReturn(Single.just(lineup1))
         Mockito.`when`(dao.getLineupByIdSingle(2)).thenReturn(Single.error(Exception()))

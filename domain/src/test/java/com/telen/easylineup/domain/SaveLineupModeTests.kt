@@ -28,7 +28,7 @@ internal class SaveLineupModeTests {
         MockitoAnnotations.initMocks(this)
         mSaveLineupMode = SaveLineupMode(lineupDao)
 
-        lineup = Lineup(1, "test1", 1, 1, MODE_DISABLED)
+        lineup = Lineup(1, "test1", 1, 1, MODE_DISABLED, 3L)
 
         Mockito.`when`(lineupDao.getLineupByIdSingle(1)).thenReturn(Single.just(lineup))
         Mockito.`when`(lineupDao.getLineupByIdSingle(2)).thenReturn(Single.error(Exception()))

@@ -58,8 +58,8 @@ internal class ExportDataTests {
         tournament1 = Tournament(1L, "A", 1L, "C")
         tournament2 = Tournament(2L, "B", 2L, "D")
 
-        lineup1 = Lineup(1L, "A", 1L, 1L, 0, 1L, 1L, "1", "E")
-        lineup2 = Lineup(2L, "B", 2L, 2L, 0, 1L, 1L, "2", "F")
+        lineup1 = Lineup(1L, "A", 1L, 1L, 0, 3L, 1L, 1L, "1", "E")
+        lineup2 = Lineup(2L, "B", 2L, 2L, 0, 3L, 1L, 1L, "2", "F")
 
         playerPosition1 = PlayerFieldPosition(1L, 1L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"G")
         playerPosition2 = PlayerFieldPosition(2L, 2L, 2L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"H")

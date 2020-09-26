@@ -224,7 +224,6 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                 .doOnError {
                     when (it) {
                         is NameEmptyException -> _errors.onNext(DomainErrors.INVALID_PLAYER_NAME)
-                        is ShirtNumberEmptyException -> _errors.onNext(DomainErrors.INVALID_PLAYER_NUMBER)
                     }
                 }
     }

@@ -26,7 +26,7 @@ internal class GetRosterTests {
     lateinit var mGetRoster: GetRoster
 
     private val lineup = Lineup(1L, "A", 1L, 1L,
-            1, 1L,1L,null, "hash")
+            1, 3L,1L,1L, null, "hash")
 
     private val player1 = Player(1L, 1L, "A", 1,
             1, null, 1, 0, 0, "hash")

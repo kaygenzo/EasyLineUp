@@ -62,7 +62,7 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
 
         eventTime = Calendar.getInstance()
 
-//        setTournamentDateHeader(calendar.timeInMillis)
+        setTournamentDateHeader(eventTime.timeInMillis)
 
         adapter = ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
         tournamentChoiceAutoComplete.setAdapter(adapter)
@@ -81,10 +81,10 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
                     .build()
             datePicker.addOnPositiveButtonClickListener {
                 eventTime.timeInMillis = it
+                setTournamentDateHeader(it)
             }
             fragmentManager?.let {
                 datePicker.show(it, "createLineupDatePicker")
-//                setTournamentDateHeader(calendar.timeInMillis)
             }
         }
 
@@ -105,10 +105,10 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         this.fragmentManager = fm
     }
 
-//    private fun setTournamentDateHeader(date: Long) {
-//        val formattedDate = DateFormat.getDateInstance().format(date)
-//        dateSummary.text = formattedDate
-//    }
+    private fun setTournamentDateHeader(date: Long) {
+        val formattedDate = DateFormat.getDateInstance().format(date)
+        dateSummary.text = formattedDate
+    }
 
     fun setOnActionClickListener(listener: OnActionButtonListener) {
         this.actionClickListener = listener
