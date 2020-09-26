@@ -126,7 +126,7 @@
         <item quantity="other">Your team is composed of %d members</item>
     </plurals>
 
-    <string name="setting_lineup_style_description">Change style of lineup font</string>
+    <string name="setting_lineup_style_description">Lineup font</string>
     <string name="setting_category_about_title">About</string>
     <string name="setting_import_data_description">Import data from file</string>
     <string name="setting_import_data_update_object_description">Update data if already exists ?</string>
