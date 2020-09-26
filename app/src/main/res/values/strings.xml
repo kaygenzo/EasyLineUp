@@ -125,6 +125,7 @@
         <item quantity="other">Your team is composed of %d members</item>
     </plurals>
 
+    <string name="setting_lineup_style_description">Change style of lineup font</string>
     <string name="setting_category_about_title">About</string>
     <string name="setting_import_data_description">Import data from file</string>
     <string name="setting_import_data_update_object_description">Update data if already exists ?</string>
@@ -133,6 +134,7 @@
     <string name="setting_version_title">Version</string>
     <string name="setting_play_store_title">Google Play Store official page</string>
 
+    <string name="key_lineup_style" translatable="false">key_lineup_style</string>
     <string name="key_export_data" translatable="false">key_export_data</string>
     <string name="key_import_data" translatable="false">key_import_data</string>
     <string name="key_import_data_update_object" translatable="false">key_import_data_update_object</string>
@@ -143,6 +145,7 @@
     <string name="login_create">Create your first team</string>
     <string name="login_import">Import an existing team</string>
 
+    <string name="settings_category_style">Style</string>
     <string name="settings_category_export">Export</string>
     <string name="settings_category_import">Import</string>
     <string name="settings_category_delete">Delete</string>
@@ -190,4 +193,8 @@
     </plurals>
 
     <string name="dashboard_edit_mode">Dashboard edit mode</string>
+
+    <string name="lineup_style_normal_label" translatable="false">Normal</string>
+    <string name="lineup_style_hand_writing_label" translatable="false">Hand writing</string>
+    <string name="lineup_style_default_value" translatable="false">0</string>
 </resources>

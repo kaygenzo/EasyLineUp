@@ -4,4 +4,14 @@
         <item>Team init</item>
         <item>Choose type</item>
     </string-array>
+
+    <string-array name="pref_lineup_font_style_labels" translatable="false">
+        <item>@string/lineup_style_normal_label</item>
+        <item>@string/lineup_style_hand_writing_label</item>
+    </string-array>
+
+    <string-array name="pref_lineup_font_style_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
 </resources>
