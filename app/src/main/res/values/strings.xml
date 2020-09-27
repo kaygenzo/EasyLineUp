@@ -196,7 +196,7 @@
     <string name="dashboard_edit_mode">Dashboard edit mode</string>
     <string name="tile_last_player_number_message">Who used last this N° ?</string>
 
-    <string name="lineup_style_normal_label" translatable="false">Normal</string>
-    <string name="lineup_style_hand_writing_label" translatable="false">Hand writing</string>
+    <string name="lineup_style_normal_label">Normal</string>
+    <string name="lineup_style_hand_writing_label">Hand writing</string>
     <string name="lineup_style_default_value" translatable="false">0</string>
 </resources>

@@ -165,8 +165,11 @@
         <item quantity="one">Remplaçant: %d</item>
         <item quantity="other">Remplaçants: %d</item>
     </plurals>
-
+    
     <string name="title_lineup_roster">Edition de l\'équipe</string>
     <string name="tile_last_lineup_header">Dern. lineup</string>
     <string name="dashboard_edit_mode">Edition de l\'accueil</string>
+
+    <string name="lineup_style_normal_label">Normal</string>
+    <string name="lineup_style_hand_writing_label">Manuscrite</string>
 </resources>
