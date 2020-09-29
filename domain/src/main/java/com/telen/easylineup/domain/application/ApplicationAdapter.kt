@@ -267,6 +267,10 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
         return Single.error(Exception("Not implemented"))
     }
 
+    override fun insertPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable {
+        return playersRepo.createPlayerNumberOverlays(overlays)
+    }
+
     override fun insertLineups(lineups: List<Lineup>): Completable {
         return lineupsRepo.insertLineups(lineups)
     }

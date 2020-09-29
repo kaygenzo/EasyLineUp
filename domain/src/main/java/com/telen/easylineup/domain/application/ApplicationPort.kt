@@ -51,6 +51,7 @@ interface ApplicationPort {
     fun getPlayersInFieldFromList(list: List<PlayerWithPosition>): Single<List<Player>>
     fun saveOrUpdatePlayerNumberOverlays(overlays: List<RosterItem>): Completable
     fun getShirtNumberHistory(number: Int): Single<List<ShirtNumberEntry>>
+    /** @deprecated **/fun insertPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
 
     //lineups
     /** @deprecated **/ fun insertLineups(lineups: List<Lineup>): Completable

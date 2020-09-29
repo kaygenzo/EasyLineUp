@@ -193,7 +193,8 @@
       "tournamentId": 1,
       "mode": 1,
       "createdTimeInMillis": 1567368919,
-      "editedTimeInMillis": 1567368919
+      "editedTimeInMillis": 1567368919,
+      "eventTime": 1567368919
     },
     {
       "id": 2,
@@ -202,7 +203,8 @@
       "tournamentId": 1,
       "mode": 0,
       "createdTimeInMillis": 1567368920,
-      "editedTimeInMillis": 1567368920
+      "editedTimeInMillis": 1567368920,
+      "eventTime": 1567368920
     },
     {
       "id": 3,
@@ -211,7 +213,8 @@
       "tournamentId": 1,
       "mode": 0,
       "createdTimeInMillis": 1567368921,
-      "editedTimeInMillis": 1567368921
+      "editedTimeInMillis": 1567368921,
+      "eventTime": 1567368921
     },
     {
       "id": 4,
@@ -220,7 +223,8 @@
       "tournamentId": 1,
       "mode": 0,
       "createdTimeInMillis": 1567368922,
-      "editedTimeInMillis": 1567368922
+      "editedTimeInMillis": 1567368922,
+      "eventTime": 1567368922
     },
     {
       "id": 5,
@@ -229,7 +233,8 @@
       "tournamentId": 1,
       "mode": 0,
       "createdTimeInMillis": 1567368923,
-      "editedTimeInMillis": 1567368923
+      "editedTimeInMillis": 1567368923,
+      "eventTime": 1567368923
     },
     {
       "id": 6,
@@ -238,7 +243,8 @@
       "tournamentId": 2,
       "mode": 0,
       "createdTimeInMillis": 1567368924,
-      "editedTimeInMillis": 1567368924
+      "editedTimeInMillis": 1567368924,
+      "eventTime": 1567368924
     },
     {
       "id": 7,
@@ -247,7 +253,8 @@
       "tournamentId": 3,
       "mode": 0,
       "createdTimeInMillis": 1567368925,
-      "editedTimeInMillis": 1567368925
+      "editedTimeInMillis": 1567368925,
+      "eventTime": 1567368925
     },
     {
       "id": 8,
@@ -256,7 +263,8 @@
       "tournamentId": 3,
       "mode": 0,
       "createdTimeInMillis": 1567368926,
-      "editedTimeInMillis": 1567368926
+      "editedTimeInMillis": 1567368926,
+      "eventTime": 1567368926
     }
   ],
   "playerPositions": [
@@ -421,6 +429,14 @@
       "x": 90,
       "y": 90,
       "order": 200
+    }
+  ],
+  "playerNumberOverlays": [
+    {
+      "id": 1,
+      "lineupId": 1,
+      "playerId": 1,
+      "number": 42
     }
   ]
 }
