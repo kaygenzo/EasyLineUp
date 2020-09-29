@@ -72,6 +72,14 @@ internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private va
         }
     }
 
+    override fun getShirtNumberFromPlayers(number: Int): Single<List<ShirtNumberEntry>> {
+        return playerDao.getShirtNumberHistoryFromPlayers(number).map { it.map { it.toShirtNumberEntry() } }
+    }
+
+    override fun getShirtNumberFromNumberOverlays(number: Int): Single<List<ShirtNumberEntry>> {
+        return playerDao.getShirtNumberHistoryFromOverlays(number).map { it.map { it.toShirtNumberEntry() } }
+    }
+
     override fun observePlayersNumberOverlay(lineupID: Long): LiveData<List<PlayerNumberOverlay>> {
         return Transformations.map(numberOverlayDao.observePlayerNumberOverlays(lineupID)) {
             it.map { it.toPlayerNumberOverlay() }
@@ -90,15 +98,19 @@ internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private va
         return numberOverlayDao.updatePlayerNumberOverlays(overlays.map { RoomPlayerNumberOverlay().init(it) })
     }
 
+    override fun updatePlayerNumberOverlay(overlay: PlayerNumberOverlay): Completable {
+        return numberOverlayDao.updatePlayerNumberOverlay(RoomPlayerNumberOverlay().init(overlay))
+    }
+
     override fun createPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable {
         return numberOverlayDao.insertPlayerNumberOverlays(overlays.map { RoomPlayerNumberOverlay().init(it) })
     }
 
-    override fun getShirtNumberFromPlayers(number: Int): Single<List<ShirtNumberEntry>> {
-        return playerDao.getShirtNumberHistoryFromPlayers(number).map { it.map { it.toShirtNumberEntry() } }
+    override fun createPlayerNumberOverlay(overlay: PlayerNumberOverlay): Completable {
+        return numberOverlayDao.insertPlayerNumberOverlay(RoomPlayerNumberOverlay().init(overlay)).ignoreElement()
     }
 
-    override fun getShirtNumberFromNumberOverlays(number: Int): Single<List<ShirtNumberEntry>> {
-        return playerDao.getShirtNumberHistoryFromOverlays(number).map { it.map { it.toShirtNumberEntry() } }
+    override fun getPlayerNumberOverlayByHash(hash: String): Single<PlayerNumberOverlay> {
+        return numberOverlayDao.getPlayerNumberOverlayByHash(hash).map { it.toPlayerNumberOverlay() }
     }
 }

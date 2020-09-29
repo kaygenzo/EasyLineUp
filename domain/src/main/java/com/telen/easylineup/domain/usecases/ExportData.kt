@@ -66,8 +66,9 @@ internal class ExportData(val teamDao: TeamRepository, val playerDao: PlayerRepo
                                         .flatMapCompletable { lineup ->
 
                                             val positionsExport = mutableListOf<PlayerPositionExport>()
+                                            val playerNumberOverlays = mutableListOf<PlayerNumberOverlayExport>()
                                             val roster = rosterToUUID(playersUUIDMap, lineup.roster, requestValues.validator)
-                                            val lineupExport = lineup.toLineupExport(positionsExport, roster)
+                                            val lineupExport = lineup.toLineupExport(positionsExport, playerNumberOverlays, roster)
                                             lineupsExport.add(lineupExport)
 
                                             playerFieldPositionsDao.getAllPlayerFieldPositionsForLineup(lineup.id)
@@ -75,6 +76,13 @@ internal class ExportData(val teamDao: TeamRepository, val playerDao: PlayerRepo
                                                     .flatMapCompletable {
                                                         val positionExport = it.toPlayerFieldPositionsExport(playersUUIDMap[it.playerId])
                                                         positionsExport.add(positionExport)
+                                                        Completable.complete()
+                                                    }
+                                                    .andThen(playerDao.getPlayersNumberOverlay(lineup.id))
+                                                    .flatMapObservable { Observable.fromIterable(it) }
+                                                    .flatMapCompletable {
+                                                        val playerNumberExport = it.toPlayerNumberOverlayExport(playersUUIDMap[it.playerID])
+                                                        playerNumberOverlays.add(playerNumberExport)
                                                         Completable.complete()
                                                     }
                                         }

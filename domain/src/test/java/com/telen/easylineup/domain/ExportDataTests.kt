@@ -37,6 +37,7 @@ internal class ExportDataTests {
     private lateinit var tournament1: Tournament
     private lateinit var lineup1: Lineup
     private lateinit var playerPosition1: PlayerFieldPosition
+    private lateinit var playerNumberOverlay1: PlayerNumberOverlay
     // team 2
     private lateinit var team2: Team
     private lateinit var player2: Player
@@ -49,19 +50,19 @@ internal class ExportDataTests {
         MockitoAnnotations.initMocks(this)
         mExport = ExportData(teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao)
 
+        //team 1
         team1 = Team(1L, "A", null, 0, true, "I")
-        team2 = Team(2L, "B", null, 0, false, "J")
-
         player1 = Player(1L, 1L, "A", 1, 1L, null, 1, 0, 0, "A")
-        player2 = Player(2L, 2L, "B", 2, 2L, null, 1, 0, 0, "B")
-
-        tournament1 = Tournament(1L, "A", 1L, "C")
-        tournament2 = Tournament(2L, "B", 2L, "D")
-
         lineup1 = Lineup(1L, "A", 1L, 1L, 0, 3L, 1L, 1L, "1", "E")
-        lineup2 = Lineup(2L, "B", 2L, 2L, 0, 3L, 1L, 1L, "2", "F")
-
+        tournament1 = Tournament(1L, "A", 1L, "C")
         playerPosition1 = PlayerFieldPosition(1L, 1L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"G")
+        playerNumberOverlay1 = PlayerNumberOverlay(1L, 1L, 1L, 42, "I")
+
+        // team 2
+        team2 = Team(2L, "B", null, 0, false, "J")
+        player2 = Player(2L, 2L, "B", 2, 2L, null, 1, 0, 0, "B")
+        lineup2 = Lineup(2L, "B", 2L, 2L, 0, 3L, 1L, 1L, "2", "F")
+        tournament2 = Tournament(2L, "B", 2L, "D")
         playerPosition2 = PlayerFieldPosition(2L, 2L, 2L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"H")
 
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team1, team2)))
@@ -86,6 +87,11 @@ internal class ExportDataTests {
         Mockito.`when`(playerPositionsDao.getAllPlayerFieldPositionsForLineup(2L))
                 .thenReturn(Single.just(listOf(playerPosition2)))
 
+        Mockito.`when`(playerDao.getPlayersNumberOverlay(1L))
+                .thenReturn(Single.just(listOf(playerNumberOverlay1)))
+        Mockito.`when`(playerDao.getPlayersNumberOverlay(2L))
+                .thenReturn(Single.just(listOf()))
+
         Mockito.`when`(validator.isDigitsOnly(any())).thenReturn(true)
         Mockito.`when`(validator.isBlank(any())).thenReturn(false)
     }
@@ -108,6 +114,9 @@ internal class ExportDataTests {
                                             listOf(playerPosition1)
                                                     .map { it.toPlayerFieldPositionsExport(player1.hash) }
                                                     .toMutableList(),
+                                            listOf(playerNumberOverlay1)
+                                                    .map { it.toPlayerNumberOverlayExport(player1.hash) }
+                                                    .toMutableList(),
                                             listOf("A")
                                     )
                                 }
@@ -121,6 +130,7 @@ internal class ExportDataTests {
                                             listOf(playerPosition2)
                                                     .map { it.toPlayerFieldPositionsExport(player2.hash) }
                                                     .toMutableList(),
+                                            listOf(),
                                             listOf("B")
                                     )
                                 }
@@ -151,6 +161,9 @@ internal class ExportDataTests {
                                     it.toLineupExport(
                                             listOf(playerPosition1)
                                                     .map { it.toPlayerFieldPositionsExport(player1.hash) }
+                                                    .toMutableList(),
+                                            listOf(playerNumberOverlay1)
+                                                    .map { it.toPlayerNumberOverlayExport(player1.hash) }
                                                     .toMutableList(),
                                             listOf("A")
                                     )
@@ -234,6 +247,9 @@ internal class ExportDataTests {
 
                                                     }
                                                     .toMutableList(),
+                                            listOf(playerNumberOverlay1)
+                                                    .map { it.toPlayerNumberOverlayExport(player1.hash) }
+                                                    .toMutableList(),
                                             listOf("A", "hash3", "hash4")
                                     )
                                 }
@@ -247,6 +263,7 @@ internal class ExportDataTests {
                                             listOf(playerPosition2)
                                                     .map { it.toPlayerFieldPositionsExport(player2.hash) }
                                                     .toMutableList(),
+                                            listOf(),
                                             listOf("B")
                                     )
                                 }

@@ -2,6 +2,7 @@ package com.telen.easylineup.repository.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.repository.model.RoomPlayer
 import com.telen.easylineup.repository.model.RoomPlayerWithPosition
 import com.telen.easylineup.repository.model.RoomShirtNumberEntry

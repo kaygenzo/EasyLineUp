@@ -25,7 +25,10 @@ interface PlayerRepository {
     fun getPlayersNumberOverlay(lineupID: Long): Single<List<PlayerNumberOverlay>>
     fun deletePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
     fun updatePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
+    fun updatePlayerNumberOverlay(overlay: PlayerNumberOverlay): Completable
     fun createPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
+    fun createPlayerNumberOverlay(overlay: PlayerNumberOverlay): Completable
     fun getShirtNumberFromPlayers(number: Int): Single<List<ShirtNumberEntry>>
     fun getShirtNumberFromNumberOverlays(number: Int): Single<List<ShirtNumberEntry>>
+    fun getPlayerNumberOverlayByHash(hash: String): Single<PlayerNumberOverlay>
 }

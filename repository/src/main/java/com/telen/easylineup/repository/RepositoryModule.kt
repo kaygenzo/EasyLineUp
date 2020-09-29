@@ -189,7 +189,7 @@ object RepositoryModule {
     private fun migration_10_11(): Migration {
         return object: Migration(10,11) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("CREATE TABLE IF NOT EXISTS playerNumberOverlay (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lineupID` INTEGER NOT NULL, `playerID` INTEGER NOT NULL, `number` INTEGER NOT NULL, FOREIGN KEY(`playerID`) REFERENCES `players`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`lineupID`) REFERENCES `lineups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+                database.execSQL("CREATE TABLE IF NOT EXISTS playerNumberOverlay (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lineupID` INTEGER NOT NULL, `playerID` INTEGER NOT NULL, `number` INTEGER NOT NULL, `hash` TEXT, FOREIGN KEY(`playerID`) REFERENCES `players`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`lineupID`) REFERENCES `lineups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_playerNumberOverlay_number` ON playerNumberOverlay (`number`)")
 
                 //update player indexes

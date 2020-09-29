@@ -2,6 +2,7 @@ package com.telen.easylineup.repository.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.repository.model.RoomPlayerNumberOverlay
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -35,4 +36,8 @@ internal interface PlayerNumberOverlayDao {
 
     @Query("SELECT * FROM playerNumberOverlay WHERE lineupID=:lineupID")
     fun observePlayerNumberOverlays(lineupID: Long): LiveData<List<RoomPlayerNumberOverlay>>
+
+
+    @Query("SELECT * from playerNumberOverlay WHERE hash = :hash" )
+    fun getPlayerNumberOverlayByHash(hash: String): Single<RoomPlayerNumberOverlay>
 }

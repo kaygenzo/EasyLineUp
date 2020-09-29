@@ -23,7 +23,8 @@ data class LineupExport (
 		@SerializedName("editedAt") val editedAt : Long,
 		@SerializedName("mode") val mode : Int,
 		@SerializedName("roster") val roster : List<String>?,
-		@SerializedName("playerPositions") val playerPositions : List<PlayerPositionExport>
+		@SerializedName("playerPositions") val playerPositions : List<PlayerPositionExport>,
+		@SerializedName("playerNumberOverlays") val playerNumberOverlays : List<PlayerNumberOverlayExport>
 ) {
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
@@ -39,6 +40,7 @@ data class LineupExport (
 		if (mode != other.mode) return false
 		if (roster != other.roster) return false
 		if (playerPositions != other.playerPositions) return false
+		if (playerNumberOverlays != other.playerNumberOverlays) return false
 
 		return true
 	}
@@ -52,6 +54,7 @@ data class LineupExport (
 		result = 31 * result + mode
 		result = 31 * result + (roster?.hashCode() ?: 0)
 		result = 31 * result + playerPositions.hashCode()
+		result = 31 * result + playerNumberOverlays.hashCode()
 		return result
 	}
 }
