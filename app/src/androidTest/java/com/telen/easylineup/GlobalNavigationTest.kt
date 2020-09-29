@@ -323,13 +323,15 @@ class GlobalNavigationTest {
 
         takeScreenshot("team_details", mHomeTestRule.activity)
 
+        //click on team image button to expand card
+        onView(withId(R.id.teamTypeRepresentation))
+                .perform(click())
+
         // check team name is "DC UNIVERS"
         BaristaVisibilityAssertions.assertContains(R.id.teamTypeTitle, "DC Univers")
 
         // check team size is 20
         BaristaVisibilityAssertions.assertContains( "Your team is composed of 20 members")
-
-        BaristaScrollInteractions.scrollTo(R.id.teamLineupsItem)
 
         // check team tournaments stats is 3T/8L
         BaristaVisibilityAssertions.assertContains("3 tournaments / 8 lineups")
@@ -360,13 +362,15 @@ class GlobalNavigationTest {
 
         applyRotation("new_team_details")
 
+        //click on team image button to expand card
+        onView(withId(R.id.teamTypeRepresentation))
+                .perform(click())
+
         // check team new name is "NewTeamName"
         BaristaVisibilityAssertions.assertContains(R.id.teamTypeTitle, "NewTeamName")
 
         // check team size is 21
         BaristaVisibilityAssertions.assertContains( "Your team is composed of 20 members")
-
-        BaristaScrollInteractions.scrollTo(R.id.teamLineupsItem)
 
         // check team tournaments stats is 3T/8L
         BaristaVisibilityAssertions.assertContains( "3 tournaments / 8 lineups")
@@ -595,13 +599,15 @@ class GlobalNavigationTest {
         onView(allOf(withId(R.id.drawerImage), withParent(withId(R.id.navDrawerRootContainer))))
                 .perform(click())
 
+        //click on team image button to expand card
+        onView(withId(R.id.teamTypeRepresentation))
+                .perform(click())
+
         // check team name is "TOTO"
         BaristaVisibilityAssertions.assertContains(R.id.teamTypeTitle, "toto")
 
         // check team size is 0
         BaristaVisibilityAssertions.assertContains("Your team is composed of 0 members")
-
-        BaristaScrollInteractions.scrollTo(R.id.teamLineupsItem)
 
         // check team tournaments stats is 0T/0L
         BaristaVisibilityAssertions.assertContains("0 tournaments / 0 lineups")
