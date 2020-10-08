@@ -10,6 +10,9 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
+import com.shakebugs.shake.Shake
+import com.shakebugs.shake.report.ShakeFile
+import com.shakebugs.shake.report.ShakeReportData
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
@@ -45,6 +48,7 @@ class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback 
         tileAdapter = DashboardTileAdapter(tileList, this)
         itemTouchedCallback = DashboardTileTouchCallback(tileAdapter)
         itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -126,6 +130,29 @@ class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback 
                     Timber.e(it)
                 })
         this.disposables.add(disposable)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.dashboard_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_report_issue -> {
+                Shake.show(object : ShakeReportData {
+                    override fun quickFacts(): String? {
+                        return null
+                    }
+
+                    override fun attachedFiles(): MutableList<ShakeFile> {
+                        return mutableListOf()
+                    }
+                })
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onPause() {

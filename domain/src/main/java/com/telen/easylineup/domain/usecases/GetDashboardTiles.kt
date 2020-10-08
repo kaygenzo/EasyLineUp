@@ -38,7 +38,7 @@ internal class GetDashboardTiles(private val playerDao: PlayerRepository,
                         tilesObservables.add(getLastLineup(requestValues.team).map { tile.apply { data = it } })
                     }
                     TileType.BETA.type -> {
-                        tilesObservables.add(getShakeBeta().map { tile.apply { data = it } })
+                        //tilesObservables.add(getShakeBeta().map { tile.apply { data = it } })
                     }
                     TileType.LAST_PLAYER_NUMBER.type -> {
                         //tilesObservables.add(getLastPlayerNumberResearch().map { tile.apply { data = it } })

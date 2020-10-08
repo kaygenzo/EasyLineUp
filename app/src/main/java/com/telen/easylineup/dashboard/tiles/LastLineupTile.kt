@@ -28,10 +28,6 @@ class LastLineupTile: ConstraintLayout{
         val players = map[KEY_LINEUP_PLAYERS] as? List<PlayerWithPosition>
 
         lineup_name.text = name
-        players?.let {
-            fieldAndPlayersRootView.setListPlayerInField(it)
-        }
-
         mask.visibility = if (inEditMode) View.VISIBLE else View.INVISIBLE
     }
 }
