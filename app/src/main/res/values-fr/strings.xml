@@ -63,7 +63,8 @@
     <string name="lineup_list_filter_focused_hint">Tapez un nom</string>
     <string name="lineup_list_filter_unfocused_hint">Filtrer par nom</string>
 
-    <string name="shake_beta_description">Un problème ? Secouez votre périphérique et envoyez un rapport!</string>
+    <string name="shake_beta_title">Un problème ? </string>
+    <string name="shake_beta_description">Secouez votre périphérique ou cliquez ici pour envoyez un rapport</string>
 
     <string name="title_baseball">Baseball</string>
     <string name="title_softball">Softball</string>

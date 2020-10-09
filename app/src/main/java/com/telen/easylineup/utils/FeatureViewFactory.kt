@@ -2,7 +2,9 @@ package com.telen.easylineup.utils
 
 import android.graphics.Typeface
 import android.view.View
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.getkeepsafe.taptargetview.TapTarget
 import com.getkeepsafe.taptargetview.TapTargetView
 import com.telen.easylineup.R
@@ -10,8 +12,16 @@ import com.telen.easylineup.R
 class FeatureViewFactory {
     companion object {
         fun apply(view: View, activity: AppCompatActivity, title: String, description: String, listener: TapTargetView.Listener) {
+            apply(TapTarget.forView(view, title, description), activity, listener)
+        }
+
+        fun apply(toolbar: Toolbar, @IdRes itemID: Int, activity: AppCompatActivity, title: String, description: String, listener: TapTargetView.Listener) {
+            apply(TapTarget.forToolbarMenuItem(toolbar,itemID, title, description), activity, listener)
+        }
+
+        private fun apply(target: TapTarget, activity: AppCompatActivity, listener: TapTargetView.Listener) {
             TapTargetView.showFor(activity,
-                    TapTarget.forView(view, title, description)
+                    target
                             // All options below are optional
                             .outerCircleColor(R.color.baseball_field_color)      // Specify a color for the outer circle
                             .outerCircleAlpha(0.93f)            // Specify the alpha amount for the outer circle

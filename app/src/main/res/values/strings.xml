@@ -70,7 +70,8 @@
     <string name="lineup_list_filter_focused_hint">Enter name</string>
     <string name="lineup_list_filter_unfocused_hint">Filter name</string>
 
-    <string name="shake_beta_description">Any problem ? Shake your phone and send a report!</string>
+    <string name="shake_beta_title">Any problem ?</string>
+    <string name="shake_beta_description">Shake your phone or click here to send a report</string>
 
     <string name="field_position_dp" translatable="false">DP</string>
     <string name="field_position_dh" translatable="false">DH</string>
