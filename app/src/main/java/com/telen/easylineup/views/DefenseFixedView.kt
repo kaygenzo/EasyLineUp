@@ -12,6 +12,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.utils.ready
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.field_view.view.*
 import timber.log.Timber
@@ -26,7 +27,7 @@ class DefenseFixedView: DefenseView {
 
     fun init(context: Context?) {
         LayoutInflater.from(context).inflate(R.layout.baseball_field_only, this)
-        fieldFrameLayout.post {
+        fieldFrameLayout.ready {
             val size = fieldFrameLayout.run {
                 val viewHeight = height
                 val viewWidth = width
@@ -46,10 +47,10 @@ class DefenseFixedView: DefenseView {
         if(players.any { FieldPosition.isDefensePlayer(it.position) })
             loadingCallback?.onStartLoading()
 
-        fieldFrameLayout.post {
+        getContainerSize { containerSize ->
+
             cleanPlayerIcons()
 
-            val containerSize = getContainerSize()
             val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
             Timber.d("DefenseFixedView: iconSize=$iconSize containerWidth=${containerSize} containerHeight=${fieldFrameLayout.height}")
 
@@ -88,8 +89,7 @@ class DefenseFixedView: DefenseView {
         if(positions.isNotEmpty())
             loadingCallback?.onStartLoading()
 
-        fieldFrameLayout.post {
-            val containerSize = getContainerSize()
+        getContainerSize { containerSize ->
             cleanPlayerIcons()
             positions.filter { FieldPosition.isDefensePlayer(it.position) }
                     .forEach { position ->

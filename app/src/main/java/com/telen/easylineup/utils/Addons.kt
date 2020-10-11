@@ -13,3 +13,17 @@ infix fun View?.ready(block: () -> Unit) {
         }
     })
 }
+
+infix fun View?.drawn(block: () -> Unit) {
+    this?.viewTreeObserver?.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+
+        override fun onPreDraw(): Boolean {
+            if(this@drawn.width != 0 && this@drawn.height !=0) {
+                this@drawn.viewTreeObserver.removeOnPreDrawListener(this)
+                block()
+                return true
+            }
+            return false
+        }
+    })
+}

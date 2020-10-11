@@ -9,6 +9,7 @@ import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
 import com.telen.easylineup.utils.LoadingCallback
+import com.telen.easylineup.utils.drawn
 import kotlinx.android.synthetic.main.field_view.view.*
 import timber.log.Timber
 import kotlin.math.min
@@ -27,11 +28,9 @@ abstract class DefenseView: ConstraintLayout {
     }
 
     protected fun addPlayerOnFieldWithPercentage(containerSize: Float, view: View, x: Float, y: Float, loadingCallback: LoadingCallback?) {
-        fieldFrameLayout.post {
-            val positionX = ((x * containerSize) / 100f)
-            val positionY = ((y * containerSize) / 100f)
-            addPlayerOnFieldWithCoordinate(view, containerSize, positionX, positionY, loadingCallback)
-        }
+        val positionX = ((x * containerSize) / 100f)
+        val positionY = ((y * containerSize) / 100f)
+        addPlayerOnFieldWithCoordinate(view, containerSize, positionX, positionY, loadingCallback)
     }
 
     protected fun addPlayerOnFieldWithCoordinate(view: View, parentWidth: Float, x: Float, y: Float, loadingCallback: LoadingCallback?) {
@@ -111,7 +110,9 @@ abstract class DefenseView: ConstraintLayout {
         callback(positionX, positionY)
     }
 
-    protected fun getContainerSize(): Float {
-        return min(fieldFrameLayout.width, fieldFrameLayout.height).toFloat()
+    protected fun getContainerSize(result: (Float) -> Unit) {
+        fieldFrameLayout.drawn {
+            result(min(fieldFrameLayout.width, fieldFrameLayout.height).toFloat())
+        }
     }
 }
