@@ -15,12 +15,9 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.RosterItem
 import com.telen.easylineup.views.RosterEntryView
-import io.reactivex.functions.Action
-import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_lineup_roster.view.*
 import kotlinx.android.synthetic.main.view_actions_form.view.*
 import timber.log.Timber
-import java.lang.NumberFormatException
 
 class LineupRosterFragment : BaseFragment(), RosterAdapterCallback {
 
@@ -92,6 +89,7 @@ class RosterAdapter(private val items: List<RosterItem>, private val listener: R
     override fun onBindViewHolder(holder: RosterViewHolder, position: Int) {
         val item = items[position]
         holder.view.setPlayerName(item.player.name)
+        holder.view.setTextListener(null)
         item.playerNumberOverlay?.let {
             holder.view.setNumber(it.number)
         } ?: let {
