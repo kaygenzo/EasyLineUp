@@ -44,8 +44,8 @@ internal class GetShirtNumberHistoryTests {
         entry2 = ShirtNumberEntry(1, "toto", 1L, 4L, 2L,2L, "lineup2")
         entry3 = ShirtNumberEntry(1, "tata", 2L, 5L, 2L,2L, "lineup2")
         entry5 = ShirtNumberEntry(42, "titi", 3L, 6L, 2L,3L, "lineup3")
-        overlay1 = PlayerNumberOverlay(1, 2L, 3L, 1, 42L, "hash")
-        overlay2 = PlayerNumberOverlay(2, 3L, 3L, 1, 42L, "hash")
+        overlay1 = PlayerNumberOverlay(1, 2L, 3L, 1, "hash")
+        overlay2 = PlayerNumberOverlay(2, 3L, 3L, 1, "hash")
 
         shirtNumberOverlay1 = ShirtNumberEntry(1, "titi", 3L, 6L, 2L, 2L, "lineup2")
         shirtNumberOverlay2 = ShirtNumberEntry(1, "test", 3L, 7L, 2L, 3L, "lineup3")
