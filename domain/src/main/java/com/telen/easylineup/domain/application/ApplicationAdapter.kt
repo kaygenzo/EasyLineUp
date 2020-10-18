@@ -79,6 +79,7 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
     private val saveDpAndFlexUseCase: SaveDpAndFlex by inject()
 
     private val savePlayerNumberOverlayUseCase: SavePlayerNumberOverlay by inject()
+    private val getShirtNumberHistoryUseCase: GetShirtNumberHistory by inject()
 
     override fun observeErrors(): PublishSubject<DomainErrors> {
         return _errors
@@ -263,8 +264,7 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
     }
 
     override fun getShirtNumberHistory(number: Int): Single<List<ShirtNumberEntry>> {
-        //return playersRepo.getShirtNumberFromPlayers(number).flatMap {  }
-        return Single.error(Exception("Not implemented"))
+        return UseCaseHandler.execute(getShirtNumberHistoryUseCase, GetShirtNumberHistory.RequestValues(number)).map { it.history }
     }
 
     override fun insertPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable {

@@ -48,5 +48,6 @@ object DomainModule {
         single { GetDPAndFlexFromPlayersInField() }
         single { SaveDpAndFlex(get()) }
         single { SavePlayerNumberOverlay(get()) }
+        single { GetShirtNumberHistory(get()) }
     }
 }

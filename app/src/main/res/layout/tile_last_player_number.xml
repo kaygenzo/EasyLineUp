@@ -7,32 +7,22 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="3dp"
+        android:background="@color/tile_team_size_background_color">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintRootView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="@dimen/default_margin"
-            style="@style/TileLastLineup">
+            android:layout_height="match_parent">
 
             <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                style="@style/Field.Header"
+                style="@style/Field.Header.Rounded"
                 android:id="@+id/tile_player_number_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
-                android:text="@string/tile_last_player_number_message"
-                android:padding="@dimen/player_details_container_separator_width"/>
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="@dimen/card_defense_header_height"
-                android:layout_height="@dimen/card_defense_header_height"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                android:visibility="visible"
-                tools:visibility="visible"/>
+                android:text="@string/tile_last_player_number_message"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilePlayerNumberLayout"
@@ -42,30 +32,75 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:layout_constraintTop_toBottomOf="@+id/tile_player_number_header"
                 android:layout_marginStart="2dp"
-                android:layout_marginEnd="2dp">
+                android:layout_marginEnd="2dp"
+                app:endIconDrawable="@drawable/ic_baseline_search_24"
+                app:endIconMode="clear_text"
+                app:endIconCheckable="true"
+                app:boxBackgroundColor="#1D2E2A"
+                app:boxStrokeColor="@color/text_input_orange_selector"
+                android:textColorHint="@color/orange"
+                app:hintTextColor="@color/orange"
+                android:textColor="@color/orange"
+                app:endIconTint="@color/white"
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/tilePlayerNumberTextField"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:imeOptions="actionDone"
                     android:maxLength="2"
-                    android:inputType="number" />
+                    android:inputType="number"
+                    android:textColor="@color/white"
+                    />
 
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.telen.easylineup.views.NormalUppercaseStyledTextView
                 style="@style/TextSmall"
-                android:id="@+id/tilePlayerNumberResult"
+                android:id="@+id/tilePlayerNumberLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tilePlayerNumberLayout"
-                app:layout_constraintBottom_toBottomOf="parent"
-                tools:text="Superman"
+                android:text="@string/tile_last_player_number_label_last"
                 android:gravity="center"
+                android:layout_marginTop="@dimen/default_margin"
+                app:normalUppercaseStyledTextColor="@color/white"/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="@dimen/card_defense_header_height"
+                android:layout_height="@dimen/card_defense_header_height"
+                app:layout_constraintTop_toBottomOf="@id/tilePlayerNumberLabel"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 android:visibility="gone"
-                tools:visibility="visible"/>
+                tools:visibility="visible"
+                android:indeterminateTint="@color/white"/>
+
+            <com.telen.easylineup.views.CollegedStyledTextView
+                style="@style/TextMiddle"
+                android:id="@+id/tilePlayerNumberResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tilePlayerNumberLabel"
+                tools:text="Player Name"
+                android:gravity="center"/>
+
+            <ImageButton
+                android:id="@+id/tilePlayerNumberHistory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:src="@drawable/ic_outline_view_list_24"
+                android:background="@android:color/transparent"
+                android:layout_margin="5dp"
+                android:tint="@color/white"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -17,9 +17,8 @@
             android:scaleType="centerCrop"/>
 
             <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                style="@style/Field.Header"
+                style="@style/Field.Header.Rounded"
                 android:id="@+id/tile_last_lineup"
-                android:background="@drawable/shape_header_round_corner_black_border"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"

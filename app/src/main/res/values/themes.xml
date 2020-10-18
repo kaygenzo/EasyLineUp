@@ -168,6 +168,10 @@ H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
         <item name="android:background">@color/tile_player_most_used_header_color</item>
     </style>
 
+    <style name="Field.Header.Rounded" parent="Field.Header">
+        <item name="android:background">@drawable/shape_header_round_corner_black_border</item>
+    </style>
+
     <!-- DRAWER -->
 
     <style name="PlayerDetailsContainer" parent="AppTheme">

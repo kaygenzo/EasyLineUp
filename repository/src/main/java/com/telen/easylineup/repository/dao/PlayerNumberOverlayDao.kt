@@ -37,7 +37,9 @@ internal interface PlayerNumberOverlayDao {
     @Query("SELECT * FROM playerNumberOverlay WHERE lineupID=:lineupID")
     fun observePlayerNumberOverlays(lineupID: Long): LiveData<List<RoomPlayerNumberOverlay>>
 
-
     @Query("SELECT * from playerNumberOverlay WHERE hash = :hash" )
     fun getPlayerNumberOverlayByHash(hash: String): Single<RoomPlayerNumberOverlay>
+
+    @Query("SELECT * from playerNumberOverlay WHERE playerID=:playerID AND lineupID=:lineupID" )
+    fun getShirtNumberOverlay(playerID: Long, lineupID: Long): Single<RoomPlayerNumberOverlay>
 }

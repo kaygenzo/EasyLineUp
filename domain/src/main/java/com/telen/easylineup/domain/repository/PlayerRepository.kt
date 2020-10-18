@@ -30,5 +30,6 @@ interface PlayerRepository {
     fun createPlayerNumberOverlay(overlay: PlayerNumberOverlay): Completable
     fun getShirtNumberFromPlayers(number: Int): Single<List<ShirtNumberEntry>>
     fun getShirtNumberFromNumberOverlays(number: Int): Single<List<ShirtNumberEntry>>
+    fun getShirtNumberOverlay(playerID: Long, lineupID: Long): Single<PlayerNumberOverlay>
     fun getPlayerNumberOverlayByHash(hash: String): Single<PlayerNumberOverlay>
 }

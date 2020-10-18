@@ -3,6 +3,7 @@ package com.telen.easylineup.dashboard
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.Toolbar
@@ -20,16 +21,21 @@ import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DashboardTile
+import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.tiles.ITileData
 import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_ID
 import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_NAME
+import com.telen.easylineup.domain.model.tiles.LastPlayerNumberResearchData
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.FeatureViewFactory
 import com.telen.easylineup.utils.NavigationUtils
+import com.telen.easylineup.utils.hideSoftKeyboard
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
 import kotlinx.android.synthetic.main.home_main_content.*
 import timber.log.Timber
+import java.text.DateFormat
+import java.util.*
 
 class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback {
 
@@ -103,6 +109,38 @@ class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback 
                 actionMode = (activity as AppCompatActivity).startSupportActionMode(this)
                 actionMode?.title = getString(R.string.dashboard_edit_mode)
             }
+        }
+    }
+
+    override fun onTileSearchNumberClicked(number: Int) {
+
+        hideSoftKeyboard()
+
+        val disposable = dashboardViewModel.getShirtNumberHistory(number)
+                .subscribe({ history ->
+
+                    tileList.find { it.data is LastPlayerNumberResearchData }?.data?.let {
+                        (it as? LastPlayerNumberResearchData)?.setHistory(history)
+                    }
+                    tileAdapter.notifyDataSetChanged()
+                }, {
+                    Timber.e(it)
+                })
+        disposables.add(disposable)
+    }
+
+    override fun onTileSearchNumberHistoryClicked(history: List<ShirtNumberEntry>) {
+        if(history.isEmpty())
+            return
+        activity?.run {
+            AlertDialog.Builder(this)
+                    .setItems(history.map {
+                        val dateInMillis = it.eventTime.takeIf { it > 0 } ?: run { it.createdAt }
+                        val date = DateFormat.getDateInstance().format(Date(dateInMillis))
+                        "${it.playerName} | $date | ${it.lineupName}"
+                    }.toTypedArray(), null)
+                    .create()
+                    .show()
         }
     }
 

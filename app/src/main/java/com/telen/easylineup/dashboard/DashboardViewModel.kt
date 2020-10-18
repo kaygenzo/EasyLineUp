@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.DashboardTile
+import com.telen.easylineup.domain.model.ShirtNumberEntry
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.koin.core.KoinComponent
@@ -33,5 +34,9 @@ class DashboardViewModel: ViewModel(), KoinComponent {
             prefs.edit().putBoolean(Constants.PREF_FEATURE_SHOW_REPORT_ISSUE_BUTTON, false).apply()
         }
         return Single.just(show)
+    }
+
+    fun getShirtNumberHistory(number: Int): Single<List<ShirtNumberEntry>> {
+        return domain.getShirtNumberHistory(number)
     }
 }

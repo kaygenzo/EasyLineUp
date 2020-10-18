@@ -69,25 +69,29 @@ internal interface PlayerDao {
     @Query("""
         SELECT players.name as playerName, 
         players.shirtNumber as number, 
+        players.id as playerID,
         lineups.eventTime as time, 
         lineups.createdAt as createdAt, 
-        lineups.id as lineupID 
+        lineups.id as lineupID,
+        lineups.name as lineupName
         FROM players 
         LEFT JOIN playerFieldPosition ON playerFieldPosition.playerID = players.id 
         LEFT JOIN lineups ON playerFieldPosition.lineupID = lineups.id 
-        WHERE number = :number;
+        WHERE lineupID > 0 AND number = :number;
     """)
     fun getShirtNumberHistoryFromPlayers(number: Int): Single<List<RoomShirtNumberEntry>>
 
     @Query("""
-        SELECT players.name as playerName, 
-        playerNumberOverlay.number as number, 
-        lineups.eventTime as time, 
-        lineups.createdAt as createdAt, 
-        lineups.id as lineupID 
-        FROM players 
-        LEFT JOIN playerNumberOverlay ON playerNumberOverlay.playerID = players.id 
-        LEFT JOIN lineups ON playerNumberOverlay.lineupID = lineups.id 
+        SELECT players.name as playerName,
+        playerNumberOverlay.number as number,
+        players.id as playerID,
+        lineups.eventTime as time,
+        lineups.createdAt as createdAt,
+        lineups.id as lineupID,
+        lineups.name as lineupName
+        FROM players
+        LEFT JOIN playerNumberOverlay ON playerNumberOverlay.playerID = players.id
+        LEFT JOIN lineups ON playerNumberOverlay.lineupID = lineups.id
         WHERE number = :number;
     """)
     fun getShirtNumberHistoryFromOverlays(number: Int): Single<List<RoomShirtNumberEntry>>
