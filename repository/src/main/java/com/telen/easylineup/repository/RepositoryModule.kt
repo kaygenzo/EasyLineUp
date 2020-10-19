@@ -9,6 +9,7 @@ import com.telen.easylineup.repository.adapters.impl.*
 import com.telen.easylineup.repository.dao.AppDatabase
 import com.telen.easylineup.repository.dao.DATABASE_NAME
 import org.koin.dsl.module
+import java.util.*
 
 object RepositoryModule {
 
@@ -25,6 +26,9 @@ object RepositoryModule {
                     .addMigrations(migration_7_8())
                     .addMigrations(migration_8_9())
                     .addMigrations(migration_9_10())
+                    .addMigrations(migration_10_11())
+                    .addMigrations(migration_11_12())
+                    .addMigrations(migration_12_13())
             if(BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
                         .fallbackToDestructiveMigration()
@@ -56,8 +60,12 @@ object RepositoryModule {
             val database: AppDatabase = get()
             database.tilesDao()
         }
+        single {
+            val database: AppDatabase = get()
+            database.playerNumberOverlaysDao()
+        }
 
-        single<PlayerRepository> { PlayerRepositoryImpl(get()) }
+        single<PlayerRepository> { PlayerRepositoryImpl(get(), get()) }
         single<TeamRepository> { TeamRepositoryImpl(get()) }
         single<LineupRepository> { LineupRepositoryImpl(get()) }
         single<TournamentRepository> { TournamentRepositoryImpl(get()) }
@@ -174,6 +182,43 @@ object RepositoryModule {
                 database.execSQL("INSERT INTO tiles (id, position, type) VALUES (2, 1, ${TileType.TEAM_SIZE.type})")
                 database.execSQL("INSERT INTO tiles (id, position, type) VALUES (3, 2, ${TileType.MOST_USED_PLAYER.type})")
                 database.execSQL("INSERT INTO tiles (id, position, type) VALUES (4, 3, ${TileType.LAST_LINEUP.type})")
+            }
+        }
+    }
+
+    private fun migration_10_11(): Migration {
+        return object: Migration(10,11) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS playerNumberOverlay (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lineupID` INTEGER NOT NULL, `playerID` INTEGER NOT NULL, `number` INTEGER NOT NULL, `hash` TEXT, FOREIGN KEY(`playerID`) REFERENCES `players`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`lineupID`) REFERENCES `lineups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_playerNumberOverlay_number` ON playerNumberOverlay (`number`)")
+
+                //update player indexes
+                database.execSQL("DROP INDEX IF EXISTS index_players_name_licenseNumber")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_players_name_licenseNumber_teamID` ON players (`name`, `licenseNumber`, `teamID`)")
+
+                //update lineups indexes
+                database.execSQL("DROP INDEX IF EXISTS index_lineups_name")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_lineups_name_teamID_tournamentID` ON lineups (`name`, `teamID`, `tournamentID`)")
+
+                //update playerFieldPosition indexes
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_playerFieldPosition_playerID_lineupID` ON playerFieldPosition (`playerID`, `lineupID`)")
+
+            }
+        }
+    }
+
+    private fun migration_11_12(): Migration {
+        return object: Migration(11,12) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("INSERT INTO tiles (id, position, type, enabled) VALUES (5, 4, ${TileType.LAST_PLAYER_NUMBER.type}, 1)")
+            }
+        }
+    }
+
+    private fun migration_12_13(): Migration {
+        return object: Migration(12,13) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE lineups ADD COLUMN eventTime INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

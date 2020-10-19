@@ -3,10 +3,7 @@ package com.telen.easylineup.domain
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.domain.model.Lineup
-import com.telen.easylineup.domain.model.Player
-import com.telen.easylineup.domain.model.RosterPlayerStatus
-import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.CreateLineup
@@ -39,9 +36,9 @@ internal class CreateLineupTests {
         mCreateLineup = CreateLineup(tournamentDao, lineupDao)
 
         roster = mutableListOf()
-        roster.add(RosterPlayerStatus(Player(1,1,"toto",1,1), true))
-        roster.add(RosterPlayerStatus(Player(2,1,"tata",1,1), true))
-        roster.add(RosterPlayerStatus(Player(3,1,"titi",1,1), true))
+        roster.add(RosterPlayerStatus(Player(1,1,"toto",1,1), true, null))
+        roster.add(RosterPlayerStatus(Player(2,1,"tata",1,1), true, null))
+        roster.add(RosterPlayerStatus(Player(3,1,"titi",1,1), true, null))
 
         Mockito.`when`(tournamentDao.insertTournament(any())).thenReturn(Single.just(1L))
         Mockito.`when`(tournamentDao.updateTournament(any())).thenReturn(Completable.complete())
@@ -52,7 +49,7 @@ internal class CreateLineupTests {
     fun shouldInsertTournamentIfNotExists() {
         val tournament = Tournament(0L, "tata", 1L)
         val observer = TestObserver<CreateLineup.ResponseValue>()
-        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", mutableListOf())).subscribe(observer)
+        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", 3L, mutableListOf())).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(tournamentDao).insertTournament(tournament)
@@ -63,7 +60,7 @@ internal class CreateLineupTests {
     fun shouldUpdateTournamentIfAlreadyExists() {
         val tournament = Tournament(1L, "tata", 1L)
         val observer = TestObserver<CreateLineup.ResponseValue>()
-        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", mutableListOf())).subscribe(observer)
+        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", 3L, mutableListOf())).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(tournamentDao).updateTournament(tournament)
@@ -74,11 +71,11 @@ internal class CreateLineupTests {
     fun shouldLineupSavedWithRosterNullForAll() {
         val tournament = Tournament(1L, "tata", 1L)
         val observer = TestObserver<CreateLineup.ResponseValue>()
-        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", roster)).subscribe(observer)
+        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", 3L, roster)).subscribe(observer)
         observer.await()
         observer.assertComplete()
 
-        val expectedLineup = Lineup(id = 0, name = "title", tournamentId = 1L, teamId = 1L, roster = null)
+        val expectedLineup = Lineup(id = 0, name = "title", tournamentId = 1L, teamId = 1L, eventTimeInMillis = 3L, roster = null)
         verify(lineupDao).insertLineup(com.nhaarman.mockitokotlin2.check {
             Assert.assertEquals(expectedLineup, it)
         })
@@ -87,13 +84,13 @@ internal class CreateLineupTests {
     @Test
     fun shouldLineupSavedWithRosterNotNullForSelection() {
         val tournament = Tournament(1L, "tata", 1L)
-        roster.add(RosterPlayerStatus(Player(4,1,"tutu",1,1), false))
+        roster.add(RosterPlayerStatus(Player(4,1,"tutu",1,1), false, null))
         val observer = TestObserver<CreateLineup.ResponseValue>()
-        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", roster)).subscribe(observer)
+        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", 3L, roster)).subscribe(observer)
         observer.await()
         observer.assertComplete()
 
-        val expectedLineup = Lineup(id = 0, name = "title", tournamentId = 1L, teamId = 1L, roster = "1;2;3")
+        val expectedLineup = Lineup(id = 0, name = "title", tournamentId = 1L, teamId = 1L, eventTimeInMillis = 3L, roster = "1;2;3")
         verify(lineupDao).insertLineup(com.nhaarman.mockitokotlin2.check {
             Assert.assertEquals(expectedLineup, it)
         })
@@ -103,7 +100,7 @@ internal class CreateLineupTests {
     fun shouldSavedSuccessfullyTheNewLineup() {
         val tournament = Tournament(1L, "tata", 1L)
         val observer = TestObserver<CreateLineup.ResponseValue>()
-        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", roster)).subscribe(observer)
+        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", 3L, roster)).subscribe(observer)
         observer.await()
         observer.assertComplete()
         Assert.assertEquals(1L, observer.values().first().lineupID)
@@ -113,7 +110,7 @@ internal class CreateLineupTests {
     fun shouldTriggerAnExceptionIfLineupNameEmpty() {
         val tournament = Tournament(1L, "Tournament", 1L)
         val observer = TestObserver<CreateLineup.ResponseValue>()
-        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "      ", roster)).subscribe(observer)
+        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "      ", 3L, roster)).subscribe(observer)
         observer.await()
         observer.assertError(LineupNameEmptyException::class.java)
     }
@@ -122,7 +119,7 @@ internal class CreateLineupTests {
     fun shouldTriggerAnExceptionIfTournamentNameEmpty() {
         val tournament = Tournament(1L, "    ", 1L)
         val observer = TestObserver<CreateLineup.ResponseValue>()
-        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", roster)).subscribe(observer)
+        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, tournament, "title", 3L, roster)).subscribe(observer)
         observer.await()
         observer.assertError(TournamentNameEmptyException::class.java)
     }

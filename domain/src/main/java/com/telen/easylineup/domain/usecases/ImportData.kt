@@ -19,11 +19,12 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
         const val RESULT_TOURNAMENTS_INDEX = 2
         const val RESULT_LINEUPS_INDEX = 3
         const val RESULT_PLAYER_POSITION_INDEX = 4
+        const val RESULT_PLAYER_NUMBER_OVERLAY_INDEX = 5
     }
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        val insertedArray = intArrayOf(0, 0, 0, 0, 0)
-        val updatedArray = intArrayOf(0, 0, 0, 0, 0)
+        val insertedArray = intArrayOf(0, 0, 0, 0, 0, 0)
+        val updatedArray = intArrayOf(0, 0, 0, 0, 0, 0)
         val updateIfExists = requestValues.updateIfExists
         return Single.just(requestValues.exportBase)
                 .flatMapObservable { Observable.fromIterable(it.teams) }
@@ -50,9 +51,20 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
                                                                             .flatMapCompletable { lineupExport ->
                                                                                 processLineup(lineupExport, team.id, tournament.id, playerIdMap, insertedArray, updatedArray, updateIfExists)
                                                                                         .flatMapCompletable { lineup ->
-                                                                                            Observable.fromIterable(lineupExport.playerPositions)
-                                                                                                    .flatMapCompletable { processPlayerFieldPosition(it, playerIdMap, lineup.id,
-                                                                                                            insertedArray, updatedArray, updateIfExists) }
+                                                                                            val positions = lineupExport.playerPositions
+                                                                                            val playerPositionsCompletable = Observable.fromIterable(positions)
+                                                                                                    .flatMapCompletable {
+                                                                                                        processPlayerFieldPosition(it, playerIdMap, lineup.id,
+                                                                                                                insertedArray, updatedArray, updateIfExists)
+                                                                                                    }
+                                                                                            val overlays = lineupExport.playerNumberOverlays ?: listOf()
+                                                                                            val playerNumberOverlayCompletable = Observable.fromIterable(overlays)
+                                                                                                    .flatMapCompletable {
+                                                                                                        processPlayerNumberOverlays(it, playerIdMap, lineup.id,
+                                                                                                                insertedArray, updatedArray, updateIfExists)
+                                                                                                    }
+                                                                                            playerPositionsCompletable
+                                                                                                    .andThen(playerNumberOverlayCompletable)
                                                                                         }
                                                                             }
                                                                 }
@@ -149,7 +161,7 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
                               insertedArray: IntArray, updatedArray: IntArray,
                               updateIfExists: Boolean): Single<Lineup> {
         val l = Lineup(0L, lineup.name, teamID, tournamentID,
-                lineup.mode, lineup.createdAt, lineup.editedAt,
+                lineup.mode, lineup.eventTime, lineup.createdAt, lineup.editedAt,
                 rosterToString(lineup.roster, players), lineup.id)
 
         return lineupDao.getLineupByHash(lineup.id)
@@ -202,6 +214,27 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
                 .onErrorResumeNext {
                     insertedArray[RESULT_PLAYER_POSITION_INDEX] += 1
                     playerFieldPositionsDao.insertPlayerFieldPosition(p).ignoreElement()
+                }
+    }
+
+    private fun processPlayerNumberOverlays(export: PlayerNumberOverlayExport, players: Map<String, Long>, lineupID: Long,
+                                           insertedArray: IntArray, updatedArray: IntArray,
+                                           updateIfExists: Boolean): Completable {
+        val p = PlayerNumberOverlay(0L, lineupID,  players[export.playerID] ?: 0L, export.number)
+
+        return playerDao.getPlayerNumberOverlayByHash(export.id)
+                .flatMapCompletable {
+                    if(updateIfExists) {
+                        updatedArray[RESULT_PLAYER_NUMBER_OVERLAY_INDEX] += 1
+                        p.id = it.id
+                        playerDao.updatePlayerNumberOverlay(p)
+                    }
+                    else
+                        Completable.complete()
+                }
+                .onErrorResumeNext {
+                    insertedArray[RESULT_PLAYER_NUMBER_OVERLAY_INDEX] += 1
+                    playerDao.createPlayerNumberOverlay(p)
                 }
     }
 

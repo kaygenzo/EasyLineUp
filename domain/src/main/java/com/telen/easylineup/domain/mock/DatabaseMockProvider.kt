@@ -18,7 +18,7 @@ class DatabaseMockProvider: KoinComponent {
     fun createMockDatabase(context: Context): Completable {
          return Single.create<String> { emitter ->
 
-            var json: String? = null
+            var json: String?
             try {
                 val input = context.assets.open("database.json")
                 val size = input.available()
@@ -40,6 +40,7 @@ class DatabaseMockProvider: KoinComponent {
                          val tournamentsJson = root.getAsJsonArray("tournaments")
                          val lineupsJson = root.getAsJsonArray("lineups")
                          val positionsJson = root.getAsJsonArray("playerPositions")
+                         val overlaysJson = root.getAsJsonArray("playerNumberOverlays")
 
                          val team = Team(teamJson.get("id").asLong, teamJson.get("name").asString, teamJson.get("image").asString, type = teamJson.get("type").asInt, main = teamJson.get("main").asBoolean)
 
@@ -61,7 +62,7 @@ class DatabaseMockProvider: KoinComponent {
                          for( i in 0 until lineupsJson.size()) {
                              val line = lineupsJson[i].asJsonObject
                              lineupsList.add(Lineup(line["id"].asLong, line["name"].asString, line["teamId"].asLong,
-                                     line["tournamentId"].asLong, line["mode"].asInt, line["createdTimeInMillis"].asLong, line["editedTimeInMillis"].asLong))
+                                     line["tournamentId"].asLong, line["mode"].asInt, line["eventTime"].asLong, line["createdTimeInMillis"].asLong, line["editedTimeInMillis"].asLong))
                          }
 
                          val positionsList = mutableListOf<PlayerFieldPosition>()
@@ -71,10 +72,18 @@ class DatabaseMockProvider: KoinComponent {
                                      line["position"].asInt, line["x"].asFloat, line["y"].asFloat, line["order"].asInt))
                          }
 
+                         val overlaysList = mutableListOf<PlayerNumberOverlay>()
+                         for( i in 0 until overlaysJson.size()) {
+                             val line = overlaysJson[i].asJsonObject
+                             overlaysList.add(PlayerNumberOverlay(line["id"].asLong, line["lineupId"].asLong, line["playerId"].asLong,
+                                     line["number"].asInt))
+                         }
+
                          insertTeam(team).andThen(insertPlayers(playersList))
                                  .andThen(insertTournaments(tournamentsList))
                                  .andThen(insertLineups(lineupsList))
                                  .andThen(insertPlayerFieldPositions(positionsList))
+                                 .andThen(insertPlayerNumberOverlays(overlaysList))
 
                      } catch (e: Exception) {
                          Completable.error(e)
@@ -99,6 +108,11 @@ class DatabaseMockProvider: KoinComponent {
 
     private fun insertPlayerFieldPositions(list: List<PlayerFieldPosition>): Completable {
         return domain.insertPlayerFieldPositions(list)
+                .subscribeOn(Schedulers.io())
+    }
+
+    private fun insertPlayerNumberOverlays(list: List<PlayerNumberOverlay>): Completable {
+        return domain.insertPlayerNumberOverlays(list)
                 .subscribeOn(Schedulers.io())
     }
 

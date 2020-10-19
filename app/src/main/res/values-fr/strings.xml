@@ -3,6 +3,7 @@
     <string name="action_edit">Editer</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_share">Partager</string>
+    <string name="action_report_issue">Reporter un problème</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_attack">Attaque</string>
@@ -51,8 +52,6 @@
     <string name="tile_most_used_player_header">Joueur le plus utilisé</string>
     <string name="tile_most_used_player_games_played">Matchs joués</string>
 
-    <string name="tile_last_lineup_header">Dernier lineup</string>
-
     <string name="header_batting_order_player_name">Nom du joueur</string>
     <string name="header_batting_order_player_shirt">N°</string>
     <string name="header_batting_order_player_position">Pos.</string>
@@ -64,7 +63,8 @@
     <string name="lineup_list_filter_focused_hint">Tapez un nom</string>
     <string name="lineup_list_filter_unfocused_hint">Filtrer par nom</string>
 
-    <string name="shake_beta_description">Un problème ? Secouez votre périphérique et envoyez un rapport!</string>
+    <string name="shake_beta_title">Un problème ? </string>
+    <string name="shake_beta_description">Secouez votre périphérique ou cliquez ici pour envoyez un rapport</string>
 
     <string name="title_baseball">Baseball</string>
     <string name="title_softball">Softball</string>
@@ -167,8 +167,15 @@
         <item quantity="one">Remplaçant: %d</item>
         <item quantity="other">Remplaçants: %d</item>
     </plurals>
+    
+    <string name="title_lineup_roster">Edition de l\'équipe</string>
+    <string name="tile_last_lineup_header">Dern. lineup</string>
+    <string name="dashboard_edit_mode">Edition de l\'accueil</string>
 
-    <string name="dashboard_edit_mode">Edition du Dashboard</string>
     <string name="lineup_style_normal_label">Normal</string>
     <string name="lineup_style_hand_writing_label">Manuscrite</string>
+
+    <string name="tile_last_player_number_message">Historique N°</string>
+    <string name="tile_last_player_number_label_last">Dernier:</string>
+    <string name="generic_not_found">Non trouvé</string>
 </resources>

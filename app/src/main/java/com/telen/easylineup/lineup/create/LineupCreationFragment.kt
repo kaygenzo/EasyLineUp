@@ -74,8 +74,8 @@ class LineupCreationFragment: BaseFragment() {
                 showRosterDialog(view.lineupCreationForm)
             }
 
-            override fun onSaveClicked(lineupName: String, tournament: Tournament) {
-                lineupViewModel.saveLineup(tournament, lineupName)
+            override fun onSaveClicked(lineupName: String, tournament: Tournament, lineupEventTime: Long) {
+                lineupViewModel.saveLineup(tournament, lineupName, lineupEventTime)
             }
 
             override fun onCancelClicked() {
@@ -83,7 +83,7 @@ class LineupCreationFragment: BaseFragment() {
             }
         })
 
-        val getRosterDisposable = lineupViewModel.getRoster().subscribe({
+        val getRosterDisposable = lineupViewModel.getCompleteRoster().subscribe({
             updateRosterSize(view.playerCount, it)
         }, {
             Timber.e(it)
@@ -104,7 +104,7 @@ class LineupCreationFragment: BaseFragment() {
     }
 
     private fun showRosterDialog(formView: LineupCreationFormView) {
-        val disposable = lineupViewModel.getRoster()
+        val disposable = lineupViewModel.getChosenRoster()
                 .subscribe({ response ->
                     activity?.let { activity ->
                         val names = mutableListOf<CharSequence>()

@@ -2,8 +2,10 @@ package com.telen.easylineup.repository.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.repository.model.RoomPlayer
 import com.telen.easylineup.repository.model.RoomPlayerWithPosition
+import com.telen.easylineup.repository.model.RoomShirtNumberEntry
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -63,4 +65,34 @@ internal interface PlayerDao {
 
     """)
     fun getTeamPlayersAndMaybePositions(lineupID: Long): LiveData<List<RoomPlayerWithPosition>>
+
+    @Query("""
+        SELECT players.name as playerName, 
+        players.shirtNumber as number, 
+        players.id as playerID,
+        lineups.eventTime as time, 
+        lineups.createdAt as createdAt, 
+        lineups.id as lineupID,
+        lineups.name as lineupName
+        FROM players 
+        LEFT JOIN playerFieldPosition ON playerFieldPosition.playerID = players.id 
+        LEFT JOIN lineups ON playerFieldPosition.lineupID = lineups.id 
+        WHERE lineupID > 0 AND number = :number;
+    """)
+    fun getShirtNumberHistoryFromPlayers(number: Int): Single<List<RoomShirtNumberEntry>>
+
+    @Query("""
+        SELECT players.name as playerName,
+        playerNumberOverlay.number as number,
+        players.id as playerID,
+        lineups.eventTime as time,
+        lineups.createdAt as createdAt,
+        lineups.id as lineupID,
+        lineups.name as lineupName
+        FROM players
+        LEFT JOIN playerNumberOverlay ON playerNumberOverlay.playerID = players.id
+        LEFT JOIN lineups ON playerNumberOverlay.lineupID = lineups.id
+        WHERE number = :number;
+    """)
+    fun getShirtNumberHistoryFromOverlays(number: Int): Single<List<RoomShirtNumberEntry>>
 }

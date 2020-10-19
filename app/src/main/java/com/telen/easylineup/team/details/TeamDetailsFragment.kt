@@ -43,7 +43,7 @@ class TeamDetailsFragment: BaseFragment() {
         teamViewModel.observeTeam().observe(viewLifecycleOwner, Observer {
             view?.run {
                 teamTypeRootView?.run {
-                    setTeamName(it.name)
+                    setTeamName(it.name.trim())
                     setTeamType(it.type)
                     setTeamImage(it.image)
                     setDragEnabled(true)

@@ -1,0 +1,173 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="102dp"
+    android:height="102dp"
+    android:viewportWidth="55.0"
+    android:viewportHeight="55.0">
+    <path
+        android:fillColor="@color/baseball_field_color"
+        android:pathData="M0,0 h 55 v 55 h -55z" />
+
+
+    <!--<path-->
+        <!--android:fillColor="@color/infield"-->
+        <!--android:strokeWidth="4"-->
+        <!--android:strokeColor="@color/infield_stroke"-->
+        <!--android:pathData="-->
+        <!--M 275,450-->
+        <!--L 137.5,325-->
+        <!--C 170,200 379,200 412.5,325-->
+        <!--Z" />-->
+
+    <!--<path-->
+        <!--android:fillColor="@color/infield"-->
+        <!--android:strokeWidth="4"-->
+        <!--android:strokeColor="@color/infield_stroke"-->
+        <!--android:pathData="-->
+        <!--M 100,350-->
+        <!--a 175,175 0 1,0 350,0-->
+        <!--a 175,175 0 1,0 -350,0"/>-->
+
+    <path
+        android:fillColor="@color/infield"
+        android:strokeWidth="0.4"
+        android:strokeColor="@color/infield_stroke"
+        android:pathData="
+        M 47.5,32.5
+        a 20,20 0 1,0 -40,0"/>
+
+    <path
+        android:fillColor="@color/baseball_field_color"
+        android:pathData="
+        M 27.5,45.0
+        L 55,20
+        L 55,45
+        Z" />
+
+    <path
+        android:fillColor="@color/baseball_field_color"
+        android:pathData="
+        M 27.5,45
+        L 0,20
+        L 0,45
+        Z" />
+
+    <path
+        android:fillColor="@color/baseball_field_color"
+        android:strokeColor="@color/infield_stroke"
+        android:strokeAlpha="1"
+        android:strokeWidth="0.6"
+        android:pathData="
+        M 27.5,45
+        L 13.75,32.5
+        L 27.5,20
+        L 41.25,32.5
+        Z" />
+
+    <path
+        android:fillColor="#ad6a24"
+        android:pathData="
+        M 27.5,32.5
+        m -2,0
+        a 2,2 0 1,0 4,0
+        a 2,2 0 1,0 -4,0"/>
+
+    <path
+        android:name="first_base"
+        android:fillColor="#FFFFFF"
+        android:pathData="
+        M 13.75,32.5
+        m 0.5,0.5
+        l -1,-1
+        l 1,-1
+        l 1,1
+        l -1,1
+        Z" />
+
+    <path
+        android:name="second_base"
+        android:fillColor="#FFFFFF"
+        android:pathData="
+        M 27.5,20
+        m 0,1
+        l -1,-1
+        l 1,-1
+        l 1,1
+        l -1,1
+        Z" />
+
+    <path
+        android:name="third_base"
+        android:fillColor="#FFFFFF"
+        android:pathData="
+        M 41.25,32.5
+        l -1,-1
+        l 1,-1
+        l 1,1
+        l -1,1
+        Z" />
+
+    <path
+        android:fillAlpha="1"
+        android:strokeWidth="0.3"
+        android:strokeColor="#FFFFFFFF"
+        android:pathData="M 27.5,45 L 0,20 Z" />
+
+    <path
+        android:fillAlpha="1"
+        android:strokeWidth="0.3"
+        android:strokeColor="#FFFFFFFF"
+        android:pathData="M 27.5,45 L 55,20 Z" />
+
+    <path
+        android:fillColor="@color/infield"
+        android:strokeWidth="0.3"
+        android:strokeColor="#FFFFFFFF"
+        android:pathData="
+        M 27.5,45
+        m -4,-1
+        a 4,4 0 1,0 8,0
+        a 4,4 0 1,0 -8,0"/>
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="
+        M 27.5,45
+        l -0.8,-0.8
+        l 0,-0.8
+        h 1.6
+        l 0,0.8
+        Z" />
+
+    <!--<path-->
+        <!--android:strokeColor="#FFFFFFFF"-->
+        <!--android:strokeWidth="2"-->
+        <!--android:pathData="-->
+        <!--M 275,450-->
+        <!--m -8,5-->
+        <!--h 16-->
+        <!--v 20-->
+        <!--h -16-->
+        <!--Z" />-->
+
+    <!--<path-->
+        <!--android:strokeColor="#FFFFFFFF"-->
+        <!--android:strokeWidth="2"-->
+        <!--android:pathData="-->
+        <!--M 275,450-->
+        <!--m 13,-28-->
+        <!--h 16-->
+        <!--v 35-->
+        <!--h -16-->
+        <!--Z" />-->
+
+    <!--<path-->
+        <!--android:strokeColor="#FFFFFFFF"-->
+        <!--android:strokeWidth="2"-->
+        <!--android:pathData="-->
+        <!--M 275,450-->
+        <!--m -29,-28-->
+        <!--h 16-->
+        <!--v 35-->
+        <!--h -16-->
+        <!--Z" />-->
+</vector>

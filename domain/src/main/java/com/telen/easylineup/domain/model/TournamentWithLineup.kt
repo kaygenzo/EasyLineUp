@@ -10,14 +10,14 @@ data class TournamentWithLineup(
         var x: Float = 0f,
         var y: Float = 0f,
         var position: Int = 0,
-        var teamID: Long = 0
+        var teamID: Long = 0,
+        var lineupEventTime: Long
 ) {
     fun toTournament() : Tournament {
         return Tournament(id = tournamentID, name = tournamentName, createdAt = tournamentCreatedAt)
     }
 
     fun toLineup(): Lineup {
-        return Lineup(id = lineupID, name = lineupName
-                ?: "", tournamentId = tournamentID)
+        return Lineup(id = lineupID, name = lineupName ?: "", tournamentId = tournamentID, eventTimeInMillis = lineupEventTime, teamId = teamID)
     }
 }

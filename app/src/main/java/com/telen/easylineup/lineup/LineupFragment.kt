@@ -250,6 +250,7 @@ abstract class LineupFragment(@LayoutRes private val layout: Int, private val is
                 true
             }
             R.id.action_roster -> {
+                showLineupRosterScreen()
                 true
             }
             R.id.action_lineup_mode -> {
@@ -298,5 +299,11 @@ abstract class LineupFragment(@LayoutRes private val layout: Int, private val is
                 // Ignore all other requests.
             }
         }
+    }
+
+    private fun showLineupRosterScreen() {
+        val bundle = Bundle()
+        bundle.putLong(Constants.LINEUP_ID, viewModel.lineupID ?: 0)
+        findNavController().navigate(R.id.lineupRosterFragment, bundle, NavigationUtils().getOptions())
     }
 }

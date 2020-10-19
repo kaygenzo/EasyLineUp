@@ -1,6 +1,7 @@
 package com.telen.easylineup.domain.model
 
 import com.telen.easylineup.domain.model.export.LineupExport
+import com.telen.easylineup.domain.model.export.PlayerNumberOverlayExport
 import com.telen.easylineup.domain.model.export.PlayerPositionExport
 import java.util.*
 
@@ -13,6 +14,7 @@ data class Lineup(
         var teamId: Long = 0,
         var tournamentId: Long = 0,
         var mode: Int = 0,
+        var eventTimeInMillis: Long,
         var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         var roster: String? = null,
@@ -46,6 +48,6 @@ data class Lineup(
     }
 }
 
-fun Lineup.toLineupExport(playerPositions: MutableList<PlayerPositionExport>, rosterUUID: List<String>?): LineupExport {
-    return LineupExport(hash ?: UUID.randomUUID().toString(), name, createdTimeInMillis, editedTimeInMillis, mode, rosterUUID, playerPositions)
+fun Lineup.toLineupExport(playerPositions: MutableList<PlayerPositionExport>, playerNumberOverlays: List<PlayerNumberOverlayExport>, rosterUUID: List<String>?): LineupExport {
+    return LineupExport(hash ?: UUID.randomUUID().toString(), name, eventTimeInMillis, createdTimeInMillis, editedTimeInMillis, mode, rosterUUID, playerPositions, playerNumberOverlays)
 }

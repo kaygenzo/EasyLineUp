@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.view_timeline_middle.view.*
+import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,10 +39,11 @@ class TimeLineMiddleView: ConstraintLayout {
         tournamentName.text = name
     }
 
-    fun setTournamentDate(createdAt: Long) {
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = createdAt
-        tournamentDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(calendar.timeInMillis)
+    fun setTournamentDate(start: Long, end: Long) {
+        val builder = StringBuilder(SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(start))
+        if(start != end)
+            builder.append(" - ").append(SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(end))
+        tournamentDate.text = builder.toString()
     }
 
     fun setOnActionsClickListener(listener: OnActionsClickListener) {

@@ -16,7 +16,7 @@ interface PlayerFieldPositionRepository {
     fun deletePosition(position: PlayerFieldPosition): Completable
     fun deletePositions(position: List<PlayerFieldPosition>): Completable
     fun updatePlayerFieldPosition(fieldPosition: PlayerFieldPosition): Completable
-    fun insertPlayerFieldPosition(fieldPositions: PlayerFieldPosition): Single<Long>
+    fun insertPlayerFieldPosition(fieldPosition: PlayerFieldPosition): Single<Long>
     fun getAllPlayerFieldPositions(): LiveData<List<PlayerFieldPosition>>
     fun getPlayerFieldPositionByHash(hash: String): Single<PlayerFieldPosition>
     fun getPlayerFieldPositions(): Single<List<PlayerFieldPosition>>

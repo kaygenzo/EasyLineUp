@@ -7,7 +7,6 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.SavePlayer
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
-import com.telen.easylineup.domain.usecases.exceptions.ShirtNumberEmptyException
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -65,12 +64,13 @@ internal class SavePlayerTests {
     }
 
     @Test
-    fun shouldTriggerShirtNumberEmptyExceptionIfShirtNumberIsNull() {
-        val request = SavePlayer.RequestValues(playerID = 1L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = null, imageUri = null, pitching = 0, batting = 0)
+    fun shouldInsertEventIfShirtNumberIsNull() {
+        val request = SavePlayer.RequestValues(playerID = 0L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = null, imageUri = null, pitching = 0, batting = 0)
         val observer = TestObserver<SavePlayer.ResponseValue>()
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()
-        observer.assertError(ShirtNumberEmptyException::class.java)
+        observer.assertComplete()
+        verify(playerDao).insertPlayer(any())
     }
 
     @Test

@@ -53,7 +53,7 @@ H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
     </style>
 
     <style name="TileTeamSize" parent="Tile">
-        <item name="android:background">@drawable/border_tile_team_size</item>
+        <item name="android:background">@color/tile_team_size_background_color</item>
     </style>
 
     <style name="TileShakeBeta" parent="Tile">
@@ -107,6 +107,11 @@ H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
 
     <style name="Field.Green.Small" parent="Field.Green">
         <item name="android:textAppearance">@style/TextSmall</item>
+    </style>
+
+    <style name="Field.Green.Small.Auto" parent="Field.Green.Small">
+        <item name="autoSizeMaxTextSize">@dimen/app_max_text_size_small</item>
+        <item name="autoSizeTextType">uniform</item>
     </style>
 
     <!-- LIGHT -->
@@ -163,6 +168,10 @@ H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
         <item name="android:background">@color/tile_player_most_used_header_color</item>
     </style>
 
+    <style name="Field.Header.Rounded" parent="Field.Header">
+        <item name="android:background">@drawable/shape_header_round_corner_black_border</item>
+    </style>
+
     <!-- DRAWER -->
 
     <style name="PlayerDetailsContainer" parent="AppTheme">
@@ -195,6 +204,8 @@ H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
 
     <style name="ButtonConfirm">
         <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
     <style name="ButtonCancel">
@@ -202,6 +213,8 @@ H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
         <item name="android:textColor">@color/colorPrimaryVariant</item>
         <item name="strokeColor">@color/colorPrimaryVariant</item>
         <item name="strokeWidth">1dp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
     <!-- Material components theming -->

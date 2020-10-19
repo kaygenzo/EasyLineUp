@@ -3,25 +3,39 @@ package com.telen.easylineup.dashboard
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
+import com.getkeepsafe.taptargetview.TapTargetView
+import com.shakebugs.shake.Shake
+import com.shakebugs.shake.report.ShakeFile
+import com.shakebugs.shake.report.ShakeReportData
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DashboardTile
+import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.tiles.ITileData
 import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_ID
 import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_NAME
+import com.telen.easylineup.domain.model.tiles.LastPlayerNumberResearchData
 import com.telen.easylineup.lineup.LineupFragment
+import com.telen.easylineup.utils.FeatureViewFactory
 import com.telen.easylineup.utils.NavigationUtils
+import com.telen.easylineup.utils.hideSoftKeyboard
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
+import kotlinx.android.synthetic.main.home_main_content.*
 import timber.log.Timber
+import java.text.DateFormat
+import java.util.*
 
 class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback {
 
@@ -45,6 +59,7 @@ class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback 
         tileAdapter = DashboardTileAdapter(tileList, this)
         itemTouchedCallback = DashboardTileTouchCallback(tileAdapter)
         itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -97,6 +112,38 @@ class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback 
         }
     }
 
+    override fun onTileSearchNumberClicked(number: Int) {
+
+        hideSoftKeyboard()
+
+        val disposable = dashboardViewModel.getShirtNumberHistory(number)
+                .subscribe({ history ->
+
+                    tileList.find { it.data is LastPlayerNumberResearchData }?.data?.let {
+                        (it as? LastPlayerNumberResearchData)?.setHistory(history)
+                    }
+                    tileAdapter.notifyDataSetChanged()
+                }, {
+                    Timber.e(it)
+                })
+        disposables.add(disposable)
+    }
+
+    override fun onTileSearchNumberHistoryClicked(history: List<ShirtNumberEntry>) {
+        if(history.isEmpty())
+            return
+        activity?.run {
+            AlertDialog.Builder(this)
+                    .setItems(history.map {
+                        val dateInMillis = it.eventTime.takeIf { it > 0 } ?: run { it.createdAt }
+                        val date = DateFormat.getDateInstance().format(Date(dateInMillis))
+                        "${it.playerName} | $date | ${it.lineupName}"
+                    }.toTypedArray(), null)
+                    .create()
+                    .show()
+        }
+    }
+
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         return false
     }
@@ -126,6 +173,56 @@ class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback 
                     Timber.e(it)
                 })
         this.disposables.add(disposable)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.dashboard_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+
+        activity?.let { activity ->
+            val disposable = dashboardViewModel.showNewReportIssueButtonFeature(activity)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ show ->
+                        if(show) {
+                            (activity.toolbar as? Toolbar)?.let { toolbar ->
+                                FeatureViewFactory.apply(toolbar, R.id.action_report_issue,
+                                        activity as AppCompatActivity,
+                                        getString(R.string.shake_beta_title),
+                                        getString(R.string.shake_beta_description),
+                                        object : TapTargetView.Listener() {
+                                            override fun onTargetClick(view: TapTargetView?) {
+                                                view?.dismiss(true)
+                                            }
+
+                                            override fun onOuterCircleClick(view: TapTargetView?) {
+                                                view?.dismiss(false)
+                                            }
+                                        })
+                            }
+                        }
+                    }, {
+                        Timber.e(it)
+                    })
+            disposables.add(disposable)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_report_issue -> {
+                Shake.show(object : ShakeReportData {
+                    override fun quickFacts(): String? {
+                        return null
+                    }
+
+                    override fun attachedFiles(): MutableList<ShakeFile> {
+                        return mutableListOf()
+                    }
+                })
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onPause() {

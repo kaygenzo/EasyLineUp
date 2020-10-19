@@ -17,6 +17,7 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.utils.drawn
 import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.item_card_team_type.view.*
 import timber.log.Timber
@@ -105,7 +106,7 @@ class TeamCardView: ConstraintLayout {
     }
 
     private fun setTeamImage(request: RequestCreator, @DrawableRes placeholderRes: Int, @DrawableRes errorRes: Int) {
-        teamTypeImage.ready {
+        teamTypeImage.drawn {
             try {
                 val size = resources.getDimensionPixelSize(R.dimen.card_team_type_ball_image_diameter)
                 val cradleRadius = resources.getDimension(R.dimen.card_team_type_ball_image_cradle_radius)

@@ -4,18 +4,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.telen.easylineup.dashboard.tiles.LastLineupTile
-import com.telen.easylineup.dashboard.tiles.MostUsedPlayerTile
-import com.telen.easylineup.dashboard.tiles.ShakeBetaTile
-import com.telen.easylineup.dashboard.tiles.TeamSizeTile
+import com.telen.easylineup.dashboard.tiles.*
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DashboardTile
+import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.tiles.ITileData
 import java.util.*
 
 interface TileClickListener {
     fun onTileClicked(type: Int, data: ITileData)
     fun onTileLongClicked(type: Int)
+    fun onTileSearchNumberClicked(number: Int)
+    fun onTileSearchNumberHistoryClicked(history: List<ShirtNumberEntry>)
 }
 
 class DashboardTileAdapter(private val list: List<DashboardTile>, private val tileClickListener: TileClickListener, var inEditMode: Boolean = false):
@@ -36,6 +36,9 @@ class DashboardTileAdapter(private val list: List<DashboardTile>, private val ti
             }
             Constants.TYPE_SHAKE_BETA -> {
                 TileViewHolder(ShakeBetaTile(parent.context))
+            }
+            Constants.TYPE_LAST_PLAYER_NUMBER -> {
+                TileViewHolder(PlayerNumberSearchTile(parent.context))
             }
             else -> {
                 throw NotImplementedError()
@@ -60,6 +63,7 @@ class DashboardTileAdapter(private val list: List<DashboardTile>, private val ti
                 is MostUsedPlayerTile -> holder.view.bind(data, inEditMode)
                 is LastLineupTile -> holder.view.bind(data, inEditMode)
                 is ShakeBetaTile -> holder.view.bind(data, inEditMode)
+                is PlayerNumberSearchTile -> holder.view.bind(data, inEditMode, tileClickListener)
             }
             holder.view.setOnClickListener {
                 if(!inEditMode)

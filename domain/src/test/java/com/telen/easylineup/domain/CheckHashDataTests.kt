@@ -49,8 +49,8 @@ internal class CheckHashDataTests {
         )
 
         val mLineups = mutableListOf(
-                Lineup(1L, "A", 1L, 1L, 0, 1L, 1L, null, null),
-                Lineup(2L, "B", 2L, 2L, 0, 1L, 1L, null, null)
+                Lineup(1L, "A", 1L, 1L, 0, 3L, 1L, 2L, null, null),
+                Lineup(2L, "B", 2L, 2L, 0, 3L, 1L, 3L, null, null)
         )
 
         val mPlayerPosition = mutableListOf(

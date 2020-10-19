@@ -12,7 +12,7 @@ import pl.hypeapp.materialtimelineview.MaterialTimelineView
 sealed class TimeLineItem
 data class HeaderTimeLineItem(val position: Int, val tournamentsSize: Int, val lineupsSize: Int) : TimeLineItem()
 data class EmptyTimeLineItem(val position: Int) : TimeLineItem()
-data class TimeLineLineItem(val tournament: Tournament) : TimeLineItem()
+data class TimeLineLineItem(val tournament: Tournament, val start: Long?, val end: Long?) : TimeLineItem()
 data class TimelineTopView(val tournament: Tournament, val lineups: List<Lineup>): TimeLineItem()
 data class TimelineMiddleView(val tournament: Tournament, val lineups: List<Lineup>): TimeLineItem()
 data class TimelineBottomView(val tournament: Tournament, val lineups: List<Lineup>): TimeLineItem()
@@ -85,7 +85,8 @@ class TournamentsAdapter(private val itemClickListener: OnItemClickedListener): 
                 val view = holder.view as TimeLineMiddleView
                 val item = items[position] as TimeLineLineItem
                 view.setTournamentName(item.tournament.name)
-                view.setTournamentDate(item.tournament.createdAt)
+                if(item.start != null && item.end != null)
+                    view.setTournamentDate(item.start, item.end)
                 view.setOnActionsClickListener(object: OnActionsClickListener {
                     override fun onDeleteClicked() {
                         itemClickListener.onDeleteTournamentClicked(item.tournament)
@@ -136,7 +137,9 @@ class TournamentsAdapter(private val itemClickListener: OnItemClickedListener): 
         else
             items.add(HeaderTimeLineItem(MaterialTimelineView.POSITION_FIRST, tournamentsSize, lineupsSize))
         tournaments.forEach {
-            items.add(TimeLineLineItem(it.first))
+            val tournamentStart = it.second.map { it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }.min()
+            val tournamentEnd = it.second.map {it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }.max()
+            items.add(TimeLineLineItem(it.first, tournamentStart, tournamentEnd))
             if(it.second.isEmpty()) {
                 when(index) {
                     tournaments.size - 1 -> items.add(EmptyTimeLineItem(MaterialTimelineView.POSITION_LAST))

@@ -18,7 +18,7 @@ import java.text.DateFormat
 import java.util.*
 
 interface OnActionButtonListener {
-    fun onSaveClicked(lineupName: String, tournament: Tournament)
+    fun onSaveClicked(lineupName: String, tournament: Tournament, lineupEventTime: Long)
     fun onCancelClicked()
     fun onRosterChangeClicked()
 }
@@ -44,7 +44,7 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
     private lateinit var adapter: ArrayAdapter<String>
     private lateinit var tournamentsNames: MutableList<String>
     private var actionClickListener: OnActionButtonListener? = null
-    private lateinit var calendar: Calendar
+    private lateinit var eventTime: Calendar
 
     private var fragmentManager: FragmentManager? = null
 
@@ -60,8 +60,9 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
 
         tournamentsNames = mutableListOf()
 
-        calendar = Calendar.getInstance()
-        setTournamentDateHeader(calendar.timeInMillis)
+        eventTime = Calendar.getInstance()
+
+        setTournamentDateHeader(eventTime.timeInMillis)
 
         adapter = ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
         tournamentChoiceAutoComplete.setAdapter(adapter)
@@ -69,21 +70,21 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
             val selected = parent.getItemAtPosition(position).toString()
             val truePosition = tournamentsNames.indexOf(selected)
             val tournament = tournaments[truePosition]
-            calendar.timeInMillis = tournament.createdAt
-            setTournamentDateHeader(calendar.timeInMillis)
+//            calendar.timeInMillis = tournament.createdAt
+//            setTournamentDateHeader(calendar.timeInMillis)
         }
 
         dateButton.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder
                     .datePicker()
-                    .setSelection(calendar.timeInMillis)
+                    .setSelection(eventTime.timeInMillis)
                     .build()
             datePicker.addOnPositiveButtonClickListener {
-                calendar.timeInMillis = it
+                eventTime.timeInMillis = it
+                setTournamentDateHeader(it)
             }
             fragmentManager?.let {
                 datePicker.show(it, "createLineupDatePicker")
-                setTournamentDateHeader(calendar.timeInMillis)
             }
         }
 
@@ -92,7 +93,7 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         }
 
         save.setOnClickListener {
-            actionClickListener?.onSaveClicked(lineupTitleInput.text.toString(), getSelectedTournament())
+            actionClickListener?.onSaveClicked(lineupTitleInput.text.toString(), getSelectedTournament(), eventTime.timeInMillis)
         }
 
         cancel.setOnClickListener {
@@ -138,10 +139,10 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         val position = tournamentsNames.indexOf(tournamentChoiceAutoComplete.text.toString())
         Timber.d("position = $position")
         return if(position >= 0) {
-            tournaments[position].createdAt = calendar.timeInMillis
+//            tournaments[position].createdAt = calendar.timeInMillis
             tournaments[position]
         }
         else
-            Tournament(name = tournamentChoiceAutoComplete.text.toString().trim(), createdAt = calendar.timeInMillis)
+            Tournament(name = tournamentChoiceAutoComplete.text.toString().trim(), createdAt = Calendar.getInstance().timeInMillis)
     }
 }

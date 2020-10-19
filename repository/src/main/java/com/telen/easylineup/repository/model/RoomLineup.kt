@@ -7,7 +7,7 @@ import java.util.*
 
 @Entity(
         tableName = "lineups",
-        indices = [Index(value = ["name"])],
+        indices = [Index(value = ["name", "teamID", "tournamentID"])],
         foreignKeys = [
             ForeignKey(entity = RoomTeam::class, parentColumns = ["id"], childColumns = ["teamID"],
                     onDelete = ForeignKey.CASCADE),
@@ -21,11 +21,16 @@ internal data class RoomLineup(
         @ColumnInfo(name = "teamID") var teamId: Long = 0,
         @ColumnInfo(name = "tournamentID") var tournamentId: Long = 0,
         @ColumnInfo(name = "mode") var mode: Int = 0,
+        @ColumnInfo(name = "eventTime") var eventTimeInMillis: Long = 0,
         @ColumnInfo(name = "createdAt") var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         @ColumnInfo(name = "editedAt") var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         @ColumnInfo(name = "roaster") var roster: String? = null,
         @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString(),
         @Ignore val playerPositions: MutableList<FieldPosition> = mutableListOf()) {
+
+    override fun toString(): String {
+        return "RoomLineup(id=$id, name='$name', teamId=$teamId, tournamentId=$tournamentId, mode=$mode, eventTimeInMillis=$eventTimeInMillis, createdTimeInMillis=$createdTimeInMillis, editedTimeInMillis=$editedTimeInMillis, roster=$roster, hash=$hash, playerPositions=$playerPositions)"
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -60,6 +65,7 @@ internal fun RoomLineup.init(lineup: Lineup): RoomLineup {
     teamId = lineup.teamId
     tournamentId = lineup.tournamentId
     mode = lineup.mode
+    eventTimeInMillis = lineup.eventTimeInMillis
     createdTimeInMillis = lineup.createdTimeInMillis
     editedTimeInMillis = lineup.editedTimeInMillis
     roster = lineup.roster
@@ -72,5 +78,5 @@ internal fun RoomLineup.init(lineup: Lineup): RoomLineup {
 }
 
 internal fun RoomLineup.toLineup(): Lineup {
-    return Lineup(id, name, teamId, tournamentId, mode, createdTimeInMillis, editedTimeInMillis, roster, hash, playerPositions)
+    return Lineup(id, name, teamId, tournamentId, mode, eventTimeInMillis, createdTimeInMillis, editedTimeInMillis, roster, hash, playerPositions)
 }

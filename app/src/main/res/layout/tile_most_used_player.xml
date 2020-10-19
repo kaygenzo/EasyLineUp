@@ -69,11 +69,12 @@
                     android:layout_marginTop="@dimen/player_details_container_separator_width">
 
                     <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                        style="@style/Field.Green.Small"
+                        style="@style/Field.Green.Small.Auto"
                         android:id="@+id/tile_player_most_used_match_played_label"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:text="@string/tile_most_used_player_games_played"
+                        android:maxLines="2"
                         android:gravity="center"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="parent"

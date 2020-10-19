@@ -6,6 +6,7 @@
     android:fillViewport="true">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:descendantFocusability="beforeDescendants"
         android:id="@+id/tileRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
