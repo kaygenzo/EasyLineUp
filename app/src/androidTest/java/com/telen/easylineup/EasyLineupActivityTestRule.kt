@@ -31,6 +31,7 @@ class EasyLineupActivityTestRule<T : Activity?> : ActivityTestRule<T>, KoinCompo
         val preferencesEditor = context.getSharedPreferences(Constants.APPLICATION_PREFERENCES, 0).edit()
         preferencesEditor.putBoolean(Constants.PREF_FEATURE_SHOW_NEW_ROSTER, false)
         preferencesEditor.putBoolean(Constants.PREF_FEATURE_SHOW_NEW_SWAP_TEAM, false)
+        preferencesEditor.putBoolean(Constants.PREF_FEATURE_SHOW_REPORT_ISSUE_BUTTON, false)
         preferencesEditor.commit()
     }
 }

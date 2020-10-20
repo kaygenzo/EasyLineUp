@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -20,6 +21,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.libraries.cloudtesting.screenshots.ScreenShotter
+import com.google.android.material.textview.MaterialTextView
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions
 import com.schibsted.spain.barista.interaction.*
 import com.schibsted.spain.barista.interaction.BaristaDrawerInteractions.openDrawer
@@ -288,11 +290,11 @@ class GlobalNavigationTest {
         //click on the tile team size
         onView(withId(R.id.tileRecyclerView))
                 .perform(
-                        RecyclerViewActions.actionOnItemAtPosition<DashboardTileAdapter.TileViewHolder>(1, click())
+                        RecyclerViewActions.actionOnItemAtPosition<DashboardTileAdapter.TileViewHolder>(0, click())
                 )
 
         //check title Team Roster
-        onView(allOf(instanceOf(TextView::class.java), withParent(withId(R.id.toolbar))))
+        onView(allOf(instanceOf(AppCompatTextView::class.java), withParent(withId(R.id.toolbar))))
                 .check(matches(withText("Roster")))
 
         //go back to dashboard
@@ -318,8 +320,7 @@ class GlobalNavigationTest {
 
         openDrawer()
 
-        onView(allOf(withId(R.id.drawerImage), withParent(withId(R.id.navDrawerRootContainer))))
-                .perform(click())
+        BaristaClickInteractions.clickOn(R.id.drawerImage)
 
         takeScreenshot("team_details", mHomeTestRule.activity)
 
@@ -390,8 +391,9 @@ class GlobalNavigationTest {
         openDrawer()
 
         //check team name is "NewTeamName"
-        onView(allOf(instanceOf(TextView::class.java), withParent(withId(R.id.navDrawerRootContainer))))
-                .check(matches(withText("NewTeamName")))
+        BaristaVisibilityAssertions.assertContains(R.id.drawerTitle, "NewTeamName")
+//        onView(allOf(instanceOf(MaterialTextView::class.java), withParent(withId(R.id.toolbar))))
+//                .check(matches(withText("NewTeamName")))
     }
 
     @Test
@@ -596,8 +598,7 @@ class GlobalNavigationTest {
         openDrawer()
 
         //click on image in drawer header
-        onView(allOf(withId(R.id.drawerImage), withParent(withId(R.id.navDrawerRootContainer))))
-                .perform(click())
+        BaristaClickInteractions.clickOn(R.id.drawerImage)
 
         //click on team image button to expand card
         onView(withId(R.id.teamTypeRepresentation))
