@@ -40,9 +40,9 @@ class DialogFactory {
         }
 
         fun getWarningTaskDialog(context: Context,
-                             @StringRes title: Int = 0, titleArgs: Array<Any> = arrayOf(),
-                             @StringRes message: Int = 0, messageArgs: Array<Any> = arrayOf(),
-                             task: Completable, @StringRes messageLoading: Int = R.string.dialog_delete_progress_message): Dialog {
+                                 @StringRes title: Int = 0, titleArgs: Array<Any> = arrayOf(),
+                                 @StringRes message: Int = 0, messageArgs: Array<Any> = arrayOf(),
+                                 task: Completable, @StringRes messageLoading: Int = R.string.dialog_delete_progress_message): Dialog {
             return getWarningDialog(
                     context = context,
                     title = title,
@@ -90,6 +90,19 @@ class DialogFactory {
                     resIcon = R.drawable.ic_check_green_24dp, resCancelText = 0)
         }
 
+        fun getSimpleDialog(context: Context,
+                            @StringRes message: Int,
+                            confirmClick: DialogInterface.OnClickListener? = null,
+                            cancelClick: DialogInterface.OnClickListener? = null,
+                            cancelable: Boolean = true): Dialog {
+            return getDialog(context = context,
+                    content = message,
+                    confirmClick = confirmClick,
+                    cancelClick = cancelClick ?: defaultClickListener,
+                    cancelable = cancelable
+            )
+        }
+
         fun getSimpleDialog(context: Context, @StringRes title: Int = 0, @StringRes message: Int = 0, view: View, confirmClick: DialogInterface.OnClickListener? = null,
                             @StringRes confirmText: Int = android.R.string.ok): Dialog {
             return getDialog(context = context,
@@ -118,7 +131,8 @@ class DialogFactory {
                               @StringRes resCancelText: Int = android.R.string.cancel,
                               confirmClick: DialogInterface.OnClickListener? = null,
                               cancelClick: DialogInterface.OnClickListener? = null,
-                              customView: View? = null
+                              customView: View? = null,
+                              cancelable: Boolean? = true
         ): Dialog {
             val dialog = MaterialAlertDialogBuilder(context)
                     .setIcon(resIcon)
@@ -137,6 +151,9 @@ class DialogFactory {
             }
             customView?.let {
                 dialog.setView(customView)
+            }
+            cancelable?.let {
+                dialog.setCancelable(it)
             }
             return dialog.create()
         }

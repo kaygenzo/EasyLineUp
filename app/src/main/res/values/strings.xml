@@ -203,4 +203,6 @@
     <string name="lineup_style_default_value" translatable="false">0</string>
 
     <string name="generic_not_found">Not found</string>
+
+    <string name="app_deeplink_file_import_title">Import data from this file ?</string>
 </resources>
