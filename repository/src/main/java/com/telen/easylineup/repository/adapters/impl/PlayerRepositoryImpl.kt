@@ -72,12 +72,12 @@ internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private va
         }
     }
 
-    override fun getShirtNumberFromPlayers(number: Int): Single<List<ShirtNumberEntry>> {
-        return playerDao.getShirtNumberHistoryFromPlayers(number).map { it.map { it.toShirtNumberEntry() } }
+    override fun getShirtNumberFromPlayers(teamID: Long, number: Int): Single<List<ShirtNumberEntry>> {
+        return playerDao.getShirtNumberHistoryFromPlayers(teamID, number).map { it.map { it.toShirtNumberEntry() } }
     }
 
-    override fun getShirtNumberFromNumberOverlays(number: Int): Single<List<ShirtNumberEntry>> {
-        return playerDao.getShirtNumberHistoryFromOverlays(number).map { it.map { it.toShirtNumberEntry() } }
+    override fun getShirtNumberFromNumberOverlays(teamID: Long, number: Int): Single<List<ShirtNumberEntry>> {
+        return playerDao.getShirtNumberHistoryFromOverlays(teamID, number).map { it.map { it.toShirtNumberEntry() } }
     }
 
     override fun getShirtNumberOverlay(playerID: Long, lineupID: Long): Single<PlayerNumberOverlay> {
