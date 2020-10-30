@@ -15,8 +15,8 @@ internal class SavePlayer(val dao: PlayerRepository): UseCase<SavePlayer.Request
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return when {
             requestValues.name.isNullOrBlank() -> Single.error(NameEmptyException())
-            !ValidatorUtils().isEmailValid(requestValues.email) -> Single.error(InvalidEmailException())
-            !ValidatorUtils().isValidPhoneNumber(requestValues.phone) -> Single.error(InvalidPhoneException())
+            !requestValues.validatorUtils.isEmailValid(requestValues.email) -> Single.error(InvalidEmailException())
+            !requestValues.validatorUtils.isValidPhoneNumber(requestValues.phone) -> Single.error(InvalidPhoneException())
             else -> {
                 val player = Player(id = requestValues.playerID, teamId = requestValues.teamID, name = requestValues.name.trim(),
                         shirtNumber = requestValues.shirtNumber ?: 0, licenseNumber = requestValues.licenseNumber ?: 0L,
@@ -40,7 +40,8 @@ internal class SavePlayer(val dao: PlayerRepository): UseCase<SavePlayer.Request
         }
     }
 
-    class RequestValues(val playerID: Long,
+    class RequestValues(val validatorUtils: ValidatorUtils,
+                        val playerID: Long,
                         val teamID: Long,
                         val name: String?,
                         val shirtNumber: Int?,

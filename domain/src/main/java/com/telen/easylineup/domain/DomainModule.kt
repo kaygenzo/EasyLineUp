@@ -3,6 +3,7 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.application.ApplicationAdapter
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.usecases.*
+import com.telen.easylineup.domain.utils.ValidatorUtils
 
 import org.koin.dsl.module
 
@@ -49,5 +50,6 @@ object DomainModule {
         single { SaveDpAndFlex(get()) }
         single { SavePlayerNumberOverlay(get()) }
         single { GetShirtNumberHistory(get()) }
+        single { ValidatorUtils() }
     }
 }

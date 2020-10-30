@@ -7,6 +7,7 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.SavePlayer
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
+import com.telen.easylineup.domain.utils.ValidatorUtils
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -23,22 +24,34 @@ import org.mockito.junit.MockitoJUnitRunner
 internal class SavePlayerTests {
 
     @Mock lateinit var playerDao: PlayerRepository
+    lateinit var validatorUtils: ValidatorUtils
     lateinit var mSavePlayer: SavePlayer
+
+    inner class ValidatorUtilsMock: ValidatorUtils() {
+        override fun isEmailValid(email: String?): Boolean {
+            return true
+        }
+
+        override fun isValidPhoneNumber(phone: String?): Boolean {
+            return true
+        }
+    }
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
         mSavePlayer = SavePlayer(playerDao)
         val player = Player(id = 1L, teamId = 1, name = "Test", image = null, shirtNumber = 1, licenseNumber = 1L, positions = 1,
-                pitching = 1, batting = 3, hash = "hash")
+                pitching = 1, batting = 3, hash = "hash", email = "p1@test.com", phone = "001")
         Mockito.`when`(playerDao.updatePlayer(any())).thenReturn(Completable.complete())
         Mockito.`when`(playerDao.insertPlayer(any())).thenReturn(Single.just(1))
         Mockito.`when`(playerDao.getPlayerByIdAsSingle(any())).thenReturn(Single.just(player))
+        validatorUtils = ValidatorUtilsMock()
     }
 
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() {
-        val request = SavePlayer.RequestValues(playerID = 1L, teamID = 1, name = "", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0)
+        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 1L, teamID = 1, name = "", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001")
         val observer = TestObserver<SavePlayer.ResponseValue>()
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -47,7 +60,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsWhitespaces() {
-        val request = SavePlayer.RequestValues(playerID = 1L, teamID = 1, name = "     ", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0)
+        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 1L, teamID = 1, name = "     ", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001")
         val observer = TestObserver<SavePlayer.ResponseValue>()
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -56,7 +69,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsNull() {
-        val request = SavePlayer.RequestValues(playerID = 1L, teamID = 1, name = null, positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0)
+        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 1L, teamID = 1, name = null, positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001")
         val observer = TestObserver<SavePlayer.ResponseValue>()
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -65,7 +78,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldInsertEventIfShirtNumberIsNull() {
-        val request = SavePlayer.RequestValues(playerID = 0L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = null, imageUri = null, pitching = 0, batting = 0)
+        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 0L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = null, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001")
         val observer = TestObserver<SavePlayer.ResponseValue>()
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -75,7 +88,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldInsertIfNewPlayer() {
-        val request = SavePlayer.RequestValues(playerID = 0L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0)
+        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 0L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001")
         val observer = TestObserver<SavePlayer.ResponseValue>()
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -86,7 +99,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldUpdateIfKnownPlayer() {
-        val request = SavePlayer.RequestValues(playerID = 1L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0)
+        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 1L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001")
         val observer = TestObserver<SavePlayer.ResponseValue>()
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()

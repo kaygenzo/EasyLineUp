@@ -17,6 +17,7 @@ import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.repository.*
 import com.telen.easylineup.domain.usecases.*
 import com.telen.easylineup.domain.usecases.exceptions.*
+import com.telen.easylineup.domain.utils.ValidatorUtils
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
@@ -79,6 +80,8 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
 
     private val savePlayerNumberOverlayUseCase: SavePlayerNumberOverlay by inject()
     private val getShirtNumberHistoryUseCase: GetShirtNumberHistory by inject()
+
+    private val validatorUtils: ValidatorUtils by inject()
 
     override fun observeErrors(): PublishSubject<DomainErrors> {
         return _errors
@@ -218,7 +221,7 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
     override fun savePlayer(playerID: Long?, name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int, email: String?, phone: String?): Completable {
         return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
                 .flatMapCompletable {
-                    val req = SavePlayer.RequestValues(playerID ?: 0, it.id, name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting, email, phone)
+                    val req = SavePlayer.RequestValues(validatorUtils, playerID ?: 0, it.id, name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting, email, phone)
                     UseCaseHandler.execute(savePlayerUseCase, req).ignoreElement()
                 }
                 .doOnError {

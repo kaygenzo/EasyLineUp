@@ -6,7 +6,7 @@ import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class ValidatorUtils {
+open class ValidatorUtils {
 
     /**
      * method is used for checking valid email id format.
@@ -14,8 +14,8 @@ class ValidatorUtils {
      * @param email
      * @return boolean true for valid false for invalid
      */
-    fun isEmailValid(email: String?): Boolean {
-        return email.takeIf { !TextUtils.isEmpty(it) }?.let {
+    open fun isEmailValid(email: String?): Boolean {
+        return email.takeIf { !it.isNullOrEmpty() }?.let {
             val expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$"
             val pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
             val matcher: Matcher = pattern.matcher(email)
@@ -23,8 +23,8 @@ class ValidatorUtils {
         } ?: true
     }
 
-    fun isValidPhoneNumber(phone: String?): Boolean {
-        return phone.takeIf { !TextUtils.isEmpty(it) }?.let {
+    open fun isValidPhoneNumber(phone: String?): Boolean {
+        return phone.takeIf { !it.isNullOrEmpty() }?.let {
             PhoneNumberUtils.isGlobalPhoneNumber(it)
         } ?: true
     }
