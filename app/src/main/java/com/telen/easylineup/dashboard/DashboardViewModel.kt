@@ -10,12 +10,28 @@ import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import timber.log.Timber
+
+sealed class EventCase
+data class GetTeamEmailsSuccess(val emails: List<String>): EventCase()
+data class GetTeamPhonesSuccess(val phones: List<String>): EventCase()
+object TeamEmailsEmpty: EventCase()
+object TeamPhonesEmpty: EventCase()
+
+const val INDEX_SEND_MESSAGES = 0
+const val INDEX_SEND_EMAILS = 1
+const val INDEX_SEND_OTHER = 2
 
 class DashboardViewModel: ViewModel(), KoinComponent {
 
     private val domain: ApplicationPort by inject()
+
+    val eventHandler = PublishSubject.create<EventCase>()
+    val disposables = CompositeDisposable()
 
     fun registerTilesLiveData(): LiveData<List<DashboardTile>> {
         return Transformations.switchMap(domain.observeTeams()) {
@@ -38,5 +54,25 @@ class DashboardViewModel: ViewModel(), KoinComponent {
 
     fun getShirtNumberHistory(number: Int): Single<List<ShirtNumberEntry>> {
         return domain.getShirtNumberHistory(number)
+    }
+
+    fun getEmails() {
+        val disposable = domain.getTeamEmails()
+                .subscribe({
+                    eventHandler.onNext(GetTeamEmailsSuccess(it))
+                }, {
+                    Timber.e(it)
+                })
+        this.disposables.add(disposable)
+    }
+
+    fun getPhones() {
+        val disposable = domain.getTeamPhones()
+                .subscribe({
+                    eventHandler.onNext(GetTeamPhonesSuccess(it))
+                }, {
+                    Timber.e(it)
+                })
+        this.disposables.add(disposable)
     }
 }

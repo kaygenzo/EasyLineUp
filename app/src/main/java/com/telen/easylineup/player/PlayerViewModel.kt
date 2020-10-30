@@ -71,8 +71,8 @@ class PlayerViewModel: ViewModel(), KoinComponent {
         disposables.clear()
     }
 
-    fun savePlayer(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int) {
-        val disposable = domain.savePlayer(playerID, name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting)
+    fun savePlayer(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int, email: String?, phone: String?) {
+        val disposable = domain.savePlayer(playerID, name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting, email, phone)
                 .subscribe({
                     _event.onNext(SavePlayerSuccess)
                 }, {

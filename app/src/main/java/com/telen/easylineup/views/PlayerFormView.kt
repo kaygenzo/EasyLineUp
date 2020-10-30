@@ -14,12 +14,13 @@ import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
-import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.view_create_player.view.*
 import timber.log.Timber
 
 interface PlayerFormListener {
-    fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int)
+    fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?,
+                      imageUri: Uri?, positions: Int, pitching: Int, batting: Int,
+                      email: String?, phone: String?)
     fun onCancel()
     fun onImagePickerRequested()
 }
@@ -55,8 +56,10 @@ class PlayerFormView: ConstraintLayout {
             val positions = getPlayerPositions()
             val pitching = getPitchingSide()?.flag ?: 0
             val batting = getBattingSide()?.flag ?: 0
+            val email = getEmail()
+            val phone = getPhone()
 
-            listener?.onSaveClicked(name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting)
+            listener?.onSaveClicked(name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting, email, phone)
         }
 
         cancel.setOnClickListener {
@@ -238,20 +241,20 @@ class PlayerFormView: ConstraintLayout {
 
     fun displayInvalidName() {
         playerNameInputLayout.error = resources.getString(R.string.player_creation_error_name_empty)
-        playerLicenseNumberInputLayout.error = null
-        playerShirtNumberInputLayout.error = null
+        playerEmailInputLayout.error = null
+        playerPhoneInputLayout.error = null
     }
 
-    fun displayInvalidLicense() {
+    fun displayInvalidEmail() {
         playerNameInputLayout.error = null
-        playerLicenseNumberInputLayout.error = resources.getString(R.string.player_creation_error_license_empty)
-        playerShirtNumberInputLayout.error = null
+        playerEmailInputLayout.error = resources.getString(R.string.player_creation_error_invalid_email_format)
+        playerPhoneInputLayout.error = null
     }
 
-    fun displayInvalidNumber() {
+    fun displayInvalidPhoneNumber() {
         playerNameInputLayout.error = null
-        playerLicenseNumberInputLayout.error = null
-        playerShirtNumberInputLayout.error = resources.getString(R.string.player_creation_error_shirt_empty)
+        playerEmailInputLayout.error = null
+        playerPhoneInputLayout.error = resources.getString(R.string.player_creation_error_invalid_phone_format)
     }
 
     fun getPitchingSide(): PlayerSide? {
@@ -312,5 +315,21 @@ class PlayerFormView: ConstraintLayout {
                 battingSideRight.isChecked = false
             }
         }
+    }
+
+    fun getEmail(): String? {
+        return playerEmailInput.text.toString()
+    }
+
+    fun setEmail(email: String?) {
+        playerEmailInput.setText(email ?: "")
+    }
+
+    fun getPhone(): String? {
+        return playerPhoneInput.text.toString()
+    }
+
+    fun setPhone(phone: String?) {
+        playerPhoneInput.setText(phone ?: "")
     }
 }

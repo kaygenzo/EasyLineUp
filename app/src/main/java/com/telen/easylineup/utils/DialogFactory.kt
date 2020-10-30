@@ -149,5 +149,12 @@ class DialogFactory {
                     .setPositiveButton(android.R.string.ok, null)
                     .create()
         }
+
+        fun getListDialog(context: Context, items: Array<CharSequence>,
+                                 listener: DialogInterface.OnClickListener? = null): Dialog {
+            return MaterialAlertDialogBuilder(context)
+                    .setItems(items, listener)
+                    .create()
+        }
     }
 }

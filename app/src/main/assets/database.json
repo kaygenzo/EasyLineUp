@@ -13,7 +13,9 @@
       "name": "       Albert",
       "shirtNumber": 90,
       "image": "https://images.pexels.com/photos/428333/pexels-photo-428333.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
-      "licenseNumber": 2
+      "licenseNumber": 2,
+      "email": "p1@test.com",
+      "phone": "001"
     },
     {
       "id": 2,
@@ -21,7 +23,9 @@
       "name": "Bernard",
       "shirtNumber": 10,
       "image": "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
-      "licenseNumber": 3
+      "licenseNumber": 3,
+      "email": "p2@test.com",
+      "phone": "002"
     },
     {
       "id": 3,
@@ -29,7 +33,9 @@
       "name": "Chrystel",
       "shirtNumber": 24,
       "image": "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
-      "licenseNumber": 4
+      "licenseNumber": 4,
+      "email": "p3@test.com",
+      "phone": "003"
     },
     {
       "id": 4,
@@ -37,7 +43,9 @@
       "name": "Damien",
       "shirtNumber": 1,
       "image": "https://images.pexels.com/photos/25758/pexels-photo.jpg?auto=compress&cs=tinysrgb&dpr=2&w=500",
-      "licenseNumber": 5
+      "licenseNumber": 5,
+      "email": "p4@test.com",
+      "phone": "004"
     },
     {
       "id": 5,

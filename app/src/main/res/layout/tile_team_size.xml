@@ -25,7 +25,8 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:background="#b4FFFFFF">
+            android:background="#b4FFFFFF"
+            android:padding="6dp">
 
             <ImageView
                 android:id="@+id/tile_team_size_icon"
@@ -36,14 +37,35 @@
                 android:src="@drawable/ic_people_black_24dp"/>
 
             <com.telen.easylineup.views.CollegedStyledTextView
-                style="@style/TextBiggest"
+                style="@style/TextBig"
                 android:id="@+id/tile_team_size_text"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/tile_separator"
                 app:layout_constraintLeft_toRightOf="@+id/tile_team_size_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 tools:text="11"
                 android:gravity="center"/>
+
+            <View
+                android:id="@+id/tile_separator"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/black"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                app:layout_constraintLeft_toRightOf="@+id/tile_team_size_text"
+                app:layout_constraintRight_toLeftOf="@+id/tile_team_size_send_icon"/>
+
+            <ImageView
+                android:id="@+id/tile_team_size_send_icon"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/tile_separator"
+                android:src="@drawable/ic_baseline_send_24"
+                app:tint="@color/colorPrimaryVariant"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

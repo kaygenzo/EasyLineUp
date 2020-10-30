@@ -16,7 +16,12 @@ class NormalUppercaseStyledTextView: MaterialTextView {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {initView(context, attrs, defStyleAttr)}
 
     private fun initView(context: Context, attrs: AttributeSet?, defStyle: Int) {
-        isAllCaps = true
+        isAllCaps = attrs?.let {
+            val a = context.obtainStyledAttributes(attrs, R.styleable.NormalUppercaseStyledTextView, defStyle, 0)
+            val textAllCaps = a.getBoolean(R.styleable.NormalUppercaseStyledTextView_normalUppercaseStyledTextAllCaps, true)
+            a.recycle()
+            textAllCaps
+        } ?: true
         val defaultColor = ContextCompat.getColor(context, R.color.normal_uppercase_style_text_color)
         val textColor = attrs?.let {
             val a = context.obtainStyledAttributes(attrs, R.styleable.NormalUppercaseStyledTextView, defStyle, 0)

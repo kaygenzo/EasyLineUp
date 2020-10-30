@@ -22,6 +22,8 @@ internal data class RoomPlayer(
         @ColumnInfo(name = "positions") var positions: Int = 0,
         @ColumnInfo(name = "pitching") var pitching: Int = 0,
         @ColumnInfo(name = "batting") var batting: Int = 0,
+        @ColumnInfo(name = "email") var email: String? = null,
+        @ColumnInfo(name = "phone") var phone: String? = null,
         @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
 ) {
     override fun equals(other: Any?): Boolean {
@@ -39,6 +41,8 @@ internal data class RoomPlayer(
         if (positions != other.positions) return false
         if (pitching != other.pitching) return false
         if (batting != other.batting) return false
+        if (email != other.email) return false
+        if (phone != other.phone) return false
         if (hash != other.hash) return false
 
         return true
@@ -54,10 +58,11 @@ internal data class RoomPlayer(
         result = 31 * result + positions
         result = 31 * result + pitching
         result = 31 * result + batting
+        result = 31 * result + (email?.hashCode() ?: 0)
+        result = 31 * result + (phone?.hashCode() ?: 0)
         result = 31 * result + (hash?.hashCode() ?: 0)
         return result
     }
-
 }
 
 internal fun RoomPlayer.init(player: Player): RoomPlayer {
@@ -70,10 +75,12 @@ internal fun RoomPlayer.init(player: Player): RoomPlayer {
     positions = player.positions
     pitching = player.pitching
     batting = player.batting
+    email = player.email
+    phone = player.phone
     hash = player.hash
     return this
 }
 
 internal fun RoomPlayer.toPlayer(): Player {
-    return Player(id, teamId, name, shirtNumber,licenseNumber, image, positions, pitching, batting, hash)
+    return Player(id, teamId, name, shirtNumber,licenseNumber, image, positions, pitching, batting, email, phone, hash)
 }

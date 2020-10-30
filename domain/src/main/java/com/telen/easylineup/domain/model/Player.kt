@@ -13,6 +13,8 @@ data class Player(
         var positions: Int = 0,
         var pitching: Int = 0,
         var batting: Int = 0,
+        var email: String? = null,
+        var phone: String? = null,
         var hash: String? = UUID.randomUUID().toString()
 ) {
     override fun equals(other: Any?): Boolean {
@@ -30,6 +32,8 @@ data class Player(
         if (positions != other.positions) return false
         if (pitching != other.pitching) return false
         if (batting != other.batting) return false
+        if (email != other.email) return false
+        if (phone != other.phone) return false
 
         return true
     }
@@ -44,11 +48,12 @@ data class Player(
         result = 31 * result + positions
         result = 31 * result + pitching
         result = 31 * result + batting
+        result = 31 * result + (email?.hashCode() ?: 0)
+        result = 31 * result + (phone?.hashCode() ?: 0)
         return result
     }
-
 }
 
 fun Player.toPlayerExport(): PlayerExport {
-    return PlayerExport(hash ?: UUID.randomUUID().toString(), name, image, shirtNumber, licenseNumber.toString(), positions, pitching, batting)
+    return PlayerExport(hash ?: UUID.randomUUID().toString(), name, image, shirtNumber, licenseNumber.toString(), positions, pitching, batting, email, phone)
 }

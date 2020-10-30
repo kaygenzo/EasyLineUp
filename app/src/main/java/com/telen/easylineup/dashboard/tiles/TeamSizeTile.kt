@@ -9,6 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
+import com.telen.easylineup.dashboard.TileClickListener
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.tiles.ITileData
 import com.telen.easylineup.domain.model.tiles.KEY_DATA_SIZE
@@ -26,7 +27,7 @@ class TeamSizeTile: ConstraintLayout {
         LayoutInflater.from(context).inflate(R.layout.tile_team_size, this)
     }
 
-    fun bind(data: ITileData, inEditMode: Boolean) {
+    fun bind(data: ITileData, inEditMode: Boolean, listener: TileClickListener) {
         val map = data.getData()
         val size: Int = map[KEY_DATA_SIZE] as Int
         tile_team_size_text.text = size.toString()
@@ -42,6 +43,8 @@ class TeamSizeTile: ConstraintLayout {
         } ?: Picasso.get().load(R.drawable.ic_unknown_team).into(teamImage)
 
         team_size_warning_container.visibility = if (size < Constants.MIN_PLAYER_COUNT) View.VISIBLE else View.GONE
+
+        tile_team_size_send_icon.setOnClickListener { listener.onTileTeamSizeSendButtonClicked() }
 
         mask.visibility = if (inEditMode) View.VISIBLE else View.INVISIBLE
     }

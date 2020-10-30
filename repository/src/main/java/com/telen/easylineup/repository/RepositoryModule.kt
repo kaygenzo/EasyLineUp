@@ -29,6 +29,7 @@ object RepositoryModule {
                     .addMigrations(migration_10_11())
                     .addMigrations(migration_11_12())
                     .addMigrations(migration_12_13())
+                    .addMigrations(migration_13_14())
             if(BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
                         .fallbackToDestructiveMigration()
@@ -219,6 +220,15 @@ object RepositoryModule {
         return object: Migration(12,13) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE lineups ADD COLUMN eventTime INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+    }
+
+    private fun migration_13_14(): Migration {
+        return object: Migration(13,14) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE players ADD COLUMN email TEXT DEFAULT null")
+                database.execSQL("ALTER TABLE players ADD COLUMN phone TEXT DEFAULT null")
             }
         }
     }

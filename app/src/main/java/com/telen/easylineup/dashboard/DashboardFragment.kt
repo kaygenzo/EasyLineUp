@@ -1,5 +1,8 @@
 package com.telen.easylineup.dashboard
 
+import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -27,6 +30,7 @@ import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_ID
 import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_NAME
 import com.telen.easylineup.domain.model.tiles.LastPlayerNumberResearchData
 import com.telen.easylineup.lineup.LineupFragment
+import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FeatureViewFactory
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.utils.hideSoftKeyboard
@@ -60,6 +64,40 @@ class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback 
         itemTouchedCallback = DashboardTileTouchCallback(tileAdapter)
         itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
         setHasOptionsMenu(true)
+
+        val disposable = dashboardViewModel.eventHandler.subscribe {
+            activity?.let { activity ->
+                when(it) {
+                    is GetTeamEmailsSuccess -> {
+                        val intent = Intent(Intent.ACTION_SENDTO).apply {
+                            data = Uri.parse("mailto:") // only email apps should handle this
+                            putExtra(Intent.EXTRA_EMAIL, it.emails.toTypedArray())
+                        }
+                        if (intent.resolveActivity(activity.packageManager) != null) {
+                            startActivity(intent)
+                        }
+                    }
+                    is GetTeamPhonesSuccess -> {
+                        val contactsBuilder = StringBuilder("smsto:")
+                        it.phones.forEach { contactsBuilder.append("$it;") }
+                        val smsIntent = Intent(Intent.ACTION_SENDTO, Uri.parse(contactsBuilder.toString()))
+                        if (smsIntent.resolveActivity(activity.packageManager) != null) {
+                            startActivity(smsIntent)
+                        }
+                    }
+                    TeamEmailsEmpty -> {
+                        DialogFactory.getErrorDialog(activity, R.string.tile_team_size_send_empty_title, R.string.tile_team_size_send_empty_emails)
+                                .show()
+                    }
+                    TeamPhonesEmpty -> {
+                        DialogFactory.getErrorDialog(activity, R.string.tile_team_size_send_empty_title, R.string.tile_team_size_send_empty_phones)
+                                .show()
+                    }
+                }
+            }
+        }
+
+        this.disposables.add(disposable)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -144,6 +182,32 @@ class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback 
         }
     }
 
+    override fun onTileTeamSizeSendButtonClicked() {
+        activity?.let { activity ->
+            val list = mutableListOf<CharSequence>()
+            list.addAll(activity.resources.getStringArray(R.array.tile_team_size_send_list_labels))
+            DialogFactory.getListDialog(activity, list.toTypedArray(), DialogInterface.OnClickListener { dialogInterface, i ->
+                when (i) {
+                    INDEX_SEND_MESSAGES -> {
+                        dashboardViewModel.getPhones()
+                    }
+                    INDEX_SEND_EMAILS -> {
+                        dashboardViewModel.getEmails()
+                    }
+                    INDEX_SEND_OTHER -> {
+                        val intent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                        }
+                        if (intent.resolveActivity(activity.packageManager) != null) {
+                            startActivity(intent)
+                        }
+                    }
+                }
+                dialogInterface.dismiss()
+            }).show()
+        }
+    }
+
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         return false
     }
@@ -166,7 +230,7 @@ class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback 
         val disposable = dashboardViewModel.saveTiles(tileList)
                 .subscribe({
                     activity?.run {
-                        if(BuildConfig.DEBUG)
+                        if (BuildConfig.DEBUG)
                             Toast.makeText(this, "Save dashboard success", Toast.LENGTH_SHORT).show()
                     }
                 }, {
@@ -183,7 +247,7 @@ class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback 
             val disposable = dashboardViewModel.showNewReportIssueButtonFeature(activity)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ show ->
-                        if(show) {
+                        if (show) {
                             (activity.toolbar as? Toolbar)?.let { toolbar ->
                                 FeatureViewFactory.apply(toolbar, R.id.action_report_issue,
                                         activity as AppCompatActivity,

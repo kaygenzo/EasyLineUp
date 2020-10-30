@@ -3,5 +3,6 @@
     <!--AbstractSettingsButtonAction-->
     <declare-styleable name="NormalUppercaseStyledTextView">
         <attr name="normalUppercaseStyledTextColor" format="color"/>
+        <attr name="normalUppercaseStyledTextAllCaps" format="boolean"/>
     </declare-styleable>
 </resources>

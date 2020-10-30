@@ -16,6 +16,7 @@ interface TileClickListener {
     fun onTileLongClicked(type: Int)
     fun onTileSearchNumberClicked(number: Int)
     fun onTileSearchNumberHistoryClicked(history: List<ShirtNumberEntry>)
+    fun onTileTeamSizeSendButtonClicked()
 }
 
 class DashboardTileAdapter(private val list: List<DashboardTile>, private val tileClickListener: TileClickListener, var inEditMode: Boolean = false):
@@ -59,7 +60,7 @@ class DashboardTileAdapter(private val list: List<DashboardTile>, private val ti
         val tile = list[position]
         tile.data?.let { data ->
             when(holder.view) {
-                is TeamSizeTile -> holder.view.bind(data, inEditMode)
+                is TeamSizeTile -> holder.view.bind(data, inEditMode, tileClickListener)
                 is MostUsedPlayerTile -> holder.view.bind(data, inEditMode)
                 is LastLineupTile -> holder.view.bind(data, inEditMode)
                 is ShakeBetaTile -> holder.view.bind(data, inEditMode)

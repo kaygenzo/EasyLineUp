@@ -47,9 +47,12 @@ class DatabaseMockProvider: KoinComponent {
                          val playersList = mutableListOf<Player>()
                          for( i in 0 until playersJson.size()) {
                              val line = playersJson[i].asJsonObject
-                             playersList.add(Player(line["id"].asLong, line["teamId"].asLong, line["name"].asString,
-                                     line["shirtNumber"].asInt, line["licenseNumber"].asLong,
-                                     if (line.has("image")) line["image"].asString else null))
+                             playersList.add(Player(id = line["id"].asLong, teamId = line["teamId"].asLong, name = line["name"].asString,
+                                     shirtNumber = line["shirtNumber"].asInt, licenseNumber = line["licenseNumber"].asLong,
+                                     image = if (line.has("image")) line["image"].asString else null,
+                                     email = if (line.has("email")) line["email"].asString else null,
+                                     phone = if (line.has("phone")) line["phone"].asString else null
+                             ))
                          }
 
                          val tournamentsList = mutableListOf<Tournament>()

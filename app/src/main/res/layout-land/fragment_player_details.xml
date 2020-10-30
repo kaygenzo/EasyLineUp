@@ -7,235 +7,312 @@
     android:layout_height="match_parent"
     tools:background="#000000">
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
     <androidx.constraintlayout.widget.ConstraintLayout
-        style="@style/PlayerDetailsContainer"
-        android:id="@+id/playerInformation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="@dimen/default_margin">
-
-        <ImageView
-            android:id="@+id/playerImage"
-            tools:src="@color/colorSecondary"
-            android:layout_width="@dimen/player_details_picture_width"
-            android:layout_height="@dimen/player_details_picture_height"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/playerName"
-            android:layout_marginEnd="@dimen/player_details_container_separator_width"/>
-
-        <com.telen.easylineup.views.CollegedStyledTextView
-            style="@style/Field.Green.Lighter.Small.Auto"
-            android:id="@+id/playerName"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/playerImage"
-            app:layout_constraintRight_toRightOf="parent"
-            tools:text="Player name"
-            android:padding="10dp"/>
+        android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/shirtNumberContainer"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintLeft_toLeftOf="@+id/playerName"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/playerName"
-            app:layout_constraintBottom_toTopOf="@+id/playerLicenseContainer"
-            android:layout_marginTop="@dimen/player_details_container_separator_width">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                style="@style/Field.Green.Middle"
-                android:id="@+id/sideContainerLabels"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@+id/sideContainerValues">
-
-                <ImageView
-                    android:id="@+id/pitchingSideLabel"
-                    android:layout_width="30dp"
-                    android:layout_height="0dp"
-                    app:srcCompat="@drawable/ic_pitching_black_24dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/battingSideLabel"
-                    android:layout_marginBottom="5dp"/>
-
-                <ImageView
-                    android:id="@+id/battingSideLabel"
-                    android:layout_width="30dp"
-                    android:layout_height="0dp"
-                    app:srcCompat="@drawable/ic_batting_black_24dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/pitchingSideLabel"
-                    android:layout_marginTop="5dp"/>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                style="@style/Field.Green.Light.Big"
-                android:id="@+id/sideContainerValues"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:layout_constraintLeft_toRightOf="@+id/sideContainerLabels">
-
-                <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                    android:id="@+id/pitchingSideValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    tools:text="Left"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/battingSideValue"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="5dp"/>
-
-                <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                    android:id="@+id/battingSideValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    tools:text="Right"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/pitchingSideValue"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="5dp"/>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <com.telen.easylineup.views.NumberedStyledTextView
-                style="@style/Field.Green.Light.Biggest.Auto"
-                android:id="@+id/shirtNumberValue"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintLeft_toRightOf="@+id/sideContainerValues"
-                tools:text="42"
-                android:textColor="@color/number_blue"
-                android:layout_marginStart="2dp"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/playerLicenseContainer"
-            android:layout_width="0dp"
+            style="@style/PlayerDetailsContainer"
+            android:id="@+id/playerInformation"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="@+id/playerName"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/shirtNumberContainer"
-            app:layout_constraintBottom_toBottomOf="@id/playerImage"
-            android:layout_marginTop="@dimen/player_details_container_separator_width">
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_margin="@dimen/default_margin">
 
-            <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                style="@style/Field.Green.Big"
-                android:id="@+id/playerLicenseLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+            <ImageView
+                android:id="@+id/playerImage"
+                tools:src="@color/colorSecondary"
+                android:layout_width="@dimen/player_details_picture_width"
+                android:layout_height="@dimen/player_details_picture_height"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                android:gravity="center"
-                android:text="@string/player_hint_license_number_short"/>
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/playerName"
+                android:layout_marginEnd="@dimen/player_details_container_separator_width"/>
 
-            <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                style="@style/Field.Green.Light.Big"
-                android:id="@+id/playerLicenseValue"
+            <com.telen.easylineup.views.CollegedStyledTextView
+                style="@style/Field.Green.Lighter.Small.Auto"
+                android:id="@+id/playerName"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="50dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/playerImage"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintLeft_toRightOf="@+id/playerLicenseLabel"
-                tools:text="42"
-                android:gravity="center"
+                tools:text="Player name"
                 android:padding="10dp"/>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/shirtNumberContainer"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintLeft_toLeftOf="@+id/playerName"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/playerName"
+                app:layout_constraintBottom_toTopOf="@+id/playerLicenseContainer"
+                android:layout_marginTop="@dimen/player_details_container_separator_width">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    style="@style/Field.Green.Middle"
+                    android:id="@+id/sideContainerLabels"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@+id/sideContainerValues">
+
+                    <ImageView
+                        android:id="@+id/pitchingSideLabel"
+                        android:layout_width="30dp"
+                        android:layout_height="0dp"
+                        app:srcCompat="@drawable/ic_pitching_black_24dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/battingSideLabel"
+                        android:layout_marginBottom="5dp"/>
+
+                    <ImageView
+                        android:id="@+id/battingSideLabel"
+                        android:layout_width="30dp"
+                        android:layout_height="0dp"
+                        app:srcCompat="@drawable/ic_batting_black_24dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/pitchingSideLabel"
+                        android:layout_marginTop="5dp"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    style="@style/Field.Green.Light.Big"
+                    android:id="@+id/sideContainerValues"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:layout_constraintLeft_toRightOf="@+id/sideContainerLabels">
+
+                    <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                        android:id="@+id/pitchingSideValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        tools:text="Left"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/battingSideValue"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="5dp"/>
+
+                    <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                        android:id="@+id/battingSideValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        tools:text="Right"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/pitchingSideValue"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="5dp"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <com.telen.easylineup.views.NumberedStyledTextView
+                    style="@style/Field.Green.Light.Biggest.Auto"
+                    android:id="@+id/shirtNumberValue"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintLeft_toRightOf="@+id/sideContainerValues"
+                    tools:text="42"
+                    android:textColor="@color/number_blue"
+                    android:layout_marginStart="2dp"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/playerLicenseContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="@+id/playerName"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/shirtNumberContainer"
+                app:layout_constraintBottom_toBottomOf="@id/playerImage"
+                android:layout_marginTop="@dimen/player_details_container_separator_width">
+
+                <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                    style="@style/Field.Green.Middle"
+                    android:id="@+id/playerLicenseLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:gravity="center"
+                    android:text="@string/player_hint_license_number_short"/>
+
+                <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                    style="@style/Field.Green.Light.Big"
+                    android:id="@+id/playerLicenseValue"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintLeft_toRightOf="@+id/playerLicenseLabel"
+                    tools:text="42"
+                    android:gravity="center"
+                    android:padding="10dp"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        style="@style/PlayerDetailsContainer"
-        android:id="@+id/playerStatistics"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/playerInformation"
-        android:layout_margin="@dimen/default_margin">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            style="@style/Field.Green"
+            style="@style/PlayerDetailsContainer"
+            android:id="@+id/playerOptionalInformation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginEnd="@dimen/player_details_container_separator_width">
+            app:layout_constraintTop_toBottomOf="@+id/playerInformation"
+            android:layout_margin="@dimen/default_margin">
 
-            <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                style="@style/Field.Green.Biggest.Auto"
-                android:id="@+id/gamesPlayedValue"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/playerEmailContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/playerPhoneContainer"
+                android:layout_marginTop="@dimen/player_details_container_separator_width"
+                android:layout_marginBottom="@dimen/player_details_container_separator_width">
+
+                <ImageView
+                    style="@style/Field.Green.Middle"
+                    android:id="@+id/playerEmailLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:src="@drawable/ic_baseline_email_24"/>
+
+                <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                    style="@style/Field.Green.Light.Big.Auto"
+                    android:id="@+id/playerEmailValue"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintLeft_toRightOf="@+id/playerEmailLabel"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    tools:text="test.email.very.long.address@test.com"
+                    app:normalUppercaseStyledTextAllCaps="false"
+                    app:autoSizeMinTextSize="10sp"
+                    android:gravity="center"
+                    android:maxLines="1"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/playerPhoneContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/playerEmailContainer"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <ImageView
+                    style="@style/Field.Green.Middle"
+                    android:id="@+id/playerPhoneLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:src="@drawable/ic_baseline_phone_24"/>
+
+                <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                    style="@style/Field.Green.Light.Big.Auto"
+                    android:id="@+id/playerPhoneValue"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintLeft_toRightOf="@+id/playerPhoneLabel"
+                    android:maxLines="1"
+                    tools:text="08 88 88 88 88"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            style="@style/PlayerDetailsContainer"
+            android:id="@+id/playerStatistics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/playerOptionalInformation"
+            android:layout_margin="@dimen/default_margin">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                style="@style/Field.Green"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginEnd="@dimen/player_details_container_separator_width">
+
+                <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                    style="@style/Field.Green.Biggest.Auto"
+                    android:id="@+id/gamesPlayedValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    tools:text="42"/>
+
+                <TextView
+                    android:background="@color/normal_uppercase_style_text_color"
+                    android:id="@+id/separator"
+                    android:layout_width="@dimen/player_details_container_separator_width"
+                    android:layout_height="70dp"
+                    app:layout_constraintTop_toTopOf="@id/gamesPlayedValue"
+                    app:layout_constraintBottom_toBottomOf="@+id/gamesPlayedValue"
+                    app:layout_constraintLeft_toRightOf="@+id/gamesPlayedValue"
+                    android:layout_marginStart="10dp"/>
+
+                <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                    style="@style/Field.Green.Middle"
+                    android:id="@+id/gamesPlayedLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:text="@string/tile_most_used_player_games_played"
+                    app:layout_constraintTop_toTopOf="@id/separator"
+                    app:layout_constraintBottom_toBottomOf="@id/separator"
+                    app:layout_constraintLeft_toRightOf="@id/separator"
+                    app:layout_constraintRight_toRightOf="parent"
+                    android:gravity="center"
+                    android:lines="2"
+                    android:layout_marginStart="10dp"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            style="@style/PlayerDetailsContainer"
+            android:id="@+id/playerPositionRepartition"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/radar_chart_size"
+            app:layout_constraintTop_toBottomOf="@+id/playerStatistics"
+            android:layout_margin="@dimen/default_margin">
+
+            <com.telen.easylineup.views.PositionsBarChart
+                style="@style/Field.Green.Dark"
+                android:id="@+id/positionsBarChart"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                tools:text="42"/>
-
-            <TextView
-                android:background="@color/normal_uppercase_style_text_color"
-                android:id="@+id/separator"
-                android:layout_width="@dimen/player_details_container_separator_width"
-                android:layout_height="70dp"
-                app:layout_constraintTop_toTopOf="@id/gamesPlayedValue"
-                app:layout_constraintBottom_toBottomOf="@+id/gamesPlayedValue"
-                app:layout_constraintLeft_toRightOf="@+id/gamesPlayedValue"
-                android:layout_marginStart="10dp"/>
-
-            <com.telen.easylineup.views.NormalUppercaseStyledTextView
-                style="@style/Field.Green.Middle"
-                android:id="@+id/gamesPlayedLabel"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="@string/tile_most_used_player_games_played"
-                app:layout_constraintTop_toTopOf="@id/separator"
-                app:layout_constraintBottom_toBottomOf="@id/separator"
-                app:layout_constraintLeft_toRightOf="@id/separator"
-                app:layout_constraintRight_toRightOf="parent"
-                android:gravity="center"
-                android:lines="2"
-                android:layout_marginStart="10dp"/>
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        style="@style/PlayerDetailsContainer"
-        android:id="@+id/playerPositionRepartition"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/radar_chart_size"
-        app:layout_constraintTop_toBottomOf="@+id/playerStatistics"
-        android:layout_margin="@dimen/default_margin">
-
-        <com.telen.easylineup.views.PositionsBarChart
-            style="@style/Field.Green.Dark"
-            android:id="@+id/positionsBarChart"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

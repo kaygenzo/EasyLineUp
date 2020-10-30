@@ -4,7 +4,10 @@ import android.net.Uri
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
+import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
+import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
+import com.telen.easylineup.domain.utils.ValidatorUtils
 import io.reactivex.Single
 
 internal class SavePlayer(val dao: PlayerRepository): UseCase<SavePlayer.RequestValues, SavePlayer.ResponseValue>() {
@@ -12,11 +15,14 @@ internal class SavePlayer(val dao: PlayerRepository): UseCase<SavePlayer.Request
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return when {
             requestValues.name.isNullOrBlank() -> Single.error(NameEmptyException())
+            !ValidatorUtils().isEmailValid(requestValues.email) -> Single.error(InvalidEmailException())
+            !ValidatorUtils().isValidPhoneNumber(requestValues.phone) -> Single.error(InvalidPhoneException())
             else -> {
                 val player = Player(id = requestValues.playerID, teamId = requestValues.teamID, name = requestValues.name.trim(),
                         shirtNumber = requestValues.shirtNumber ?: 0, licenseNumber = requestValues.licenseNumber ?: 0L,
                         image = requestValues.imageUri?.toString(), positions = requestValues.positions,
-                        pitching = requestValues.pitching, batting = requestValues.batting
+                        pitching = requestValues.pitching, batting = requestValues.batting,
+                        email = requestValues.email, phone = requestValues.phone
                 )
 
                 val task = if(player.id == 0L) {
@@ -42,7 +48,9 @@ internal class SavePlayer(val dao: PlayerRepository): UseCase<SavePlayer.Request
                         val imageUri: Uri?,
                         val positions: Int,
                         val pitching: Int,
-                        val batting: Int
+                        val batting: Int,
+                        val email: String?,
+                        val phone: String?
     ): UseCase.RequestValues
 
     class ResponseValue: UseCase.ResponseValue

@@ -60,6 +60,14 @@ class PlayerEditFragment: BaseFragment(), PlayerFormListener {
                     //case of a player creation
                     FirebaseAnalyticsUtils.emptyPlayerID(activity)
                 }
+                DomainErrors.INVALID_EMAIL_FORMAT -> {
+                    view?.editPlayerForm?.displayInvalidEmail()
+                    FirebaseAnalyticsUtils.invalidPlayerEmail(activity)
+                }
+                DomainErrors.INVALID_PHONE_NUMBER_FORMAT -> {
+                    view?.editPlayerForm?.displayInvalidPhoneNumber()
+                    FirebaseAnalyticsUtils.invalidPlayerPhoneNumber(activity)
+                }
                 else -> {
                     Timber.e("Unknown error: $error")
                 }
@@ -100,6 +108,8 @@ class PlayerEditFragment: BaseFragment(), PlayerFormListener {
             val savedPositions = savedInstanceState?.getInt(Constants.PLAYER_POSITIONS)
             val savedPitching = savedInstanceState?.getInt(Constants.PLAYER_PITCHING_SIDE)
             val savedBatting = savedInstanceState?.getInt(Constants.PLAYER_BATTING_SIDE)
+            val savedEmail = savedInstanceState?.getString(Constants.PLAYER_EMAIL)
+            val savedPhoneNumber = savedInstanceState?.getString(Constants.PLAYER_PHONE_NUMBER)
 
             view.editPlayerForm.apply {
                 setName(savedName ?: player.name)
@@ -112,6 +122,8 @@ class PlayerEditFragment: BaseFragment(), PlayerFormListener {
                 }
                 setPitchingSide(PlayerSide.getSideByValue(savedPitching ?: player.pitching))
                 setBattingSide(PlayerSide.getSideByValue(savedBatting ?: player.batting))
+                setEmail(savedEmail ?: player.email)
+                setPhone(savedPhoneNumber ?: player.phone)
             }
         })
 
@@ -132,6 +144,8 @@ class PlayerEditFragment: BaseFragment(), PlayerFormListener {
         val positions = view?.editPlayerForm?.getPlayerPositions()
         val pitching = view?.editPlayerForm?.getPitchingSide()
         val batting = view?.editPlayerForm?.getBattingSide()
+        val email = view?.editPlayerForm?.getEmail()
+        val phoneNumber = view?.editPlayerForm?.getPhone()
 
         if(!TextUtils.isEmpty(name))
             outState.putString(Constants.NAME, name)
@@ -159,10 +173,19 @@ class PlayerEditFragment: BaseFragment(), PlayerFormListener {
         batting?.let {
             outState.putInt(Constants.PLAYER_BATTING_SIDE, it.flag)
         }
+
+        email?.let {
+            outState.putString(Constants.PLAYER_EMAIL, it)
+        }
+
+        phoneNumber?.let {
+            outState.putString(Constants.PLAYER_PHONE_NUMBER, it)
+        }
     }
 
-    override fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int) {
-        viewModel.savePlayer(name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting)
+    override fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?,
+                               imageUri: Uri?, positions: Int, pitching: Int, batting: Int, email: String?, phone: String?) {
+        viewModel.savePlayer(name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting, email, phone)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -34,6 +34,8 @@ class Constants {
         const val PLAYER_POSITIONS = "player_positions"
         const val PLAYER_PITCHING_SIDE = "player_pitchingSide"
         const val PLAYER_BATTING_SIDE = "player_battingSide"
+        const val PLAYER_EMAIL = "player_email"
+        const val PLAYER_PHONE_NUMBER = "player_phone_number"
 
         const val EXTRA_TOURNAMENT = "com.telen.extra.tournament"
 

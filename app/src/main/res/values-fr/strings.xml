@@ -178,4 +178,17 @@
     <string name="tile_last_player_number_message">Historique N°</string>
     <string name="tile_last_player_number_label_last">Dernier:</string>
     <string name="generic_not_found">Non trouvé</string>
+
+    <string name="player_hint_email">Email</string>
+    <string name="player_hint_phone">Numéro de téléphone</string>
+    <string name="player_hint_phone_short">N° tél.</string>
+    <string name="player_creation_error_invalid_email_format">Format d\'email invalide</string>
+    <string name="player_creation_error_invalid_phone_format">Format de n° de téléphone invalide</string>
+    <string name="tile_team_size_send_text_message">SMS</string>
+    <string name="tile_team_size_send_email">Email</string>
+    <string name="tile_team_size_send_other">Autre</string>
+    <string name="tile_team_size_send_title">Envoyer un message avec</string>
+    <string name="tile_team_size_send_empty_title">Un problème est survenu</string>
+    <string name="tile_team_size_send_empty_emails">Aucun email trouvé dans la liste des joueurs</string>
+    <string name="tile_team_size_send_empty_phones">Aucun n° de téléphone trouvé dans la liste des joueurs</string>
 </resources>

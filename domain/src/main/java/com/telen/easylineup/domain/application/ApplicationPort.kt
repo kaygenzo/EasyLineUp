@@ -44,7 +44,7 @@ interface ApplicationPort {
     /** @deprecated **/ fun insertPlayers(players: List<Player>): Completable
     fun getPlayer(playerID: Long?): Single<Player>
     fun getPlayerPositionsSummary(playerID: Long?): Single<Map<FieldPosition, Int>>
-    fun savePlayer(playerID: Long?, name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int): Completable
+    fun savePlayer(playerID: Long?, name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int, email: String?, phone: String?): Completable
     fun deletePlayer(playerID: Long?): Completable
     fun getPlayers(): Single<List<Player>>
     fun getNotSelectedPlayersFromList(list: List<PlayerWithPosition>, lineupID: Long?, sortBy: FieldPosition? = null): Single<List<Player>>
@@ -52,6 +52,8 @@ interface ApplicationPort {
     fun saveOrUpdatePlayerNumberOverlays(overlays: List<RosterItem>): Completable
     fun getShirtNumberHistory(number: Int): Single<List<ShirtNumberEntry>>
     /** @deprecated **/fun insertPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
+    fun getTeamEmails(): Single<List<String>>
+    fun getTeamPhones(): Single<List<String>>
 
     //lineups
     /** @deprecated **/ fun insertLineups(lineups: List<Lineup>): Completable

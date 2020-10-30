@@ -15,6 +15,8 @@ import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.fragment_player_details.view.*
 import timber.log.Timber
 
+const val EMPTY_MARKER = "-"
+
 class PlayerDetailsFragment: Fragment() {
 
     private lateinit var viewModel: PlayerViewModel
@@ -78,6 +80,9 @@ class PlayerDetailsFragment: Fragment() {
                     view.battingSideValue.text = getString(R.string.generic_unknown)
                 }
             }
+
+            view.playerEmailValue.text = it.email.takeIf { !it.isNullOrEmpty() } ?: EMPTY_MARKER
+            view.playerPhoneValue.text = it.phone.takeIf { !it.isNullOrEmpty() } ?: EMPTY_MARKER
         })
 
         viewModel.observeLineups().observe(viewLifecycleOwner, Observer {

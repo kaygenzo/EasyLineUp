@@ -138,6 +138,11 @@ H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
         <item name="android:textAppearance">@style/TextBig</item>
     </style>
 
+    <style name="Field.Green.Light.Big.Auto" parent="Field.Green.Light.Big">
+        <item name="autoSizeMaxTextSize">@dimen/app_max_text_size_big</item>
+        <item name="autoSizeTextType">uniform</item>
+    </style>
+
     <!-- LIGHTER -->
 
     <style name="Field.Green.Lighter" parent="Field">

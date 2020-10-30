@@ -8,6 +8,7 @@ object FirebaseAnalyticsUtils {
 
     const val EVENT_NAME_EXCEPTION = "elu_exception"
     const val KEY_EMPTY_FIELD = "empty_field"
+    const val KEY_INVALID_FORMAT = "invalid_format"
 
     const val EVENT_MISSING_PITCHER = "elu_exception_missing_pitcher"
     const val EVENT_MISSING_DP_FLEX = "elu_exception_missing_dp_flex"
@@ -48,8 +49,12 @@ object FirebaseAnalyticsUtils {
         logInvalidParameter(context, KEY_EMPTY_FIELD, "player_name", EVENT_NAME_EXCEPTION)
     }
 
-    fun emptyPlayerNumber(context: Context?) {
-        logInvalidParameter(context, KEY_EMPTY_FIELD, "player_number", EVENT_NAME_EXCEPTION)
+    fun invalidPlayerEmail(context: Context?) {
+        logInvalidParameter(context, KEY_INVALID_FORMAT, "player_email", EVENT_NAME_EXCEPTION)
+    }
+
+    fun invalidPlayerPhoneNumber(context: Context?) {
+        logInvalidParameter(context, KEY_INVALID_FORMAT, "player_phone_number", EVENT_NAME_EXCEPTION)
     }
 
     fun emptyPlayerID(context: Context?) {

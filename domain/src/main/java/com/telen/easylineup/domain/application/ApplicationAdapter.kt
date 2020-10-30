@@ -3,13 +3,13 @@ package com.telen.easylineup.domain.application
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
+import android.text.TextUtils
 import android.webkit.URLUtil
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.model.*
@@ -26,7 +26,6 @@ import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
-import java.lang.Exception
 
 internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErrors> = PublishSubject.create()): ApplicationPort, KoinComponent {
 
@@ -216,15 +215,17 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                 .map { it.summary }
     }
 
-    override fun savePlayer(playerID: Long?, name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int): Completable {
+    override fun savePlayer(playerID: Long?, name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int, email: String?, phone: String?): Completable {
         return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
                 .flatMapCompletable {
-                    val req = SavePlayer.RequestValues(playerID ?: 0, it.id, name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting)
+                    val req = SavePlayer.RequestValues(playerID ?: 0, it.id, name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting, email, phone)
                     UseCaseHandler.execute(savePlayerUseCase, req).ignoreElement()
                 }
                 .doOnError {
                     when (it) {
                         is NameEmptyException -> _errors.onNext(DomainErrors.INVALID_PLAYER_NAME)
+                        is InvalidEmailException -> _errors.onNext(DomainErrors.INVALID_EMAIL_FORMAT)
+                        is InvalidPhoneException ->_errors.onNext(DomainErrors.INVALID_PHONE_NUMBER_FORMAT)
                     }
                 }
     }
@@ -269,6 +270,20 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
 
     override fun insertPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable {
         return playersRepo.createPlayerNumberOverlays(overlays)
+    }
+
+    override fun getTeamEmails(): Single<List<String>> {
+        return getPlayers().map { players ->
+            players.filter { player -> !TextUtils.isEmpty(player.email) }
+                    .map { it.email ?: "" }
+        }
+    }
+
+    override fun getTeamPhones(): Single<List<String>> {
+        return getPlayers().map { players ->
+            players.filter { player -> !TextUtils.isEmpty(player.phone) }
+                    .map { it.phone ?: "" }
+        }
     }
 
     override fun insertLineups(lineups: List<Lineup>): Completable {

@@ -23,7 +23,9 @@ data class PlayerExport (
         @SerializedName("licenseNumber") val licenseNumber : String,
         @SerializedName("positions") val positions : Int,
         @SerializedName("pitching") val pitching : Int,
-        @SerializedName("batting") val batting : Int
+        @SerializedName("batting") val batting : Int,
+        @SerializedName("email") var email : String?,
+        @SerializedName("phone") var phone : String?
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -39,6 +41,8 @@ data class PlayerExport (
         if (positions != other.positions) return false
         if (pitching != other.pitching) return false
         if (batting != other.batting) return false
+        if (email != other.email) return false
+        if (phone != other.phone) return false
 
         return true
     }
@@ -52,6 +56,9 @@ data class PlayerExport (
         result = 31 * result + positions
         result = 31 * result + pitching
         result = 31 * result + batting
+        result = 31 * result + (email?.hashCode() ?: 0)
+        result = 31 * result + (phone?.hashCode() ?: 0)
         return result
     }
+
 }

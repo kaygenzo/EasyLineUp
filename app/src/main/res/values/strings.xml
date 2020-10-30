@@ -22,6 +22,9 @@
     <string name="player_hint_shirt_number">Shirt number</string>
     <string name="player_hint_license_number">License number</string>
     <string name="player_hint_license_number_short">License N°</string>
+    <string name="player_hint_email">Email</string>
+    <string name="player_hint_phone">Phone number</string>
+    <string name="player_hint_phone_short">Phone n°</string>
 
     <string name="title_last_lineup">Dashboard</string>
     <string name="title_team">Roster</string>
@@ -38,6 +41,8 @@
     <string name="player_creation_error_name_empty">Player name cannot be empty</string>
     <string name="player_creation_error_shirt_empty">Player shirt number cannot be empty</string>
     <string name="player_creation_error_license_empty">Player license cannot be empty</string>
+    <string name="player_creation_error_invalid_email_format">Invalid email format</string>
+    <string name="player_creation_error_invalid_phone_format">Invalid phone number format</string>
 
     <string name="lineup_creation_error_name_empty">Lineup name cannot be empty</string>
     <string name="lineup_creation_error_tournament_empty">Tournament name cannot be empty</string>
@@ -203,4 +208,13 @@
     <string name="lineup_style_default_value" translatable="false">0</string>
 
     <string name="generic_not_found">Not found</string>
+
+    <string name="tile_team_size_send_text_message">Text message</string>
+    <string name="tile_team_size_send_email">Email</string>
+    <string name="tile_team_size_send_other">Other</string>
+
+    <string name="tile_team_size_send_title">Send message with</string>
+    <string name="tile_team_size_send_empty_title">Something went wrong</string>
+    <string name="tile_team_size_send_empty_emails">No emails found into players</string>
+    <string name="tile_team_size_send_empty_phones">No phone numbers found into players</string>
 </resources>
