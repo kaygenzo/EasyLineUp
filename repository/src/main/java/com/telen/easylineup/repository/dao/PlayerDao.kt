@@ -77,9 +77,9 @@ internal interface PlayerDao {
         FROM players 
         LEFT JOIN playerFieldPosition ON playerFieldPosition.playerID = players.id 
         LEFT JOIN lineups ON playerFieldPosition.lineupID = lineups.id 
-        WHERE lineupID > 0 AND number = :number;
+        WHERE players.teamID = :teamID AND lineupID > 0 AND number = :number;
     """)
-    fun getShirtNumberHistoryFromPlayers(number: Int): Single<List<RoomShirtNumberEntry>>
+    fun getShirtNumberHistoryFromPlayers(teamID: Long, number: Int): Single<List<RoomShirtNumberEntry>>
 
     @Query("""
         SELECT players.name as playerName,
@@ -92,7 +92,7 @@ internal interface PlayerDao {
         FROM players
         LEFT JOIN playerNumberOverlay ON playerNumberOverlay.playerID = players.id
         LEFT JOIN lineups ON playerNumberOverlay.lineupID = lineups.id
-        WHERE number = :number;
+        WHERE players.teamID = :teamID AND number = :number;
     """)
-    fun getShirtNumberHistoryFromOverlays(number: Int): Single<List<RoomShirtNumberEntry>>
+    fun getShirtNumberHistoryFromOverlays(teamID: Long, number: Int): Single<List<RoomShirtNumberEntry>>
 }
