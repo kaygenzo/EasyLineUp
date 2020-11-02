@@ -191,4 +191,6 @@
     <string name="tile_team_size_send_empty_title">Un problème est survenu</string>
     <string name="tile_team_size_send_empty_emails">Aucun email trouvé dans la liste des joueurs</string>
     <string name="tile_team_size_send_empty_phones">Aucun n° de téléphone trouvé dans la liste des joueurs</string>
+
+    <string name="app_deeplink_file_import_title">Importer les données de ce fichier ?</string>
 </resources>
