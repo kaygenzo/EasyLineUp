@@ -63,4 +63,15 @@ class SplashScreenActivity: BaseImportActivity(), KoinComponent {
                 cancelable = false
         ).show()
     }
+
+    override fun displayImportFailure() {
+        DialogFactory.getErrorDialog(
+                context = this@SplashScreenActivity,
+                title = R.string.settings_import_error_title,
+                message = R.string.settings_import_error_message,
+                confirmClick = DialogInterface.OnClickListener { dialogInterface, i ->
+                    dialogInterface.dismiss()
+                    finish()
+                }).show()
+    }
 }

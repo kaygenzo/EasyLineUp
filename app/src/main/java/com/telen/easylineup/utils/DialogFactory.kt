@@ -121,6 +121,10 @@ class DialogFactory {
             return getDialog(context = context, title = title, content = message, resIcon = R.drawable.ic_warning_red_24dp, resCancelText = 0)
         }
 
+        fun getErrorDialog(context: Context, @StringRes title: Int, @StringRes message: Int, confirmClick: DialogInterface.OnClickListener?): Dialog {
+            return getDialog(context = context, title = title, content = message, resIcon = R.drawable.ic_warning_red_24dp, resCancelText = 0, confirmClick = confirmClick)
+        }
+
         private fun getDialog(context: Context,
                               @StringRes title: Int = 0,
                               titleArgs: Array<Any> = arrayOf(),

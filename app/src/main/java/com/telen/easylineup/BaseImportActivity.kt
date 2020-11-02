@@ -49,7 +49,7 @@ abstract class BaseImportActivity: BaseActivity() {
                     dialog.show()
                 }
                 ImportFailure -> {
-                    DialogFactory.getErrorDialog(this@BaseImportActivity, title = R.string.settings_import_error_title, message = R.string.settings_import_error_message).show()
+                    displayImportFailure()
                 }
                 is GetTeamSuccess -> {
                     //the file contains at least one main team
@@ -98,8 +98,20 @@ abstract class BaseImportActivity: BaseActivity() {
     }
 
     private fun importDataFromUri(uri: Uri) {
-        uri.path?.let {
-            viewModel.importData(it, true)
+        if(uri.scheme.equals("file")) {
+            uri.path?.let {
+                viewModel.importData(it, true)
+            }
+        }
+        else if(uri.scheme.equals("content")) {
+            contentResolver.openInputStream(uri)?.let {
+                viewModel.importData(it, true)
+            } ?: let {
+                displayImportFailure()
+            }
+        }
+        else {
+            displayImportFailure()
         }
     }
 
@@ -135,5 +147,12 @@ abstract class BaseImportActivity: BaseActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
         finish()
+    }
+
+    protected open fun displayImportFailure() {
+        DialogFactory.getErrorDialog(
+                context = this@BaseImportActivity,
+                title = R.string.settings_import_error_title,
+                message = R.string.settings_import_error_message).show()
     }
 }
