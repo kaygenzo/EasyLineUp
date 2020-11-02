@@ -268,7 +268,9 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
     }
 
     override fun getShirtNumberHistory(number: Int): Single<List<ShirtNumberEntry>> {
-        return UseCaseHandler.execute(getShirtNumberHistoryUseCase, GetShirtNumberHistory.RequestValues(number)).map { it.history }
+        return getTeam().flatMap {
+            UseCaseHandler.execute(getShirtNumberHistoryUseCase, GetShirtNumberHistory.RequestValues(it.id, number)).map { it.history }
+        }
     }
 
     override fun insertPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable {

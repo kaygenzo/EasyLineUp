@@ -56,15 +56,15 @@ internal class GetShirtNumberHistoryTests {
         Mockito.`when`(playerRepo.getShirtNumberOverlay(2L, 2L)).thenReturn(Single.error(Exception()))
         Mockito.`when`(playerRepo.getShirtNumberOverlay(3L, 3L)).thenReturn(Single.error(Exception()))
 
-        Mockito.`when`(playerRepo.getShirtNumberFromNumberOverlays(1)).thenReturn(Single.just(listOf()))
+        Mockito.`when`(playerRepo.getShirtNumberFromNumberOverlays(1L, 1)).thenReturn(Single.just(listOf()))
     }
 
     @Test
     fun shouldGetAllShirtNumberFromPositions() {
-        Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1)).thenReturn(Single.just(listOf(entry1, entry2, entry3, entry4)))
+        Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 1)).thenReturn(Single.just(listOf(entry1, entry2, entry3, entry4)))
 
         val observer = TestObserver<GetShirtNumberHistory.ResponseValue>()
-        mGetShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(1))
+        mGetShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(1L, 1))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -73,14 +73,14 @@ internal class GetShirtNumberHistoryTests {
 
     @Test
     fun shouldGetAllShirtNumberFromPositionsAndOverlays() {
-        Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1)).thenReturn(Single.just(listOf(entry1, entry2, entry3, entry4)))
+        Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 1)).thenReturn(Single.just(listOf(entry1, entry2, entry3, entry4)))
 
-        Mockito.`when`(playerRepo.getShirtNumberFromNumberOverlays(1)).thenReturn(Single.just(listOf(
+        Mockito.`when`(playerRepo.getShirtNumberFromNumberOverlays(1L, 1)).thenReturn(Single.just(listOf(
                 shirtNumberOverlay1, shirtNumberOverlay2
         )))
 
         val observer = TestObserver<GetShirtNumberHistory.ResponseValue>()
-        mGetShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(1))
+        mGetShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(1L, 1))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -90,12 +90,12 @@ internal class GetShirtNumberHistoryTests {
 
     @Test
     fun shouldNotGetPlayerNumberIfOverlayExists() {
-        Mockito.`when`(playerRepo.getShirtNumberFromPlayers(42)).thenReturn(Single.just(listOf(entry5)))
+        Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 42)).thenReturn(Single.just(listOf(entry5)))
         Mockito.`when`(playerRepo.getShirtNumberOverlay(3L, 3L)).thenReturn(Single.just(overlay2))
-        Mockito.`when`(playerRepo.getShirtNumberFromNumberOverlays(42)).thenReturn(Single.just(listOf()))
+        Mockito.`when`(playerRepo.getShirtNumberFromNumberOverlays(1L, 42)).thenReturn(Single.just(listOf()))
 
         val observer = TestObserver<GetShirtNumberHistory.ResponseValue>()
-        mGetShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(42))
+        mGetShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(1L, 42))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()

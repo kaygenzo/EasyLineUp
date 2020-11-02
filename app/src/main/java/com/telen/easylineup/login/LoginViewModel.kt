@@ -12,9 +12,7 @@ import io.reactivex.subjects.Subject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileReader
+import java.io.*
 
 sealed class LoginEvent
 object ImportSuccessfulEvent: LoginEvent()
@@ -35,9 +33,19 @@ class LoginViewModel : ViewModel(), KoinComponent {
     }
 
     fun importData(dataPath: String, updateIfExists: Boolean) {
+        try {
+            val inputStream: InputStream = FileInputStream(File(dataPath))
+            importData(inputStream, updateIfExists)
+        }
+        catch (e: Exception) {
+            _loginEvent.onNext(ImportFailure)
+        }
+    }
+
+    fun importData(inputStream: InputStream, updateIfExists: Boolean) {
         var input : BufferedReader? = null
         val task = try {
-            input = BufferedReader(FileReader(File(dataPath)))
+            input = BufferedReader(InputStreamReader(inputStream))
             val data = Gson().fromJson(input, ExportBase::class.java)
             domain.importData(data, updateIfExists)
         }
@@ -46,6 +54,7 @@ class LoginViewModel : ViewModel(), KoinComponent {
         }
         finally {
             input?.close()
+            inputStream.close()
         }
 
         val disposable = task.subscribe({

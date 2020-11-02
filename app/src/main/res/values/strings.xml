@@ -217,4 +217,6 @@
     <string name="tile_team_size_send_empty_title">Something went wrong</string>
     <string name="tile_team_size_send_empty_emails">No emails found into players</string>
     <string name="tile_team_size_send_empty_phones">No phone numbers found into players</string>
+
+    <string name="app_deeplink_file_import_title">Import data from this file ?</string>
 </resources>
