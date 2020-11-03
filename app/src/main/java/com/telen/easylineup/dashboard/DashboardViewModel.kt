@@ -59,7 +59,10 @@ class DashboardViewModel: ViewModel(), KoinComponent {
     fun getEmails() {
         val disposable = domain.getTeamEmails()
                 .subscribe({
-                    eventHandler.onNext(GetTeamEmailsSuccess(it))
+                    if(it.isNotEmpty())
+                        eventHandler.onNext(GetTeamEmailsSuccess(it))
+                    else
+                        eventHandler.onNext(TeamEmailsEmpty)
                 }, {
                     Timber.e(it)
                 })
@@ -69,7 +72,10 @@ class DashboardViewModel: ViewModel(), KoinComponent {
     fun getPhones() {
         val disposable = domain.getTeamPhones()
                 .subscribe({
-                    eventHandler.onNext(GetTeamPhonesSuccess(it))
+                    if(it.isNotEmpty())
+                        eventHandler.onNext(GetTeamPhonesSuccess(it))
+                    else
+                        eventHandler.onNext(TeamPhonesEmpty)
                 }, {
                     Timber.e(it)
                 })
