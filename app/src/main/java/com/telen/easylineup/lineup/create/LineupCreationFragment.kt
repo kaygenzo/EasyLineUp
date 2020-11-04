@@ -31,7 +31,7 @@ import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
 import kotlinx.android.synthetic.main.fragment_lineup_creation.view.*
 import timber.log.Timber
 
-class LineupCreationFragment: BaseFragment() {
+class LineupCreationFragment: BaseFragment("LineupCreationFragment") {
 
     private lateinit var lineupViewModel: LineupViewModel
 

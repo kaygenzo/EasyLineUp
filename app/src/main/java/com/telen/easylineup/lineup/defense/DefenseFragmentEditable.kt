@@ -30,7 +30,7 @@ import kotlinx.android.synthetic.main.fragment_lineup_defense_editable.view.*
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-class DefenseFragmentEditable: BaseFragment(), OnPlayerButtonCallback {
+class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayerButtonCallback {
 
     lateinit var viewModel: PlayersPositionViewModel
 

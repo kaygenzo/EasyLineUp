@@ -17,7 +17,7 @@ import io.reactivex.Completable
 import kotlinx.android.synthetic.main.fragment_players_details_container.view.*
 import timber.log.Timber
 
-class PlayersDetailsContainerFragment: BaseFragment(), ViewPager.OnPageChangeListener {
+class PlayersDetailsContainerFragment: BaseFragment("PlayersDetailsContainerFragment"), ViewPager.OnPageChangeListener {
 
     private lateinit var mAdapter: PlayersDetailsPagerAdapter
     private lateinit var teamViewModel: TeamViewModel

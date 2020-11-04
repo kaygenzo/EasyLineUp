@@ -41,7 +41,7 @@ import timber.log.Timber
 import java.text.DateFormat
 import java.util.*
 
-class DashboardFragment: BaseFragment(), TileClickListener, ActionMode.Callback {
+class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, ActionMode.Callback {
 
     private lateinit var dashboardViewModel: DashboardViewModel
     private val tileList = mutableListOf<DashboardTile>()

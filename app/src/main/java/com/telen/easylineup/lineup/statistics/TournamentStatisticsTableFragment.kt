@@ -5,9 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Tournament
@@ -15,7 +15,7 @@ import com.telen.library.widget.tablemultiscroll.views.StyleConfiguration
 import com.telen.library.widget.tablemultiscroll.views.TableConfiguration
 import kotlinx.android.synthetic.main.fragment_tournament_statistics_table.view.*
 
-class TournamentStatisticsTableFragment: Fragment() {
+class TournamentStatisticsTableFragment: BaseFragment("TournamentStatisticsTableFragment") {
 
     private lateinit var viewModel: TournamentStatisticsViewModel
 

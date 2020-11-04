@@ -21,7 +21,7 @@ import timber.log.Timber
 
 const val REQUEST_EDIT_TEAM = 0
 
-class TeamDetailsFragment: BaseFragment() {
+class TeamDetailsFragment: BaseFragment("TeamDetailsFragment") {
 
     private lateinit var teamViewModel: TeamViewModel
     private lateinit var lineupViewModel: LineupViewModel

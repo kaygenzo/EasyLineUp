@@ -25,7 +25,7 @@ import kotlinx.android.synthetic.main.fragment_team_edit.view.*
 import kotlinx.android.synthetic.main.view_create_team.*
 import timber.log.Timber
 
-class TeamEditFragment: BaseFragment() , TeamFormListener {
+class TeamEditFragment: BaseFragment("TeamEditFragment") , TeamFormListener {
 
     private lateinit var viewModel: SetupViewModel
     private var teamForm: TeamFormView? = null

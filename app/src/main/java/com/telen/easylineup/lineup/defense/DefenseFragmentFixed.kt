@@ -15,7 +15,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_lineup_defense_fixed.view.*
 import java.util.concurrent.TimeUnit
 
-class DefenseFragmentFixed: BaseFragment() {
+class DefenseFragmentFixed: BaseFragment("DefenseFragmentFixed") {
     lateinit var viewModel: PlayersPositionViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

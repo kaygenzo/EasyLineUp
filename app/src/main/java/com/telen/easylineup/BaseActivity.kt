@@ -1,7 +1,6 @@
 package com.telen.easylineup
 
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import io.reactivex.disposables.CompositeDisposable
 
 abstract class BaseActivity: AppCompatActivity() {

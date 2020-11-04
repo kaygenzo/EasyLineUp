@@ -1,9 +1,11 @@
 package com.telen.easylineup.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 
+@SuppressLint("MissingPermission")
 object FirebaseAnalyticsUtils {
 
     const val EVENT_NAME_EXCEPTION = "elu_exception"
@@ -97,5 +99,14 @@ object FirebaseAnalyticsUtils {
 
     fun endTutorial(context: Context?) {
         logInvalidParameter(context, FirebaseAnalytics.Event.TUTORIAL_COMPLETE)
+    }
+
+    fun onScreen(context: Context?, screenName: String) {
+        context?.run {
+            FirebaseAnalytics.getInstance(this).logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, Bundle().apply {
+                putString(FirebaseAnalytics.Param.SCREEN_NAME, screenName)
+                putString(FirebaseAnalytics.Param.SCREEN_CLASS, screenName)
+            })
+        }
     }
 }

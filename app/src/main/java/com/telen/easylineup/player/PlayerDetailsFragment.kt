@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.squareup.picasso.Picasso
+import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.PlayerSide
@@ -17,7 +17,7 @@ import timber.log.Timber
 
 const val EMPTY_MARKER = "-"
 
-class PlayerDetailsFragment: Fragment() {
+class PlayerDetailsFragment: BaseFragment("PlayerDetailsFragment") {
 
     private lateinit var viewModel: PlayerViewModel
 

@@ -27,7 +27,7 @@ import com.telen.easylineup.views.PlayerFormListener
 import kotlinx.android.synthetic.main.fragment_player_edit.view.*
 import timber.log.Timber
 
-class PlayerEditFragment: BaseFragment(), PlayerFormListener {
+class PlayerEditFragment: BaseFragment("PlayerEditFragment"), PlayerFormListener {
 
     private lateinit var viewModel: PlayerViewModel
 

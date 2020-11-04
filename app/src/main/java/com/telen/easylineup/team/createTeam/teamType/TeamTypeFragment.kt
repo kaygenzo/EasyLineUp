@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.fragment_team_type.view.*
 import timber.log.Timber
 
 
-class TeamTypeFragment: BaseFragment() {
+class TeamTypeFragment: BaseFragment("TeamTypeFragment") {
 
     private lateinit var viewModel: SetupViewModel
     private lateinit var mViewPager: ViewPager2

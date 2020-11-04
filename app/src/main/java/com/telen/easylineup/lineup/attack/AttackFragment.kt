@@ -21,7 +21,7 @@ import com.telen.easylineup.views.LineupTypeface
 import kotlinx.android.synthetic.main.fragment_list_batter.view.*
 import timber.log.Timber
 
-class AttackFragment: BaseFragment(), OnDataChangedListener {
+class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
 
     private lateinit var playerAdapter: BattingOrderAdapter
     private val adapterDataList = mutableListOf<PlayerWithPosition>()

@@ -36,7 +36,7 @@ class LineupsScrollListener(private val view: FloatingActionButton): RecyclerVie
     }
 }
 
-class TournamentListFragment: BaseFragment(), OnItemClickedListener, MaterialSearchBar.OnSearchActionListener {
+class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClickedListener, MaterialSearchBar.OnSearchActionListener {
 
     private lateinit var tournamentsAdapter: TournamentsAdapter
     private lateinit var viewModel: LineupViewModel

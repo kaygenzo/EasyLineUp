@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.fragment_lineup_roster.view.*
 import kotlinx.android.synthetic.main.view_actions_form.view.*
 import timber.log.Timber
 
-class LineupRosterFragment : BaseFragment(), RosterAdapterCallback {
+class LineupRosterFragment : BaseFragment("LineupRosterFragment"), RosterAdapterCallback {
 
     private lateinit var rosterAdapter: RosterAdapter
 

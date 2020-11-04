@@ -28,7 +28,7 @@ import com.telen.easylineup.lineup.defense.DefenseFragmentEditable
 import com.telen.easylineup.utils.NavigationUtils
 import timber.log.Timber
 
-class LineupFragmentFixed: LineupFragment(R.layout.fragment_lineup_fixed, false) {
+class LineupFragmentFixed: LineupFragment("LineupFragmentFixed", R.layout.fragment_lineup_fixed, false) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_lineup_summary, menu)
@@ -48,7 +48,7 @@ class LineupFragmentFixed: LineupFragment(R.layout.fragment_lineup_fixed, false)
 
 }
 
-class LineupFragmentEditable: LineupFragment(R.layout.fragment_lineup_edition, true) {
+class LineupFragmentEditable: LineupFragment("LineupFragmentEditable", R.layout.fragment_lineup_edition, true) {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_lineup_edition, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -80,7 +80,7 @@ class LineupFragmentEditable: LineupFragment(R.layout.fragment_lineup_edition, t
     }
 }
 
-abstract class LineupFragment(@LayoutRes private val layout: Int, private val isEditable: Boolean): BaseFragment() {
+abstract class LineupFragment(fragmentName: String, @LayoutRes private val layout: Int, private val isEditable: Boolean): BaseFragment(fragmentName) {
 
     companion object {
         const val REQUEST_WRITE_EXTERENAL_STORAGE_PERMISSION = 0
