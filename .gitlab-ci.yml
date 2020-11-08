@@ -25,7 +25,7 @@ before_script:
   - echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
   - echo $APP_DISTRIBUTION_SERVICE_FILE | base64 -d > easylineup-services.json
   - echo $APP_DISTRIBUTION_TESTERS_FILE | base64 -d > testers.txt
-  - git branch --show-current > releasenotes.txt
+  - git rev-parse --abbrev-ref HEAD > releasenotes.txt
   - git log -1 --pretty="%B %ad" >> releasenotes.txt
 
 stages:
