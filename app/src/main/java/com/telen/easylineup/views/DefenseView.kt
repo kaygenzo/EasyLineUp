@@ -19,6 +19,8 @@ const val ICON_SIZE_SCALE = 0.12f
 
 abstract class DefenseView: ConstraintLayout {
 
+    private var containerSize: Float? = 0f
+
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
@@ -41,7 +43,7 @@ abstract class DefenseView: ConstraintLayout {
 
         val iconSize = (parentWidth * ICON_SIZE_SCALE).roundToInt()
 
-        view.post {
+        view.drawn {
             val imageWidth = view.width.toFloat()
             val imageHeight = view.height.toFloat()
 
@@ -111,8 +113,14 @@ abstract class DefenseView: ConstraintLayout {
     }
 
     protected fun getContainerSize(result: (Float) -> Unit) {
-        fieldFrameLayout.drawn {
-            result(min(fieldFrameLayout.width, fieldFrameLayout.height).toFloat())
+        containerSize?.takeIf { it > 0f }?.let {
+            result(it)
+        } ?: let {
+            fieldFrameLayout.drawn {
+                val size = min(fieldFrameLayout.width, fieldFrameLayout.height).toFloat()
+                this.containerSize = size
+                result(size)
+            }
         }
     }
 }

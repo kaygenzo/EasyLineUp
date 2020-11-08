@@ -87,6 +87,7 @@ android {
             dimension 'version'
             firebaseAppDistribution {
                 serviceCredentialsFile="easylineup-services.json"
+                releaseNotesFile="releasenotes.txt"
                 testersFile="testers.txt"
             }
             matchingFallbacks = ['prod']
