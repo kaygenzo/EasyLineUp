@@ -13,7 +13,7 @@ internal class GetPositionsSummaryForPlayer(val dao: PlayerFieldPositionReposito
                     .map { list ->
                         val chartData: MutableMap<FieldPosition, Int> = mutableMapOf()
                         list.forEach { position ->
-                            val fieldPosition = FieldPosition.getFieldPosition(position.position)
+                            val fieldPosition = FieldPosition.getFieldPositionById(position.position)
                             fieldPosition?.let { element ->
                                 chartData[element] = chartData[element]?.let { it + 1 } ?: 1
                             }

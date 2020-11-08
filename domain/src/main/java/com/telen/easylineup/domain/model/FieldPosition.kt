@@ -1,44 +1,55 @@
 package com.telen.easylineup.domain.model
 
 import android.content.Context
-import androidx.annotation.ColorRes
+import android.graphics.PointF
 import com.telen.easylineup.domain.R
+import java.lang.Exception
 
-enum class FieldPosition(val position: Int, val mask: Int, val xPercent: Float, val yPercent: Float, @ColorRes val color: Int) {
-    SUBSTITUTE(0, 0, 0f, 100f, R.color.brown),
-    PITCHER(1,      0x01, 50f, 60f, R.color.blue_004a8d),
-    CATCHER(2,      0x02, 50f, 87f, R.color.orange),
-    FIRST_BASE(3,   0x04, 74f, 57f, R.color.red),
-    SECOND_BASE(4,  0x08, 63f, 44f, R.color.blue_5bc0de),
-    THIRD_BASE(5,   0x10, 27f, 59f, R.color.light_brown),
-    SHORT_STOP(6,   0x20, 37f, 43f, R.color.yellow),
-    LEFT_FIELD(7,   0x40, 15f, 15f, R.color.green),
-    CENTER_FIELD(8, 0x80, 50f, 10f, R.color.violet),
-    RIGHT_FIELD(9,  0x0100, 85f, 15f, R.color.lavanda),
-    DP_DH(10,  0x0200, 0f, 100f, R.color.beige);
+enum class FieldPosition(val id: Int, val mask: Int, private val position: Int) {
+    SUBSTITUTE(0, 0, 0),
+    PITCHER(1,      0x01, 1),
+    CATCHER(2,      0x02, 2),
+    FIRST_BASE(3,   0x04, 3),
+    SECOND_BASE(4,  0x08, 4),
+    THIRD_BASE(5,   0x10, 5),
+    SHORT_STOP(6,   0x20, 6),
+    LEFT_FIELD(7,   0x40, 7),
+    CENTER_FIELD(8, 0x80, 8),
+    RIGHT_FIELD(9,  0x0100, 9),
+    DP_DH(10,  0x0200, 10),
+
+    //Slowpitch
+    SLOWPITCH_LF(11, 0x0400, 7),
+    SLOWPITCH_LCF(12, 0x0800, 8),
+    SLOWPITCH_RCF(13, 0x1000, 9),
+    SLOWPITCH_RF(14, 0x2000, 10);
+
+    fun getPosition(): Int {
+        return position
+    }
 
     companion object {
-        fun getFieldPosition(position: Int): FieldPosition? {
+        fun getFieldPositionById(id: Int): FieldPosition? {
             values().forEach {
-                if(position == it.position)
+                if(id == it.id)
                     return it
             }
             return null
         }
 
         //TODO move in domain
-        fun isSubstitute(position: Int): Boolean {
-            return position == SUBSTITUTE.position
+        fun isSubstitute(id: Int): Boolean {
+            return id == SUBSTITUTE.id
         }
 
         //TODO move in domain
-        fun isDefensePlayer(position: Int): Boolean {
-            return !isSubstitute(position) && position != DP_DH.position
+        fun isDefensePlayer(id: Int): Boolean {
+            return !isSubstitute(id) && id != DP_DH.id
         }
 
         //TODO move in domain
-        fun canBeBatterWhenModeEnabled(position: Int, flags: Int): Boolean {
-            return !isSubstitute(position) && (flags and PlayerFieldPosition.FLAG_FLEX == 0)
+        fun canBeBatterWhenModeEnabled(id: Int, flags: Int): Boolean {
+            return !isSubstitute(id) && (flags and PlayerFieldPosition.FLAG_FLEX == 0)
         }
 
         fun getPositionShortNames(context: Context, teamType: Int): Array<String> {
@@ -49,6 +60,45 @@ enum class FieldPosition(val position: Int, val mask: Int, val xPercent: Float, 
                 else -> { //apply baseball rule
                     context.resources.getStringArray(R.array.field_positions_baseball_list)
                 }
+            }
+        }
+
+        fun getPositionCoordinates(position: FieldPosition, strategy: TeamStrategy): PointF {
+            return when(strategy) {
+                TeamStrategy.STANDARD -> {
+                    when (position) {
+                        SUBSTITUTE -> PointF(0f, 0f)
+                        PITCHER -> PointF(50f, 60f)
+                        CATCHER -> PointF(50f, 87f)
+                        FIRST_BASE -> PointF(74f, 57f)
+                        SECOND_BASE -> PointF(63f, 44f)
+                        THIRD_BASE -> PointF(27f, 59f)
+                        SHORT_STOP -> PointF(37f, 43f)
+                        LEFT_FIELD -> PointF(15f, 15f)
+                        CENTER_FIELD -> PointF(50f, 10f)
+                        RIGHT_FIELD -> PointF(85f, 15f)
+                        DP_DH -> PointF(0f, 100f)
+                        else -> throw Exception("Not a valid position $position for strategy $strategy")
+                    }
+                }
+                TeamStrategy.SLOWPITCH -> {
+                    when (position) {
+                        SUBSTITUTE -> PointF(0f, 0f)
+                        PITCHER -> PointF(50f, 60f)
+                        CATCHER -> PointF(50f, 87f)
+                        FIRST_BASE -> PointF(74f, 57f)
+                        SECOND_BASE -> PointF(63f, 44f)
+                        THIRD_BASE -> PointF(27f, 59f)
+                        SHORT_STOP -> PointF(37f, 43f)
+                        LEFT_FIELD -> PointF(15f, 15f)
+                        SLOWPITCH_LCF -> PointF(50f, 50f)
+                        SLOWPITCH_RCF -> PointF(50f, 50f)
+                        RIGHT_FIELD -> PointF(85f, 15f)
+                        DP_DH -> PointF(0f, 100f)
+                        else -> throw Exception("Not a valid position for strategy $strategy")
+                    }
+                }
+//                TeamStrategy.SLOWPITCH_5_MAN -> TODO()
             }
         }
     }

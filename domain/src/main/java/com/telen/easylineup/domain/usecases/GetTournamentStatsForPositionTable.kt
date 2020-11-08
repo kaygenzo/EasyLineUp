@@ -35,8 +35,8 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository): Us
                     val positionsArray = FieldPosition.getPositionShortNames(requestValues.context, requestValues.team.type)
 
                     topHeaderData.add(Pair(requestValues.context.getString(R.string.tournament_stats_label_games_played), -1))
-                    FieldPosition.values().forEach { fieldPosition ->
-                        topHeaderData.add(Pair(positionsArray[fieldPosition.position], fieldPosition.position))
+                    TeamStrategy.STANDARD.positions.forEach { fieldPosition ->
+                        topHeaderData.add(Pair(positionsArray[fieldPosition.id], fieldPosition.id))
                     }
 
                     playersIdToPlayerName.forEach { entry ->
@@ -46,19 +46,19 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository): Us
 
                         //games played
                         val gamesCount = playerIdToData[entry.key]
-                                ?.filter{ !FieldPosition.isSubstitute(it.position ?: FieldPosition.SUBSTITUTE.position) }
+                                ?.filter{ !FieldPosition.isSubstitute(it.position ?: FieldPosition.SUBSTITUTE.id) }
                                 ?.size?.toString() ?: "0"
                         data.add(Pair(gamesCount, -1))
 
                         playerIdToData[entry.key]?.let { positions ->
-                            FieldPosition.values().forEach { fieldPosition ->
-                                val count = positions.filter { it.position == fieldPosition.position }.size.toString()
-                                data.add(Pair(count, fieldPosition.position))
+                            TeamStrategy.STANDARD.positions.forEach { fieldPosition ->
+                                val count = positions.filter { it.position == fieldPosition.id }.size.toString()
+                                data.add(Pair(count, fieldPosition.id))
                             }
                         }
                     }
 
-                    ResponseValue(TournamentStatsUIConfig(leftHeaderData, topHeaderData, mainData, mutableListOf(FieldPosition.SUBSTITUTE.position)))
+                    ResponseValue(TournamentStatsUIConfig(leftHeaderData, topHeaderData, mainData, mutableListOf(FieldPosition.SUBSTITUTE.id)))
                 }
     }
 

@@ -33,15 +33,15 @@ internal class UpdatePlayersWithLineupModeTests {
         updatePlayersWithLineupMode = UpdatePlayersWithLineupMode(lineupDao)
         players = mutableListOf()
         players.add(PlayerWithPosition("toto", 1, 1, 1, null,
-                FieldPosition.SECOND_BASE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,0, 1, 1, 1, 1))
+                FieldPosition.SECOND_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,0, 1, 1, 1, 1))
         players.add(PlayerWithPosition("tata", 2, 2, 1, null,
-                FieldPosition.CATCHER.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 2, 2, 1, 2))
+                FieldPosition.CATCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 2, 2, 1, 2))
         players.add(PlayerWithPosition("titi", 3, 3, 1, null,
-                FieldPosition.CENTER_FIELD.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,4, 3, 3, 1, 4))
+                FieldPosition.CENTER_FIELD.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,4, 3, 3, 1, 4))
         players.add(PlayerWithPosition("tutu", 4, 4, 1, null,
-                FieldPosition.FIRST_BASE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,6, 4, 4, 1, 8))
+                FieldPosition.FIRST_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,6, 4, 4, 1, 8))
         players.add(PlayerWithPosition("tete", 5, 5, 1, null,
-                FieldPosition.SUBSTITUTE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
+                FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
 
         Mockito.`when`(lineupDao.updatePlayerFieldPosition(any())).thenReturn(Completable.complete())
         Mockito.`when`(lineupDao.deletePosition(any())).thenReturn(Completable.complete())
@@ -108,7 +108,7 @@ internal class UpdatePlayersWithLineupModeTests {
 
     @Test
     fun shouldUpdatePitcherOrderTo_10_ifAssignedAndDPEnabled() {
-        players[0].position = FieldPosition.PITCHER.position
+        players[0].position = FieldPosition.PITCHER.id
 
         updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, true, TeamType.BASEBALL.id))
                 .subscribe(observer)
@@ -118,7 +118,7 @@ internal class UpdatePlayersWithLineupModeTests {
         verify(lineupDao).updatePlayerFieldPosition(check {
             Assert.assertEquals(Constants.ORDER_PITCHER_WHEN_DH, it.order)
             Assert.assertEquals(PlayerFieldPosition.FLAG_FLEX, it.flags)
-            Assert.assertEquals(FieldPosition.PITCHER.position, it.position)
+            Assert.assertEquals(FieldPosition.PITCHER.id, it.position)
         })
         verify(lineupDao, never()).deletePosition(any())
     }
@@ -126,10 +126,10 @@ internal class UpdatePlayersWithLineupModeTests {
     @Test
     fun shouldDeletePitcherAndDPifAssignedAndDPDisabled() {
         players[0].apply {
-            position = FieldPosition.PITCHER.position
+            position = FieldPosition.PITCHER.id
             flags = PlayerFieldPosition.FLAG_FLEX
         }
-        players[1].position = FieldPosition.DP_DH.position
+        players[1].position = FieldPosition.DP_DH.id
 
         updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, false, TeamType.BASEBALL.id))
                 .subscribe(observer)
@@ -137,7 +137,7 @@ internal class UpdatePlayersWithLineupModeTests {
         observer.assertComplete()
 
         verify(lineupDao, times(2)).deletePosition(check {
-            Assert.assertEquals(true, it.flags and PlayerFieldPosition.FLAG_FLEX > 0 || it.position == FieldPosition.DP_DH.position)
+            Assert.assertEquals(true, it.flags and PlayerFieldPosition.FLAG_FLEX > 0 || it.position == FieldPosition.DP_DH.id)
         })
         verify(lineupDao, never()).updatePlayerFieldPosition(any())
     }

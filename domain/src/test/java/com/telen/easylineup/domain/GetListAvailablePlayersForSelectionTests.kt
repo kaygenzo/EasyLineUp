@@ -25,15 +25,15 @@ internal class GetListAvailablePlayersForSelectionTests {
 
         players = mutableListOf()
         players.add(PlayerWithPosition("toto", 1, 1, teamID, null,
-                FieldPosition.PITCHER.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,0, 1, 1, 1, 1))
+                FieldPosition.PITCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,0, 1, 1, 1, 1))
         players.add(PlayerWithPosition("tata", 2, 2, teamID, null,
-                FieldPosition.CATCHER.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 0, 2, 1, 2))
+                FieldPosition.CATCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 0, 2, 1, 2))
         players.add(PlayerWithPosition("titi", 3, 3, teamID, null,
-                FieldPosition.CENTER_FIELD.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,9, 3, 3, 1, 4))
+                FieldPosition.CENTER_FIELD.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,9, 3, 3, 1, 4))
         players.add(PlayerWithPosition("tutu", 4, 4, teamID, null,
-                FieldPosition.FIRST_BASE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,10, 0, 4, 1, 8))
+                FieldPosition.FIRST_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,10, 0, 4, 1, 8))
         players.add(PlayerWithPosition("tete", 5, 5, teamID, null,
-                FieldPosition.SUBSTITUTE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
+                FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
 
         roster = mutableListOf()
         roster.add(RosterPlayerStatus(Player(id = 1L, teamId = teamID, name = "toto", shirtNumber =  1, licenseNumber = 1, image = null, positions = 1), true, null))

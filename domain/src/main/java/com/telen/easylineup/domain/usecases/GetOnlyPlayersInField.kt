@@ -11,7 +11,7 @@ internal class GetOnlyPlayersInField: UseCase<GetOnlyPlayersInField.RequestValue
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.just(requestValues.playersInLineup)
-                .map { list -> list.filter { it.position >= FieldPosition.PITCHER.position && it.position <= FieldPosition.RIGHT_FIELD.position } }
+                .map { list -> list.filter { it.position >= FieldPosition.PITCHER.id && it.position <= FieldPosition.RIGHT_FIELD.id } }
                 .map { ResponseValue(it.map { it.toPlayer() }) }
     }
 

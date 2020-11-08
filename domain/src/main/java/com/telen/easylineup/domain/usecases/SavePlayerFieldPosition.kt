@@ -11,11 +11,11 @@ internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositio
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return requestValues.lineupID?.let { lineupID ->
             val playerPosition = requestValues.players.firstOrNull {
-                p -> p.position == requestValues.position.position  && p.position != FieldPosition.SUBSTITUTE.position
+                p -> p.position == requestValues.position.id  && p.position != FieldPosition.SUBSTITUTE.id
             }?.run {
                 this.toPlayerFieldPosition()
             } ?: run {
-                PlayerFieldPosition(playerId = 0, lineupId = lineupID, position = requestValues.position.position, order = 0)
+                PlayerFieldPosition(playerId = 0, lineupId = lineupID, position = requestValues.position.id, order = 0)
             }
 
             playerPosition.apply {
@@ -40,8 +40,9 @@ internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositio
                 if(order <= 0)
                     order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
 
-                x = requestValues.position.xPercent
-                y = requestValues.position.yPercent
+                val coordinate = FieldPosition.getPositionCoordinates(requestValues.position, TeamStrategy.STANDARD)
+                x = coordinate.x
+                y = coordinate.y
             }
 
             val task = if (playerPosition.id > 0) {

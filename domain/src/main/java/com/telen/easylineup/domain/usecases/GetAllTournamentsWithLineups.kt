@@ -18,7 +18,7 @@ internal class GetAllTournamentsWithLineups(val dao: LineupRepository): UseCase<
                     it.forEach { item ->
                         val tournament = item.toTournament()
                         val lineup = item.toLineup()
-                        val position = FieldPosition.getFieldPosition(item.position)
+                        val position = FieldPosition.getFieldPositionById(item.position)
 
                         if(result[tournament] == null) {
                             result[tournament] = mutableListOf()

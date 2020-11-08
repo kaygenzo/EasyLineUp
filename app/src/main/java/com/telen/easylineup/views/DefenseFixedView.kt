@@ -2,7 +2,6 @@ package com.telen.easylineup.views
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +11,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.utils.ready
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.field_view.view.*
@@ -56,14 +56,14 @@ class DefenseFixedView: DefenseView {
 
             players.filter { !FieldPosition.isSubstitute(it.position) }
                     .forEach { player ->
-                        val position = FieldPosition.getFieldPosition(player.position)
+                        val position = FieldPosition.getFieldPositionById(player.position)
                         position?.let {
-                            val coordinatePercent = PointF(it.xPercent, it.yPercent)
+                            val coordinatePercent = FieldPosition.getPositionCoordinates(it, TeamStrategy.STANDARD)
 
                             val playerView = PlayerFieldIcon(context).run {
                                 layoutParams = LayoutParams(iconSize, iconSize)
-                                if(players.any { pos -> pos.position == FieldPosition.DP_DH.position }) {
-                                    if(player.flags and PlayerFieldPosition.FLAG_FLEX > 0 || player.position == FieldPosition.DP_DH.position) {
+                                if(players.any { pos -> pos.position == FieldPosition.DP_DH.id }) {
+                                    if(player.flags and PlayerFieldPosition.FLAG_FLEX > 0 || player.position == FieldPosition.DP_DH.id) {
                                         setPlayerImage(player.image, player.playerName, iconSize, Color.RED, 3f)
                                     }
                                     else {
@@ -91,7 +91,7 @@ class DefenseFixedView: DefenseView {
 
         getContainerSize { containerSize ->
             cleanPlayerIcons()
-            positions.filter { FieldPosition.isDefensePlayer(it.position) }
+            positions.filter { FieldPosition.isDefensePlayer(it.id) }
                     .forEach { position ->
                         val iconView = SmallBaseballImageView(context).run {
                             layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -99,7 +99,8 @@ class DefenseFixedView: DefenseView {
                             scaleType = ImageView.ScaleType.CENTER_INSIDE
                             this
                         }
-                        addPlayerOnFieldWithPercentage(containerSize, iconView, position.xPercent, position.yPercent, loadingCallback)
+                        val coordinate = FieldPosition.getPositionCoordinates(position, TeamStrategy.STANDARD)
+                        addPlayerOnFieldWithPercentage(containerSize, iconView, coordinate.x, coordinate.y, loadingCallback)
                     }
 
         }

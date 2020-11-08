@@ -15,7 +15,7 @@ internal class GetListAvailablePlayersForSelection: UseCase<GetListAvailablePlay
                 .map { it.toPlayer() }
 
         requestValues.position?.run {
-            if (FieldPosition.isDefensePlayer(this.position))
+            if (FieldPosition.isDefensePlayer(this.id))
                 listAvailablePlayers = listAvailablePlayers.sortedWith(getPlayerComparator(this))
         }
 

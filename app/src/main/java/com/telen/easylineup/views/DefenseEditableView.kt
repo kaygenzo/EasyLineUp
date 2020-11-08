@@ -76,7 +76,7 @@ class DefenseEditableView: DefenseView {
             val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
 
             val emptyPositions = mutableListOf<FieldPosition>()
-            emptyPositions.addAll(FieldPosition.values().filter { FieldPosition.isDefensePlayer(it.position) })
+            emptyPositions.addAll(TeamStrategy.STANDARD.positions.filter { FieldPosition.isDefensePlayer(it.id) })
 
             val playerPositions: MutableMap<String, Pair<Player, FieldPosition?>> = mutableMapOf()
 
@@ -84,7 +84,7 @@ class DefenseEditableView: DefenseView {
 
                 val player = entry.toPlayer()
                 val playerTag: String = player.id.toString()
-                val fieldPosition = FieldPosition.getFieldPosition(entry.position)
+                val fieldPosition = FieldPosition.getFieldPositionById(entry.position)
 
                 playerPositions[playerTag] = Pair(player, fieldPosition)
 
@@ -92,14 +92,14 @@ class DefenseEditableView: DefenseView {
 
                     emptyPositions.remove(pos)
 
-                    if(FieldPosition.isDefensePlayer(pos.position)) {
+                    if(FieldPosition.isDefensePlayer(pos.id)) {
 
                         loadingCallback?.onStartLoading()
 
                         val playerView = PlayerFieldIcon(context).run {
                             layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
                             if(lineupMode == MODE_ENABLED) {
-                                if(entry.flags and PlayerFieldPosition.FLAG_FLEX > 0 || entry.position == FieldPosition.DP_DH.position) {
+                                if(entry.flags and PlayerFieldPosition.FLAG_FLEX > 0 || entry.position == FieldPosition.DP_DH.id) {
                                     setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
                                 }
                                 else {
@@ -131,7 +131,8 @@ class DefenseEditableView: DefenseView {
                             this
                         }
 
-                        addPlayerOnFieldWithPercentage(containerSize, playerView, pos.xPercent, pos.yPercent, loadingCallback)
+                        val coordinate = FieldPosition.getPositionCoordinates(pos, TeamStrategy.STANDARD)
+                        addPlayerOnFieldWithPercentage(containerSize, playerView, coordinate.x, coordinate.y, loadingCallback)
 
                         playerView.setOnClickListener { view ->
                             playerListener?.onPlayerButtonClicked(pos)
@@ -245,7 +246,8 @@ class DefenseEditableView: DefenseView {
                 this
             }
 
-            addPlayerOnFieldWithPercentage(containerSize, positionView, position.xPercent, position.yPercent, null)
+            val coordinate = FieldPosition.getPositionCoordinates(position, TeamStrategy.STANDARD)
+            addPlayerOnFieldWithPercentage(containerSize, positionView, coordinate.x, coordinate.y, null)
         }
     }
 
@@ -288,7 +290,7 @@ class DefenseEditableView: DefenseView {
     private fun addDesignatedPlayerIfExists(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int, containerSize: Float) {
         if(lineupMode == MODE_ENABLED) {
             val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
-            players.filter { it.position == FieldPosition.DP_DH.position }.let { listPlayers ->
+            players.filter { it.position == FieldPosition.DP_DH.id }.let { listPlayers ->
                 var view: View?
                 try {
                     val player = listPlayers.first().toPlayer()
@@ -373,7 +375,8 @@ class DefenseEditableView: DefenseView {
                         playerListener?.onPlayerButtonClicked(FieldPosition.DP_DH)
                     }
 
-                    addPlayerOnFieldWithPercentage(containerSize, this, FieldPosition.DP_DH.xPercent, FieldPosition.DP_DH.yPercent, null)
+                    val coordinate = FieldPosition.getPositionCoordinates(FieldPosition.DP_DH, TeamStrategy.STANDARD)
+                    addPlayerOnFieldWithPercentage(containerSize, this, coordinate.x, coordinate.y, null)
                 }
 
             }

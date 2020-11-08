@@ -16,6 +16,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.TeamStrategy
 import kotlinx.android.synthetic.main.view_bar_chart.view.*
 
 
@@ -71,7 +72,7 @@ class PositionsBarChart: ConstraintLayout {
         xAxis.textColor = Color.BLACK
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.setDrawGridLines(false)
-        xAxis.labelCount = FieldPosition.values().size
+        xAxis.labelCount = TeamStrategy.STANDARD.positions.size
         xAxis.axisLineColor = Color.BLACK
 
         val yAxis = chart.getAxis(YAxis.AxisDependency.LEFT)
@@ -100,13 +101,13 @@ class PositionsBarChart: ConstraintLayout {
         val yAxis = chart.getAxis(YAxis.AxisDependency.LEFT)
         yAxis.axisMaximum = count.toFloat()
 
-        FieldPosition.values().forEach {
+        TeamStrategy.STANDARD.positions.forEach {
             val value = positionsMap[it]
             if(value!=null) {
-                entries.add(BarEntry(it.position.toFloat(), value.toFloat()))
+                entries.add(BarEntry(it.id.toFloat(), value.toFloat()))
             }
             else {
-                entries.add(it.position, BarEntry(it.ordinal.toFloat(), 0f))
+                entries.add(it.id, BarEntry(it.ordinal.toFloat(), 0f))
             }
         }
 

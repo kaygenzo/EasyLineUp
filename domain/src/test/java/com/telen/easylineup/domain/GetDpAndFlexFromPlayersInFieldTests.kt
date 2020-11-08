@@ -43,7 +43,7 @@ internal class GetDpAndFlexFromPlayersInFieldTests: BaseUseCaseTests() {
     @Test
     fun shouldTriggerNeedAssignPitcherFirstExceptionIf_PitcherNotAssigned_Baseball() {
         val observer = TestObserver<GetDPAndFlexFromPlayersInField.ResponseValue>()
-        players.removeIf { it.position == FieldPosition.PITCHER.position }
+        players.removeIf { it.position == FieldPosition.PITCHER.id }
         useCase.executeUseCase(GetDPAndFlexFromPlayersInField.RequestValues(players, TeamType.BASEBALL.id))
                 .subscribe(observer)
         observer.await()
@@ -53,7 +53,7 @@ internal class GetDpAndFlexFromPlayersInFieldTests: BaseUseCaseTests() {
     @Test
     fun shouldReturnDPAndFlexPitcher_baseball() {
         val observer = TestObserver<GetDPAndFlexFromPlayersInField.ResponseValue>()
-        players.removeIf { it.position == FieldPosition.DP_DH.position }
+        players.removeIf { it.position == FieldPosition.DP_DH.id }
         useCase.executeUseCase(GetDPAndFlexFromPlayersInField.RequestValues(players, TeamType.BASEBALL.id))
                 .subscribe(observer)
         observer.await()
@@ -80,7 +80,7 @@ internal class GetDpAndFlexFromPlayersInFieldTests: BaseUseCaseTests() {
     @Test
     fun shouldReturnDPAndFlexRightField_softball() {
         val observer = TestObserver<GetDPAndFlexFromPlayersInField.ResponseValue>()
-        players.first { it.position == FieldPosition.RIGHT_FIELD.position }.flags = PlayerFieldPosition.FLAG_FLEX
+        players.first { it.position == FieldPosition.RIGHT_FIELD.id }.flags = PlayerFieldPosition.FLAG_FLEX
         useCase.executeUseCase(GetDPAndFlexFromPlayersInField.RequestValues(players, TeamType.SOFTBALL.id))
                 .subscribe(observer)
         observer.await()
@@ -94,8 +94,8 @@ internal class GetDpAndFlexFromPlayersInFieldTests: BaseUseCaseTests() {
     @Test
     fun shouldReturnOnlyFlexRightField_softball() {
         val observer = TestObserver<GetDPAndFlexFromPlayersInField.ResponseValue>()
-        players.first { it.position == FieldPosition.RIGHT_FIELD.position }.flags = PlayerFieldPosition.FLAG_FLEX
-        players.removeIf { it.position == FieldPosition.DP_DH.position }
+        players.first { it.position == FieldPosition.RIGHT_FIELD.id }.flags = PlayerFieldPosition.FLAG_FLEX
+        players.removeIf { it.position == FieldPosition.DP_DH.id }
         useCase.executeUseCase(GetDPAndFlexFromPlayersInField.RequestValues(players, TeamType.SOFTBALL.id))
                 .subscribe(observer)
         observer.await()

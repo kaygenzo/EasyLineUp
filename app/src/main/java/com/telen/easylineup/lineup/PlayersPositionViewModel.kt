@@ -235,13 +235,13 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun switchPlayersPosition(p1: PlayerWithPosition, p2: PlayerWithPosition): Completable {
-        val position1 = FieldPosition.getFieldPosition(p1.position) ?: FieldPosition.FIRST_BASE
-        val position2 = FieldPosition.getFieldPosition(p2.position) ?: FieldPosition.FIRST_BASE
+        val position1 = FieldPosition.getFieldPositionById(p1.position) ?: FieldPosition.FIRST_BASE
+        val position2 = FieldPosition.getFieldPositionById(p2.position) ?: FieldPosition.FIRST_BASE
         return switchPlayersPosition(position1, position2)
     }
 
     fun switchPlayersPosition(p1: PlayerWithPosition, position2: FieldPosition): Completable {
-        val position1 = FieldPosition.getFieldPosition(p1.position) ?: FieldPosition.FIRST_BASE
+        val position1 = FieldPosition.getFieldPositionById(p1.position) ?: FieldPosition.FIRST_BASE
         return switchPlayersPosition(position1, position2)
     }
 

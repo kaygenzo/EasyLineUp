@@ -141,15 +141,15 @@ internal class SaveDpAndFlexTests: BaseUseCaseTests() {
         observer.assertComplete()
 
         verify(playerFieldPositionDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(1, it.filter { it.position == FieldPosition.DP_DH.position }.count())
-            Assert.assertEquals(players[3].playerID, it.firstOrNull { it.position == FieldPosition.DP_DH.position }?.playerId)
-            Assert.assertEquals(2, it.firstOrNull { it.position == FieldPosition.DP_DH.position }?.order)
+            Assert.assertEquals(1, it.filter { it.position == FieldPosition.DP_DH.id }.count())
+            Assert.assertEquals(players[3].playerID, it.firstOrNull { it.position == FieldPosition.DP_DH.id }?.playerId)
+            Assert.assertEquals(2, it.firstOrNull { it.position == FieldPosition.DP_DH.id }?.order)
         })
     }
 
     @Test
     fun shouldAssignDPToNotExistingPosition() {
-        players.removeIf { it.position == FieldPosition.DP_DH.position }
+        players.removeIf { it.position == FieldPosition.DP_DH.id }
 
         val observer = TestObserver<SaveDpAndFlex.ResponseValue>()
         useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[3].toPlayer(), flex = players[1].toPlayer()))
@@ -158,13 +158,13 @@ internal class SaveDpAndFlexTests: BaseUseCaseTests() {
         observer.assertComplete()
 
         verify(playerFieldPositionDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(0, it.filter { it.position == FieldPosition.DP_DH.position }.count())
+            Assert.assertEquals(0, it.filter { it.position == FieldPosition.DP_DH.id }.count())
         })
 
         verify(playerFieldPositionDao).insertPlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(1, it.filter { it.position == FieldPosition.DP_DH.position }.count())
-            Assert.assertEquals(players[3].playerID, it.firstOrNull { it.position == FieldPosition.DP_DH.position }?.playerId)
-            Assert.assertEquals(2, it.firstOrNull { it.position == FieldPosition.DP_DH.position }?.order)
+            Assert.assertEquals(1, it.filter { it.position == FieldPosition.DP_DH.id }.count())
+            Assert.assertEquals(players[3].playerID, it.firstOrNull { it.position == FieldPosition.DP_DH.id }?.playerId)
+            Assert.assertEquals(2, it.firstOrNull { it.position == FieldPosition.DP_DH.id }?.order)
         })
     }
 }

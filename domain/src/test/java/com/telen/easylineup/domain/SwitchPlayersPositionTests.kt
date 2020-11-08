@@ -34,17 +34,17 @@ internal class SwitchPlayersPositionTests {
         mSwitchPlayersPosition = SwitchPlayersPosition(playerFieldPositionsDao)
 
         players.add(PlayerWithPosition("toto", 1, 1, 1, null,
-                FieldPosition.PITCHER.position, 0f, 0f, PlayerFieldPosition.FLAG_FLEX,10, 1, 1, 1, 1))
+                FieldPosition.PITCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_FLEX,10, 1, 1, 1, 1))
         players.add(PlayerWithPosition("tata", 2, 2, 1, null,
-                FieldPosition.CATCHER.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 2, 2, 1, 2))
+                FieldPosition.CATCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 2, 2, 1, 2))
         players.add(PlayerWithPosition("titi", 3, 3, 1, null,
-                FieldPosition.CENTER_FIELD.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,4, 3, 3, 1, 4))
+                FieldPosition.CENTER_FIELD.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,4, 3, 3, 1, 4))
         players.add(PlayerWithPosition("tutu", 4, 4, 1, null,
-                FieldPosition.FIRST_BASE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,6, 4, 4, 1, 8))
+                FieldPosition.FIRST_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,6, 4, 4, 1, 8))
         players.add(PlayerWithPosition("tete", 5, 5, 1, null,
-                FieldPosition.SUBSTITUTE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
+                FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
         players.add(PlayerWithPosition("toutou", 6, 6, 1, null,
-                FieldPosition.DP_DH.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE, 8, 6, 6, 1, 16))
+                FieldPosition.DP_DH.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, 8, 6, 6, 1, 16))
 
         player2bis = PlayerWithPosition(
                 "tata", 2, 2, 1,
@@ -92,8 +92,8 @@ internal class SwitchPlayersPositionTests {
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            assertVerification(it[0],4, 4, FieldPosition.CENTER_FIELD.position, PlayerFieldPosition.FLAG_NONE, 6)
-            assertVerification(it[1],3, 3, FieldPosition.FIRST_BASE.position, PlayerFieldPosition.FLAG_NONE, 4)
+            assertVerification(it[0],4, 4, FieldPosition.CENTER_FIELD.id, PlayerFieldPosition.FLAG_NONE, 6)
+            assertVerification(it[1],3, 3, FieldPosition.FIRST_BASE.id, PlayerFieldPosition.FLAG_NONE, 4)
         })
     }
 
@@ -109,8 +109,8 @@ internal class SwitchPlayersPositionTests {
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            assertVerification(it[0],6, 6, FieldPosition.PITCHER.position, PlayerFieldPosition.FLAG_FLEX, Constants.ORDER_PITCHER_WHEN_DH)
-            assertVerification(it[1],1, 1, FieldPosition.DP_DH.position, PlayerFieldPosition.FLAG_NONE, 8)
+            assertVerification(it[0],6, 6, FieldPosition.PITCHER.id, PlayerFieldPosition.FLAG_FLEX, Constants.ORDER_PITCHER_WHEN_DH)
+            assertVerification(it[1],1, 1, FieldPosition.DP_DH.id, PlayerFieldPosition.FLAG_NONE, 8)
         })
     }
 
@@ -126,8 +126,8 @@ internal class SwitchPlayersPositionTests {
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            assertVerification(it[0],6, 6, FieldPosition.FIRST_BASE.position, PlayerFieldPosition.FLAG_NONE, 8)
-            assertVerification(it[1],4, 4, FieldPosition.DP_DH.position, PlayerFieldPosition.FLAG_NONE, 6)
+            assertVerification(it[0],6, 6, FieldPosition.FIRST_BASE.id, PlayerFieldPosition.FLAG_NONE, 8)
+            assertVerification(it[1],4, 4, FieldPosition.DP_DH.id, PlayerFieldPosition.FLAG_NONE, 6)
         })
     }
 
@@ -143,8 +143,8 @@ internal class SwitchPlayersPositionTests {
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            assertVerification(it[0],1, 1, FieldPosition.FIRST_BASE.position, PlayerFieldPosition.FLAG_NONE, 6)
-            assertVerification(it[1],4, 4, FieldPosition.PITCHER.position, PlayerFieldPosition.FLAG_FLEX, Constants.ORDER_PITCHER_WHEN_DH)
+            assertVerification(it[0],1, 1, FieldPosition.FIRST_BASE.id, PlayerFieldPosition.FLAG_NONE, 6)
+            assertVerification(it[1],4, 4, FieldPosition.PITCHER.id, PlayerFieldPosition.FLAG_FLEX, Constants.ORDER_PITCHER_WHEN_DH)
         })
     }
 
@@ -161,7 +161,7 @@ internal class SwitchPlayersPositionTests {
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
             Assert.assertEquals(1, it.size)
-            assertVerification(it[0],1, 1, FieldPosition.SECOND_BASE.position, PlayerFieldPosition.FLAG_NONE, 1)
+            assertVerification(it[0],1, 1, FieldPosition.SECOND_BASE.id, PlayerFieldPosition.FLAG_NONE, 1)
         })
     }
 
@@ -178,7 +178,7 @@ internal class SwitchPlayersPositionTests {
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
             Assert.assertEquals(1, it.size)
-            assertVerification(it[0],6, 6, FieldPosition.SECOND_BASE.position, PlayerFieldPosition.FLAG_NONE, 8)
+            assertVerification(it[0],6, 6, FieldPosition.SECOND_BASE.id, PlayerFieldPosition.FLAG_NONE, 8)
         })
     }
 
@@ -195,7 +195,7 @@ internal class SwitchPlayersPositionTests {
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
             Assert.assertEquals(1, it.size)
-            assertVerification(it[0],4, 4, FieldPosition.SECOND_BASE.position, PlayerFieldPosition.FLAG_NONE, 6)
+            assertVerification(it[0],4, 4, FieldPosition.SECOND_BASE.id, PlayerFieldPosition.FLAG_NONE, 6)
         })
     }
 
@@ -224,8 +224,8 @@ internal class SwitchPlayersPositionTests {
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            assertVerification(it[0],4, 4, FieldPosition.CENTER_FIELD.position, PlayerFieldPosition.FLAG_NONE, 6)
-            assertVerification(it[1],3, 3, FieldPosition.FIRST_BASE.position, PlayerFieldPosition.FLAG_NONE, 4)
+            assertVerification(it[0],4, 4, FieldPosition.CENTER_FIELD.id, PlayerFieldPosition.FLAG_NONE, 6)
+            assertVerification(it[1],3, 3, FieldPosition.FIRST_BASE.id, PlayerFieldPosition.FLAG_NONE, 4)
         })
     }
 
@@ -234,12 +234,12 @@ internal class SwitchPlayersPositionTests {
         val lineupMode = MODE_ENABLED
         val teamType = TeamType.SOFTBALL.id
 
-        players.first { it.position == FieldPosition.PITCHER.position }.apply {
+        players.first { it.position == FieldPosition.PITCHER.id }.apply {
             flags = PlayerFieldPosition.FLAG_NONE
             order = 1
         }
 
-        players.first { it.position == FieldPosition.CATCHER.position }.apply {
+        players.first { it.position == FieldPosition.CATCHER.id }.apply {
             flags = PlayerFieldPosition.FLAG_FLEX
             order = Constants.ORDER_PITCHER_WHEN_DH
         }
@@ -252,8 +252,8 @@ internal class SwitchPlayersPositionTests {
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            assertVerification(it[0],2, 2, FieldPosition.CENTER_FIELD.position, PlayerFieldPosition.FLAG_FLEX, Constants.ORDER_PITCHER_WHEN_DH)
-            assertVerification(it[1],3, 3, FieldPosition.CATCHER.position, PlayerFieldPosition.FLAG_NONE, 4)
+            assertVerification(it[0],2, 2, FieldPosition.CENTER_FIELD.id, PlayerFieldPosition.FLAG_FLEX, Constants.ORDER_PITCHER_WHEN_DH)
+            assertVerification(it[1],3, 3, FieldPosition.CATCHER.id, PlayerFieldPosition.FLAG_NONE, 4)
         })
     }
 
@@ -270,8 +270,8 @@ internal class SwitchPlayersPositionTests {
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            assertVerification(it[0],6, 6, FieldPosition.CENTER_FIELD.position, PlayerFieldPosition.FLAG_NONE, 8)
-            assertVerification(it[1],3, 3, FieldPosition.DP_DH.position, PlayerFieldPosition.FLAG_NONE, 4)
+            assertVerification(it[0],6, 6, FieldPosition.CENTER_FIELD.id, PlayerFieldPosition.FLAG_NONE, 8)
+            assertVerification(it[1],3, 3, FieldPosition.DP_DH.id, PlayerFieldPosition.FLAG_NONE, 4)
         })
     }
 
@@ -280,12 +280,12 @@ internal class SwitchPlayersPositionTests {
         val lineupMode = MODE_ENABLED
         val teamType = TeamType.SOFTBALL.id
 
-        players.first { it.position == FieldPosition.PITCHER.position }.apply {
+        players.first { it.position == FieldPosition.PITCHER.id }.apply {
             flags = PlayerFieldPosition.FLAG_NONE
             order = 1
         }
 
-        players.first { it.position == FieldPosition.CATCHER.position }.apply {
+        players.first { it.position == FieldPosition.CATCHER.id }.apply {
             flags = PlayerFieldPosition.FLAG_FLEX
             order = Constants.ORDER_PITCHER_WHEN_DH
         }
@@ -298,8 +298,8 @@ internal class SwitchPlayersPositionTests {
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            assertVerification(it[0],2, 2, FieldPosition.DP_DH.position, PlayerFieldPosition.FLAG_NONE, 8)
-            assertVerification(it[1],6, 6, FieldPosition.CATCHER.position, PlayerFieldPosition.FLAG_FLEX, Constants.ORDER_PITCHER_WHEN_DH)
+            assertVerification(it[0],2, 2, FieldPosition.DP_DH.id, PlayerFieldPosition.FLAG_NONE, 8)
+            assertVerification(it[1],6, 6, FieldPosition.CATCHER.id, PlayerFieldPosition.FLAG_FLEX, Constants.ORDER_PITCHER_WHEN_DH)
         })
     }
 
@@ -308,12 +308,12 @@ internal class SwitchPlayersPositionTests {
         val lineupMode = MODE_ENABLED
         val teamType = TeamType.SOFTBALL.id
 
-        players.first { it.position == FieldPosition.PITCHER.position }.apply {
+        players.first { it.position == FieldPosition.PITCHER.id }.apply {
             flags = PlayerFieldPosition.FLAG_NONE
             order = 1
         }
 
-        players.first { it.position == FieldPosition.CATCHER.position }.apply {
+        players.first { it.position == FieldPosition.CATCHER.id }.apply {
             flags = PlayerFieldPosition.FLAG_FLEX
             order = Constants.ORDER_PITCHER_WHEN_DH
         }
@@ -326,8 +326,8 @@ internal class SwitchPlayersPositionTests {
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            assertVerification(it[0],6, 6, FieldPosition.CATCHER.position, PlayerFieldPosition.FLAG_FLEX, Constants.ORDER_PITCHER_WHEN_DH)
-            assertVerification(it[1],2, 2, FieldPosition.DP_DH.position, PlayerFieldPosition.FLAG_NONE, 8)
+            assertVerification(it[0],6, 6, FieldPosition.CATCHER.id, PlayerFieldPosition.FLAG_FLEX, Constants.ORDER_PITCHER_WHEN_DH)
+            assertVerification(it[1],2, 2, FieldPosition.DP_DH.id, PlayerFieldPosition.FLAG_NONE, 8)
         })
     }
 

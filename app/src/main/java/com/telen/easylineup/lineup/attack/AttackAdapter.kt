@@ -110,7 +110,7 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>,
 
             order.text = player.order.toString()
 
-            if(player.position >= FieldPosition.PITCHER.position && player.position <= FieldPosition.DP_DH.position) {
+            if(player.position >= FieldPosition.PITCHER.id && player.position <= FieldPosition.DP_DH.id) {
                 order.visibility = View.VISIBLE
             }
             else if(BuildConfig.DEBUG) {
@@ -121,7 +121,7 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>,
             }
 
             positionDescriptions?.let { descs ->
-                FieldPosition.getFieldPosition(player.position)?.let {
+                FieldPosition.getFieldPositionById(player.position)?.let {
                     positionDesc.setText(descs[it.ordinal])
                 }
                 positionDesc.setBackground(R.drawable.position_unselected_background)
@@ -135,7 +135,7 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>,
                 reorderImage.visibility = View.VISIBLE
             }
 
-            if(!isEditable || isSubstitute || (lineupMode == MODE_ENABLED && FieldPosition.getFieldPosition(player.position) == FieldPosition.DP_DH)) {
+            if(!isEditable || isSubstitute || (lineupMode == MODE_ENABLED && FieldPosition.getFieldPositionById(player.position) == FieldPosition.DP_DH)) {
                 positionDesc.visibility = View.VISIBLE
             }
             else {

@@ -29,15 +29,15 @@ internal class SaveBattingOrderTests {
         mSaveBattingOrder = SaveBattingOrder(lineupDao)
         players = mutableListOf()
         players.add(PlayerWithPosition("toto", 1, 1, 1, null,
-                FieldPosition.PITCHER.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE, 0, 1, 1, 1, 1))
+                FieldPosition.PITCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, 0, 1, 1, 1, 1))
         players.add(PlayerWithPosition("tata", 2, 2, 1, null,
-                FieldPosition.CATCHER.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 2, 2, 1, 1))
+                FieldPosition.CATCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 2, 2, 1, 1))
         players.add(PlayerWithPosition("titi", 3, 3, 1, null,
-                FieldPosition.CENTER_FIELD.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,9, 3, 3, 1, 1))
+                FieldPosition.CENTER_FIELD.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,9, 3, 3, 1, 1))
         players.add(PlayerWithPosition("tutu", 4, 4, 1, null,
-                FieldPosition.FIRST_BASE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,10, 4, 4, 1, 1))
+                FieldPosition.FIRST_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,10, 4, 4, 1, 1))
         players.add(PlayerWithPosition("tete", 5, 5, 1, null,
-                FieldPosition.SUBSTITUTE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 1))
+                FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 1))
     }
 
     @Test

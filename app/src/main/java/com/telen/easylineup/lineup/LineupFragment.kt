@@ -180,7 +180,7 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
             })
 
             viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer {
-                val size = it.filter { item -> item.position == FieldPosition.SUBSTITUTE.position
+                val size = it.filter { item -> item.position == FieldPosition.SUBSTITUTE.id
                         && item.fieldPositionID > 0 }.size
                 val substituteIndication = view.findViewById<MaterialTextView>(R.id.substitutesIndication)
                 substituteIndication?.text = resources.getQuantityString(R.plurals.lineups_substitutes_size, size, size)

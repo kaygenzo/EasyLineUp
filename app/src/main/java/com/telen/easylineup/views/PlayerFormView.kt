@@ -14,6 +14,7 @@ import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
+import com.telen.easylineup.domain.model.TeamStrategy
 import kotlinx.android.synthetic.main.view_create_player.view.*
 import timber.log.Timber
 
@@ -184,8 +185,8 @@ class PlayerFormView: ConstraintLayout {
 
         favoritePositionsContainer.removeAllViews()
 
-        FieldPosition.values()
-                .filter { FieldPosition.isDefensePlayer(it.position) }
+        TeamStrategy.STANDARD.positions
+                .filter { FieldPosition.isDefensePlayer(it.id) }
                 .forEach { position ->
             val isEnabled = (positions and position.mask) != 0
             positionState[position] = isEnabled

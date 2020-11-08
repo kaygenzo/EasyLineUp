@@ -11,13 +11,13 @@ internal class GetDPAndFlexFromPlayersInField: UseCase<GetDPAndFlexFromPlayersIn
         return Single.just(requestValues.playersInLineup)
                 .map { list ->
                     list.filter {
-                        it.position >= FieldPosition.PITCHER.position && it.position <= FieldPosition.DP_DH.position
+                        it.position >= FieldPosition.PITCHER.id && it.position <= FieldPosition.DP_DH.id
                     }
                 }
                 .map { players ->
                     val dpLocked = false
                     var flexLocked = false
-                    val dp: Player? = players.filter { it.position == FieldPosition.DP_DH.position }
+                    val dp: Player? = players.filter { it.position == FieldPosition.DP_DH.id }
                             .map { it.toPlayer() }
                             .firstOrNull()
 
@@ -29,7 +29,7 @@ internal class GetDPAndFlexFromPlayersInField: UseCase<GetDPAndFlexFromPlayersIn
                         }
                         else -> {
                             flexLocked = true
-                            players.filter { it.position == FieldPosition.PITCHER.position }
+                            players.filter { it.position == FieldPosition.PITCHER.id }
                                     .map { it.toPlayer() }
                                     .firstOrNull()
                         }

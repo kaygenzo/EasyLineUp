@@ -33,15 +33,15 @@ internal class SavePlayerFieldPositionTests {
         savePlayerFieldPosition = SavePlayerFieldPosition(lineupDao)
         players = mutableListOf()
         players.add(PlayerWithPosition("toto", 1, 1, 1, null,
-                FieldPosition.PITCHER.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,0, 1, 1, 1, 1))
+                FieldPosition.PITCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,0, 1, 1, 1, 1))
         players.add(PlayerWithPosition("tata", 2, 2, 1, null,
-                FieldPosition.CATCHER.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 2, 2, 1, 2))
+                FieldPosition.CATCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 2, 2, 1, 2))
         players.add(PlayerWithPosition("titi", 3, 3, 1, null,
-                FieldPosition.CENTER_FIELD.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,4, 3, 3, 1, 4))
+                FieldPosition.CENTER_FIELD.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,4, 3, 3, 1, 4))
         players.add(PlayerWithPosition("tutu", 4, 4, 1, null,
-                FieldPosition.FIRST_BASE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,6, 4, 4, 1, 8))
+                FieldPosition.FIRST_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,6, 4, 4, 1, 8))
         players.add(PlayerWithPosition("tete", 5, 5, 1, null,
-                FieldPosition.SUBSTITUTE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
+                FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
         Mockito.`when`(lineupDao.insertPlayerFieldPosition(any())).thenReturn(Single.just(6))
         Mockito.`when`(lineupDao.updatePlayerFieldPosition(any())).thenReturn(Completable.complete())
     }
@@ -151,7 +151,7 @@ internal class SavePlayerFieldPositionTests {
                 lineupMode = mode
         )
 
-        players.removeIf { it.position == FieldPosition.PITCHER.position }
+        players.removeIf { it.position == FieldPosition.PITCHER.id }
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -177,7 +177,7 @@ internal class SavePlayerFieldPositionTests {
                 lineupMode = mode
         )
 
-        players.removeIf { it.position == FieldPosition.PITCHER.position }
+        players.removeIf { it.position == FieldPosition.PITCHER.id }
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -251,7 +251,7 @@ internal class SavePlayerFieldPositionTests {
                 lineupMode = mode
         )
 
-        players.removeIf { it.position == FieldPosition.PITCHER.position }
+        players.removeIf { it.position == FieldPosition.PITCHER.id }
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -278,7 +278,7 @@ internal class SavePlayerFieldPositionTests {
         )
 
         players.add(PlayerWithPosition("test", 7, 7, 1, null,
-                FieldPosition.THIRD_BASE.position, 0f, 0f, PlayerFieldPosition.FLAG_NONE,1, 7, 7, 1, 16))
+                FieldPosition.THIRD_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,1, 7, 7, 1, 16))
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -329,7 +329,7 @@ internal class SavePlayerFieldPositionTests {
                 lineupMode = mode
         )
 
-        players.removeIf { it.position == FieldPosition.PITCHER.position }
+        players.removeIf { it.position == FieldPosition.PITCHER.id }
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -354,7 +354,7 @@ internal class SavePlayerFieldPositionTests {
                 lineupMode = mode
         )
 
-        players.removeIf { it.position == FieldPosition.PITCHER.position }
+        players.removeIf { it.position == FieldPosition.PITCHER.id }
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -457,8 +457,9 @@ internal class SavePlayerFieldPositionTests {
         verify(lineupDao, never()).insertPlayerFieldPosition(any())
         verify(lineupDao).updatePlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
             Assert.assertEquals(newPlayer.id, it.playerId)
-            Assert.assertEquals(FieldPosition.FIRST_BASE.xPercent, it.x)
-            Assert.assertEquals(FieldPosition.FIRST_BASE.yPercent, it.y)
+            var coordinate = FieldPosition.getPositionCoordinates(FieldPosition.FIRST_BASE, TeamStrategy.STANDARD)
+            Assert.assertEquals(coordinate.x, it.x)
+            Assert.assertEquals(coordinate.y, it.y)
         })
     }
 }

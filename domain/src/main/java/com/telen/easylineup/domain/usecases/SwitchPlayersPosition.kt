@@ -15,13 +15,13 @@ internal class SwitchPlayersPosition(val dao: PlayerFieldPositionRepository): Us
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
 
         val player1 = try {
-            requestValues.players.first { it.position == requestValues.position1.position }
+            requestValues.players.first { it.position == requestValues.position1.id }
         }
         catch (e: NoSuchElementException) {
             return Single.error(FirstPositionEmptyException())
         }
 
-        val player2 = requestValues.players.firstOrNull { it.position == requestValues.position2.position }
+        val player2 = requestValues.players.firstOrNull { it.position == requestValues.position2.id }
 
         if(player1 == player2)
             return Single.error(SamePlayerException())
@@ -29,8 +29,8 @@ internal class SwitchPlayersPosition(val dao: PlayerFieldPositionRepository): Us
         val player1FieldPosition = player1.toPlayerFieldPosition()
         val player2FieldPosition = player2?.toPlayerFieldPosition()
 
-        player1FieldPosition.position = requestValues.position2.position
-        player2FieldPosition?.position = requestValues.position1.position
+        player1FieldPosition.position = requestValues.position2.id
+        player2FieldPosition?.position = requestValues.position1.id
 
         val playerPositions = arrayListOf(player1FieldPosition)
         player2FieldPosition?.let {
@@ -40,13 +40,13 @@ internal class SwitchPlayersPosition(val dao: PlayerFieldPositionRepository): Us
         // just keep reference of the first order different of 10
         val tmpOrder = playerPositions.firstOrNull { it.order != Constants.ORDER_PITCHER_WHEN_DH }?.order
         val oneIsFlex = playerPositions.any {it.flags and PlayerFieldPosition.FLAG_FLEX > 0}
-        val oneIsDp = playerPositions.any {it.position == FieldPosition.DP_DH.position}
+        val oneIsDp = playerPositions.any {it.position == FieldPosition.DP_DH.id}
 
         // if at least one player has a flag flex and it is a baseball team, the pitcher is always
         // the flex. Otherwise, the flex can be any other player. The only exception is the DP/DH
         playerPositions.forEach {
             if(requestValues.lineupMode == MODE_ENABLED) {
-                val newPosition = FieldPosition.getFieldPosition(it.position)
+                val newPosition = FieldPosition.getFieldPositionById(it.position)
                 if(requestValues.teamType == TeamType.BASEBALL.id) {
                     when(newPosition) {
                         FieldPosition.PITCHER -> {

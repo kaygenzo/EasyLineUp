@@ -12,13 +12,13 @@ internal class DeletePlayerFieldPosition(private val dao: PlayerFieldPositionRep
             val toDelete = mutableListOf<PlayerFieldPosition>()
             //substitutes have the same position, let's use player to get the good one
             val player = requestValues.players.first {
-                it.position == requestValues.position.position && it.playerID == requestValues.playerToDelete.id
+                it.position == requestValues.fieldPosition.id && it.playerID == requestValues.playerToDelete.id
             }
 
             if(requestValues.lineupMode == MODE_ENABLED &&
-                    (requestValues.position == FieldPosition.DP_DH || player.flags and PlayerFieldPosition.FLAG_FLEX > 0)) {
+                    (requestValues.fieldPosition == FieldPosition.DP_DH || player.flags and PlayerFieldPosition.FLAG_FLEX > 0)) {
                 toDelete.addAll(requestValues.players
-                        .filter { it.position == FieldPosition.DP_DH.position || it.flags and PlayerFieldPosition.FLAG_FLEX > 0 }
+                        .filter { it.position == FieldPosition.DP_DH.id || it.flags and PlayerFieldPosition.FLAG_FLEX > 0 }
                         .map { it.toPlayerFieldPosition() }
                 )
             }
@@ -34,6 +34,6 @@ internal class DeletePlayerFieldPosition(private val dao: PlayerFieldPositionRep
     }
 
 
-    class RequestValues(val players: List<PlayerWithPosition>, val playerToDelete: Player, val position: FieldPosition, val lineupMode: Int): UseCase.RequestValues
+    class RequestValues(val players: List<PlayerWithPosition>, val playerToDelete: Player, val fieldPosition: FieldPosition, val lineupMode: Int): UseCase.RequestValues
     class ResponseValue: UseCase.ResponseValue
 }

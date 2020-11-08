@@ -38,13 +38,13 @@ internal class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPosi
                     toUpdate.add(it)
             }
 
-            requestValues.players.firstOrNull { p -> p.position == FieldPosition.DP_DH.position }?.run {
+            requestValues.players.firstOrNull { p -> p.position == FieldPosition.DP_DH.id }?.run {
                 order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
                 playerID = dp.id
                 if(!toUpdate.contains(this))
                     toUpdate.add(this)
             } ?: run {
-                val newPosition = PlayerFieldPosition(playerId = dp.id, lineupId = lineupID, position = FieldPosition.DP_DH.position,
+                val newPosition = PlayerFieldPosition(playerId = dp.id, lineupId = lineupID, position = FieldPosition.DP_DH.id,
                         order = PlayerWithPosition.getNextAvailableOrder(requestValues.players))
                 toInsert.add(newPosition)
             }

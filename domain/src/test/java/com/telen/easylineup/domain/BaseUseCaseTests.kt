@@ -10,7 +10,7 @@ open class BaseUseCaseTests {
                 licenseNumber = id,
                 teamId = teamID,
                 image = null,
-                position = position.position,
+                position = position.id,
                 x = 0f, y = 0f,
                 flags = flag,
                 order = order,
