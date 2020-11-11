@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:fabSize="normal"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/fab"
+        app:layout_constraintBottom_toBottomOf="@+id/fab"
+        app:layout_constraintLeft_toLeftOf="@+id/fab"
+        app:layout_constraintRight_toRightOf="@+id/fab"
+        android:elevation="6dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/designatedPlayerLabel"
+            style="@style/TextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:textColor="@color/white"
+            android:text="@string/field_position_dh"
+            android:visibility="invisible"
+            tools:visibility="visible"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/imagePlayerContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:layout_height="40dp"
+        tools:layout_width="40dp"
+        android:background="@android:color/transparent"
+        tools:background="#80808080"
+        app:layout_constraintTop_toTopOf="@+id/fab"
+        app:layout_constraintBottom_toBottomOf="@+id/fab"
+        app:layout_constraintLeft_toLeftOf="@+id/fab"
+        app:layout_constraintRight_toRightOf="@+id/fab"
+        tools:visibility="invisible">
+
+        <ImageView
+            android:id="@+id/playerImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:src="@drawable/unknown_player"
+            android:scaleType="centerInside"
+            android:visibility="invisible"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/playerNameFallback"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:autoSizeTextType="uniform"
+            tools:text="JC"
+            android:textStyle="bold"
+            android:textColor="?attr/colorPrimaryVariant"
+            android:background="@drawable/circle_shape_letters_border_black"
+            android:padding="8dp"
+            android:gravity="center"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

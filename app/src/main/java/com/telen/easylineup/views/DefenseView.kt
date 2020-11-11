@@ -19,7 +19,7 @@ const val ICON_SIZE_SCALE = 0.12f
 
 abstract class DefenseView: ConstraintLayout {
 
-    private var containerSize: Float? = 0f
+    protected var containerSize: Float? = 0f
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -36,7 +36,7 @@ abstract class DefenseView: ConstraintLayout {
     }
 
     protected fun addPlayerOnFieldWithCoordinate(view: View, parentWidth: Float, x: Float, y: Float, loadingCallback: LoadingCallback?) {
-        if(fieldFrameLayout.findViewWithTag<PlayerFieldIcon>(view.tag)!=null)
+        if(fieldFrameLayout.findViewWithTag<MultipleStateDefenseIconButton>(view.tag)!=null)
             fieldFrameLayout.removeView(view)
 
         view.visibility = View.INVISIBLE
@@ -64,7 +64,7 @@ abstract class DefenseView: ConstraintLayout {
                     invalidate()
                 }
 
-                if(view is AddPlayerButton) {
+                (view as? MultipleStateDefenseIconButton)?.takeIf { it.getState() == StateDefense.EMPTY }?.let {
                     val shake = AnimationUtils.loadAnimation(context, R.anim.shake_effect)
                     view.animation = shake
                 }
@@ -80,9 +80,7 @@ abstract class DefenseView: ConstraintLayout {
         if(fieldFrameLayout.childCount > 1) {
             for (i in fieldFrameLayout.childCount-1 downTo 0) {
                 val view = fieldFrameLayout.getChildAt(i)
-                if(view is PlayerFieldIcon || view is AddPlayerButton
-                        || view is AddDesignatedPlayerButton || view is TrashFieldButton
-                        || view is SmallBaseballImageView) {
+                if(view is MultipleStateDefenseIconButton || view is SmallBaseballImageView) {
                     view.clearAnimation()
                     view.setOnDragListener(null)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

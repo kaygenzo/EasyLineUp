@@ -7,6 +7,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.android.material.card.MaterialCardView
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.card_defense_editable.view.*
@@ -30,6 +31,10 @@ class CardDefenseEditable: MaterialCardView, LoadingCallback {
         context?.let {
             setBackgroundColor(ContextCompat.getColor(it, android.R.color.transparent))
         }
+    }
+
+    fun init(positions: List<FieldPosition>) {
+        fieldAndPlayersRootView.initField(positions)
     }
 
     fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int) {

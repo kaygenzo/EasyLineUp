@@ -47,9 +47,9 @@ class DefenseFixedView: DefenseView {
         if(players.any { FieldPosition.isDefensePlayer(it.position) })
             loadingCallback?.onStartLoading()
 
-        getContainerSize { containerSize ->
+        cleanPlayerIcons()
 
-            cleanPlayerIcons()
+        getContainerSize { containerSize ->
 
             val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
             Timber.d("DefenseFixedView: iconSize=$iconSize containerWidth=${containerSize} containerHeight=${fieldFrameLayout.height}")
@@ -60,8 +60,9 @@ class DefenseFixedView: DefenseView {
                         position?.let {
                             val coordinatePercent = PointF(it.xPercent, it.yPercent)
 
-                            val playerView = PlayerFieldIcon(context).run {
+                            val playerView = MultipleStateDefenseIconButton(context).run {
                                 layoutParams = LayoutParams(iconSize, iconSize)
+                                setState(StateDefense.PLAYER)
                                 if(players.any { pos -> pos.position == FieldPosition.DP_DH.position }) {
                                     if(player.flags and PlayerFieldPosition.FLAG_FLEX > 0 || player.position == FieldPosition.DP_DH.position) {
                                         setPlayerImage(player.image, player.playerName, iconSize, Color.RED, 3f)
@@ -89,8 +90,10 @@ class DefenseFixedView: DefenseView {
         if(positions.isNotEmpty())
             loadingCallback?.onStartLoading()
 
+        cleanPlayerIcons()
+
         getContainerSize { containerSize ->
-            cleanPlayerIcons()
+
             positions.filter { FieldPosition.isDefensePlayer(it.position) }
                     .forEach { position ->
                         val iconView = SmallBaseballImageView(context).run {

@@ -11,6 +11,7 @@ import android.util.AttributeSet
 import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
+import android.view.animation.*
 import android.widget.FrameLayout
 import android.widget.ImageView
 import com.telen.easylineup.utils.LoadingCallback
@@ -18,10 +19,6 @@ import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
 import timber.log.Timber
 import kotlin.math.roundToInt
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.Animation
-import android.view.animation.ScaleAnimation
-import android.view.animation.DecelerateInterpolator
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.*
 import kotlin.math.min
@@ -39,6 +36,9 @@ interface OnPlayerButtonCallback {
 class DefenseEditableView: DefenseView {
 
     private var playerListener: OnPlayerButtonCallback? = null
+    private val players: MutableCollection<PlayerWithPosition> = mutableListOf()
+
+    private val positionMarkers: MutableMap<FieldPosition, MultipleStateDefenseIconButton> = mutableMapOf()
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -50,35 +50,47 @@ class DefenseEditableView: DefenseView {
 
     init {
         LayoutInflater.from(context).inflate(R.layout.baseball_field_with_players, this)
-        fieldFrameLayout.post {
-            val size = fieldFrameLayout.run {
-                val viewHeight = height
-                val viewWidth = width
-                min(viewHeight, viewWidth)
+
+        getContainerSize { containerSize ->
+            fieldFrameLayout.layoutParams.height = containerSize.toInt()
+            fieldFrameLayout.layoutParams.width = containerSize.toInt()
+
+            addTrashButton(containerSize)
+        }
+    }
+
+    fun initField(positions: List<FieldPosition>) {
+
+        positionMarkers.clear()
+        cleanPlayerIcons()
+
+        getContainerSize {
+            val iconSize = (it * ICON_SIZE_SCALE).roundToInt()
+            positions.forEach { position ->
+                val view = MultipleStateDefenseIconButton(context).apply {
+                    layoutParams = LayoutParams(iconSize, iconSize)
+                    setState(StateDefense.LOADING)
+                    setOnClickListener { view ->
+                        playerListener?.onPlayerButtonClicked(position)
+                    }
+                }
+                positionMarkers[position] = view
+                addPlayerOnFieldWithPercentage(it, view, position.xPercent, position.yPercent, null)
             }
-            fieldFrameLayout.layoutParams.height = size
-            fieldFrameLayout.layoutParams.width = size
         }
     }
 
     fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int, loadingCallback: LoadingCallback?) {
 
-        if(fieldFrameLayout==null)
-            return
+        this.players.clear()
+        this.players.addAll(players)
 
         getContainerSize { containerSize ->
-
-            cleanPlayerIcons()
-
-            if(containerSize <= 0)
-                return@getContainerSize
 
             val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
 
             val emptyPositions = mutableListOf<FieldPosition>()
-            emptyPositions.addAll(FieldPosition.values().filter { FieldPosition.isDefensePlayer(it.position) })
-
-            val playerPositions: MutableMap<String, Pair<Player, FieldPosition?>> = mutableMapOf()
+            emptyPositions.addAll(positionMarkers.keys)
 
             players.forEach { entry ->
 
@@ -86,39 +98,35 @@ class DefenseEditableView: DefenseView {
                 val playerTag: String = player.id.toString()
                 val fieldPosition = FieldPosition.getFieldPosition(entry.position)
 
-                playerPositions[playerTag] = Pair(player, fieldPosition)
-
                 fieldPosition?.let { pos ->
 
                     emptyPositions.remove(pos)
 
-                    if(FieldPosition.isDefensePlayer(pos.position)) {
+                    if (FieldPosition.isDefensePlayer(pos.position)) {
 
-                        loadingCallback?.onStartLoading()
+                        positionMarkers[pos]?.apply {
 
-                        val playerView = PlayerFieldIcon(context).run {
-                            layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-                            if(lineupMode == MODE_ENABLED) {
-                                if(entry.flags and PlayerFieldPosition.FLAG_FLEX > 0 || entry.position == FieldPosition.DP_DH.position) {
+                            setState(StateDefense.PLAYER)
+
+                            if (lineupMode == MODE_ENABLED) {
+                                if (entry.flags and PlayerFieldPosition.FLAG_FLEX > 0 || entry.position == FieldPosition.DP_DH.position) {
                                     setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
-                                }
-                                else {
+                                } else {
                                     setPlayerImage(player.image, player.name, iconSize)
                                 }
 
-                            }
-                            else {
+                            } else {
                                 setPlayerImage(player.image, player.name, iconSize)
                             }
 
                             setOnDragListener { v, event ->
-                                when(event.action) {
+                                when (event.action) {
                                     DragEvent.ACTION_DRAG_STARTED,
                                     DragEvent.ACTION_DRAG_ENDED -> true
                                     DragEvent.ACTION_DROP -> {
                                         val id: ClipData.Item = event.clipData.getItemAt(0)
                                         val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
-                                        Timber.d( "action=ACTION_DROP switch ${playerFound?.playerName} with ${entry.playerName}")
+                                        Timber.d("action=ACTION_DROP switch ${playerFound?.playerName} with ${entry.playerName}")
                                         playerFound?.let {
                                             playerListener?.onPlayersSwitched(entry, it)
                                         }
@@ -128,40 +136,31 @@ class DefenseEditableView: DefenseView {
                                 }
                             }
 
-                            this
-                        }
-
-                        addPlayerOnFieldWithPercentage(containerSize, playerView, pos.xPercent, pos.yPercent, loadingCallback)
-
-                        playerView.setOnClickListener { view ->
-                            playerListener?.onPlayerButtonClicked(pos)
-                        }
-
-                        playerView.setOnLongClickListener {
-                            val playerID = ClipData.Item(playerTag)
-                            val playerPosition = ClipData.Item(pos.name)
-                            val dragData = ClipData(ClipDescription(playerTag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)), playerID)
-                            dragData.addItem(playerPosition)
-                            val shadowBuilder = PlayerDragShadowBuilder(playerView)
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                playerView.startDragAndDrop(dragData, shadowBuilder, null, 0)
-                            } else {
-                                playerView.startDrag(dragData, shadowBuilder, null, 0)
+                            setOnLongClickListener {
+                                val playerID = ClipData.Item(playerTag)
+                                val playerPosition = ClipData.Item(pos.name)
+                                val dragData = ClipData(ClipDescription(playerTag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)), playerID)
+                                dragData.addItem(playerPosition)
+                                val shadowBuilder = PlayerDragShadowBuilder(this)
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    startDragAndDrop(dragData, shadowBuilder, null, 0)
+                                } else {
+                                    startDrag(dragData, shadowBuilder, null, 0)
+                                }
+                                true
                             }
-                            true
                         }
                     }
                 }
             }
 
-            addEmptyPositionMarker(players, emptyPositions, containerSize)
-            addSubstitutePlayers(players, containerSize)
-            addDesignatedPlayerIfExists(players, lineupMode, teamType, containerSize)
-            addTrashButton(players, containerSize)
+            addEmptyPositionMarker(emptyPositions)
+            addSubstitutePlayers(containerSize)
+            addDesignatedPlayerIfExists(lineupMode, teamType, iconSize)
         }
     }
 
-    private fun addTrashButton(players: List<PlayerWithPosition>, containerSize: Float) {
+    private fun addTrashButton(containerSize: Float) {
         val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
 
         val trashView = TrashFieldButton(context).run {
@@ -170,8 +169,8 @@ class DefenseEditableView: DefenseView {
             tag = TAG_TRASH
 
             setOnDragListener { v, event ->
-                Timber.d( "action=${event.action}")
-                when(event.action) {
+                Timber.d("action=${event.action}")
+                when (event.action) {
                     DragEvent.ACTION_DRAG_STARTED,
                     DragEvent.ACTION_DRAG_ENDED -> true
                     DragEvent.ACTION_DRAG_EXITED -> {
@@ -196,7 +195,7 @@ class DefenseEditableView: DefenseView {
                         val player = players.firstOrNull { it.playerID.toString() == id.text.toString() }
                         val position = event.clipData.getItemAt(1)
                         val fieldPosition = FieldPosition.valueOf(position.text.toString())
-                        Timber.d( "action=ACTION_DROP player=${player?.playerName} position=$fieldPosition")
+                        Timber.d("action=ACTION_DROP player=${player?.playerName} position=$fieldPosition")
                         player?.let {
                             playerListener?.onPlayerSentToTrash(it.toPlayer(), fieldPosition)
                         }
@@ -214,25 +213,20 @@ class DefenseEditableView: DefenseView {
         }
     }
 
-    private fun addEmptyPositionMarker(players: List<PlayerWithPosition>, positionMarkers: MutableList<FieldPosition>, containerSize: Float) {
-        val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
-        positionMarkers.forEach {position ->
+    private fun addEmptyPositionMarker(emptyPositions: MutableList<FieldPosition>) {
+        emptyPositions.forEach { position ->
+            positionMarkers[position]?.apply {
 
-            val positionView = AddPlayerButton(context).run {
-                layoutParams = LayoutParams(iconSize, iconSize)
-                setScaleType(ImageView.ScaleType.CENTER)
-                setOnClickListener {
-                    playerListener?.onPlayerButtonClicked(position)
-                }
+                setState(StateDefense.EMPTY)
 
                 setOnDragListener { v, event ->
-                    when(event.action) {
+                    when (event.action) {
                         DragEvent.ACTION_DRAG_STARTED,
                         DragEvent.ACTION_DRAG_ENDED -> true
                         DragEvent.ACTION_DROP -> {
                             val id: ClipData.Item = event.clipData.getItemAt(0)
                             val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
-                            Timber.d( "action=ACTION_DROP reassigned ${playerFound?.playerName} to ${position}")
+                            Timber.d("action=ACTION_DROP reassigned ${playerFound?.playerName} to ${position}")
                             playerFound?.let {
                                 playerListener?.onPlayerReassigned(it, position)
                             }
@@ -241,15 +235,11 @@ class DefenseEditableView: DefenseView {
                         else -> false
                     }
                 }
-
-                this
             }
-
-            addPlayerOnFieldWithPercentage(containerSize, positionView, position.xPercent, position.yPercent, null)
         }
     }
 
-    private fun addSubstitutePlayers(players: List<PlayerWithPosition>, containerSize: Float) {
+    private fun addSubstitutePlayers(containerSize: Float) {
         val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
         val columnCount = (substituteContainer.width - substituteContainer.paddingStart - substituteContainer.paddingEnd) / iconSize
         substituteContainer.columnCount = columnCount
@@ -270,8 +260,9 @@ class DefenseEditableView: DefenseView {
 
         players.filter { FieldPosition.isSubstitute(it.position) && it.fieldPositionID > 0 }
                 .forEach { entry ->
-                    val playerView = PlayerFieldIcon(context).run {
+                    val playerView = MultipleStateDefenseIconButton(context).run {
                         layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
+                        setState(StateDefense.PLAYER)
                         setPlayerImage(entry.image, entry.playerName, iconSize)
 
                         setOnLongClickListener {
@@ -285,18 +276,15 @@ class DefenseEditableView: DefenseView {
                 }
     }
 
-    private fun addDesignatedPlayerIfExists(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int, containerSize: Float) {
-        if(lineupMode == MODE_ENABLED) {
-            val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
+    private fun addDesignatedPlayerIfExists(lineupMode: Int, teamType: Int, iconSize: Int) {
+        if (lineupMode == MODE_ENABLED) {
             players.filter { it.position == FieldPosition.DP_DH.position }.let { listPlayers ->
-                var view: View?
-                try {
-                    val player = listPlayers.first().toPlayer()
-                    val position = FieldPosition.DP_DH
-                    val playerView = PlayerFieldIcon(context).run {
-                        layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
+                val position = FieldPosition.DP_DH
+                positionMarkers[position]?.apply {
+                    try {
+                        val player = listPlayers.first().toPlayer()
+                        setState(StateDefense.PLAYER)
                         setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
-
                         setOnLongClickListener {
                             val playerID = ClipData.Item(player.id.toString())
                             val playerPosition = ClipData.Item(position.name)
@@ -312,13 +300,13 @@ class DefenseEditableView: DefenseView {
                         }
 
                         setOnDragListener { v, event ->
-                            when(event.action) {
+                            when (event.action) {
                                 DragEvent.ACTION_DRAG_STARTED,
                                 DragEvent.ACTION_DRAG_ENDED -> true
                                 DragEvent.ACTION_DROP -> {
                                     val id: ClipData.Item = event.clipData.getItemAt(0)
                                     val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
-                                    Timber.d( "action=ACTION_DROP switch ${playerFound?.playerName} with ${listPlayers.first().playerName}")
+                                    Timber.d("action=ACTION_DROP switch ${playerFound?.playerName} with ${listPlayers.first().playerName}")
                                     playerFound?.let {
                                         playerListener?.onPlayersSwitched(listPlayers.first(), it)
                                     }
@@ -327,14 +315,11 @@ class DefenseEditableView: DefenseView {
                                 else -> false
                             }
                         }
+                    } catch (e: NoSuchElementException) {
 
-                        this
-                    }
+                        setState(StateDefense.DP_DH)
 
-                    view = playerView
-                } catch (e: NoSuchElementException) {
-                    val positionView = AddDesignatedPlayerButton(context).run {
-                        when(teamType) {
+                        when (teamType) {
                             TeamType.SOFTBALL.id -> {
                                 setLabel(context.getString(R.string.field_position_dp))
                             }
@@ -342,8 +327,6 @@ class DefenseEditableView: DefenseView {
                                 setLabel(context.getString(R.string.field_position_dh))
                             }
                         }
-
-                        layoutParams = LayoutParams(iconSize, iconSize)
 
                         setOnDragListener { v, event ->
                             when(event.action) {
@@ -361,21 +344,12 @@ class DefenseEditableView: DefenseView {
                                 else -> false
                             }
                         }
-
-                        this
                     }
-
-                    view = positionView
                 }
-
-                view?.apply {
-                    setOnClickListener {
-                        playerListener?.onPlayerButtonClicked(FieldPosition.DP_DH)
-                    }
-
-                    addPlayerOnFieldWithPercentage(containerSize, this, FieldPosition.DP_DH.xPercent, FieldPosition.DP_DH.yPercent, null)
-                }
-
+            }
+        } else {
+            positionMarkers[FieldPosition.DP_DH]?.apply {
+                setState(StateDefense.NONE)
             }
         }
     }

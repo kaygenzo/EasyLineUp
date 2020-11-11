@@ -98,6 +98,9 @@ class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayer
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_lineup_defense_editable, container, false)
 
+        //TODO to get from a strategy when it will be developed
+        view.cardDefenseView.init(FieldPosition.values().filter { FieldPosition.isDefensePlayer(it.position) || it == FieldPosition.DP_DH })
+
         viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer { players ->
             view.cardDefenseView.setPlayerStateListener(this)
             val disposable = viewModel.getTeamType().subscribe({

@@ -32,6 +32,8 @@ class DpFlexLinkView: ConstraintLayout {
         LayoutInflater.from(context).inflate(R.layout.view_dp_flex_link, this)
         linkDpFlexPlayerList.visibility = View.GONE
         iconeSize = resources.getDimensionPixelSize(R.dimen.link_dp_flex_icon_size)
+        player_dp.setState(StateDefense.PLAYER)
+        player_flex.setState(StateDefense.PLAYER)
     }
 
     fun setTeamType(type: Int) {
