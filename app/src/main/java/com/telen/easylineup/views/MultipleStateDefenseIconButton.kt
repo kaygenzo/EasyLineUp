@@ -7,18 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.utils.StringUtils
-import kotlinx.android.synthetic.main.player_icon_field.view.*
-import kotlinx.android.synthetic.main.view_add_player_button.view.*
 import kotlinx.android.synthetic.main.view_multiple_state_defense_icon.view.*
-import kotlinx.android.synthetic.main.view_multiple_state_defense_icon.view.fab
-import kotlinx.android.synthetic.main.view_multiple_state_defense_icon.view.playerImage
-import kotlinx.android.synthetic.main.view_multiple_state_defense_icon.view.playerNameFallback
 import timber.log.Timber
 
 enum class StateDefense {
@@ -101,6 +97,10 @@ class MultipleStateDefenseIconButton: ConstraintLayout {
         else {
             playerNameFallback.setBackgroundResource(R.drawable.circle_shape_letters_border_black)
         }
+    }
+
+    fun setPlayerImage(@DrawableRes resId: Int) {
+        playerImage.setImageResource(resId)
     }
 
     fun setPlayerImage(url: String?, fallbackName: String, size: Int, @ColorInt borderColor: Int, borderWidth: Float) {

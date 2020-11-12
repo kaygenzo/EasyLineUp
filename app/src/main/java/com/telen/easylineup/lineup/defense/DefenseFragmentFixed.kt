@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.lineup.PlayersPositionViewModel
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -23,6 +24,9 @@ class DefenseFragmentFixed: BaseFragment("DefenseFragmentFixed") {
 
         parentFragment?.let { parent ->
             viewModel = ViewModelProviders.of(parent).get(PlayersPositionViewModel::class.java)
+
+            //TODO to get from a strategy when it will be developed
+            view.cardDefenseView.init(FieldPosition.values().filter { FieldPosition.isDefensePlayer(it.position) || it == FieldPosition.DP_DH })
 
             viewModel.lineupID?.let {
                 viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer { players ->

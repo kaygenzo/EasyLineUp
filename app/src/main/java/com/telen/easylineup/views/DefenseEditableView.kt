@@ -11,17 +11,18 @@ import android.util.AttributeSet
 import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
-import android.view.animation.*
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.Animation
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.ScaleAnimation
 import android.widget.FrameLayout
 import android.widget.ImageView
-import com.telen.easylineup.utils.LoadingCallback
+import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.*
 import kotlinx.android.synthetic.main.baseball_field_with_players.view.*
 import kotlinx.android.synthetic.main.field_view.view.*
 import timber.log.Timber
 import kotlin.math.roundToInt
-import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.*
-import kotlin.math.min
 
 const val TAG_TRASH = "_trash"
 
@@ -37,8 +38,6 @@ class DefenseEditableView: DefenseView {
 
     private var playerListener: OnPlayerButtonCallback? = null
     private val players: MutableCollection<PlayerWithPosition> = mutableListOf()
-
-    private val positionMarkers: MutableMap<FieldPosition, MultipleStateDefenseIconButton> = mutableMapOf()
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -59,28 +58,7 @@ class DefenseEditableView: DefenseView {
         }
     }
 
-    fun initField(positions: List<FieldPosition>) {
-
-        positionMarkers.clear()
-        cleanPlayerIcons()
-
-        getContainerSize {
-            val iconSize = (it * ICON_SIZE_SCALE).roundToInt()
-            positions.forEach { position ->
-                val view = MultipleStateDefenseIconButton(context).apply {
-                    layoutParams = LayoutParams(iconSize, iconSize)
-                    setState(StateDefense.LOADING)
-                    setOnClickListener { view ->
-                        playerListener?.onPlayerButtonClicked(position)
-                    }
-                }
-                positionMarkers[position] = view
-                addPlayerOnFieldWithPercentage(it, view, position.xPercent, position.yPercent, null)
-            }
-        }
-    }
-
-    fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int, loadingCallback: LoadingCallback?) {
+    fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int) {
 
         this.players.clear()
         this.players.addAll(players)
@@ -209,7 +187,7 @@ class DefenseEditableView: DefenseView {
         }
 
         trashView.apply {
-            addPlayerOnFieldWithPercentage(containerSize, this, 100f, 100f, null)
+            addPlayerOnFieldWithPercentage(containerSize, this, 100f, 100f)
         }
     }
 
@@ -352,6 +330,10 @@ class DefenseEditableView: DefenseView {
                 setState(StateDefense.NONE)
             }
         }
+    }
+
+    override fun onFieldPositionClicked(position: FieldPosition) {
+        playerListener?.onPlayerButtonClicked(position)
     }
 }
 

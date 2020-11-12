@@ -7,6 +7,7 @@ data class TournamentWithLineup(
         var fieldPositionID: Long = 0,
         var lineupName: String? = "",
         var lineupID: Long = 0,
+        var lineupMode: Int = 0,
         var x: Float = 0f,
         var y: Float = 0f,
         var position: Int = 0,
@@ -18,6 +19,6 @@ data class TournamentWithLineup(
     }
 
     fun toLineup(): Lineup {
-        return Lineup(id = lineupID, name = lineupName ?: "", tournamentId = tournamentID, eventTimeInMillis = lineupEventTime, teamId = teamID)
+        return Lineup(id = lineupID, name = lineupName ?: "", tournamentId = tournamentID, eventTimeInMillis = lineupEventTime, teamId = teamID, mode = lineupMode)
     }
 }

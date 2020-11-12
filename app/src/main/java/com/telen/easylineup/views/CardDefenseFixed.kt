@@ -3,23 +3,14 @@ package com.telen.easylineup.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.android.material.card.MaterialCardView
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
-import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.card_defense_fixed.view.*
 
-class CardDefenseFixed: MaterialCardView, LoadingCallback {
-
-    override fun onStartLoading() {
-        progressBar.visibility = View.VISIBLE
-    }
-
-    override fun onFinishLoading() {
-        progressBar.visibility = View.GONE
-    }
+class CardDefenseFixed: MaterialCardView {
 
     constructor(context: Context) : super(context) { init(context)}
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs){ init(context)}
@@ -32,7 +23,11 @@ class CardDefenseFixed: MaterialCardView, LoadingCallback {
         }
     }
 
+    fun init(positions: List<FieldPosition>) {
+        fieldAndPlayersRootView.initField(positions)
+    }
+
     fun setListPlayer(players: List<PlayerWithPosition>) {
-        fieldAndPlayersRootView.setListPlayerInField(players, this)
+        fieldAndPlayersRootView.setListPlayerInField(players)
     }
 }

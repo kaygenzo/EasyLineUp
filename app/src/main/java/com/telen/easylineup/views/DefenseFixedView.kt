@@ -5,18 +5,13 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
-import com.telen.easylineup.utils.ready
-import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.field_view.view.*
 import timber.log.Timber
-import kotlin.math.min
 import kotlin.math.roundToInt
 
 class DefenseFixedView: DefenseView {
@@ -27,27 +22,14 @@ class DefenseFixedView: DefenseView {
 
     fun init(context: Context?) {
         LayoutInflater.from(context).inflate(R.layout.baseball_field_only, this)
-        fieldFrameLayout.ready {
-            val size = fieldFrameLayout.run {
-                val viewHeight = height
-                val viewWidth = width
-                min(viewHeight, viewWidth)
-            }
-            fieldFrameLayout.layoutParams.height = size
-            fieldFrameLayout.layoutParams.width = size
+
+        getContainerSize { containerSize ->
+            fieldFrameLayout.layoutParams.height = containerSize.toInt()
+            fieldFrameLayout.layoutParams.width = containerSize.toInt()
         }
     }
 
     fun setListPlayerInField(players: List<PlayerWithPosition>) {
-        setListPlayerInField(players, null)
-    }
-
-    fun setListPlayerInField(players: List<PlayerWithPosition>, loadingCallback: LoadingCallback?) {
-
-        if(players.any { FieldPosition.isDefensePlayer(it.position) })
-            loadingCallback?.onStartLoading()
-
-        cleanPlayerIcons()
 
         getContainerSize { containerSize ->
 
@@ -76,47 +58,25 @@ class DefenseFixedView: DefenseView {
                                     setPlayerImage(player.image, player.playerName, iconSize)
                                 this
                             }
-                            addPlayerOnFieldWithPercentage(containerSize, playerView, coordinatePercent.x, coordinatePercent.y, loadingCallback)
+                            addPlayerOnFieldWithPercentage(containerSize, playerView, coordinatePercent.x, coordinatePercent.y)
                         }
                     }
         }
     }
 
-    fun setSmallPlayerPosition(players: List<FieldPosition>) {
-        setSmallPlayerPosition(players, null)
-    }
-    fun setSmallPlayerPosition(positions: List<FieldPosition>, loadingCallback: LoadingCallback?) {
-
-        if(positions.isNotEmpty())
-            loadingCallback?.onStartLoading()
-
-        cleanPlayerIcons()
-
+    fun setSmallPlayerPosition(positions: List<FieldPosition>, lineupMode: Int) {
         getContainerSize { containerSize ->
-
             positions.filter { FieldPosition.isDefensePlayer(it.position) }
                     .forEach { position ->
-                        val iconView = SmallBaseballImageView(context).run {
-                            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                            setImageResource(R.drawable.baseball_ball_icon)
-                            scaleType = ImageView.ScaleType.CENTER_INSIDE
-                            this
+                        positionMarkers[position]?.apply {
+                            setState(StateDefense.PLAYER)
+                            setPlayerImage(R.drawable.baseball_ball_icon)
                         }
-                        addPlayerOnFieldWithPercentage(containerSize, iconView, position.xPercent, position.yPercent, loadingCallback)
                     }
-
-        }
-    }
-
-    fun refresh() {
-        refreshView(fieldFrameLayout)
-    }
-
-    private fun refreshView(rootView: View) {
-        rootView.invalidate()
-        if(rootView is ViewGroup) {
-            for (i in 0 until rootView.childCount) {
-                refreshView(rootView.getChildAt(i))
+            if(lineupMode == MODE_DISABLED) {
+                positionMarkers[FieldPosition.DP_DH]?.apply {
+                    setState(StateDefense.NONE)
+                }
             }
         }
     }
