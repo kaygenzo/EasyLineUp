@@ -2,16 +2,12 @@ package com.telen.easylineup.views
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.widget.ImageView
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.FieldPosition
-import com.telen.easylineup.domain.model.MODE_DISABLED
-import com.telen.easylineup.domain.model.PlayerFieldPosition
-import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.*
 import kotlinx.android.synthetic.main.field_view.view.*
-import timber.log.Timber
 import kotlin.math.roundToInt
 
 class DefenseFixedView: DefenseView {
@@ -29,55 +25,81 @@ class DefenseFixedView: DefenseView {
         }
     }
 
-    fun setListPlayerInField(players: List<PlayerWithPosition>) {
+    fun setListPlayerInField(players: List<PlayerWithPosition>, lineupMode: Int) {
+
+        val emptyPositions = mutableListOf<FieldPosition>()
+        positionMarkers.keys.forEach { emptyPositions.add(it) }
 
         getContainerSize { containerSize ->
 
             val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
-            Timber.d("DefenseFixedView: iconSize=$iconSize containerWidth=${containerSize} containerHeight=${fieldFrameLayout.height}")
 
-            players.filter { !FieldPosition.isSubstitute(it.position) }
-                    .forEach { player ->
-                        val position = FieldPosition.getFieldPosition(player.position)
-                        position?.let {
-                            val coordinatePercent = PointF(it.xPercent, it.yPercent)
+            //Timber.d("DefenseFixedView: iconSize=$iconSize containerWidth=${containerSize} containerHeight=${fieldFrameLayout.height}")
 
-                            val playerView = MultipleStateDefenseIconButton(context).run {
-                                layoutParams = LayoutParams(iconSize, iconSize)
-                                setState(StateDefense.PLAYER)
-                                if(players.any { pos -> pos.position == FieldPosition.DP_DH.position }) {
-                                    if(player.flags and PlayerFieldPosition.FLAG_FLEX > 0 || player.position == FieldPosition.DP_DH.position) {
-                                        setPlayerImage(player.image, player.playerName, iconSize, Color.RED, 3f)
-                                    }
-                                    else {
-                                        setPlayerImage(player.image, player.playerName, iconSize)
-                                    }
-
+            //here we process the player positions only for those who are really set, and excluded substitutes
+            players.filter { !FieldPosition.isSubstitute(it.position) }.let { filteredPlayers ->
+                filteredPlayers.forEach { player ->
+                    val position = FieldPosition.getFieldPosition(player.position)
+                    position?.let {
+                        positionMarkers[position]?.apply {
+                            emptyPositions.remove(it)
+                            setState(StateDefense.PLAYER)
+                            if(lineupMode == MODE_ENABLED) {
+                                if(player.flags and PlayerFieldPosition.FLAG_FLEX > 0 || it == FieldPosition.DP_DH) {
+                                    setPlayerImage(player.image, player.playerName, iconSize, Color.RED, 3f)
                                 }
-                                else
+                                else {
                                     setPlayerImage(player.image, player.playerName, iconSize)
-                                this
+                                }
                             }
-                            addPlayerOnFieldWithPercentage(containerSize, playerView, coordinatePercent.x, coordinatePercent.y)
+                            else
+                                setPlayerImage(player.image, player.playerName, iconSize)
                         }
                     }
+                }
+            }
+
+            processNonDefensePositions(emptyPositions, lineupMode)
         }
     }
 
+    @Deprecated("Will be remove in the future if no use case need it")
     fun setSmallPlayerPosition(positions: List<FieldPosition>, lineupMode: Int) {
+
+        val emptyPositions = mutableListOf<FieldPosition>()
+        positionMarkers.keys.forEach { emptyPositions.add(it) }
+
         getContainerSize { containerSize ->
             positions.filter { FieldPosition.isDefensePlayer(it.position) }
                     .forEach { position ->
                         positionMarkers[position]?.apply {
+                            emptyPositions.remove(position)
                             setState(StateDefense.PLAYER)
-                            setPlayerImage(R.drawable.baseball_ball_icon)
+                            setPlayerImage(R.drawable.baseball_ball_icon, ImageView.ScaleType.CENTER_INSIDE)
                         }
                     }
-            if(lineupMode == MODE_DISABLED) {
-                positionMarkers[FieldPosition.DP_DH]?.apply {
-                    setState(StateDefense.NONE)
-                }
-            }
+
+            processNonDefensePositions(emptyPositions, lineupMode)
         }
+    }
+
+    private fun processNonDefensePositions(emptyPositions: MutableList<FieldPosition>, lineupMode: Int) {
+        //Special case for DP/DH
+        // if the lineup do not manage dp/dh mode, just remove the field position. Otherwise,
+        // let's just take a look if the position has been set before
+        emptyPositions.filter { it == FieldPosition.DP_DH }
+                .mapNotNull { positionMarkers[it] }
+                .forEach {
+                    if(lineupMode == MODE_DISABLED) {
+                        it.setState(StateDefense.NONE)
+                    }
+                    else {
+                        it.setState(StateDefense.EMPTY)
+                    }
+                }
+        emptyPositions.remove(FieldPosition.DP_DH)
+
+        //now, there are still some empty positions, let's just hide it
+        emptyPositions.mapNotNull { positionMarkers[it] }.forEach { it.setState(StateDefense.EMPTY) }
     }
 }

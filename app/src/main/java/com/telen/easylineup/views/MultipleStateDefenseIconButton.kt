@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.view_multiple_state_defense_icon.view.*
 import timber.log.Timber
 
 enum class StateDefense {
-    LOADING, EMPTY, DP_DH, PLAYER, NONE
+    LOADING, ADD_PLAYER, DP_DH, PLAYER, NONE, EMPTY
 }
 
 class MultipleStateDefenseIconButton: ConstraintLayout {
@@ -51,7 +51,7 @@ class MultipleStateDefenseIconButton: ConstraintLayout {
                 fab.visibility = View.VISIBLE
                 progressIcon.visibility = View.VISIBLE
             }
-            StateDefense.EMPTY -> {
+            StateDefense.ADD_PLAYER -> {
                 designatedPlayerLabel.visibility = View.GONE
                 fab.visibility = View.VISIBLE
                 fab.setImageResource(R.drawable.ic_add_white_24dp)
@@ -79,6 +79,14 @@ class MultipleStateDefenseIconButton: ConstraintLayout {
                 imagePlayerContainer.visibility = View.GONE
                 progressIcon.visibility = View.GONE
             }
+            StateDefense.EMPTY -> {
+                designatedPlayerLabel.visibility = View.GONE
+                fab.visibility = View.VISIBLE
+                fab.isEnabled = false
+                fab.setImageResource(0)
+                imagePlayerContainer.visibility = View.GONE
+                progressIcon.visibility = View.GONE
+            }
         }
     }
 
@@ -99,8 +107,11 @@ class MultipleStateDefenseIconButton: ConstraintLayout {
         }
     }
 
-    fun setPlayerImage(@DrawableRes resId: Int) {
-        playerImage.setImageResource(resId)
+    fun setPlayerImage(@DrawableRes resId: Int, scaleType: ImageView.ScaleType) {
+        playerImage.apply {
+            setImageResource(resId)
+            setScaleType(scaleType)
+        }
     }
 
     fun setPlayerImage(url: String?, fallbackName: String, size: Int, @ColorInt borderColor: Int, borderWidth: Float) {

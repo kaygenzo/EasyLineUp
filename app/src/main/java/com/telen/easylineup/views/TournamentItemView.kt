@@ -8,14 +8,24 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.lineup.list.LineupsAdapter
 import com.telen.easylineup.lineup.list.OnItemClickedListener
 import kotlinx.android.synthetic.main.item_adapter_tournaments.view.*
+import java.lang.StringBuilder
+import java.text.SimpleDateFormat
+import java.util.*
+
+interface OnActionsClickListener {
+    fun onDeleteClicked()
+    fun onStatsClicked()
+}
 
 class TournamentItemView : ConstraintLayout {
 
     lateinit var lineupsAdapter: LineupsAdapter
     private val lineups = mutableListOf<Lineup>()
+    private var listener: OnActionsClickListener? = null
 
     constructor(context: Context, itemClickedListener: OnItemClickedListener?) : super(context) {initView(context, itemClickedListener)}
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {initView(context, null)}
@@ -33,6 +43,14 @@ class TournamentItemView : ConstraintLayout {
             addItemDecoration(dividerItemDecoration)
             adapter = lineupsAdapter
         }
+
+        deleteTournament.setOnClickListener {
+            listener?.onDeleteClicked()
+        }
+
+        statsTournament.setOnClickListener {
+            listener?.onStatsClicked()
+        }
     }
 
     fun setLineups(lineups: List<Lineup>) {
@@ -41,7 +59,18 @@ class TournamentItemView : ConstraintLayout {
         this.lineupsAdapter.notifyDataSetChanged()
     }
 
-    fun setTimeLinePosition(position: Int) {
-        material_timeline_view.position = position
+    fun setTournamentName(tournamentName: String) {
+        this.tournamentName.text = tournamentName
+    }
+
+    fun setTournamentDate(start: Long, end: Long) {
+        val builder = StringBuilder(SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(start))
+        if(start != end)
+            builder.append(" - ").append(SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(end))
+        tournamentDate.text = builder.toString()
+    }
+
+    fun setOnActionsClickListener(listener: OnActionsClickListener) {
+        this.listener = listener
     }
 }

@@ -195,7 +195,7 @@ class DefenseEditableView: DefenseView {
         emptyPositions.forEach { position ->
             positionMarkers[position]?.apply {
 
-                setState(StateDefense.EMPTY)
+                setState(StateDefense.ADD_PLAYER)
 
                 setOnDragListener { v, event ->
                     when (event.action) {

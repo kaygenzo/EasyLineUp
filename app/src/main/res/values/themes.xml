@@ -241,7 +241,6 @@ H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
         <item name="android:textAppearance">@style/TextMiddle</item>
         <item name="autoSizeTextType">none</item>
         <item name="autoSizeMaxTextSize">@dimen/app_max_text_size_middle</item>
-        <item name="android:padding">10dp</item>
         <item name="android:maxLines">2</item>
         <item name="android:ellipsize">end</item>
     </style>

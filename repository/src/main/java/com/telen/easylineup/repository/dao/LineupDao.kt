@@ -68,7 +68,9 @@ internal interface LineupDao {
         lineups.name as lineupName,
         lineups.id as lineupID,
         lineups.teamID as teamID,
-        lineups.eventTime as eventTime,
+        lineups.eventTime as lineupEventTime,
+        lineups.createdAt as lineupCreatedTime,
+        lineups.roaster as roster,
         lineups.mode as lineupMode,
         x, y, position
         FROM tournaments

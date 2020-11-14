@@ -5,40 +5,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <com.telen.easylineup.views.DefenseFixedView
-        android:id="@+id/lineupField"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:padding="8dp"/>
-
-    <com.telen.easylineup.views.CollegedStyledTextView
-        android:id="@+id/tournamentName"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        tools:text="Tournament Name"
-        app:layout_constraintLeft_toRightOf="@+id/lineupField"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/lineupField"
-        app:layout_constraintBottom_toTopOf="@+id/lineupName"
-        android:gravity="center_vertical"
-        android:layout_marginStart="10dp"/>
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/default_margin"
+    android:layout_marginBottom="10dp"
+    android:layout_marginTop="10dp">
 
     <com.telen.easylineup.views.MLBStyledTextView
         style="@style/LineupName"
         android:id="@+id/lineupName"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         tools:text="Lineup Name"
-        app:layout_constraintLeft_toRightOf="@+id/lineupField"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tournamentName"
-        app:layout_constraintBottom_toBottomOf="@+id/lineupField"
-        android:gravity="center_vertical"
-        android:layout_marginStart="10dp"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/lineupDate"
+        android:gravity="center_vertical"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/lineupDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/lineupName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:text="31/12/2019"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

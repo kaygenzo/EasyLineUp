@@ -15,9 +15,12 @@ internal data class RoomTournamentWithLineup(
         @ColumnInfo(name = "y") var y: Float = 0f,
         @ColumnInfo(name = "position") var position: Int = 0,
         @ColumnInfo(name = "teamID") var teamID: Long = 0,
-        @ColumnInfo(name = "eventTime") var lineupEventTime: Long = 0
+        @ColumnInfo(name = "lineupEventTime") var lineupEventTime: Long = 0,
+        @ColumnInfo(name = "lineupCreatedTime") var lineupCreatedTime: Long = 0,
+        @ColumnInfo(name = "roster") var roster: String? = null
 )
 
 internal fun RoomTournamentWithLineup.toTournamentWithLineup(): TournamentWithLineup {
-    return TournamentWithLineup(tournamentID, tournamentName, tournamentCreatedAt, fieldPositionID, lineupName, lineupID, lineupMode, x, y, position, teamID, lineupEventTime)
+    return TournamentWithLineup(tournamentID, tournamentName, tournamentCreatedAt, fieldPositionID,
+            lineupName, lineupID, lineupMode, x, y, position, teamID, lineupEventTime, lineupCreatedTime, roster)
 }

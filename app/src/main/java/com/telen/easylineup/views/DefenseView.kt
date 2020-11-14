@@ -33,7 +33,7 @@ abstract class DefenseView: ConstraintLayout {
     fun initField(positions: List<FieldPosition>) {
 
         positionMarkers.clear()
-        cleanPlayerIcons()
+        //cleanPlayerIcons()
 
         getContainerSize {
             val iconSize = (it * ICON_SIZE_SCALE).roundToInt()
@@ -52,7 +52,7 @@ abstract class DefenseView: ConstraintLayout {
     }
 
     fun clear() {
-        cleanPlayerIcons()
+        //cleanPlayerIcons()
     }
 
     protected fun addPlayerOnFieldWithPercentage(containerSize: Float, view: View, x: Float, y: Float) {
@@ -76,7 +76,7 @@ abstract class DefenseView: ConstraintLayout {
             checkBounds(parentWidth, x, y, imageWidth, imageHeight) { correctedX: Float, correctedY: Float ->
                 val positionX = correctedX - imageWidth / 2
                 val positionY = correctedY - imageHeight / 2
-                Timber.d("containerSize=$parentWidth x=$x y=$y correctedX=$correctedX correctedY=$correctedY positionX=$positionX positionY=$positionY")
+                //Timber.d("containerSize=$parentWidth x=$x y=$y correctedX=$correctedX correctedY=$correctedY positionX=$positionX positionY=$positionY")
 
                 val layoutParamCustom = FrameLayout.LayoutParams(iconSize, iconSize).run {
                     leftMargin = positionX.toInt()
@@ -90,7 +90,7 @@ abstract class DefenseView: ConstraintLayout {
                     invalidate()
                 }
 
-                (view as? MultipleStateDefenseIconButton)?.takeIf { it.getState() == StateDefense.EMPTY }?.let {
+                (view as? MultipleStateDefenseIconButton)?.takeIf { it.getState() == StateDefense.ADD_PLAYER }?.let {
                     val shake = AnimationUtils.loadAnimation(context, R.anim.shake_effect)
                     view.animation = shake
                 }

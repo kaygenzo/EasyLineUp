@@ -1,12 +1,12 @@
 package com.telen.easylineup.lineup.list
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
+import java.text.SimpleDateFormat
+import java.util.*
 
 class LineupsAdapter(private val lineups: List<Lineup>, private val itemClickedListener: OnItemClickedListener?): RecyclerView.Adapter<LineupsViewHolder>() {
 
@@ -21,14 +21,10 @@ class LineupsAdapter(private val lineups: List<Lineup>, private val itemClickedL
 
     override fun onBindViewHolder(holder: LineupsViewHolder, position: Int) {
         val lineup = lineups[position]
-
-        holder.field.apply {
-            //TODO to get from a strategy when it will be developed
-            initField(FieldPosition.values().filter { FieldPosition.isDefensePlayer(it.position) || it == FieldPosition.DP_DH })
-            setSmallPlayerPosition(lineup.playerPositions, lineup.mode)
-        }
         holder.lineupName.text = lineup.name
-        holder.tournamentName.visibility = View.GONE
+        val date = lineup.eventTimeInMillis.takeIf { it > 0L } ?: lineup.createdTimeInMillis
+        val builder = StringBuilder(SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(date))
+        holder.lineupDate.text = builder.toString()
         holder.rootView.setOnClickListener {
             itemClickedListener?.onLineupClicked(lineup)
         }

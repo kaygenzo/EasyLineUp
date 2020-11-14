@@ -27,7 +27,7 @@ class CardDefenseFixed: MaterialCardView {
         fieldAndPlayersRootView.initField(positions)
     }
 
-    fun setListPlayer(players: List<PlayerWithPosition>) {
-        fieldAndPlayersRootView.setListPlayerInField(players)
+    fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int) {
+        fieldAndPlayersRootView.setListPlayerInField(players, lineupMode)
     }
 }

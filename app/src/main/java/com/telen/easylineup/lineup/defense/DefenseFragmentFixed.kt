@@ -34,7 +34,7 @@ class DefenseFragmentFixed: BaseFragment("DefenseFragmentFixed") {
                             .subscribeOn(Schedulers.computation())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
-                                view.cardDefenseView.setListPlayer(players)
+                                view.cardDefenseView.setListPlayer(players, viewModel.lineupMode)
                             }, {
 
                             })
