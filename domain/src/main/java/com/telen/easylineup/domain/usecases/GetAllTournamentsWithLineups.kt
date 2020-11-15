@@ -41,7 +41,7 @@ internal class GetAllTournamentsWithLineups(val dao: LineupRepository): UseCase<
                     val list = mutableListOf<Pair<Tournament, List<Lineup>>>()
                     it.forEach { item ->
                         val tournament = item.key
-                        val lineups = item.value
+                        val lineups = item.value.sortedByDescending { it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }
                         list.add(Pair(tournament, lineups))
                     }
                     ResponseValue(list)

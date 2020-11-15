@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.mancj.materialsearchbar.MaterialSearchBar
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
@@ -21,7 +20,9 @@ import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.utils.hideSoftKeyboard
+import com.telen.easylineup.views.OnSearchBarListener
 import io.reactivex.Completable
+import kotlinx.android.synthetic.main.fragment_list_tournaments.*
 import kotlinx.android.synthetic.main.fragment_list_tournaments.view.*
 
 
@@ -36,7 +37,7 @@ class LineupsScrollListener(private val view: FloatingActionButton): RecyclerVie
     }
 }
 
-class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClickedListener, MaterialSearchBar.OnSearchActionListener {
+class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClickedListener, OnSearchBarListener {
 
     private lateinit var tournamentsAdapter: TournamentsAdapter
     private lateinit var viewModel: LineupViewModel
@@ -58,8 +59,6 @@ class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClic
             addOnScrollListener(LineupsScrollListener(view.fab))
         }
 
-        view.searchBar.setOnSearchActionListener(this)
-
         view.fab.setOnClickListener {
             findNavController().navigate(R.id.lineupCreationFragment, null, NavigationUtils().getOptions())
         }
@@ -70,6 +69,8 @@ class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClic
 
         viewModel.setFilter("")
 
+        view.materialSearchBar.onSearchBarListener = this
+
         return view
     }
 
@@ -78,6 +79,11 @@ class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClic
         view?.recyclerView?.apply {
             adapter = null
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        materialSearchBar.setIdle()
     }
 
     override fun onDeleteTournamentClicked(tournament: Tournament) {
@@ -116,19 +122,9 @@ class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClic
         }
     }
 
-    override fun onButtonClicked(buttonCode: Int) {
-    }
-
-    override fun onSearchStateChanged(enabled: Boolean) {
-        if(!enabled) {
-            viewModel.setFilter("")
-            hideSoftKeyboard()
-        }
-    }
-
-    override fun onSearchConfirmed(text: CharSequence?) {
+    override fun onSearchConfirmed(text: String?) {
         text?.let {
-            viewModel.setFilter(it.toString())
+            viewModel.setFilter(it)
             hideSoftKeyboard()
         }
     }

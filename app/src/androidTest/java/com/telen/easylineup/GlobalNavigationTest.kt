@@ -497,8 +497,6 @@ class GlobalNavigationTest {
 
         BaristaListInteractions.scrollListToPosition(R.id.recyclerView, 0)
 
-        BaristaVisibilityAssertions.assertDisplayed(R.id.headerText, "3 TOURNAMENTS / 7 LINEUPS")
-
         //click on delete tournament
 
         onView(allOf(withId(R.id.deleteTournament),
@@ -509,9 +507,6 @@ class GlobalNavigationTest {
 
         //confirm delete with dialog ok button
         BaristaClickInteractions.clickOn(android.R.id.button1)
-
-        //check new summary header
-        BaristaVisibilityAssertions.assertDisplayed(R.id.headerText, "2 TOURNAMENTS / 3 LINEUPS")
 
         //click on add lineup
         BaristaClickInteractions.clickOn(R.id.fab)
@@ -558,9 +553,6 @@ class GlobalNavigationTest {
 
         //go to the list of lineups
         pressBack()
-
-        //check header
-        BaristaVisibilityAssertions.assertDisplayed(R.id.headerText, "3 TOURNAMENTS / 4 LINEUPS")
 
 //        onView(allOf(withId(R.id.tournamentDate),
 //                hasSibling(withText("NewTournament")),

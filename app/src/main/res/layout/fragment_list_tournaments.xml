@@ -22,29 +22,22 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
 
-            <com.mancj.materialsearchbar.MaterialSearchBar
-                style="@style/MaterialSearchBarLight"
-                app:mt_speechMode="false"
-                app:mt_hint="@string/lineup_list_filter_focused_hint"
-                app:mt_maxSuggestionsCount="10"
-                app:mt_navIconEnabled="false"
-                app:mt_placeholder="@string/lineup_list_filter_unfocused_hint"
+            <com.telen.easylineup.views.MaterialSearchBar
+                android:id="@+id/materialSearchBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/searchBar"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:paddingBottom="4dp"/>
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:scrollbars="vertical"
-                app:layout_constraintTop_toBottomOf="@+id/searchBar"
+                app:layout_constraintTop_toBottomOf="@+id/materialSearchBar"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

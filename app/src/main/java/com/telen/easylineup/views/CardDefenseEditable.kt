@@ -3,23 +3,14 @@ package com.telen.easylineup.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.android.material.card.MaterialCardView
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
-import com.telen.easylineup.utils.LoadingCallback
 import kotlinx.android.synthetic.main.card_defense_editable.view.*
 
-class CardDefenseEditable: MaterialCardView, LoadingCallback {
-
-    override fun onStartLoading() {
-        progressBar.visibility = View.VISIBLE
-    }
-
-    override fun onFinishLoading() {
-        progressBar.visibility = View.GONE
-    }
+class CardDefenseEditable: MaterialCardView {
 
     constructor(context: Context) : super(context) { init(context)}
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs){ init(context)}
@@ -32,8 +23,12 @@ class CardDefenseEditable: MaterialCardView, LoadingCallback {
         }
     }
 
+    fun init(positions: List<FieldPosition>) {
+        fieldAndPlayersRootView.initField(positions)
+    }
+
     fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int) {
-        fieldAndPlayersRootView.setListPlayer(players, lineupMode, teamType, this)
+        fieldAndPlayersRootView.setListPlayer(players, lineupMode, teamType)
     }
 
     fun setPlayerStateListener(playerButtonCallback: OnPlayerButtonCallback) {

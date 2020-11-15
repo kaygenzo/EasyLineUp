@@ -4,12 +4,12 @@ import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.orhanobut.dialogplus.DialogPlus
-import com.orhanobut.dialogplus.ViewHolder
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.DomainErrors
@@ -17,12 +17,12 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.lineup.*
+import com.telen.easylineup.lineup.defense.available.ListAvailablePlayersBottomSheet
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.views.DpFlexLinkView
 import com.telen.easylineup.views.OnPlayerButtonCallback
 import com.telen.easylineup.views.OnPlayerClickListener
-import com.telen.easylineup.views.PlayerListView
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -33,10 +33,13 @@ import java.util.concurrent.TimeUnit
 class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayerButtonCallback {
 
     lateinit var viewModel: PlayersPositionViewModel
+    lateinit var availablePlayersBottomSheet: ListAvailablePlayersBottomSheet
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProviders.of(parentFragment as LineupFragment).get(PlayersPositionViewModel::class.java)
+
+        availablePlayersBottomSheet = ListAvailablePlayersBottomSheet()
 
         val disposable = viewModel.observeErrors().subscribe({
             when(it) {
@@ -81,7 +84,13 @@ class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayer
                 SavePlayerPositionSuccess -> Timber.d("Successfully saved player field position")
                 DeletePlayerPositionSuccess -> Timber.d("Successfully deleted player field position")
                 is GetAllAvailablePlayersSuccess -> activity?.run {
-                    getDialogListAvailablePlayers(this, event.players, event.position).show()
+                    availablePlayersBottomSheet.setPlayers(event.players, event.position, object: OnPlayerClickListener {
+                        override fun onPlayerSelected(player: Player) {
+                            viewModel.onPlayerSelected(player, event.position)
+                            availablePlayersBottomSheet.dismiss()
+                        }
+                    })
+                    availablePlayersBottomSheet.show(supportFragmentManager, "available_players_bottom_sheet")
                 }
                 is NeedLinkDpFlex -> activity?.run {
                     getDialogLinkDpAndFlex(this, event.initialData, event.dpLocked, event.flexLocked, event.teamType, event.title).show()
@@ -97,6 +106,9 @@ class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayer
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_lineup_defense_editable, container, false)
+
+        //TODO to get from a strategy when it will be developed
+        view.cardDefenseView.init(FieldPosition.values().filter { FieldPosition.isDefensePlayer(it.position) || it == FieldPosition.DP_DH })
 
         viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer { players ->
             view.cardDefenseView.setPlayerStateListener(this)
@@ -193,26 +205,6 @@ class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayer
             viewModel.linkPlayersInField.removeObservers(viewLifecycleOwner)
         }
         dialog.setCancelable(false)
-        return dialog
-    }
-
-    private fun getDialogListAvailablePlayers(context: Context, players: List<Player>, position: FieldPosition): DialogPlus {
-        val playerListView = PlayerListView(context)
-        playerListView.setPlayers(players, position)
-
-        val dialog = DialogPlus.newDialog(context)
-                .setContentHolder(ViewHolder(playerListView))
-                .setGravity(Gravity.BOTTOM)
-                .setCancelable(true)
-                .create()
-
-        playerListView.setOnPlayerClickListener(object : OnPlayerClickListener {
-            override fun onPlayerSelected(player: Player) {
-                viewModel.onPlayerSelected(player, position)
-                dialog.dismiss()
-            }
-        })
-
         return dialog
     }
 

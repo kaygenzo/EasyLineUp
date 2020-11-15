@@ -20,12 +20,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
-import com.makeramen.roundedimageview.RoundedTransformationBuilder
-import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
-import com.telen.easylineup.utils.ready
+import com.telen.easylineup.views.StateDefense
 import kotlinx.android.synthetic.main.team_item_view.view.*
-import timber.log.Timber
 
 class TeamItemView: LinearLayout {
 
@@ -61,6 +58,7 @@ class TeamItemView: LinearLayout {
 
     fun setImage(stringUri: String?, teamName: String) {
         val size = resources.getDimensionPixelSize(R.dimen.teams_list_icon_size)
+        teamIcon.setState(StateDefense.PLAYER)
         teamIcon.setPlayerImage(stringUri, teamName, size)
     }
 }

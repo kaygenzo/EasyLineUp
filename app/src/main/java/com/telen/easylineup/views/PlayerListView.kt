@@ -61,7 +61,7 @@ class PlayerListView: ConstraintLayout, OnPlayerClickListener {
     }
 }
 
-class PlayerListAdapter(val list: List<Player>, val playerListener: OnPlayerClickListener?): RecyclerView.Adapter<PlayerListAdapter.PlayerViewHolder>() {
+class PlayerListAdapter(val list: List<Player>, private val playerListener: OnPlayerClickListener?): RecyclerView.Adapter<PlayerListAdapter.PlayerViewHolder>() {
 
     private var filter: FieldPosition? = null
 

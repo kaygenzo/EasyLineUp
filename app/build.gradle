@@ -221,11 +221,6 @@ dependencies {
     implementation "com.shuhart.stepview:stepview:$stepViewVersion"
     implementation "com.makeramen:roundedimageview:$roundedImageView"
 
-    implementation 'pl.hypeapp:materialtimelineview:1.1'
-    implementation "net.cachapa.expandablelayout:expandablelayout:$expandablelayoutVersion"
-    implementation "com.github.mancj:MaterialSearchBar:$materialSearchBarVersion"
-    implementation "com.orhanobut:dialogplus:1.11@aar"
-
     implementation "com.github.nguyenhoanglam:ImagePicker:$imagepickerVersion"
 
     implementation "org.koin:koin-android:$koinVersion"

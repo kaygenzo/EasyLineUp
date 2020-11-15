@@ -8,7 +8,7 @@ import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
-import com.telen.easylineup.utils.LoadingCallback
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.utils.drawn
 import kotlinx.android.synthetic.main.field_view.view.*
 import timber.log.Timber
@@ -20,23 +20,49 @@ const val ICON_SIZE_SCALE = 0.12f
 abstract class DefenseView: ConstraintLayout {
 
     private var containerSize: Float? = 0f
+    protected val positionMarkers: MutableMap<FieldPosition, MultipleStateDefenseIconButton> = mutableMapOf()
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    fun clear() {
-        cleanPlayerIcons()
+    protected open fun onFieldPositionClicked(position: FieldPosition) {
+        // to implement if needed
     }
 
-    protected fun addPlayerOnFieldWithPercentage(containerSize: Float, view: View, x: Float, y: Float, loadingCallback: LoadingCallback?) {
+    fun initField(positions: List<FieldPosition>) {
+
+        positionMarkers.clear()
+        //cleanPlayerIcons()
+
+        getContainerSize {
+            val iconSize = (it * ICON_SIZE_SCALE).roundToInt()
+            positions.forEach { position ->
+                val view = MultipleStateDefenseIconButton(context).apply {
+                    layoutParams = LayoutParams(iconSize, iconSize)
+                    setState(StateDefense.LOADING)
+                    setOnClickListener { view ->
+                        onFieldPositionClicked(position)
+                    }
+                }
+                positionMarkers[position] = view
+                addPlayerOnFieldWithPercentage(it, view, position.xPercent, position.yPercent)
+            }
+        }
+    }
+
+    fun clear() {
+        //cleanPlayerIcons()
+    }
+
+    protected fun addPlayerOnFieldWithPercentage(containerSize: Float, view: View, x: Float, y: Float) {
         val positionX = ((x * containerSize) / 100f)
         val positionY = ((y * containerSize) / 100f)
-        addPlayerOnFieldWithCoordinate(view, containerSize, positionX, positionY, loadingCallback)
+        addPlayerOnFieldWithCoordinate(view, containerSize, positionX, positionY)
     }
 
-    protected fun addPlayerOnFieldWithCoordinate(view: View, parentWidth: Float, x: Float, y: Float, loadingCallback: LoadingCallback?) {
-        if(fieldFrameLayout.findViewWithTag<PlayerFieldIcon>(view.tag)!=null)
+    protected fun addPlayerOnFieldWithCoordinate(view: View, parentWidth: Float, x: Float, y: Float) {
+        if(fieldFrameLayout.findViewWithTag<MultipleStateDefenseIconButton>(view.tag)!=null)
             fieldFrameLayout.removeView(view)
 
         view.visibility = View.INVISIBLE
@@ -50,7 +76,7 @@ abstract class DefenseView: ConstraintLayout {
             checkBounds(parentWidth, x, y, imageWidth, imageHeight) { correctedX: Float, correctedY: Float ->
                 val positionX = correctedX - imageWidth / 2
                 val positionY = correctedY - imageHeight / 2
-                Timber.d("containerSize=$parentWidth x=$x y=$y correctedX=$correctedX correctedY=$correctedY positionX=$positionX positionY=$positionY")
+                //Timber.d("containerSize=$parentWidth x=$x y=$y correctedX=$correctedX correctedY=$correctedY positionX=$positionX positionY=$positionY")
 
                 val layoutParamCustom = FrameLayout.LayoutParams(iconSize, iconSize).run {
                     leftMargin = positionX.toInt()
@@ -64,25 +90,21 @@ abstract class DefenseView: ConstraintLayout {
                     invalidate()
                 }
 
-                if(view is AddPlayerButton) {
+                (view as? MultipleStateDefenseIconButton)?.takeIf { it.getState() == StateDefense.ADD_PLAYER }?.let {
                     val shake = AnimationUtils.loadAnimation(context, R.anim.shake_effect)
                     view.animation = shake
                 }
-
-                loadingCallback?.onFinishLoading()
             }
         }
 
         fieldFrameLayout.addView(view)
     }
 
-    protected fun cleanPlayerIcons() {
+    private fun cleanPlayerIcons() {
         if(fieldFrameLayout.childCount > 1) {
             for (i in fieldFrameLayout.childCount-1 downTo 0) {
                 val view = fieldFrameLayout.getChildAt(i)
-                if(view is PlayerFieldIcon || view is AddPlayerButton
-                        || view is AddDesignatedPlayerButton || view is TrashFieldButton
-                        || view is SmallBaseballImageView) {
+                if(view is MultipleStateDefenseIconButton || view is SmallBaseballImageView) {
                     view.clearAnimation()
                     view.setOnDragListener(null)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
