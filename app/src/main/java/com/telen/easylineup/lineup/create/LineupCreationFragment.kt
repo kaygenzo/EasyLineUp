@@ -14,9 +14,7 @@ import com.getkeepsafe.taptargetview.TapTargetView
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.model.DomainErrors
-import com.telen.easylineup.domain.model.TeamRosterSummary
-import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.lineup.list.LineupViewModel
 import com.telen.easylineup.lineup.list.SaveSuccess
@@ -27,6 +25,7 @@ import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.LineupCreationFormView
 import com.telen.easylineup.views.OnActionButtonListener
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
 import kotlinx.android.synthetic.main.fragment_lineup_creation.view.*
 import timber.log.Timber
@@ -67,6 +66,13 @@ class LineupCreationFragment: BaseFragment("LineupCreationFragment") {
         })
         disposables.add(getTournamentsDisposable)
 
+        val getTeamType = lineupViewModel.getTeamType().subscribe({
+            view.lineupCreationForm.setTeamType(TeamType.getTypeById(it))
+        }, {
+            Timber.e(it)
+        })
+        disposables.add(getTeamType)
+
         view.lineupCreationForm.setFragmentManager(childFragmentManager)
 
         view.lineupCreationForm.setOnActionClickListener(object: OnActionButtonListener {
@@ -74,8 +80,8 @@ class LineupCreationFragment: BaseFragment("LineupCreationFragment") {
                 showRosterDialog(view.lineupCreationForm)
             }
 
-            override fun onSaveClicked(lineupName: String, tournament: Tournament, lineupEventTime: Long) {
-                lineupViewModel.saveLineup(tournament, lineupName, lineupEventTime)
+            override fun onSaveClicked(lineupName: String, tournament: Tournament, lineupEventTime: Long, strategy: TeamStrategy) {
+                lineupViewModel.saveLineup(tournament, lineupName, lineupEventTime, strategy)
             }
 
             override fun onCancelClicked() {
@@ -94,7 +100,7 @@ class LineupCreationFragment: BaseFragment("LineupCreationFragment") {
             when(it) {
                 is SaveSuccess -> {
                     Timber.d("successfully inserted new lineup, new id: ${it.lineupID}")
-                    val extras = LineupFragment.getArguments(it.lineupID,  it.lineupName)
+                    val extras = LineupFragment.getArguments(it.lineupID,  it.lineupName, it.strategy)
                     findNavController().navigate(R.id.lineupFragmentEditable, extras, NavigationUtils().getOptionsWithPopDestination(R.id.navigation_lineups, false))
                 }
             }

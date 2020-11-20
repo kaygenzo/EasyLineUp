@@ -15,6 +15,7 @@ class Constants {
         const val LINEUP_ID = "lineup_id"
         const val PLAYER_ID = "player_id"
         const val LINEUP_TITLE = "lineup_title"
+        const val EXTRA_LINEUP_STRATEGY = "com.telen.extra.lineup_title"
 
         //extras
         const val EXTRA_EDITABLE = "com.telen.extra.editable"
@@ -42,8 +43,6 @@ class Constants {
         const val MIN_PLAYER_COUNT = 9
 
         const val SUBSTITUTE_ORDER_VALUE = 200
-
-        const val ORDER_PITCHER_WHEN_DH = 10
 
         const val TYPE_LAST_LINEUP = 0
         const val TYPE_TEAM_SIZE = 1

@@ -6,12 +6,12 @@ import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import com.telen.easylineup.domain.model.TeamStrategy
 
-
-class ItemDecoratorAttackRecycler(context: Context?, orientation: Int) : DividerItemDecoration(context, orientation) {
+class ItemDecoratorAttackRecycler(context: Context?, orientation: Int, batterSize: Int = TeamStrategy.STANDARD.batterSize, extraHitterSize: Int = 0) : DividerItemDecoration(context, orientation) {
 
     private val mExtraDividerHeight: Int = 15
-    private val mExtraDividerIndex = 8
+    private val mExtraDividerIndex = (batterSize + extraHitterSize) - 1
 
     override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
 

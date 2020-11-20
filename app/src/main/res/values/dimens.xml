@@ -58,4 +58,7 @@
 
     <dimen name="players_available_list_size">150dp</dimen>
 
+    <dimen name="lineup_creation_icon_size">24dp</dimen>
+    <dimen name="lineup_creation_field_size">50dp</dimen>
+
 </resources>

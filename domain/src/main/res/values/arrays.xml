@@ -12,6 +12,10 @@
         <item>CF</item>
         <item>RF</item>
         <item>DH</item>
+        <item>LF</item>
+        <item>LCF</item>
+        <item>RCF</item>
+        <item>RF</item>
     </string-array>
 
     <string-array name="field_positions_softball_list" translatable="false">
@@ -26,5 +30,14 @@
         <item>CF</item>
         <item>RF</item>
         <item>DP</item>
+        <item>LF</item>
+        <item>LCF</item>
+        <item>RCF</item>
+        <item>RF</item>
+    </string-array>
+
+    <string-array name="softball_strategy_array" translatable="false">
+        <item>@string/softball_strategy_fastpitch</item>
+        <item>@string/softball_strategy_slowpitch</item>
     </string-array>
 </resources>

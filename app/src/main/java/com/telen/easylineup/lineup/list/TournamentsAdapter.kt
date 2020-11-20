@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.views.OnActionsClickListener
 import com.telen.easylineup.views.TournamentItemView
@@ -20,7 +21,7 @@ interface OnItemClickedListener {
     fun onStatisticsTournamentClicked(tournament: Tournament)
 }
 
-class TournamentsAdapter(private val itemClickListener: OnItemClickedListener): RecyclerView.Adapter<TournamentsAdapter.TournamentsViewHolder>() {
+class TournamentsAdapter(private val itemClickListener: OnItemClickedListener, private var teamType: Int = TeamType.BASEBALL.id): RecyclerView.Adapter<TournamentsAdapter.TournamentsViewHolder>() {
 
     private val items: MutableList<TimeLineItem> = mutableListOf()
 
@@ -42,7 +43,7 @@ class TournamentsAdapter(private val itemClickListener: OnItemClickedListener): 
         val item = items[position] as TournamentItem
 
         view.setTournamentName(item.tournament.name)
-
+        view.setTeamType(this.teamType)
         view.setLineups(item.lineups)
 
         if(item.start != null && item.end != null)
@@ -68,6 +69,11 @@ class TournamentsAdapter(private val itemClickListener: OnItemClickedListener): 
             val tournamentEnd = it.second.map {it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }.max()
             items.add(TournamentItem(it.first, tournamentStart, tournamentEnd, it.second))
         }
+        notifyDataSetChanged()
+    }
+
+    fun setTeamType(teamType: Int) {
+        this.teamType = teamType
         notifyDataSetChanged()
     }
 }

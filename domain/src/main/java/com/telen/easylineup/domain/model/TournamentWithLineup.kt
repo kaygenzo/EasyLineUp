@@ -1,7 +1,5 @@
 package com.telen.easylineup.domain.model
 
-import java.util.*
-
 data class TournamentWithLineup(
         var tournamentID: Long = 0,
         var tournamentName: String = "",
@@ -10,6 +8,7 @@ data class TournamentWithLineup(
         var lineupName: String? = "",
         var lineupID: Long = 0,
         var lineupMode: Int = 0,
+        var lineupStrategy: Int = TeamStrategy.STANDARD.id,
         var x: Float = 0f,
         var y: Float = 0f,
         var position: Int = 0,
@@ -24,6 +23,6 @@ data class TournamentWithLineup(
 
     fun toLineup(): Lineup {
         return Lineup(id = lineupID, name = lineupName ?: "", tournamentId = tournamentID, eventTimeInMillis = lineupEventTime,
-                teamId = teamID, mode = lineupMode, createdTimeInMillis = lineupCreatedTime, roster = roster)
+                teamId = teamID, mode = lineupMode, createdTimeInMillis = lineupCreatedTime, roster = roster, strategy = lineupStrategy)
     }
 }

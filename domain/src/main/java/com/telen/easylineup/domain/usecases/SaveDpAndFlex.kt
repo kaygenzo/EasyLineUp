@@ -1,12 +1,10 @@
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCase
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import io.reactivex.Single
-
 
 
 internal class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPositionRepository): UseCase<SaveDpAndFlex.RequestValues, SaveDpAndFlex.ResponseValue>() {
@@ -23,7 +21,7 @@ internal class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPosi
             // we will update the flag, and by the way, free the batting order
             requestValues.players.firstOrNull { p -> p.playerID == flex.id }?.run {
                 flags = PlayerFieldPosition.FLAG_FLEX
-                order = Constants.ORDER_PITCHER_WHEN_DH
+                order = requestValues.strategy.getDesignatedPlayerOrder()
                 if(!toUpdate.contains(this))
                     toUpdate.add(this)
             }
@@ -59,7 +57,8 @@ internal class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPosi
     class RequestValues(val lineupID: Long?,
                         val dp: Player?,
                         val flex: Player?,
-                        val players: List<PlayerWithPosition>
+                        val players: List<PlayerWithPosition>,
+                        val strategy: TeamStrategy
     ): UseCase.RequestValues
     inner class ResponseValue: UseCase.ResponseValue
 }

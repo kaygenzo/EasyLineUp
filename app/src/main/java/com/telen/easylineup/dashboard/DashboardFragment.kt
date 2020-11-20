@@ -25,10 +25,8 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.ShirtNumberEntry
-import com.telen.easylineup.domain.model.tiles.ITileData
-import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_ID
-import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_NAME
-import com.telen.easylineup.domain.model.tiles.LastPlayerNumberResearchData
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.tiles.*
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FeatureViewFactory
@@ -131,7 +129,8 @@ class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, A
             Constants.TYPE_LAST_LINEUP -> {
                 val lineupID = data.getData()[KEY_LINEUP_ID] as? Long ?: 0L
                 val lineupName = data.getData()[KEY_LINEUP_NAME] as? String ?: ""
-                val extras = LineupFragment.getArguments(lineupID, lineupName)
+                val lineupStrategy = data.getData()[KEY_LINEUP_STRATEGY] as TeamStrategy
+                val extras = LineupFragment.getArguments(lineupID, lineupName, lineupStrategy)
                 findNavController().navigate(R.id.lineupFragmentFixed, extras, NavigationUtils().getOptions())
             }
             else -> {

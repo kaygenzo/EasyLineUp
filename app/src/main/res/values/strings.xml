@@ -219,4 +219,10 @@
     <string name="tile_team_size_send_empty_phones">No phone numbers found into players</string>
 
     <string name="app_deeplink_file_import_title">Import data from this file ?</string>
+
+    <string name="form_lineup_creation_strategy_label">Strategy</string>
+    <string name="lineup_list_strategy_type">  &#8212;  %s</string>
+
+    <string name="softball_strategy_fastpitch" translatable="false">Fastpitch</string>
+    <string name="softball_strategy_slowpitch" translatable="false">Slowpitch</string>
 </resources>

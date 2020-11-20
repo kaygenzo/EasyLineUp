@@ -2,9 +2,9 @@ package com.telen.easylineup.domain.model
 
 import com.telen.easylineup.domain.model.FieldPosition
 
-enum class TeamStrategy(vararg val positions: FieldPosition)
+enum class TeamStrategy(val id: Int, val batterSize: Int, val extraHitterSize: Int, vararg val positions: FieldPosition)
 {
-    STANDARD(
+    STANDARD(0, 9, 0,
             FieldPosition.CATCHER,
             FieldPosition.PITCHER,
             FieldPosition.FIRST_BASE,
@@ -16,7 +16,7 @@ enum class TeamStrategy(vararg val positions: FieldPosition)
             FieldPosition.RIGHT_FIELD,
             FieldPosition.DP_DH
     ),
-    SLOWPITCH(
+    SLOWPITCH(1, 10, 0,
             FieldPosition.CATCHER,
             FieldPosition.PITCHER,
             FieldPosition.FIRST_BASE,
@@ -41,4 +41,18 @@ enum class TeamStrategy(vararg val positions: FieldPosition)
             FieldPosition.CENTER_FIELD,
             FieldPosition.RIGHT_FIELD
     )*/
+
+    fun getDesignatedPlayerOrder(): Int {
+        return batterSize + extraHitterSize + 1
+    }
+
+    companion object {
+        fun getStrategyById(id: Int): TeamStrategy {
+            values().forEach {
+                if (it.id == id)
+                    return it
+            }
+            return STANDARD
+        }
+    }
 }

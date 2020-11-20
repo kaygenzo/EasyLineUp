@@ -10,7 +10,10 @@ import com.squareup.picasso.Picasso
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.fragment_player_details.view.*
 import timber.log.Timber
@@ -91,7 +94,11 @@ class PlayerDetailsFragment: BaseFragment("PlayerDetailsFragment") {
         })
 
         viewModel.observeTeamType().observe(viewLifecycleOwner, Observer {
-            view.positionsBarChart.setTeamType(it)
+            val positions = TeamType.getValidPositionsForTeam(TeamType.getTypeById(it), TeamStrategy.STANDARD)
+            view.positionsBarChart.apply {
+                setPositionsReference(positions)
+                setTeamType(it)
+            }
         })
 
         return view

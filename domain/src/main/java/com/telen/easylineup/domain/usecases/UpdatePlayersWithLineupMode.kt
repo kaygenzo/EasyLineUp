@@ -1,9 +1,8 @@
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCase
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -21,7 +20,7 @@ internal class UpdatePlayersWithLineupMode(private val lineupDao: PlayerFieldPos
                         // find the pitcher if exists and set him at position 10 in lineup
                         requestValues.players.firstOrNull { it.position == FieldPosition.PITCHER.id }?.let {
                             val playerFieldPosition = it.toPlayerFieldPosition()
-                            playerFieldPosition.order = Constants.ORDER_PITCHER_WHEN_DH
+                            playerFieldPosition.order = TeamStrategy.STANDARD.getDesignatedPlayerOrder()
                             playerFieldPosition.flags = PlayerFieldPosition.FLAG_FLEX
                             lineupDao.updatePlayerFieldPosition(playerFieldPosition)
                         } ?: Completable.complete()

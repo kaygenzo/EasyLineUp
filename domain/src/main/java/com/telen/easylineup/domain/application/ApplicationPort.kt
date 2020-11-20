@@ -59,18 +59,18 @@ interface ApplicationPort {
     /** @deprecated **/ fun insertLineups(lineups: List<Lineup>): Completable
     fun getCompleteRoster(): Single<TeamRosterSummary>
     fun getRoster(lineupID: Long): Single<TeamRosterSummary>
-    fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary, lineupEventTime: Long): Single<Long>
+    fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary, lineupEventTime: Long, strategy: TeamStrategy): Single<Long>
     fun deleteLineup(lineupID: Long?): Completable
     fun updateLineupMode(isEnabled: Boolean, lineupID: Long?, lineupMode: Int, list: List<PlayerWithPosition>): Completable
 
     //player field positions
     /** @deprecated **/ fun insertPlayerFieldPositions(playerFieldPositions: List<PlayerFieldPosition>): Completable
-    fun savePlayerFieldPosition(player: Player, position: FieldPosition, list: List<PlayerWithPosition>, lineupID: Long?, lineupMode: Int): Completable
+    fun savePlayerFieldPosition(player: Player, position: FieldPosition, list: List<PlayerWithPosition>, lineupID: Long?, lineupMode: Int, strategy: TeamStrategy): Completable
     fun deletePlayerPosition(player: Player, position: FieldPosition, list: List<PlayerWithPosition>, lineupMode: Int): Completable
     fun saveBattingOrder(players: List<PlayerWithPosition>): Completable
-    fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition, list: List<PlayerWithPosition>, lineupMode: Int): Completable
+    fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition, list: List<PlayerWithPosition>, lineupMode: Int, strategy: TeamStrategy): Completable
     fun getDpAndFlexFromPlayersInField(list: List<PlayerWithPosition>): Single<DpAndFlexConfiguration>
-    fun linkDpAndFlex(dp: Player?, flex: Player?, lineupID: Long?, list: List<PlayerWithPosition>): Completable
+    fun linkDpAndFlex(dp: Player?, flex: Player?, lineupID: Long?, list: List<PlayerWithPosition>, strategy: TeamStrategy): Completable
 
     //tournaments
     fun getTournaments(): Single<List<Tournament>>

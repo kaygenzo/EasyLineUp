@@ -22,6 +22,7 @@ data class LineupExport (
 		@SerializedName("createdAt") val createdAt : Long,
 		@SerializedName("editedAt") val editedAt : Long,
 		@SerializedName("mode") val mode : Int,
+		@SerializedName("strategy") val strategy : Int,
 		@SerializedName("roster") val roster : List<String>?,
 		@SerializedName("playerPositions") val playerPositions : List<PlayerPositionExport>,
 		@SerializedName("playerNumberOverlays") val playerNumberOverlays : List<PlayerNumberOverlayExport>
@@ -38,6 +39,7 @@ data class LineupExport (
 		if (createdAt != other.createdAt) return false
 		if (editedAt != other.editedAt) return false
 		if (mode != other.mode) return false
+		if (strategy != other.strategy) return false
 		if (roster != other.roster) return false
 		if (playerPositions != other.playerPositions) return false
 		if (playerNumberOverlays != other.playerNumberOverlays) return false
@@ -52,6 +54,7 @@ data class LineupExport (
 		result = 31 * result + createdAt.hashCode()
 		result = 31 * result + editedAt.hashCode()
 		result = 31 * result + mode
+		result = 31 * result + strategy
 		result = 31 * result + (roster?.hashCode() ?: 0)
 		result = 31 * result + playerPositions.hashCode()
 		result = 31 * result + playerNumberOverlays.hashCode()

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.lineup.PlayersPositionViewModel
 import com.telen.easylineup.lineup.SaveBattingOrderSuccess
@@ -59,18 +60,16 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
         val view = inflater.inflate(R.layout.fragment_list_batter, container, false)
 
         val linearLayoutManager = LinearLayoutManager(activity)
-        val dividerItemDecoration = ItemDecoratorAttackRecycler(context, linearLayoutManager.orientation)
 
         val isEditable = viewModel.editable
 
-        playerAdapter = BattingOrderAdapter(adapterDataList, this, isEditable, TeamType.BASEBALL.id, lineupTypeface)
+        playerAdapter = BattingOrderAdapter(adapterDataList, this, isEditable, TeamType.BASEBALL.id, lineupTypeface, viewModel.strategy)
 
-        itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
+        itemTouchedCallback = AttackItemTouchCallback(playerAdapter, TeamStrategy.STANDARD.batterSize, TeamStrategy.STANDARD.extraHitterSize)
         itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
 
         view.recyclerView.apply {
             layoutManager = linearLayoutManager
-            addItemDecoration(dividerItemDecoration)
             adapter = playerAdapter
         }
 
@@ -79,9 +78,15 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
         }
 
         val disposable = viewModel.getTeamType()
-                .subscribe({ teamType ->
+                .subscribe({
+                    val batterSize = viewModel.strategy.batterSize
+                    val extraHitterSize = 0
+                    val dividerItemDecoration = ItemDecoratorAttackRecycler(context, linearLayoutManager.orientation, batterSize, extraHitterSize)
+                    view.recyclerView.addItemDecoration(dividerItemDecoration)
                     playerAdapter.apply {
-                        this.teamType = teamType
+                        this.teamType = viewModel.teamType
+                        itemTouchedCallback.batterSize = batterSize
+                        itemTouchedCallback.extraHitterSize = extraHitterSize
                         notifyDataSetChanged()
                     }
                 }, {

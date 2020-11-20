@@ -15,6 +15,7 @@ import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.DialogFactory
@@ -22,8 +23,11 @@ import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.utils.hideSoftKeyboard
 import com.telen.easylineup.views.OnSearchBarListener
 import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_list_tournaments.*
 import kotlinx.android.synthetic.main.fragment_list_tournaments.view.*
+import timber.log.Timber
 
 
 class LineupsScrollListener(private val view: FloatingActionButton): RecyclerView.OnScrollListener() {
@@ -66,6 +70,15 @@ class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClic
         viewModel.observeCategorizedLineups().observe(viewLifecycleOwner, Observer {
             tournamentsAdapter.setList(it)
         })
+
+        val disposable = viewModel.getTeamType()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    tournamentsAdapter.setTeamType(it)
+                }, {
+                    Timber.e(it)
+                })
+        this.disposables.add(disposable)
 
         viewModel.setFilter("")
 
@@ -117,7 +130,7 @@ class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClic
 
     override fun onLineupClicked(lineup: Lineup) {
         activity?.let {
-            val extras = LineupFragment.getArguments(lineup.id, lineup.name)
+            val extras = LineupFragment.getArguments(lineup.id, lineup.name, TeamStrategy.getStrategyById(lineup.strategy))
             findNavController().navigate(R.id.lineupFragmentFixed, extras, NavigationUtils().getOptions())
         }
     }

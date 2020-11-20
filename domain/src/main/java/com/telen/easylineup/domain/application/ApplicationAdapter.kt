@@ -307,10 +307,10 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                 .map { it.summary }
     }
 
-    override fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary, lineupEventTime: Long): Single<Long> {
+    override fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary, lineupEventTime: Long, strategy: TeamStrategy): Single<Long> {
         return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
                 .flatMap { team ->
-                    UseCaseHandler.execute(createLineupUseCase, CreateLineup.RequestValues(team.id, tournament, lineupTitle, lineupEventTime, rosterFilter.players))
+                    UseCaseHandler.execute(createLineupUseCase, CreateLineup.RequestValues(team.id, tournament, lineupTitle, lineupEventTime, rosterFilter.players, strategy))
                 }
                 .map { it.lineupID }
                 .doOnError {
@@ -350,7 +350,7 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
         return playerFieldPositionRepo.insertPlayerFieldPositions(playerFieldPositions)
     }
 
-    override fun savePlayerFieldPosition(player: Player, position: FieldPosition, list: List<PlayerWithPosition>, lineupID: Long?, lineupMode: Int): Completable {
+    override fun savePlayerFieldPosition(player: Player, position: FieldPosition, list: List<PlayerWithPosition>, lineupID: Long?, lineupMode: Int, strategy: TeamStrategy): Completable {
         return getTeam()
                 .flatMapCompletable {
                     val requestValues = SavePlayerFieldPosition.RequestValues(
@@ -359,7 +359,9 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                             position = position,
                             players = list,
                             lineupMode = lineupMode,
-                            teamType = it.type)
+                            teamType = it.type,
+                            strategy = strategy
+                    )
 
                     UseCaseHandler.execute(savePlayerFieldPositionUseCase, requestValues).ignoreElement()
                 }
@@ -384,7 +386,7 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                 }
     }
 
-    override fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition, list: List<PlayerWithPosition>, lineupMode: Int): Completable {
+    override fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition, list: List<PlayerWithPosition>, lineupMode: Int, strategy: TeamStrategy): Completable {
         return getTeam()
                 .flatMapCompletable {
                     UseCaseHandler.execute(switchPlayersPositionUseCase, SwitchPlayersPosition.RequestValues(
@@ -392,7 +394,8 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                             position1 = p1,
                             position2 = p2,
                             teamType = it.type,
-                            lineupMode = lineupMode
+                            lineupMode = lineupMode,
+                            strategy = strategy
                     )).ignoreElement()
                 }
     }
@@ -413,9 +416,9 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                 }
     }
 
-    override fun linkDpAndFlex(dp: Player?, flex: Player?, lineupID: Long?, list: List<PlayerWithPosition>): Completable {
+    override fun linkDpAndFlex(dp: Player?, flex: Player?, lineupID: Long?, list: List<PlayerWithPosition>, strategy: TeamStrategy): Completable {
         return UseCaseHandler.execute(saveDpAndFlexUseCase, SaveDpAndFlex.RequestValues(
-                lineupID = lineupID, dp = dp, flex = flex, players = list
+                lineupID = lineupID, dp = dp, flex = flex, players = list, strategy = strategy
         ))
                 .ignoreElement()
                 .doOnError {

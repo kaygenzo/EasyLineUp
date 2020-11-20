@@ -12,6 +12,11 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository): Us
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return dao.getAllPlayerPositionsForTournament(requestValues.tournament.id, requestValues.team.id)
                 .map { list ->
+
+                    // TODO think about this use case, maybe only display used positions instead of the whole list
+                    // TODO propose a spinner to choose which strategy to display
+                    val strategy = TeamStrategy.STANDARD.positions
+
                     val topHeaderData = mutableListOf<Pair<String, Int>>()
                     val leftHeaderData = mutableListOf<Pair<String, Int>>()
                     val mainData = mutableListOf<List<Pair<String, Int>>>()
@@ -35,7 +40,8 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository): Us
                     val positionsArray = FieldPosition.getPositionShortNames(requestValues.context, requestValues.team.type)
 
                     topHeaderData.add(Pair(requestValues.context.getString(R.string.tournament_stats_label_games_played), -1))
-                    TeamStrategy.STANDARD.positions.forEach { fieldPosition ->
+
+                    strategy.forEach { fieldPosition ->
                         topHeaderData.add(Pair(positionsArray[fieldPosition.id], fieldPosition.id))
                     }
 
@@ -51,7 +57,7 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository): Us
                         data.add(Pair(gamesCount, -1))
 
                         playerIdToData[entry.key]?.let { positions ->
-                            TeamStrategy.STANDARD.positions.forEach { fieldPosition ->
+                            strategy.forEach { fieldPosition ->
                                 val count = positions.filter { it.position == fieldPosition.id }.size.toString()
                                 data.add(Pair(count, fieldPosition.id))
                             }

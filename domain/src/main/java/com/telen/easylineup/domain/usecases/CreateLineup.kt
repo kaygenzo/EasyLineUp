@@ -5,6 +5,7 @@ import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.RosterPlayerStatus
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
@@ -30,14 +31,15 @@ internal class CreateLineup(private val tournamentDao: TournamentRepository, pri
                 .flatMap {
                     val roster = if(requestValues.roster.none { !it.status }) null else rosterToString(requestValues.roster)
                     val newLineup = Lineup(name = requestValues.lineupTitle, teamId = requestValues.teamID, tournamentId = it,
-                            eventTimeInMillis = requestValues.lineupEventTime, roster = roster)
+                            eventTimeInMillis = requestValues.lineupEventTime, roster = roster, strategy = requestValues.strategy.id)
                     lineupsDao.insertLineup(newLineup)
                 }
                 .map { ResponseValue(it) }
     }
 
     class ResponseValue(val lineupID: Long): UseCase.ResponseValue
-    class RequestValues(val teamID: Long, val tournament: Tournament, val lineupTitle: String, val lineupEventTime: Long, val roster: List<RosterPlayerStatus>): UseCase.RequestValues
+    class RequestValues(val teamID: Long, val tournament: Tournament, val lineupTitle: String,
+                        val lineupEventTime: Long, val roster: List<RosterPlayerStatus>, val strategy: TeamStrategy): UseCase.RequestValues
 
     private fun rosterToString(list: List<RosterPlayerStatus>): String {
         val builder = StringBuilder()

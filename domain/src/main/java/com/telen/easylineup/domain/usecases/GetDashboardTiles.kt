@@ -3,6 +3,7 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.tiles.*
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
@@ -76,10 +77,10 @@ internal class GetDashboardTiles(private val playerDao: PlayerRepository,
         return lineupDao.getLastLineup(team.id)
                 .flatMap { lineup ->
                     playerFieldPositionDao.getAllPlayersWithPositionsForLineupRx(lineup.id)
-                            .map { LastLineupData(lineup.id, lineup.name, it) }
+                            .map { LastLineupData(lineup.id, lineup.name, it, TeamStrategy.getStrategyById(lineup.strategy)) }
                             .onErrorResumeNext {
                                 it.printStackTrace()
-                                Single.just(LastLineupData(lineup.id, lineup.name, listOf()))
+                                Single.just(LastLineupData(lineup.id, lineup.name, listOf(), TeamStrategy.getStrategyById(lineup.strategy)))
                             }
                             .toMaybe()
                 }

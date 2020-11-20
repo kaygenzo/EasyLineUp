@@ -17,26 +17,25 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
 import kotlinx.android.synthetic.main.view_bar_chart.view.*
+import java.lang.reflect.Field
 
 
 class PositionsBarChart: ConstraintLayout {
+
+    // positions reference to display in xAxis
+    private var positionsRef: MutableList<FieldPosition> = mutableListOf()
+
+    private var teamType: Int? = null
+    private var data: MutableMap<FieldPosition, Int> = mutableMapOf()
+
+    // names from arrays.xml
+    private var mPositions: Array<String>? = null
+
     constructor(context: Context) : super(context) {init(context)}
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {init(context)}
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {init(context)}
-
-    fun setTeamType(teamType: Int) {
-        val xAxis = playerPositionsChart.xAxis
-        xAxis.valueFormatter = object : ValueFormatter() {
-
-            private val mPositions = FieldPosition.getPositionShortNames(context, teamType)
-
-            override fun getFormattedValue(value: Float): String {
-                return mPositions[value.toInt()]
-            }
-        }
-        playerPositionsChart.invalidate()
-    }
 
     private fun init(context: Context) {
         LayoutInflater.from(context).inflate(R.layout.view_bar_chart, this)
@@ -56,23 +55,14 @@ class PositionsBarChart: ConstraintLayout {
         chart.setFitBars(true)
         chart.setExtraOffsets(0f, 0f, 0f, 0f)
 
-
         chart.animateXY(1000, 1000, Easing.EaseInOutQuad)
 
         val xAxis = chart.xAxis
-        xAxis.valueFormatter = object : ValueFormatter() {
-
-            private val mPositions = FieldPosition.getPositionShortNames(context, 0)
-
-            override fun getFormattedValue(value: Float): String {
-                return mPositions[value.toInt()]
-            }
-        }
+        refreshXAxis()
         xAxis.textSize = resources.getDimension(R.dimen.player_bar_chart_x_axis_size)
         xAxis.textColor = Color.BLACK
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.setDrawGridLines(false)
-        xAxis.labelCount = TeamStrategy.STANDARD.positions.size
         xAxis.axisLineColor = Color.BLACK
 
         val yAxis = chart.getAxis(YAxis.AxisDependency.LEFT)
@@ -87,31 +77,69 @@ class PositionsBarChart: ConstraintLayout {
         yRightAxis.setDrawGridLines(false)
     }
 
-    fun setData(positionsMap: Map<FieldPosition, Int>) {
+    fun setData(data: Map<FieldPosition, Int>) {
+        this.data.putAll(data)
+        refreshChart()
+    }
+
+    fun setPositionsReference(reference: List<FieldPosition>) {
+        this.positionsRef.apply {
+            clear()
+            addAll(reference)
+        }
+        refreshChart()
+    }
+
+    fun setTeamType(teamType: Int) {
+        this.teamType = teamType
+        refreshXAxis()
+        refreshChart()
+    }
+
+    private fun refreshXAxis() {
+        teamType?.let {
+            val xAxis = playerPositionsChart.xAxis
+            mPositions = FieldPosition.getPositionShortNames(context, it)
+            xAxis.valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    val index = value.toInt()
+                    val position = positionsRef[index]
+                    return mPositions?.get(position.id) ?: "N/A"
+                }
+            }
+        }
+    }
+
+    private fun refreshChart() {
+
+        if(positionsRef.isEmpty() || teamType == null || data.isEmpty()) {
+            return
+        }
 
         val chart = playerPositionsChart
 
+        val xAxis = chart.xAxis
+        xAxis.labelCount = positionsRef.size
+
         val entries: MutableList<BarEntry> = mutableListOf()
 
-        var count = 0
-        positionsMap.forEach {
-            count += it.value
-        }
+        val count = data.map { it.value }.sum()
 
         val yAxis = chart.getAxis(YAxis.AxisDependency.LEFT)
         yAxis.axisMaximum = count.toFloat()
 
-        TeamStrategy.STANDARD.positions.forEach {
-            val value = positionsMap[it]
-            if(value!=null) {
-                entries.add(BarEntry(it.id.toFloat(), value.toFloat()))
+        var index = 0f
+        positionsRef.forEach {
+            val value = data[it]
+            if (value != null) {
+                entries.add(BarEntry(index, value.toFloat()))
+            } else {
+                entries.add(BarEntry(index, 0f))
             }
-            else {
-                entries.add(it.id, BarEntry(it.ordinal.toFloat(), 0f))
-            }
+            index++
         }
 
-        val set1 = BarDataSet(entries,"")
+        val set1 = BarDataSet(entries, "")
         set1.color = Color.rgb(200, 201, 163)
         set1.axisDependency = YAxis.AxisDependency.LEFT
 
@@ -123,9 +151,9 @@ class PositionsBarChart: ConstraintLayout {
         data.setValueTypeface(Typeface.DEFAULT)
         data.setDrawValues(true)
         data.setValueTextColor(Color.BLACK)
-        data.setValueFormatter(object : ValueFormatter(){
+        data.setValueFormatter(object : ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
-                return if(value.toInt() > 0) {
+                return if (value.toInt() > 0) {
                     value.toInt().toString()
                 } else {
                     ""
@@ -134,6 +162,7 @@ class PositionsBarChart: ConstraintLayout {
         })
 
         chart.data = data
+        chart.notifyDataSetChanged()
         chart.invalidate()
     }
 }

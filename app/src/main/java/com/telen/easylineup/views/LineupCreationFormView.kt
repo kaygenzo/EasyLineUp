@@ -6,11 +6,15 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
 import timber.log.Timber
@@ -18,30 +22,17 @@ import java.text.DateFormat
 import java.util.*
 
 interface OnActionButtonListener {
-    fun onSaveClicked(lineupName: String, tournament: Tournament, lineupEventTime: Long)
+    fun onSaveClicked(lineupName: String, tournament: Tournament, lineupEventTime: Long, strategy: TeamStrategy)
     fun onCancelClicked()
     fun onRosterChangeClicked()
 }
 
 class LineupCreationFormView: ConstraintLayout, TextWatcher {
 
-    override fun afterTextChanged(s: Editable?) {
-        //readyStateListener?.onFormStateChanged()
-        val lineupName = lineupTitleInput.text
-        val tournamentName = tournamentChoiceAutoComplete.text
-        if(!TextUtils.isEmpty(lineupName?.trim())) {
-            lineupTitleInputLayout.error = null
-        }
-        if(!TextUtils.isEmpty(tournamentName.trim())){
-            tournamentTitleInputLayout.error = null
-        }
-    }
-
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
     private val tournaments: MutableList<Tournament> = mutableListOf()
-    private lateinit var adapter: ArrayAdapter<String>
+    private var strategy: TeamStrategy = TeamStrategy.STANDARD
+    private lateinit var tournamentAdapter: ArrayAdapter<String>
+    private lateinit var strategyAdapter: ArrayAdapter<String>
     private lateinit var tournamentsNames: MutableList<String>
     private var actionClickListener: OnActionButtonListener? = null
     private lateinit var eventTime: Calendar
@@ -64,15 +55,8 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
 
         setTournamentDateHeader(eventTime.timeInMillis)
 
-        adapter = ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
-        tournamentChoiceAutoComplete.setAdapter(adapter)
-        tournamentChoiceAutoComplete.setOnItemClickListener { parent, view, position, id ->
-            val selected = parent.getItemAtPosition(position).toString()
-            val truePosition = tournamentsNames.indexOf(selected)
-            val tournament = tournaments[truePosition]
-//            calendar.timeInMillis = tournament.createdAt
-//            setTournamentDateHeader(calendar.timeInMillis)
-        }
+        tournamentAdapter = ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
+        tournamentChoiceAutoComplete.setAdapter(tournamentAdapter)
 
         dateButton.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder
@@ -93,7 +77,7 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         }
 
         save.setOnClickListener {
-            actionClickListener?.onSaveClicked(lineupTitleInput.text.toString(), getSelectedTournament(), eventTime.timeInMillis)
+            actionClickListener?.onSaveClicked(lineupTitleInput.text.toString(), getSelectedTournament(), eventTime.timeInMillis, strategy)
         }
 
         cancel.setOnClickListener {
@@ -114,6 +98,30 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         this.actionClickListener = listener
     }
 
+    fun setTeamType(teamType: TeamType) {
+        when(teamType) {
+            TeamType.SOFTBALL -> {
+                val strategies = TeamStrategy.values()
+                val strategiesName = resources.getStringArray(R.array.softball_strategy_array)
+                strategyAdapter = ArrayAdapter(context, R.layout.item_team_strategy, strategiesName)
+                lineupStrategySpinner.apply {
+                    adapter = strategyAdapter
+                    onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+                        override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                        }
+
+                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                            strategy = strategies[position]
+                        }
+                    }
+                }
+                lineupStrategyContainer.visibility = View.VISIBLE
+            }
+            else -> {}
+        }
+    }
+
     fun setLineupNameError(error: String) {
         lineupTitleInputLayout.error = error
     }
@@ -132,7 +140,7 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
                 add(it.name)
             }
         }
-        adapter.notifyDataSetChanged()
+        tournamentAdapter.notifyDataSetChanged()
     }
 
     private fun getSelectedTournament(): Tournament {
@@ -145,4 +153,19 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         else
             Tournament(name = tournamentChoiceAutoComplete.text.toString().trim(), createdAt = Calendar.getInstance().timeInMillis)
     }
+
+    override fun afterTextChanged(s: Editable?) {
+        //readyStateListener?.onFormStateChanged()
+        val lineupName = lineupTitleInput.text
+        val tournamentName = tournamentChoiceAutoComplete.text
+        if(!TextUtils.isEmpty(lineupName?.trim())) {
+            lineupTitleInputLayout.error = null
+        }
+        if(!TextUtils.isEmpty(tournamentName.trim())){
+            tournamentTitleInputLayout.error = null
+        }
+    }
+
+    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 }

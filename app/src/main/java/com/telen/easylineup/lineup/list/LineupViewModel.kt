@@ -17,7 +17,7 @@ import org.koin.core.inject
 import timber.log.Timber
 
 sealed class SaveResult
-data class SaveSuccess(val lineupID: Long, val lineupName: String): SaveResult()
+data class SaveSuccess(val lineupID: Long, val lineupName: String, val strategy: TeamStrategy): SaveResult()
 
 class LineupViewModel: ViewModel(), KoinComponent {
 
@@ -46,9 +46,14 @@ class LineupViewModel: ViewModel(), KoinComponent {
         return domain.getTournaments()
     }
 
+    fun getTypeType(): Single<Int>{
+        return domain.getTeamType()
+    }
+
     fun observeCategorizedLineups(): LiveData<List<Pair<Tournament, List<Lineup>>>> {
         return Transformations.switchMap(filterLiveData) { filter ->
             val disposable = domain.getCategorizedLineups(filter)
+
                     .subscribe({
                         _categorizedLineupsLiveData.value = it
                     }, {
@@ -75,10 +80,10 @@ class LineupViewModel: ViewModel(), KoinComponent {
         return Single.just(chosenRoster)
     }
 
-    fun saveLineup(tournament: Tournament, lineupTitle: String, lineupEventTime: Long) {
-        val disposable = domain.saveLineup(tournament, lineupTitle, chosenRoster, lineupEventTime)
+    fun saveLineup(tournament: Tournament, lineupTitle: String, lineupEventTime: Long, strategy: TeamStrategy) {
+        val disposable = domain.saveLineup(tournament, lineupTitle, chosenRoster, lineupEventTime, strategy)
                 .subscribe({
-                    saveResult.value = SaveSuccess(it, lineupTitle)
+                    saveResult.value = SaveSuccess(it, lineupTitle, strategy)
                 }, {
                     Timber.e(it)
                 })

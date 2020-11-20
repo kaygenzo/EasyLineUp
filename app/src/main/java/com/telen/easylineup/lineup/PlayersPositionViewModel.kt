@@ -69,6 +69,8 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     var lineupTitle: String? = null
     var lineupMode = MODE_DISABLED
     var editable = false
+    var teamType: Int = 0
+    var strategy = TeamStrategy.STANDARD
 
     private var team: Team? = null
 
@@ -92,7 +94,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     private fun savePlayerFieldPosition(player: Player, position: FieldPosition): Completable {
-        return domain.savePlayerFieldPosition(player, position, _listPlayersWithPosition, lineupID, lineupMode)
+        return domain.savePlayerFieldPosition(player, position, _listPlayersWithPosition, lineupID, lineupMode, strategy)
     }
 
     fun onDeletePosition(player: Player, position: FieldPosition) {
@@ -161,8 +163,11 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         disposables.add(disposable)
     }
 
-    fun getTeamType(): Single<Int> {
-        return domain.getTeamType()
+    fun getTeamType(): Completable {
+        return domain.getTeamType().flatMapCompletable {
+            this.teamType = it
+            Completable.complete()
+        }
     }
 
     fun onLineupModeChanged(isEnabled: Boolean) {
@@ -246,7 +251,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     private fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition): Completable {
-        return domain.switchPlayersPosition(p1, p2,_listPlayersWithPosition, lineupMode)
+        return domain.switchPlayersPosition(p1, p2,_listPlayersWithPosition, lineupMode, strategy)
     }
 
     fun onPlayerSelected(player: Player, position: FieldPosition) {
@@ -287,7 +292,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
      */
     fun linkDpAndFlex(dp: Player?, flex: Player?): Completable {
         _linkPlayersInField.value = null
-        return domain.linkDpAndFlex(dp,flex, lineupID, _listPlayersWithPosition)
+        return domain.linkDpAndFlex(dp,flex, lineupID, _listPlayersWithPosition, strategy)
     }
 
     ///////////// LIVE DATA OBSERVER //////////////

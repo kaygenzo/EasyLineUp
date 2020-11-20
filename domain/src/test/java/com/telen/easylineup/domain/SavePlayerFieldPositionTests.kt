@@ -440,6 +440,7 @@ internal class SavePlayerFieldPositionTests {
     fun shouldUpdatePositionWithNewPlayerId() {
         val fieldPosition = FieldPosition.FIRST_BASE
         val teamType = TeamType.BASEBALL.id
+        val strategy = TeamStrategy.STANDARD
 
         val request = SavePlayerFieldPosition.RequestValues(
                 lineupID = 1,
@@ -447,7 +448,8 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = MODE_DISABLED
+                lineupMode = MODE_DISABLED,
+                strategy = strategy
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -457,7 +459,7 @@ internal class SavePlayerFieldPositionTests {
         verify(lineupDao, never()).insertPlayerFieldPosition(any())
         verify(lineupDao).updatePlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
             Assert.assertEquals(newPlayer.id, it.playerId)
-            var coordinate = FieldPosition.getPositionCoordinates(FieldPosition.FIRST_BASE, TeamStrategy.STANDARD)
+            var coordinate = FieldPosition.getPositionCoordinates(FieldPosition.FIRST_BASE, strategy)
             Assert.assertEquals(coordinate.x, it.x)
             Assert.assertEquals(coordinate.y, it.y)
         })

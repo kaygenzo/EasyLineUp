@@ -29,7 +29,8 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>,
                           private val dataListener: OnDataChangedListener?,
                           private val isEditable: Boolean,
                           var teamType: Int,
-                          private val lineupTypeface: LineupTypeface): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
+                          private val lineupTypeface: LineupTypeface,
+                          val strategy: TeamStrategy): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
 
     private var positionDescriptions: Array<String>? = null
     var lineupMode = MODE_DISABLED
@@ -104,7 +105,7 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>,
             shirtNumber.text = player.shirtNumber.toString()
 
             if(isDefensePlayer)
-                fieldPosition.text = player.position.toString()
+                fieldPosition.text = FieldPosition.getFieldPositionById(player.position)?.getPosition()?.toString() ?: ""
             else
                 fieldPosition.text = ""
 

@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import androidx.core.content.ContextCompat
 import com.google.android.material.card.MaterialCardView
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamStrategy
 import kotlinx.android.synthetic.main.card_defense_fixed.view.*
 
 class CardDefenseFixed: MaterialCardView {
@@ -23,8 +23,8 @@ class CardDefenseFixed: MaterialCardView {
         }
     }
 
-    fun init(positions: List<FieldPosition>) {
-        fieldAndPlayersRootView.initField(positions)
+    fun init(strategy: TeamStrategy) {
+        fieldAndPlayersRootView.initField(strategy)
     }
 
     fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int) {

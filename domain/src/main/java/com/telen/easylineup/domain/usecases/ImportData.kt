@@ -161,7 +161,7 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
                               insertedArray: IntArray, updatedArray: IntArray,
                               updateIfExists: Boolean): Single<Lineup> {
         val l = Lineup(0L, lineup.name, teamID, tournamentID,
-                lineup.mode, lineup.eventTime, lineup.createdAt, lineup.editedAt,
+                lineup.mode, lineup.strategy, lineup.eventTime, lineup.createdAt, lineup.editedAt,
                 rosterToString(lineup.roster, players), lineup.id)
 
         return lineupDao.getLineupByHash(lineup.id)

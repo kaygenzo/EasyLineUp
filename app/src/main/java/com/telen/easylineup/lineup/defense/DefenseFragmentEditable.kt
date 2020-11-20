@@ -12,10 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.DomainErrors
-import com.telen.easylineup.domain.model.FieldPosition
-import com.telen.easylineup.domain.model.Player
-import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.lineup.*
 import com.telen.easylineup.lineup.defense.available.ListAvailablePlayersBottomSheet
 import com.telen.easylineup.utils.DialogFactory
@@ -107,8 +104,7 @@ class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayer
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_lineup_defense_editable, container, false)
 
-        //TODO to get from a strategy when it will be developed
-        view.cardDefenseView.init(FieldPosition.values().filter { FieldPosition.isDefensePlayer(it.position) || it == FieldPosition.DP_DH })
+        view.cardDefenseView.init(viewModel.strategy)
 
         viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer { players ->
             view.cardDefenseView.setPlayerStateListener(this)
@@ -117,7 +113,7 @@ class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayer
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            view.cardDefenseView.setListPlayer(players, viewModel.lineupMode, it)
+                            view.cardDefenseView.setListPlayer(players, viewModel.lineupMode, viewModel.teamType)
                         }, {
 
                         })

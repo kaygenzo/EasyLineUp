@@ -19,10 +19,10 @@ enum class FieldPosition(val id: Int, val mask: Int, private val position: Int) 
     DP_DH(10,  0x0200, 10),
 
     //Slowpitch
-    SLOWPITCH_LF(11, 0x0400, 7),
+    SLOWPITCH_LF(11, LEFT_FIELD.mask, 7),
     SLOWPITCH_LCF(12, 0x0800, 8),
     SLOWPITCH_RCF(13, 0x1000, 9),
-    SLOWPITCH_RF(14, 0x2000, 10);
+    SLOWPITCH_RF(14, RIGHT_FIELD.mask, 10);
 
     fun getPosition(): Int {
         return position
@@ -64,41 +64,37 @@ enum class FieldPosition(val id: Int, val mask: Int, private val position: Int) 
         }
 
         fun getPositionCoordinates(position: FieldPosition, strategy: TeamStrategy): PointF {
-            return when(strategy) {
-                TeamStrategy.STANDARD -> {
-                    when (position) {
-                        SUBSTITUTE -> PointF(0f, 0f)
-                        PITCHER -> PointF(50f, 60f)
-                        CATCHER -> PointF(50f, 87f)
-                        FIRST_BASE -> PointF(74f, 57f)
-                        SECOND_BASE -> PointF(63f, 44f)
-                        THIRD_BASE -> PointF(27f, 59f)
-                        SHORT_STOP -> PointF(37f, 43f)
-                        LEFT_FIELD -> PointF(15f, 15f)
-                        CENTER_FIELD -> PointF(50f, 10f)
-                        RIGHT_FIELD -> PointF(85f, 15f)
-                        DP_DH -> PointF(0f, 100f)
-                        else -> throw Exception("Not a valid position $position for strategy $strategy")
-                    }
-                }
-                TeamStrategy.SLOWPITCH -> {
-                    when (position) {
-                        SUBSTITUTE -> PointF(0f, 0f)
-                        PITCHER -> PointF(50f, 60f)
-                        CATCHER -> PointF(50f, 87f)
-                        FIRST_BASE -> PointF(74f, 57f)
-                        SECOND_BASE -> PointF(63f, 44f)
-                        THIRD_BASE -> PointF(27f, 59f)
-                        SHORT_STOP -> PointF(37f, 43f)
-                        LEFT_FIELD -> PointF(15f, 15f)
-                        SLOWPITCH_LCF -> PointF(50f, 50f)
-                        SLOWPITCH_RCF -> PointF(50f, 50f)
-                        RIGHT_FIELD -> PointF(85f, 15f)
-                        DP_DH -> PointF(0f, 100f)
-                        else -> throw Exception("Not a valid position for strategy $strategy")
-                    }
-                }
+            return when(position) {
+                SUBSTITUTE -> PointF(0f, 0f)
+                PITCHER -> PointF(50f, 60f)
+                CATCHER -> PointF(50f, 87f)
+                FIRST_BASE -> PointF(74f, 57f)
+                SECOND_BASE -> PointF(63f, 44f)
+                THIRD_BASE -> PointF(27f, 59f)
+                SHORT_STOP -> PointF(37f, 43f)
+                DP_DH -> PointF(0f, 100f)
+                else -> {
+                    when(strategy) {
+                        TeamStrategy.STANDARD -> {
+                            when (position) {
+                                LEFT_FIELD -> PointF(15f, 15f)
+                                CENTER_FIELD -> PointF(50f, 10f)
+                                RIGHT_FIELD -> PointF(85f, 15f)
+                                else -> throw Exception("Not a valid position $position for strategy $strategy")
+                            }
+                        }
+                        TeamStrategy.SLOWPITCH -> {
+                            when (position) {
+                                SLOWPITCH_LF -> PointF(14f, 20f)
+                                SLOWPITCH_LCF -> PointF(38f, 10f)
+                                SLOWPITCH_RCF -> PointF(62f, 10f)
+                                SLOWPITCH_RF -> PointF(86f, 20f)
+                                else -> throw Exception("Not a valid position for strategy $strategy")
+                            }
+                        }
 //                TeamStrategy.SLOWPITCH_5_MAN -> TODO()
+                    }
+                }
             }
         }
     }

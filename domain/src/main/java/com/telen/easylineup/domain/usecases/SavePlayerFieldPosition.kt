@@ -2,8 +2,8 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCase
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import io.reactivex.Single
 
 internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositionRepository): UseCase<SavePlayerFieldPosition.RequestValues, SavePlayerFieldPosition.ResponseValue>() {
@@ -24,8 +24,9 @@ internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositio
                         order = Constants.SUBSTITUTE_ORDER_VALUE
                     }
                     FieldPosition.PITCHER -> {
+                        //if the new position is a pitcher for a baseball team with dh enabled, the batting order is automatically equals to 10
                         if (requestValues.lineupMode == MODE_ENABLED && requestValues.teamType == TeamType.BASEBALL.id) {
-                            order = Constants.ORDER_PITCHER_WHEN_DH
+                            order = requestValues.strategy.getDesignatedPlayerOrder()
                             flags = PlayerFieldPosition.FLAG_FLEX
                         }
                     }
@@ -40,7 +41,7 @@ internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositio
                 if(order <= 0)
                     order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
 
-                val coordinate = FieldPosition.getPositionCoordinates(requestValues.position, TeamStrategy.STANDARD)
+                val coordinate = FieldPosition.getPositionCoordinates(requestValues.position, requestValues.strategy)
                 x = coordinate.x
                 y = coordinate.y
             }
@@ -60,7 +61,8 @@ internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositio
                         val position: FieldPosition,
                         val players: List<PlayerWithPosition>,
                         val teamType: Int,
-                        val lineupMode: Int
+                        val lineupMode: Int,
+                        val strategy: TeamStrategy = TeamStrategy.STANDARD
     ): UseCase.RequestValues
     inner class ResponseValue: UseCase.ResponseValue
 }

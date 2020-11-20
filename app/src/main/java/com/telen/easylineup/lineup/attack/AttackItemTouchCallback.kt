@@ -4,10 +4,10 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import timber.log.Timber
 
-class AttackItemTouchCallback(val adapter: BattingOrderAdapter): ItemTouchHelper.Callback() {
+class AttackItemTouchCallback(val adapter: BattingOrderAdapter, var batterSize: Int, var extraHitterSize: Int = 0): ItemTouchHelper.Callback() {
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
         val dragFlags = when(viewHolder.adapterPosition) {
-            in 0..8 -> ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            in 0 until (batterSize + extraHitterSize) -> ItemTouchHelper.UP or ItemTouchHelper.DOWN
             else -> 0
         }
         Timber.d("getMovementFlags=$dragFlags position=${viewHolder.adapterPosition}")

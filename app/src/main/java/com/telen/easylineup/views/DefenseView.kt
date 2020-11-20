@@ -9,9 +9,9 @@ import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.utils.drawn
 import kotlinx.android.synthetic.main.field_view.view.*
-import timber.log.Timber
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -21,6 +21,7 @@ abstract class DefenseView: ConstraintLayout {
 
     private var containerSize: Float? = 0f
     protected val positionMarkers: MutableMap<FieldPosition, MultipleStateDefenseIconButton> = mutableMapOf()
+    private var strategy: TeamStrategy = TeamStrategy.STANDARD
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -30,14 +31,15 @@ abstract class DefenseView: ConstraintLayout {
         // to implement if needed
     }
 
-    fun initField(positions: List<FieldPosition>) {
+    fun initField(strategy: TeamStrategy) {
 
+        this.strategy = strategy
         positionMarkers.clear()
         //cleanPlayerIcons()
 
         getContainerSize {
             val iconSize = (it * ICON_SIZE_SCALE).roundToInt()
-            positions.forEach { position ->
+            strategy.positions.forEach { position ->
                 val view = MultipleStateDefenseIconButton(context).apply {
                     layoutParams = LayoutParams(iconSize, iconSize)
                     setState(StateDefense.LOADING)
@@ -46,7 +48,8 @@ abstract class DefenseView: ConstraintLayout {
                     }
                 }
                 positionMarkers[position] = view
-                addPlayerOnFieldWithPercentage(it, view, position.xPercent, position.yPercent)
+                val coordinates = FieldPosition.getPositionCoordinates(position, strategy)
+                addPlayerOnFieldWithPercentage(it, view, coordinates.x, coordinates.y)
             }
         }
     }

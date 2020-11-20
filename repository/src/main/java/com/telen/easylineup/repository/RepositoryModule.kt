@@ -3,6 +3,7 @@ package com.telen.easylineup.repository
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.tiles.TileType
 import com.telen.easylineup.domain.repository.*
 import com.telen.easylineup.repository.adapters.impl.*
@@ -30,6 +31,7 @@ object RepositoryModule {
                     .addMigrations(migration_11_12())
                     .addMigrations(migration_12_13())
                     .addMigrations(migration_13_14())
+                    .addMigrations(migration_14_15())
             if(BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
                         .fallbackToDestructiveMigration()
@@ -229,6 +231,14 @@ object RepositoryModule {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE players ADD COLUMN email TEXT DEFAULT null")
                 database.execSQL("ALTER TABLE players ADD COLUMN phone TEXT DEFAULT null")
+            }
+        }
+    }
+
+    private fun migration_14_15(): Migration {
+        return object: Migration(14,15) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE lineups ADD COLUMN strategy INTEGER NOT NULL DEFAULT ${TeamStrategy.STANDARD.id}")
             }
         }
     }

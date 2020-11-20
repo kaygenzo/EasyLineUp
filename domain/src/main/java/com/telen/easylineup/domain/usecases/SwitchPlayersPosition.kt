@@ -1,10 +1,9 @@
 package com.telen.easylineup.domain.usecases
 
 import android.annotation.SuppressLint
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCase
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.exceptions.FirstPositionEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.SamePlayerException
 import io.reactivex.Single
@@ -37,8 +36,10 @@ internal class SwitchPlayersPosition(val dao: PlayerFieldPositionRepository): Us
             playerPositions.add(it)
         }
 
+        val orderDesignatedPlayer = requestValues.strategy.getDesignatedPlayerOrder()
+
         // just keep reference of the first order different of 10
-        val tmpOrder = playerPositions.firstOrNull { it.order != Constants.ORDER_PITCHER_WHEN_DH }?.order
+        val tmpOrder = playerPositions.firstOrNull { it.order != orderDesignatedPlayer }?.order
         val oneIsFlex = playerPositions.any {it.flags and PlayerFieldPosition.FLAG_FLEX > 0}
         val oneIsDp = playerPositions.any {it.position == FieldPosition.DP_DH.id}
 
@@ -50,13 +51,13 @@ internal class SwitchPlayersPosition(val dao: PlayerFieldPositionRepository): Us
                 if(requestValues.teamType == TeamType.BASEBALL.id) {
                     when(newPosition) {
                         FieldPosition.PITCHER -> {
-                            it.order = Constants.ORDER_PITCHER_WHEN_DH
+                            it.order = orderDesignatedPlayer
                             it.flags = PlayerFieldPosition.FLAG_FLEX
                         }
                         else -> {
                             it.flags = PlayerFieldPosition.FLAG_NONE
                             //if possible, just keep order, but in case of a swap with a pitcher, exchange orders
-                            if(it.order == Constants.ORDER_PITCHER_WHEN_DH) {
+                            if(it.order == orderDesignatedPlayer) {
                                 //we were a pitcher but not anymore.
                                 it.order = tmpOrder ?: PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
                             }
@@ -78,13 +79,13 @@ internal class SwitchPlayersPosition(val dao: PlayerFieldPositionRepository): Us
                     if(oneIsFlex && oneIsDp) {
                         if(newPosition == FieldPosition.DP_DH) {
                             it.flags = PlayerFieldPosition.FLAG_NONE
-                            if(it.order == Constants.ORDER_PITCHER_WHEN_DH) {
+                            if(it.order == orderDesignatedPlayer) {
                                 //we were a pitcher but not anymore.
                                 it.order = tmpOrder ?: PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
                             }
                         }
                         else {
-                            it.order = Constants.ORDER_PITCHER_WHEN_DH
+                            it.order = orderDesignatedPlayer
                             it.flags = PlayerFieldPosition.FLAG_FLEX
                         }
                     }
@@ -97,5 +98,7 @@ internal class SwitchPlayersPosition(val dao: PlayerFieldPositionRepository): Us
     }
 
     class ResponseValue: UseCase.ResponseValue
-    class RequestValues(val players: List<PlayerWithPosition>, val position1: FieldPosition, val position2: FieldPosition, val teamType: Int, val lineupMode: Int): UseCase.RequestValues
+    class RequestValues(val players: List<PlayerWithPosition>, val position1: FieldPosition,
+                        val position2: FieldPosition, val teamType: Int, val lineupMode: Int,
+                        val strategy: TeamStrategy): UseCase.RequestValues
 }

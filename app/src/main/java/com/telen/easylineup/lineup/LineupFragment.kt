@@ -19,10 +19,7 @@ import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.model.DomainErrors
-import com.telen.easylineup.domain.model.FieldPosition
-import com.telen.easylineup.domain.model.MODE_ENABLED
-import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.lineup.attack.AttackFragment
 import com.telen.easylineup.lineup.defense.DefenseFragmentEditable
 import com.telen.easylineup.utils.NavigationUtils
@@ -58,7 +55,7 @@ class LineupFragmentEditable: LineupFragment("LineupFragmentEditable", R.layout.
 
         val teamTypeDisposable = viewModel.getTeamType()
                 .subscribe({
-                    val teamType = TeamType.getTypeById(it)
+                    val teamType = TeamType.getTypeById(viewModel.teamType)
                     val item = menu.findItem(R.id.action_lineup_mode)
                     when(teamType) {
                         TeamType.UNKNOWN -> item.isVisible = false
@@ -85,10 +82,11 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
     companion object {
         const val REQUEST_WRITE_EXTERENAL_STORAGE_PERMISSION = 0
 
-        fun getArguments(lineupID: Long, lineupTitle: String): Bundle {
+        fun getArguments(lineupID: Long, lineupTitle: String, strategy: TeamStrategy): Bundle {
             val extras = Bundle()
             extras.putLong(Constants.LINEUP_ID, lineupID)
             extras.putString(Constants.LINEUP_TITLE, lineupTitle)
+            extras.putSerializable(Constants.EXTRA_LINEUP_STRATEGY, strategy)
             return extras
         }
     }
@@ -111,6 +109,7 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
         viewModel.lineupID = arguments?.getLong(Constants.LINEUP_ID, 0) ?: 0
         viewModel.lineupTitle = arguments?.getString(Constants.LINEUP_TITLE) ?: ""
         viewModel.editable = isEditable
+        viewModel.strategy = arguments?.getSerializable(Constants.EXTRA_LINEUP_STRATEGY) as TeamStrategy
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -237,7 +236,10 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_edit -> {
-                val extras = Companion.getArguments(viewModel.lineupID ?: 0,  viewModel.lineupTitle ?: "")
+                val extras = Companion.getArguments(lineupID = viewModel.lineupID ?: 0,
+                        lineupTitle = viewModel.lineupTitle ?: "",
+                        strategy = viewModel.strategy
+                )
                 findNavController().navigate(R.id.lineupFragmentEditable, extras, NavigationUtils().getOptions())
                 true
             }
