@@ -1,10 +1,7 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.*
-import com.telen.easylineup.domain.model.FieldPosition
-import com.telen.easylineup.domain.model.PlayerFieldPosition
-import com.telen.easylineup.domain.model.PlayerWithPosition
-import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithLineupMode
 import io.reactivex.Completable
@@ -116,7 +113,7 @@ internal class UpdatePlayersWithLineupModeTests {
         observer.assertComplete()
 
         verify(lineupDao).updatePlayerFieldPosition(check {
-            Assert.assertEquals(Constants.ORDER_PITCHER_WHEN_DH, it.order)
+            Assert.assertEquals(TeamStrategy.STANDARD.getDesignatedPlayerOrder(), it.order)
             Assert.assertEquals(PlayerFieldPosition.FLAG_FLEX, it.flags)
             Assert.assertEquals(FieldPosition.PITCHER.id, it.position)
         })

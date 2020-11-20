@@ -3,6 +3,7 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.GetRoster
@@ -26,7 +27,7 @@ internal class GetRosterTests {
     lateinit var mGetRoster: GetRoster
 
     private val lineup = Lineup(1L, "A", 1L, 1L,
-            1, 3L,1L,1L, null, "hash")
+            1, TeamStrategy.STANDARD.id,3L,1L,1L, null, "hash")
 
     private val player1 = Player(1L, 1L, "A", 1,
             1, null, 1, 0, 0, "hash")

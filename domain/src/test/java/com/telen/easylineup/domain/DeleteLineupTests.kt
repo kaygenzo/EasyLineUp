@@ -2,6 +2,7 @@ package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_DISABLED
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.DeleteLineup
 import io.reactivex.Completable
@@ -27,7 +28,7 @@ internal class DeleteLineupTests {
         MockitoAnnotations.initMocks(this)
         mDeleteLineup = DeleteLineup(dao)
 
-        lineup1 = Lineup(1, "test1", 1, 1, MODE_DISABLED, 3L)
+        lineup1 = Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id, 3L)
 
         Mockito.`when`(dao.getLineupByIdSingle(1)).thenReturn(Single.just(lineup1))
         Mockito.`when`(dao.getLineupByIdSingle(2)).thenReturn(Single.error(Exception()))

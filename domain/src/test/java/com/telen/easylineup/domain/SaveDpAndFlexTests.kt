@@ -2,10 +2,7 @@ package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.domain.model.FieldPosition
-import com.telen.easylineup.domain.model.PlayerFieldPosition
-import com.telen.easylineup.domain.model.PlayerWithPosition
-import com.telen.easylineup.domain.model.toPlayer
+import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.SaveDpAndFlex
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
@@ -26,6 +23,7 @@ internal class SaveDpAndFlexTests: BaseUseCaseTests() {
     private lateinit var useCase: SaveDpAndFlex
     lateinit var players: MutableList<PlayerWithPosition>
     @Mock lateinit var playerFieldPositionDao: PlayerFieldPositionRepository
+    private val strategy = TeamStrategy.STANDARD
 
     @Before
     fun init() {
@@ -48,7 +46,7 @@ internal class SaveDpAndFlexTests: BaseUseCaseTests() {
     @Test
     fun shouldTriggerAnErrorIfLineupIdIsNull() {
         val observer = TestObserver<SaveDpAndFlex.ResponseValue>()
-        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = null, players = players, dp = null, flex = null))
+        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = null, players = players, dp = null, flex = null, strategy = strategy))
                 .subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
@@ -57,7 +55,7 @@ internal class SaveDpAndFlexTests: BaseUseCaseTests() {
     @Test
     fun shouldTriggerAnErrorIfDpNotAssigned() {
         val observer = TestObserver<SaveDpAndFlex.ResponseValue>()
-        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = null, flex = players[0].toPlayer()))
+        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = null, flex = players[0].toPlayer(), strategy = strategy))
                 .subscribe(observer)
         observer.await()
         observer.assertError(NeedAssignBothPlayersException::class.java)
@@ -66,7 +64,7 @@ internal class SaveDpAndFlexTests: BaseUseCaseTests() {
     @Test
     fun shouldTriggerAnErrorIfFlexNotAssigned() {
         val observer = TestObserver<SaveDpAndFlex.ResponseValue>()
-        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[0].toPlayer(), flex = null))
+        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[0].toPlayer(), flex = null, strategy = strategy))
                 .subscribe(observer)
         observer.await()
         observer.assertError(NeedAssignBothPlayersException::class.java)
@@ -76,7 +74,7 @@ internal class SaveDpAndFlexTests: BaseUseCaseTests() {
     fun shouldTriggerAnErrorIfErrorDuringUpdateInDao() {
         Mockito.`when`(playerFieldPositionDao.updatePlayerFieldPositions(any())).thenReturn(Completable.error(Exception()))
         val observer = TestObserver<SaveDpAndFlex.ResponseValue>()
-        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[0].toPlayer(), flex = players[1].toPlayer()))
+        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[0].toPlayer(), flex = players[1].toPlayer(), strategy = strategy))
                 .subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
@@ -86,7 +84,7 @@ internal class SaveDpAndFlexTests: BaseUseCaseTests() {
     fun shouldTriggerAnErrorIfErrorDuringInsertInDao() {
         Mockito.`when`(playerFieldPositionDao.insertPlayerFieldPositions(any())).thenReturn(Completable.error(Exception()))
         val observer = TestObserver<SaveDpAndFlex.ResponseValue>()
-        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[0].toPlayer(), flex = players[1].toPlayer()))
+        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[0].toPlayer(), flex = players[1].toPlayer(), strategy = strategy))
                 .subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
@@ -95,13 +93,13 @@ internal class SaveDpAndFlexTests: BaseUseCaseTests() {
     @Test
     fun shouldChangeFlagAndOrderOfTheFlex() {
         val observer = TestObserver<SaveDpAndFlex.ResponseValue>()
-        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[3].toPlayer(), flex = players[1].toPlayer()))
+        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[3].toPlayer(), flex = players[1].toPlayer(), strategy = strategy))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
             Assert.assertEquals(PlayerFieldPosition.FLAG_FLEX, it.firstOrNull { it.playerId == players[1].playerID }?.flags)
-            Assert.assertEquals(Constants.ORDER_PITCHER_WHEN_DH, it.firstOrNull { it.playerId == players[1].playerID }?.order)
+            Assert.assertEquals(TeamStrategy.STANDARD.getDesignatedPlayerOrder(), it.firstOrNull { it.playerId == players[1].playerID }?.order)
         })
     }
 
@@ -115,7 +113,7 @@ internal class SaveDpAndFlexTests: BaseUseCaseTests() {
 
         val observer = TestObserver<SaveDpAndFlex.ResponseValue>()
 
-        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[3].toPlayer(), flex = players[1].toPlayer()))
+        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[3].toPlayer(), flex = players[1].toPlayer(), strategy = strategy))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -124,7 +122,7 @@ internal class SaveDpAndFlexTests: BaseUseCaseTests() {
             //flex
             Assert.assertEquals(1, it.filter { it.flags and PlayerFieldPosition.FLAG_FLEX > 0 }.count())
             Assert.assertEquals(players[1].playerID, it.firstOrNull { it.flags and PlayerFieldPosition.FLAG_FLEX > 0 }?.playerId)
-            Assert.assertEquals(Constants.ORDER_PITCHER_WHEN_DH, it.firstOrNull { it.flags and PlayerFieldPosition.FLAG_FLEX > 0 }?.order)
+            Assert.assertEquals(TeamStrategy.STANDARD.getDesignatedPlayerOrder(), it.firstOrNull { it.flags and PlayerFieldPosition.FLAG_FLEX > 0 }?.order)
 
             //others
             Assert.assertEquals(3, it.filter { it.flags and PlayerFieldPosition.FLAG_FLEX == 0 }.count())
@@ -135,7 +133,7 @@ internal class SaveDpAndFlexTests: BaseUseCaseTests() {
     @Test
     fun shouldAssignDPToExistingPosition() {
         val observer = TestObserver<SaveDpAndFlex.ResponseValue>()
-        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[3].toPlayer(), flex = players[1].toPlayer()))
+        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[3].toPlayer(), flex = players[1].toPlayer(), strategy = strategy))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -152,7 +150,7 @@ internal class SaveDpAndFlexTests: BaseUseCaseTests() {
         players.removeIf { it.position == FieldPosition.DP_DH.id }
 
         val observer = TestObserver<SaveDpAndFlex.ResponseValue>()
-        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[3].toPlayer(), flex = players[1].toPlayer()))
+        useCase.executeUseCase(SaveDpAndFlex.RequestValues(lineupID = 1L, players = players, dp = players[3].toPlayer(), flex = players[1].toPlayer(), strategy = strategy))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()

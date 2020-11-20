@@ -158,7 +158,7 @@ internal class SavePlayerFieldPositionTests {
         observer.assertComplete()
 
         verify(lineupDao).insertPlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(Constants.ORDER_PITCHER_WHEN_DH, it.order)
+            Assert.assertEquals(TeamStrategy.STANDARD.getDesignatedPlayerOrder(), it.order)
         })
         verify(lineupDao, never()).updatePlayerFieldPosition(any())
     }
@@ -208,7 +208,7 @@ internal class SavePlayerFieldPositionTests {
         observer.assertComplete()
 
         verify(lineupDao).updatePlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(Constants.ORDER_PITCHER_WHEN_DH, it.order)
+            Assert.assertEquals(TeamStrategy.STANDARD.getDesignatedPlayerOrder(), it.order)
         })
         verify(lineupDao, never()).insertPlayerFieldPosition(any())
     }

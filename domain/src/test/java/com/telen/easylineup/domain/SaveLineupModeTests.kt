@@ -4,6 +4,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.SaveLineupMode
 import io.reactivex.Completable
@@ -28,7 +29,7 @@ internal class SaveLineupModeTests {
         MockitoAnnotations.initMocks(this)
         mSaveLineupMode = SaveLineupMode(lineupDao)
 
-        lineup = Lineup(1, "test1", 1, 1, MODE_DISABLED, 3L)
+        lineup = Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id,3L)
 
         Mockito.`when`(lineupDao.getLineupByIdSingle(1)).thenReturn(Single.just(lineup))
         Mockito.`when`(lineupDao.getLineupByIdSingle(2)).thenReturn(Single.error(Exception()))
