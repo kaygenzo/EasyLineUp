@@ -32,7 +32,6 @@ class BattingOrderAdapter(private val players: MutableList<BatterState>,
                           private val lineupTypeface: LineupTypeface
 ): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
 
-    private var positionDescriptions: Array<String>? = null
     var lineupMode = MODE_DISABLED
 
     override fun onDragStart() {
@@ -59,11 +58,13 @@ class BattingOrderAdapter(private val players: MutableList<BatterState>,
         if(canMoveFrom && canMoveTo) {
             val fromOrder = players[fromPosition].playerOrder
             val toOrder = players[toPosition].playerOrder
-            Timber.d("""Before: (${players[fromPosition].playerName}, ${players[fromPosition].playerOrder}) (${players[toPosition].playerName}, ${players[toPosition].playerOrder})""")
+            Timber.d("""Before: (${players[fromPosition].playerName}, ${players[fromPosition].origin.order}) (${players[toPosition].playerName}, ${players[toPosition].origin.order})""")
+            players[fromPosition].origin.order = toOrder
+            players[toPosition].origin.order = fromOrder
             players[fromPosition].playerOrder = toOrder
             players[toPosition].playerOrder = fromOrder
-            Timber.d("""After: (${players[fromPosition].playerName}, ${players[fromPosition].playerOrder}) (${players[toPosition].playerName}, ${players[toPosition].playerOrder})""")
-            players.sortBy { it.playerOrder }
+            Timber.d("""After: (${players[fromPosition].playerName}, ${players[fromPosition].origin.order}) (${players[toPosition].playerName}, ${players[toPosition].origin.order})""")
+            players.sortBy { it.origin.order }
             notifyItemMoved(fromPosition, toPosition)
         }
     }

@@ -10,7 +10,7 @@ import io.reactivex.Single
 
 data class BatterState(val playerID: Long, val playerFlag: Int, var playerOrder: Int, val playerName: String, val playerNumber: String,
                        val playerPosition: FieldPosition, val playerPositionDesc: String, val canShowPosition: Boolean,
-                       val canMove: Boolean, val canShowDescription: Boolean, val canShowOrder: Boolean)
+                       val canMove: Boolean, val canShowDescription: Boolean, val canShowOrder: Boolean, val origin: PlayerWithPosition)
 
 internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBattersState.ResponseValue>() {
 
@@ -86,7 +86,7 @@ internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBatter
             position++
 
             result.add(BatterState(playerID, playerFlag, order, playerName, shirtNumber, fieldPosition ?: FieldPosition.SUBSTITUTE,
-                    playerPositionDesc, canShowPosition, canMove, canShowDescription, canShowIndex))
+                    playerPositionDesc, canShowPosition, canMove, canShowDescription, canShowIndex, player))
         }
 
         return Single.just(ResponseValue(result))

@@ -120,6 +120,11 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
         return view
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.saveNewBattingOrder()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         view?.recyclerView?.apply {
@@ -128,10 +133,6 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
     }
 
     override fun onOrderChanged() {
-        save()
-    }
 
-    private fun save() {
-        viewModel.saveNewBattingOrder()
     }
 }
