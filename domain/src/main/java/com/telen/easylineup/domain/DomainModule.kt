@@ -51,5 +51,6 @@ object DomainModule {
         single { SavePlayerNumberOverlay(get()) }
         single { GetShirtNumberHistory(get()) }
         single { ValidatorUtils() }
+        single { GetBattersState() }
     }
 }

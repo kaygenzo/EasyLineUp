@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.model.tiles.ITileData
+import com.telen.easylineup.domain.usecases.BatterState
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -71,6 +72,7 @@ interface ApplicationPort {
     fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition, list: List<PlayerWithPosition>, lineupMode: Int, strategy: TeamStrategy): Completable
     fun getDpAndFlexFromPlayersInField(list: List<PlayerWithPosition>): Single<DpAndFlexConfiguration>
     fun linkDpAndFlex(dp: Player?, flex: Player?, lineupID: Long?, list: List<PlayerWithPosition>, strategy: TeamStrategy): Completable
+    fun getBatterStates(players: List<PlayerWithPosition>, teamType: Int, batterSize: Int, extraHitterSize: Int, lineupMode: Int, isDebug: Boolean,isEditable: Boolean): Single<List<BatterState>>
 
     //tournaments
     fun getTournaments(): Single<List<Tournament>>

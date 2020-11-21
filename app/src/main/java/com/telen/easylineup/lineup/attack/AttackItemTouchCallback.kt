@@ -10,7 +10,7 @@ class AttackItemTouchCallback(val adapter: BattingOrderAdapter, var batterSize: 
             in 0 until (batterSize + extraHitterSize) -> ItemTouchHelper.UP or ItemTouchHelper.DOWN
             else -> 0
         }
-        Timber.d("getMovementFlags=$dragFlags position=${viewHolder.adapterPosition}")
+        Timber.d("getMovementFlags=$dragFlags position=${viewHolder.adapterPosition} sizeMax=${batterSize + extraHitterSize -1}")
         return makeMovementFlags(dragFlags, 0)
     }
 

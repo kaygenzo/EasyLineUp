@@ -77,6 +77,7 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
     private val getPlayersInField: GetOnlyPlayersInField by inject()
     private val getDpAndFlexFromPlayersInFieldUseCase: GetDPAndFlexFromPlayersInField by inject()
     private val saveDpAndFlexUseCase: SaveDpAndFlex by inject()
+    private val getBatterStateUseCase: GetBattersState by inject()
 
     private val savePlayerNumberOverlayUseCase: SavePlayerNumberOverlay by inject()
     private val getShirtNumberHistoryUseCase: GetShirtNumberHistory by inject()
@@ -426,6 +427,12 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                         _errors.onNext(DomainErrors.DP_OR_FLEX_NOT_ASSIGNED)
                     }
                 }
+    }
+
+    override fun getBatterStates(players: List<PlayerWithPosition>, teamType: Int, batterSize: Int, extraHitterSize: Int, lineupMode: Int, isDebug: Boolean, isEditable: Boolean): Single<List<BatterState>> {
+        return UseCaseHandler.execute(getBatterStateUseCase, GetBattersState.RequestValues(context = context, players = players, teamType = teamType,
+                batterSize = batterSize, extraHitterSize = extraHitterSize, lineupMode = lineupMode, isDebug = isDebug, isEditable = isEditable
+        )).map { it.players }
     }
 
     override fun getTournaments(): Single<List<Tournament>> {

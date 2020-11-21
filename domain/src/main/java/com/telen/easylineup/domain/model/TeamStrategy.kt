@@ -16,7 +16,7 @@ enum class TeamStrategy(val id: Int, val batterSize: Int, val extraHitterSize: I
             FieldPosition.RIGHT_FIELD,
             FieldPosition.DP_DH
     ),
-    SLOWPITCH(1, 10, 0,
+    SLOWPITCH(1, 10, 2,
             FieldPosition.CATCHER,
             FieldPosition.PITCHER,
             FieldPosition.FIRST_BASE,

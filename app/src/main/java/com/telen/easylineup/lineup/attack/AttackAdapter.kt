@@ -6,9 +6,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.MODE_DISABLED
+import com.telen.easylineup.domain.usecases.BatterState
 import com.telen.easylineup.views.LineupTypeface
 import com.telen.easylineup.views.PlayerPositionFilterView
 import com.telen.easylineup.views.PreferencesStyledTextView
@@ -25,12 +26,11 @@ interface OnDataChangedListener {
     fun onOrderChanged()
 }
 
-class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>,
+class BattingOrderAdapter(private val players: MutableList<BatterState>,
                           private val dataListener: OnDataChangedListener?,
-                          private val isEditable: Boolean,
                           var teamType: Int,
-                          private val lineupTypeface: LineupTypeface,
-                          val strategy: TeamStrategy): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
+                          private val lineupTypeface: LineupTypeface
+): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
 
     private var positionDescriptions: Array<String>? = null
     var lineupMode = MODE_DISABLED
@@ -49,21 +49,21 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>,
 
     override fun onMoved(fromPosition: Int, toPosition: Int) {
         val canMoveFrom = if(lineupMode == MODE_DISABLED)
-            FieldPosition.isDefensePlayer(players[fromPosition].position)
+            FieldPosition.isDefensePlayer(players[fromPosition].playerPosition.getPosition())
         else
-            FieldPosition.canBeBatterWhenModeEnabled(players[fromPosition].position, players[fromPosition].flags)
+            FieldPosition.canBeBatterWhenModeEnabled(players[fromPosition].playerPosition.getPosition(), players[fromPosition].playerFlag)
         val canMoveTo = if(lineupMode == MODE_DISABLED)
-            FieldPosition.isDefensePlayer(players[toPosition].position)
+            FieldPosition.isDefensePlayer(players[toPosition].playerPosition.getPosition())
         else
-            FieldPosition.canBeBatterWhenModeEnabled(players[toPosition].position, players[toPosition].flags)
+            FieldPosition.canBeBatterWhenModeEnabled(players[toPosition].playerPosition.getPosition(), players[toPosition].playerFlag)
         if(canMoveFrom && canMoveTo) {
-            val fromOrder = players[fromPosition].order
-            val toOrder = players[toPosition].order
-            Timber.d("""Before: (${players[fromPosition].playerName}, ${players[fromPosition].order}) (${players[toPosition].playerName}, ${players[toPosition].order})""")
-            players[fromPosition].order = toOrder
-            players[toPosition].order = fromOrder
-            Timber.d("""After: (${players[fromPosition].playerName}, ${players[fromPosition].order}) (${players[toPosition].playerName}, ${players[toPosition].order})""")
-            players.sortBy { it.order }
+            val fromOrder = players[fromPosition].playerOrder
+            val toOrder = players[toPosition].playerOrder
+            Timber.d("""Before: (${players[fromPosition].playerName}, ${players[fromPosition].playerOrder}) (${players[toPosition].playerName}, ${players[toPosition].playerOrder})""")
+            players[fromPosition].playerOrder = toOrder
+            players[toPosition].playerOrder = fromOrder
+            Timber.d("""After: (${players[fromPosition].playerName}, ${players[fromPosition].playerOrder}) (${players[toPosition].playerName}, ${players[toPosition].playerOrder})""")
+            players.sortBy { it.playerOrder }
             notifyItemMoved(fromPosition, toPosition)
         }
     }
@@ -87,61 +87,30 @@ class BattingOrderAdapter(private val players: MutableList<PlayerWithPosition>,
     }
 
     override fun onBindViewHolder(holder: BatterViewHolder, position: Int) {
-        val player = players[position]
-
-        if(positionDescriptions == null)
-            positionDescriptions = FieldPosition.getPositionShortNames(holder.positionDesc.context, teamType)
+        val batter = players[position]
 
         with(holder) {
-
             playerName.setTypeface(lineupTypeface)
+            playerName.text = batter.playerName.trim()
+
             fieldPosition.setTypeface(lineupTypeface)
+            fieldPosition.text = batter.playerPosition.getPosition().toString()
+
             shirtNumber.setTypeface(lineupTypeface)
+            shirtNumber.text = batter.playerNumber
 
-            val isSubstitute = FieldPosition.isSubstitute(player.position)
-            val isDefensePlayer = FieldPosition.isDefensePlayer(player.position)
+            order.text = batter.playerOrder.toString()
 
-            playerName.text = player.playerName.trim()
-            shirtNumber.text = player.shirtNumber.toString()
-
-            if(isDefensePlayer)
-                fieldPosition.text = FieldPosition.getFieldPositionById(player.position)?.getPosition()?.toString() ?: ""
-            else
-                fieldPosition.text = ""
-
-            order.text = player.order.toString()
-
-            if(player.position >= FieldPosition.PITCHER.id && player.position <= FieldPosition.DP_DH.id) {
-                order.visibility = View.VISIBLE
-            }
-            else if(BuildConfig.DEBUG) {
-                order.visibility = View.VISIBLE
-            }
-            else {
-                order.visibility = View.GONE
+            positionDesc?.apply {
+                setBackground(R.drawable.position_unselected_background)
+                setTextColor(R.color.tile_team_size_background_color)
+                positionDesc.setText(batter.playerPositionDesc)
             }
 
-            positionDescriptions?.let { descs ->
-                FieldPosition.getFieldPositionById(player.position)?.let {
-                    positionDesc.setText(descs[it.ordinal])
-                }
-                positionDesc.setBackground(R.drawable.position_unselected_background)
-                positionDesc.setTextColor(R.color.tile_team_size_background_color)
-            }
-
-            if(!isEditable || isSubstitute || (lineupMode == MODE_ENABLED && player.flags and PlayerFieldPosition.FLAG_FLEX > 0)) {
-                reorderImage.visibility = View.GONE
-            }
-            else {
-                reorderImage.visibility = View.VISIBLE
-            }
-
-            if(!isEditable || isSubstitute || (lineupMode == MODE_ENABLED && FieldPosition.getFieldPositionById(player.position) == FieldPosition.DP_DH)) {
-                positionDesc.visibility = View.VISIBLE
-            }
-            else {
-                positionDesc.visibility = View.GONE
-            }
+            order.visibility = if(batter.canShowOrder) View.VISIBLE else View.GONE
+            fieldPosition.visibility = if(batter.canShowPosition) View.VISIBLE else View.GONE
+            positionDesc.visibility = if(batter.canShowDescription) View.VISIBLE else View.GONE
+            reorderImage.visibility = if(batter.canMove) View.VISIBLE else View.GONE
         }
     }
 }

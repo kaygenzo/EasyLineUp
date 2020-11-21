@@ -17,10 +17,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.usecases.BatterState
 import com.telen.easylineup.utils.DialogFactory
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -60,6 +62,7 @@ object DeletePlayerPositionSuccess: EventCase()
 object SaveBattingOrderSuccess: EventCase()
 object DeleteLineupSuccess: EventCase()
 object UpdatePlayersWithLineupModeSuccess: EventCase()
+data class NewBatterOrderAvailable(val players: List<BatterState>): EventCase()
 data class GetAllAvailablePlayersSuccess(val players: List<Player>, val position: FieldPosition): EventCase()
 data class NeedLinkDpFlex(val initialData: Pair<Player?, Player?>, val dpLocked: Boolean, val flexLocked: Boolean, val teamType: Int, @StringRes val title: Int): EventCase()
 
@@ -143,8 +146,8 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         disposables.add(disposable)
     }
 
-    fun saveNewBattingOrder(players: List<PlayerWithPosition>) {
-        val disposable = domain.saveBattingOrder(players)
+    fun saveNewBattingOrder() {
+        val disposable = domain.saveBattingOrder(_listPlayersWithPosition)
                 .subscribe({
                     eventHandler.onNext(SaveBattingOrderSuccess)
                 }, {
@@ -295,6 +298,18 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         return domain.linkDpAndFlex(dp,flex, lineupID, _listPlayersWithPosition, strategy)
     }
 
+    fun getBatterStates(players: List<PlayerWithPosition>, batterSize: Int, extraHitterSize: Int) {
+        val playersInput = players.filter { it.order > 0 }.sortedBy { it.order }
+        val disposable = domain.getBatterStates(players = playersInput, teamType = teamType, batterSize = batterSize,
+                extraHitterSize = extraHitterSize, lineupMode = lineupMode, isDebug = BuildConfig.DEBUG, isEditable = editable)
+                .subscribe({
+                    eventHandler.onNext(NewBatterOrderAvailable(it))
+                }, {
+                    Timber.e(it)
+                })
+        this.disposables.add(disposable)
+    }
+
     ///////////// LIVE DATA OBSERVER //////////////
 
     fun registerLineupAndPositionsChanged(): LiveData<List<PlayerWithPosition>> {
@@ -324,13 +339,6 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
             _listPlayersWithPosition.clear()
             _listPlayersWithPosition.addAll(it)
             it
-        }
-    }
-
-    fun registerLineupBatters(): LiveData<List<PlayerWithPosition>> {
-        return Transformations.map(registerLineupAndPositionsChanged()) { players ->
-            players.filter { it.order > 0 }
-                    .sortedBy { it.order }
         }
     }
 

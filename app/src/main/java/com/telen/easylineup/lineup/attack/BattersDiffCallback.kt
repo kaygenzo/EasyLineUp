@@ -1,9 +1,9 @@
 package com.telen.easylineup.lineup.attack
 
 import androidx.recyclerview.widget.DiffUtil
-import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.usecases.BatterState
 
-class BattersDiffCallback(private val mOldBatters: List<PlayerWithPosition>, private val mNewBatters: List<PlayerWithPosition>): DiffUtil.Callback() {
+class BattersDiffCallback(private val mOldBatters: List<BatterState>, private val mNewBatters: List<BatterState>): DiffUtil.Callback() {
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         return if(oldItemPosition < mOldBatters.size && newItemPosition < mOldBatters.size)

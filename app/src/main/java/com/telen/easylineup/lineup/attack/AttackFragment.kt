@@ -12,9 +12,9 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.PlayerWithPosition
-import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.usecases.BatterState
+import com.telen.easylineup.lineup.NewBatterOrderAvailable
 import com.telen.easylineup.lineup.PlayersPositionViewModel
 import com.telen.easylineup.lineup.SaveBattingOrderSuccess
 import com.telen.easylineup.views.ItemDecoratorAttackRecycler
@@ -25,7 +25,7 @@ import timber.log.Timber
 class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
 
     private lateinit var playerAdapter: BattingOrderAdapter
-    private val adapterDataList = mutableListOf<PlayerWithPosition>()
+    private val adapterDataList = mutableListOf<BatterState>()
 
     private lateinit var viewModel: PlayersPositionViewModel
 
@@ -43,6 +43,15 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
             val eventsDisposable = viewModel.eventHandler.subscribe({
                 when (it) {
                     SaveBattingOrderSuccess -> Timber.d("Successfully saved!")
+                    is NewBatterOrderAvailable -> {
+                        val diffCallback = BattersDiffCallback(adapterDataList, it.players)
+                        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+                        adapterDataList.clear()
+                        adapterDataList.addAll(it.players)
+
+                        diffResult.dispatchUpdatesTo(playerAdapter)
+                    }
                 }
             }, {
                 Timber.e(it)
@@ -63,9 +72,10 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
 
         val isEditable = viewModel.editable
 
-        playerAdapter = BattingOrderAdapter(adapterDataList, this, isEditable, TeamType.BASEBALL.id, lineupTypeface, viewModel.strategy)
-
-        itemTouchedCallback = AttackItemTouchCallback(playerAdapter, TeamStrategy.STANDARD.batterSize, TeamStrategy.STANDARD.extraHitterSize)
+        val batterSize = viewModel.strategy.batterSize
+        val extraHitterSize = viewModel.strategy.extraHitterSize
+        playerAdapter = BattingOrderAdapter(adapterDataList, this, TeamType.BASEBALL.id, lineupTypeface)
+        itemTouchedCallback = AttackItemTouchCallback(playerAdapter, batterSize, extraHitterSize)
         itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
 
         view.recyclerView.apply {
@@ -79,14 +89,10 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
 
         val disposable = viewModel.getTeamType()
                 .subscribe({
-                    val batterSize = viewModel.strategy.batterSize
-                    val extraHitterSize = 0
                     val dividerItemDecoration = ItemDecoratorAttackRecycler(context, linearLayoutManager.orientation, batterSize, extraHitterSize)
                     view.recyclerView.addItemDecoration(dividerItemDecoration)
                     playerAdapter.apply {
                         this.teamType = viewModel.teamType
-                        itemTouchedCallback.batterSize = batterSize
-                        itemTouchedCallback.extraHitterSize = extraHitterSize
                         notifyDataSetChanged()
                     }
                 }, {
@@ -97,16 +103,9 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
         view.header.setIsEditable(isEditable)
 
         viewModel.lineupID?.let {
-            viewModel.registerLineupBatters().observe(viewLifecycleOwner, Observer { items ->
-                Timber.d("PlayerWithPositions list changed!")
 
-                val diffCallback = BattersDiffCallback(adapterDataList, items)
-                val diffResult = DiffUtil.calculateDiff(diffCallback)
-
-                adapterDataList.clear()
-                adapterDataList.addAll(items)
-
-                diffResult.dispatchUpdatesTo(playerAdapter)
+            viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer { items ->
+                viewModel.getBatterStates(items, batterSize, extraHitterSize)
             })
 
             viewModel.registerLineupChange().observe(viewLifecycleOwner, Observer { lineup ->
@@ -133,6 +132,6 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
     }
 
     private fun save() {
-        viewModel.saveNewBattingOrder(adapterDataList)
+        viewModel.saveNewBattingOrder()
     }
 }
