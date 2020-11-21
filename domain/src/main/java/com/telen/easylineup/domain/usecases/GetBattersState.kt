@@ -31,12 +31,12 @@ internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBatter
             var canMove = false
             var canShowDescription = false
             var canShowIndex = false
+            var canShowPosition = isDefensePlayer
 
             val order = player.order
             val playerName = player.playerName.trim()
             var playerPositionDesc = ""
             val shirtNumber = player.shirtNumber.toString()
-            val canShowPosition = isDefensePlayer
 
             var isDP = false
             var isFlex = false
@@ -65,10 +65,22 @@ internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBatter
                 playerPositionDesc = positionDescriptions[this@run.ordinal]
             }
 
-            if (!requestValues.isEditable || isFlex) {
+            if (!requestValues.isEditable) {
                 canShowDescription = true
-            } else if (position < maxBatterSize || isDP) {
-                canMove = true
+            } else if (position < maxBatterSize) {
+                if(!isFlex)
+                    canMove = true
+                if(isDP) {
+                    canShowDescription = true
+                }
+            }
+            else {
+                canShowDescription = true
+            }
+
+            if(isSubstitute) {
+                canShowPosition = false
+                canShowDescription = true
             }
 
             position++

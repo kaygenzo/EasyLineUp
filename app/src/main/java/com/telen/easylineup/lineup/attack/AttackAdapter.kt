@@ -94,7 +94,7 @@ class BattingOrderAdapter(private val players: MutableList<BatterState>,
             playerName.text = batter.playerName.trim()
 
             fieldPosition.setTypeface(lineupTypeface)
-            fieldPosition.text = batter.playerPosition.getPosition().toString()
+            fieldPosition.text = if(batter.canShowPosition) batter.playerPosition.getPosition().toString() else ""
 
             shirtNumber.setTypeface(lineupTypeface)
             shirtNumber.text = batter.playerNumber
@@ -108,7 +108,6 @@ class BattingOrderAdapter(private val players: MutableList<BatterState>,
             }
 
             order.visibility = if(batter.canShowOrder) View.VISIBLE else View.GONE
-            fieldPosition.visibility = if(batter.canShowPosition) View.VISIBLE else View.GONE
             positionDesc.visibility = if(batter.canShowDescription) View.VISIBLE else View.GONE
             reorderImage.visibility = if(batter.canMove) View.VISIBLE else View.GONE
         }
