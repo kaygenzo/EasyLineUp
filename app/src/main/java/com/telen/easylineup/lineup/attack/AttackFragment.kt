@@ -7,13 +7,12 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceManager
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.usecases.BatterState
 import com.telen.easylineup.lineup.NewBatterOrderAvailable
 import com.telen.easylineup.lineup.PlayersPositionViewModel
 import com.telen.easylineup.lineup.SaveBattingOrderSuccess
@@ -44,13 +43,9 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
                 when (it) {
                     SaveBattingOrderSuccess -> Timber.d("Successfully saved!")
                     is NewBatterOrderAvailable -> {
-                        val diffCallback = BattersDiffCallback(adapterDataList, it.players)
-                        val diffResult = DiffUtil.calculateDiff(diffCallback)
-
                         adapterDataList.clear()
                         adapterDataList.addAll(it.players)
-
-                        diffResult.dispatchUpdatesTo(playerAdapter)
+                        playerAdapter.notifyDataSetChanged()
                     }
                 }
             }, {
@@ -63,6 +58,9 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
         val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
         val lineupValue = preferences.getString(getString(R.string.key_lineup_style), getString(R.string.lineup_style_default_value))
         lineupTypeface = LineupTypeface.getByValue(lineupValue)
+        playerAdapter = BattingOrderAdapter(adapterDataList, this, TeamType.BASEBALL.id, lineupTypeface).apply {
+            setHasStableIds(true)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -71,16 +69,16 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
         val linearLayoutManager = LinearLayoutManager(activity)
 
         val isEditable = viewModel.editable
-
         val batterSize = viewModel.strategy.batterSize
         val extraHitterSize = viewModel.strategy.extraHitterSize
-        playerAdapter = BattingOrderAdapter(adapterDataList, this, TeamType.BASEBALL.id, lineupTypeface)
+
         itemTouchedCallback = AttackItemTouchCallback(playerAdapter, batterSize, extraHitterSize)
         itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
 
         view.recyclerView.apply {
             layoutManager = linearLayoutManager
             adapter = playerAdapter
+            setHasFixedSize(true)
         }
 
         isEditable.takeIf { it }?.let {
@@ -120,11 +118,6 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
         return view
     }
 
-    override fun onStop() {
-        super.onStop()
-        viewModel.saveNewBattingOrder()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         view?.recyclerView?.apply {
@@ -133,6 +126,6 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
     }
 
     override fun onOrderChanged() {
-
+        viewModel.saveNewBattingOrder()
     }
 }

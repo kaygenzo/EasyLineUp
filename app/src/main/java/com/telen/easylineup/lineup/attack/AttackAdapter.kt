@@ -7,13 +7,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.MODE_DISABLED
-import com.telen.easylineup.domain.usecases.BatterState
 import com.telen.easylineup.views.LineupTypeface
 import com.telen.easylineup.views.PlayerPositionFilterView
 import com.telen.easylineup.views.PreferencesStyledTextView
-import timber.log.Timber
+import java.util.*
 
 interface OnItemTouchedListener {
     fun onMoved(fromPosition: Int, toPosition: Int)
@@ -47,24 +47,38 @@ class BattingOrderAdapter(private val players: MutableList<BatterState>,
     }
 
     override fun onMoved(fromPosition: Int, toPosition: Int) {
+        val fromBatter = players[fromPosition]
+        val toBatter = players[toPosition]
+
         val canMoveFrom = if(lineupMode == MODE_DISABLED)
-            FieldPosition.isDefensePlayer(players[fromPosition].playerPosition.getPosition())
+            FieldPosition.isDefensePlayer(fromBatter.playerPosition.getPosition())
         else
-            FieldPosition.canBeBatterWhenModeEnabled(players[fromPosition].playerPosition.getPosition(), players[fromPosition].playerFlag)
+            FieldPosition.canBeBatterWhenModeEnabled(fromBatter.playerPosition.getPosition(), fromBatter.playerFlag)
         val canMoveTo = if(lineupMode == MODE_DISABLED)
-            FieldPosition.isDefensePlayer(players[toPosition].playerPosition.getPosition())
+            FieldPosition.isDefensePlayer(toBatter.playerPosition.getPosition())
         else
-            FieldPosition.canBeBatterWhenModeEnabled(players[toPosition].playerPosition.getPosition(), players[toPosition].playerFlag)
+            FieldPosition.canBeBatterWhenModeEnabled(toBatter.playerPosition.getPosition(), toBatter.playerFlag)
+
         if(canMoveFrom && canMoveTo) {
-            val fromOrder = players[fromPosition].playerOrder
-            val toOrder = players[toPosition].playerOrder
-            Timber.d("""Before: (${players[fromPosition].playerName}, ${players[fromPosition].origin.order}) (${players[toPosition].playerName}, ${players[toPosition].origin.order})""")
-            players[fromPosition].origin.order = toOrder
-            players[toPosition].origin.order = fromOrder
-            players[fromPosition].playerOrder = toOrder
-            players[toPosition].playerOrder = fromOrder
-            Timber.d("""After: (${players[fromPosition].playerName}, ${players[fromPosition].origin.order}) (${players[toPosition].playerName}, ${players[toPosition].origin.order})""")
-            players.sortBy { it.origin.order }
+            val fromOrder = fromBatter.playerOrder
+            val toOrder = toBatter.playerOrder
+//            Timber.d("""Before: (${fromBatter.playerName}, ${fromBatter.origin.order}) (${toBatter.playerName}, ${toBatter.origin.order})""")
+            fromBatter.origin.order = toOrder
+            toBatter.origin.order = fromOrder
+            fromBatter.playerOrder = toOrder
+            toBatter.playerOrder = fromOrder
+//            Timber.d("""After: (${fromBatter.playerName}, ${fromBatter.origin.order}) (${toBatter.playerName}, ${toBatter.origin.order})""")
+            //players.sortBy { it.origin.order }
+
+            if (fromPosition < toPosition) {
+                for (i in fromPosition until toPosition) {
+                    Collections.swap(players, i, i + 1)
+                }
+            } else {
+                for (i in fromPosition downTo toPosition + 1) {
+                    Collections.swap(players, i, i - 1)
+                }
+            }
             notifyItemMoved(fromPosition, toPosition)
         }
     }
@@ -85,6 +99,14 @@ class BattingOrderAdapter(private val players: MutableList<BatterState>,
 
     override fun getItemCount(): Int {
         return players.size
+    }
+
+    override fun getItemId(position: Int): Long {
+        return players[position].playerID
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return 0
     }
 
     override fun onBindViewHolder(holder: BatterViewHolder, position: Int) {

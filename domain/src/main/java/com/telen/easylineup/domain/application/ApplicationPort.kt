@@ -4,10 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.model.export.ExportBase
-import com.telen.easylineup.domain.model.tiles.ITileData
-import com.telen.easylineup.domain.usecases.BatterState
 import io.reactivex.Completable
-import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 

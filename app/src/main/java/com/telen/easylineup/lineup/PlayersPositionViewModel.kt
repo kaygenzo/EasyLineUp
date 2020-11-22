@@ -22,7 +22,6 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.*
-import com.telen.easylineup.domain.usecases.BatterState
 import com.telen.easylineup.utils.DialogFactory
 import io.reactivex.Completable
 import io.reactivex.Single

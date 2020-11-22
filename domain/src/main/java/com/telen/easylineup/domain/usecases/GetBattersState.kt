@@ -2,15 +2,8 @@ package com.telen.easylineup.domain.usecases
 
 import android.content.Context
 import com.telen.easylineup.domain.UseCase
-import com.telen.easylineup.domain.model.FieldPosition
-import com.telen.easylineup.domain.model.MODE_ENABLED
-import com.telen.easylineup.domain.model.PlayerFieldPosition
-import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.*
 import io.reactivex.Single
-
-data class BatterState(val playerID: Long, val playerFlag: Int, var playerOrder: Int, val playerName: String, val playerNumber: String,
-                       val playerPosition: FieldPosition, val playerPositionDesc: String, val canShowPosition: Boolean,
-                       val canMove: Boolean, val canShowDescription: Boolean, val canShowOrder: Boolean, val origin: PlayerWithPosition)
 
 internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBattersState.ResponseValue>() {
 

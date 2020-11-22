@@ -1,7 +1,7 @@
 package com.telen.easylineup.lineup.attack
 
 import androidx.recyclerview.widget.DiffUtil
-import com.telen.easylineup.domain.usecases.BatterState
+import com.telen.easylineup.domain.model.BatterState
 
 class BattersDiffCallback(private val mOldBatters: List<BatterState>, private val mNewBatters: List<BatterState>): DiffUtil.Callback() {
 
