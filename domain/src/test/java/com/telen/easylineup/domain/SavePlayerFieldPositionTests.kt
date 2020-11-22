@@ -27,6 +27,10 @@ internal class SavePlayerFieldPositionTests {
     var observer = TestObserver<SavePlayerFieldPosition.ResponseValue>()
     var newPlayer = Player(6, 1, "tyty", 6, 6, null, 128)
 
+    val strategy = TeamStrategy.STANDARD
+    val batterSize = strategy.batterSize
+    val extraHitterSize = 0
+
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
@@ -57,7 +61,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -80,7 +87,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -102,7 +112,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -114,7 +127,7 @@ internal class SavePlayerFieldPositionTests {
     //// ORDER /////
 
     @Test
-    fun shouldInsertPlayerWithSortOrder_200_BecauseIsSubstituteAndNewPosition() {
+    fun shouldInsertPlayerWithSortOrder_1_IfSubstituteAndIndexAvailable() {
         val fieldPosition = FieldPosition.SUBSTITUTE
         val teamType = TeamType.BASEBALL.id
         val mode = MODE_DISABLED
@@ -124,7 +137,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -132,7 +148,7 @@ internal class SavePlayerFieldPositionTests {
         observer.assertComplete()
 
         verify(lineupDao).insertPlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(Constants.SUBSTITUTE_ORDER_VALUE, it.order)
+            Assert.assertEquals(1, it.order)
         })
         verify(lineupDao, never()).updatePlayerFieldPosition(any())
     }
@@ -148,7 +164,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         players.removeIf { it.position == FieldPosition.PITCHER.id }
@@ -174,7 +193,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         players.removeIf { it.position == FieldPosition.PITCHER.id }
@@ -200,7 +222,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -224,7 +249,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -248,7 +276,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         players.removeIf { it.position == FieldPosition.PITCHER.id }
@@ -274,7 +305,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         players.add(PlayerWithPosition("test", 7, 7, 1, null,
@@ -301,7 +335,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -326,7 +363,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         players.removeIf { it.position == FieldPosition.PITCHER.id }
@@ -351,7 +391,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         players.removeIf { it.position == FieldPosition.PITCHER.id }
@@ -376,7 +419,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -399,7 +445,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -422,7 +471,10 @@ internal class SavePlayerFieldPositionTests {
                 position = fieldPosition,
                 players = players,
                 teamType = teamType,
-                lineupMode = mode
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -449,7 +501,9 @@ internal class SavePlayerFieldPositionTests {
                 players = players,
                 teamType = teamType,
                 lineupMode = MODE_DISABLED,
-                strategy = strategy
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
