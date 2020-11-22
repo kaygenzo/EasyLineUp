@@ -63,7 +63,8 @@ interface ApplicationPort {
 
     //player field positions
     /** @deprecated **/ fun insertPlayerFieldPositions(playerFieldPositions: List<PlayerFieldPosition>): Completable
-    fun savePlayerFieldPosition(player: Player, position: FieldPosition, list: List<PlayerWithPosition>, lineupID: Long?, lineupMode: Int, strategy: TeamStrategy): Completable
+    fun savePlayerFieldPosition(player: Player, position: FieldPosition, list: List<PlayerWithPosition>, lineupID: Long?,
+                                lineupMode: Int, strategy: TeamStrategy, batterSize: Int, extraBatterSize: Int): Completable
     fun deletePlayerPosition(player: Player, position: FieldPosition, list: List<PlayerWithPosition>, lineupMode: Int): Completable
     fun saveBattingOrder(players: List<PlayerWithPosition>): Completable
     fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition, list: List<PlayerWithPosition>, lineupMode: Int, strategy: TeamStrategy): Completable

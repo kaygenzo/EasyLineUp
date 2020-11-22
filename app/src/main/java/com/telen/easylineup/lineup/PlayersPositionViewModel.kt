@@ -95,10 +95,6 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         disposables.clear()
     }
 
-    private fun savePlayerFieldPosition(player: Player, position: FieldPosition): Completable {
-        return domain.savePlayerFieldPosition(player, position, _listPlayersWithPosition, lineupID, lineupMode, strategy)
-    }
-
     fun onDeletePosition(player: Player, position: FieldPosition) {
         val disposable = domain.deletePlayerPosition(player, position, _listPlayersWithPosition, lineupMode)
                 .subscribe({
@@ -257,7 +253,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun onPlayerSelected(player: Player, position: FieldPosition) {
-        val disposable = savePlayerFieldPosition(player, position)
+        val disposable = domain.savePlayerFieldPosition(player, position, _listPlayersWithPosition, lineupID, lineupMode, strategy, strategy.batterSize, strategy.extraHitterSize)
                 .subscribe({
                     eventHandler.onNext(SavePlayerPositionSuccess)
                 }, {

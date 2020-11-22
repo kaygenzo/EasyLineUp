@@ -47,11 +47,6 @@ enum class FieldPosition(val id: Int, val mask: Int, private val position: Int) 
             return !isSubstitute(id) && id != DP_DH.id
         }
 
-        //TODO move in domain
-        fun canBeBatterWhenModeEnabled(id: Int, flags: Int): Boolean {
-            return !isSubstitute(id) && (flags and PlayerFieldPosition.FLAG_FLEX == 0)
-        }
-
         fun getPositionShortNames(context: Context, teamType: Int): Array<String> {
             return when(teamType) {
                 TeamType.SOFTBALL.id -> {

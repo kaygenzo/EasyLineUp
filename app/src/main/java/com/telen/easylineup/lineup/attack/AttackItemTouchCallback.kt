@@ -2,12 +2,18 @@ package com.telen.easylineup.lineup.attack
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.telen.easylineup.domain.model.PlayerFieldPosition
 import timber.log.Timber
 
 class AttackItemTouchCallback(val adapter: BattingOrderAdapter, var batterSize: Int, var extraHitterSize: Int = 0): ItemTouchHelper.Callback() {
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
         val dragFlags = when(viewHolder.adapterPosition) {
-            in 0 until (batterSize + extraHitterSize) -> ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            in 0 until (batterSize + extraHitterSize) -> {
+                if(adapter.players[viewHolder.adapterPosition].playerFlag and PlayerFieldPosition.FLAG_FLEX == 0) {
+                    ItemTouchHelper.UP or ItemTouchHelper.DOWN
+                }
+                else 0
+            }
             else -> 0
         }
         Timber.d("getMovementFlags=$dragFlags position=${viewHolder.adapterPosition} sizeMax=${batterSize + extraHitterSize -1}")

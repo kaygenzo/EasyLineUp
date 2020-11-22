@@ -351,7 +351,8 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
         return playerFieldPositionRepo.insertPlayerFieldPositions(playerFieldPositions)
     }
 
-    override fun savePlayerFieldPosition(player: Player, position: FieldPosition, list: List<PlayerWithPosition>, lineupID: Long?, lineupMode: Int, strategy: TeamStrategy): Completable {
+    override fun savePlayerFieldPosition(player: Player, position: FieldPosition, list: List<PlayerWithPosition>, lineupID: Long?,
+                                         lineupMode: Int, strategy: TeamStrategy, batterSize: Int, extraBatterSize: Int): Completable {
         return getTeam()
                 .flatMapCompletable {
                     val requestValues = SavePlayerFieldPosition.RequestValues(
@@ -361,7 +362,9 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                             players = list,
                             lineupMode = lineupMode,
                             teamType = it.type,
-                            strategy = strategy
+                            strategy = strategy,
+                            batterSize = batterSize,
+                            extraBatterSize = extraBatterSize
                     )
 
                     UseCaseHandler.execute(savePlayerFieldPositionUseCase, requestValues).ignoreElement()

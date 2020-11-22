@@ -21,7 +21,11 @@ internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositio
             playerPosition.apply {
                 when (requestValues.position) {
                     FieldPosition.SUBSTITUTE -> {
-                        order = Constants.SUBSTITUTE_ORDER_VALUE
+                        // it depends of the extra hitter size
+                        val nextAvailableOrder = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
+                        if(nextAvailableOrder > requestValues.batterSize + requestValues.extraBatterSize) {
+                            order = Constants.SUBSTITUTE_ORDER_VALUE
+                        }
                     }
                     FieldPosition.PITCHER -> {
                         //if the new position is a pitcher for a baseball team with dh enabled, the batting order is automatically equals to 10
@@ -38,7 +42,7 @@ internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositio
                 playerId = requestValues.player.id
 
                 // we keep the order of the previous position, except if there wasn't
-                if(order <= 0)
+                if(order == 0)
                     order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
 
                 val coordinate = FieldPosition.getPositionCoordinates(requestValues.position, requestValues.strategy)
@@ -62,7 +66,9 @@ internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositio
                         val players: List<PlayerWithPosition>,
                         val teamType: Int,
                         val lineupMode: Int,
-                        val strategy: TeamStrategy = TeamStrategy.STANDARD
+                        val strategy: TeamStrategy,
+                        val batterSize: Int,
+                        val extraBatterSize: Int
     ): UseCase.RequestValues
     inner class ResponseValue: UseCase.ResponseValue
 }

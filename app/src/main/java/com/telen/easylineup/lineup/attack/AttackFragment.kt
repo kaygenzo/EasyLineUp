@@ -33,6 +33,9 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
 
     private lateinit var lineupTypeface: LineupTypeface
 
+    private var batterSize = 0
+    private var extraHitterSize = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -57,10 +60,18 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
         val lineupValue = preferences.getString(getString(R.string.key_lineup_style), getString(R.string.lineup_style_default_value))
+
+        batterSize = viewModel.strategy.batterSize
+        extraHitterSize = viewModel.strategy.extraHitterSize
+        val lineupMode = viewModel.lineupMode
+
         lineupTypeface = LineupTypeface.getByValue(lineupValue)
-        playerAdapter = BattingOrderAdapter(adapterDataList, this, TeamType.BASEBALL.id, lineupTypeface).apply {
+        playerAdapter = BattingOrderAdapter(adapterDataList, this, TeamType.BASEBALL.id, lineupTypeface, batterSize, extraHitterSize, lineupMode).apply {
             setHasStableIds(true)
         }
+        itemTouchedCallback = AttackItemTouchCallback(playerAdapter, batterSize, extraHitterSize)
+        itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
+        playerAdapter.itemTouchHelper = itemTouchedHelper
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -69,11 +80,6 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
         val linearLayoutManager = LinearLayoutManager(activity)
 
         val isEditable = viewModel.editable
-        val batterSize = viewModel.strategy.batterSize
-        val extraHitterSize = viewModel.strategy.extraHitterSize
-
-        itemTouchedCallback = AttackItemTouchCallback(playerAdapter, batterSize, extraHitterSize)
-        itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
 
         view.recyclerView.apply {
             layoutManager = linearLayoutManager
@@ -118,6 +124,11 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
         return view
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.saveNewBattingOrder()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         view?.recyclerView?.apply {
@@ -126,6 +137,6 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
     }
 
     override fun onOrderChanged() {
-        viewModel.saveNewBattingOrder()
+
     }
 }
