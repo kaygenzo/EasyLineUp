@@ -23,7 +23,10 @@ internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositio
                     FieldPosition.SUBSTITUTE -> {
                         // it depends of the extra hitter size
                         val nextAvailableOrder = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
-                        if(nextAvailableOrder > requestValues.batterSize + requestValues.extraBatterSize) {
+                        val substitutesBatterSize = requestValues.players.filter { FieldPosition.isSubstitute(it.position) && it.order > 0 }.size
+                        // there are some cases where substitutes can me inserted before defense players.
+                        // We authorize only maximum extraBatterSize susbstitutes to be batter
+                        if(nextAvailableOrder > requestValues.batterSize + requestValues.extraBatterSize || substitutesBatterSize >= requestValues.extraBatterSize) {
                             order = Constants.SUBSTITUTE_ORDER_VALUE
                         }
                     }
@@ -36,9 +39,7 @@ internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositio
                     }
                     else -> { }
                 }
-            }
 
-            playerPosition.apply {
                 playerId = requestValues.player.id
 
                 // we keep the order of the previous position, except if there wasn't

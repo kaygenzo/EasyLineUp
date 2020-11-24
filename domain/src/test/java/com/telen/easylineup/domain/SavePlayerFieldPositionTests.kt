@@ -18,35 +18,71 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
+////////////// DEFAULT HITTER SIZE //////////////
+
 @RunWith(MockitoJUnitRunner::class)
-internal class SavePlayerFieldPositionTests {
+internal class SavePlayerFieldPositionBaseballStandardTests: SavePlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.STANDARD,
+        TeamStrategy.STANDARD.batterSize, TeamStrategy.STANDARD.extraHitterSize)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class SavePlayerFieldPositionSoftballStandardTests: SavePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
+        TeamStrategy.STANDARD.batterSize, TeamStrategy.STANDARD.extraHitterSize)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class SavePlayerFieldPositionSoftballSlowpitchTests: SavePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
+        TeamStrategy.SLOWPITCH.batterSize, TeamStrategy.SLOWPITCH.extraHitterSize)
+
+////////////// CUSTOM HITTER SIZE //////////////
+
+@RunWith(MockitoJUnitRunner::class)
+internal class SavePlayerFieldPositionBaseballCustomStandardTests: SavePlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.STANDARD,
+        TeamStrategy.STANDARD.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class SavePlayerFieldPositionSoftballCustomStandardTests: SavePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
+        TeamStrategy.STANDARD.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class SavePlayerFieldPositionSoftballCustomSlowpitchTests: SavePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
+        TeamStrategy.SLOWPITCH.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner::class)
+internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val strategy: TeamStrategy, val batterSize: Int, val extraHitterSize: Int) {
 
     lateinit var savePlayerFieldPosition: SavePlayerFieldPosition
     @Mock lateinit var lineupDao: PlayerFieldPositionRepository
     lateinit var players: MutableList<PlayerWithPosition>
     var observer = TestObserver<SavePlayerFieldPosition.ResponseValue>()
-    var newPlayer = Player(6, 1, "tyty", 6, 6, null, 128)
 
-    val strategy = TeamStrategy.STANDARD
-    val batterSize = strategy.batterSize
-    val extraHitterSize = 0
+    val newPlayer = Player(9, 1, "t9", 9, 9, null, 0x07)
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
         savePlayerFieldPosition = SavePlayerFieldPosition(lineupDao)
+
         players = mutableListOf()
-        players.add(PlayerWithPosition("toto", 1, 1, 1, null,
-                FieldPosition.PITCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,0, 1, 1, 1, 1))
-        players.add(PlayerWithPosition("tata", 2, 2, 1, null,
-                FieldPosition.CATCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 2, 2, 1, 2))
-        players.add(PlayerWithPosition("titi", 3, 3, 1, null,
-                FieldPosition.CENTER_FIELD.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,4, 3, 3, 1, 4))
-        players.add(PlayerWithPosition("tutu", 4, 4, 1, null,
-                FieldPosition.FIRST_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,6, 4, 4, 1, 8))
-        players.add(PlayerWithPosition("tete", 5, 5, 1, null,
-                FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
-        Mockito.`when`(lineupDao.insertPlayerFieldPosition(any())).thenReturn(Single.just(6))
+        var i = 1
+        TeamType.getValidPositionsForTeam(teamType, strategy).forEach {
+            players.add(PlayerWithPosition(
+                    playerName = "t${i}",
+                    shirtNumber = i,
+                    licenseNumber = i.toLong(),
+                    teamId = 1,
+                    image = null,
+                    position = i,
+                    x = 0f, y = 0f,
+                    flags = PlayerFieldPosition.FLAG_NONE,
+                    order = batterSize - i + 1,
+                    fieldPositionID = i.toLong(),
+                    playerID = i.toLong(),
+                    lineupId = 1,
+                    playerPositions = 1)
+            )
+            i++
+        }
+
+        Mockito.`when`(lineupDao.insertPlayerFieldPosition(any())).thenReturn(Single.just(9))
         Mockito.`when`(lineupDao.updatePlayerFieldPosition(any())).thenReturn(Completable.complete())
     }
 
@@ -54,13 +90,12 @@ internal class SavePlayerFieldPositionTests {
     fun shouldTriggerAnErrorIfLineupIDIsNull() {
         val fieldPosition = FieldPosition.SUBSTITUTE
         val mode = MODE_DISABLED
-        val teamType = TeamType.BASEBALL.id
         val request = SavePlayerFieldPosition.RequestValues(
                 lineupID = null,
                 player = newPlayer,
                 position = fieldPosition,
                 players = players,
-                teamType = teamType,
+                teamType = teamType.id,
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
@@ -79,14 +114,13 @@ internal class SavePlayerFieldPositionTests {
         Mockito.`when`(lineupDao.insertPlayerFieldPosition(any())).thenReturn(Single.error(Exception()))
 
         val fieldPosition = FieldPosition.SUBSTITUTE
-        val teamType = TeamType.BASEBALL.id
         val mode = MODE_DISABLED
         val request = SavePlayerFieldPosition.RequestValues(
                 lineupID = 1,
                 player = newPlayer,
                 position = fieldPosition,
                 players = players,
-                teamType = teamType,
+                teamType = teamType.id,
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
@@ -104,14 +138,13 @@ internal class SavePlayerFieldPositionTests {
         Mockito.`when`(lineupDao.updatePlayerFieldPosition(any())).thenReturn(Completable.error(Exception()))
 
         val fieldPosition = FieldPosition.PITCHER
-        val teamType = TeamType.BASEBALL.id
         val mode = MODE_DISABLED
         val request = SavePlayerFieldPosition.RequestValues(
                 lineupID = 1,
                 player = newPlayer,
                 position = fieldPosition,
                 players = players,
-                teamType = teamType,
+                teamType = teamType.id,
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
@@ -127,16 +160,48 @@ internal class SavePlayerFieldPositionTests {
     //// ORDER /////
 
     @Test
-    fun shouldInsertPlayerWithSortOrder_1_IfSubstituteAndIndexAvailable() {
+    fun shouldInsertPlayerWhenOrderAvailable() {
+        players.removeAt(5)
+
+        val fieldPosition = FieldPosition.SHORT_STOP
+        val mode = MODE_DISABLED
+
+        val request = SavePlayerFieldPosition.RequestValues(
+                lineupID = 1,
+                player = newPlayer,
+                position = fieldPosition,
+                players = players,
+                teamType = teamType.id,
+                lineupMode = mode,
+                strategy = strategy,
+                batterSize = batterSize,
+                extraBatterSize = extraHitterSize
+        )
+
+        savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
+        observer.await()
+        observer.assertComplete()
+        verify(lineupDao, never()).updatePlayerFieldPosition(any())
+        verify(lineupDao).insertPlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
+            Assert.assertEquals(batterSize - 5, it.order)
+            Assert.assertEquals(9, it.playerId)
+        })
+    }
+
+    @Test
+    fun shouldInsertSubstituteWhenOrderAvailable() {
+
+        players.removeAt(players.size - 1)
+
         val fieldPosition = FieldPosition.SUBSTITUTE
-        val teamType = TeamType.BASEBALL.id
         val mode = MODE_DISABLED
+
         val request = SavePlayerFieldPosition.RequestValues(
                 lineupID = 1,
                 player = newPlayer,
                 position = fieldPosition,
                 players = players,
-                teamType = teamType,
+                teamType = teamType.id,
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
@@ -146,331 +211,128 @@ internal class SavePlayerFieldPositionTests {
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
         observer.await()
         observer.assertComplete()
-
-        verify(lineupDao).insertPlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(1, it.order)
-        })
         verify(lineupDao, never()).updatePlayerFieldPosition(any())
-    }
-
-    @Test
-    fun shouldInsertPlayerWithSortOrder_10_BecauseIs_Pitcher_MODE_ENABLED_BASEBALL_positionEmpty() {
-        val fieldPosition = FieldPosition.PITCHER
-        val teamType = TeamType.BASEBALL.id
-        val mode = MODE_ENABLED
-        val request = SavePlayerFieldPosition.RequestValues(
-                lineupID = 1,
-                player = newPlayer,
-                position = fieldPosition,
-                players = players,
-                teamType = teamType,
-                lineupMode = mode,
-                strategy = strategy,
-                batterSize = batterSize,
-                extraBatterSize = extraHitterSize
-        )
-
-        players.removeIf { it.position == FieldPosition.PITCHER.id }
-
-        savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
         verify(lineupDao).insertPlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(TeamStrategy.STANDARD.getDesignatedPlayerOrder(), it.order)
+            if(extraHitterSize < 1) {
+                Assert.assertEquals(200, it.order)
+            }
+            else
+                Assert.assertEquals(1, it.order)
+            Assert.assertEquals(9, it.playerId)
         })
-        verify(lineupDao, never()).updatePlayerFieldPosition(any())
     }
 
     @Test
-    fun shouldInsertPlayerWithNextAvailableOrder_BecauseIs_Pitcher_MODE_ENABLED_SOFTBALL_positionEmpty() {
-        val fieldPosition = FieldPosition.PITCHER
-        val teamType = TeamType.SOFTBALL.id
-        val mode = MODE_ENABLED
-        val request = SavePlayerFieldPosition.RequestValues(
-                lineupID = 1,
-                player = newPlayer,
-                position = fieldPosition,
-                players = players,
-                teamType = teamType,
-                lineupMode = mode,
-                strategy = strategy,
-                batterSize = batterSize,
-                extraBatterSize = extraHitterSize
-        )
+    fun shouldInsertSubstituteWhenOrderAvailableAndExtraHitterFilled() {
+        players.removeAt(players.size - 1)
+        for(i in (batterSize+1)..(batterSize+extraHitterSize+1)) {
+            players.add(PlayerWithPosition("t${i}", i, i.toLong(), 1L, null,
+                    FieldPosition.SUBSTITUTE.getPosition(), 0f, 0f, PlayerFieldPosition.FLAG_NONE, i,
+                    i.toLong(), i.toLong(), 1L, i))
+        }
 
-        players.removeIf { it.position == FieldPosition.PITCHER.id }
-
-        savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
-        verify(lineupDao).insertPlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(1, it.order)
-        })
-        verify(lineupDao, never()).updatePlayerFieldPosition(any())
-    }
-
-    @Test
-    fun shouldInsertPlayerWithSortOrder_10_BecauseIs_Pitcher_MODE_ENABLED_BASEBALL_positionNotEmpty() {
-        val fieldPosition = FieldPosition.PITCHER
-        val teamType = TeamType.BASEBALL.id
-        val mode = MODE_ENABLED
-        val request = SavePlayerFieldPosition.RequestValues(
-                lineupID = 1,
-                player = newPlayer,
-                position = fieldPosition,
-                players = players,
-                teamType = teamType,
-                lineupMode = mode,
-                strategy = strategy,
-                batterSize = batterSize,
-                extraBatterSize = extraHitterSize
-        )
-
-        savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
-        verify(lineupDao).updatePlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(TeamStrategy.STANDARD.getDesignatedPlayerOrder(), it.order)
-        })
-        verify(lineupDao, never()).insertPlayerFieldPosition(any())
-    }
-
-    @Test
-    fun shouldInsertPlayerWithNextAvailableOrder_BecauseIs_Pitcher_MODE_ENABLED_SOFTBALL_positionNotEmpty() {
-        val fieldPosition = FieldPosition.PITCHER
-        val teamType = TeamType.SOFTBALL.id
-        val mode = MODE_ENABLED
-        val request = SavePlayerFieldPosition.RequestValues(
-                lineupID = 1,
-                player = newPlayer,
-                position = fieldPosition,
-                players = players,
-                teamType = teamType,
-                lineupMode = mode,
-                strategy = strategy,
-                batterSize = batterSize,
-                extraBatterSize = extraHitterSize
-        )
-
-        savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
-        verify(lineupDao).updatePlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(1, it.order)
-        })
-        verify(lineupDao, never()).insertPlayerFieldPosition(any())
-    }
-
-    @Test
-    fun shouldInsertPitcherWithSortOrder_1_Because_MODE_DISABLED() {
-        val fieldPosition = FieldPosition.PITCHER
-        val teamType = TeamType.BASEBALL.id
+        val fieldPosition = FieldPosition.SUBSTITUTE
         val mode = MODE_DISABLED
+
         val request = SavePlayerFieldPosition.RequestValues(
                 lineupID = 1,
                 player = newPlayer,
                 position = fieldPosition,
                 players = players,
-                teamType = teamType,
+                teamType = teamType.id,
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
                 extraBatterSize = extraHitterSize
         )
 
-        players.removeIf { it.position == FieldPosition.PITCHER.id }
-
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
         observer.await()
         observer.assertComplete()
-
-        verify(lineupDao).insertPlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(1, it.order)
-        })
         verify(lineupDao, never()).updatePlayerFieldPosition(any())
+        verify(lineupDao).insertPlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
+            Assert.assertEquals(200, it.order)
+            Assert.assertEquals(9, it.playerId)
+        })
     }
 
     @Test
-    fun shouldInsertPlayerWithSortOrder_3_BecauseIs_Player_MODE_DISABLED() {
-        val fieldPosition = FieldPosition.SECOND_BASE
-        val teamType = TeamType.BASEBALL.id
+    fun shouldInsertSubstituteWhenBattersCompleteAndExtraHitterAvailable() {
+        for(i in 10..10) {
+            players.add(PlayerWithPosition("t${i}", i, i.toLong(), 1L, null,
+                    FieldPosition.SUBSTITUTE.getPosition(), 0f, 0f, PlayerFieldPosition.FLAG_NONE, i,
+                    i.toLong(), i.toLong(), 1L, i))
+        }
+
+        val fieldPosition = FieldPosition.SUBSTITUTE
         val mode = MODE_DISABLED
+
         val request = SavePlayerFieldPosition.RequestValues(
                 lineupID = 1,
                 player = newPlayer,
                 position = fieldPosition,
                 players = players,
-                teamType = teamType,
+                teamType = teamType.id,
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
                 extraBatterSize = extraHitterSize
         )
 
-        players.add(PlayerWithPosition("test", 7, 7, 1, null,
-                FieldPosition.THIRD_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,1, 7, 7, 1, 16))
-
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
         observer.await()
         observer.assertComplete()
-
-        verify(lineupDao).insertPlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(3, it.order)
-        })
         verify(lineupDao, never()).updatePlayerFieldPosition(any())
-    }
-
-    @Test
-    fun shouldKeepOrderOfOtherPlayer() {
-        val fieldPosition = FieldPosition.CENTER_FIELD
-        val teamType = TeamType.BASEBALL.id
-        val mode = MODE_DISABLED
-        val request = SavePlayerFieldPosition.RequestValues(
-                lineupID = 1,
-                player = newPlayer,
-                position = fieldPosition,
-                players = players,
-                teamType = teamType,
-                lineupMode = mode,
-                strategy = strategy,
-                batterSize = batterSize,
-                extraBatterSize = extraHitterSize
-        )
-
-        savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
-        verify(lineupDao).updatePlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(4, it.order)
-        })
-    }
-
-    //// FLAGS /////
-
-    @Test
-    fun shouldAdd_FlagFlex_BecauseIs_Pitcher_MODE_ENABLED_BASEBALL_positionEmpty() {
-        val fieldPosition = FieldPosition.PITCHER
-        val teamType = TeamType.BASEBALL.id
-        val mode = MODE_ENABLED
-        val request = SavePlayerFieldPosition.RequestValues(
-                lineupID = 1,
-                player = newPlayer,
-                position = fieldPosition,
-                players = players,
-                teamType = teamType,
-                lineupMode = mode,
-                strategy = strategy,
-                batterSize = batterSize,
-                extraBatterSize = extraHitterSize
-        )
-
-        players.removeIf { it.position == FieldPosition.PITCHER.id }
-
-        savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
         verify(lineupDao).insertPlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(PlayerFieldPosition.FLAG_FLEX, it.flags)
+            if(extraHitterSize < 1) {
+                Assert.assertEquals(200, it.order)
+            }
+            else {
+                Assert.assertEquals(11, it.order)
+            }
+            Assert.assertEquals(9, it.playerId)
         })
     }
 
     @Test
-    fun shouldAdd_FlagNone_BecauseIs_Pitcher_MODE_ENABLED_SOFTBALL_positionEmpty() {
+    fun shouldInsertPitcherIntoBaseballStrategyAndLineupModeEnabled() {
+        players.removeAt(0)
         val fieldPosition = FieldPosition.PITCHER
-        val teamType = TeamType.SOFTBALL.id
         val mode = MODE_ENABLED
+
         val request = SavePlayerFieldPosition.RequestValues(
                 lineupID = 1,
                 player = newPlayer,
                 position = fieldPosition,
                 players = players,
-                teamType = teamType,
+                teamType = TeamType.BASEBALL.id,
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
                 extraBatterSize = extraHitterSize
         )
 
-        players.removeIf { it.position == FieldPosition.PITCHER.id }
-
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
         observer.await()
         observer.assertComplete()
-
+        verify(lineupDao, never()).updatePlayerFieldPosition(any())
         verify(lineupDao).insertPlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(PlayerFieldPosition.FLAG_NONE, it.flags)
+            Assert.assertEquals(strategy.getDesignatedPlayerOrder(), it.order)
+            Assert.assertEquals(9, it.playerId)
         })
     }
 
     @Test
-    fun shouldAdd_FlagFlex_BecauseIs_Pitcher_MODE_ENABLED_BASEBALL_positionNotEmpty() {
-        val fieldPosition = FieldPosition.PITCHER
-        val teamType = TeamType.BASEBALL.id
-        val mode = MODE_ENABLED
-        val request = SavePlayerFieldPosition.RequestValues(
-                lineupID = 1,
-                player = newPlayer,
-                position = fieldPosition,
-                players = players,
-                teamType = teamType,
-                lineupMode = mode,
-                strategy = strategy,
-                batterSize = batterSize,
-                extraBatterSize = extraHitterSize
-        )
-
-        savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
-        verify(lineupDao).updatePlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(PlayerFieldPosition.FLAG_FLEX, it.flags)
-        })
-    }
-
-    @Test
-    fun shouldAdd_FlagFlex_BecauseIs_Pitcher_MODE_ENABLED_SOFTBALL_positionNotEmpty() {
-        val fieldPosition = FieldPosition.PITCHER
-        val teamType = TeamType.SOFTBALL.id
-        val mode = MODE_ENABLED
-        val request = SavePlayerFieldPosition.RequestValues(
-                lineupID = 1,
-                player = newPlayer,
-                position = fieldPosition,
-                players = players,
-                teamType = teamType,
-                lineupMode = mode,
-                strategy = strategy,
-                batterSize = batterSize,
-                extraBatterSize = extraHitterSize
-        )
-
-        savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
-        verify(lineupDao).updatePlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(PlayerFieldPosition.FLAG_NONE, it.flags)
-        })
-    }
-
-    @Test
-    fun shouldAdd_FlagNone_BecauseIs_Pitcher_MODE_DISABLED() {
-        val fieldPosition = FieldPosition.PITCHER
-        val teamType = TeamType.BASEBALL.id
+    fun shouldUpdatePlayerIfPositionAlreadyExists() {
+        val fieldPosition = FieldPosition.SHORT_STOP
         val mode = MODE_DISABLED
+
         val request = SavePlayerFieldPosition.RequestValues(
                 lineupID = 1,
-                player = newPlayer,
+                player = Player(42L, 1L, "test", 42, 42L, null, 0),
                 position = fieldPosition,
                 players = players,
-                teamType = teamType,
+                teamType = teamType.id,
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
@@ -480,42 +342,10 @@ internal class SavePlayerFieldPositionTests {
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
         observer.await()
         observer.assertComplete()
-
-        verify(lineupDao).updatePlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(PlayerFieldPosition.FLAG_NONE, it.flags)
-        })
-    }
-
-    //// POSITION /////
-
-    @Test
-    fun shouldUpdatePositionWithNewPlayerId() {
-        val fieldPosition = FieldPosition.FIRST_BASE
-        val teamType = TeamType.BASEBALL.id
-        val strategy = TeamStrategy.STANDARD
-
-        val request = SavePlayerFieldPosition.RequestValues(
-                lineupID = 1,
-                player = newPlayer,
-                position = fieldPosition,
-                players = players,
-                teamType = teamType,
-                lineupMode = MODE_DISABLED,
-                strategy = strategy,
-                batterSize = batterSize,
-                extraBatterSize = extraHitterSize
-        )
-
-        savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
         verify(lineupDao, never()).insertPlayerFieldPosition(any())
         verify(lineupDao).updatePlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(newPlayer.id, it.playerId)
-            var coordinate = FieldPosition.getPositionCoordinates(FieldPosition.FIRST_BASE, strategy)
-            Assert.assertEquals(coordinate.x, it.x)
-            Assert.assertEquals(coordinate.y, it.y)
+            Assert.assertEquals( batterSize - 5, it.order)
+            Assert.assertEquals(42, it.playerId)
         })
     }
 }
