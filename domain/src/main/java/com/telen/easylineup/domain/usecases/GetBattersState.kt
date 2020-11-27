@@ -14,73 +14,82 @@ internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBatter
         val maxBatterSize = requestValues.batterSize + requestValues.extraHitterSize
 
         var position = 0
-        requestValues.players.forEach { player ->
-            val playerFlag = player.flags
-            val playerID = player.playerID
-            val fieldPosition = FieldPosition.getFieldPositionById(player.position)
-            val isSubstitute = FieldPosition.isSubstitute(player.position)
-            val isDefensePlayer = FieldPosition.isDefensePlayer(player.position)
+        var subsFoundNumber = 0
+        requestValues.players
+                .filter { it.order > 0 }
+                .sortedBy { it.order }
+                .forEach { player ->
+                    val playerFlag = player.flags
+                    val playerID = player.playerID
+                    val fieldPosition = FieldPosition.getFieldPositionById(player.position)
+                    val isSubstitute = FieldPosition.isSubstitute(player.position)
+                    val isDefensePlayer = FieldPosition.isDefensePlayer(player.position)
 
-            var canMove = false
-            var canShowDescription = false
-            var canShowIndex = false
-            var canShowPosition = isDefensePlayer
+                    var canMove = false
+                    var canShowDescription = false
+                    var canShowIndex = false
+                    var canShowPosition = isDefensePlayer
 
-            val order = player.order
-            val playerName = player.playerName.trim()
-            var playerPositionDesc = ""
-            val shirtNumber = player.shirtNumber.toString()
+                    val order = player.order
+                    val playerName = player.playerName.trim()
+                    var playerPositionDesc = ""
+                    val shirtNumber = player.shirtNumber.toString()
 
-            var isDP = false
-            var isFlex = false
+                    var isDP = false
+                    var isFlex = false
 
-            fieldPosition?.run {
-                when (this) {
-                    FieldPosition.SUBSTITUTE -> {
-                        //Log.d("", "id=${position} position=${fieldPosition} maxSize=${maxBatterSize}")
-                        if (position < maxBatterSize) {
+                    fieldPosition?.run {
+                        when (this) {
+                            FieldPosition.SUBSTITUTE -> {
+                                subsFoundNumber++
+                                //Log.d("", "id=${position} position=${fieldPosition} maxSize=${maxBatterSize}")
+                                if (position < maxBatterSize) {
+                                    canShowIndex = true
+                                }
+                            }
+                            FieldPosition.DP_DH -> {
+                                isDP = requestValues.lineupMode == MODE_ENABLED
+                            }
+                            else -> {
+                                isFlex = requestValues.lineupMode == MODE_ENABLED && (player.flags and PlayerFieldPosition.FLAG_FLEX > 0)
+                                canShowIndex = true
+                            }
+                        }
+
+                        if (requestValues.isDebug) {
                             canShowIndex = true
                         }
+
+                        playerPositionDesc = positionDescriptions[this@run.ordinal]
                     }
-                    FieldPosition.DP_DH -> {
-                        isDP = requestValues.lineupMode == MODE_ENABLED
+
+                    if (!requestValues.isEditable) {
+                        canShowDescription = true
+                    } else if (position < maxBatterSize) {
+                        if(!isFlex)
+                            canMove = true
+                        if(isDP) {
+                            canShowDescription = true
+                        }
+                        // In case of substitues are added before defense ones, let's prevent non authorized ones to be moved
+                        if(subsFoundNumber > requestValues.extraHitterSize) {
+                            canMove = false
+                        }
                     }
-                    else -> {
-                        isFlex = requestValues.lineupMode == MODE_ENABLED && (player.flags and PlayerFieldPosition.FLAG_FLEX > 0)
-                        canShowIndex = true
+                    else {
+                        canShowDescription = true
                     }
+
+                    if(isSubstitute) {
+                        canShowPosition = false
+                        canShowDescription = true
+                    }
+
+                    position++
+
+                    result.add(BatterState(playerID, playerFlag, order, playerName, shirtNumber, fieldPosition ?: FieldPosition.SUBSTITUTE,
+                            playerPositionDesc, canShowPosition, canMove, canShowDescription, canShowIndex, player))
                 }
-
-                if (requestValues.isDebug) {
-                    canShowIndex = true
-                }
-
-                playerPositionDesc = positionDescriptions[this@run.ordinal]
-            }
-
-            if (!requestValues.isEditable) {
-                canShowDescription = true
-            } else if (position < maxBatterSize) {
-                if(!isFlex)
-                    canMove = true
-                if(isDP) {
-                    canShowDescription = true
-                }
-            }
-            else {
-                canShowDescription = true
-            }
-
-            if(isSubstitute) {
-                canShowPosition = false
-                canShowDescription = true
-            }
-
-            position++
-
-            result.add(BatterState(playerID, playerFlag, order, playerName, shirtNumber, fieldPosition ?: FieldPosition.SUBSTITUTE,
-                    playerPositionDesc, canShowPosition, canMove, canShowDescription, canShowIndex, player))
-        }
 
         return Single.just(ResponseValue(result))
     }

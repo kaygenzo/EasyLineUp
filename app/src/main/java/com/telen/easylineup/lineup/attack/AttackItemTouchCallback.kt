@@ -2,6 +2,7 @@ package com.telen.easylineup.lineup.attack
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import timber.log.Timber
 
@@ -9,7 +10,14 @@ class AttackItemTouchCallback(val adapter: BattingOrderAdapter, var batterSize: 
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
         val dragFlags = when(viewHolder.adapterPosition) {
             in 0 until (batterSize + extraHitterSize) -> {
-                if(adapter.players[viewHolder.adapterPosition].playerFlag and PlayerFieldPosition.FLAG_FLEX == 0) {
+                val isSubstitute = adapter.players[viewHolder.adapterPosition].playerPosition == FieldPosition.SUBSTITUTE
+                var subsBeforeCount =  0
+                adapter.players.forEachIndexed { index, batterState ->
+                    if(isSubstitute && index < viewHolder.adapterPosition)
+                        subsBeforeCount++
+                }
+                val isFlex = adapter.players[viewHolder.adapterPosition].playerFlag and PlayerFieldPosition.FLAG_FLEX != 0
+                if(!isFlex && (!isSubstitute || subsBeforeCount < extraHitterSize)) {
                     ItemTouchHelper.UP or ItemTouchHelper.DOWN
                 }
                 else 0

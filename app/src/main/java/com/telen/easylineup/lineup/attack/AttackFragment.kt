@@ -109,7 +109,7 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
         viewModel.lineupID?.let {
 
             viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer { items ->
-                viewModel.getBatterStates(items, batterSize, extraHitterSize)
+                viewModel.getBatterStates(items)
             })
 
             viewModel.registerLineupChange().observe(viewLifecycleOwner, Observer { lineup ->

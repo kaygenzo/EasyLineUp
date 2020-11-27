@@ -96,7 +96,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun onDeletePosition(player: Player, position: FieldPosition) {
-        val disposable = domain.deletePlayerPosition(player, position, _listPlayersWithPosition, lineupMode)
+        val disposable = domain.deletePlayerPosition(player, position, _listPlayersWithPosition, lineupMode, strategy.extraHitterSize)
                 .subscribe({
                     eventHandler.onNext(DeletePlayerPositionSuccess)
                 }, {
@@ -293,10 +293,9 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         return domain.linkDpAndFlex(dp,flex, lineupID, _listPlayersWithPosition, strategy)
     }
 
-    fun getBatterStates(players: List<PlayerWithPosition>, batterSize: Int, extraHitterSize: Int) {
-        val playersInput = players.filter { it.order > 0 }.sortedBy { it.order }
-        val disposable = domain.getBatterStates(players = playersInput, teamType = teamType, batterSize = batterSize,
-                extraHitterSize = extraHitterSize, lineupMode = lineupMode, isDebug = BuildConfig.DEBUG, isEditable = editable)
+    fun getBatterStates(players: List<PlayerWithPosition>) {
+        val disposable = domain.getBatterStates(players = players, teamType = teamType, batterSize = strategy.batterSize,
+                extraHitterSize = strategy.extraHitterSize, lineupMode = lineupMode, isDebug = BuildConfig.DEBUG, isEditable = editable)
                 .subscribe({
                     eventHandler.onNext(NewBatterOrderAvailable(it))
                 }, {

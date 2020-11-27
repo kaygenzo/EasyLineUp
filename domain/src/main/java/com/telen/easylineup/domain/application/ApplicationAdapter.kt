@@ -374,8 +374,8 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                 }
     }
 
-    override fun deletePlayerPosition(player: Player, position: FieldPosition, list: List<PlayerWithPosition>, lineupMode: Int): Completable {
-        val requestValues = DeletePlayerFieldPosition.RequestValues(list, player, position, lineupMode)
+    override fun deletePlayerPosition(player: Player, position: FieldPosition, list: List<PlayerWithPosition>, lineupMode: Int, extraHitterSize: Int): Completable {
+        val requestValues = DeletePlayerFieldPosition.RequestValues(list, player, position, lineupMode, extraHitterSize)
         return UseCaseHandler.execute(deletePlayerFieldPositionUseCase, requestValues).ignoreElement()
                 .doOnError {
                     _errors.onNext(DomainErrors.DELETE_PLAYER_FIELD_POSITION_FAILED)
