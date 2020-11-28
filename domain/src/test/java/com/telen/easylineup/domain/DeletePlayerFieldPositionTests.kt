@@ -15,133 +15,203 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
+import java.lang.IllegalArgumentException
+
+////////////// DEFAULT HITTER SIZE //////////////
 
 @RunWith(MockitoJUnitRunner::class)
-internal class DeletePlayerFieldPositionTests {
+internal class DeletePlayerFieldPositionBaseballStandardTests: DeletePlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.STANDARD,
+        TeamStrategy.STANDARD.batterSize, TeamStrategy.STANDARD.extraHitterSize)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class DeletePlayerFieldPositionSoftballStandardTests: DeletePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
+        TeamStrategy.STANDARD.batterSize, TeamStrategy.STANDARD.extraHitterSize)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class DeletePlayerFieldPositionSoftballSlowpitchTests: DeletePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
+        TeamStrategy.SLOWPITCH.batterSize, TeamStrategy.SLOWPITCH.extraHitterSize)
+
+////////////// CUSTOM HITTER SIZE //////////////
+
+@RunWith(MockitoJUnitRunner::class)
+internal class DeletePlayerFieldPositionBaseballCustomStandardTests: DeletePlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.STANDARD,
+        TeamStrategy.STANDARD.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class DeletePlayerFieldPositionSoftballCustomStandardTests: DeletePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
+        TeamStrategy.STANDARD.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class DeletePlayerFieldPositionSoftballCustomSlowpitchTests: DeletePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
+        TeamStrategy.SLOWPITCH.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner::class)
+internal abstract class DeletePlayerFieldPositionTests(private val teamType: TeamType, private val strategy: TeamStrategy, private val batterSize: Int, private val extraHitterSize: Int) {
     lateinit var deletePlayerFieldPosition: DeletePlayerFieldPosition
     @Mock lateinit var lineupDao: PlayerFieldPositionRepository
     lateinit var players: MutableList<PlayerWithPosition>
+    val lineupMode = MODE_ENABLED
+    val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
         deletePlayerFieldPosition = DeletePlayerFieldPosition(lineupDao)
         players = mutableListOf()
-        players.add(PlayerWithPosition("toto", 1, 1, 1, null,
-                FieldPosition.PITCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_FLEX,0, 1, 1, 1, 1))
-        players.add(PlayerWithPosition("tata", 2, 2, 1, null,
-                FieldPosition.CATCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 0, 2, 1, 2))
-        players.add(PlayerWithPosition("titi", 3, 3, 1, null,
-                FieldPosition.CENTER_FIELD.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,9, 3, 3, 1, 4))
-        players.add(PlayerWithPosition("tutu", 4, 4, 1, null,
-                FieldPosition.FIRST_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,10, 0, 4, 1, 8))
-        players.add(PlayerWithPosition("tete", 5, 5, 1, null,
-                FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
-        players.add(PlayerWithPosition("toutou", 6, 6, 1, null,
-                FieldPosition.DP_DH.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, 8, 6, 6, 1, 16))
+        var i = 1
+        TeamType.getValidPositionsForTeam(teamType, strategy).forEach {
+            players.add(createPlayerWithPosition(i, PlayerFieldPosition.FLAG_NONE, it))
+            i++
+        }
 
         Mockito.`when`(lineupDao.deletePositions(any())).thenReturn(Completable.complete())
+        Mockito.`when`(lineupDao.updatePlayerFieldPositions(any())).thenReturn(Completable.complete())
+    }
+
+    private fun createPlayerWithPosition(index: Int, flag: Int, position: FieldPosition, order: Int = index): PlayerWithPosition {
+        return PlayerWithPosition("t${index}", index, index.toLong(), 1L, null,
+                position.id, 0f, 0f, flag, order,
+                index.toLong(), index.toLong(), 1L, index)
     }
 
     @Test
     fun shouldTriggerAnExceptionIfListIsEmpty() {
-        val lineupMode = MODE_ENABLED
-        val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
         val player = Player(1, 1,"", 1, 1L, null, 1)
-        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(mutableListOf(), player, FieldPosition.PITCHER, lineupMode))
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(mutableListOf(), player, FieldPosition.PITCHER, lineupMode, extraHitterSize))
                 .subscribe(observer)
         observer.await()
         observer.assertError(NoSuchElementException::class.java)
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfNoMatchingPlayerAndPosition() {
-        val lineupMode = MODE_ENABLED
-        val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
-        val player = Player(7, 1,"", 7, 7L, null, 1)
-        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.SECOND_BASE, lineupMode))
-                .subscribe(observer)
-        observer.await()
-        observer.assertError(Exception::class.java)
-    }
-
-    @Test
     fun shouldTriggerAnErrorIfAnErrorOccurredDuringDeletion() {
-        val lineupMode = MODE_ENABLED
         Mockito.`when`(lineupDao.deletePositions(any())).thenReturn(Completable.error(Exception()))
-        val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
         val player = Player(1, 1,"", 1, 1L, null, 1)
-        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.PITCHER, lineupMode))
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.PITCHER, lineupMode, extraHitterSize))
                 .subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
     }
 
     @Test
-    fun shouldDeletePlayerFieldPositions_dp_and_flex_if_flex() {
-        val lineupMode = MODE_ENABLED
-        val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
-        val player = Player(1, 1,"", 1, 1L, null, 1)
-        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.PITCHER, lineupMode))
+    fun shouldTriggerAnErrorIfAnErrorOccurredDuringUpdate() {
+        Mockito.`when`(lineupDao.updatePlayerFieldPositions(any())).thenReturn(Completable.error(IllegalArgumentException()))
+
+        for(i in (batterSize+1)..(batterSize+extraHitterSize+4)) {
+            players.add(createPlayerWithPosition(i, PlayerFieldPosition.FLAG_NONE, FieldPosition.SUBSTITUTE))
+        }
+
+        val player = Player((batterSize+1).toLong(), 1,"", 1, 1L, null, 1)
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.SUBSTITUTE, lineupMode, extraHitterSize))
+                .subscribe(observer)
+        observer.await()
+        observer.assertError(IllegalArgumentException::class.java)
+    }
+
+    @Test
+    fun shouldDeletePlayerFieldPositions_dp_and_flex_if_delete_flex() {
+
+        players[0].position = FieldPosition.DP_DH.id
+        players.add(createPlayerWithPosition(batterSize+1, PlayerFieldPosition.FLAG_FLEX, FieldPosition.PITCHER))
+
+        val player = Player((batterSize+1).toLong(), 1,"", 1, 1L, null, 1)
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.PITCHER, lineupMode, extraHitterSize))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
 
         verify(lineupDao).deletePositions(com.nhaarman.mockitokotlin2.check {
             Assert.assertEquals(1, it[0].id)
-            Assert.assertEquals(6, it[1].id)
+            Assert.assertEquals((batterSize+1).toLong(), it[1].id)
+            Assert.assertEquals(2, it.size)
         })
     }
 
     @Test
-    fun shouldDeletePlayerFieldPositions_dp_and_flex_if_dp() {
-        val lineupMode = MODE_ENABLED
-        val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
-        val player = Player(6, 1,"", 6, 6L, null, 1)
-        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.DP_DH, lineupMode))
+    fun shouldDeletePlayerFieldPositions_dp_and_flex_if_delete_dp() {
+
+        players[0].position = FieldPosition.DP_DH.id
+        players.add(createPlayerWithPosition(batterSize+1, PlayerFieldPosition.FLAG_FLEX, FieldPosition.PITCHER))
+
+        val player = Player(1, 1,"", 6, 6L, null, 1)
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.DP_DH, lineupMode, extraHitterSize))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
 
         verify(lineupDao).deletePositions(com.nhaarman.mockitokotlin2.check {
             Assert.assertEquals(1, it[0].id)
-            Assert.assertEquals(6, it[1].id)
+            Assert.assertEquals((batterSize+1).toLong(), it[1].id)
+            Assert.assertEquals(2, it.size)
         })
     }
 
     @Test
     fun shouldDeletePlayerFieldPosition_one_position_if_not_dp_nor_flex() {
-        val lineupMode = MODE_ENABLED
-        val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
         val player = Player(2, 1,"", 2, 2L, null, 1)
-        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.CATCHER, lineupMode))
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.CATCHER, lineupMode, extraHitterSize))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
 
         verify(lineupDao).deletePositions(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(0, it[0].id)
+            Assert.assertEquals(2, it[0].id)
             Assert.assertEquals(1, it.size)
         })
     }
 
     @Test
     fun shouldDeletePlayerFieldPosition_if_multiple_substitutes_player_not_first() {
-        val lineupMode = MODE_ENABLED
-        val observer = TestObserver<DeletePlayerFieldPosition.ResponseValue>()
 
-        players.add(PlayerWithPosition("poupou", 9, 9, 1, null,
-                FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 9, 9, 1, 16))
+        for(i in (batterSize+1)..(batterSize+extraHitterSize+1)) {
+            players.add(createPlayerWithPosition(i, PlayerFieldPosition.FLAG_NONE, FieldPosition.SUBSTITUTE))
+        }
 
-        val player = Player(9, 1,"", 9, 9L, null, 1)
-        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.SUBSTITUTE, lineupMode))
+        val player = Player((batterSize+extraHitterSize+1).toLong(), 1,"", 9, 9L, null, 1)
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.SUBSTITUTE, lineupMode, extraHitterSize))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
 
         verify(lineupDao).deletePositions(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(9, it[0].id)
+            Assert.assertEquals((batterSize+extraHitterSize+1).toLong(), it[0].id)
             Assert.assertEquals(1, it.size)
         })
+    }
+
+    @Test
+    fun shouldShiftSubstitutes() {
+        //added 2 substitutes as batters
+        for(i in (batterSize-1)..batterSize) {
+            players[i-1].position = FieldPosition.SUBSTITUTE.id
+        }
+        //added 2 substitutes as non batters
+        for(i in (batterSize+1)..(batterSize+extraHitterSize+1)) {
+            players.add(createPlayerWithPosition(i, PlayerFieldPosition.FLAG_NONE, FieldPosition.SUBSTITUTE, Constants.SUBSTITUTE_ORDER_VALUE))
+        }
+
+        val player = Player((batterSize-1).toLong(), 1,"", 9, 9L, null, 1)
+        deletePlayerFieldPosition.executeUseCase(DeletePlayerFieldPosition.RequestValues(players, player, FieldPosition.SUBSTITUTE, lineupMode, extraHitterSize))
+                .subscribe(observer)
+        observer.await()
+        observer.assertComplete()
+
+        verify(lineupDao).deletePositions(com.nhaarman.mockitokotlin2.check {
+            Assert.assertEquals((batterSize-1).toLong(), it[0].id)
+            Assert.assertEquals(1, it.size)
+        })
+
+        if(extraHitterSize > 0) {
+            verify(lineupDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
+                Assert.assertEquals(batterSize - 1, it[0].order)
+                Assert.assertEquals((batterSize + 1).toLong(), it[0].id)
+                Assert.assertEquals(1, it.size)
+            })
+        }
+        else {
+            verify(lineupDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
+                Assert.assertEquals(true, it.isEmpty())
+            })
+        }
     }
 }

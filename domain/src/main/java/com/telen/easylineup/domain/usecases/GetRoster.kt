@@ -48,7 +48,7 @@ internal class GetRoster(private val dao: PlayerRepository, private val lineupDa
                 try {
                     it.toLong()
                 } catch (e: NumberFormatException) {
-                    e.printStackTrace()
+                    //e.printStackTrace()
                     0L
                 }
             }.filter { it > 0L } // in case of exception occurred

@@ -70,7 +70,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
                     licenseNumber = i.toLong(),
                     teamId = 1,
                     image = null,
-                    position = i,
+                    position = it.id,
                     x = 0f, y = 0f,
                     flags = PlayerFieldPosition.FLAG_NONE,
                     order = batterSize - i + 1,
@@ -227,7 +227,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
         players.removeAt(players.size - 1)
         for(i in (batterSize+1)..(batterSize+extraHitterSize+1)) {
             players.add(PlayerWithPosition("t${i}", i, i.toLong(), 1L, null,
-                    FieldPosition.SUBSTITUTE.getPosition(), 0f, 0f, PlayerFieldPosition.FLAG_NONE, i,
+                    FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, i,
                     i.toLong(), i.toLong(), 1L, i))
         }
 
@@ -260,7 +260,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
     fun shouldInsertSubstituteWhenBattersCompleteAndExtraHitterAvailable() {
         for(i in 10..10) {
             players.add(PlayerWithPosition("t${i}", i, i.toLong(), 1L, null,
-                    FieldPosition.SUBSTITUTE.getPosition(), 0f, 0f, PlayerFieldPosition.FLAG_NONE, i,
+                    FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, i,
                     i.toLong(), i.toLong(), 1L, i))
         }
 

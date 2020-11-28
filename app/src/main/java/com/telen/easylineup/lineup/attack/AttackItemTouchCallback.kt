@@ -2,29 +2,13 @@ package com.telen.easylineup.lineup.attack
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.telen.easylineup.domain.model.FieldPosition
-import com.telen.easylineup.domain.model.PlayerFieldPosition
 import timber.log.Timber
 
-class AttackItemTouchCallback(val adapter: BattingOrderAdapter, var batterSize: Int, var extraHitterSize: Int = 0): ItemTouchHelper.Callback() {
+class AttackItemTouchCallback(val adapter: BattingOrderAdapter): ItemTouchHelper.Callback() {
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-        val dragFlags = when(viewHolder.adapterPosition) {
-            in 0 until (batterSize + extraHitterSize) -> {
-                val isSubstitute = adapter.players[viewHolder.adapterPosition].playerPosition == FieldPosition.SUBSTITUTE
-                var subsBeforeCount =  0
-                adapter.players.forEachIndexed { index, batterState ->
-                    if(isSubstitute && index < viewHolder.adapterPosition)
-                        subsBeforeCount++
-                }
-                val isFlex = adapter.players[viewHolder.adapterPosition].playerFlag and PlayerFieldPosition.FLAG_FLEX != 0
-                if(!isFlex && (!isSubstitute || subsBeforeCount < extraHitterSize)) {
-                    ItemTouchHelper.UP or ItemTouchHelper.DOWN
-                }
-                else 0
-            }
-            else -> 0
-        }
-        Timber.d("getMovementFlags=$dragFlags position=${viewHolder.adapterPosition} sizeMax=${batterSize + extraHitterSize -1}")
+        val batterState = adapter.players[viewHolder.adapterPosition]
+        val dragFlags = if(batterState.canMove) ItemTouchHelper.UP or ItemTouchHelper.DOWN else 0
+        Timber.d("getMovementFlags=$dragFlags position=${viewHolder.adapterPosition}")
         return makeMovementFlags(dragFlags, 0)
     }
 

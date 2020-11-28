@@ -66,10 +66,10 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
         val lineupMode = viewModel.lineupMode
 
         lineupTypeface = LineupTypeface.getByValue(lineupValue)
-        playerAdapter = BattingOrderAdapter(adapterDataList, this, TeamType.BASEBALL.id, lineupTypeface, batterSize, extraHitterSize, lineupMode).apply {
+        playerAdapter = BattingOrderAdapter(adapterDataList, this, TeamType.BASEBALL.id, lineupTypeface, lineupMode).apply {
             setHasStableIds(true)
         }
-        itemTouchedCallback = AttackItemTouchCallback(playerAdapter, batterSize, extraHitterSize)
+        itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
         itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
         playerAdapter.itemTouchHelper = itemTouchedHelper
     }

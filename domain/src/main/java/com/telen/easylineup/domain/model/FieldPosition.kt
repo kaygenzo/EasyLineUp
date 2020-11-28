@@ -16,7 +16,7 @@ enum class FieldPosition(val id: Int, val mask: Int, private val position: Int) 
     LEFT_FIELD(7,   0x40, 7),
     CENTER_FIELD(8, 0x80, 8),
     RIGHT_FIELD(9,  0x0100, 9),
-    DP_DH(10,  0x0200, 10),
+    DP_DH(10,  0x0200, 255),
 
     //Slowpitch
     SLOWPITCH_LF(11, LEFT_FIELD.mask, 7),
@@ -24,7 +24,7 @@ enum class FieldPosition(val id: Int, val mask: Int, private val position: Int) 
     SLOWPITCH_RCF(13, 0x1000, 9),
     SLOWPITCH_RF(14, RIGHT_FIELD.mask, 10);
 
-    fun getPosition(): Int {
+    fun getPositionOnField(): Int {
         return position
     }
 

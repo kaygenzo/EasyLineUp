@@ -30,8 +30,6 @@ class BattingOrderAdapter(val players: MutableList<BatterState>,
                           private val dataListener: OnDataChangedListener?,
                           var teamType: Int,
                           private val lineupTypeface: LineupTypeface,
-                          val batterSize: Int,
-                          val extraBatterSize: Int,
                           var lineupMode: Int = MODE_DISABLED,
                           var itemTouchHelper: ItemTouchHelper? = null
 ): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
@@ -43,62 +41,38 @@ class BattingOrderAdapter(val players: MutableList<BatterState>,
         dataListener?.onOrderChanged()
     }
 
-    private fun canBeBatter(position: Int, id: Int, flags: Int, lineupMode: Int, batterSize: Int, extraBatterSize: Int): Boolean {
-        val maxPosition = batterSize + extraBatterSize
-        val result = position < maxPosition && if(lineupMode == MODE_ENABLED) {
-            (flags and PlayerFieldPosition.FLAG_FLEX == 0)
-        }
-        else {
-            true
-        }
-        Timber.d("result=$result for id=${FieldPosition.getFieldPositionById(id)} flags=$flags lineupMode=$lineupMode maxPosition=$maxPosition")
-        return result
-    }
-
     override fun onMoved(fromPosition: Int, toPosition: Int) {
-//        //TODO move into domain
-//        val disposable = Completable.create { emitter ->
-            val fromBatter = players[fromPosition]
-            val toBatter = players[toPosition]
+        Timber.d("Adapter: Try to move from position $fromPosition to position $toPosition from a list of ${players.size} elements")
+        val fromBatter = players[fromPosition]
+        val toBatter = players[toPosition]
 
-            val canMoveFrom = canBeBatter(fromPosition, fromBatter.playerPosition.getPosition(), fromBatter.playerFlag, lineupMode, batterSize, extraBatterSize)
-            val canMoveTo = canBeBatter(toPosition, toBatter.playerPosition.getPosition(), toBatter.playerFlag, lineupMode, batterSize, extraBatterSize)
+        Timber.d("Adapter: canMove from=${fromBatter.canMove} canMoveTo=${toBatter.canMove}")
+        if(fromBatter.canMove && toBatter.canMove) {
 
-            if(canMoveFrom && canMoveTo) {
-                val fromOrder = fromBatter.playerOrder
-                val toOrder = toBatter.playerOrder
-//            Timber.d("""Before: (${fromBatter.playerName}, ${fromBatter.origin.order}) (${toBatter.playerName}, ${toBatter.origin.order})""")
-                fromBatter.origin.order = toOrder
-                toBatter.origin.order = fromOrder
-                fromBatter.playerOrder = toOrder
-                toBatter.playerOrder = fromOrder
-//            Timber.d("""After: (${fromBatter.playerName}, ${fromBatter.origin.order}) (${toBatter.playerName}, ${toBatter.origin.order})""")
-                //players.sortBy { it.origin.order }
+            //we simply just swap orders
 
-                if (fromPosition < toPosition) {
-                    for (i in fromPosition until toPosition) {
-                        Collections.swap(players, i, i + 1)
-                    }
-                } else {
-                    for (i in fromPosition downTo toPosition + 1) {
-                        Collections.swap(players, i, i - 1)
-                    }
+            val fromOrder = fromBatter.playerOrder
+            val toOrder = toBatter.playerOrder
+
+            fromBatter.origin.order = toOrder
+            toBatter.origin.order = fromOrder
+            fromBatter.playerOrder = toOrder
+            toBatter.playerOrder = fromOrder
+
+            if (fromPosition < toPosition) {
+                for (i in fromPosition until toPosition) {
+                    Collections.swap(players, i, i + 1)
                 }
-//                emitter.onComplete()
-                notifyItemChanged(fromPosition)
-                notifyItemMoved(fromPosition, toPosition)
-                notifyItemChanged(fromPosition)
-                notifyItemChanged(toPosition)
+            } else {
+                for (i in fromPosition downTo toPosition + 1) {
+                    Collections.swap(players, i, i - 1)
+                }
             }
-            else {
-//                emitter.onError(UnauthorizedToMove())
-            }
-//        }.observeOn(AndroidSchedulers.mainThread()).subscribe({
-//            notifyItemMoved(fromPosition, toPosition)
-//        }, {
-//            Timber.d("Cannot move these positions")
-//        })
 
+            notifyItemChanged(fromPosition)
+            notifyItemChanged(toPosition)
+            notifyItemMoved(fromPosition, toPosition)
+        }
     }
 
     class BatterViewHolder(view: View): RecyclerView.ViewHolder(view) {
@@ -135,7 +109,7 @@ class BattingOrderAdapter(val players: MutableList<BatterState>,
             playerName.text = batter.playerName.trim()
 
             fieldPosition.setTypeface(lineupTypeface)
-            fieldPosition.text = if(batter.canShowPosition) batter.playerPosition.getPosition().toString() else ""
+            fieldPosition.text = if(batter.canShowPosition) batter.playerPosition.getPositionOnField().toString() else ""
 
             shirtNumber.setTypeface(lineupTypeface)
             shirtNumber.text = batter.playerNumber
