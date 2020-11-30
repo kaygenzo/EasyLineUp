@@ -29,6 +29,7 @@ internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBatter
                     var canShowDescription = false
                     var canShowIndex = false
                     var canShowPosition = isDefensePlayer
+                    var applyBackground = false
 
                     val order = player.order
                     val playerName = player.playerName.trim()
@@ -52,7 +53,9 @@ internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBatter
                             }
                             else -> {
                                 isFlex = requestValues.lineupMode == MODE_ENABLED && (player.flags and PlayerFieldPosition.FLAG_FLEX > 0)
-                                canShowIndex = true
+                                if(isFlex) {
+                                    applyBackground = true
+                                }
                             }
                         }
 
@@ -88,7 +91,7 @@ internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBatter
                     position++
 
                     result.add(BatterState(playerID, playerFlag, order, playerName, shirtNumber, fieldPosition ?: FieldPosition.SUBSTITUTE,
-                            playerPositionDesc, canShowPosition, canMove, canShowDescription, canShowIndex, player))
+                            playerPositionDesc, canShowPosition, canMove, canShowDescription, canShowIndex, player, applyBackground, requestValues.isEditable))
                 }
 
         return Single.just(ResponseValue(result))

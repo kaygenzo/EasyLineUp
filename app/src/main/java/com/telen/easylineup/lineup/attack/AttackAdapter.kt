@@ -5,6 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
@@ -82,6 +84,7 @@ class BattingOrderAdapter(val players: MutableList<BatterState>,
         val order = view.findViewById<TextView>(R.id.order)
         val reorderImage = view.findViewById<ImageView>(R.id.reorderImage)
         val positionDesc = view.findViewById<PlayerPositionFilterView>(R.id.fieldPositionDescription)
+        val itemPlayerAttack = view.findViewById<ConstraintLayout>(R.id.itemPlayerAttack)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BatterViewHolder {
@@ -122,9 +125,11 @@ class BattingOrderAdapter(val players: MutableList<BatterState>,
                 positionDesc.setText(batter.playerPositionDesc)
             }
 
-            order.visibility = if(batter.canShowOrder) View.VISIBLE else View.GONE
+            order.visibility = if(batter.canShowOrder) View.VISIBLE else if(batter.isEditable) View.INVISIBLE else View.GONE
             positionDesc.visibility = if(batter.canShowDescription) View.VISIBLE else View.GONE
-            reorderImage.visibility = if(batter.canMove) View.VISIBLE else View.GONE
+            reorderImage.visibility = if(batter.canMove) View.VISIBLE else if(batter.isEditable) View.INVISIBLE else View.GONE
+            if(batter.applyBackground)
+                itemPlayerAttack.setBackgroundResource(R.color.grey_light)
             reorderImage.setOnTouchListener { view, motionEvent ->
                 itemTouchHelper?.startDrag(this)
                 true

@@ -2,8 +2,8 @@ package com.telen.easylineup.domain.model
 
 data class BatterState(val playerID: Long, val playerFlag: Int, var playerOrder: Int, val playerName: String, val playerNumber: String,
                        val playerPosition: FieldPosition, val playerPositionDesc: String, val canShowPosition: Boolean,
-                       val canMove: Boolean, val canShowDescription: Boolean, val canShowOrder: Boolean, val origin: PlayerWithPosition) {
-
+                       val canMove: Boolean, val canShowDescription: Boolean, val canShowOrder: Boolean, val origin: PlayerWithPosition,
+                       val applyBackground: Boolean, val isEditable: Boolean) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -21,6 +21,9 @@ data class BatterState(val playerID: Long, val playerFlag: Int, var playerOrder:
         if (canMove != other.canMove) return false
         if (canShowDescription != other.canShowDescription) return false
         if (canShowOrder != other.canShowOrder) return false
+        if (origin != other.origin) return false
+        if (applyBackground != other.applyBackground) return false
+        if (isEditable != other.isEditable) return false
 
         return true
     }
@@ -37,6 +40,10 @@ data class BatterState(val playerID: Long, val playerFlag: Int, var playerOrder:
         result = 31 * result + canMove.hashCode()
         result = 31 * result + canShowDescription.hashCode()
         result = 31 * result + canShowOrder.hashCode()
+        result = 31 * result + origin.hashCode()
+        result = 31 * result + applyBackground.hashCode()
+        result = 31 * result + isEditable.hashCode()
         return result
     }
+
 }

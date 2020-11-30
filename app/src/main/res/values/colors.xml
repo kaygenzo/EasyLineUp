@@ -37,6 +37,7 @@
     <color name="tournaments_timeline_color">@color/colorPrimaryVariant</color>
 
     <color name="list_empty_text">#6d6d6d</color>
+    <color name="grey_light">#DCDCDC</color>
     <color name="teams_list_text_primary">#4d4d4d</color>
 
     <color name="blue_grey_80">#ff37474f</color>
