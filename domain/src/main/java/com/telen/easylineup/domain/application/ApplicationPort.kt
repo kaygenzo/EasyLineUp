@@ -57,9 +57,9 @@ interface ApplicationPort {
     /** @deprecated **/ fun insertLineups(lineups: List<Lineup>): Completable
     fun getCompleteRoster(): Single<TeamRosterSummary>
     fun getRoster(lineupID: Long): Single<TeamRosterSummary>
-    fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary, lineupEventTime: Long, strategy: TeamStrategy): Single<Long>
+    fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary, lineupEventTime: Long, strategy: TeamStrategy, extraHittersSize: Int): Single<Long>
     fun deleteLineup(lineupID: Long?): Completable
-    fun updateLineupMode(isEnabled: Boolean, lineupID: Long?, lineupMode: Int, list: List<PlayerWithPosition>): Completable
+    fun updateLineupMode(isEnabled: Boolean, lineupID: Long?, lineupMode: Int, list: List<PlayerWithPosition>, extraHittersSize: Int): Completable
 
     //player field positions
     /** @deprecated **/ fun insertPlayerFieldPositions(playerFieldPositions: List<PlayerFieldPosition>): Completable
@@ -67,9 +67,9 @@ interface ApplicationPort {
                                 lineupMode: Int, strategy: TeamStrategy, batterSize: Int, extraBatterSize: Int): Completable
     fun deletePlayerPosition(player: Player, position: FieldPosition, list: List<PlayerWithPosition>, lineupMode: Int, extraHitterSize: Int): Completable
     fun saveBattingOrder(players: List<PlayerWithPosition>): Completable
-    fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition, list: List<PlayerWithPosition>, lineupMode: Int, strategy: TeamStrategy): Completable
+    fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition, list: List<PlayerWithPosition>, lineupMode: Int, strategy: TeamStrategy, extraHittersSize: Int): Completable
     fun getDpAndFlexFromPlayersInField(list: List<PlayerWithPosition>): Single<DpAndFlexConfiguration>
-    fun linkDpAndFlex(dp: Player?, flex: Player?, lineupID: Long?, list: List<PlayerWithPosition>, strategy: TeamStrategy): Completable
+    fun linkDpAndFlex(dp: Player?, flex: Player?, lineupID: Long?, list: List<PlayerWithPosition>, strategy: TeamStrategy, extraHittersSize: Int): Completable
     fun getBatterStates(players: List<PlayerWithPosition>, teamType: Int, batterSize: Int, extraHitterSize: Int, lineupMode: Int, isDebug: Boolean,isEditable: Boolean): Single<List<BatterState>>
 
     //tournaments

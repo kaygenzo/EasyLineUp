@@ -80,8 +80,8 @@ class LineupCreationFragment: BaseFragment("LineupCreationFragment") {
                 showRosterDialog(view.lineupCreationForm)
             }
 
-            override fun onSaveClicked(lineupName: String, tournament: Tournament, lineupEventTime: Long, strategy: TeamStrategy) {
-                lineupViewModel.saveLineup(tournament, lineupName, lineupEventTime, strategy)
+            override fun onSaveClicked(lineupName: String, tournament: Tournament, lineupEventTime: Long, strategy: TeamStrategy, extraHitters: Int) {
+                lineupViewModel.saveLineup(tournament, lineupName, lineupEventTime, strategy, extraHitters)
             }
 
             override fun onCancelClicked() {
@@ -100,7 +100,7 @@ class LineupCreationFragment: BaseFragment("LineupCreationFragment") {
             when(it) {
                 is SaveSuccess -> {
                     Timber.d("successfully inserted new lineup, new id: ${it.lineupID}")
-                    val extras = LineupFragment.getArguments(it.lineupID,  it.lineupName, it.strategy)
+                    val extras = LineupFragment.getArguments(it.lineupID,  it.lineupName, it.strategy, it.extraHitters)
                     findNavController().navigate(R.id.lineupFragmentEditable, extras, NavigationUtils().getOptionsWithPopDestination(R.id.navigation_lineups, false))
                 }
             }

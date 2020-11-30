@@ -190,6 +190,45 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/lineupExtraHittersContainer"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/lineup_creation_field_size"
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="visible">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineExtraHitters"
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/lineupExtraHittersLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintRight_toLeftOf="@+id/guidelineExtraHitters"
+                    android:text="@string/form_lineup_creation_extra_hitters_label"
+                    android:gravity="center_vertical"/>
+
+                <Spinner
+                    android:id="@+id/lineupExtraHittersSpinner"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toRightOf="@+id/guidelineExtraHitters"
+                    android:entries="@array/extra_hitters_labels"
+                    android:entryValues="@array/extra_hitters_values"
+                    android:gravity="center_vertical"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </androidx.appcompat.widget.LinearLayoutCompat>
 
     </ScrollView>

@@ -33,9 +33,6 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
 
     private lateinit var lineupTypeface: LineupTypeface
 
-    private var batterSize = 0
-    private var extraHitterSize = 0
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -61,8 +58,6 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
         val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
         val lineupValue = preferences.getString(getString(R.string.key_lineup_style), getString(R.string.lineup_style_default_value))
 
-        batterSize = viewModel.strategy.batterSize
-        extraHitterSize = viewModel.strategy.extraHitterSize
         val lineupMode = viewModel.lineupMode
 
         lineupTypeface = LineupTypeface.getByValue(lineupValue)
@@ -93,7 +88,8 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
 
         val disposable = viewModel.getTeamType()
                 .subscribe({
-                    val dividerItemDecoration = ItemDecoratorAttackRecycler(context, linearLayoutManager.orientation, batterSize, extraHitterSize)
+                    val batterSize = viewModel.strategy.batterSize
+                    val dividerItemDecoration = ItemDecoratorAttackRecycler(context, linearLayoutManager.orientation, batterSize, viewModel.extraHitters)
                     view.recyclerView.addItemDecoration(dividerItemDecoration)
                     playerAdapter.apply {
                         this.teamType = viewModel.teamType

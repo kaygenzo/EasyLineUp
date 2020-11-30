@@ -16,6 +16,7 @@ class Constants {
         const val PLAYER_ID = "player_id"
         const val LINEUP_TITLE = "lineup_title"
         const val EXTRA_LINEUP_STRATEGY = "com.telen.extra.lineup_title"
+        const val EXTRA_LINEUP_EXTRA_HITTERS = "com.telen.extra.lineup_extra_hitters"
 
         //extras
         const val EXTRA_EDITABLE = "com.telen.extra.editable"

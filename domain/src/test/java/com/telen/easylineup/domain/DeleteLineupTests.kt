@@ -22,13 +22,14 @@ internal class DeleteLineupTests {
 
     lateinit var mDeleteLineup: DeleteLineup
     lateinit var lineup1: Lineup
+    private val extraHitters = 0
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
         mDeleteLineup = DeleteLineup(dao)
 
-        lineup1 = Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id, 3L)
+        lineup1 = Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id, extraHitters, 3L)
 
         Mockito.`when`(dao.getLineupByIdSingle(1)).thenReturn(Single.just(lineup1))
         Mockito.`when`(dao.getLineupByIdSingle(2)).thenReturn(Single.error(Exception()))

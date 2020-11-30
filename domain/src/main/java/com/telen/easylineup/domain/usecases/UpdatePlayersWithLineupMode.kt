@@ -20,7 +20,7 @@ internal class UpdatePlayersWithLineupMode(private val lineupDao: PlayerFieldPos
                         // find the pitcher if exists and set him at position 10 in lineup
                         requestValues.players.firstOrNull { it.position == FieldPosition.PITCHER.id }?.let {
                             val playerFieldPosition = it.toPlayerFieldPosition()
-                            playerFieldPosition.order = TeamStrategy.STANDARD.getDesignatedPlayerOrder()
+                            playerFieldPosition.order = TeamStrategy.STANDARD.getDesignatedPlayerOrder(requestValues.extraHittersSize)
                             playerFieldPosition.flags = PlayerFieldPosition.FLAG_FLEX
                             lineupDao.updatePlayerFieldPosition(playerFieldPosition)
                         } ?: Completable.complete()
@@ -43,6 +43,6 @@ internal class UpdatePlayersWithLineupMode(private val lineupDao: PlayerFieldPos
         return playerTask.andThen(Single.just(ResponseValue()))
     }
 
-    class RequestValues(val players: List<PlayerWithPosition>, val isDesignatedPlayerEnabled: Boolean, val teamType: Int): UseCase.RequestValues
+    class RequestValues(val players: List<PlayerWithPosition>, val isDesignatedPlayerEnabled: Boolean, val teamType: Int, val extraHittersSize: Int): UseCase.RequestValues
     class ResponseValue: UseCase.ResponseValue
 }

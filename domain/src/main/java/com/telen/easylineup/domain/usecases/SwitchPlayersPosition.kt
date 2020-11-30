@@ -36,7 +36,7 @@ internal class SwitchPlayersPosition(val dao: PlayerFieldPositionRepository): Us
             playerPositions.add(it)
         }
 
-        val orderDesignatedPlayer = requestValues.strategy.getDesignatedPlayerOrder()
+        val orderDesignatedPlayer = requestValues.strategy.getDesignatedPlayerOrder(requestValues.extraHittersSize)
 
         // just keep reference of the first order different of 10
         val tmpOrder = playerPositions.firstOrNull { it.order != orderDesignatedPlayer }?.order
@@ -100,5 +100,5 @@ internal class SwitchPlayersPosition(val dao: PlayerFieldPositionRepository): Us
     class ResponseValue: UseCase.ResponseValue
     class RequestValues(val players: List<PlayerWithPosition>, val position1: FieldPosition,
                         val position2: FieldPosition, val teamType: Int, val lineupMode: Int,
-                        val strategy: TeamStrategy): UseCase.RequestValues
+                        val strategy: TeamStrategy, val extraHittersSize: Int): UseCase.RequestValues
 }

@@ -23,13 +23,14 @@ internal class SaveLineupModeTests {
     @Mock lateinit var lineupDao: LineupRepository
     lateinit var mSaveLineupMode: SaveLineupMode
     lateinit var lineup: Lineup
+    private val extraHitters = 0
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
         mSaveLineupMode = SaveLineupMode(lineupDao)
 
-        lineup = Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id,3L)
+        lineup = Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id, extraHitters, 3L)
 
         Mockito.`when`(lineupDao.getLineupByIdSingle(1)).thenReturn(Single.just(lineup))
         Mockito.`when`(lineupDao.getLineupByIdSingle(2)).thenReturn(Single.error(Exception()))

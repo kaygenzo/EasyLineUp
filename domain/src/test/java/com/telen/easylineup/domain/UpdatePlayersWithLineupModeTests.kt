@@ -21,6 +21,7 @@ internal class UpdatePlayersWithLineupModeTests {
     lateinit var updatePlayersWithLineupMode: UpdatePlayersWithLineupMode
     lateinit var players: MutableList<PlayerWithPosition>
     var observer = TestObserver<UpdatePlayersWithLineupMode.ResponseValue>()
+    private val extraHitters = 0
 
     @Mock lateinit var lineupDao: PlayerFieldPositionRepository
 
@@ -47,7 +48,7 @@ internal class UpdatePlayersWithLineupModeTests {
     @Test
     fun shouldTriggerAnExceptionIfTeamTypeIsUnknown() {
         val teamType = 10
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true, teamType))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true, teamType, extraHitters))
                 .subscribe(observer)
         observer.await()
         observer.assertError(IllegalArgumentException::class.java)
@@ -55,7 +56,7 @@ internal class UpdatePlayersWithLineupModeTests {
 
     @Test
     fun shouldDoNothingIfListEmptyAndDPEnabled() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true, TeamType.BASEBALL.id))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true, TeamType.BASEBALL.id, extraHitters))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -65,7 +66,7 @@ internal class UpdatePlayersWithLineupModeTests {
 
     @Test
     fun shouldDoNothingIfListEmptyAndDPDisabled() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), false, TeamType.BASEBALL.id))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), false, TeamType.BASEBALL.id, extraHitters))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -75,7 +76,7 @@ internal class UpdatePlayersWithLineupModeTests {
 
     @Test
     fun shouldDoNothingIfDesignatedPlayerEnabledAndSoftballTeam() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true, TeamType.SOFTBALL.id))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true, TeamType.SOFTBALL.id, extraHitters))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -85,7 +86,7 @@ internal class UpdatePlayersWithLineupModeTests {
 
     @Test
     fun shouldDoNothingIfDPEnabledAndNoPitcherAssigned() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, true, TeamType.BASEBALL.id))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, true, TeamType.BASEBALL.id, extraHitters))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -95,7 +96,7 @@ internal class UpdatePlayersWithLineupModeTests {
 
     @Test
     fun shouldDoNothingIfDPDisabledAndNoPitcherOrDPAssigned() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, false, TeamType.BASEBALL.id))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, false, TeamType.BASEBALL.id, extraHitters))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -107,13 +108,13 @@ internal class UpdatePlayersWithLineupModeTests {
     fun shouldUpdatePitcherOrderTo_10_ifAssignedAndDPEnabled() {
         players[0].position = FieldPosition.PITCHER.id
 
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, true, TeamType.BASEBALL.id))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, true, TeamType.BASEBALL.id, extraHitters))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()
 
         verify(lineupDao).updatePlayerFieldPosition(check {
-            Assert.assertEquals(TeamStrategy.STANDARD.getDesignatedPlayerOrder(), it.order)
+            Assert.assertEquals(TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters), it.order)
             Assert.assertEquals(PlayerFieldPosition.FLAG_FLEX, it.flags)
             Assert.assertEquals(FieldPosition.PITCHER.id, it.position)
         })
@@ -128,7 +129,7 @@ internal class UpdatePlayersWithLineupModeTests {
         }
         players[1].position = FieldPosition.DP_DH.id
 
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, false, TeamType.BASEBALL.id))
+        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, false, TeamType.BASEBALL.id, extraHitters))
                 .subscribe(observer)
         observer.await()
         observer.assertComplete()

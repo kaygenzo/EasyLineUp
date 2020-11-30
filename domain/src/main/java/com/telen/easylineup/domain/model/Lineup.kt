@@ -15,6 +15,7 @@ data class Lineup(
         var tournamentId: Long = 0,
         var mode: Int = 0,
         var strategy: Int,
+        var extraHitters: Int,
         var eventTimeInMillis: Long,
         var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
         var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
@@ -33,7 +34,9 @@ data class Lineup(
         if (teamId != other.teamId) return false
         if (tournamentId != other.tournamentId) return false
         if (mode != other.mode) return false
-        if(strategy != other.strategy) return false
+        if (strategy != other.strategy) return false
+        if (extraHitters != other.extraHitters) return false
+        if (eventTimeInMillis != other.eventTimeInMillis) return false
         if (roster != other.roster) return false
 
         return true
@@ -46,11 +49,18 @@ data class Lineup(
         result = 31 * result + tournamentId.hashCode()
         result = 31 * result + mode
         result = 31 * result + strategy
+        result = 31 * result + extraHitters
+        result = 31 * result + eventTimeInMillis.hashCode()
+        result = 31 * result + createdTimeInMillis.hashCode()
+        result = 31 * result + editedTimeInMillis.hashCode()
         result = 31 * result + (roster?.hashCode() ?: 0)
+        result = 31 * result + (hash?.hashCode() ?: 0)
         return result
     }
+
 }
 
 fun Lineup.toLineupExport(playerPositions: MutableList<PlayerPositionExport>, playerNumberOverlays: List<PlayerNumberOverlayExport>, rosterUUID: List<String>?): LineupExport {
-    return LineupExport(hash ?: UUID.randomUUID().toString(), name, eventTimeInMillis, createdTimeInMillis, editedTimeInMillis, mode, strategy, rosterUUID, playerPositions, playerNumberOverlays)
+    return LineupExport(hash ?: UUID.randomUUID().toString(), name, eventTimeInMillis, createdTimeInMillis, editedTimeInMillis,
+            mode, strategy, extraHitters, rosterUUID, playerPositions, playerNumberOverlays)
 }

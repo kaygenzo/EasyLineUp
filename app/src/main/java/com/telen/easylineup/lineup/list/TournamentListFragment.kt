@@ -130,7 +130,7 @@ class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClic
 
     override fun onLineupClicked(lineup: Lineup) {
         activity?.let {
-            val extras = LineupFragment.getArguments(lineup.id, lineup.name, TeamStrategy.getStrategyById(lineup.strategy))
+            val extras = LineupFragment.getArguments(lineup.id, lineup.name, TeamStrategy.getStrategyById(lineup.strategy), lineup.extraHitters)
             findNavController().navigate(R.id.lineupFragmentFixed, extras, NavigationUtils().getOptions())
         }
     }

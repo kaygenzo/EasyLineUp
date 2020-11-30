@@ -76,18 +76,15 @@ internal class GetDashboardTiles(private val playerDao: PlayerRepository,
     private fun getLastLineup(team: Team): Maybe<ITileData> {
         return lineupDao.getLastLineup(team.id)
                 .flatMap { lineup ->
+                    val strategy = TeamStrategy.getStrategyById(lineup.strategy)
                     playerFieldPositionDao.getAllPlayersWithPositionsForLineupRx(lineup.id)
-                            .map { LastLineupData(lineup.id, lineup.name, it, TeamStrategy.getStrategyById(lineup.strategy)) }
+                            .map { LastLineupData(lineup.id, lineup.name, it, strategy, lineup.extraHitters) }
                             .onErrorResumeNext {
                                 it.printStackTrace()
-                                Single.just(LastLineupData(lineup.id, lineup.name, listOf(), TeamStrategy.getStrategyById(lineup.strategy)))
+                                Single.just(LastLineupData(lineup.id, lineup.name, listOf(), strategy, lineup.extraHitters))
                             }
                             .toMaybe()
                 }
-    }
-
-    private fun getShakeBeta(): Maybe<ITileData> {
-        return Maybe.just(ShakeBetaData())
     }
 
     private fun getLastPlayerNumberResearch(): Maybe<ITileData> {

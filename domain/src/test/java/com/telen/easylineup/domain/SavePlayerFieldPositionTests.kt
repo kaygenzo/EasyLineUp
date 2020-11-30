@@ -18,19 +18,19 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
-////////////// DEFAULT HITTER SIZE //////////////
+////////////// NO HITTER SIZE //////////////
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerFieldPositionBaseballStandardTests: SavePlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.STANDARD,
-        TeamStrategy.STANDARD.batterSize, TeamStrategy.STANDARD.extraHitterSize)
+        TeamStrategy.STANDARD.batterSize, 0)
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerFieldPositionSoftballStandardTests: SavePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
-        TeamStrategy.STANDARD.batterSize, TeamStrategy.STANDARD.extraHitterSize)
+        TeamStrategy.STANDARD.batterSize, 0)
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerFieldPositionSoftballSlowpitchTests: SavePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
-        TeamStrategy.SLOWPITCH.batterSize, TeamStrategy.SLOWPITCH.extraHitterSize)
+        TeamStrategy.SLOWPITCH.batterSize, 0)
 
 ////////////// CUSTOM HITTER SIZE //////////////
 
@@ -99,7 +99,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
-                extraBatterSize = extraHitterSize
+                extraHittersSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -124,7 +124,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
-                extraBatterSize = extraHitterSize
+                extraHittersSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -148,7 +148,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
-                extraBatterSize = extraHitterSize
+                extraHittersSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -175,7 +175,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
-                extraBatterSize = extraHitterSize
+                extraHittersSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -205,7 +205,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
-                extraBatterSize = extraHitterSize
+                extraHittersSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -243,7 +243,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
-                extraBatterSize = extraHitterSize
+                extraHittersSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -276,7 +276,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
-                extraBatterSize = extraHitterSize
+                extraHittersSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -309,7 +309,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
-                extraBatterSize = extraHitterSize
+                extraHittersSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
@@ -317,7 +317,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
         observer.assertComplete()
         verify(lineupDao, never()).updatePlayerFieldPosition(any())
         verify(lineupDao).insertPlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-            Assert.assertEquals(strategy.getDesignatedPlayerOrder(), it.order)
+            Assert.assertEquals(strategy.getDesignatedPlayerOrder(extraHitterSize), it.order)
             Assert.assertEquals(9, it.playerId)
         })
     }
@@ -336,7 +336,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
                 lineupMode = mode,
                 strategy = strategy,
                 batterSize = batterSize,
-                extraBatterSize = extraHitterSize
+                extraHittersSize = extraHitterSize
         )
 
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)

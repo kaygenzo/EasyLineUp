@@ -27,6 +27,7 @@ internal class CheckHashDataTests {
     @Mock lateinit var playerPositionsDao: PlayerFieldPositionRepository
 
     private lateinit var mCheckHash: CheckHashData
+    private val extraHitters = 0
 
     @Before
     fun init() {
@@ -49,8 +50,8 @@ internal class CheckHashDataTests {
         )
 
         val mLineups = mutableListOf(
-                Lineup(1L, "A", 1L, 1L, 0, TeamStrategy.STANDARD.id, 3L, 1L, 2L, null, null),
-                Lineup(2L, "B", 2L, 2L, 0, TeamStrategy.STANDARD.id, 3L, 1L, 3L, null, null)
+                Lineup(1L, "A", 1L, 1L, 0, TeamStrategy.STANDARD.id, extraHitters,3L, 1L, 2L, null, null),
+                Lineup(2L, "B", 2L, 2L, 0, TeamStrategy.STANDARD.id, extraHitters, 3L, 1L, 3L, null, null)
         )
 
         val mPlayerPosition = mutableListOf(

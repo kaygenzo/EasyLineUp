@@ -20,4 +20,22 @@
         <item>@string/softball_strategy_fastpitch</item>
         <item>@string/softball_strategy_slowpitch</item>
     </string-array>
+
+    <string-array name="extra_hitters_labels" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>@string/generic_infinite</item>
+    </string-array>
+
+    <integer-array name="extra_hitters_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>255</item>
+    </integer-array>
 </resources>

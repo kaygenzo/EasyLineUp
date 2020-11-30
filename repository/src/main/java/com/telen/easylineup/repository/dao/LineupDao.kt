@@ -73,6 +73,7 @@ internal interface LineupDao {
         lineups.roaster as roster,
         lineups.mode as lineupMode,
         lineups.strategy as lineupStrategy,
+        lineups.extraHitters as lineupExtraHittersSize,
         x, y, position
         FROM tournaments
         LEFT JOIN lineups ON tournaments.id = lineups.tournamentID

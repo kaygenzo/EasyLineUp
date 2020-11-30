@@ -21,7 +21,7 @@ internal class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPosi
             // we will update the flag, and by the way, free the batting order
             requestValues.players.firstOrNull { p -> p.playerID == flex.id }?.run {
                 flags = PlayerFieldPosition.FLAG_FLEX
-                order = requestValues.strategy.getDesignatedPlayerOrder()
+                order = requestValues.strategy.getDesignatedPlayerOrder(requestValues.extraHittersSize)
                 if(!toUpdate.contains(this))
                     toUpdate.add(this)
             }
@@ -58,7 +58,8 @@ internal class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPosi
                         val dp: Player?,
                         val flex: Player?,
                         val players: List<PlayerWithPosition>,
-                        val strategy: TeamStrategy
+                        val strategy: TeamStrategy,
+                        val extraHittersSize: Int
     ): UseCase.RequestValues
     inner class ResponseValue: UseCase.ResponseValue
 }

@@ -26,14 +26,14 @@ internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositio
                         val substitutesBatterSize = requestValues.players.filter { FieldPosition.isSubstitute(it.position) && it.order > 0 }.size
                         // there are some cases where substitutes can me inserted before defense players.
                         // We authorize only maximum extraBatterSize susbstitutes to be batter
-                        if(nextAvailableOrder > requestValues.batterSize + requestValues.extraBatterSize || substitutesBatterSize >= requestValues.extraBatterSize) {
+                        if(nextAvailableOrder > requestValues.batterSize + requestValues.extraHittersSize || substitutesBatterSize >= requestValues.extraHittersSize) {
                             order = Constants.SUBSTITUTE_ORDER_VALUE
                         }
                     }
                     FieldPosition.PITCHER -> {
                         //if the new position is a pitcher for a baseball team with dh enabled, the batting order is automatically equals to 10
                         if (requestValues.lineupMode == MODE_ENABLED && requestValues.teamType == TeamType.BASEBALL.id) {
-                            order = requestValues.strategy.getDesignatedPlayerOrder()
+                            order = requestValues.strategy.getDesignatedPlayerOrder(requestValues.extraHittersSize)
                             flags = PlayerFieldPosition.FLAG_FLEX
                         }
                     }
@@ -69,7 +69,7 @@ internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositio
                         val lineupMode: Int,
                         val strategy: TeamStrategy,
                         val batterSize: Int,
-                        val extraBatterSize: Int
+                        val extraHittersSize: Int
     ): UseCase.RequestValues
     inner class ResponseValue: UseCase.ResponseValue
 }

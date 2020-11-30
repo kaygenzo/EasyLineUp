@@ -31,7 +31,7 @@ internal class CreateLineup(private val tournamentDao: TournamentRepository, pri
                 .flatMap {
                     val roster = if(requestValues.roster.none { !it.status }) null else rosterToString(requestValues.roster)
                     val newLineup = Lineup(name = requestValues.lineupTitle, teamId = requestValues.teamID, tournamentId = it,
-                            eventTimeInMillis = requestValues.lineupEventTime, roster = roster, strategy = requestValues.strategy.id)
+                            eventTimeInMillis = requestValues.lineupEventTime, roster = roster, strategy = requestValues.strategy.id, extraHitters = requestValues.extraHittersSize)
                     lineupsDao.insertLineup(newLineup)
                 }
                 .map { ResponseValue(it) }
@@ -39,7 +39,7 @@ internal class CreateLineup(private val tournamentDao: TournamentRepository, pri
 
     class ResponseValue(val lineupID: Long): UseCase.ResponseValue
     class RequestValues(val teamID: Long, val tournament: Tournament, val lineupTitle: String,
-                        val lineupEventTime: Long, val roster: List<RosterPlayerStatus>, val strategy: TeamStrategy): UseCase.RequestValues
+                        val lineupEventTime: Long, val roster: List<RosterPlayerStatus>, val strategy: TeamStrategy, val extraHittersSize: Int): UseCase.RequestValues
 
     private fun rosterToString(list: List<RosterPlayerStatus>): String {
         val builder = StringBuilder()

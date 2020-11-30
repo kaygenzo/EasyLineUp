@@ -13,6 +13,7 @@ internal data class RoomTournamentWithLineup(
         @ColumnInfo(name = "lineupID") var lineupID: Long = 0,
         @ColumnInfo(name = "lineupMode") var lineupMode: Int = 0,
         @ColumnInfo(name = "lineupStrategy") var lineupStrategy: Int = TeamStrategy.STANDARD.id,
+        @ColumnInfo(name = "lineupExtraHittersSize") var lineupExtraHittersSize: Int = 0,
         @ColumnInfo(name = "x") var x: Float = 0f,
         @ColumnInfo(name = "y") var y: Float = 0f,
         @ColumnInfo(name = "position") var position: Int = 0,
@@ -24,5 +25,6 @@ internal data class RoomTournamentWithLineup(
 
 internal fun RoomTournamentWithLineup.toTournamentWithLineup(): TournamentWithLineup {
     return TournamentWithLineup(tournamentID, tournamentName, tournamentCreatedAt, fieldPositionID,
-            lineupName, lineupID, lineupMode, lineupStrategy, x, y, position, teamID, lineupEventTime, lineupCreatedTime, roster)
+            lineupName, lineupID, lineupMode, lineupStrategy, lineupExtraHittersSize, x, y, position,
+            teamID, lineupEventTime, lineupCreatedTime, roster)
 }

@@ -130,7 +130,8 @@ class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, A
                 val lineupID = data.getData()[KEY_LINEUP_ID] as? Long ?: 0L
                 val lineupName = data.getData()[KEY_LINEUP_NAME] as? String ?: ""
                 val lineupStrategy = data.getData()[KEY_LINEUP_STRATEGY] as TeamStrategy
-                val extras = LineupFragment.getArguments(lineupID, lineupName, lineupStrategy)
+                val extraHitters = data.getData()[KEY_LINEUP_EXTRA_HITTERS] as? Int ?: 0
+                val extras = LineupFragment.getArguments(lineupID, lineupName, lineupStrategy, extraHitters)
                 findNavController().navigate(R.id.lineupFragmentFixed, extras, NavigationUtils().getOptions())
             }
             else -> {

@@ -9,6 +9,7 @@ data class TournamentWithLineup(
         var lineupID: Long = 0,
         var lineupMode: Int = 0,
         var lineupStrategy: Int = TeamStrategy.STANDARD.id,
+        var lineupExtraHittersSize: Int = 0,
         var x: Float = 0f,
         var y: Float = 0f,
         var position: Int = 0,
@@ -23,6 +24,7 @@ data class TournamentWithLineup(
 
     fun toLineup(): Lineup {
         return Lineup(id = lineupID, name = lineupName ?: "", tournamentId = tournamentID, eventTimeInMillis = lineupEventTime,
-                teamId = teamID, mode = lineupMode, createdTimeInMillis = lineupCreatedTime, roster = roster, strategy = lineupStrategy)
+                teamId = teamID, mode = lineupMode, createdTimeInMillis = lineupCreatedTime, roster = roster, strategy = lineupStrategy,
+                extraHitters = lineupExtraHittersSize)
     }
 }

@@ -222,6 +222,8 @@
 
     <string name="form_lineup_creation_strategy_label">Strategy</string>
     <string name="lineup_list_strategy_type">  &#8212;  %s</string>
+    <string name="form_lineup_creation_extra_hitters_label">Extra hitters</string>
+    <string name="generic_infinite">&#8734;</string>
 
     <string name="softball_strategy_fastpitch" translatable="false">Fastpitch</string>
     <string name="softball_strategy_slowpitch" translatable="false">Slowpitch</string>

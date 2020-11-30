@@ -28,6 +28,7 @@ internal class SwitchPlayersPositionTests {
     private lateinit var player2bis: PlayerWithPosition
     private val players = mutableListOf<PlayerWithPosition>()
     private val strategy = TeamStrategy.STANDARD
+    private val extraHitters = 0
 
     @Before
     fun init() {
@@ -62,7 +63,7 @@ internal class SwitchPlayersPositionTests {
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.PITCHER, position2 = FieldPosition.PITCHER,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy)).subscribe(observer)
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters)).subscribe(observer)
         observer.await()
         observer.assertError(SamePlayerException::class.java)
     }
@@ -74,7 +75,7 @@ internal class SwitchPlayersPositionTests {
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.SHORT_STOP, position2 = FieldPosition.PITCHER,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy)).subscribe(observer)
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters)).subscribe(observer)
         observer.await()
         observer.assertError(FirstPositionEmptyException::class.java)
     }
@@ -88,7 +89,7 @@ internal class SwitchPlayersPositionTests {
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.FIRST_BASE, position2 = FieldPosition.CENTER_FIELD,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters
         )).subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -105,12 +106,12 @@ internal class SwitchPlayersPositionTests {
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.DP_DH, position2 = FieldPosition.PITCHER,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters
         )).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            assertVerification(it[0],6, 6, FieldPosition.PITCHER.id, PlayerFieldPosition.FLAG_FLEX, TeamStrategy.STANDARD.getDesignatedPlayerOrder())
+            assertVerification(it[0],6, 6, FieldPosition.PITCHER.id, PlayerFieldPosition.FLAG_FLEX, TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters))
             assertVerification(it[1],1, 1, FieldPosition.DP_DH.id, PlayerFieldPosition.FLAG_NONE, 8)
         })
     }
@@ -122,7 +123,7 @@ internal class SwitchPlayersPositionTests {
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.DP_DH, position2 = FieldPosition.FIRST_BASE,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters
         )).subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -139,13 +140,13 @@ internal class SwitchPlayersPositionTests {
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.PITCHER, position2 = FieldPosition.FIRST_BASE,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters
         )).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
             assertVerification(it[0],1, 1, FieldPosition.FIRST_BASE.id, PlayerFieldPosition.FLAG_NONE, 6)
-            assertVerification(it[1],4, 4, FieldPosition.PITCHER.id, PlayerFieldPosition.FLAG_FLEX, TeamStrategy.STANDARD.getDesignatedPlayerOrder())
+            assertVerification(it[1],4, 4, FieldPosition.PITCHER.id, PlayerFieldPosition.FLAG_FLEX, TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters))
         })
     }
 
@@ -156,7 +157,7 @@ internal class SwitchPlayersPositionTests {
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.PITCHER, position2 = FieldPosition.SECOND_BASE,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters
         )).subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -173,7 +174,7 @@ internal class SwitchPlayersPositionTests {
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.DP_DH, position2 = FieldPosition.SECOND_BASE,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters
         )).subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -190,7 +191,7 @@ internal class SwitchPlayersPositionTests {
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.FIRST_BASE, position2 = FieldPosition.SECOND_BASE,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters
         )).subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -220,7 +221,7 @@ internal class SwitchPlayersPositionTests {
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.FIRST_BASE, position2 = FieldPosition.CENTER_FIELD,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters
         )).subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -242,18 +243,18 @@ internal class SwitchPlayersPositionTests {
 
         players.first { it.position == FieldPosition.CATCHER.id }.apply {
             flags = PlayerFieldPosition.FLAG_FLEX
-            order = TeamStrategy.STANDARD.getDesignatedPlayerOrder()
+            order = TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters)
         }
 
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.CATCHER, position2 = FieldPosition.CENTER_FIELD,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters
         )).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            assertVerification(it[0],2, 2, FieldPosition.CENTER_FIELD.id, PlayerFieldPosition.FLAG_FLEX, TeamStrategy.STANDARD.getDesignatedPlayerOrder())
+            assertVerification(it[0],2, 2, FieldPosition.CENTER_FIELD.id, PlayerFieldPosition.FLAG_FLEX, TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters))
             assertVerification(it[1],3, 3, FieldPosition.CATCHER.id, PlayerFieldPosition.FLAG_NONE, 4)
         })
     }
@@ -266,7 +267,7 @@ internal class SwitchPlayersPositionTests {
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.DP_DH, position2 = FieldPosition.CENTER_FIELD,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters
         )).subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -288,19 +289,19 @@ internal class SwitchPlayersPositionTests {
 
         players.first { it.position == FieldPosition.CATCHER.id }.apply {
             flags = PlayerFieldPosition.FLAG_FLEX
-            order = TeamStrategy.STANDARD.getDesignatedPlayerOrder()
+            order = TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters)
         }
 
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.CATCHER, position2 = FieldPosition.DP_DH,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters
         )).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
             assertVerification(it[0],2, 2, FieldPosition.DP_DH.id, PlayerFieldPosition.FLAG_NONE, 8)
-            assertVerification(it[1],6, 6, FieldPosition.CATCHER.id, PlayerFieldPosition.FLAG_FLEX, TeamStrategy.STANDARD.getDesignatedPlayerOrder())
+            assertVerification(it[1],6, 6, FieldPosition.CATCHER.id, PlayerFieldPosition.FLAG_FLEX, TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters))
         })
     }
 
@@ -316,18 +317,18 @@ internal class SwitchPlayersPositionTests {
 
         players.first { it.position == FieldPosition.CATCHER.id }.apply {
             flags = PlayerFieldPosition.FLAG_FLEX
-            order = TeamStrategy.STANDARD.getDesignatedPlayerOrder()
+            order = TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters)
         }
 
         val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
         mSwitchPlayersPosition.executeUseCase(SwitchPlayersPosition.RequestValues(players = players,
                 position1 = FieldPosition.DP_DH, position2 = FieldPosition.CATCHER,
-                lineupMode = lineupMode, teamType = teamType, strategy = strategy
+                lineupMode = lineupMode, teamType = teamType, strategy = strategy, extraHittersSize = extraHitters
         )).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(playerFieldPositionsDao).updatePlayerFieldPositions(com.nhaarman.mockitokotlin2.check {
-            assertVerification(it[0],6, 6, FieldPosition.CATCHER.id, PlayerFieldPosition.FLAG_FLEX, TeamStrategy.STANDARD.getDesignatedPlayerOrder())
+            assertVerification(it[0],6, 6, FieldPosition.CATCHER.id, PlayerFieldPosition.FLAG_FLEX, TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters))
             assertVerification(it[1],2, 2, FieldPosition.DP_DH.id, PlayerFieldPosition.FLAG_NONE, 8)
         })
     }

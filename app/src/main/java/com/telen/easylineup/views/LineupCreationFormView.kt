@@ -22,7 +22,7 @@ import java.text.DateFormat
 import java.util.*
 
 interface OnActionButtonListener {
-    fun onSaveClicked(lineupName: String, tournament: Tournament, lineupEventTime: Long, strategy: TeamStrategy)
+    fun onSaveClicked(lineupName: String, tournament: Tournament, lineupEventTime: Long, strategy: TeamStrategy, extraHitters: Int)
     fun onCancelClicked()
     fun onRosterChangeClicked()
 }
@@ -31,6 +31,7 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
 
     private val tournaments: MutableList<Tournament> = mutableListOf()
     private var strategy: TeamStrategy = TeamStrategy.STANDARD
+    private var extraHitters = 0
     private lateinit var tournamentAdapter: ArrayAdapter<String>
     private lateinit var strategyAdapter: ArrayAdapter<String>
     private lateinit var tournamentsNames: MutableList<String>
@@ -77,11 +78,20 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
         }
 
         save.setOnClickListener {
-            actionClickListener?.onSaveClicked(lineupTitleInput.text.toString(), getSelectedTournament(), eventTime.timeInMillis, strategy)
+            actionClickListener?.onSaveClicked(lineupTitleInput.text.toString(), getSelectedTournament(), eventTime.timeInMillis, strategy, extraHitters)
         }
 
         cancel.setOnClickListener {
             actionClickListener?.onCancelClicked()
+        }
+
+        lineupExtraHittersSpinner.setSelection(extraHitters)
+        lineupExtraHittersSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, id: Long) {
+                extraHitters = resources.getIntArray(R.array.extra_hitters_values)[position]
+            }
         }
     }
 

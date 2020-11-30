@@ -17,19 +17,19 @@ import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 import java.lang.IllegalArgumentException
 
-////////////// DEFAULT HITTER SIZE //////////////
+////////////// NO HITTER SIZE //////////////
 
 @RunWith(MockitoJUnitRunner::class)
 internal class DeletePlayerFieldPositionBaseballStandardTests: DeletePlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.STANDARD,
-        TeamStrategy.STANDARD.batterSize, TeamStrategy.STANDARD.extraHitterSize)
+        TeamStrategy.STANDARD.batterSize, 0)
 
 @RunWith(MockitoJUnitRunner::class)
 internal class DeletePlayerFieldPositionSoftballStandardTests: DeletePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
-        TeamStrategy.STANDARD.batterSize, TeamStrategy.STANDARD.extraHitterSize)
+        TeamStrategy.STANDARD.batterSize, 0)
 
 @RunWith(MockitoJUnitRunner::class)
 internal class DeletePlayerFieldPositionSoftballSlowpitchTests: DeletePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
-        TeamStrategy.SLOWPITCH.batterSize, TeamStrategy.SLOWPITCH.extraHitterSize)
+        TeamStrategy.SLOWPITCH.batterSize, 0)
 
 ////////////// CUSTOM HITTER SIZE //////////////
 

@@ -73,6 +73,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     var editable = false
     var teamType: Int = 0
     var strategy = TeamStrategy.STANDARD
+    var extraHitters = 0
 
     private var team: Team? = null
 
@@ -96,7 +97,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun onDeletePosition(player: Player, position: FieldPosition) {
-        val disposable = domain.deletePlayerPosition(player, position, _listPlayersWithPosition, lineupMode, strategy.extraHitterSize)
+        val disposable = domain.deletePlayerPosition(player, position, _listPlayersWithPosition, lineupMode, extraHitters)
                 .subscribe({
                     eventHandler.onNext(DeletePlayerPositionSuccess)
                 }, {
@@ -171,7 +172,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     fun onLineupModeChanged(isEnabled: Boolean) {
         lineupMode = if(isEnabled) MODE_ENABLED else MODE_DISABLED
 
-        val disposable = domain.updateLineupMode(isEnabled, lineupID, lineupMode, _listPlayersWithPosition)
+        val disposable = domain.updateLineupMode(isEnabled, lineupID, lineupMode, _listPlayersWithPosition, extraHitters)
                 .subscribe({
                     eventHandler.onNext(UpdatePlayersWithLineupModeSuccess)
                 }, {
@@ -249,11 +250,11 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     private fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition): Completable {
-        return domain.switchPlayersPosition(p1, p2,_listPlayersWithPosition, lineupMode, strategy)
+        return domain.switchPlayersPosition(p1, p2,_listPlayersWithPosition, lineupMode, strategy, extraHitters)
     }
 
     fun onPlayerSelected(player: Player, position: FieldPosition) {
-        val disposable = domain.savePlayerFieldPosition(player, position, _listPlayersWithPosition, lineupID, lineupMode, strategy, strategy.batterSize, strategy.extraHitterSize)
+        val disposable = domain.savePlayerFieldPosition(player, position, _listPlayersWithPosition, lineupID, lineupMode, strategy, strategy.batterSize, extraHitters)
                 .subscribe({
                     eventHandler.onNext(SavePlayerPositionSuccess)
                 }, {
@@ -290,12 +291,12 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
      */
     fun linkDpAndFlex(dp: Player?, flex: Player?): Completable {
         _linkPlayersInField.value = null
-        return domain.linkDpAndFlex(dp,flex, lineupID, _listPlayersWithPosition, strategy)
+        return domain.linkDpAndFlex(dp,flex, lineupID, _listPlayersWithPosition, strategy, extraHitters)
     }
 
     fun getBatterStates(players: List<PlayerWithPosition>) {
         val disposable = domain.getBatterStates(players = players, teamType = teamType, batterSize = strategy.batterSize,
-                extraHitterSize = strategy.extraHitterSize, lineupMode = lineupMode, isDebug = BuildConfig.DEBUG, isEditable = editable)
+                extraHitterSize = extraHitters, lineupMode = lineupMode, isDebug = BuildConfig.DEBUG, isEditable = editable)
                 .subscribe({
                     eventHandler.onNext(NewBatterOrderAvailable(it))
                 }, {

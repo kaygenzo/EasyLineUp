@@ -82,11 +82,12 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
     companion object {
         const val REQUEST_WRITE_EXTERENAL_STORAGE_PERMISSION = 0
 
-        fun getArguments(lineupID: Long, lineupTitle: String, strategy: TeamStrategy): Bundle {
+        fun getArguments(lineupID: Long, lineupTitle: String, strategy: TeamStrategy, extraHitters: Int): Bundle {
             val extras = Bundle()
             extras.putLong(Constants.LINEUP_ID, lineupID)
             extras.putString(Constants.LINEUP_TITLE, lineupTitle)
             extras.putSerializable(Constants.EXTRA_LINEUP_STRATEGY, strategy)
+            extras.putInt(Constants.EXTRA_LINEUP_EXTRA_HITTERS, extraHitters)
             return extras
         }
     }
@@ -110,6 +111,7 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
         viewModel.lineupTitle = arguments?.getString(Constants.LINEUP_TITLE) ?: ""
         viewModel.editable = isEditable
         viewModel.strategy = arguments?.getSerializable(Constants.EXTRA_LINEUP_STRATEGY) as TeamStrategy
+        viewModel.extraHitters = arguments?.getInt(Constants.EXTRA_LINEUP_EXTRA_HITTERS) as Int
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -238,7 +240,8 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
             R.id.action_edit -> {
                 val extras = Companion.getArguments(lineupID = viewModel.lineupID ?: 0,
                         lineupTitle = viewModel.lineupTitle ?: "",
-                        strategy = viewModel.strategy
+                        strategy = viewModel.strategy,
+                        extraHitters = viewModel.extraHitters
                 )
                 findNavController().navigate(R.id.lineupFragmentEditable, extras, NavigationUtils().getOptions())
                 true

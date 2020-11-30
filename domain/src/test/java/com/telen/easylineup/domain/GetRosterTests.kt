@@ -25,9 +25,10 @@ internal class GetRosterTests {
     @Mock lateinit var lineupDao: LineupRepository
     @Mock lateinit var playerDao: PlayerRepository
     lateinit var mGetRoster: GetRoster
+    private val extraHitters = 0
 
     private val lineup = Lineup(1L, "A", 1L, 1L,
-            1, TeamStrategy.STANDARD.id,3L,1L,1L, null, "hash")
+            1, TeamStrategy.STANDARD.id, extraHitters, 3L,1L,1L, null, "hash")
 
     private val player1 = Player(1L, 1L, "A", 1,
             1, null, 1, 0, 0, "hash")

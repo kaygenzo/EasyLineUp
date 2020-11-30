@@ -239,6 +239,7 @@ object RepositoryModule {
         return object: Migration(14,15) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE lineups ADD COLUMN strategy INTEGER NOT NULL DEFAULT ${TeamStrategy.STANDARD.id}")
+                database.execSQL("ALTER TABLE lineups ADD COLUMN extraHitters INTEGER NOT NULL DEFAULT 0")
                 //TODO transformet tous les dh avec position == 10 to position == 255
             }
         }

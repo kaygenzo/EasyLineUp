@@ -17,7 +17,7 @@ import org.koin.core.inject
 import timber.log.Timber
 
 sealed class SaveResult
-data class SaveSuccess(val lineupID: Long, val lineupName: String, val strategy: TeamStrategy): SaveResult()
+data class SaveSuccess(val lineupID: Long, val lineupName: String, val strategy: TeamStrategy, val extraHitters: Int): SaveResult()
 
 class LineupViewModel: ViewModel(), KoinComponent {
 
@@ -80,10 +80,10 @@ class LineupViewModel: ViewModel(), KoinComponent {
         return Single.just(chosenRoster)
     }
 
-    fun saveLineup(tournament: Tournament, lineupTitle: String, lineupEventTime: Long, strategy: TeamStrategy) {
-        val disposable = domain.saveLineup(tournament, lineupTitle, chosenRoster, lineupEventTime, strategy)
+    fun saveLineup(tournament: Tournament, lineupTitle: String, lineupEventTime: Long, strategy: TeamStrategy, extraHitters: Int) {
+        val disposable = domain.saveLineup(tournament, lineupTitle, chosenRoster, lineupEventTime, strategy, extraHitters)
                 .subscribe({
-                    saveResult.value = SaveSuccess(it, lineupTitle, strategy)
+                    saveResult.value = SaveSuccess(it, lineupTitle, strategy, extraHitters)
                 }, {
                     Timber.e(it)
                 })

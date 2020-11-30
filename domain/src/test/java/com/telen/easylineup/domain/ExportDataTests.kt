@@ -45,6 +45,8 @@ internal class ExportDataTests {
     private lateinit var lineup2: Lineup
     private lateinit var playerPosition2: PlayerFieldPosition
 
+    private val extraHitters = 0
+
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
@@ -53,7 +55,7 @@ internal class ExportDataTests {
         //team 1
         team1 = Team(1L, "A", null, 0, true, "I")
         player1 = Player(1L, 1L, "A", 1, 1L, null, 1, 0, 0, "p1@test.com", "001","A")
-        lineup1 = Lineup(1L, "A", 1L, 1L, 0, TeamStrategy.STANDARD.id,3L, 1L, 1L, "1", "E")
+        lineup1 = Lineup(1L, "A", 1L, 1L, 0, TeamStrategy.STANDARD.id, extraHitters, 3L, 1L, 1L, "1", "E")
         tournament1 = Tournament(1L, "A", 1L, "C")
         playerPosition1 = PlayerFieldPosition(1L, 1L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"G")
         playerNumberOverlay1 = PlayerNumberOverlay(1L, 1L, 1L, 42, "I")
@@ -61,7 +63,7 @@ internal class ExportDataTests {
         // team 2
         team2 = Team(2L, "B", null, 0, false, "J")
         player2 = Player(2L, 2L, "B", 2, 2L, null, 1, 0, 0, "p2@test.com", "002", "B")
-        lineup2 = Lineup(2L, "B", 2L, 2L, 0, TeamStrategy.STANDARD.id,3L, 1L, 1L, "2", "F")
+        lineup2 = Lineup(2L, "B", 2L, 2L, 0, TeamStrategy.STANDARD.id, extraHitters, 3L, 1L, 1L, "2", "F")
         tournament2 = Tournament(2L, "B", 2L, "D")
         playerPosition2 = PlayerFieldPosition(2L, 2L, 2L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE,"H")
 
