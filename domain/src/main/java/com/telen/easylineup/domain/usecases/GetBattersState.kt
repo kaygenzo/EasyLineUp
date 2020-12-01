@@ -50,12 +50,15 @@ internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBatter
                             }
                             FieldPosition.DP_DH -> {
                                 isDP = requestValues.lineupMode == MODE_ENABLED
+                                canShowIndex = true
                             }
                             else -> {
                                 isFlex = requestValues.lineupMode == MODE_ENABLED && (player.flags and PlayerFieldPosition.FLAG_FLEX > 0)
                                 if(isFlex) {
                                     applyBackground = true
                                 }
+                                else
+                                    canShowIndex = true
                             }
                         }
 

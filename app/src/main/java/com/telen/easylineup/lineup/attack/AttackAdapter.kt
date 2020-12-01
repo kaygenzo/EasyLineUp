@@ -125,11 +125,13 @@ class BattingOrderAdapter(val players: MutableList<BatterState>,
                 positionDesc.setText(batter.playerPositionDesc)
             }
 
-            order.visibility = if(batter.canShowOrder) View.VISIBLE else if(batter.isEditable) View.INVISIBLE else View.GONE
+            order.visibility = if(batter.canShowOrder) View.VISIBLE else View.INVISIBLE
             positionDesc.visibility = if(batter.canShowDescription) View.VISIBLE else View.GONE
             reorderImage.visibility = if(batter.canMove) View.VISIBLE else if(batter.isEditable) View.INVISIBLE else View.GONE
             if(batter.applyBackground)
                 itemPlayerAttack.setBackgroundResource(R.color.grey_light)
+            else
+                itemPlayerAttack.setBackgroundResource(0)
             reorderImage.setOnTouchListener { view, motionEvent ->
                 itemTouchHelper?.startDrag(this)
                 true
