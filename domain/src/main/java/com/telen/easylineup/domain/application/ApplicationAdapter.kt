@@ -435,7 +435,7 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
 
     override fun getBatterStates(players: List<PlayerWithPosition>, teamType: Int, batterSize: Int, extraHitterSize: Int, lineupMode: Int, isDebug: Boolean, isEditable: Boolean): Single<List<BatterState>> {
         return UseCaseHandler.execute(getBatterStateUseCase, GetBattersState.RequestValues(context = context, players = players, teamType = teamType,
-                batterSize = batterSize, extraHitterSize = extraHitterSize, lineupMode = lineupMode, isDebug = isDebug, isEditable = isEditable
+                batterSize = batterSize, extraHitterSize = extraHitterSize, isDebug = isDebug, isEditable = isEditable
         )).map { it.players }
     }
 

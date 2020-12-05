@@ -49,11 +49,11 @@ internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBatter
                                 }
                             }
                             FieldPosition.DP_DH -> {
-                                isDP = requestValues.lineupMode == MODE_ENABLED
+                                isDP = true
                                 canShowIndex = true
                             }
                             else -> {
-                                isFlex = requestValues.lineupMode == MODE_ENABLED && (player.flags and PlayerFieldPosition.FLAG_FLEX > 0)
+                                isFlex = player.flags and PlayerFieldPosition.FLAG_FLEX > 0
                                 if(isFlex) {
                                     applyBackground = true
                                 }
@@ -77,7 +77,7 @@ internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBatter
                         if(isDP) {
                             canShowDescription = true
                         }
-                        // In case of substitues are added before defense ones, let's prevent non authorized ones to be moved
+                        // In case of substitutes are added before defense ones, let's prevent non authorized ones to be moved
                         if(subsFoundNumber > requestValues.extraHitterSize) {
                             canMove = false
                         }
@@ -102,6 +102,6 @@ internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBatter
 
     class ResponseValue(val players: List<BatterState>): UseCase.ResponseValue
     class RequestValues(val context: Context, val players: List<PlayerWithPosition>, val teamType: Int,
-                        val batterSize: Int, val extraHitterSize: Int, val lineupMode: Int,
+                        val batterSize: Int, val extraHitterSize: Int,
                         val isDebug: Boolean, val isEditable: Boolean): UseCase.RequestValues
 }
