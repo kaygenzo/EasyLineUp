@@ -193,4 +193,7 @@
     <string name="tile_team_size_send_empty_phones">Aucun n° de téléphone trouvé dans la liste des joueurs</string>
 
     <string name="app_deeplink_file_import_title">Importer les données de ce fichier ?</string>
+
+    <string name="form_lineup_creation_extra_hitters_label">Batteurs supplém.</string>
+    <string name="form_lineup_creation_strategy_label">Type de match</string>
 </resources>
