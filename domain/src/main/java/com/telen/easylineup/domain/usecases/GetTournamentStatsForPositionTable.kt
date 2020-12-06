@@ -12,10 +12,7 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository): Us
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return dao.getAllPlayerPositionsForTournament(requestValues.tournament.id, requestValues.team.id)
                 .map { list ->
-
-                    // TODO think about this use case, maybe only display used positions instead of the whole list
-                    // TODO propose a spinner to choose which strategy to display
-                    val strategy = TeamStrategy.STANDARD.positions
+                    val possiblePositions = requestValues.strategy.positions
 
                     val topHeaderData = mutableListOf<Pair<String, Int>>()
                     val leftHeaderData = mutableListOf<Pair<String, Int>>()
@@ -41,7 +38,7 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository): Us
 
                     topHeaderData.add(Pair(requestValues.context.getString(R.string.tournament_stats_label_games_played), -1))
 
-                    strategy.forEach { fieldPosition ->
+                    possiblePositions.forEach { fieldPosition ->
                         topHeaderData.add(Pair(positionsArray[fieldPosition.id], fieldPosition.id))
                     }
 
@@ -57,18 +54,28 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository): Us
                         data.add(Pair(gamesCount, -1))
 
                         playerIdToData[entry.key]?.let { positions ->
-                            strategy.forEach { fieldPosition ->
+                            possiblePositions.forEach { fieldPosition ->
                                 val count = positions.filter { it.position == fieldPosition.id }.size.toString()
                                 data.add(Pair(count, fieldPosition.id))
                             }
                         }
                     }
 
-                    ResponseValue(TournamentStatsUIConfig(leftHeaderData, topHeaderData, mainData, mutableListOf(FieldPosition.SUBSTITUTE.id)))
+                    var topLeftCell: List<String>? = null
+                    when(TeamType.getTypeById(requestValues.team.type)) {
+                        TeamType.SOFTBALL -> {
+                            topLeftCell = requestValues.context.resources.getStringArray(R.array.softball_strategy_array).toList()
+                        }
+                        else -> {
+                            //nothing to do, just use standard strategy
+                        }
+                    }
+
+                    ResponseValue(TournamentStatsUIConfig(leftHeaderData, topHeaderData, mainData, mutableListOf(FieldPosition.SUBSTITUTE.id), topLeftCell))
                 }
     }
 
     class ResponseValue(val uiConfig: TournamentStatsUIConfig): UseCase.ResponseValue
 
-    class RequestValues(val tournament: Tournament, val team: Team, val context: Context): UseCase.RequestValues
+    class RequestValues(val tournament: Tournament, val team: Team, val context: Context, val strategy: TeamStrategy): UseCase.RequestValues
 }

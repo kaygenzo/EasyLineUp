@@ -94,7 +94,9 @@ class PlayerDetailsFragment: BaseFragment("PlayerDetailsFragment") {
         })
 
         viewModel.observeTeamType().observe(viewLifecycleOwner, Observer {
-            val positions = TeamType.getValidPositionsForTeam(TeamType.getTypeById(it), TeamStrategy.STANDARD)
+
+            //val positions = TeamType.getValidPositionsForTeam(TeamType.getTypeById(it), TeamStrategy.STANDARD)
+            val positions = FieldPosition.values().filter { it.id != FieldPosition.SUBSTITUTE.id }
             view.positionsBarChart.apply {
                 setPositionsReference(positions)
                 setTeamType(it)

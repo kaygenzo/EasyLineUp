@@ -6,4 +6,7 @@
 
     <string name="tournament_stats_unknown_player_name">Unknown</string>
     <string name="tournament_stats_label_games_played">Total</string>
+
+    <string name="softball_strategy_fastpitch" translatable="false">Fastpitch</string>
+    <string name="softball_strategy_slowpitch" translatable="false">Slowpitch</string>
 </resources>

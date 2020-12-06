@@ -16,11 +16,6 @@
         <item>@string/tile_team_size_send_other</item>
     </string-array>
 
-    <string-array name="softball_strategy_array" translatable="false">
-        <item>@string/softball_strategy_fastpitch</item>
-        <item>@string/softball_strategy_slowpitch</item>
-    </string-array>
-
     <string-array name="extra_hitters_labels" translatable="false">
         <item>0</item>
         <item>1</item>

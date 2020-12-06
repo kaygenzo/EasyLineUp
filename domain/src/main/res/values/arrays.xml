@@ -35,4 +35,10 @@
         <item>RCF</item>
         <item>RF</item>
     </string-array>
+
+    <string-array name="softball_strategy_array" translatable="false">
+        <item>@string/softball_strategy_fastpitch</item>
+        <item>@string/softball_strategy_slowpitch</item>
+    </string-array>
+
 </resources>

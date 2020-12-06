@@ -172,7 +172,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     fun onLineupModeChanged(isEnabled: Boolean) {
         lineupMode = if(isEnabled) MODE_ENABLED else MODE_DISABLED
 
-        val disposable = domain.updateLineupMode(isEnabled, lineupID, lineupMode, _listPlayersWithPosition, extraHitters)
+        val disposable = domain.updateLineupMode(isEnabled, lineupID, lineupMode, _listPlayersWithPosition, strategy, extraHitters)
                 .subscribe({
                     eventHandler.onNext(UpdatePlayersWithLineupModeSuccess)
                 }, {

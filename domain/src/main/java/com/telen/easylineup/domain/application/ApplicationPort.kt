@@ -59,7 +59,7 @@ interface ApplicationPort {
     fun getRoster(lineupID: Long): Single<TeamRosterSummary>
     fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary, lineupEventTime: Long, strategy: TeamStrategy, extraHittersSize: Int): Single<Long>
     fun deleteLineup(lineupID: Long?): Completable
-    fun updateLineupMode(isEnabled: Boolean, lineupID: Long?, lineupMode: Int, list: List<PlayerWithPosition>, extraHittersSize: Int): Completable
+    fun updateLineupMode(isEnabled: Boolean, lineupID: Long?, lineupMode: Int, list: List<PlayerWithPosition>, strategy: TeamStrategy, extraHittersSize: Int): Completable
 
     //player field positions
     /** @deprecated **/ fun insertPlayerFieldPositions(playerFieldPositions: List<PlayerFieldPosition>): Completable
@@ -77,7 +77,7 @@ interface ApplicationPort {
     /** @deprecated **/ fun insertTournaments(tournaments: List<Tournament>): Completable
     fun deleteTournament(tournament: Tournament) : Completable
     fun getCategorizedLineups(filter: String): Single<List<Pair<Tournament, List<Lineup>>>>
-    fun getPlayersPositionForTournament(tournament: Tournament): Single<TournamentStatsUIConfig>
+    fun getPlayersPositionForTournament(tournament: Tournament, strategy: TeamStrategy): Single<TournamentStatsUIConfig>
 
     //data
     fun importData(root: ExportBase, updateIfExists: Boolean): Completable

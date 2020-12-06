@@ -332,7 +332,7 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                 }
     }
 
-    override fun updateLineupMode(isEnabled: Boolean, lineupID: Long?, lineupMode: Int, list: List<PlayerWithPosition>, extraHittersSize: Int): Completable {
+    override fun updateLineupMode(isEnabled: Boolean, lineupID: Long?, lineupMode: Int, list: List<PlayerWithPosition>, strategy: TeamStrategy, extraHittersSize: Int): Completable {
         return UseCaseHandler.execute(saveLineupMode, SaveLineupMode.RequestValues(lineupID, lineupMode))
                 .doOnError {
                     _errors.onNext(DomainErrors.SAVE_LINEUP_MODE_FAILED)
@@ -341,7 +341,7 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
 //            eventHandler.value = SaveLineupModeSuccess
                     getTeam()
                             .flatMapCompletable {
-                                val requestValues = UpdatePlayersWithLineupMode.RequestValues(list, isEnabled, it.type, extraHittersSize)
+                                val requestValues = UpdatePlayersWithLineupMode.RequestValues(list, isEnabled, it.type, strategy, extraHittersSize)
                                 UseCaseHandler.execute(updatePlayersWithLineupMode, requestValues).ignoreElement()
                             }
                 }
@@ -457,9 +457,9 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
                 .map { it.result }
     }
 
-    override fun getPlayersPositionForTournament(tournament: Tournament): Single<TournamentStatsUIConfig> {
+    override fun getPlayersPositionForTournament(tournament: Tournament, strategy: TeamStrategy): Single<TournamentStatsUIConfig> {
         return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
-                .flatMap { UseCaseHandler.execute(tableDataUseCase, GetTournamentStatsForPositionTable.RequestValues(tournament, it.team, context)) }
+                .flatMap { UseCaseHandler.execute(tableDataUseCase, GetTournamentStatsForPositionTable.RequestValues(tournament, it.team, context, strategy)) }
                 .map { it.uiConfig }
     }
 

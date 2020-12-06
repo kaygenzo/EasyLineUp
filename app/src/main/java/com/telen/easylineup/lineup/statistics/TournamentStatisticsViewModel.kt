@@ -4,10 +4,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.library.widget.tablemultiscroll.views.CellConfiguration
 import com.telen.library.widget.tablemultiscroll.views.Highlight
 import com.telen.library.widget.tablemultiscroll.views.StyleConfiguration
+import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -21,11 +23,21 @@ class TournamentStatisticsViewModel: ViewModel(), KoinComponent {
     val leftHeadersData = MutableLiveData<List<CellConfiguration>>()
     val mainTableData = MutableLiveData<List<List<CellConfiguration>>>()
     val columnHighlights = MutableLiveData<List<Highlight>>()
+    val topLeftCell = MutableLiveData<List<String>>()
 
     private val domain: ApplicationPort by inject()
+    var strategy = TeamStrategy.STANDARD
+    var tournament: Tournament? = null
 
-    fun getPlayersPositionForTournament(tournament: Tournament) {
-        disposable = domain.getPlayersPositionForTournament(tournament)
+    fun getPlayersPositionForTournament() {
+        disposable = Single.create<Tournament> { emitter ->
+            tournament?.let {
+                emitter.onSuccess(it)
+            } ?: run {
+                emitter.onError(IllegalArgumentException())
+            }
+        }
+                .flatMap { domain.getPlayersPositionForTournament(it, strategy) }
                 .subscribe({
                     val leftHeaderDataList = mutableListOf<CellConfiguration>()
                     it.leftHeader.forEach {
@@ -56,9 +68,18 @@ class TournamentStatisticsViewModel: ViewModel(), KoinComponent {
                     this.mainTableData.value = mainDataList
                     this.columnHighlights.value = columnHighlights
 
+                    it.topLeftCell?.let {
+                        this.topLeftCell.value = it
+                    }
+
                 }, {
                     Timber.e(it)
                 })
+    }
+
+    fun onStrategyChosen(index: Int) {
+        strategy = TeamStrategy.getStrategyById(index)
+        getPlayersPositionForTournament()
     }
 
     fun clear() {
