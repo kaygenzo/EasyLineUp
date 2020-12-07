@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.squareup.picasso.Picasso
@@ -13,9 +15,9 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.TeamStrategy
-import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.fragment_player_details.view.*
+import kotlinx.android.synthetic.main.view_bar_chart.view.*
 import timber.log.Timber
 
 const val EMPTY_MARKER = "-"
@@ -94,14 +96,31 @@ class PlayerDetailsFragment: BaseFragment("PlayerDetailsFragment") {
         })
 
         viewModel.observeTeamType().observe(viewLifecycleOwner, Observer {
+            view.positionsBarChart.setTeamType(it)
+        })
 
-            //val positions = TeamType.getValidPositionsForTeam(TeamType.getTypeById(it), TeamStrategy.STANDARD)
-            val positions = FieldPosition.values().filter { it.id != FieldPosition.SUBSTITUTE.id }
-            view.positionsBarChart.apply {
-                setPositionsReference(positions)
-                setTeamType(it)
+        viewModel.observeStrategiesCount().observe(viewLifecycleOwner, Observer {
+            view.teamStrategy.apply {
+                visibility = if(it.size > 1) View.VISIBLE else View.GONE
+                val strategiesName = resources.getStringArray(R.array.softball_strategy_array)
+                adapter = ArrayAdapter(context, R.layout.item_team_strategy, strategiesName)
+                setSelection(TeamStrategy.STANDARD.id, false)
+                onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+                    override fun onNothingSelected(p0: AdapterView<*>?) {}
+                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
+                        viewModel.onStrategySelected(position)
+                    }
+                }
             }
         })
+
+        viewModel.observeStrategy().observe(viewLifecycleOwner, Observer {
+            view.positionsBarChart.apply {
+                setStrategy(it)
+            }
+        })
+
+        viewModel.loadData()
 
         return view
     }

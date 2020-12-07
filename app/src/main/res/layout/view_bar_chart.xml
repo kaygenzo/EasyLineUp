@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.github.mikephil.charting.charts.BarChart
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/playerPositionsChart"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    android:layout_height="wrap_content">
+
+    <Spinner
+        android:id="@+id/teamStrategy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/playerPositionsChart"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/radar_chart_size"
+        app:layout_constraintTop_toBottomOf="@+id/teamStrategy"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

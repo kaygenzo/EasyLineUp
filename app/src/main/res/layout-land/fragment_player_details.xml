@@ -297,7 +297,7 @@
             style="@style/PlayerDetailsContainer"
             android:id="@+id/playerPositionRepartition"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/radar_chart_size"
+            android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/playerStatistics"
             android:layout_margin="@dimen/default_margin">
 
@@ -305,7 +305,7 @@
                 style="@style/Field.Green.Dark"
                 android:id="@+id/positionsBarChart"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

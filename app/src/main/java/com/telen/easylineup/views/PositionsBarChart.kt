@@ -11,23 +11,23 @@ import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamStrategy
-import com.telen.easylineup.domain.model.TeamType
 import kotlinx.android.synthetic.main.view_bar_chart.view.*
-import java.lang.reflect.Field
 
 
 class PositionsBarChart: ConstraintLayout {
 
     // positions reference to display in xAxis
-    private var positionsRef: MutableList<FieldPosition> = mutableListOf()
-
+    private var strategy: TeamStrategy = TeamStrategy.STANDARD
     private var teamType: Int? = null
+
     private var data: MutableMap<FieldPosition, Int> = mutableMapOf()
 
     // names from arrays.xml
@@ -58,7 +58,6 @@ class PositionsBarChart: ConstraintLayout {
         chart.animateXY(1000, 1000, Easing.EaseInOutQuad)
 
         val xAxis = chart.xAxis
-        refreshXAxis()
         xAxis.textSize = resources.getDimension(R.dimen.player_bar_chart_x_axis_size)
         xAxis.textColor = Color.BLACK
         xAxis.position = XAxis.XAxisPosition.BOTTOM
@@ -82,17 +81,13 @@ class PositionsBarChart: ConstraintLayout {
         refreshChart()
     }
 
-    fun setPositionsReference(reference: List<FieldPosition>) {
-        this.positionsRef.apply {
-            clear()
-            addAll(reference)
-        }
+    fun setStrategy(strategy: TeamStrategy) {
+        this.strategy = strategy
         refreshChart()
     }
 
     fun setTeamType(teamType: Int) {
         this.teamType = teamType
-        refreshXAxis()
         refreshChart()
     }
 
@@ -103,8 +98,12 @@ class PositionsBarChart: ConstraintLayout {
             xAxis.valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
                     val index = value.toInt()
-                    val position = positionsRef[index]
-                    return mPositions?.get(position.id) ?: "N/A"
+                    if(index < strategy.positions.size) {
+                        val position = strategy.positions[index]
+                        return mPositions?.get(position.id) ?: "N/A"
+                    }
+                    else
+                        return "N/A"
                 }
             }
         }
@@ -112,7 +111,8 @@ class PositionsBarChart: ConstraintLayout {
 
     private fun refreshChart() {
 
-        if(positionsRef.isEmpty() || teamType == null || data.isEmpty()) {
+        val positionsRef = strategy.positions
+        if(teamType == null || data.isEmpty()) {
             return
         }
 
@@ -120,6 +120,8 @@ class PositionsBarChart: ConstraintLayout {
 
         val xAxis = chart.xAxis
         xAxis.labelCount = positionsRef.size
+
+        refreshXAxis()
 
         val entries: MutableList<BarEntry> = mutableListOf()
 

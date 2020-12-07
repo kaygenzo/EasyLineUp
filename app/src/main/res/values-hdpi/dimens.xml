@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="radar_chart_size">120dp</dimen>
+    <dimen name="radar_chart_size">100dp</dimen>
 
     <dimen name="player_details_picture_width">100dp</dimen>
     <dimen name="player_details_picture_height">120dp</dimen>

@@ -7,6 +7,10 @@ import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
+import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
@@ -27,11 +31,15 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     private val disposables = CompositeDisposable()
 
     private val _teamTypeLiveData = MutableLiveData<Int>()
+    private val _strategyLiveData = MutableLiveData<TeamStrategy>()
     private val _playerLiveData = MutableLiveData<Player>()
     private val _lineupsLiveData = MutableLiveData<Map<FieldPosition, Int>>()
     private val _event = PublishSubject.create<Event>()
+    private val _strategiesLiveData = MutableLiveData<List<TeamStrategy>>()
 
     var playerID: Long? = 0
+    var teamType: Int = 0
+    var strategies = mutableListOf<TeamStrategy>()
 
     fun observePlayer(): LiveData<Player> {
         val disposable = domain.getPlayer(playerID)
@@ -44,15 +52,41 @@ class PlayerViewModel: ViewModel(), KoinComponent {
         return _playerLiveData
     }
 
+    fun observeStrategy(): LiveData<TeamStrategy> {
+        return _strategyLiveData
+    }
+
     fun observeTeamType(): LiveData<Int> {
+        return _teamTypeLiveData
+    }
+
+    fun observeStrategiesCount() : LiveData<List<TeamStrategy>> {
+        return _strategiesLiveData
+    }
+
+    fun loadData() {
         val disposable = domain.getTeamType()
+                .flatMapCompletable {
+                    this.teamType = it
+                    strategies.clear()
+                    when(TeamType.getTypeById(it)) {
+                        TeamType.SOFTBALL -> {
+                            strategies.addAll(TeamStrategy.values())
+                        }
+                        else -> {
+                            strategies.add(TeamStrategy.STANDARD)
+                        }
+                    }
+                    Completable.complete()
+                }
                 .subscribe({
-                    _teamTypeLiveData.postValue(it)
+                    _strategiesLiveData.postValue(this.strategies)
+                    _teamTypeLiveData.postValue(this.teamType)
+                    _strategyLiveData.postValue(this.strategies[0])
                 }, {
                     Timber.e(it)
                 })
         disposables.add(disposable)
-        return _teamTypeLiveData
     }
 
     fun observeLineups(): LiveData<Map<FieldPosition, Int>> {
@@ -97,4 +131,8 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     }
 
     fun registerFormErrorResult() = domain.observeErrors()
+
+    fun onStrategySelected(index: Int) {
+        _strategyLiveData.postValue(strategies[index])
+    }
 }
