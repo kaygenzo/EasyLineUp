@@ -33,9 +33,7 @@ internal abstract class GetBattersStateEditableTests(teamType: TeamType, strateg
         players[0].order = new
         players[players.size - 1].order = old
 
-        mGetBattersState.executeUseCase(GetBattersState.RequestValues(context, players, teamType.id, batterSize, extraHittersSize, false, isEditable))
-                .subscribe(observer)
-        observer.awaitTerminalEvent()
+        applyUserCase()
 
         val expected = BatterState(1L, PlayerFieldPosition.FLAG_NONE, new, "t1", "1",
                 FieldPosition.DP_DH, playerPositionDesc = if (teamType == TeamType.BASEBALL) "DH" else "DP", canShowPosition = false, canMove = true, canShowDescription = true,
@@ -56,9 +54,7 @@ internal abstract class GetBattersStateEditableTests(teamType: TeamType, strateg
             order = newFlexOrder
         }
 
-        mGetBattersState.executeUseCase(GetBattersState.RequestValues(context, players, teamType.id, batterSize, extraHittersSize, false, isEditable))
-                .subscribe(observer)
-        observer.awaitTerminalEvent()
+        applyUserCase()
 
         val expected = BatterState(1L, PlayerFieldPosition.FLAG_FLEX, newFlexOrder, "t1", "1",
                 FieldPosition.PITCHER, playerPositionDesc = "P", canShowPosition = true, canMove = false, canShowDescription = false,
@@ -71,9 +67,8 @@ internal abstract class GetBattersStateEditableTests(teamType: TeamType, strateg
     @Test
     fun defense_player_should_only_showIndex_and_showPosition_and_canMove_when_lineup_editable() {
         addPlayers()
-        mGetBattersState.executeUseCase(GetBattersState.RequestValues(context, players, teamType.id, batterSize, extraHittersSize, false, isEditable))
-                .subscribe(observer)
-        observer.awaitTerminalEvent()
+
+        applyUserCase()
 
         var i = 1
         observer.values()[0].players.forEach { batterState ->
@@ -93,9 +88,7 @@ internal abstract class GetBattersStateEditableTests(teamType: TeamType, strateg
         addExtraHitters(extraHittersSize)
         addSubstitutes()
 
-        mGetBattersState.executeUseCase(GetBattersState.RequestValues(context, players, teamType.id, batterSize, extraHittersSize, false, isEditable))
-                .subscribe(observer)
-        observer.awaitTerminalEvent()
+        applyUserCase()
 
         var i = batterSize + 1
         observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }.forEach { batterState ->
@@ -114,9 +107,7 @@ internal abstract class GetBattersStateEditableTests(teamType: TeamType, strateg
         addExtraHitters(extraHittersSize)
         addSubstitutes()
 
-        mGetBattersState.executeUseCase(GetBattersState.RequestValues(context, players, teamType.id, batterSize, extraHittersSize, false, isEditable))
-                .subscribe(observer)
-        observer.awaitTerminalEvent()
+       applyUserCase()
 
         var i = 1
         observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }.forEach { batterState ->
@@ -130,6 +121,26 @@ internal abstract class GetBattersStateEditableTests(teamType: TeamType, strateg
         }
     }
 
+    @Test
+    fun shouldNotShowSubstitutesOrderIfCannotMove_when_lineup_editable() {
+        addPlayers()
+        addSubstitutes(Constants.SUBSTITUTE_ORDER_VALUE)
+        for(i in batterSize until (batterSize + extraHittersSize)) { players[i].order = i + 1 }
+        players.removeAt(0)
+        applyUserCase()
+
+        var i = batterSize + 1
+        observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }.forEach { batterState ->
+            // we don't test here the field position and desc, so let's use the same as the loop object
+            val subAllowBatting = i <= batterSize + extraHittersSize
+            val expected = BatterState(i.toLong(), PlayerFieldPosition.FLAG_NONE, if(subAllowBatting) i else Constants.SUBSTITUTE_ORDER_VALUE,
+                    "t$i", "$i", FieldPosition.SUBSTITUTE, playerPositionDesc = "SUB", canShowPosition = false,
+                    canMove = subAllowBatting, canShowDescription = true, canShowOrder = subAllowBatting, origin = players[i-2], applyBackground = false,
+                    isEditable = isEditable)
+            Assert.assertEquals(expected, batterState)
+            i++
+        }
+    }
 }
 
 ////////////// EDITABLE NO HITTER SIZE //////////////
@@ -179,9 +190,7 @@ internal abstract class GetBattersStateNotEditableTests(teamType: TeamType, stra
         players[0].order = new
         players[players.size - 1].order = old
 
-        mGetBattersState.executeUseCase(GetBattersState.RequestValues(context, players, teamType.id, batterSize, extraHittersSize, false, isEditable))
-                .subscribe(observer)
-        observer.awaitTerminalEvent()
+        applyUserCase()
 
         val expected = BatterState(1L, PlayerFieldPosition.FLAG_NONE, new, "t1", "1",
                 FieldPosition.DP_DH, playerPositionDesc = if (teamType == TeamType.BASEBALL) "DH" else "DP", canShowPosition = false, canMove = false, canShowDescription = true,
@@ -202,9 +211,7 @@ internal abstract class GetBattersStateNotEditableTests(teamType: TeamType, stra
             order = newFlexOrder
         }
 
-        mGetBattersState.executeUseCase(GetBattersState.RequestValues(context, players, teamType.id, batterSize, extraHittersSize, false, isEditable))
-                .subscribe(observer)
-        observer.awaitTerminalEvent()
+        applyUserCase()
 
         val expected = BatterState(1L, PlayerFieldPosition.FLAG_FLEX, newFlexOrder, "t1", "1",
                 FieldPosition.PITCHER, playerPositionDesc = "P", canShowPosition = true, canMove = false, canShowDescription = true,
@@ -217,9 +224,8 @@ internal abstract class GetBattersStateNotEditableTests(teamType: TeamType, stra
     @Test
     fun defense_player_should_only_showIndex_and_showPosition_showDescription_when_lineup_editable() {
         addPlayers()
-        mGetBattersState.executeUseCase(GetBattersState.RequestValues(context, players, teamType.id, batterSize, extraHittersSize, false, isEditable))
-                .subscribe(observer)
-        observer.awaitTerminalEvent()
+
+        applyUserCase()
 
         var i = 1
         observer.values()[0].players.forEach { batterState ->
@@ -239,9 +245,7 @@ internal abstract class GetBattersStateNotEditableTests(teamType: TeamType, stra
         addExtraHitters(extraHittersSize)
         addSubstitutes()
 
-        mGetBattersState.executeUseCase(GetBattersState.RequestValues(context, players, teamType.id, batterSize, extraHittersSize, false, isEditable))
-                .subscribe(observer)
-        observer.awaitTerminalEvent()
+        applyUserCase()
 
         var i = batterSize + 1
         observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }.forEach { batterState ->
@@ -260,9 +264,7 @@ internal abstract class GetBattersStateNotEditableTests(teamType: TeamType, stra
         addExtraHitters(extraHittersSize)
         addSubstitutes()
 
-        mGetBattersState.executeUseCase(GetBattersState.RequestValues(context, players, teamType.id, batterSize, extraHittersSize, false, isEditable))
-                .subscribe(observer)
-        observer.awaitTerminalEvent()
+        applyUserCase()
 
         var i = 1
         observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }.forEach { batterState ->
@@ -271,6 +273,27 @@ internal abstract class GetBattersStateNotEditableTests(teamType: TeamType, stra
             val expected = BatterState(i.toLong(), PlayerFieldPosition.FLAG_NONE, i, "t$i", "$i",
                     FieldPosition.SUBSTITUTE, playerPositionDesc = "SUB", canShowPosition = false, canMove = false, canShowDescription = true,
                     canShowOrder = subAllowBatting, origin = players[i-1], applyBackground = false, isEditable = isEditable)
+            Assert.assertEquals(expected, batterState)
+            i++
+        }
+    }
+
+    @Test
+    fun shouldNotShowSubstitutesOrderIfCannotMove() {
+        addPlayers()
+        addSubstitutes(Constants.SUBSTITUTE_ORDER_VALUE)
+        for(i in batterSize until (batterSize + extraHittersSize)) { players[i].order = i + 1 }
+        players.removeAt(0)
+        applyUserCase()
+
+        var i = batterSize + 1
+        observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }.forEach { batterState ->
+            // we don't test here the field position and desc, so let's use the same as the loop object
+            val subAllowBatting = i <= batterSize + extraHittersSize
+            val expected = BatterState(i.toLong(), PlayerFieldPosition.FLAG_NONE, if(subAllowBatting) i else Constants.SUBSTITUTE_ORDER_VALUE,
+                    "t$i", "$i", FieldPosition.SUBSTITUTE, playerPositionDesc = "SUB", canShowPosition = false,
+                    canMove = false, canShowDescription = true, canShowOrder = subAllowBatting, origin = players[i-2], applyBackground = false,
+                    isEditable = isEditable)
             Assert.assertEquals(expected, batterState)
             i++
         }
@@ -360,7 +383,7 @@ internal abstract class GetBattersStateTests(protected val teamType: TeamType, p
         }
     }
 
-    protected fun addSubstitutes() {
+    protected fun addSubstitutes(order: Int = 0) {
         val fromIndex = players.size + 1
         for (j in fromIndex..fromIndex+9) {
             players.add(PlayerWithPosition(
@@ -372,7 +395,7 @@ internal abstract class GetBattersStateTests(protected val teamType: TeamType, p
                     position = FieldPosition.SUBSTITUTE.id,
                     x = 0f, y = 0f,
                     flags = PlayerFieldPosition.FLAG_NONE,
-                    order = 0,
+                    order = order,
                     fieldPositionID = j.toLong(),
                     playerID = j.toLong(),
                     lineupId = 1,
@@ -402,13 +425,17 @@ internal abstract class GetBattersStateTests(protected val teamType: TeamType, p
         }
     }
 
+    protected fun applyUserCase() {
+        mGetBattersState.executeUseCase(GetBattersState.RequestValues(context, players, teamType.id, batterSize, extraHittersSize, false, isEditable))
+                .subscribe(observer)
+        observer.awaitTerminalEvent()
+    }
+
     @Test
     fun shouldFilterPlayersWithOrder0() {
         addPlayers()
         addSubstitutes()
-        mGetBattersState.executeUseCase(GetBattersState.RequestValues(context, players, teamType.id, batterSize, extraHittersSize, false, isEditable))
-                .subscribe(observer)
-        observer.awaitTerminalEvent()
+        applyUserCase()
         Assert.assertEquals(batterSize, observer.values()[0].players.count())
         Assert.assertEquals(0, observer.values()[0].players.filter { it.playerOrder == 0 }.count())
     }

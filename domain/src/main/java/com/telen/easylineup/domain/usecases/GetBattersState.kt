@@ -45,7 +45,7 @@ internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBatter
                                 subsFoundNumber++
                                 //Log.d("", "id=${position} position=${fieldPosition} maxSize=${maxBatterSize}")
                                 if (position < maxBatterSize) {
-                                    canShowIndex = true
+                                    canShowIndex = subsFoundNumber <= requestValues.extraHitterSize
                                 }
                             }
                             FieldPosition.DP_DH -> {
