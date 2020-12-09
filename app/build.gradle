@@ -189,10 +189,6 @@ dependencies {
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation "androidx.room:room-runtime:$room_version"
-    implementation "androidx.legacy:legacy-support-v4:$legacySupportVersion"
-    kapt "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-rxjava2:$room_version"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version_ktx"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version_ktx"
 
@@ -218,7 +214,6 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     implementation "com.github.PhilJay:MPAndroidChart:$androidchartVersion"
     implementation "com.squareup.picasso:picasso:$picassoVersion"
-    implementation "com.shuhart.stepview:stepview:$stepViewVersion"
     implementation "com.makeramen:roundedimageview:$roundedImageView"
 
     implementation "com.github.nguyenhoanglam:ImagePicker:$imagepickerVersion"
