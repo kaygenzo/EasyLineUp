@@ -160,18 +160,18 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
                 }
             }
 
-            view.findViewById<ConstraintLayout>(R.id.fragment_attack)?.let {
+            view.findViewById<ConstraintLayout>(R.id.fragment_attack_edition)?.let {
                 childFragmentManager.fragments.filterIsInstance<AttackFragment>().lastOrNull()?.let {
                     if (!it.isRemoving) {
                         childFragmentManager
                                 .beginTransaction()
-                                .replace(R.id.fragment_attack, it)
+                                .replace(R.id.fragment_attack_edition, it)
                                 .commit()
                     }
                 } ?: run {
                     childFragmentManager
                             .beginTransaction()
-                            .replace(R.id.fragment_attack, AttackFragment())
+                            .replace(R.id.fragment_attack_edition, AttackFragment())
                             .commit()
                 }
             }

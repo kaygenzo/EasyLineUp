@@ -23,7 +23,7 @@
         app:layout_constraintGuide_percent="0.5"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/fragment_attack"
+        android:id="@+id/fragment_attack_edition"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:name="com.telen.easylineup.lineup.attack.AttackFragment"
