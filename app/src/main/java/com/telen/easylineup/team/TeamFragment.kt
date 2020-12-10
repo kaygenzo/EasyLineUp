@@ -13,6 +13,7 @@ import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.android.synthetic.main.fragment_player_list.view.*
 
@@ -46,6 +47,7 @@ class TeamFragment: BaseFragment("TeamFragment"), OnPlayerClickListener {
 
             view.fab.setOnClickListener {
                 context?.let {
+                    FirebaseAnalyticsUtils.onClick(activity, "click_team_players_create")
                     findNavController().navigate(R.id.playerEditFragment, null, NavigationUtils().getOptions())
                 }
             }
@@ -61,6 +63,7 @@ class TeamFragment: BaseFragment("TeamFragment"), OnPlayerClickListener {
     }
 
     override fun onPlayerSelected(player: Player) {
+        FirebaseAnalyticsUtils.onClick(activity, "click_team_players_selected")
         val extras = Bundle()
         extras.putLong(Constants.PLAYER_ID, player.id)
         findNavController().navigate(R.id.playerDetailsFragment, extras, NavigationUtils().getOptions())

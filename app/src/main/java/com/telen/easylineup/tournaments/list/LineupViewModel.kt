@@ -1,4 +1,4 @@
-package com.telen.easylineup.lineup.list
+package com.telen.easylineup.tournaments.list
 
 import android.content.Context
 import androidx.lifecycle.LiveData

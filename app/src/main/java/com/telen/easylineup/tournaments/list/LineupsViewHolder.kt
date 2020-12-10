@@ -1,12 +1,9 @@
-package com.telen.easylineup.lineup.list
+package com.telen.easylineup.tournaments.list
 
 import android.view.View
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textview.MaterialTextView
 import com.telen.easylineup.R
-import com.telen.easylineup.views.CollegedStyledTextView
-import com.telen.easylineup.views.DefenseFixedView
 import com.telen.easylineup.views.MLBStyledTextView
 
 data class LineupsViewHolder(val view: View): RecyclerView.ViewHolder(view) {

@@ -36,6 +36,7 @@ class PlayerEditFragment: BaseFragment("PlayerEditFragment"), PlayerFormListener
     }
 
     override fun onImagePickerRequested() {
+        FirebaseAnalyticsUtils.onClick(activity, "click_player_edit_image_pick")
         ImagePickerUtils.launchPicker(this)
     }
 
@@ -201,6 +202,7 @@ class PlayerEditFragment: BaseFragment("PlayerEditFragment"), PlayerFormListener
     }
 
     fun cancel() {
+        FirebaseAnalyticsUtils.onClick(activity, "click_player_edit_cancel")
         activity?.run {
             DialogFactory.getWarningDialog(
                     context = this,

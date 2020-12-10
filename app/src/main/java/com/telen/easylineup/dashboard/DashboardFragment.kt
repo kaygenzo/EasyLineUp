@@ -28,10 +28,7 @@ import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.tiles.*
 import com.telen.easylineup.lineup.LineupFragment
-import com.telen.easylineup.utils.DialogFactory
-import com.telen.easylineup.utils.FeatureViewFactory
-import com.telen.easylineup.utils.NavigationUtils
-import com.telen.easylineup.utils.hideSoftKeyboard
+import com.telen.easylineup.utils.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
 import kotlinx.android.synthetic.main.home_main_content.*
@@ -124,9 +121,11 @@ class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, A
     override fun onTileClicked(type: Int, data: ITileData) {
         when(type) {
             Constants.TYPE_TEAM_SIZE -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_team_size")
                 findNavController().navigate(R.id.navigation_team, null, NavigationUtils().getOptions())
             }
             Constants.TYPE_LAST_LINEUP -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_last_lineup")
                 val lineupID = data.getData()[KEY_LINEUP_ID] as? Long ?: 0L
                 val lineupName = data.getData()[KEY_LINEUP_NAME] as? String ?: ""
                 val lineupStrategy = data.getData()[KEY_LINEUP_STRATEGY] as TeamStrategy
@@ -142,6 +141,7 @@ class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, A
 
     override fun onTileLongClicked(type: Int) {
         activity?.let { activity ->
+            FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_reorder")
             val inEditMode = tileAdapter.inEditMode
             if (!inEditMode) {
                 actionMode = (activity as AppCompatActivity).startSupportActionMode(this)
@@ -151,6 +151,8 @@ class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, A
     }
 
     override fun onTileSearchNumberClicked(number: Int) {
+
+        FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_search_player")
 
         hideSoftKeyboard()
 
@@ -170,6 +172,9 @@ class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, A
     override fun onTileSearchNumberHistoryClicked(history: List<ShirtNumberEntry>) {
         if(history.isEmpty())
             return
+
+        FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_number_history")
+
         activity?.run {
             AlertDialog.Builder(this)
                     .setItems(history.map {
@@ -184,17 +189,21 @@ class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, A
 
     override fun onTileTeamSizeSendButtonClicked() {
         activity?.let { activity ->
+
             val list = mutableListOf<CharSequence>()
             list.addAll(activity.resources.getStringArray(R.array.tile_team_size_send_list_labels))
             DialogFactory.getListDialog(activity, list.toTypedArray(), DialogInterface.OnClickListener { dialogInterface, i ->
                 when (i) {
                     INDEX_SEND_MESSAGES -> {
+                        FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_send_message")
                         dashboardViewModel.getPhones()
                     }
                     INDEX_SEND_EMAILS -> {
+                        FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_send_email")
                         dashboardViewModel.getEmails()
                     }
                     INDEX_SEND_OTHER -> {
+                        FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_send_other")
                         val intent = Intent(Intent.ACTION_SEND).apply {
                             type = "text/plain"
                         }
@@ -274,6 +283,7 @@ class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, A
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_report_issue -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_report_issue")
                 Shake.show(object : ShakeReportData {
                     override fun quickFacts(): String? {
                         return null

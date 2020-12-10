@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.telen.easylineup.BaseImportActivity
 import com.telen.easylineup.R
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import kotlinx.android.synthetic.main.activity_login.*
 
 
@@ -15,10 +16,12 @@ class LoginActivity: BaseImportActivity() {
         setContentView(R.layout.activity_login)
 
         login_create.setOnClickListener {
+            FirebaseAnalyticsUtils.onClick(this, "click_login_create")
             launchTeamCreation()
         }
 
         login_import.setOnClickListener {
+            FirebaseAnalyticsUtils.onClick(this, "click_login_import")
             importData()
         }
     }

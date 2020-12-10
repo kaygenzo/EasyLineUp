@@ -90,13 +90,20 @@ class TeamCreationActivity: BaseActivity() {
 
         disposables.add(disposable)
 
-        buttonNext.setOnClickListener { viewModel.nextButtonClicked() }
-        buttonPrevious.setOnClickListener { viewModel.previousButtonClicked() }
+        buttonNext.setOnClickListener {
+            FirebaseAnalyticsUtils.onClick(this, "click_team_creation_next")
+            viewModel.nextButtonClicked()
+        }
+        buttonPrevious.setOnClickListener {
+            FirebaseAnalyticsUtils.onClick(this, "click_team_creation_previous")
+            viewModel.previousButtonClicked()
+        }
 
         viewModel.refresh()
     }
 
     override fun onBackPressed() {
+        FirebaseAnalyticsUtils.onClick(this, "click_team_creation_back_clicked")
         viewModel.previousButtonClicked()
     }
 }

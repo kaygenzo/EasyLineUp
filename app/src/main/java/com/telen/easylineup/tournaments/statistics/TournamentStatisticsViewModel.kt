@@ -1,4 +1,4 @@
-package com.telen.easylineup.lineup.statistics
+package com.telen.easylineup.tournaments.statistics
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

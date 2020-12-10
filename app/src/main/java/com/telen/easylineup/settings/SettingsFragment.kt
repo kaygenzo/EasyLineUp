@@ -154,6 +154,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     override fun onPreferenceTreeClick(preference: Preference?): Boolean {
         when(preference?.key) {
             getString(R.string.key_play_store) -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_settings_play_store")
                 try {
                     val intent = Intent(Intent.ACTION_VIEW)
                     intent.data = Uri.parse("market://details?id=${activity?.packageName}")
@@ -172,6 +173,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                     DialogFactory.getWarningTaskDialog(context = it,
                             message = R.string.dialog_delete_cannot_undo_message,
                             task = Completable.create { emitter ->
+                                FirebaseAnalyticsUtils.onClick(activity, "click_settings_delete_data")
                                 viewModel.deleteAllData()
                                 emitter.onComplete()
                             }
@@ -219,6 +221,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                         view = input,
                         confirmText = R.string.export_button,
                         confirmClick = DialogInterface.OnClickListener { dialog, which ->
+                            FirebaseAnalyticsUtils.onClick(activity, "click_settings_export_data")
                             val name = input.getName()
                             viewModel.exportDataOnExternalMemory(name, it.fallbackName)
                         }
@@ -237,6 +240,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                     .withIcon(R.mipmap.ic_launcher)
                     .withStartFile("${Environment.getExternalStorageDirectory().path}/${Constants.EXPORTS_DIRECTORY}")
                     .withChosenListener { path, _ ->
+                        FirebaseAnalyticsUtils.onClick(activity, "click_settings_import_data")
                         val updateIfExists = findPreference<CheckBoxPreference>(getString(R.string.key_import_data_update_object))?.isChecked ?: false
                         loginViewModel.importData(path, updateIfExists)
                     }
@@ -256,7 +260,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when(key) {
-            getString(R.string.key_lineup_style) -> updateLineupStyleSummary()
+            getString(R.string.key_lineup_style) -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_settings_lineup_style")
+                updateLineupStyleSummary()
+            }
         }
     }
 }

@@ -12,9 +12,9 @@ import com.squareup.picasso.Picasso
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.fragment_player_details.view.*
 import kotlinx.android.synthetic.main.view_bar_chart.view.*
@@ -108,6 +108,7 @@ class PlayerDetailsFragment: BaseFragment("PlayerDetailsFragment") {
                 onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
                     override fun onNothingSelected(p0: AdapterView<*>?) {}
                     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
+                        FirebaseAnalyticsUtils.onClick(activity, "click_player_details_strategy_selected")
                         viewModel.onStrategySelected(position)
                     }
                 }

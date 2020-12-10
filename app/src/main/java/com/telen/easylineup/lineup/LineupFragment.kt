@@ -22,6 +22,7 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.lineup.attack.AttackFragment
 import com.telen.easylineup.lineup.defense.DefenseFragmentEditable
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import timber.log.Timber
 
@@ -238,6 +239,7 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_edit -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_lineup_edit")
                 val extras = Companion.getArguments(lineupID = viewModel.lineupID ?: 0,
                         lineupTitle = viewModel.lineupTitle ?: "",
                         strategy = viewModel.strategy,
@@ -247,20 +249,24 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
                 true
             }
             R.id.action_delete -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_lineup_delete")
                 askUserConsentForDelete()
                 true
             }
             R.id.action_share -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_lineup_share")
                 exportLineupToExternalStorage()
                 true
             }
             R.id.action_roster -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_lineup_roster")
                 showLineupRosterScreen()
                 true
             }
             R.id.action_lineup_mode -> {
                 if(BuildConfig.DEBUG)
                     Toast.makeText(activity, "Mode is ${item.isChecked}", Toast.LENGTH_SHORT).show()
+                FirebaseAnalyticsUtils.onClick(activity, "click_lineup_mode")
                 viewModel.onLineupModeChanged(!item.isChecked)
                 true
             }

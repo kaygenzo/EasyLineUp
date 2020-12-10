@@ -10,7 +10,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.lineup.list.LineupViewModel
+import com.telen.easylineup.tournaments.list.LineupViewModel
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.utils.DialogFactory
@@ -94,6 +94,7 @@ class TeamDetailsFragment: BaseFragment("TeamDetailsFragment") {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_edit -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_team_details_edit")
                 teamViewModel.team?.let {
                     FirebaseAnalyticsUtils.startTutorial(activity, false)
                     val intent = Intent(activity, TeamCreationActivity::class.java)
@@ -111,6 +112,7 @@ class TeamDetailsFragment: BaseFragment("TeamDetailsFragment") {
                                 titleArgs = arrayOf(team.name),
                                 message = R.string.dialog_delete_cannot_undo_message,
                                 task = Completable.create { emitter ->
+                                    FirebaseAnalyticsUtils.onClick(activity, "click_team_details_delete")
                                     val disposable = teamViewModel.deleteTeam(team)
                                             .subscribe({
                                                 findNavController().popBackStack()

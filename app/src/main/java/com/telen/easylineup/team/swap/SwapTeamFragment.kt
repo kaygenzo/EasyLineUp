@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +11,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.views.ListEmptyView
 import kotlinx.android.synthetic.main.teams_list_view.view.*
 
@@ -56,6 +56,7 @@ class SwapTeamFragment: DialogFragment() {
 
             mAdapter = SwapTeamsListAdapter(teams, object : SwapTeamsListAdapter.HostInterface {
                 override fun onTeamClicked(team: Team) {
+                    FirebaseAnalyticsUtils.onClick(activity, "click_team_swap_selection")
                     mHostInterface?.onTeamClick(team)
                     dismiss()
                 }
@@ -72,6 +73,7 @@ class SwapTeamFragment: DialogFragment() {
                     .setTitle(R.string.team_list_dialog_title)
 
             dialogBuilder.setPositiveButton(R.string.team_list_dialog_create) { dialog, which ->
+                FirebaseAnalyticsUtils.onClick(activity, "click_team_swap_create")
                 mHostInterface?.onCreateTeamClick()
                 dismiss()
             }

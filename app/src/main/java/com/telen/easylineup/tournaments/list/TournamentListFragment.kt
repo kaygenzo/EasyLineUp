@@ -1,4 +1,4 @@
-package com.telen.easylineup.lineup.list
+package com.telen.easylineup.tournaments.list
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,12 +19,12 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.utils.hideSoftKeyboard
 import com.telen.easylineup.views.OnSearchBarListener
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_list_tournaments.*
 import kotlinx.android.synthetic.main.fragment_list_tournaments.view.*
 import timber.log.Timber
@@ -64,6 +64,7 @@ class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClic
         }
 
         view.fab.setOnClickListener {
+            FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_create")
             findNavController().navigate(R.id.lineupCreationFragment, null, NavigationUtils().getOptions())
         }
 
@@ -101,6 +102,7 @@ class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClic
 
     override fun onDeleteTournamentClicked(tournament: Tournament) {
         activity?.let {
+            FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_delete")
             val task: Completable = viewModel.deleteTournament(tournament)
                     .doOnError {throwable ->
                         Toast.makeText(activity, "Something wrong happened: ${throwable.message}", Toast.LENGTH_LONG).show()
@@ -119,6 +121,7 @@ class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClic
     }
 
     override fun onStatisticsTournamentClicked(tournament: Tournament) {
+        FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_stats")
         val extras = Bundle()
         extras.putSerializable(Constants.EXTRA_TOURNAMENT, tournament)
         findNavController().navigate(R.id.tournamentStatisticsTableFragment, extras, NavigationUtils().getOptions())
@@ -130,6 +133,7 @@ class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClic
 
     override fun onLineupClicked(lineup: Lineup) {
         activity?.let {
+            FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_lineup_selected")
             val extras = LineupFragment.getArguments(lineup.id, lineup.name, TeamStrategy.getStrategyById(lineup.strategy), lineup.extraHitters)
             findNavController().navigate(R.id.lineupFragmentFixed, extras, NavigationUtils().getOptions())
         }
@@ -137,6 +141,7 @@ class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClic
 
     override fun onSearchConfirmed(text: String?) {
         text?.let {
+            FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_search")
             viewModel.setFilter(it)
             hideSoftKeyboard()
         }

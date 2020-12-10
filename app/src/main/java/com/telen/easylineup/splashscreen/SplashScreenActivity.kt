@@ -10,6 +10,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.splashscreen.*
@@ -54,6 +55,7 @@ class SplashScreenActivity: BaseImportActivity(), KoinComponent {
         DialogFactory.getSimpleDialog(context = this,
                 message = R.string.app_deeplink_file_import_title,
                 confirmClick = DialogInterface.OnClickListener { dialogInterface, i ->
+                    FirebaseAnalyticsUtils.onClick(this, "click_splashscreen_import")
                     importData(uri)
                 },
                 cancelClick = DialogInterface.OnClickListener { dialogInterface, i ->

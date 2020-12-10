@@ -16,8 +16,8 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.lineup.LineupFragment
-import com.telen.easylineup.lineup.list.LineupViewModel
-import com.telen.easylineup.lineup.list.SaveSuccess
+import com.telen.easylineup.tournaments.list.LineupViewModel
+import com.telen.easylineup.tournaments.list.SaveSuccess
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FeatureViewFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
@@ -25,7 +25,6 @@ import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.LineupCreationFormView
 import com.telen.easylineup.views.OnActionButtonListener
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
 import kotlinx.android.synthetic.main.fragment_lineup_creation.view.*
 import timber.log.Timber

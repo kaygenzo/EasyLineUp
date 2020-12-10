@@ -14,7 +14,7 @@
 
     <fragment
         android:id="@+id/navigation_lineups"
-        android:name="com.telen.easylineup.lineup.list.TournamentListFragment"
+        android:name="com.telen.easylineup.tournaments.list.TournamentListFragment"
         android:label="@string/title_lineups"
         tools:layout="@layout/fragment_list_tournaments"/>
 
@@ -55,7 +55,7 @@
 
     <fragment
         android:id="@+id/tournamentStatisticsTableFragment"
-        android:name="com.telen.easylineup.lineup.statistics.TournamentStatisticsTableFragment"
+        android:name="com.telen.easylineup.tournaments.statistics.TournamentStatisticsTableFragment"
         android:label="@string/title_tournament_summary"
         tools:layout="@layout/view_table_multi_scroll"/>
 

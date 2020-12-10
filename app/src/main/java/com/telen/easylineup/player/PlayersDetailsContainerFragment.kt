@@ -12,6 +12,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.fragment_players_details_container.view.*
@@ -100,12 +101,14 @@ class PlayersDetailsContainerFragment: BaseFragment("PlayersDetailsContainerFrag
 
         return when (item.itemId) {
             R.id.action_edit -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_player_details_edit")
                 val extras = Bundle()
                 extras.putLong(Constants.PLAYER_ID, selectedPlayerId)
                 findNavController().navigate(R.id.playerEditFragment, extras, NavigationUtils().getOptions())
                 true
             }
             R.id.action_delete -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_player_details_delete")
                 askUserConsentForDeletePlayerWithId(selectedPlayerId)
                 true
             }

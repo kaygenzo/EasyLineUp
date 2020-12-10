@@ -1,4 +1,4 @@
-package com.telen.easylineup.lineup.statistics
+package com.telen.easylineup.tournaments.statistics
 
 import android.graphics.Typeface
 import android.os.Bundle
