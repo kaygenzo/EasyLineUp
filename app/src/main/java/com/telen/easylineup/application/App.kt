@@ -5,6 +5,7 @@ import androidx.multidex.MultiDexApplication
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.instabug.library.Instabug
 import com.instabug.library.invocation.InstabugInvocationEvent
+import com.instabug.library.ui.onboarding.WelcomeMessage
 import com.telen.easylineup.BuildConfig
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -34,6 +35,7 @@ open class App: MultiDexApplication() {
         Instabug.Builder(this, "ab91d9b105f5827a61d43a1b1e6c645a")
                 .setInvocationEvents(InstabugInvocationEvent.SHAKE)
                 .build()
+        Instabug.setWelcomeMessageState(WelcomeMessage.State.DISABLED)
 
         startKoin {
             androidContext(this@App)
