@@ -21,6 +21,9 @@ object FirebaseAnalyticsUtils {
 
     const val KEY_FIRST_TEAM = "first_team"
 
+    const val EVENT_CLICK = "elu_click"
+    const val CLICK_NAME = "click_name"
+
     private fun logEvent(context: Context?, eventName: String) {
         logEvent(context, null, eventName)
     }
@@ -81,8 +84,10 @@ object FirebaseAnalyticsUtils {
 
     /* EVENT */
 
-    fun onClick(context: Context?, eventName: String) {
-        logEvent(context, eventName)
+    fun onClick(context: Context?, clickEventName: String) {
+        val params = Bundle()
+        params.putString(CLICK_NAME, clickEventName)
+        logEvent(context, params, EVENT_CLICK)
     }
 
     /* ACTIONS */
