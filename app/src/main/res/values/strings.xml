@@ -221,6 +221,7 @@
     <string name="app_deeplink_file_import_title">Import data from this file ?</string>
 
     <string name="lineup_list_strategy_type" translatable="false">  &#8212;  %s</string>
+    <string name="lineup_list_extra_hitters" translatable="false">  &#8212;  EH: %s</string>
     <string name="generic_infinite" translatable="false">&#8734;</string>
     <string name="form_lineup_creation_extra_hitters_label">Extra hitters</string>
     <string name="form_lineup_creation_strategy_label">Game type</string>

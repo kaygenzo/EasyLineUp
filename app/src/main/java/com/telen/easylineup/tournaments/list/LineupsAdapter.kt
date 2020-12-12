@@ -42,6 +42,22 @@ class LineupsAdapter(private val lineups: List<Lineup>, private val itemClickedL
             else -> holder.lineupStrategy.visibility = View.GONE
         }
 
+        holder.lineupExtraHitters.apply {
+            lineup.extraHitters.takeIf { it > 0 }?.let {
+                visibility = View.VISIBLE
+                text = when(it) {
+                    in 0..4 -> {
+                        context.getString(R.string.lineup_list_extra_hitters, it.toString())
+                    }
+                    else -> {
+                        context.getString(R.string.lineup_list_extra_hitters, context.getString(R.string.generic_infinite))
+                    }
+                }
+            } ?: run {
+                visibility = View.GONE
+            }
+        }
+
         holder.rootView.setOnClickListener {
             itemClickedListener?.onLineupClicked(lineup)
         }

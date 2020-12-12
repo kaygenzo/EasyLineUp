@@ -37,7 +37,7 @@
 
     <dimen name="table_multiple_scroll_cell_width">50dp</dimen>
     <dimen name="table_multiple_scroll_cell_height">30dp</dimen>
-    <dimen name="table_multiple_scroll_left_header_width">100dp</dimen>
+    <dimen name="table_multiple_scroll_left_header_width">150dp</dimen>
     <dimen name="table_multiple_scroll_top_header_height">40dp</dimen>
 
     <dimen name="link_dp_flex_icon_size">50dp</dimen>

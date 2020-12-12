@@ -10,5 +10,6 @@ data class LineupsViewHolder(val view: View): RecyclerView.ViewHolder(view) {
     val lineupName: MLBStyledTextView = view.findViewById(R.id.lineupName)
     val lineupDate: MaterialTextView = view.findViewById(R.id.lineupDate)
     val lineupStrategy: MaterialTextView = view.findViewById(R.id.lineupStrategy)
+    val lineupExtraHitters: MaterialTextView = view.findViewById(R.id.lineupExtraHitters)
     val rootView: View = view.findViewById(R.id.rootView)
 }
