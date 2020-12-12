@@ -3,7 +3,8 @@ package com.telen.easylineup.application
 import android.util.Log
 import androidx.multidex.MultiDexApplication
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.shakebugs.shake.Shake
+import com.instabug.library.Instabug
+import com.instabug.library.invocation.InstabugInvocationEvent
 import com.telen.easylineup.BuildConfig
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -30,7 +31,9 @@ open class App: MultiDexApplication() {
         val crashlytics: FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
         crashlytics.setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
 
-        Shake.start(this)
+        Instabug.Builder(this, "ab91d9b105f5827a61d43a1b1e6c645a")
+                .setInvocationEvents(InstabugInvocationEvent.SHAKE)
+                .build()
 
         startKoin {
             androidContext(this@App)

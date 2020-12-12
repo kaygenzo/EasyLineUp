@@ -16,9 +16,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.getkeepsafe.taptargetview.TapTargetView
-import com.shakebugs.shake.Shake
-import com.shakebugs.shake.report.ShakeFile
-import com.shakebugs.shake.report.ShakeReportData
+import com.instabug.bug.BugReporting
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
@@ -284,15 +282,7 @@ class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, A
         return when (item.itemId) {
             R.id.action_report_issue -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_report_issue")
-                Shake.show(object : ShakeReportData {
-                    override fun quickFacts(): String? {
-                        return null
-                    }
-
-                    override fun attachedFiles(): MutableList<ShakeFile> {
-                        return mutableListOf()
-                    }
-                })
+                BugReporting.show(BugReporting.ReportType.BUG)
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -228,7 +228,7 @@ dependencies {
     debugImplementation "com.facebook.stetho:stetho:$stethoVersion"
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
 
-    implementation "com.shakebugs.android:shake:$shakeVersion"
+    implementation "com.instabug.library:instabug:$bugReportVersion"
 }
 
 apply from: '../jacoco.gradle'

@@ -47,7 +47,7 @@ buildscript {
         roundedImageView = "2.3.0"
         expandablelayoutVersion = "2.9.2"
         materialSearchBarVersion = "0.8.2"
-        shakeVersion = "13.1.1"
+        bugReportVersion = "10.1.0"
         stethoVersion = "1.5.1"
     }
 
