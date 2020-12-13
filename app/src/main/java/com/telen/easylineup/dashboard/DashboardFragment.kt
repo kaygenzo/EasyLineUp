@@ -282,7 +282,9 @@ class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, A
         return when (item.itemId) {
             R.id.action_report_issue -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_report_issue")
-                BugReporting.show(BugReporting.ReportType.BUG)
+                if(BuildConfig.UseBetaTool) {
+                    BugReporting.show(BugReporting.ReportType.BUG)
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)

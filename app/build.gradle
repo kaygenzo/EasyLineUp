@@ -53,7 +53,8 @@ android {
         testInstrumentationRunner "com.telen.easylineup.EasylineupAndroidTestRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary true
-        buildConfigField("String", "ReportToolApiKey", reportProperties['apiKey'])
+        buildConfigField "String", "ReportToolApiKey", reportProperties['apiKey']
+        buildConfigField "Boolean", "UseBetaTool", "true"
     }
 
     useLibrary 'android.test.runner'
@@ -95,6 +96,7 @@ android {
         demo {
             dimension 'version'
             matchingFallbacks = ['demo']
+            buildConfigField "Boolean", "UseBetaTool", "false"
         }
     }
 

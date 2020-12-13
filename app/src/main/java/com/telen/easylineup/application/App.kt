@@ -37,6 +37,9 @@ open class App: MultiDexApplication() {
                 .build()
         Instabug.setWelcomeMessageState(WelcomeMessage.State.DISABLED)
 
+        if(!BuildConfig.UseBetaTool) {
+            Instabug.disable()
+        }
         startKoin {
             androidContext(this@App)
             modules(ModuleProvider.modules)
