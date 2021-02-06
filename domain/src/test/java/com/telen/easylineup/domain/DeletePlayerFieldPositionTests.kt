@@ -59,7 +59,7 @@ internal abstract class DeletePlayerFieldPositionTests(private val teamType: Tea
         deletePlayerFieldPosition = DeletePlayerFieldPosition(lineupDao)
         players = mutableListOf()
         var i = 1
-        TeamType.getValidPositionsForTeam(teamType, strategy).forEach {
+        teamType.getValidPositions(strategy).forEach {
             players.add(createPlayerWithPosition(i, PlayerFieldPosition.FLAG_NONE, it))
             i++
         }

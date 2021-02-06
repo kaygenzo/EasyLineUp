@@ -63,7 +63,7 @@ internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val
 
         players = mutableListOf()
         var i = 1
-        TeamType.getValidPositionsForTeam(teamType, strategy).forEach {
+        teamType.getValidPositions(strategy).forEach {
             players.add(PlayerWithPosition(
                     playerName = "t${i}",
                     shirtNumber = i,

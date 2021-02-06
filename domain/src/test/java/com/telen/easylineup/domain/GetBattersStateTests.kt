@@ -363,7 +363,7 @@ internal abstract class GetBattersStateTests(protected val teamType: TeamType, p
 
     protected fun addPlayers() {
         var i = 1
-        TeamType.getValidPositionsForTeam(teamType, strategy).forEach {
+        teamType.getValidPositions(strategy).forEach {
             players.add(PlayerWithPosition(
                     playerName = "t${i}",
                     shirtNumber = i,
