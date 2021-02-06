@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.library.widget.tablemultiscroll.views.StyleConfiguration
 import com.telen.library.widget.tablemultiscroll.views.TableConfiguration
@@ -27,6 +28,9 @@ class TournamentStatisticsTableFragment: BaseFragment("TournamentStatisticsTable
         viewModel = ViewModelProviders.of(this)[TournamentStatisticsViewModel::class.java]
         arguments?.getSerializable(Constants.EXTRA_TOURNAMENT)?.let { tournament ->
             viewModel.tournament = tournament as Tournament
+        }
+        arguments?.getInt(Constants.EXTRA_TEAM_TYPE)?.let { teamType ->
+            viewModel.teamType = TeamType.getTypeById(teamType)
         }
     }
 

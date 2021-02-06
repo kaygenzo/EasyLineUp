@@ -104,7 +104,7 @@ class PlayerDetailsFragment: BaseFragment("PlayerDetailsFragment") {
                 visibility = if(it.size > 1) View.VISIBLE else View.GONE
                 val strategiesName = resources.getStringArray(R.array.softball_strategy_array)
                 adapter = ArrayAdapter(context, R.layout.item_team_strategy, strategiesName)
-                setSelection(TeamStrategy.STANDARD.id, false)
+                setSelection(0, false)
                 onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
                     override fun onNothingSelected(p0: AdapterView<*>?) {}
                     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {

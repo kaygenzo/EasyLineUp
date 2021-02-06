@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.application.ApplicationPort
 import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.library.widget.tablemultiscroll.views.CellConfiguration
 import com.telen.library.widget.tablemultiscroll.views.Highlight
@@ -28,6 +29,14 @@ class TournamentStatisticsViewModel: ViewModel(), KoinComponent {
     private val domain: ApplicationPort by inject()
     var strategy = TeamStrategy.STANDARD
     var tournament: Tournament? = null
+    var teamType: TeamType? = null
+        set(value) {
+            field = value
+            this.strategy = when(field) {
+                TeamType.BASEBALL_5 -> TeamStrategy.B5_DEFAULT
+                else -> TeamStrategy.STANDARD
+            }
+        }
 
     fun getPlayersPositionForTournament() {
         disposable = Single.create<Tournament> { emitter ->

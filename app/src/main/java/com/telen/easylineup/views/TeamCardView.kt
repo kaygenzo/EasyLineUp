@@ -96,11 +96,13 @@ class TeamCardView: ConstraintLayout {
     fun setTeamType(teamType: Int) {
         when(teamType) {
             TeamType.BASEBALL.id -> {
-                Picasso.get().load(R.drawable.pitcher_baseball_team).into(teamTypeRepresentation)
-
+                Picasso.get().load(TeamType.BASEBALL.sportResId).into(teamTypeRepresentation)
             }
             TeamType.SOFTBALL.id -> {
-                Picasso.get().load(R.drawable.pitcher_softball_team).into(teamTypeRepresentation)
+                Picasso.get().load(TeamType.SOFTBALL.sportResId).into(teamTypeRepresentation)
+            }
+            TeamType.BASEBALL_5.id -> {
+                Picasso.get().load(TeamType.BASEBALL_5.sportResId).into(teamTypeRepresentation)
             }
         }
     }

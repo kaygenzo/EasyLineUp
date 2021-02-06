@@ -85,9 +85,6 @@
     <string name="action_add_dp_flex">Use DP/Flex</string>
     <string name="action_add_dh">Use DH</string>
 
-    <string name="title_baseball">Baseball</string>
-    <string name="title_softball">Softball</string>
-
     <string name="tournaments_summary_header" translatable="false">%1$s / %2$s</string>
 
     <plurals name="tournaments_quantity">

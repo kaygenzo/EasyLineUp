@@ -66,9 +66,6 @@
     <string name="shake_beta_title">Un problème ? </string>
     <string name="shake_beta_description">Secouez votre périphérique ou cliquez ici pour envoyez un rapport</string>
 
-    <string name="title_baseball">Baseball</string>
-    <string name="title_softball">Softball</string>
-
     <string name="action_add_dp_flex">Utiliser un DP/Flex</string>
     <string name="action_add_dh">Utiliser un DH</string>
 

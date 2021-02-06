@@ -16,6 +16,7 @@
         <item>LCF</item>
         <item>RCF</item>
         <item>RF</item>
+        <item>MF</item>
     </string-array>
 
     <string-array name="field_positions_softball_list" translatable="false">
@@ -34,6 +35,7 @@
         <item>LCF</item>
         <item>RCF</item>
         <item>RF</item>
+        <item>MF</item>
     </string-array>
 
     <string-array name="softball_strategy_array" translatable="false">

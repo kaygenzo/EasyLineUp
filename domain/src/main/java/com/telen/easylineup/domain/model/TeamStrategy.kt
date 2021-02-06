@@ -28,6 +28,13 @@ enum class TeamStrategy(val id: Int, val batterSize: Int, vararg val positions: 
             FieldPosition.SLOWPITCH_RCF,
             FieldPosition.SLOWPITCH_RF,
             FieldPosition.DP_DH
+    ),
+    B5_DEFAULT(2, 5,
+            FieldPosition.FIRST_BASE,
+            FieldPosition.SECOND_BASE,
+            FieldPosition.THIRD_BASE,
+            FieldPosition.SHORT_STOP,
+            FieldPosition.MID_FIELDER
     );/*,
     FIVE_MAN_SLOWPITCH(
             FieldPosition.CATCHER,

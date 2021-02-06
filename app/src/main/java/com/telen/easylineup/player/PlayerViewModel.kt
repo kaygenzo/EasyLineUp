@@ -68,14 +68,9 @@ class PlayerViewModel: ViewModel(), KoinComponent {
         val disposable = domain.getTeamType()
                 .flatMapCompletable {
                     this.teamType = it
-                    strategies.clear()
-                    when(TeamType.getTypeById(it)) {
-                        TeamType.SOFTBALL -> {
-                            strategies.addAll(TeamStrategy.values())
-                        }
-                        else -> {
-                            strategies.add(TeamStrategy.STANDARD)
-                        }
+                    strategies.run {
+                        clear()
+                        addAll(TeamType.getTypeById(it).getStrategies())
                     }
                     Completable.complete()
                 }

@@ -7,10 +7,12 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.utils.drawn
+import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.field_view.view.*
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -35,7 +37,6 @@ abstract class DefenseView: ConstraintLayout {
 
         this.strategy = strategy
         positionMarkers.clear()
-        //cleanPlayerIcons()
 
         getContainerSize {
             val iconSize = (it * ICON_SIZE_SCALE).roundToInt()
@@ -50,6 +51,18 @@ abstract class DefenseView: ConstraintLayout {
                 positionMarkers[position] = view
                 val coordinates = FieldPosition.getPositionCoordinates(position, strategy)
                 addPlayerOnFieldWithPercentage(it, view, coordinates.x, coordinates.y)
+            }
+
+            baseballField.ready {
+                val image = when(strategy) {
+                    TeamStrategy.B5_DEFAULT -> {
+                        VectorDrawableCompat.create(resources, R.drawable.baseball5_field, null)
+                    }
+                    else -> {
+                        VectorDrawableCompat.create(resources, R.drawable.baseball_field, null)
+                    }
+                }
+                baseballField.setImageDrawable(image)
             }
         }
     }

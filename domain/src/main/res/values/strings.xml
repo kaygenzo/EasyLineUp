@@ -9,4 +9,8 @@
 
     <string name="softball_strategy_fastpitch" translatable="false">Fastpitch</string>
     <string name="softball_strategy_slowpitch" translatable="false">Slowpitch</string>
+
+    <string name="title_baseball" translatable="false">Baseball</string>
+    <string name="title_softball" translatable="false">Softball</string>
+    <string name="title_baseball_5" translatable="false">Baseball Five</string>
 </resources>

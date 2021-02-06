@@ -35,7 +35,7 @@ class LineupsAdapter(private val lineups: List<Lineup>, private val itemClickedL
                 holder.lineupStrategy.apply {
                     visibility = View.VISIBLE
                     val array = context.resources.getStringArray(R.array.softball_strategy_array)
-                    val strategyName = strategy.id.takeIf { it < array.count() }?.let { array[it] } ?: array[TeamStrategy.STANDARD.id]
+                    val strategyName = strategy.id.takeIf { it < array.count() }?.let { array[it] } ?: array[0]
                     text = context.getString(R.string.lineup_list_strategy_type, strategyName)
                 }
             }

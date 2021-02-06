@@ -16,6 +16,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.DialogFactory
@@ -120,10 +121,11 @@ class TournamentListFragment: BaseFragment("TournamentListFragment"), OnItemClic
         }
     }
 
-    override fun onStatisticsTournamentClicked(tournament: Tournament) {
+    override fun onStatisticsTournamentClicked(teamType: TeamType, tournament: Tournament) {
         FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_stats")
         val extras = Bundle()
         extras.putSerializable(Constants.EXTRA_TOURNAMENT, tournament)
+        extras.putInt(Constants.EXTRA_TEAM_TYPE, teamType.id)
         findNavController().navigate(R.id.tournamentStatisticsTableFragment, extras, NavigationUtils().getOptions())
     }
 

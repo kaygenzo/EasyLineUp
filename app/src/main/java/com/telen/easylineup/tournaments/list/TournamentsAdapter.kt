@@ -18,7 +18,7 @@ interface OnItemClickedListener {
     fun onHeaderClicked()
     fun onLineupClicked(lineup: Lineup)
     fun onDeleteTournamentClicked(tournament: Tournament)
-    fun onStatisticsTournamentClicked(tournament: Tournament)
+    fun onStatisticsTournamentClicked(teamType:TeamType, tournament: Tournament)
 }
 
 class TournamentsAdapter(private val itemClickListener: OnItemClickedListener, private var teamType: Int = TeamType.BASEBALL.id): RecyclerView.Adapter<TournamentsAdapter.TournamentsViewHolder>() {
@@ -55,7 +55,7 @@ class TournamentsAdapter(private val itemClickListener: OnItemClickedListener, p
             }
 
             override fun onStatsClicked() {
-                itemClickListener.onStatisticsTournamentClicked(item.tournament)
+                itemClickListener.onStatisticsTournamentClicked(TeamType.getTypeById(teamType), item.tournament)
             }
         })
     }
