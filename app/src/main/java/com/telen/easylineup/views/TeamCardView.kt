@@ -50,11 +50,13 @@ class TeamCardView: ConstraintLayout {
             behavior?.setExpandedOffset(resources.getDimensionPixelOffset(R.dimen.card_team_type_ball_image_radius))
         }
 
-        teamTypeTitle.ready {
+        teamTypeTitle.drawn {
             val imageRadius = resources.getDimensionPixelSize(R.dimen.card_team_type_ball_image_radius)
             val textSize = teamTypeTitle.height
             val margin = resources.getDimensionPixelSize(R.dimen.default_margin)
-            behavior?.peekHeight = imageRadius + textSize + margin
+            val peekHeight = imageRadius + textSize + margin
+            Timber.d("peekHeight=${peekHeight}")
+            behavior?.peekHeight = peekHeight
         }
     }
 
