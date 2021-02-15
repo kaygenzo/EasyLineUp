@@ -70,7 +70,7 @@ internal class GetDashboardTiles(private val playerDao: PlayerRepository,
     private fun getTeamSize(team: Team): Maybe<ITileData> {
         return playerDao.getPlayers(team.id)
                 .toMaybe()
-                .map { TeamSizeData(it.size, teamImage = team.image) }
+                .map { TeamSizeData(it.size, teamType = team.type, teamImage = team.image) }
     }
 
     private fun getLastLineup(team: Team): Maybe<ITileData> {

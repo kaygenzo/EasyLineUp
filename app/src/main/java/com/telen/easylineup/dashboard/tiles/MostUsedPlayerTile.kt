@@ -49,9 +49,6 @@ class MostUsedPlayerTile: ConstraintLayout {
                 KEY_DATA_SHIRT_NUMBER -> {
                     tile_player_most_used_shirt_number.text = item.value.toString()
                 }
-                KEY_DATA_MATCH_PLAYED -> {
-                    tile_player_most_used_match_played_value.text = item.value.toString()
-                }
             }
         }
 
