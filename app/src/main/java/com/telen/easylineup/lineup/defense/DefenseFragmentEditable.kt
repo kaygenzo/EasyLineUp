@@ -87,7 +87,8 @@ class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayer
                             availablePlayersBottomSheet.dismiss()
                         }
                     })
-                    availablePlayersBottomSheet.show(supportFragmentManager, "available_players_bottom_sheet")
+                    if(!availablePlayersBottomSheet.isAdded)
+                        availablePlayersBottomSheet.show(supportFragmentManager, "available_players_bottom_sheet")
                 }
                 is NeedLinkDpFlex -> activity?.run {
                     getDialogLinkDpAndFlex(this, event.initialData, event.dpLocked, event.flexLocked, event.teamType, event.title).show()
