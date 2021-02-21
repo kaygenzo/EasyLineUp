@@ -13,7 +13,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/baseball_field"
+            android:src="@drawable/tile_last_lineup_background"
             android:scaleType="centerCrop"/>
 
             <com.telen.easylineup.views.NormalUppercaseStyledTextView

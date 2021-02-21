@@ -12,19 +12,44 @@
         android:layout_height="match_parent"
         style="@style/TilePlayerMostUsed">
 
-        <com.telen.easylineup.views.NormalUppercaseStyledTextView
-            style="@style/Field.Header"
-            android:id="@+id/tile_player_most_used_header"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/tile_player_most_used_header_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:text="@string/tile_most_used_player_header"
-            android:padding="@dimen/player_details_container_separator_width"/>
+            app:layout_constraintRight_toRightOf="parent"
+            android:padding="@dimen/player_details_container_separator_width">
+
+            <com.telen.easylineup.views.NumberedStyledTextView
+                android:id="@+id/tile_player_most_used_shirt_number"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                style="@style/TilePlayerMostUsed.Number"
+                tools:text="20"
+                android:padding="@dimen/player_details_container_separator_width"/>
+
+            <com.telen.easylineup.views.NormalUppercaseStyledTextView
+                style="@style/Field.Header"
+                android:id="@+id/tile_player_most_used_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/tile_player_most_used_shirt_number"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="@string/tile_most_used_player_header"
+                android:background="@drawable/shape_header_round_corner_black_border"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@+id/tile_player_most_used_header"
+            app:layout_constraintTop_toBottomOf="@+id/tile_player_most_used_header_container"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageView
@@ -33,15 +58,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:alpha="0.70"/>
-
-            <com.telen.easylineup.views.NumberedStyledTextView
-                android:id="@+id/tile_player_most_used_shirt_number"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                app:layout_constraintBottom_toTopOf="@+id/tile_player_most_used_name_container"
-                app:layout_constraintRight_toRightOf="parent"
-                style="@style/TilePlayerMostUsed.Number"
-                tools:text="20"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/tile_player_most_used_name_container"
