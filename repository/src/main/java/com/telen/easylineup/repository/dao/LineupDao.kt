@@ -28,6 +28,9 @@ internal interface LineupDao {
     @Delete
     fun deleteLineup(lineup: RoomLineup): Completable
 
+    @Delete
+    fun deleteLineups(lineups: List<RoomLineup>): Completable
+
     @Query("SELECT * FROM lineups ORDER BY id ASC")
     fun getAllLineup(): LiveData<List<RoomLineup>>
 

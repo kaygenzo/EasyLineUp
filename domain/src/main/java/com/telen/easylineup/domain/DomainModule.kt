@@ -20,7 +20,7 @@ object DomainModule {
         single { CreateLineup(get(), get()) }
         single { GetTournaments(get()) }
         single { GetAllTournamentsWithLineups(get()) }
-        single { DeleteTournament(get()) }
+        single { DeleteTournamentLineups(get()) }
         single { GetPlayer(get()) }
         single { DeletePlayer(get()) }
         single { SavePlayer(get()) }

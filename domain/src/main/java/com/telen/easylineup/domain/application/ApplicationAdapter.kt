@@ -46,7 +46,7 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
     private val getAllTeamsUseCase: GetAllTeams by inject()
     private val saveCurrentTeam: SaveCurrentTeam by inject()
     private val createLineupUseCase: CreateLineup by inject()
-    private val deleteTournamentUseCase: DeleteTournament by inject()
+    private val deleteTournamentUseCase: DeleteTournamentLineups by inject()
     private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineups by inject()
     private val getTournamentsUseCase: GetTournaments by inject()
     private val getRosterUseCase: GetRoster by inject()
@@ -448,7 +448,9 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
     }
 
     override fun deleteTournament(tournament: Tournament): Completable {
-        return UseCaseHandler.execute(deleteTournamentUseCase, DeleteTournament.RequestValues(tournament)).ignoreElement()
+        return getTeam().flatMapCompletable {
+            UseCaseHandler.execute(deleteTournamentUseCase, DeleteTournamentLineups.RequestValues(tournament, it)).ignoreElement()
+        }
     }
 
     override fun getCategorizedLineups(filter: String): Single<List<Pair<Tournament, List<Lineup>>>> {

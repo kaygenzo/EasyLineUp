@@ -14,6 +14,7 @@ interface LineupRepository {
     fun updateLineup(lineup: Lineup): Completable
     fun updateLineupsWithRowCount(lineups: List<Lineup>): Single<Int>
     fun deleteLineup(lineup: Lineup): Completable
+    fun deleteLineups(lineups: List<Lineup>): Completable
     fun getAllLineup(): LiveData<List<Lineup>>
     fun getLineups(): Single<List<Lineup>>
     fun getLineupById(lineupId: Long): LiveData<Lineup>

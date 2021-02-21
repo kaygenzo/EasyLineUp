@@ -39,6 +39,10 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao): LineupRep
         return lineupDao.deleteLineup(RoomLineup().init(lineup))
     }
 
+    override fun deleteLineups(lineups: List<Lineup>): Completable {
+        return lineupDao.deleteLineups(lineups.map { RoomLineup().init(it) })
+    }
+
     override fun getAllLineup(): LiveData<List<Lineup>> {
         return Transformations.map(lineupDao.getAllLineup()) {
             it.map { it.toLineup() }
