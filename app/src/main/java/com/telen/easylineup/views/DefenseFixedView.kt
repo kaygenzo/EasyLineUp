@@ -12,9 +12,9 @@ import kotlin.math.roundToInt
 
 class DefenseFixedView: DefenseView {
 
-    constructor(context: Context?) : super(context) { init(context)}
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) { init(context)}
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context)}
+    constructor(context: Context) : super(context) { init(context)}
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init(context)}
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context)}
 
     fun init(context: Context?) {
         LayoutInflater.from(context).inflate(R.layout.baseball_field_only, this)

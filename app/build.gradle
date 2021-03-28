@@ -157,7 +157,7 @@ repositories {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.annotation:annotation:' + rootProject.androidxLibVersion
 
@@ -230,7 +230,7 @@ dependencies {
     debugImplementation "com.facebook.stetho:stetho:$stethoVersion"
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
 
-    implementation "com.instabug.library:instabug:$bugReportVersion"
+    implementation "com.github.kaygenzo:bugreporter:$bugreportingVersion"
 }
 
 apply from: '../jacoco.gradle'

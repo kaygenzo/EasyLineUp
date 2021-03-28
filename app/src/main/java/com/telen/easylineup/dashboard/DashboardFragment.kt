@@ -16,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.getkeepsafe.taptargetview.TapTargetView
-import com.instabug.bug.BugReporting
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
@@ -27,6 +26,7 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.tiles.*
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.*
+import com.telen.library.bugreporter.BugReporter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
 import kotlinx.android.synthetic.main.home_main_content.*
@@ -283,7 +283,9 @@ class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, A
             R.id.action_report_issue -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_report_issue")
                 if(BuildConfig.UseBetaTool) {
-                    BugReporting.show(BugReporting.ReportType.BUG)
+                    activity?.run {
+                        BugReporter.startReport(this)
+                    }
                 }
                 true
             }

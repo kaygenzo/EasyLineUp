@@ -49,11 +49,13 @@ buildscript {
         materialSearchBarVersion = "0.8.2"
         bugReportVersion = "10.1.0"
         stethoVersion = "1.5.1"
+        bugreportingVersion="1.0.0"
     }
 
     repositories {
         google()
         jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.2'
@@ -89,6 +91,7 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         maven { url 'https://dl.bintray.com/shake/shake' }
+        mavenCentral()
         flatDir {
             dirs '../aars'
         }
