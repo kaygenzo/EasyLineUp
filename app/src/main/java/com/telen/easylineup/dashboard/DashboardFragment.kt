@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.getkeepsafe.taptargetview.TapTargetView
+import com.github.kaygenzo.bugreporter.BugReporter
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
@@ -26,7 +27,6 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.tiles.*
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.*
-import com.telen.library.bugreporter.BugReporter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_dashboard.view.*
 import kotlinx.android.synthetic.main.home_main_content.*

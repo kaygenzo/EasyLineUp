@@ -2,10 +2,10 @@ package com.telen.easylineup.application
 
 import android.util.Log
 import androidx.multidex.MultiDexApplication
+import com.github.kaygenzo.bugreporter.BugReporter
+import com.github.kaygenzo.bugreporter.ReportMethod
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.telen.easylineup.BuildConfig
-import com.telen.library.bugreporter.BugReporter
-import com.telen.library.bugreporter.ReportMethod
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
