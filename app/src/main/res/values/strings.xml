@@ -222,4 +222,8 @@
     <string name="generic_infinite" translatable="false">&#8734;</string>
     <string name="form_lineup_creation_extra_hitters_label">Extra hitters</string>
     <string name="form_lineup_creation_strategy_label">Game type</string>
+
+    <string name="report_sending_message">The issue reporting is currently sending, please wait&#8230;</string>
+    <string name="report_sending_message_success">Report sent successfully! Thank you!</string>
+    <string name="report_sending_message_failure">An error occurred, please try again</string>
 </resources>

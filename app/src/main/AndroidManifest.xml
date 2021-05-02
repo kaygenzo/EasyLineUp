@@ -66,6 +66,10 @@
 
         <activity android:name=".login.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar.FullScreen"/>
+
+        <activity
+            android:name=".reporting.SendReportActivity"
+            android:theme="@style/AppTheme.NoActionBar.Transparent" />
         
         <provider
             android:authorities="com.telen.easylineup.fileprovider"

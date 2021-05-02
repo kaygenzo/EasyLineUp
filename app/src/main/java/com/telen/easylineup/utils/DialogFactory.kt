@@ -8,7 +8,9 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.appcompat.view.ContextThemeWrapper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.telen.easylineup.R
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -73,12 +75,13 @@ class DialogFactory {
         }
 
         fun getLoadingDialog(context: Context, @StringRes message: Int): Dialog {
-            val progressBar = ProgressBar(context)
-            progressBar.layoutParams = ViewGroup.LayoutParams(100, 100)
-            progressBar.isIndeterminate = true
-            progressBar.setPadding(20,20,20,20)
+            val progressIndicator = CircularProgressIndicator(context).apply {
+                layoutParams = ViewGroup.LayoutParams(100, 100)
+                isIndeterminate = true
+                setPadding(20,20,20,20)
+            }
 
-            return getDialog(context = context, title = message, customView = progressBar, resConfirmText = 0, resCancelText = 0).apply {
+            return getDialog(context = context, title = message, customView = progressIndicator, resConfirmText = 0, resCancelText = 0).apply {
                 setCancelable(false)
             }
         }

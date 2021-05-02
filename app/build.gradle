@@ -171,10 +171,8 @@ dependencies {
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.10.0'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
 
-    androidTestImplementation('tools.fastlane:screengrab:1.2.0') {
-        exclude group: 'com.android.support.test.uiautomator', module: 'uiautomator-v18'
-    }
-    androidTestImplementation('com.schibsted.spain:barista:3.2.0') {
+    androidTestImplementation 'tools.fastlane:screengrab:2.0.0'
+    androidTestImplementation('com.schibsted.spain:barista:3.9.0') {
         exclude group: 'org.jetbrains.kotlin' // Only if you already use Kotlin in your project
     }
 
@@ -196,10 +194,15 @@ dependencies {
 
     ////////// GOOGLE //////////
 
+    implementation platform("com.google.firebase:firebase-bom:$firebaseBOMVersion")
+
     implementation "com.google.android.material:material:$googleMaterialVersion"
     implementation "com.google.code.gson:gson:$googleGsonVersion"
-    implementation "com.google.firebase:firebase-analytics:$firebaseAnalyticsVersion"
-    implementation "com.google.firebase:firebase-crashlytics:$firebaseCrashlyticsVersion"
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation 'com.google.firebase:firebase-storage-ktx'
     if (!project.hasProperty("disable-performance-plugin")) {
         implementation "com.google.firebase:firebase-perf:$firebasePerfVersion"
     }

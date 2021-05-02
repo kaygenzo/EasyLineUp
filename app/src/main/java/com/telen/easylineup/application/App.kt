@@ -6,6 +6,7 @@ import com.github.kaygenzo.bugreporter.BugReporter
 import com.github.kaygenzo.bugreporter.ReportMethod
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.telen.easylineup.BuildConfig
+import com.telen.easylineup.reporting.BugReporterManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
@@ -31,6 +32,11 @@ open class App: MultiDexApplication() {
         val crashlytics: FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
         crashlytics.setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
 
+        val koinApp = startKoin {
+            androidContext(this@App)
+            modules(ModuleProvider.modules)
+        }
+
         BugReporter.Builder()
                 .setCompressionQuality(75)
                 .setImagePreviewScale(0.3f)
@@ -43,13 +49,9 @@ open class App: MultiDexApplication() {
                             listOf(ReportMethod.SHAKE, ReportMethod.FLOATING_BUTTON)
                         }
                 )
+                .observeResult(koinApp.koin.get<BugReporterManager>())
                 .build()
                 .init(this)
-
-        startKoin {
-            androidContext(this@App)
-            modules(ModuleProvider.modules)
-        }
     }
 
     class ReleaseTree: Timber.DebugTree() {

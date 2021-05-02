@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.getkeepsafe.taptargetview.TapTargetView
 import com.github.kaygenzo.bugreporter.BugReporter
+import com.github.kaygenzo.bugreporter.utils.PermissionsUtils
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R

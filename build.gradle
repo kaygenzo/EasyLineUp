@@ -28,7 +28,6 @@ buildscript {
         tablemultiscrollVersion = "1.0.5"
         taptargetviewVersion = "1.13.0"
         imagepickerVersion = "1.3.3"
-        sweetalertVersion = "1.6.2"
         recyclerViewVersion = "1.1.0"
         preferenceVersion = "1.1.1"
         constraintLayoutVersion = "1.1.3"
@@ -49,12 +48,13 @@ buildscript {
         materialSearchBarVersion = "0.8.2"
         bugReportVersion = "10.1.0"
         stethoVersion = "1.5.1"
-        bugreportingVersion="1.0.0"
+        bugreportingVersion="1.0.5"
+
+        firebaseBOMVersion = "27.0.0"
     }
 
     repositories {
         google()
-        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -88,7 +88,17 @@ apply from: 'detekt.gradle'
 allprojects {
     repositories {
         google()
-        jcenter()
+        jcenter() {
+            content {
+                includeModule("com.telen.library", "tablemultiscroll")
+                includeModule("org.koin", "koin-android")
+                includeModule("org.koin", "koin-core")
+                includeModule("com.getkeepsafe.taptargetview", "taptargetview")
+                includeModule("tools.fastlane", "screengrab")
+                includeModule("com.schibsted.spain", "barista")
+                includeModule("com.jraska", "falcon")
+            }
+        }
         maven { url "https://jitpack.io" }
         maven { url 'https://dl.bintray.com/shake/shake' }
         mavenCentral()
