@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.view.animation.Animation
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -18,8 +17,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.functions.Action
-import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.activity_message_loading.*
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -126,9 +123,7 @@ class SendReportActivity: BaseActivity() {
                             screenshotRef.downloadUrl
                         }
                     }
-                    .addOnFailureListener {
-                        emitter.onError(it)
-                    }.addOnCompleteListener { task ->
+                    .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             val downloadUri = task.result
                             Timber.d("downloadUri=$downloadUri")
