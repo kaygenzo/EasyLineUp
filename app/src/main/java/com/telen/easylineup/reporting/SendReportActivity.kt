@@ -19,6 +19,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_message_loading.*
 import timber.log.Timber
+import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 class SendReportActivity: BaseActivity() {
@@ -38,11 +39,16 @@ class SendReportActivity: BaseActivity() {
         val jsonData = JsonParser.parseString(jsonStringData).asJsonObject
 
         _disposables.add(authenticate()
-                .andThen(getScreenshotUrl(imageUri))
-                .flatMapCompletable {
-                    jsonData.addProperty("imageUrl", it)
-                    storeFireStore(jsonData)
-                }
+                .andThen(Completable.defer {
+                    imageUri?.let {
+                        getScreenshotUrl(it).flatMapCompletable { imageUrl ->
+                            jsonData.addProperty("imageUrl", imageUrl)
+                            storeFireStore(jsonData)
+                        }
+                    } ?: let {
+                        Completable.error(Exception("No image found to join to report"))
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     Timber.d("Successfully stored remotely")

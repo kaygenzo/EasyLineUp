@@ -48,7 +48,7 @@ buildscript {
         materialSearchBarVersion = "0.8.2"
         bugReportVersion = "10.1.0"
         stethoVersion = "1.5.1"
-        bugreportingVersion="1.0.5"
+        bugreportingVersion="1.0.7"
 
         firebaseBOMVersion = "27.0.0"
     }
