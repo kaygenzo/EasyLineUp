@@ -12,6 +12,7 @@ import com.google.firebase.storage.ktx.storage
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.telen.easylineup.BaseActivity
+import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -116,7 +117,7 @@ class SendReportActivity: BaseActivity() {
             val firebaseStorage = Firebase.storage
             val storageRef = firebaseStorage.reference
 
-            val screenshotRef = storageRef.child("bugreports/${imageUri.lastPathSegment}")
+            val screenshotRef = storageRef.child("${BuildConfig.reportStorageRoot}/${imageUri.lastPathSegment}")
             val uploadTask = screenshotRef.putFile(imageUri)
             uploadTask
                     .continueWithTask { task ->
@@ -150,7 +151,7 @@ class SendReportActivity: BaseActivity() {
             json.entrySet().forEach {
                 mapData[it.key] = it.value.asString
             }
-            db.collection("reports")
+            db.collection(BuildConfig.reportStorageRoot)
                     .add(mapData)
                     .addOnSuccessListener {
                         Timber.d("Successfully stored")

@@ -65,7 +65,7 @@ buildscript {
 
         // quality related classpath
         classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2'
-        classpath 'org.owasp:dependency-check-gradle:5.3.1'
+        classpath 'org.owasp:dependency-check-gradle:6.1.6'
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detektVersion"
 
         // firebase related classpath

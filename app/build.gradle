@@ -55,6 +55,7 @@ android {
         vectorDrawables.useSupportLibrary true
         buildConfigField "String", "ReportToolApiKey", reportProperties['apiKey']
         buildConfigField "Boolean", "UseBetaTool", "true"
+        buildConfigField "String", "reportStorageRoot", "\"reports.dev\""
     }
 
     useLibrary 'android.test.runner'
@@ -92,11 +93,13 @@ android {
                 testersFile="testers.txt"
             }
             matchingFallbacks = ['prod']
+            buildConfigField "String", "reportStorageRoot", "\"reports.prod\""
         }
         demo {
             dimension 'version'
             matchingFallbacks = ['demo']
             buildConfigField "Boolean", "UseBetaTool", "false"
+            buildConfigField "String", "reportStorageRoot", "\"reports.demo\""
         }
     }
 
@@ -165,12 +168,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.coreVersion
     androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoCoreVersion
     androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:' + rootProject.espressoCoreVersion
-
     androidTestImplementation (name:'cloudtestingscreenshotter_lib', ext:'aar')
-
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.10.0'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
-
     androidTestImplementation 'tools.fastlane:screengrab:2.0.0'
     androidTestImplementation('com.schibsted.spain:barista:3.9.0') {
         exclude group: 'org.jetbrains.kotlin' // Only if you already use Kotlin in your project
