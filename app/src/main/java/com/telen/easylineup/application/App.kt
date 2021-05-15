@@ -51,7 +51,7 @@ open class App: MultiDexApplication() {
                         if(!BuildConfig.UseBetaTool) {
                             listOf()
                         } else {
-                            listOf(ReportMethod.SHAKE, ReportMethod.FLOATING_BUTTON)
+                            listOf(ReportMethod.SHAKE)
                         }
                 )
                 .observeResult(koinApp.koin.get<BugReporterManager>())
