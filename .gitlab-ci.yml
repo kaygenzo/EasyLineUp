@@ -27,6 +27,9 @@ before_script:
   - echo $APP_DISTRIBUTION_TESTERS_FILE | base64 -d > testers.txt
   - git rev-parse --abbrev-ref HEAD > releasenotes.txt
   - git log -1 --pretty="%B %ad" >> releasenotes.txt
+  - ruby --version
+  - source "https://rubygems.org"
+  - gem "fastlane"
 
 stages:
   - test
