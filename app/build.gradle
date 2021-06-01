@@ -151,6 +151,10 @@ android {
             includeAndroidResources = true
         }
     }
+
+    configurations.all {
+        resolutionStrategy.force "com.google.android.material:material:1.2.1"
+    }
 }
 
 repositories {

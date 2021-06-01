@@ -4,13 +4,9 @@ import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ProgressBar
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.appcompat.view.ContextThemeWrapper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.telen.easylineup.R
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -72,18 +68,6 @@ class DialogFactory {
                     }
 
             )
-        }
-
-        fun getLoadingDialog(context: Context, @StringRes message: Int): Dialog {
-            val progressIndicator = CircularProgressIndicator(context).apply {
-                layoutParams = ViewGroup.LayoutParams(100, 100)
-                isIndeterminate = true
-                setPadding(20,20,20,20)
-            }
-
-            return getDialog(context = context, title = message, customView = progressIndicator, resConfirmText = 0, resCancelText = 0).apply {
-                setCancelable(false)
-            }
         }
 
         fun getSuccessDialog(context: Context,

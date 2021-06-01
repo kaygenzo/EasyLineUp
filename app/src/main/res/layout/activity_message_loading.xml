@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.google.android.material.progressindicator.CircularProgressIndicator
+            <ProgressBar
                 android:id="@+id/loading_progress"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -26,8 +26,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="24dp"
-                app:hideAnimationBehavior="outward"/>
+                android:layout_marginStart="24dp"/>
 
             <ImageView
                 android:id="@+id/loading_status"

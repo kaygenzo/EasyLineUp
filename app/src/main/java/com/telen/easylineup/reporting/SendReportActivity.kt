@@ -53,7 +53,7 @@ class SendReportActivity: BaseActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     Timber.d("Successfully stored remotely")
-                    loading_progress.hide()
+                    loading_progress.visibility = View.INVISIBLE
                     loading_status.apply {
                         setImageResource(R.drawable.ic_check_green_24dp)
                         visibility = View.VISIBLE
@@ -62,7 +62,7 @@ class SendReportActivity: BaseActivity() {
                     closeScreen()
                 }, {
                     Timber.e(it)
-                    loading_progress.hide()
+                    loading_progress.visibility = View.INVISIBLE
                     loading_status.apply {
                         setImageResource(R.drawable.ic_warning_red_24dp)
                         visibility = View.VISIBLE
