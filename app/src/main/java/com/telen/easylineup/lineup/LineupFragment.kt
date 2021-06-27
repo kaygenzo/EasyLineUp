@@ -221,7 +221,13 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
                 DeleteLineupSuccess -> {
                     activity?.run {
                         this.runOnUiThread {
-                            findNavController().popBackStack(R.id.navigation_lineups, false)
+                            val isShortcut = arguments?.getBoolean(Constants.EXTRA_IS_FROM_SHORTCUT) ?: false
+                            if (isShortcut) {
+                                findNavController().popBackStack(R.id.navigation_home, false)
+                            }
+                            else {
+                                findNavController().popBackStack(R.id.navigation_lineups, false)
+                            }
                         }
                     }
                 }

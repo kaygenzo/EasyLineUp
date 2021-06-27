@@ -129,6 +129,7 @@ class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, A
                 val lineupStrategy = data.getData()[KEY_LINEUP_STRATEGY] as TeamStrategy
                 val extraHitters = data.getData()[KEY_LINEUP_EXTRA_HITTERS] as? Int ?: 0
                 val extras = LineupFragment.getArguments(lineupID, lineupName, lineupStrategy, extraHitters)
+                extras.putBoolean(Constants.EXTRA_IS_FROM_SHORTCUT, true)
                 findNavController().navigate(R.id.lineupFragmentFixed, extras, NavigationUtils().getOptions())
             }
             else -> {

@@ -41,6 +41,7 @@ class Constants {
 
         const val EXTRA_TOURNAMENT = "com.telen.extra.tournament"
 
+        const val EXTRA_IS_FROM_SHORTCUT = "com.telen.extra.isShortcut"
         const val SUBSTITUTE_ORDER_VALUE = 200
 
         const val TYPE_LAST_LINEUP = 0
