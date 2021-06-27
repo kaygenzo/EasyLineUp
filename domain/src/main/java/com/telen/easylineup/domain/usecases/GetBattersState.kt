@@ -91,6 +91,11 @@ internal class GetBattersState: UseCase<GetBattersState.RequestValues, GetBatter
                         canShowDescription = true
                     }
 
+                    //do not show field position value for baseball 5
+                    if(requestValues.teamType == TeamType.BASEBALL_5.id) {
+                        canShowPosition = false
+                    }
+
                     position++
 
                     result.add(BatterState(playerID, playerFlag, order, playerName, shirtNumber, fieldPosition ?: FieldPosition.SUBSTITUTE,
