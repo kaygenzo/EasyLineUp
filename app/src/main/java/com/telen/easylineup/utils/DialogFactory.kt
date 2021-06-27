@@ -163,11 +163,12 @@ class DialogFactory {
         }
 
         fun getMultiChoiceDialog(context: Context, @StringRes title: Int, items: Array<CharSequence>, checkedItems: BooleanArray,
-                                 listener: DialogInterface.OnMultiChoiceClickListener? = null): Dialog {
+                                 listener: DialogInterface.OnMultiChoiceClickListener? = null,
+                                 confirmClick: DialogInterface.OnClickListener? = null): Dialog {
             return MaterialAlertDialogBuilder(context)
                     .setTitle(title)
                     .setMultiChoiceItems(items, checkedItems, listener)
-                    .setPositiveButton(android.R.string.ok, null)
+                    .setPositiveButton(android.R.string.ok, confirmClick)
                     .create()
         }
 

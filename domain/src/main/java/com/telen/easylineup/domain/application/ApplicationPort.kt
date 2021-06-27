@@ -57,6 +57,7 @@ interface ApplicationPort {
     /** @deprecated **/ fun insertLineups(lineups: List<Lineup>): Completable
     fun getCompleteRoster(): Single<TeamRosterSummary>
     fun getRoster(lineupID: Long): Single<TeamRosterSummary>
+    fun updateRoster(lineupID: Long, roster: List<RosterPlayerStatus>): Completable
     fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary, lineupEventTime: Long, strategy: TeamStrategy, extraHittersSize: Int): Single<Long>
     fun deleteLineup(lineupID: Long?): Completable
     fun updateLineupMode(isEnabled: Boolean, lineupID: Long?, lineupMode: Int, list: List<PlayerWithPosition>, strategy: TeamStrategy, extraHittersSize: Int): Completable

@@ -50,6 +50,7 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
     private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineups by inject()
     private val getTournamentsUseCase: GetTournaments by inject()
     private val getRosterUseCase: GetRoster by inject()
+    private val updateLineupRoster: UpdateLineupRoster by inject()
     private val tableDataUseCase: GetTournamentStatsForPositionTable by inject()
     private val mImporterUseCase: ImportData by inject()
     private val exportDataUseCase: ExportData by inject()
@@ -306,6 +307,10 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
         return UseCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team }
                 .flatMap { UseCaseHandler.execute(getRosterUseCase, GetRoster.RequestValues(it.id, lineupID)) }
                 .map { it.summary }
+    }
+
+    override fun updateRoster(lineupID: Long, roster: List<RosterPlayerStatus>): Completable {
+        return UseCaseHandler.execute(updateLineupRoster, UpdateLineupRoster.RequestValues(lineupID, roster)).ignoreElement()
     }
 
     override fun saveLineup(tournament: Tournament, lineupTitle: String, rosterFilter: TeamRosterSummary, lineupEventTime: Long, strategy: TeamStrategy, extraHittersSize: Int): Single<Long> {

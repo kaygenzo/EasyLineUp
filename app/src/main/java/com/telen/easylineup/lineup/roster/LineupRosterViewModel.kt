@@ -1,16 +1,13 @@
 package com.telen.easylineup.lineup.roster
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.application.ApplicationPort
-import com.telen.easylineup.domain.model.Player
-import com.telen.easylineup.domain.model.PlayerNumberOverlay
-import com.telen.easylineup.domain.model.RosterItem
-import com.telen.easylineup.domain.model.TeamRosterSummary
+import com.telen.easylineup.domain.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import timber.log.Timber
 
 class LineupRosterViewModel: ViewModel(), KoinComponent {
 
@@ -25,9 +22,9 @@ class LineupRosterViewModel: ViewModel(), KoinComponent {
 
     fun getRosterItems() = rosterItems
 
-    fun getRoster(): Single<List<RosterItem>> {
-        return domain.getRoster(lineupID)
-                .map { it.players.filter { it.status == true } }
+    fun getCurrentRoster(): Single<List<RosterItem>> {
+        return getRoster()
+                .map { it.filter { it.status } }
                 .map {
                     val items = mutableListOf<RosterItem>()
                     it.forEach {
@@ -35,6 +32,11 @@ class LineupRosterViewModel: ViewModel(), KoinComponent {
                     }
                     items
                 }
+    }
+
+    fun getRoster(): Single<List<RosterPlayerStatus>> {
+        return domain.getRoster(lineupID)
+                .map { it.players }
     }
 
     fun saveOverlays(): Completable {
@@ -47,5 +49,13 @@ class LineupRosterViewModel: ViewModel(), KoinComponent {
         } ?: let {
             item.playerNumberOverlay = PlayerNumberOverlay(lineupID = lineupID, playerID = item.player.id, number = number)
         }
+    }
+
+    fun saveUpdatedRoster(newRosterStatus: List<RosterPlayerStatus>): Completable {
+        return domain.updateRoster(lineupID, newRosterStatus)
+    }
+
+    fun observeLineup(): LiveData<Lineup> {
+        return domain.observeLineupById(lineupID)
     }
 }

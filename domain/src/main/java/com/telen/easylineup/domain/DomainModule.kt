@@ -38,6 +38,7 @@ object DomainModule {
         single { SaveLineupMode(get()) }
         single { UpdatePlayersWithLineupMode(get()) }
         single { GetRoster(get(), get()) }
+        single { UpdateLineupRoster(get()) }
         single { DeleteTeam(get()) }
         single { SwitchPlayersPosition(get()) }
         single { DeleteAllData(get(), get()) }
