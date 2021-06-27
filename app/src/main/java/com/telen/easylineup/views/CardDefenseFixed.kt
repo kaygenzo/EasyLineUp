@@ -16,11 +16,9 @@ class CardDefenseFixed: MaterialCardView {
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs){ init(context)}
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr){ init(context)}
 
-    private fun init(context: Context?) {
+    private fun init(context: Context) {
         LayoutInflater.from(context).inflate(R.layout.card_defense_fixed, this)
-        context?.let {
-            setBackgroundColor(ContextCompat.getColor(it, android.R.color.transparent))
-        }
+        setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent))
     }
 
     fun init(strategy: TeamStrategy) {

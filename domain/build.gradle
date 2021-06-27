@@ -13,12 +13,12 @@ if (sonarPropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
 
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -66,17 +66,14 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.0.2'
+    implementation 'androidx.core:core-ktx:1.5.0'
+    implementation "androidx.appcompat:appcompat:$appCompatVersion"
 
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:2.19.0'
+    testImplementation 'org.mockito:mockito-core:2.23.0'
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-
-    implementation "io.reactivex.rxjava2:rxjava:2.2.14"
+    implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
     implementation "com.google.code.gson:gson:$googleGsonVersion"
     implementation "org.koin:koin-android:$koinVersion"
 }

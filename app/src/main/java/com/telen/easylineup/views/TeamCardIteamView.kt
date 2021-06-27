@@ -9,9 +9,9 @@ import com.telen.easylineup.R
 import kotlinx.android.synthetic.main.view_item_team_card.view.*
 
 class TeamCardItemView: ConstraintLayout {
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_item_team_card, this)

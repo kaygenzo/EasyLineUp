@@ -39,9 +39,9 @@ class DefenseEditableView: DefenseView {
     private var playerListener: OnPlayerButtonCallback? = null
     private val players: MutableCollection<PlayerWithPosition> = mutableListOf()
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     fun setOnPlayerListener(playerButtonCallback: OnPlayerButtonCallback) {
         playerListener = playerButtonCallback

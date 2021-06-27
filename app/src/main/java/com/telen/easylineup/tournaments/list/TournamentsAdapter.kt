@@ -65,8 +65,8 @@ class TournamentsAdapter(private val itemClickListener: OnItemClickedListener, p
     fun setList(tournaments: List<Pair<Tournament, List<Lineup>>>) {
         items.clear()
         tournaments.forEach {
-            val tournamentStart = it.second.map { it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }.min()
-            val tournamentEnd = it.second.map {it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }.max()
+            val tournamentStart = it.second.map { it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }.minOrNull()
+            val tournamentEnd = it.second.map {it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }.maxOrNull()
             items.add(TournamentItem(it.first, tournamentStart, tournamentEnd, it.second))
         }
         notifyDataSetChanged()

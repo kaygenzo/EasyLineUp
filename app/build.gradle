@@ -43,11 +43,11 @@ else {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.telen.easylineup"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode appVersionCode
         versionName appVersionName
         testInstrumentationRunner "com.telen.easylineup.EasylineupAndroidTestRunner"
@@ -171,10 +171,10 @@ dependencies {
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.10.0'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
 
-    androidTestImplementation('tools.fastlane:screengrab:1.2.0') {
+    androidTestImplementation('tools.fastlane:screengrab:2.0.0') {
         exclude group: 'com.android.support.test.uiautomator', module: 'uiautomator-v18'
     }
-    androidTestImplementation('com.schibsted.spain:barista:3.2.0') {
+    androidTestImplementation('com.schibsted.spain:barista:3.9.0') {
         exclude group: 'org.jetbrains.kotlin' // Only if you already use Kotlin in your project
     }
 
@@ -185,7 +185,7 @@ dependencies {
     ////////// ANDROID X //////////
 
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
-    implementation "androidx.preference:preference:$preferenceVersion"
+    implementation "androidx.preference:preference-ktx:$preferenceVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     // ViewModel and LiveData

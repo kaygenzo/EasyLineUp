@@ -16,11 +16,9 @@ class PlayerCard: MaterialCardView {
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init(context) }
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context) }
 
-    fun init(context: Context?) {
-        context?.let {
-            LayoutInflater.from(context).inflate(R.layout.item_player_list, this)
-            setBackgroundColor(ContextCompat.getColor(context,android.R.color.transparent))
-        }
+    fun init(context: Context) {
+        LayoutInflater.from(context).inflate(R.layout.item_player_list, this)
+        setBackgroundColor(ContextCompat.getColor(context,android.R.color.transparent))
     }
 
     fun setImage(path: String?) {
