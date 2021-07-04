@@ -12,11 +12,11 @@ import com.obsez.android.lib.filechooser.ChooserDialog
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.login.*
 import com.telen.easylineup.login.GetTeamSuccess
-import com.telen.easylineup.splashscreen.SplashScreenActivity
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import timber.log.Timber
+import java.io.FileNotFoundException
 
 
 abstract class BaseImportActivity: BaseActivity() {
@@ -98,20 +98,27 @@ abstract class BaseImportActivity: BaseActivity() {
     }
 
     private fun importDataFromUri(uri: Uri) {
-        if(uri.scheme.equals("file")) {
-            uri.path?.let {
-                viewModel.importData(it, true)
+        when {
+            uri.scheme.equals("file") -> {
+                uri.path?.let {
+                    viewModel.importData(it, true)
+                }
             }
-        }
-        else if(uri.scheme.equals("content")) {
-            contentResolver.openInputStream(uri)?.let {
-                viewModel.importData(it, true)
-            } ?: let {
+            uri.scheme.equals("content") -> {
+                try {
+                    contentResolver.openInputStream(uri)?.let {
+                        viewModel.importData(it, true)
+                    } ?: let {
+                        displayImportFailure()
+                    }
+                } catch (e: FileNotFoundException) {
+                    Timber.e(e)
+                    displayImportFailure()
+                }
+            }
+            else -> {
                 displayImportFailure()
             }
-        }
-        else {
-            displayImportFailure()
         }
     }
 
