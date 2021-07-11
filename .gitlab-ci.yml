@@ -40,7 +40,7 @@ publishAlpha:
   stage: alpha
   when: manual
   script:
-    - ./gradlew assembleProdRelease
+    - fastlane deploy_to_alpha
   artifacts:
     paths:
       - app/build/outputs/apk/prod/release
