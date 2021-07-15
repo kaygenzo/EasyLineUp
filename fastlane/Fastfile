@@ -25,7 +25,7 @@ platform :android do
 
     desc "Deploy to Alpha"
     lane :deploy_to_alpha do
-        upload_to_play_store(track: 'alpha', apk: 'app/build/outputs/apk/prod/release/app-prod-release.apk')
+        upload_to_play_store(track: 'alpha', aab: 'app/build/outputs/bundle/prodRelease/app-prod-release.aab')
     end
 
     desc "Deploy to Beta"

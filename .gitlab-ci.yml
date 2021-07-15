@@ -42,8 +42,10 @@ prodRelease:
 alpha:
   stage: alpha
   when: manual
+#  only:
+#    - tags
   script:
-    - ./gradlew assembleProdRelease
+    - ./gradlew bundleProdRelease
     - bundle exec fastlane deploy_to_alpha
   artifacts:
     paths:
