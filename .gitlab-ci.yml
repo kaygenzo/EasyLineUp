@@ -1,39 +1,34 @@
-image: openjdk:8-jdk
-
-variables:
-  ANDROID_COMPILE_SDK: "28"
-  ANDROID_BUILD_TOOLS: "28.0.2"
-  ANDROID_SDK_TOOLS:   "4333796"
+image: mingc/android-build-box
 
 before_script:
-  - apt-get --quiet update --yes
-  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
-  - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS}.zip
-  - unzip -d android-sdk-linux android-sdk.zip
-  - echo y | android-sdk-linux/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
-  - echo y | android-sdk-linux/tools/bin/sdkmanager "platform-tools" >/dev/null
-  - echo y | android-sdk-linux/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
-  - export ANDROID_HOME=$PWD/android-sdk-linux
-  - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
-  - chmod +x ./gradlew
-  # temporarily disable checking for EPIPE error and use yes to accept all licenses
-  - set +o pipefail
-  - yes | android-sdk-linux/tools/bin/sdkmanager --licenses
-  - set -o pipefail
   - echo $DEBUG_KEYSTORE_FILE | base64 -d > telen.debug.jks
   - echo $KEYSTORE_FILE | base64 -d > telen.release.jks
   - echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
   - echo $APP_DISTRIBUTION_SERVICE_FILE | base64 -d > easylineup-services.json
   - echo $APP_DISTRIBUTION_TESTERS_FILE | base64 -d > testers.txt
+  - echo $PLAY_STORE_CREDENTIALS | base64 -d > play-store-credentials.json
   - git rev-parse --abbrev-ref HEAD > releasenotes.txt
   - git log -1 --pretty="%B %ad" >> releasenotes.txt
+  - ruby --version
+  - gem install bundler -v '2.2.22'
+  - bundle install
+
+after_script:
+  - rm telen.debug.jks
+  - rm telen.release.jks
+  - rm app/google-services.json
+  - rm easylineup-services.json
+  - rm testers.txt
+  - rm releasenotes.txt
+  - rm play-store-credentials.json
 
 stages:
   - test
   - develop
   - release
+  - alpha
 
-assembleProdRelease:
+prodRelease:
   stage: release
   only:
     - tags
@@ -44,8 +39,23 @@ assembleProdRelease:
       - app/build/outputs/apk/prod/release
       - app/build/outputs/mapping/prodRelease/mapping.txt
 
-assembleProdReleaseAndDeployAppDistribution:
+alpha:
+  stage: alpha
+  when: manual
+#  only:
+#    - tags
+  script:
+    - ./gradlew bundleProdRelease
+    - bundle exec fastlane deploy_to_alpha
+  artifacts:
+    paths:
+      - app/build/outputs/apk/prod/release
+      - app/build/outputs/mapping/prodRelease/mapping.txt
+
+deployAppDistribution:
   stage: develop
+  only:
+    - develop
   script:
     - ./gradlew assembleProdRelease appDistributionUploadProdRelease
   artifacts:
@@ -55,6 +65,8 @@ assembleProdReleaseAndDeployAppDistribution:
 
 lintProdDebug:
   stage: test
+  only:
+    - develop
   script:
     - ./gradlew -Pci --console=plain lintProdDebug -PbuildDir=lint
   artifacts:
@@ -69,11 +81,15 @@ lintProdDebug:
 
 unitTests:
   stage: test
+  only:
+    - develop
   script:
     - ./gradlew -Pci --console=plain testProdDebugUnitTest
 
 dependencyCheckTests:
   stage: test
+  only:
+    - develop
   script:
     - ./gradlew -Pci --console=plain dependencyCheckAnalyze --info
   artifacts:
@@ -85,6 +101,8 @@ dependencyCheckTests:
 
 assembleAndroidTests:
   stage: test
+  only:
+    - develop
   script:
     - ./gradlew assembleDemoDebug
     - ./gradlew assembleDemoDebugAndroidTest
