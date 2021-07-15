@@ -25,7 +25,7 @@ else {
     reportProperties.setProperty("apiKey", "\"${System.getenv('REPORTING_TOOL_API_KEY')}\"")
 }
 
-def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystorePropertiesFile = rootProject.file("keystore-upload.properties")
 def keystoreProperties = new Properties()
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
