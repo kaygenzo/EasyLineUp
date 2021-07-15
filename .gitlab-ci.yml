@@ -10,6 +10,8 @@ before_script:
   - git rev-parse --abbrev-ref HEAD > releasenotes.txt
   - git log -1 --pretty="%B %ad" >> releasenotes.txt
   - ruby --version
+  - gem install bundler -v '2.2.22'
+  - bundle install
 
 after_script:
   - rm telen.debug.jks
@@ -42,7 +44,7 @@ alpha:
   when: manual
   script:
     - ./gradlew assembleProdRelease
-    - fastlane deploy_to_alpha
+    - bundle exec fastlane deploy_to_alpha
   artifacts:
     paths:
       - app/build/outputs/apk/prod/release
