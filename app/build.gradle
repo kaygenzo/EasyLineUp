@@ -239,6 +239,7 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
 
     implementation "com.github.kaygenzo:bugreporter:$bugreportingVersion"
+    implementation 'androidx.documentfile:documentfile:1.0.1'
 }
 
 apply from: '../jacoco.gradle'

@@ -22,7 +22,7 @@ class LoginActivity: BaseImportActivity() {
 
         login_import.setOnClickListener {
             FirebaseAnalyticsUtils.onClick(this, "click_login_import")
-            importData()
+            importDataFromBrowser()
         }
     }
 

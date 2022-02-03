@@ -184,17 +184,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     //TODO use case ?
     fun exportLineupToExternalStorage(context: Context, viewToSave: View?, exportType: Int): Single<Intent> {
         return Single.create(SingleOnSubscribe<ArrayList<Uri>> {
-
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                it.onError(InsufficientPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)))
-                return@SingleOnSubscribe
-            }
-
-            val tmpSDPath = StringBuilder(Environment.getExternalStorageDirectory().absolutePath).append("/${Constants.LINEUPS_DIRECTORY}").toString()
-            if(!File(tmpSDPath).exists())
-                File(tmpSDPath).mkdirs()
-
+            val tmpPath = context.cacheDir.path
             val timeInMillis = Calendar.getInstance().timeInMillis
 
             val uris = arrayListOf<Uri>()
@@ -202,12 +192,18 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
             viewToSave?.run {
                 val filePath = when(exportType) {
                     FRAGMENT_DEFENSE_INDEX -> {
-                        StringBuilder(tmpSDPath).append(timeInMillis).append("_defense.png").toString()
+                        StringBuilder(tmpPath)
+                            .append("/")
+                            .append(timeInMillis).append("_defense.png").toString()
                     }
                     FRAGMENT_ATTACK_INDEX -> {
-                        StringBuilder(tmpSDPath).append(timeInMillis).append("_attack.png").toString()
+                        StringBuilder(tmpPath)
+                            .append("/")
+                            .append(timeInMillis).append("_attack.png").toString()
                     }
-                    else -> StringBuilder(tmpSDPath).append(timeInMillis).append("_all.png").toString()
+                    else -> StringBuilder(tmpPath)
+                        .append("/")
+                        .append(timeInMillis).append("_all.png").toString()
                 }
                 val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", File(filePath))
 

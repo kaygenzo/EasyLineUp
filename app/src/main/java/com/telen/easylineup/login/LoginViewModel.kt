@@ -1,5 +1,7 @@
 package com.telen.easylineup.login
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import com.telen.easylineup.domain.application.ApplicationPort
@@ -23,6 +25,7 @@ object GetTeamFailed: LoginEvent()
 class LoginViewModel : ViewModel(), KoinComponent {
 
     private val domain: ApplicationPort by inject()
+    private val context: Context by inject()
 
     private val _loginEvent = PublishSubject.create<LoginEvent>()
 
@@ -32,29 +35,18 @@ class LoginViewModel : ViewModel(), KoinComponent {
         return _loginEvent
     }
 
-    fun importData(dataPath: String, updateIfExists: Boolean) {
-        try {
-            val inputStream: InputStream = FileInputStream(File(dataPath))
-            importData(inputStream, updateIfExists)
-        }
-        catch (e: Exception) {
-            _loginEvent.onNext(ImportFailure)
-        }
-    }
-
-    fun importData(inputStream: InputStream, updateIfExists: Boolean) {
-        var input : BufferedReader? = null
-        val task = try {
-            input = BufferedReader(InputStreamReader(inputStream))
-            val data = Gson().fromJson(input, ExportBase::class.java)
-            domain.importData(data, updateIfExists)
-        }
-        catch (e: Exception) {
-            Completable.error(e)
-        }
-        finally {
-            input?.close()
-            inputStream.close()
+    fun importData(uri: Uri, updateIfExists: Boolean) {
+        val task: Completable = context.contentResolver.openInputStream(uri)?.let {
+            Completable.defer {
+                it.use { stream ->
+                    stream.bufferedReader().use { reader ->
+                        val data = Gson().fromJson(reader, ExportBase::class.java)
+                        domain.importData(data, updateIfExists)
+                    }
+                }
+            }
+        } ?: let {
+            Completable.error(IllegalArgumentException("Cannot open uri"))
         }
 
         val disposable = task.subscribe({

@@ -82,7 +82,7 @@ interface ApplicationPort {
     //data
     fun importData(root: ExportBase, updateIfExists: Boolean): Completable
     fun deleteAllData(): Completable
-    fun exportDataOnExternalMemory(name: String, fallbackName: String): Single<String>
+    fun exportData(dirUri: Uri): Single<String>
 
     fun generateMockedData(): Completable
 

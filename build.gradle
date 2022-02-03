@@ -88,6 +88,7 @@ apply from: 'detekt.gradle'
 allprojects {
     repositories {
         google()
+        mavenCentral()
         jcenter() {
             content {
                 includeModule("com.telen.library", "tablemultiscroll")
@@ -101,7 +102,6 @@ allprojects {
         }
         maven { url "https://jitpack.io" }
         maven { url 'https://dl.bintray.com/shake/shake' }
-        mavenCentral()
         flatDir {
             dirs '../aars'
         }
