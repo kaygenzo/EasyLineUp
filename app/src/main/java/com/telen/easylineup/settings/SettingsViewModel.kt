@@ -1,7 +1,6 @@
 package com.telen.easylineup.settings
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.application.ApplicationPort
 import io.reactivex.Completable
@@ -11,11 +10,7 @@ import io.reactivex.subjects.Subject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.TimeUnit
-
-data class ExportDataObject(val fallbackName: String)
 
 sealed class Event
 object DeleteAllDataEventSuccess: Event()
@@ -29,9 +24,6 @@ class SettingsViewModel: ViewModel(), KoinComponent {
 
     private val _event = PublishSubject.create<Event>()
     private val disposables = CompositeDisposable()
-
-    private val _exportDataObjectLiveData = MutableLiveData<ExportDataObject>()
-    val exportDataObjectLiveData: LiveData<ExportDataObject> = _exportDataObjectLiveData
 
     fun clear() {
         disposables.clear()
@@ -49,18 +41,11 @@ class SettingsViewModel: ViewModel(), KoinComponent {
         disposables.add(disposable)
     }
 
-    fun exportDataTriggered() {
-        val now = Calendar.getInstance().time
-        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ROOT)
-        val dateTime = formatter.format(now)
-        _exportDataObjectLiveData.value = ExportDataObject(dateTime)
-    }
-
     /**
      * @return The directory name where the file is exported
      */
-    fun exportDataOnExternalMemory(name: String, fallbackName: String) {
-        val disposable = domain.exportDataOnExternalMemory(name, fallbackName)
+    fun exportData(dirUri: Uri) {
+        val disposable = domain.exportData(dirUri)
                 .subscribe({
                     _event.onNext(ExportDataEventSuccess(it))
                 }, {

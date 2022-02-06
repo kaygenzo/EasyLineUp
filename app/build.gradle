@@ -10,11 +10,6 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.appdistribution'
 apply plugin: 'com.google.firebase.crashlytics'
 
-repositories {
-    maven { url 'https://maven.fabric.io/public' }
-    maven { url 'https://jitpack.io' }
-}
-
 def reportPropertiesFile = rootProject.file("bugbattle.properties")
 def reportProperties = new Properties()
 if (reportPropertiesFile.exists()) {
@@ -55,6 +50,7 @@ android {
         vectorDrawables.useSupportLibrary true
         buildConfigField "String", "ReportToolApiKey", reportProperties['apiKey']
         buildConfigField "Boolean", "UseBetaTool", "true"
+        buildConfigField "String", "reportStorageRoot", "\"reports.dev\""
     }
 
     useLibrary 'android.test.runner'
@@ -92,11 +88,13 @@ android {
                 testersFile="testers.txt"
             }
             matchingFallbacks = ['prod']
+            buildConfigField "String", "reportStorageRoot", "\"reports.prod\""
         }
         demo {
             dimension 'version'
             matchingFallbacks = ['demo']
             buildConfigField "Boolean", "UseBetaTool", "false"
+            buildConfigField "String", "reportStorageRoot", "\"reports.demo\""
         }
     }
 
@@ -148,6 +146,10 @@ android {
             includeAndroidResources = true
         }
     }
+
+    configurations.all {
+        resolutionStrategy.force "com.google.android.material:material:1.2.1"
+    }
 }
 
 repositories {
@@ -157,7 +159,7 @@ repositories {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.annotation:annotation:' + rootProject.androidxLibVersion
 
@@ -165,16 +167,11 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.coreVersion
     androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoCoreVersion
     androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:' + rootProject.espressoCoreVersion
-
     androidTestImplementation (name:'cloudtestingscreenshotter_lib', ext:'aar')
-
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.10.0'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
-
-    androidTestImplementation('tools.fastlane:screengrab:1.2.0') {
-        exclude group: 'com.android.support.test.uiautomator', module: 'uiautomator-v18'
-    }
-    androidTestImplementation('com.schibsted.spain:barista:3.2.0') {
+    androidTestImplementation 'tools.fastlane:screengrab:2.1.1'
+    androidTestImplementation('com.adevinta.android:barista:4.2.0') {
         exclude group: 'org.jetbrains.kotlin' // Only if you already use Kotlin in your project
     }
 
@@ -196,10 +193,16 @@ dependencies {
 
     ////////// GOOGLE //////////
 
+    implementation platform("com.google.firebase:firebase-bom:$firebaseBOMVersion")
+
     implementation "com.google.android.material:material:$googleMaterialVersion"
     implementation "com.google.code.gson:gson:$googleGsonVersion"
-    implementation "com.google.firebase:firebase-analytics:$firebaseAnalyticsVersion"
-    implementation "com.google.firebase:firebase-crashlytics:$firebaseCrashlyticsVersion"
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation 'com.google.firebase:firebase-storage-ktx'
+    implementation 'com.google.firebase:firebase-config-ktx'
     if (!project.hasProperty("disable-performance-plugin")) {
         implementation "com.google.firebase:firebase-perf:$firebasePerfVersion"
     }
@@ -220,17 +223,16 @@ dependencies {
 
     implementation "com.github.nguyenhoanglam:ImagePicker:$imagepickerVersion"
 
-    implementation "org.koin:koin-android:$koinVersion"
+    implementation "io.insert-koin:koin-android:$koinVersion"
     implementation "com.getkeepsafe.taptargetview:taptargetview:$taptargetviewVersion"
-
-    implementation 'com.github.hedzr:android-file-chooser:master-SNAPSHOT'
 
     // only debug libraries
 
     debugImplementation "com.facebook.stetho:stetho:$stethoVersion"
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
 
-    implementation "com.instabug.library:instabug:$bugReportVersion"
+    implementation "com.github.kaygenzo:bugreporter:$bugreportingVersion"
+    implementation "androidx.documentfile:documentfile:$documentFileVersion"
 }
 
 apply from: '../jacoco.gradle'

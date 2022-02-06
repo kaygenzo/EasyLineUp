@@ -1,45 +1,32 @@
 package com.telen.easylineup.settings
 
-import android.Manifest
+import android.app.Activity
 import android.content.ActivityNotFoundException
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.app.ActivityCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.obsez.android.lib.filechooser.ChooserDialog
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.login.ImportFailure
 import com.telen.easylineup.login.ImportSuccessfulEvent
 import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.login.LoginViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import com.telen.easylineup.views.CustomEditTextView
+import com.telen.easylineup.utils.StorageUtils
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 
-
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
-
-    companion object {
-        const val REQUEST_WRITE_EXTERNAL_STORAGE = 0
-        const val REQUEST_READ_EXTERNAL_STORAGE = 1
-    }
 
     lateinit var viewModel: SettingsViewModel
     lateinit var loginViewModel: LoginViewModel
@@ -135,22 +122,6 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         disposables.clear()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when(requestCode) {
-            REQUEST_WRITE_EXTERNAL_STORAGE -> {
-                if(grantResults.none { it == PackageManager.PERMISSION_DENIED }) {
-                    exportData()
-                }
-            }
-            REQUEST_READ_EXTERNAL_STORAGE -> {
-                if(grantResults.none { it == PackageManager.PERMISSION_DENIED }) {
-                    importData()
-                }
-            }
-        }
-    }
-
     override fun onPreferenceTreeClick(preference: Preference?): Boolean {
         when(preference?.key) {
             getString(R.string.key_play_store) -> {
@@ -182,72 +153,25 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 return true
             }
             getString(R.string.key_export_data) -> {
-                activity?.run {
-                    if(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                        this@SettingsFragment.requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_EXTERNAL_STORAGE)
-                    }
-                    else {
-                        exportData()
-                    }
-                }
+                FirebaseAnalyticsUtils.onClick(activity, "click_settings_export_data")
+                exportData()
                 return true
             }
             getString(R.string.key_import_data) -> {
-                activity?.run {
-                    if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                        this@SettingsFragment.requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_READ_EXTERNAL_STORAGE)
-                    }
-                    else {
-                        importData()
-                    }
-                }
+                FirebaseAnalyticsUtils.onClick(activity, "click_settings_import_data")
+                importData()
                 return true
             }
             else -> return super.onPreferenceTreeClick(preference)
         }
     }
 
-    private fun exportData() {
-
-        viewModel.exportDataObjectLiveData.observe(viewLifecycleOwner, Observer {
-            viewModel.exportDataObjectLiveData.removeObservers(viewLifecycleOwner)
-            context?.run {
-                val input = CustomEditTextView(this)
-                input.setPlaceholder(it.fallbackName)
-
-                DialogFactory.getSimpleDialog(
-                        context = this,
-                        message = R.string.export_data_to_file_dialog_title,
-                        view = input,
-                        confirmText = R.string.export_button,
-                        confirmClick = DialogInterface.OnClickListener { dialog, which ->
-                            FirebaseAnalyticsUtils.onClick(activity, "click_settings_export_data")
-                            val name = input.getName()
-                            viewModel.exportDataOnExternalMemory(name, it.fallbackName)
-                        }
-                ).show()
-            }
-        })
-
-        viewModel.exportDataTriggered()
+    private fun importData() {
+        StorageUtils.openFile(this)
     }
 
-    private fun importData() {
-
-        activity?.run {
-            ChooserDialog(this)
-                    .withFilter(false, false, "elu")
-                    .withIcon(R.mipmap.ic_launcher)
-                    .withStartFile("${Environment.getExternalStorageDirectory().path}/${Constants.EXPORTS_DIRECTORY}")
-                    .withChosenListener { path, _ ->
-                        FirebaseAnalyticsUtils.onClick(activity, "click_settings_import_data")
-                        val updateIfExists = findPreference<CheckBoxPreference>(getString(R.string.key_import_data_update_object))?.isChecked ?: false
-                        loginViewModel.importData(path, updateIfExists)
-                    }
-                    .withOnCancelListener { dialog -> dialog.cancel() }
-                    .build()
-                    .show()
-        }
+    private fun exportData() {
+        StorageUtils.createFile(this)
     }
 
     private fun updateLineupStyleSummary() {
@@ -263,6 +187,23 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             getString(R.string.key_lineup_style) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_lineup_style")
                 updateLineupStyleSummary()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                StorageUtils.REQUEST_CODE_OPEN_DOCUMENT -> {
+                    val uri = data?.data ?: return
+                    val updateIfExists = findPreference<CheckBoxPreference>(getString(R.string.key_import_data_update_object))?.isChecked ?: false
+                    loginViewModel.importData(uri, updateIfExists)
+                }
+                StorageUtils.REQUEST_CODE_CHOOSE_DIRECTORY -> {
+                    val dirUri = data?.data ?: return
+                    viewModel.exportData(dirUri)
+                }
             }
         }
     }

@@ -16,7 +16,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.getkeepsafe.taptargetview.TapTargetView
-import com.instabug.bug.BugReporting
+import com.github.kaygenzo.bugreporter.BugReporter
+import com.github.kaygenzo.bugreporter.utils.PermissionsUtils
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
@@ -284,7 +285,9 @@ class DashboardFragment: BaseFragment("DashboardFragment"), TileClickListener, A
             R.id.action_report_issue -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_report_issue")
                 if(BuildConfig.UseBetaTool) {
-                    BugReporting.show(BugReporting.ReportType.BUG)
+                    activity?.run {
+                        BugReporter.startReport(this)
+                    }
                 }
                 true
             }

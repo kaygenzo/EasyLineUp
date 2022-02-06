@@ -61,6 +61,9 @@ android {
             }
         }
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -78,7 +81,8 @@ dependencies {
 
     implementation "io.reactivex.rxjava2:rxjava:2.2.14"
     implementation "com.google.code.gson:gson:$googleGsonVersion"
-    implementation "org.koin:koin-android:$koinVersion"
+    implementation "io.insert-koin:koin-android:$koinVersion"
+    implementation "androidx.documentfile:documentfile:$documentFileVersion"
 }
 
 apply from: '../jacoco.gradle'

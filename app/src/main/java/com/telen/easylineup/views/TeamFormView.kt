@@ -29,9 +29,9 @@ class TeamFormView: ConstraintLayout {
     private var listener: TeamFormListener? = null
     private var imageUri: Uri? = null
 
-    constructor(context: Context?) : super(context) {initView(context)}
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {initView(context)}
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {initView(context)}
+    constructor(context: Context) : super(context) {initView(context)}
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {initView(context)}
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {initView(context)}
 
     fun setListener(listener: TeamFormListener) {
         this.listener = listener

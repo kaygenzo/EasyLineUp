@@ -26,6 +26,20 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
+    <style name="AppTheme.NoActionBar.Transparent" parent="AppTheme.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="colorControlActivated">?attr/colorControlHighlight</item>
+        <item name="listPreferredItemPaddingStart">?attr/dialogPreferredPadding</item>
+        <item name="listPreferredItemPaddingEnd">?attr/dialogPreferredPadding</item>
+    </style>
+
     <style name="AppTheme.NoActionBar.FullScreen" parent="AppTheme.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
@@ -43,7 +57,7 @@
         <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.App.Body.Text</item>
     </style>
 
-H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
+    <style name="Tile" parent="Widget.MaterialComponents.CardView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/dashboard_tile_height</item>
         <item name="cardCornerRadius">6dp</item>
@@ -281,6 +295,16 @@ H    <style name="Tile" parent="Widget.MaterialComponents.CardView">
         <item name="autoSizeTextType">uniform</item>
         <item name="android:layout_marginEnd">5dp</item>
         <item name="android:layout_marginTop">5dp</item>
+    </style>
+
+    <style name="ActivityLoadingView" parent="Widget.MaterialComponents.CardView">
+        <item name="android:layout_width">280dp</item>
+        <item name="android:layout_height">120dp</item>
+        <item name="cardCornerRadius">6dp</item>
+        <item name="cardElevation">6dp</item>
+        <item name="cardPreventCornerOverlap">false</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="android:background">@color/white</item>
     </style>
 
 </resources>

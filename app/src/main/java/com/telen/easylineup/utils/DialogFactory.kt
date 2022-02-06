@@ -4,8 +4,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ProgressBar
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -70,17 +68,6 @@ class DialogFactory {
                     }
 
             )
-        }
-
-        fun getLoadingDialog(context: Context, @StringRes message: Int): Dialog {
-            val progressBar = ProgressBar(context)
-            progressBar.layoutParams = ViewGroup.LayoutParams(100, 100)
-            progressBar.isIndeterminate = true
-            progressBar.setPadding(20,20,20,20)
-
-            return getDialog(context = context, title = message, customView = progressBar, resConfirmText = 0, resCancelText = 0).apply {
-                setCancelable(false)
-            }
         }
 
         fun getSuccessDialog(context: Context,

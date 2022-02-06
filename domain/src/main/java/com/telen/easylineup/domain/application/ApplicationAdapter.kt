@@ -2,14 +2,13 @@ package com.telen.easylineup.domain.application
 
 import android.content.Context
 import android.net.Uri
-import android.os.Environment
 import android.text.TextUtils
 import android.webkit.URLUtil
 import androidx.core.text.isDigitsOnly
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.model.*
@@ -23,10 +22,9 @@ import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import java.io.BufferedWriter
-import java.io.File
-import java.io.FileWriter
-import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.NoSuchElementException
 
 internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErrors> = PublishSubject.create()): ApplicationPort, KoinComponent {
 
@@ -481,7 +479,7 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
         return UseCaseHandler.execute(deleteAllDataUseCase, DeleteAllData.RequestValues()).ignoreElement()
     }
 
-    override fun exportDataOnExternalMemory(name: String, fallbackName: String): Single<String> {
+    override fun exportData(dirUri: Uri): Single<String> {
         return UseCaseHandler.execute(checkHashUseCase, CheckHashData.RequestValues()).flatMapCompletable {
             println("update result is ${it.updateResult}")
             Completable.complete()
@@ -499,33 +497,32 @@ internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErro
             }
         })))
                 .flatMap {
-                    val storageDirectoryName = Constants.EXPORTS_DIRECTORY
+                    val now = Calendar.getInstance().time
+                    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ROOT)
+                    val dateTime = formatter.format(now)
                     val json = Gson().toJson(it.exportBase)
-
-                    val rootDirectory = File(Environment.getExternalStorageDirectory().path
-                            + "/" + storageDirectoryName)
-                    if(!rootDirectory.exists())
-                        rootDirectory.mkdirs()
-
-                    val fileName = if(name.isNotBlank()) name else fallbackName
-                    val file = File(rootDirectory.absolutePath + "/$fileName.elu")
-                    if(!file.exists())
-                        file.createNewFile()
-
-                    var out: BufferedWriter? = null
-                    try {
-                        out = BufferedWriter(FileWriter(file.absolutePath, false))
-                        out.write(json)
-                        out.flush()
-                    }
-                    catch (e: IOException) {
-                        println(e)
+                    val dir = DocumentFile.fromTreeUri(context, dirUri)
+                    val filename = "$dateTime.elu"
+                    val file = dir?.createFile("application/octet-stream", filename)
+                    file?.let {
+                        context.contentResolver.openOutputStream(it.uri)?.let { os ->
+                            Single.defer {
+                                os.use { stream ->
+                                    stream.bufferedWriter().use { writer ->
+                                        writer.write(json)
+                                        writer.flush()
+                                        Single.just(filename)
+                                    }
+                                }
+                            }
+                        } ?: let {
+                            _errors.onNext(DomainErrors.CANNOT_EXPORT_DATA)
+                            Single.error<String>(Exception("Cannot write in file"))
+                        }
+                    } ?: let {
                         _errors.onNext(DomainErrors.CANNOT_EXPORT_DATA)
+                        Single.error<String>(Exception("Cannot open directory"))
                     }
-                    finally {
-                        out?.close()
-                    }
-                    Single.just(storageDirectoryName)
                 }
     }
 
