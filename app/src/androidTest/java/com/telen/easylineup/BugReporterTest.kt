@@ -10,10 +10,10 @@ import androidx.test.runner.AndroidJUnit4
 import androidx.test.runner.lifecycle.ActivityLifecycleCallback
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions
+import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
+import com.adevinta.android.barista.interaction.BaristaKeyboardInteractions
 import com.google.android.material.textview.MaterialTextView
-import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions
-import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions
-import com.schibsted.spain.barista.interaction.BaristaKeyboardInteractions
 import com.telen.easylineup.utils.ConditionWatcher
 import com.telen.easylineup.utils.Instruction
 import org.junit.After

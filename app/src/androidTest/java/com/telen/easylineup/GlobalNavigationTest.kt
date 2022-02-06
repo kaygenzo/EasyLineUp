@@ -12,6 +12,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.NavigationViewActions
 import androidx.test.espresso.contrib.RecyclerViewActions
@@ -20,14 +21,11 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.viewpager2.widget.ViewPager2
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions
+import com.adevinta.android.barista.interaction.*
+import com.adevinta.android.barista.internal.matcher.DisplayedMatchers
+import com.adevinta.android.barista.rule.cleardata.ClearPreferencesRule
 import com.google.android.libraries.cloudtesting.screenshots.ScreenShotter
-import com.google.android.material.textview.MaterialTextView
-import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions
-import com.schibsted.spain.barista.interaction.*
-import com.schibsted.spain.barista.interaction.BaristaDrawerInteractions.openDrawer
-import com.schibsted.spain.barista.internal.matcher.DisplayedMatchers
-import com.schibsted.spain.barista.internal.viewaction.SwipeActions.swipeLeft
-import com.schibsted.spain.barista.rule.cleardata.ClearPreferencesRule
 import com.telen.easylineup.dashboard.DashboardTileAdapter
 import com.telen.easylineup.team.TeamAdapter
 import org.hamcrest.Description
@@ -116,7 +114,7 @@ class GlobalNavigationTest {
 
         takeScreenshot("dashboard", mHomeTestRule.activity)
 
-        openDrawer()
+        BaristaDrawerInteractions.openDrawer()
 
         validateTapTarget()
     }
@@ -318,7 +316,7 @@ class GlobalNavigationTest {
 
         initialization()
 
-        openDrawer()
+        BaristaDrawerInteractions.openDrawer()
 
         BaristaClickInteractions.clickOn(R.id.drawerImage)
 
@@ -388,7 +386,7 @@ class GlobalNavigationTest {
                         isDisplayed()))
         appCompatImageButton7.perform(click())
 
-        openDrawer()
+        BaristaDrawerInteractions.openDrawer()
 
         //check team name is "NewTeamName"
         BaristaVisibilityAssertions.assertContains(R.id.drawerTitle, "NewTeamName")
@@ -401,7 +399,7 @@ class GlobalNavigationTest {
 
         initialization()
 
-        openDrawer()
+        BaristaDrawerInteractions.openDrawer()
 
         //go to the lineups list screen
         onView(withId(R.id.nav_view))
@@ -564,7 +562,7 @@ class GlobalNavigationTest {
 
         initialization()
 
-        openDrawer()
+        BaristaDrawerInteractions.openDrawer()
 
         //click on switch team
         BaristaClickInteractions.clickOn(R.id.changeTeam)
@@ -587,7 +585,7 @@ class GlobalNavigationTest {
         //click finish
         BaristaClickInteractions.clickOn(R.id.buttonNext)
 
-        openDrawer()
+        BaristaDrawerInteractions.openDrawer()
 
         //click on image in drawer header
         BaristaClickInteractions.clickOn(R.id.drawerImage)
@@ -607,7 +605,7 @@ class GlobalNavigationTest {
 
         pressBack()
 
-        openDrawer()
+        BaristaDrawerInteractions.openDrawer()
 
         BaristaClickInteractions.clickOn(R.id.changeTeam)
 

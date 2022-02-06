@@ -10,11 +10,6 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.appdistribution'
 apply plugin: 'com.google.firebase.crashlytics'
 
-repositories {
-    maven { url 'https://maven.fabric.io/public' }
-    maven { url 'https://jitpack.io' }
-}
-
 def reportPropertiesFile = rootProject.file("bugbattle.properties")
 def reportProperties = new Properties()
 if (reportPropertiesFile.exists()) {
@@ -175,8 +170,8 @@ dependencies {
     androidTestImplementation (name:'cloudtestingscreenshotter_lib', ext:'aar')
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.10.0'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
-    androidTestImplementation 'tools.fastlane:screengrab:2.0.0'
-    androidTestImplementation('com.schibsted.spain:barista:3.9.0') {
+    androidTestImplementation 'tools.fastlane:screengrab:2.1.1'
+    androidTestImplementation('com.adevinta.android:barista:4.2.0') {
         exclude group: 'org.jetbrains.kotlin' // Only if you already use Kotlin in your project
     }
 
@@ -228,10 +223,8 @@ dependencies {
 
     implementation "com.github.nguyenhoanglam:ImagePicker:$imagepickerVersion"
 
-    implementation "org.koin:koin-android:$koinVersion"
+    implementation "io.insert-koin:koin-android:$koinVersion"
     implementation "com.getkeepsafe.taptargetview:taptargetview:$taptargetviewVersion"
-
-    implementation 'com.github.hedzr:android-file-chooser:master-SNAPSHOT'
 
     // only debug libraries
 
@@ -239,7 +232,7 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
 
     implementation "com.github.kaygenzo:bugreporter:$bugreportingVersion"
-    implementation 'androidx.documentfile:documentfile:1.0.1'
+    implementation "androidx.documentfile:documentfile:$documentFileVersion"
 }
 
 apply from: '../jacoco.gradle'
