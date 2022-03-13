@@ -93,8 +93,7 @@ class TeamEditFragment: BaseFragment("TeamEditFragment") , TeamFormListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == Config.RC_PICK_IMAGES && resultCode == Activity.RESULT_OK) {
             data?.let {
-                val pickedImages: ArrayList<Image> = it.getParcelableArrayListExtra(Config.EXTRA_IMAGES)
-                pickedImages.firstOrNull()?.let {image ->
+                val pickedImages = it.getParcelableArrayListExtra<Image>(Config.EXTRA_IMAGES)?.firstOrNull()?.let {image ->
                     teamForm?.onImageUriReceived(image)
                 }
             }

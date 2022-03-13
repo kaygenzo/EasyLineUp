@@ -6,8 +6,10 @@ buildscript {
         appVersionName = "1.6.1" //1.6.1.0
         appVersionCode = 1610
 
-        nav_version = "2.1.0-alpha05"
-        kotlin_version = '1.5.31'
+        dependencyCheckClasspathVersion = "6.5.3"
+
+        nav_version = "2.4.1"
+        kotlin_version = '1.6.10'
         androidxLibVersion = "1.0.0"
         robolectricVersion = "4.3"
         extTruthVersion = '1.3.0-alpha02'
@@ -22,7 +24,7 @@ buildscript {
         room_version = "2.2.5"
         nav_version_ktx = "2.3.1"
         koinVersion = "2.0.1"
-        detektVersion = "1.7.0-beta1"
+        detektVersion = "1.19.0"
         picassoVersion = "2.71828"
         androidchartVersion = "v3.1.0"
         tablemultiscrollVersion = "1.0.5"
@@ -60,14 +62,14 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.2'
+        classpath 'com.android.tools.build:gradle:7.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.3.3'
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
 
         // quality related classpath
         classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3'
-        classpath 'org.owasp:dependency-check-gradle:6.5.3'
+        classpath "org.owasp:dependency-check-gradle:$dependencyCheckClasspathVersion"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detektVersion"
 
         // firebase related classpath
@@ -79,13 +81,6 @@ buildscript {
         }
     }
 }
-
-plugins {
-    id "io.gitlab.arturbosch.detekt" version "1.19.0"
-}
-
-apply from: 'sonar.gradle'
-apply from: 'detekt.gradle'
 
 allprojects {
     repositories {
@@ -101,7 +96,11 @@ allprojects {
             dirs '../aars'
         }
     }
+    apply from: "$rootDir/detekt.gradle"
 }
+
+//apply from: "$rootDir/sonar.gradle"
+apply from: "$rootDir/dependency-check.gradle"
 
 task clean(type: Delete) {
     delete rootProject.buildDir
