@@ -54,8 +54,8 @@ alpha:
 
 deployAppDistribution:
   stage: develop
-  only:
-    - develop
+#  only:
+#    - develop
   script:
     - ./gradlew assembleProdRelease appDistributionUploadProdRelease
   artifacts:
