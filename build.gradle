@@ -82,6 +82,13 @@ buildscript {
     }
 }
 
+plugins {
+    id "io.gitlab.arturbosch.detekt" version "1.19.0"
+}
+
+apply from: 'sonar.gradle'
+apply from: 'detekt.gradle'
+
 allprojects {
     repositories {
         google()
@@ -96,11 +103,7 @@ allprojects {
             dirs '../aars'
         }
     }
-    apply from: "$rootDir/detekt.gradle"
 }
-
-//apply from: "$rootDir/sonar.gradle"
-apply from: "$rootDir/dependency-check.gradle"
 
 task clean(type: Delete) {
     delete rootProject.buildDir

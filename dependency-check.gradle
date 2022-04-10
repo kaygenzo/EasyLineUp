@@ -1,5 +1,16 @@
 apply plugin: 'org.owasp.dependencycheck'
 dependencyCheck {
-    outputDirectory = "$buildDir/security-report"
+    scanConfigurations = configurations.findAll {
+        !it.name.startsWithAny('androidTest', 'test', 'debug') &&
+                it.name.contains("DependenciesMetadata") && (
+                it.name.startsWithAny("api", "implementation", "runtimeOnly") ||
+                        it.name.contains("Api") ||
+                        it.name.contains("Implementation") ||
+                        it.name.contains("RuntimeOnly")
+        )
+    }.collect {
+        it.name
+    }
+
     format='ALL'
 }
