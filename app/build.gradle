@@ -10,16 +10,6 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.appdistribution'
 apply plugin: 'com.google.firebase.crashlytics'
 
-def reportPropertiesFile = rootProject.file("bugbattle.properties")
-def reportProperties = new Properties()
-if (reportPropertiesFile.exists()) {
-    reportProperties.load(new FileInputStream(reportPropertiesFile))
-}
-else {
-    // Otherwise read from environment variables, this happens in CI
-    reportProperties.setProperty("apiKey", "\"${System.getenv('REPORTING_TOOL_API_KEY')}\"")
-}
-
 def keystorePropertiesFile = rootProject.file("keystore-upload.properties")
 def keystoreProperties = new Properties()
 if (keystorePropertiesFile.exists()) {
@@ -38,19 +28,16 @@ else {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.telen.easylineup"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode appVersionCode
         versionName appVersionName
         testInstrumentationRunner "com.telen.easylineup.EasylineupAndroidTestRunner"
-        multiDexEnabled true
         vectorDrawables.useSupportLibrary true
-        buildConfigField "String", "ReportToolApiKey", reportProperties['apiKey']
         buildConfigField "Boolean", "UseBetaTool", "true"
-        buildConfigField "String", "reportStorageRoot", "\"reports.dev\""
     }
 
     useLibrary 'android.test.runner'
@@ -79,6 +66,7 @@ android {
         dev {
             dimension 'version'
             matchingFallbacks = ['prod']
+            buildConfigField "String", "reportStorageRoot", "\"reports.dev\""
         }
         prod {
             dimension 'version'
@@ -148,13 +136,11 @@ android {
     }
 
     configurations.all {
-        resolutionStrategy.force "com.google.android.material:material:1.2.1"
+        resolutionStrategy.force "com.google.android.material:material:$googleMaterialVersion"
     }
-}
 
-repositories {
-    flatDir {
-        dirs 'libs'
+    buildFeatures {
+        viewBinding true
     }
 }
 
@@ -164,7 +150,6 @@ dependencies {
     implementation 'androidx.annotation:annotation:' + rootProject.androidxLibVersion
 
     // Testing-only dependencies
-    androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.coreVersion
     androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoCoreVersion
     androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:' + rootProject.espressoCoreVersion
     androidTestImplementation (name:'cloudtestingscreenshotter_lib', ext:'aar')

@@ -1,4 +1,4 @@
-image: mingc/android-build-box
+image: kaygenzo/android-fastlane:30
 
 before_script:
   - echo $DEBUG_KEYSTORE_FILE | base64 -d > telen.debug.jks
@@ -10,7 +10,6 @@ before_script:
   - git rev-parse --abbrev-ref HEAD > releasenotes.txt
   - git log -1 --pretty="%B %ad" >> releasenotes.txt
   - ruby --version
-  - gem install bundler -v '2.2.22'
   - bundle install
 
 after_script:
@@ -23,27 +22,15 @@ after_script:
   - rm play-store-credentials.json
 
 stages:
-  - test
-  - develop
-  - release
+  - build
   - alpha
-
-prodRelease:
-  stage: release
-  only:
-    - tags
-  script:
-    - ./gradlew assembleProdRelease
-  artifacts:
-    paths:
-      - app/build/outputs/apk/prod/release
-      - app/build/outputs/mapping/prodRelease/mapping.txt
+  - test
 
 alpha:
   stage: alpha
   when: manual
-#  only:
-#    - tags
+  #  only:
+  #    - tags
   script:
     - ./gradlew bundleProdRelease
     - bundle exec fastlane deploy_to_alpha
@@ -53,9 +40,7 @@ alpha:
       - app/build/outputs/mapping/prodRelease/mapping.txt
 
 deployAppDistribution:
-  stage: develop
-  only:
-    - develop
+  stage: build
   script:
     - ./gradlew assembleProdRelease appDistributionUploadProdRelease
   artifacts:
