@@ -73,7 +73,7 @@ buildscript {
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detektVersion"
 
         // firebase related classpath
-        classpath 'com.google.firebase:firebase-appdistribution-gradle:2.0.1'
+        classpath 'com.google.firebase:firebase-appdistribution-gradle:3.0.1'
         classpath "com.google.firebase:firebase-crashlytics-gradle:$firebaseCrashlyticsGradleVersion"
 
         if (!project.hasProperty("disable-performance-plugin")) {
