@@ -3,8 +3,8 @@
 buildscript {
 
     ext {
-        appVersionName = "1.6.1" //1.6.1.0
-        appVersionCode = 1610
+        appVersionName = "1.6.2" //1.6.2.0
+        appVersionCode = 1620
 
         dependencyCheckClasspathVersion = "6.5.3"
 
