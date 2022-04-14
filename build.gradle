@@ -75,10 +75,6 @@ buildscript {
         // firebase related classpath
         classpath 'com.google.firebase:firebase-appdistribution-gradle:3.0.1'
         classpath "com.google.firebase:firebase-crashlytics-gradle:$firebaseCrashlyticsGradleVersion"
-
-        if (!project.hasProperty("disable-performance-plugin")) {
-            classpath 'com.google.firebase:perf-plugin:1.3.1'
-        }
     }
 }
 

@@ -3,9 +3,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
-if (!project.hasProperty("disable-performance-plugin")) {
-    apply plugin: 'com.google.firebase.firebase-perf'
-}
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.appdistribution'
 apply plugin: 'com.google.firebase.crashlytics'
@@ -188,9 +185,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx'
     implementation 'com.google.firebase:firebase-config-ktx'
-    if (!project.hasProperty("disable-performance-plugin")) {
-        implementation "com.google.firebase:firebase-perf:$firebasePerfVersion"
-    }
 
     ////////// PRIVATE //////////
 
