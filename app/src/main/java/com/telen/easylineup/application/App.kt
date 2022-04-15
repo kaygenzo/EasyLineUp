@@ -48,11 +48,7 @@ open class App: MultiDexApplication() {
                 .setFields(null)
                 .setEmail("developer@telen.fr")
                 .setReportMethods(
-                        if(!BuildConfig.UseBetaTool) {
-                            listOf()
-                        } else {
-                            listOf(ReportMethod.SHAKE)
-                        }
+                    listOf(ReportMethod.SHAKE)
                 )
                 .observeResult(koinApp.koin.get<BugReporterManager>())
                 .build()

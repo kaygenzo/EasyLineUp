@@ -78,7 +78,6 @@ android {
         demo {
             dimension 'version'
             matchingFallbacks = ['demo']
-            buildConfigField "Boolean", "UseBetaTool", "false"
             buildConfigField "String", "reportStorageRoot", "\"reports.demo\""
         }
     }
@@ -147,7 +146,9 @@ dependencies {
     implementation 'androidx.annotation:annotation:' + rootProject.androidxLibVersion
 
     // Testing-only dependencies
-    androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoCoreVersion
+    androidTestImplementation('androidx.test.espresso:espresso-core:' + rootProject.espressoCoreVersion) {
+        exclude group: "com.google.protobuf"
+    }
     androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:' + rootProject.espressoCoreVersion
     androidTestImplementation (name:'cloudtestingscreenshotter_lib', ext:'aar')
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.10.0'
