@@ -1,7 +1,7 @@
 package com.telen.easylineup.team.createTeam
 
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.StepConfiguration
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
@@ -15,7 +15,7 @@ import org.koin.core.inject
 
 class SetupViewModel: ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
     var currentStep: Int = 0
     var lastConfiguration: StepConfiguration? = null
 

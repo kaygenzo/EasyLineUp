@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.TeamStrategy
@@ -26,7 +26,7 @@ data class DeletePlayerFailure(val message: String?): Event()
 
 class PlayerViewModel: ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     private val disposables = CompositeDisposable()
 

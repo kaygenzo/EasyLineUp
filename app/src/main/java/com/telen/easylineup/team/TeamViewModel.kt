@@ -3,7 +3,7 @@ package com.telen.easylineup.team
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.Team
 import io.reactivex.Completable
@@ -14,7 +14,7 @@ import timber.log.Timber
 
 class TeamViewModel: ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     private var playerSelectedID = 0L
     var team: Team? = null

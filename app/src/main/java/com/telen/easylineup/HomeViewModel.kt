@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.Team
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -26,7 +26,7 @@ object SwapButtonFailure: Event()
 
 class HomeViewModel: ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     private val _event = PublishSubject.create<Event>()
 

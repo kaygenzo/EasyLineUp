@@ -8,7 +8,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 
-interface ApplicationPort {
+interface ApplicationInteractor {
 
     fun observeErrors(): PublishSubject<DomainErrors>
 

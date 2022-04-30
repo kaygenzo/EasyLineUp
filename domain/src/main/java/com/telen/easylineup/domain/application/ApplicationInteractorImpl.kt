@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.NoSuchElementException
 
-internal class ApplicationAdapter(private val _errors: PublishSubject<DomainErrors> = PublishSubject.create()): ApplicationPort, KoinComponent {
+internal class ApplicationInteractorImpl(private val _errors: PublishSubject<DomainErrors> = PublishSubject.create()): ApplicationInteractor, KoinComponent {
 
     private val context: Context by inject()
 

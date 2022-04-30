@@ -2,7 +2,7 @@ package com.telen.easylineup.lineup.roster
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -11,7 +11,7 @@ import org.koin.core.inject
 
 class LineupRosterViewModel: ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
     var lineupID: Long = 0
     private val rosterItems = mutableListOf<RosterItem>()
 

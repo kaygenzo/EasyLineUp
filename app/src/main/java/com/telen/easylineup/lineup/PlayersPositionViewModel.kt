@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.utils.DialogFactory
 import io.reactivex.Completable
@@ -84,7 +84,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     val linkPlayersInField: LiveData<List<Player>?>
         get() = _linkPlayersInField
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     private val _lineupTitle = MutableLiveData<String>()
     private val _designatedPlayerTitle = MutableLiveData<String>()

@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -21,7 +21,7 @@ data class SaveSuccess(val lineupID: Long, val lineupName: String, val strategy:
 
 class LineupViewModel: ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     private val _categorizedLineupsLiveData = MutableLiveData<List<Pair<Tournament, List<Lineup>>>>()
 

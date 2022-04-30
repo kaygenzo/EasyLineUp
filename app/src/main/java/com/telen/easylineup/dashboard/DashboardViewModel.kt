@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import io.reactivex.Completable
@@ -28,7 +28,7 @@ const val INDEX_SEND_OTHER = 2
 
 class DashboardViewModel: ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     val eventHandler = PublishSubject.create<EventCase>()
     val disposables = CompositeDisposable()

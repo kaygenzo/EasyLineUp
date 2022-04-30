@@ -1,7 +1,7 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.domain.application.ApplicationAdapter
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractorImpl
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.usecases.*
 import com.telen.easylineup.domain.utils.ValidatorUtils
 
@@ -9,7 +9,7 @@ import org.koin.dsl.module
 
 object DomainModule {
     val domainModules = module {
-        single<ApplicationPort> { ApplicationAdapter() }
+        single<ApplicationInteractor> { ApplicationInteractorImpl() }
 
         single { GetTeam(get()) }
         single { GetAllTeams(get()) }

@@ -2,7 +2,7 @@ package com.telen.easylineup.domain.mock
 
 import android.content.Context
 import com.google.gson.JsonParser
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -13,7 +13,7 @@ import org.koin.core.inject
 
 class DatabaseMockProvider: KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     fun createMockDatabase(context: Context): Completable {
          return Single.create<String> { emitter ->

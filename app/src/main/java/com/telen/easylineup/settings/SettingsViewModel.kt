@@ -2,7 +2,7 @@ package com.telen.easylineup.settings
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
@@ -20,7 +20,7 @@ object ExportDataEventFailure: Event()
 
 class SettingsViewModel: ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     private val _event = PublishSubject.create<Event>()
     private val disposables = CompositeDisposable()
