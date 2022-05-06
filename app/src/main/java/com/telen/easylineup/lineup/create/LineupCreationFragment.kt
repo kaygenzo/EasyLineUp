@@ -39,11 +39,11 @@ class LineupCreationFragment: BaseFragment("LineupCreationFragment") {
 
         val disposable = lineupViewModel.observeErrors().subscribe({
             when(it) {
-                DomainErrors.INVALID_TOURNAMENT_NAME -> {
+                DomainErrors.Lineups.INVALID_TOURNAMENT_NAME -> {
                     view?.lineupCreationForm?.setTournamentNameError(getString(R.string.lineup_creation_error_name_empty))
                     FirebaseAnalyticsUtils.emptyTournamentName(activity)
                 }
-                DomainErrors.INVALID_LINEUP_NAME -> {
+                DomainErrors.Lineups.INVALID_LINEUP_NAME -> {
                     view?.lineupCreationForm?.setLineupNameError(getString(R.string.lineup_creation_error_tournament_empty))
                     FirebaseAnalyticsUtils.emptyLineupName(activity)
                 }

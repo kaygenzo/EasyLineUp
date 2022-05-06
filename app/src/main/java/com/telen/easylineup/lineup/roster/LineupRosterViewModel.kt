@@ -35,12 +35,12 @@ class LineupRosterViewModel: ViewModel(), KoinComponent {
     }
 
     fun getRoster(): Single<List<RosterPlayerStatus>> {
-        return domain.getRoster(lineupID)
+        return domain.lineups().getRoster(lineupID)
                 .map { it.players }
     }
 
     fun saveOverlays(): Completable {
-        return domain.saveOrUpdatePlayerNumberOverlays(rosterItems)
+        return domain.players().saveOrUpdatePlayerNumberOverlays(rosterItems)
     }
 
     fun numberChanged(number: Int, item: RosterItem) {
@@ -52,10 +52,10 @@ class LineupRosterViewModel: ViewModel(), KoinComponent {
     }
 
     fun saveUpdatedRoster(newRosterStatus: List<RosterPlayerStatus>): Completable {
-        return domain.updateRoster(lineupID, newRosterStatus)
+        return domain.lineups().updateRoster(lineupID, newRosterStatus)
     }
 
     fun observeLineup(): LiveData<Lineup> {
-        return domain.observeLineupById(lineupID)
+        return domain.lineups().observeLineupById(lineupID)
     }
 }

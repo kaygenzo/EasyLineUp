@@ -32,7 +32,7 @@ class SplashScreenActivity: BaseImportActivity(), KoinComponent {
             checkDataUri(it)
         } ?: run {
             val disposable = Completable.timer(3000, TimeUnit.MILLISECONDS)
-                    .andThen(domain.getTeam())
+                    .andThen(domain.teams().getTeam())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
                         launchHome()

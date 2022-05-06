@@ -33,7 +33,7 @@ class HomeViewModel: ViewModel(), KoinComponent {
     val disposables = CompositeDisposable()
 
     fun registerTeamUpdates(): LiveData<List<Team>> {
-        return domain.observeTeams()
+        return domain.teams().observeTeams()
     }
 
     fun clear() {
@@ -45,7 +45,7 @@ class HomeViewModel: ViewModel(), KoinComponent {
     }
 
     fun getTeam() {
-        val disposable = domain.getTeam()
+        val disposable = domain.teams().getTeam()
                 .subscribe({
                     _event.onNext(GetTeamSuccess(it))
                 }, {
@@ -56,7 +56,7 @@ class HomeViewModel: ViewModel(), KoinComponent {
     }
 
     fun getTeamsCount() {
-        val disposable = domain.getTeamsCount()
+        val disposable = domain.teams().getTeamsCount()
                 .subscribe({
                     _event.onNext(GetTeamsCountSuccess(it))
                 }, {
@@ -67,7 +67,7 @@ class HomeViewModel: ViewModel(), KoinComponent {
     }
 
     fun onSwapButtonClicked() {
-        val disposable = domain.getAllTeams()
+        val disposable = domain.teams().getAllTeams()
                 .subscribe({
                     _event.onNext(SwapButtonSuccess(it))
                 }, {
@@ -78,7 +78,7 @@ class HomeViewModel: ViewModel(), KoinComponent {
     }
 
     fun updateCurrentTeam(currentTeam: Team) {
-        val disposable = domain.updateCurrentTeam(currentTeam)
+        val disposable = domain.teams().updateCurrentTeam(currentTeam)
                 .subscribe({
                     _event.onNext(UpdateCurrentTeamSuccess)
                 }, {

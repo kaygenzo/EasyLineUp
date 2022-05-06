@@ -25,7 +25,7 @@ class TeamViewModel: ViewModel(), KoinComponent {
     private val disposables = CompositeDisposable()
 
     fun observePlayers(): LiveData<List<Player>> {
-        val disposable = domain.getPlayers()
+        val disposable = domain.players().getPlayers()
                 .subscribe({
                     _playersLiveData.postValue(it)
                 }, {
@@ -40,7 +40,7 @@ class TeamViewModel: ViewModel(), KoinComponent {
     }
 
     fun observeTeam(): LiveData<Team> {
-        val disposable = domain.getTeam()
+        val disposable = domain.teams().getTeam()
                 .subscribe({
                     this.team = it
                     _teamLiveData.postValue(it)
@@ -52,7 +52,7 @@ class TeamViewModel: ViewModel(), KoinComponent {
     }
 
     fun deleteTeam(team: Team): Completable {
-        return domain.deleteTeam(team)
+        return domain.teams().deleteTeam(team)
     }
 
     fun getPlayerId() : Long {

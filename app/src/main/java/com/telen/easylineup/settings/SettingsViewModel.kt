@@ -30,7 +30,7 @@ class SettingsViewModel: ViewModel(), KoinComponent {
     }
 
     fun deleteAllData() {
-        val disposable = domain.deleteAllData()
+        val disposable = domain.data().deleteAllData()
                 .andThen(Completable.timer(1000, TimeUnit.MILLISECONDS))
                 .subscribe({
                     _event.onNext(DeleteAllDataEventSuccess)
@@ -45,7 +45,7 @@ class SettingsViewModel: ViewModel(), KoinComponent {
      * @return The directory name where the file is exported
      */
     fun exportData(dirUri: Uri) {
-        val disposable = domain.exportData(dirUri)
+        val disposable = domain.data().exportData(dirUri)
                 .subscribe({
                     _event.onNext(ExportDataEventSuccess(it))
                 }, {

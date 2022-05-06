@@ -41,7 +41,7 @@ class LoginViewModel : ViewModel(), KoinComponent {
                 it.use { stream ->
                     stream.bufferedReader().use { reader ->
                         val data = Gson().fromJson(reader, ExportBase::class.java)
-                        domain.importData(data, updateIfExists)
+                        domain.data().importData(data, updateIfExists)
                     }
                 }
             }
@@ -63,7 +63,7 @@ class LoginViewModel : ViewModel(), KoinComponent {
     }
 
     fun getMainTeam() {
-        val disposable = domain.getTeam()
+        val disposable = domain.teams().getTeam()
                 .subscribe({
                     _loginEvent.onNext(GetTeamSuccess(it))
                 }, {

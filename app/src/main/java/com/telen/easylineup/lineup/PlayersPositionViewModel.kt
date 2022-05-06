@@ -1,16 +1,12 @@
 package com.telen.easylineup.lineup
 
-import android.Manifest
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Environment
 import android.view.View
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.drawToBitmap
 import androidx.lifecycle.LiveData
@@ -19,7 +15,6 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.utils.DialogFactory
@@ -97,7 +92,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun onDeletePosition(player: Player, position: FieldPosition) {
-        val disposable = domain.deletePlayerPosition(player, position, _listPlayersWithPosition, lineupMode, extraHitters)
+        val disposable = domain.playerFieldPositions().deletePlayerPosition(player, position, _listPlayersWithPosition, lineupMode, extraHitters)
                 .subscribe({
                     eventHandler.onNext(DeletePlayerPositionSuccess)
                 }, {
@@ -107,7 +102,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     private fun getNotSelectedPlayers(sortBy: FieldPosition? = null): Single<List<Player>> {
-        return domain.getNotSelectedPlayersFromList(_listPlayersWithPosition, lineupID, sortBy)
+        return domain.lineups().getNotSelectedPlayersFromList(_listPlayersWithPosition, lineupID, sortBy)
     }
 
     private fun getAllAvailablePlayers(position: FieldPosition) {
@@ -132,7 +127,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun getPlayerSelectionForFlex() {
-        val disposable = domain.getPlayersInFieldFromList(_listPlayersWithPosition)
+        val disposable = domain.lineups().getPlayersInFieldFromList(_listPlayersWithPosition)
                 .subscribe({
                     _linkPlayersInField.value = it
                 }, {
@@ -143,7 +138,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun saveNewBattingOrder() {
-        val disposable = domain.saveBattingOrder(_listPlayersWithPosition)
+        val disposable = domain.lineups().saveBattingOrder(_listPlayersWithPosition)
                 .subscribe({
                     eventHandler.onNext(SaveBattingOrderSuccess)
                 }, {
@@ -153,7 +148,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     private fun deleteLineup() {
-        val disposable = domain.deleteLineup(lineupID)
+        val disposable = domain.lineups().deleteLineup(lineupID)
                 .subscribe({
                     eventHandler.onNext(DeleteLineupSuccess)
                 }, {
@@ -163,7 +158,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun getTeamType(): Completable {
-        return domain.getTeamType().flatMapCompletable {
+        return domain.teams().getTeamType().flatMapCompletable {
             this.teamType = it
             Completable.complete()
         }
@@ -172,7 +167,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     fun onLineupModeChanged(isEnabled: Boolean) {
         lineupMode = if(isEnabled) MODE_ENABLED else MODE_DISABLED
 
-        val disposable = domain.updateLineupMode(isEnabled, lineupID, lineupMode, _listPlayersWithPosition, strategy, extraHitters)
+        val disposable = domain.lineups().updateLineupMode(isEnabled, lineupID, lineupMode, _listPlayersWithPosition, strategy, extraHitters)
                 .subscribe({
                     eventHandler.onNext(UpdatePlayersWithLineupModeSuccess)
                 }, {
@@ -246,11 +241,11 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     private fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition): Completable {
-        return domain.switchPlayersPosition(p1, p2,_listPlayersWithPosition, lineupMode, strategy, extraHitters)
+        return domain.playerFieldPositions().switchPlayersPosition(p1, p2,_listPlayersWithPosition, lineupMode, strategy, extraHitters)
     }
 
     fun onPlayerSelected(player: Player, position: FieldPosition) {
-        val disposable = domain.savePlayerFieldPosition(player, position, _listPlayersWithPosition, lineupID, lineupMode, strategy, strategy.batterSize, extraHitters)
+        val disposable = domain.playerFieldPositions().savePlayerFieldPosition(player, position, _listPlayersWithPosition, lineupID, lineupMode, strategy, strategy.batterSize, extraHitters)
                 .subscribe({
                     eventHandler.onNext(SavePlayerPositionSuccess)
                 }, {
@@ -265,7 +260,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
             getAllAvailablePlayers(position)
         }
         else {
-            val disposable = domain.getDpAndFlexFromPlayersInField(_listPlayersWithPosition)
+            val disposable = domain.lineups().getDpAndFlexFromPlayersInField(_listPlayersWithPosition)
                     .subscribe({
                         _linkPlayersInField.value = null
                         val title = if(it.teamType == TeamType.SOFTBALL.id) {
@@ -287,11 +282,11 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
      */
     fun linkDpAndFlex(dp: Player?, flex: Player?): Completable {
         _linkPlayersInField.value = null
-        return domain.linkDpAndFlex(dp,flex, lineupID, _listPlayersWithPosition, strategy, extraHitters)
+        return domain.lineups().linkDpAndFlex(dp,flex, lineupID, _listPlayersWithPosition, strategy, extraHitters)
     }
 
     fun getBatterStates(players: List<PlayerWithPosition>) {
-        val disposable = domain.getBatterStates(players = players, teamType = teamType, batterSize = strategy.batterSize,
+        val disposable = domain.lineups().getBatterStates(players = players, teamType = teamType, batterSize = strategy.batterSize,
                 extraHitterSize = extraHitters, lineupMode = lineupMode, isDebug = BuildConfig.DEBUG, isEditable = editable)
                 .subscribe({
                     eventHandler.onNext(NewBatterOrderAvailable(it))
@@ -307,10 +302,10 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
         val currentLineupID = lineupID ?: 0
 
-        val getLineup = domain.observeLineupById(currentLineupID)
+        val getLineup = domain.lineups().observeLineupById(currentLineupID)
         val getPositions = Transformations.switchMap(getLineup) {
             this.lineupMode = it?.mode ?: 0
-            domain.observeTeamPlayersAndMaybePositionsForLineup(currentLineupID)
+            domain.lineups().observeTeamPlayersAndMaybePositionsForLineup(currentLineupID)
         }
 
         val getPlayerNumberOverlays = Transformations.switchMap(getPositions) { positions ->
@@ -318,7 +313,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
             positions.forEach {
                 playerMap[it.playerID] = it
             }
-            Transformations.map(domain.observePlayerNumberOverlays(currentLineupID)) {
+            Transformations.map(domain.players().observePlayerNumberOverlays(currentLineupID)) {
                 it.forEach {  overlay ->
                     playerMap[overlay.playerID]?.shirtNumber = overlay.number
                 }
@@ -334,7 +329,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     }
 
     fun registerLineupChange(): LiveData<Lineup> {
-        return domain.observeLineupById(lineupID ?: 0)
+        return domain.lineups().observeLineupById(lineupID ?: 0)
     }
 
     fun getLineupName(): LiveData<String> {
@@ -356,10 +351,11 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     private fun getTeam(): Single<Team> {
         return team?.let {
             Single.just(it)
-        } ?: domain.getTeam().doOnSuccess {
+        } ?: domain.teams().getTeam().doOnSuccess {
             this.team = it
         }
     }
 
-    fun observeErrors() = domain.observeErrors()
+    fun observeLineupErrors() = domain.lineups().observeErrors()
+    fun observePlayerFieldPositionErrors() = domain.playerFieldPositions().observeErrors()
 }

@@ -34,13 +34,13 @@ class DashboardViewModel: ViewModel(), KoinComponent {
     val disposables = CompositeDisposable()
 
     fun registerTilesLiveData(): LiveData<List<DashboardTile>> {
-        return Transformations.switchMap(domain.observeTeams()) {
-            domain.getTiles()
+        return Transformations.switchMap(domain.teams().observeTeams()) {
+            domain.data().getDashboardConfigurations()
         }
     }
 
     fun saveTiles(tiles: List<DashboardTile>): Completable {
-        return domain.updateTiles(tiles)
+        return domain.data().updateDashboardConfiguration(tiles)
     }
 
     fun showNewReportIssueButtonFeature(context: Context): Single<Boolean> {
@@ -53,11 +53,11 @@ class DashboardViewModel: ViewModel(), KoinComponent {
     }
 
     fun getShirtNumberHistory(number: Int): Single<List<ShirtNumberEntry>> {
-        return domain.getShirtNumberHistory(number)
+        return domain.players().getShirtNumberHistory(number)
     }
 
     fun getEmails() {
-        val disposable = domain.getTeamEmails()
+        val disposable = domain.players().getTeamEmails()
                 .subscribe({
                     if(it.isNotEmpty())
                         eventHandler.onNext(GetTeamEmailsSuccess(it))
@@ -70,7 +70,7 @@ class DashboardViewModel: ViewModel(), KoinComponent {
     }
 
     fun getPhones() {
-        val disposable = domain.getTeamPhones()
+        val disposable = domain.players().getTeamPhones()
                 .subscribe({
                     if(it.isNotEmpty())
                         eventHandler.onNext(GetTeamPhonesSuccess(it))

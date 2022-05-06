@@ -46,7 +46,7 @@ class TournamentStatisticsViewModel: ViewModel(), KoinComponent {
                 emitter.onError(IllegalArgumentException())
             }
         }
-                .flatMap { domain.getPlayersPositionForTournament(it, strategy) }
+                .flatMap { domain.tournaments().getPlayersPositionForTournament(it, strategy) }
                 .subscribe({
                     val leftHeaderDataList = mutableListOf<CellConfiguration>()
                     it.leftHeader.forEach {

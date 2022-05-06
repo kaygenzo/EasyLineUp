@@ -46,7 +46,7 @@ class SetupViewModel: ViewModel(), KoinComponent {
     }
 
     fun saveTeam(): Completable {
-        return domain.saveTeam(team).doOnComplete {
+        return domain.teams().saveTeam(team).doOnComplete {
             errorLiveData.onNext(Error.NONE)
         }
     }
@@ -57,7 +57,7 @@ class SetupViewModel: ViewModel(), KoinComponent {
 
     fun nextButtonClicked() {
         dispose(saveDisposable)
-        saveDisposable = domain.getTeamCreationNextStep(currentStep, team)
+        saveDisposable = domain.teams().getTeamCreationNextStep(currentStep, team)
                 .subscribe({
                     errorLiveData.onNext(Error.NONE)
                     stepLiveData.onNext(it)
@@ -74,7 +74,7 @@ class SetupViewModel: ViewModel(), KoinComponent {
 
     fun previousButtonClicked() {
         dispose(saveDisposable)
-        saveDisposable = domain.getTeamCreationPreviousStep(currentStep, team)
+        saveDisposable = domain.teams().getTeamCreationPreviousStep(currentStep, team)
                 .subscribe({
                     errorLiveData.onNext(Error.NONE)
                     stepLiveData.onNext(it)
