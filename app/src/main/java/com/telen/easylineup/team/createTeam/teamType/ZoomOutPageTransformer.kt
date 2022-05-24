@@ -14,10 +14,11 @@ private const val MIN_ELEVATION_SCALE = 0.5f
 
 class ZoomOutPageTransformer : ViewPager2.PageTransformer {
 
+    companion object {
+        const val BASE_ELEVATION = 20f
+    }
+
     override fun transformPage(view: View, position: Float) {
-
-        val baseElevation = 20f
-
         view.apply {
             val pageWidth = width
             val pageHeight = height
@@ -42,8 +43,12 @@ class ZoomOutPageTransformer : ViewPager2.PageTransformer {
                     scaleY = scaleFactor
 
                     // Fade the page relative to its size.
-                    alpha = (MIN_ALPHA + (((scaleFactor - MIN_SCALE) / (1 - MIN_SCALE)) * (1 - MIN_ALPHA)))
-                    val elevation =  baseElevation - (baseElevation * (1 - max(MIN_ELEVATION_SCALE, 1 - abs(position))))
+                    alpha =
+                        (MIN_ALPHA + (((scaleFactor - MIN_SCALE) / (1 - MIN_SCALE)) * (1 - MIN_ALPHA)))
+                    val elevation = BASE_ELEVATION - (BASE_ELEVATION * (1 - max(
+                        MIN_ELEVATION_SCALE,
+                        1 - abs(position)
+                    )))
                     Timber.d("scaleFactor=$scaleFactor elevation=$elevation position=$position")
                     findViewById<CardView>(R.id.cardView).cardElevation = elevation
                 }
