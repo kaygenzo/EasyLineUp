@@ -1,7 +1,13 @@
 package com.telen.easylineup.domain
 
+import com.telen.easylineup.domain.application.*
 import com.telen.easylineup.domain.application.ApplicationInteractorImpl
-import com.telen.easylineup.domain.application.ApplicationInteractor
+import com.telen.easylineup.domain.application.impl.*
+import com.telen.easylineup.domain.application.impl.DataInteractorImpl
+import com.telen.easylineup.domain.application.impl.LineupsInteractorImpl
+import com.telen.easylineup.domain.application.impl.PlayerFieldPositionsInteractorImpl
+import com.telen.easylineup.domain.application.impl.TeamsInteractorImpl
+import com.telen.easylineup.domain.application.impl.TournamentsInteractorImpl
 import com.telen.easylineup.domain.usecases.*
 import com.telen.easylineup.domain.utils.ValidatorUtils
 
@@ -10,6 +16,12 @@ import org.koin.dsl.module
 object DomainModule {
     val domainModules = module {
         single<ApplicationInteractor> { ApplicationInteractorImpl() }
+        single<PlayersInteractor> { PlayersInteractorImpl() }
+        single<TeamsInteractor> { TeamsInteractorImpl() }
+        single<LineupsInteractor> { LineupsInteractorImpl(get()) }
+        single<TournamentsInteractor> { TournamentsInteractorImpl(get()) }
+        single<PlayerFieldPositionsInteractor> { PlayerFieldPositionsInteractorImpl() }
+        single<DataInteractor> { DataInteractorImpl(get()) }
 
         single { GetTeam(get()) }
         single { GetAllTeams(get()) }
