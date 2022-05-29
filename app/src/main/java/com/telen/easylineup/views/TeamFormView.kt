@@ -24,14 +24,26 @@ interface TeamFormListener {
     fun onImagePickerRequested()
 }
 
-class TeamFormView: ConstraintLayout {
+class TeamFormView : ConstraintLayout {
 
     private var listener: TeamFormListener? = null
     private var imageUri: Uri? = null
 
-    constructor(context: Context) : super(context) {initView(context)}
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {initView(context)}
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {initView(context)}
+    constructor(context: Context) : super(context) {
+        initView(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        initView(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        initView(context)
+    }
 
     fun setListener(listener: TeamFormListener) {
         this.listener = listener
@@ -41,22 +53,24 @@ class TeamFormView: ConstraintLayout {
         LayoutInflater.from(context).inflate(R.layout.view_create_team, this)
 
         Picasso.get().load(R.drawable.ic_unknown_team)
-                .fit()
-                .transform(RoundedTransformationBuilder()
-                        .borderColor(Color.BLACK)
-                        .borderWidthDp(2f)
-                        .cornerRadiusDp(16f)
-                        .oval(true)
-                        .build())
-                .placeholder(R.drawable.ic_unknown_team)
-                .error(R.drawable.ic_unknown_team)
-                .into(teamImage)
+            .fit()
+            .transform(
+                RoundedTransformationBuilder()
+                    .borderColor(Color.BLACK)
+                    .borderWidthDp(2f)
+                    .cornerRadiusDp(16f)
+                    .oval(true)
+                    .build()
+            )
+            .placeholder(R.drawable.ic_unknown_team)
+            .error(R.drawable.ic_unknown_team)
+            .into(teamImage)
 
         teamImage.setOnClickListener {
             listener?.onImagePickerRequested()
         }
 
-        teamNameInput.addTextChangedListener(object: TextWatcher {
+        teamNameInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun afterTextChanged(s: Editable?) {}
@@ -73,9 +87,10 @@ class TeamFormView: ConstraintLayout {
     }
 
     fun onImageUriReceived(image: Image) {
-        val filePathUri = android.content.ContentResolver.SCHEME_FILE + ":///" + image.path
+        val filePathUri =
+            Uri.parse(android.content.ContentResolver.SCHEME_FILE + ":///" + image.path)
         setImage(filePathUri)
-        this.listener?.onImageChanged(Uri.parse(filePathUri))
+        this.listener?.onImageChanged(filePathUri)
     }
 
     fun getName(): String {
@@ -92,36 +107,38 @@ class TeamFormView: ConstraintLayout {
 
     fun setTeamImage(@DrawableRes resId: Int) {
         Picasso.get().load(resId)
-                .placeholder(R.drawable.ic_unknown_team)
-                .error(R.drawable.ic_unknown_team)
-                .into(teamImage)
+            .placeholder(R.drawable.ic_unknown_team)
+            .error(R.drawable.ic_unknown_team)
+            .into(teamImage)
     }
 
-    fun setImage(path: String) {
-        imageUri = Uri.parse(path)
+    fun setImage(uri: Uri) {
+        imageUri = uri
         teamImage.ready {
             try {
-                Picasso.get().load(path)
-                        .resize(teamImage.width, teamImage.height)
-                        .centerCrop()
-                        .transform(RoundedTransformationBuilder()
-                                .borderColor(Color.BLACK)
-                                .borderWidthDp(2f)
-                                .cornerRadiusDp(16f)
-                                .oval(true)
-                                .build())
-                        .placeholder(R.drawable.ic_unknown_team)
-                        .error(R.drawable.ic_unknown_team)
-                        .into(teamImage, object: Callback {
-                            override fun onSuccess() {
-                                Timber.e("Successfully loaded image")
-                            }
+                Picasso.get().load(uri)
+                    .resize(teamImage.width, teamImage.height)
+                    .centerCrop()
+                    .transform(
+                        RoundedTransformationBuilder()
+                            .borderColor(Color.BLACK)
+                            .borderWidthDp(2f)
+                            .cornerRadiusDp(16f)
+                            .oval(true)
+                            .build()
+                    )
+                    .placeholder(R.drawable.ic_unknown_team)
+                    .error(R.drawable.ic_unknown_team)
+                    .into(teamImage, object : Callback {
+                        override fun onSuccess() {
+                            Timber.e("Successfully loaded image")
+                        }
 
-                            override fun onError(e: Exception?) {
-                                Timber.e(e)
-                            }
+                        override fun onError(e: Exception?) {
+                            Timber.e(e)
+                        }
 
-                        })
+                    })
             } catch (e: IllegalArgumentException) {
                 Timber.e(e)
             }
