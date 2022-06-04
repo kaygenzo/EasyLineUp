@@ -10,6 +10,7 @@ import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.databinding.FragmentTeamTypeBinding
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.team.createTeam.SetupViewModel
+import com.telen.easylineup.utils.ready
 import timber.log.Timber
 
 class TeamTypeFragment : BaseFragment("TeamTypeFragment") {
@@ -43,7 +44,9 @@ class TeamTypeFragment : BaseFragment("TeamTypeFragment") {
         }
 
         viewModel.observeTeamType().observe(viewLifecycleOwner) {
-            TeamType.getTypeById(it).let { type -> viewPager.currentItem = type.position }
+            TeamType.getTypeById(it).let { type ->
+                viewPager.ready { viewPager.currentItem = type.position }
+            }
         }
 
         return binder.root
