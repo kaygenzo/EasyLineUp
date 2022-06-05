@@ -66,6 +66,12 @@ internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private va
         return playerDao.getPlayers().map { it.map { it.toPlayer() } }
     }
 
+    override fun observePlayers(teamID: Long): LiveData<List<Player>> {
+        return Transformations.map(playerDao.getPlayersAsLiveData(teamID)) {
+            it.map { it.toPlayer() }
+        }
+    }
+
     override fun getTeamPlayersAndMaybePositions(lineupID: Long): LiveData<List<PlayerWithPosition>> {
         return Transformations.map(playerDao.getTeamPlayersAndMaybePositions(lineupID)) {
             it.map { it.toPlayerWithPosition() }

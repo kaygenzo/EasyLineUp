@@ -116,6 +116,10 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
             .map { it.players }
     }
 
+    override fun observePlayers(teamID: Long): LiveData<List<Player>> {
+        return playersRepo.observePlayers(teamID)
+    }
+
     override fun saveOrUpdatePlayerNumberOverlays(overlays: List<RosterItem>): Completable {
         return UseCaseHandler
             .execute(savePlayerNumberOverlay, SavePlayerNumberOverlay.RequestValues(overlays))

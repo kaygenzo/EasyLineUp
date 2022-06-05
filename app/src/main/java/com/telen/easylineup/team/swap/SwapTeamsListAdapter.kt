@@ -3,13 +3,15 @@ package com.telen.easylineup.team.swap
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.telen.easylineup.R
+import com.telen.easylineup.databinding.TeamsListItemViewBinding
 import com.telen.easylineup.domain.model.Team
 
+class SwapTeamsListAdapter(
+    private val teams: List<Team>,
+    private val listener: SwapTeamsAdapterListener
+) : RecyclerView.Adapter<SwapTeamsListAdapter.TeamsListViewHolder>() {
 
-class SwapTeamsListAdapter(private val teams: List<Team>, private val hostInterface: HostInterface): RecyclerView.Adapter<SwapTeamsListAdapter.TeamsListViewHolder>() {
-
-    interface HostInterface {
+    interface SwapTeamsAdapterListener {
         fun onTeamClicked(team: Team)
     }
 
@@ -21,16 +23,14 @@ class SwapTeamsListAdapter(private val teams: List<Team>, private val hostInterf
         val team = teams[position]
         holder.view.setTeamName(team.name)
         holder.view.setImage(team.image, team.name)
-        holder.view.setOnClickListener {
-            hostInterface.onTeamClicked(team)
-        }
+        holder.view.setOnClickListener { listener.onTeamClicked(team) }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TeamsListViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.teams_list_item_view, null) as TeamItemView
-        return TeamsListViewHolder(itemView)
+        val itemView =
+            TeamsListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return TeamsListViewHolder(itemView.root)
     }
 
-    inner class TeamsListViewHolder(val view: TeamItemView): RecyclerView.ViewHolder(view)
-
+    inner class TeamsListViewHolder(val view: TeamItemView) : RecyclerView.ViewHolder(view)
 }

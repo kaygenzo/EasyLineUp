@@ -21,7 +21,7 @@ data class GetTeamsCountSuccess(val count: Int) : Event()
 object GetTeamsCountFailure : Event()
 object UpdateCurrentTeamSuccess : Event()
 object UpdateCurrentTeamFailure : Event()
-data class SwapButtonSuccess(val team: List<Team>): Event()
+data class SwapButtonSuccess(val teams: List<Team>): Event()
 object SwapButtonFailure: Event()
 
 class HomeViewModel: ViewModel(), KoinComponent {

@@ -48,6 +48,9 @@ internal interface PlayerDao {
     @Query("SELECT * FROM players")
     fun getPlayers(): Single<List<RoomPlayer>>
 
+    @Query("SELECT * FROM players WHERE players.teamID = :teamID")
+    fun getPlayersAsLiveData(teamID: Long): LiveData<List<RoomPlayer>>
+
     @Query("""
         SELECT result.*, position, x, y, `order`, playerFieldPosition.id as fieldPositionID, flags
         FROM (

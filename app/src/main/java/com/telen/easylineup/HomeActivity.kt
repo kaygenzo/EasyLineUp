@@ -17,7 +17,7 @@ import com.google.android.material.navigation.NavigationView
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
-import com.telen.easylineup.team.swap.HostInterface
+import com.telen.easylineup.team.swap.SwapTeamActions
 import com.telen.easylineup.team.swap.SwapTeamFragment
 import com.telen.easylineup.utils.FeatureViewFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
@@ -28,7 +28,7 @@ import kotlinx.android.synthetic.main.nav_drawer_header.view.*
 import timber.log.Timber
 import java.io.Serializable
 
-class HomeActivity : BaseActivity(), HostInterface {
+class HomeActivity : BaseActivity(), SwapTeamActions {
 
     private lateinit var viewModel: HomeViewModel
 
@@ -95,10 +95,10 @@ class HomeActivity : BaseActivity(), HostInterface {
                 }
                 is SwapButtonSuccess -> {
                     val argument = Bundle()
-                    argument.putSerializable(Constants.EXTRA_TEAM, it.team as Serializable)
+                    argument.putSerializable(Constants.EXTRA_TEAMS, it.teams as Serializable)
                     val dialog = SwapTeamFragment()
                     dialog.arguments = argument
-                    dialog.setHostInterface(this)
+                    dialog.setSwapTeamActionsListener(this)
                     dialog.show(supportFragmentManager, "SwapTeamFragment")
                 }
                 else -> {}
@@ -138,7 +138,7 @@ class HomeActivity : BaseActivity(), HostInterface {
     override fun onResume() {
         super.onResume()
         supportFragmentManager.findFragmentByTag("SwapTeamFragment")?.let {
-            (it as SwapTeamFragment).setHostInterface(this)
+            (it as SwapTeamFragment).setSwapTeamActionsListener(this)
         }
     }
 

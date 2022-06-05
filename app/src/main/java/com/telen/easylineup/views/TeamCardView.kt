@@ -81,9 +81,8 @@ class TeamCardView: ConstraintLayout {
         behavior?.state = state
     }
 
-    fun setTeamImage(image: String?) {
-        val uri = image?.let { Uri.parse(image) }
-        val request = Picasso.get().load(uri)
+    fun setTeamImage(image: Uri?) {
+        val request = Picasso.get().load(image)
         setTeamImage(request, R.drawable.ic_unknown_team, R.drawable.ic_unknown_team)
     }
 

@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 
 interface PlayersInteractor {
@@ -28,6 +27,7 @@ interface PlayersInteractor {
 
     fun deletePlayer(playerID: Long?): Completable
     fun getPlayers(): Single<List<Player>>
+    fun observePlayers(teamID: Long): LiveData<List<Player>>
 
     fun saveOrUpdatePlayerNumberOverlays(overlays: List<RosterItem>): Completable
     fun getShirtNumberHistory(number: Int): Single<List<ShirtNumberEntry>>

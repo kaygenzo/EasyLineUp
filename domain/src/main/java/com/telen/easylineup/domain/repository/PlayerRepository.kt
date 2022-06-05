@@ -19,6 +19,7 @@ interface PlayerRepository {
     fun getPlayerByIdAsSingle(playerID: Long): Single<Player>
     fun getPlayers(teamID: Long): Single<List<Player>>
     fun getPlayers(): Single<List<Player>>
+    fun observePlayers(teamID: Long): LiveData<List<Player>>
     fun getTeamPlayersAndMaybePositions(lineupID: Long): LiveData<List<PlayerWithPosition>>
 
     fun observePlayersNumberOverlay(lineupID: Long): LiveData<List<PlayerNumberOverlay>>
