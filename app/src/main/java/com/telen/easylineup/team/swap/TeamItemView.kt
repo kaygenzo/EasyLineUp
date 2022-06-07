@@ -24,11 +24,23 @@ import com.telen.easylineup.R
 import com.telen.easylineup.views.StateDefense
 import kotlinx.android.synthetic.main.team_item_view.view.*
 
-class TeamItemView: LinearLayout {
+class TeamItemView : LinearLayout {
 
-    constructor(context: Context) : super(context) { init(context) }
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init(context) }
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context) }
+    constructor(context: Context) : super(context) {
+        init(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        init(context)
+    }
 
     private fun init(context: Context) {
         LayoutInflater.from(context).inflate(R.layout.team_item_view, this, true)

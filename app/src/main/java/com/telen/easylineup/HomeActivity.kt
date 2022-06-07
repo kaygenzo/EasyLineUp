@@ -1,8 +1,10 @@
 package com.telen.easylineup
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -36,6 +38,13 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
     private val navController by lazy { findNavController(R.id.nav_host_fragment) }
     private val navigationView by lazy { findViewById<NavigationView>(R.id.nav_view) }
     private lateinit var drawerHeader: DrawerHeader
+
+    private val createTeam =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                navController.popBackStack(R.id.navigation_home, false)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -159,7 +168,7 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
         FirebaseAnalyticsUtils.startTutorial(this, false)
         val intent = Intent(this, TeamCreationActivity::class.java)
         intent.putExtra(Constants.EXTRA_CAN_EXIT, true)
-        startActivity(intent)
+        createTeam.launch(intent)
     }
 
     override fun onTeamClick(team: Team) {
