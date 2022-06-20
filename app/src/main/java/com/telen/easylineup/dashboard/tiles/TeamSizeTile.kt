@@ -17,7 +17,7 @@ import com.telen.easylineup.utils.ready
 
 class TeamSizeTile(context: Context) : ConstraintLayout(context) {
 
-    private val binding = TileTeamSizeBinding.inflate(LayoutInflater.from(context), this, false)
+    private val binding = TileTeamSizeBinding.inflate(LayoutInflater.from(context), this, true)
 
     fun bind(data: ITileData, inEditMode: Boolean, listener: TileClickListener) {
         val map = data.getData()

@@ -122,10 +122,10 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
         val disposable = viewModel.getShirtNumberHistory(number).subscribe({ history ->
             val item = tileAdapter.currentList.firstOrNull {
                 it.data is LastPlayerNumberResearchData
-            }?.data as? LastPlayerNumberResearchData
-            item?.setHistory(history)
-
-            tileAdapter.submitList(tileAdapter.currentList)
+            }
+            (item?.data as? LastPlayerNumberResearchData)?.setHistory(history)
+            val indexOfTile = tileAdapter.currentList.indexOfFirst { it == item }
+            tileAdapter.notifyItemChanged(indexOfTile)
         }, {
             Timber.e(it)
         })

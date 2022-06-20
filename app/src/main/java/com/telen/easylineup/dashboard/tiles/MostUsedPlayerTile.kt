@@ -17,7 +17,7 @@ import timber.log.Timber
 class MostUsedPlayerTile(context: Context) : ConstraintLayout(context) {
 
     private val binding =
-        TileMostUsedPlayerBinding.inflate(LayoutInflater.from(context), this, false)
+        TileMostUsedPlayerBinding.inflate(LayoutInflater.from(context), this, true)
 
     fun bind(data: ITileData, inEditMode: Boolean) {
         val map = data.getData()

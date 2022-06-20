@@ -16,7 +16,7 @@ import timber.log.Timber
 class PlayerNumberSearchTile(context: Context) : ConstraintLayout(context) {
 
     private val binding =
-        TileLastPlayerNumberBinding.inflate(LayoutInflater.from(context), this, false)
+        TileLastPlayerNumberBinding.inflate(LayoutInflater.from(context), this, true)
 
     fun bind(data: ITileData, inEditMode: Boolean, listener: TileClickListener) {
 

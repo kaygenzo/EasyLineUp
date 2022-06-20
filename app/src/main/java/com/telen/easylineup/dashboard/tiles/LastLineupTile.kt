@@ -10,7 +10,7 @@ import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_NAME
 
 class LastLineupTile(context: Context) : ConstraintLayout(context) {
 
-    private val binding = TileLastLineupBinding.inflate(LayoutInflater.from(context), this, false)
+    private val binding = TileLastLineupBinding.inflate(LayoutInflater.from(context), this, true)
 
     fun bind(data: ITileData, inEditMode: Boolean) {
         val map = data.getData()

@@ -81,16 +81,19 @@ class DashboardTileAdapter(
 
     override fun onItemMove(fromPosition: Int, toPosition: Int) {
         if (inEditMode) {
+            val newList = mutableListOf<DashboardTile>().apply {
+                addAll(currentList)
+            }
             if (fromPosition < toPosition) {
                 for (i in fromPosition until toPosition) {
-                    Collections.swap(currentList, i, i + 1)
+                    Collections.swap(newList, i, i + 1)
                 }
             } else {
                 for (i in fromPosition downTo toPosition + 1) {
-                    Collections.swap(currentList, i, i - 1)
+                    Collections.swap(newList, i, i - 1)
                 }
             }
-            notifyItemMoved(fromPosition, toPosition)
+            submitList(newList)
         }
     }
 }
