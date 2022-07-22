@@ -1,22 +1,20 @@
 package com.telen.easylineup.player
 
 import android.app.Activity
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.nguyenhoanglam.imagepicker.model.Config
 import com.nguyenhoanglam.imagepicker.model.Image
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.FragmentPlayerEditBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.PlayerSide
@@ -24,15 +22,15 @@ import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.PlayerFormListener
-import kotlinx.android.synthetic.main.fragment_player_edit.view.*
 import timber.log.Timber
 
-class PlayerEditFragment: BaseFragment("PlayerEditFragment"), PlayerFormListener {
+class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListener {
 
-    private lateinit var viewModel: PlayerViewModel
+    private val viewModel by viewModels<PlayerViewModel>()
+    private var binding: FragmentPlayerEditBinding? = null
 
     override fun onCancel() {
-        cancel()
+        onCancelForm()
     }
 
     override fun onImagePickerRequested() {
@@ -42,31 +40,29 @@ class PlayerEditFragment: BaseFragment("PlayerEditFragment"), PlayerFormListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activity?.onBackPressedDispatcher?.addCallback(this, object: OnBackPressedCallback(true) {
+        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                cancel()
+                onCancelForm()
             }
         })
-
-        viewModel = ViewModelProviders.of(this).get(PlayerViewModel::class.java)
-        viewModel.playerID = arguments?.getLong(Constants.PLAYER_ID)
+        viewModel.playerID = arguments?.getLong(Constants.PLAYER_ID) ?: 0L
 
         val errorsDisposable = viewModel.registerPlayerFormErrorResult().subscribe({ error ->
-            when(error) {
+            when (error) {
                 DomainErrors.Players.INVALID_PLAYER_NAME -> {
-                    view?.editPlayerForm?.displayInvalidName()
+                    binding?.editPlayerForm?.displayInvalidName()
                     FirebaseAnalyticsUtils.emptyPlayerName(activity)
                 }
                 DomainErrors.Players.INVALID_PLAYER_ID -> {
-                    //case of a player creation
+                    // case of a player creation
                     FirebaseAnalyticsUtils.emptyPlayerID(activity)
                 }
                 DomainErrors.Players.INVALID_EMAIL_FORMAT -> {
-                    view?.editPlayerForm?.displayInvalidEmail()
+                    binding?.editPlayerForm?.displayInvalidEmail()
                     FirebaseAnalyticsUtils.invalidPlayerEmail(activity)
                 }
                 DomainErrors.Players.INVALID_PHONE_NUMBER_FORMAT -> {
-                    view?.editPlayerForm?.displayInvalidPhoneNumber()
+                    binding?.editPlayerForm?.displayInvalidPhoneNumber()
                     FirebaseAnalyticsUtils.invalidPlayerPhoneNumber(activity)
                 }
                 else -> {
@@ -77,58 +73,55 @@ class PlayerEditFragment: BaseFragment("PlayerEditFragment"), PlayerFormListener
             Timber.e(it)
         })
         disposables.add(errorsDisposable)
-
-        val eventsDisposable = viewModel.registerEvent().subscribe({
-            when(it) {
-                SavePlayerSuccess -> {
-                    findNavController().navigateUp()
-                }
-                else -> {
-
-                }
-            }
-        }, {
-            Timber.e(it)
-        })
-        disposables.add(eventsDisposable)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_player_edit, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val binding = FragmentPlayerEditBinding.inflate(inflater, container, false)
+        this.binding = binding
 
-        view.editPlayerForm.apply {
-            setListener(this@PlayerEditFragment)
+        binding.editPlayerForm.setListener(this)
+
+        viewModel.observePlayerName().observe(viewLifecycleOwner) {
+            binding.editPlayerForm.setName(it)
         }
 
-        viewModel.observePlayer().observe(viewLifecycleOwner, Observer { player ->
-            //if it's a player edition
-            val savedName = savedInstanceState?.getString(Constants.NAME)
-            val savedShirtNumber = savedInstanceState?.getInt(Constants.PLAYER_SHIRT)
-            val savedLicenseNumber = savedInstanceState?.getLong(Constants.PLAYER_LICENSE)
-            val savedImage = savedInstanceState?.getString(Constants.IMAGE)
-            val savedPositions = savedInstanceState?.getInt(Constants.PLAYER_POSITIONS)
-            val savedPitching = savedInstanceState?.getInt(Constants.PLAYER_PITCHING_SIDE)
-            val savedBatting = savedInstanceState?.getInt(Constants.PLAYER_BATTING_SIDE)
-            val savedEmail = savedInstanceState?.getString(Constants.PLAYER_EMAIL)
-            val savedPhoneNumber = savedInstanceState?.getString(Constants.PLAYER_PHONE_NUMBER)
+        viewModel.observePlayerLicenseNumber().observe(viewLifecycleOwner) {
+            binding.editPlayerForm.setLicenseNumber(it)
+        }
 
-            view.editPlayerForm.apply {
-                setName(savedName ?: player.name)
-                setShirtNumber(savedShirtNumber ?: player.shirtNumber)
-                setLicenseNumber(savedLicenseNumber ?: player.licenseNumber)
-                setPositionsFilter(savedPositions ?: player.positions)
-                val imagePath = savedImage ?: player.image
-                imagePath?.let { imageUriString ->
-                    setImage(imageUriString)
-                }
-                setPitchingSide(PlayerSide.getSideByValue(savedPitching ?: player.pitching))
-                setBattingSide(PlayerSide.getSideByValue(savedBatting ?: player.batting))
-                setEmail(savedEmail ?: player.email)
-                setPhone(savedPhoneNumber ?: player.phone)
-            }
-        })
+        viewModel.observePlayerShirtNumber().observe(viewLifecycleOwner) {
+            binding.editPlayerForm.setShirtNumber(it)
+        }
 
-        return view
+        viewModel.observePlayerPosition().observe(viewLifecycleOwner) {
+            binding.editPlayerForm.setPositionsFilter(it)
+        }
+
+        viewModel.observePlayerImage().observe(viewLifecycleOwner) {
+            it?.let { imageUriString -> binding.editPlayerForm.setImage(imageUriString) }
+        }
+
+        viewModel.observePlayerPitchingSide().observe(viewLifecycleOwner) {
+            binding.editPlayerForm.setPitchingSide(PlayerSide.getSideByValue(it))
+        }
+
+        viewModel.observePlayerBattingSide().observe(viewLifecycleOwner) {
+            binding.editPlayerForm.setBattingSide(PlayerSide.getSideByValue(it))
+        }
+
+        viewModel.observePlayerEmail().observe(viewLifecycleOwner) {
+            binding.editPlayerForm.setEmail(it)
+        }
+
+        viewModel.observePlayerPhoneNumber().observe(viewLifecycleOwner) {
+            binding.editPlayerForm.setPhone(it)
+        }
+
+        return binding.root
     }
 
     override fun onDestroyView() {
@@ -137,81 +130,73 @@ class PlayerEditFragment: BaseFragment("PlayerEditFragment"), PlayerFormListener
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        val name = view?.editPlayerForm?.getName()
-        val image = view?.editPlayerForm?.getImageUri()
-        val license = view?.editPlayerForm?.getLicenseNumber()
-        val shirt = view?.editPlayerForm?.getShirtNumber()
-        val positions = view?.editPlayerForm?.getPlayerPositions()
-        val pitching = view?.editPlayerForm?.getPitchingSide()
-        val batting = view?.editPlayerForm?.getBattingSide()
-        val email = view?.editPlayerForm?.getEmail()
-        val phoneNumber = view?.editPlayerForm?.getPhone()
-
-        if(!TextUtils.isEmpty(name))
-            outState.putString(Constants.NAME, name)
-
-        license?.let {
-            outState.putLong(Constants.PLAYER_LICENSE, it)
-        }
-
-        shirt?.let {
-            outState.putInt(Constants.PLAYER_SHIRT, it)
-        }
-
-        positions?.let {
-            outState.putInt(Constants.PLAYER_POSITIONS, it)
-        }
-
-        image?.let {
-            outState.putString(Constants.IMAGE, it.toString())
-        }
-
-        pitching?.let {
-            outState.putInt(Constants.PLAYER_PITCHING_SIDE, it.flag)
-        }
-
-        batting?.let {
-            outState.putInt(Constants.PLAYER_BATTING_SIDE, it.flag)
-        }
-
-        email?.let {
-            outState.putString(Constants.PLAYER_EMAIL, it)
-        }
-
-        phoneNumber?.let {
-            outState.putString(Constants.PLAYER_PHONE_NUMBER, it)
+        binding?.editPlayerForm?.run {
+            viewModel.run {
+                savedName = getName()
+                savedImage = getImageUri()?.toString()
+                savedLicenseNumber = getLicenseNumber()
+                savedShirtNumber = getShirtNumber()
+                savedPositions = getPlayerPositions()
+                savedPitching = getPitchingSide()?.flag
+                savedBatting = getBattingSide()?.flag
+                savedEmail = getEmail()
+                savedPhoneNumber = getPhone()
+            }
         }
     }
 
-    override fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?,
-                               imageUri: Uri?, positions: Int, pitching: Int, batting: Int, email: String?, phone: String?) {
-        viewModel.savePlayer(name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting, email, phone)
+    override fun onSaveClicked(
+        name: String?,
+        shirtNumber: Int?,
+        licenseNumber: Long?,
+        imageUri: Uri?,
+        positions: Int,
+        pitching: Int,
+        batting: Int,
+        email: String?,
+        phone: String?
+    ) {
+        val saveDisposable = viewModel.savePlayer(
+            name,
+            shirtNumber,
+            licenseNumber,
+            imageUri,
+            positions,
+            pitching,
+            batting,
+            email,
+            phone
+        ).subscribe({
+            findNavController().navigateUp()
+        }, {
+            Timber.e(it)
+        })
+        disposables.add(saveDisposable)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == Config.RC_PICK_IMAGES && resultCode == Activity.RESULT_OK) {
             data?.let {
-                it.getParcelableArrayListExtra<Image>(Config.EXTRA_IMAGES)?.firstOrNull()?.let {image ->
-                    view?.editPlayerForm?.onImageUriReceived(image)
-                }
+                it.getParcelableArrayListExtra<Image>(Config.EXTRA_IMAGES)
+                    ?.firstOrNull()
+                    ?.let { image -> binding?.editPlayerForm?.onImageUriReceived(image) }
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    fun cancel() {
+    fun onCancelForm() {
         FirebaseAnalyticsUtils.onClick(activity, "click_player_edit_cancel")
         activity?.run {
             DialogFactory.getWarningDialog(
-                    context = this,
-                    title = R.string.discard_title,
-                    message = R.string.discard_message,
-                    confirmText = R.string.generic_discard,
-                    confirmClick = DialogInterface.OnClickListener { dialog, which ->
-                        findNavController().navigateUp()
-                        dialog.dismiss()
-                    }
+                context = this,
+                title = R.string.discard_title,
+                message = R.string.discard_message,
+                confirmText = R.string.generic_discard,
+                confirmClick = { dialog, _ ->
+                    findNavController().navigateUp()
+                    dialog.dismiss()
+                }
             ).show()
         }
     }

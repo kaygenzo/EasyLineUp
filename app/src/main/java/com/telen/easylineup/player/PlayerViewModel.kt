@@ -3,96 +3,107 @@ package com.telen.easylineup.player
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.FieldPosition
-import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import io.reactivex.Completable
-import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
-import io.reactivex.subjects.Subject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
 
-sealed class Event
-object SavePlayerSuccess: Event()
-object SavePlayerFailure: Event()
-object DeletePlayerSuccess: Event()
-data class DeletePlayerFailure(val message: String?): Event()
-
-class PlayerViewModel: ViewModel(), KoinComponent {
+class PlayerViewModel : ViewModel(), KoinComponent {
 
     private val domain: ApplicationInteractor by inject()
 
     private val disposables = CompositeDisposable()
-
-    private val _teamTypeLiveData = MutableLiveData<Int>()
+    private val _teamTypeLiveData = MutableLiveData<Int>().apply { getTeamType() }
     private val _strategyLiveData = MutableLiveData<TeamStrategy>()
-    private val _playerLiveData = MutableLiveData<Player>()
-    private val _lineupsLiveData = MutableLiveData<Map<FieldPosition, Int>>()
-    private val _event = PublishSubject.create<Event>()
-    private val _strategiesLiveData = MutableLiveData<List<TeamStrategy>>()
+    private val _lineupsLiveData = MutableLiveData<Map<FieldPosition, Int>>().apply { getLineups() }
+    private val _player by lazy { domain.players().getPlayer(playerID) }
 
-    var playerID: Long? = 0
+    var playerID: Long = 0
     var teamType: Int = 0
     var strategies = mutableListOf<TeamStrategy>()
 
-    fun observePlayer(): LiveData<Player> {
-        val disposable = domain.players().getPlayer(playerID)
-                .subscribe({
-                    _playerLiveData.postValue(it)
-                }, {
-                    Timber.e(it)
-                })
-        disposables.add(disposable)
-        return _playerLiveData
+    var savedName: String? = null
+    var savedShirtNumber: Int? = null
+    var savedLicenseNumber: Long? = null
+    var savedImage: String? = null
+    var savedPositions: Int? = null
+    var savedPitching: Int? = null
+    var savedBatting: Int? = null
+    var savedEmail: String? = null
+    var savedPhoneNumber: String? = null
+
+    fun observePlayerName(): LiveData<String> {
+        return Transformations.map(_player) { savedName ?: it.name }
+    }
+
+    fun observePlayerShirtNumber(): LiveData<Int> {
+        return Transformations.map(_player) { savedShirtNumber ?: it.shirtNumber }
+    }
+
+    fun observePlayerLicenseNumber(): LiveData<Long> {
+        return Transformations.map(_player) { savedLicenseNumber ?: it.licenseNumber }
+    }
+
+    fun observePlayerImage(): LiveData<String?> {
+        return Transformations.map(_player) { savedImage ?: it.image }
+    }
+
+    fun observePlayerPosition(): LiveData<Int> {
+        return Transformations.map(_player) { savedPositions ?: it.positions }
+    }
+
+    fun observePlayerPitchingSide(): LiveData<Int> {
+        return Transformations.map(_player) { savedPitching ?: it.pitching }
+    }
+
+    fun observePlayerBattingSide(): LiveData<Int> {
+        return Transformations.map(_player) { savedBatting ?: it.batting }
+    }
+
+    fun observePlayerEmail(): LiveData<String> {
+        return Transformations.map(_player) { savedEmail ?: it.email }
+    }
+
+    fun observePlayerPhoneNumber(): LiveData<String> {
+        return Transformations.map(_player) { savedPhoneNumber ?: it.phone }
     }
 
     fun observeStrategy(): LiveData<TeamStrategy> {
         return _strategyLiveData
     }
 
+    fun observeStrategies(): LiveData<List<TeamStrategy>> {
+        return Transformations.map(observeTeamType()) { teamType ->
+            strategies.apply {
+                clear()
+                addAll(TeamType.getTypeById(teamType).getStrategies())
+                _strategyLiveData.postValue(this[0])
+            }
+        }
+    }
+
     fun observeTeamType(): LiveData<Int> {
         return _teamTypeLiveData
     }
 
-    fun observeStrategiesCount() : LiveData<List<TeamStrategy>> {
-        return _strategiesLiveData
-    }
-
-    fun loadData() {
-        val disposable = domain.teams().getTeamType()
-                .flatMapCompletable {
-                    this.teamType = it
-                    strategies.run {
-                        clear()
-                        addAll(TeamType.getTypeById(it).getStrategies())
-                    }
-                    Completable.complete()
-                }
-                .subscribe({
-                    _strategiesLiveData.postValue(this.strategies)
-                    _teamTypeLiveData.postValue(this.teamType)
-                    _strategyLiveData.postValue(this.strategies[0])
-                }, {
-                    Timber.e(it)
-                })
+    private fun getTeamType() {
+        val disposable = domain.teams().getTeamType().subscribe({
+            this.teamType = it
+            _teamTypeLiveData.postValue(it)
+        }, {
+            Timber.e(it)
+        })
         disposables.add(disposable)
     }
 
     fun observeLineups(): LiveData<Map<FieldPosition, Int>> {
-        val disposable = domain.players().getPlayerPositionsSummary(playerID)
-                .subscribe({
-                    _lineupsLiveData.postValue(it)
-                }, {
-                    Timber.e(it)
-                })
-
-        disposables.add(disposable)
         return _lineupsLiveData
     }
 
@@ -100,34 +111,48 @@ class PlayerViewModel: ViewModel(), KoinComponent {
         disposables.clear()
     }
 
-    fun savePlayer(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int, email: String?, phone: String?) {
-        val disposable = domain.players().savePlayer(playerID, name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting, email, phone)
-                .subscribe({
-                    _event.onNext(SavePlayerSuccess)
-                }, {
-                    Timber.e(it)
-                    _event.onNext(SavePlayerFailure)
-                })
-        disposables.add(disposable)
+    fun savePlayer(
+        name: String?,
+        shirtNumber: Int?,
+        licenseNumber: Long?,
+        imageUri: Uri?,
+        positions: Int,
+        pitching: Int,
+        batting: Int,
+        email: String?,
+        phone: String?
+    ): Completable {
+        return domain.players().savePlayer(
+            playerID,
+            name,
+            shirtNumber,
+            licenseNumber,
+            imageUri,
+            positions,
+            pitching,
+            batting,
+            email,
+            phone
+        )
     }
 
-    fun deletePlayer() {
-        val disposable = domain.players().deletePlayer(playerID)
-                .subscribe({
-                    _event.onNext(DeletePlayerSuccess)
-                }, {
-                    _event.onNext(DeletePlayerFailure(it.message))
-                })
-        disposables.add(disposable)
-    }
-
-    fun registerEvent(): Subject<Event> {
-        return _event
+    fun deletePlayer(): Completable {
+        return domain.players().deletePlayer(playerID)
     }
 
     fun registerPlayerFormErrorResult() = domain.players().observeErrors()
 
     fun onStrategySelected(index: Int) {
         _strategyLiveData.postValue(strategies[index])
+    }
+
+    private fun getLineups() {
+        val disposable = domain.players().getPlayerPositionsSummary(playerID)
+            .subscribe({
+                _lineupsLiveData.postValue(it)
+            }, {
+                Timber.e(it)
+            })
+        disposables.add(disposable)
     }
 }
