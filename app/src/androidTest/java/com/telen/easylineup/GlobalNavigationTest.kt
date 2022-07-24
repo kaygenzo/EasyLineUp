@@ -307,6 +307,9 @@ class GlobalNavigationTest {
                         isDisplayed()))
         appCompatImageButton5.perform(click())
 
+        // add some delay because of the diff utils
+        Thread.sleep(500)
+
         //check now the most used player is Bernard
         onView(withId(R.id.tile_player_most_used_name)).check(matches(withText("BERNARD")))
     }
