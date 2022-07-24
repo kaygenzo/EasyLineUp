@@ -3,7 +3,7 @@ package com.telen.easylineup.tournaments.statistics
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
@@ -26,7 +26,7 @@ class TournamentStatisticsViewModel: ViewModel(), KoinComponent {
     val columnHighlights = MutableLiveData<List<Highlight>>()
     val topLeftCell = MutableLiveData<List<String>>()
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
     var strategy = TeamStrategy.STANDARD
     var tournament: Tournament? = null
     var teamType: TeamType? = null
@@ -46,7 +46,7 @@ class TournamentStatisticsViewModel: ViewModel(), KoinComponent {
                 emitter.onError(IllegalArgumentException())
             }
         }
-                .flatMap { domain.getPlayersPositionForTournament(it, strategy) }
+                .flatMap { domain.tournaments().getPlayersPositionForTournament(it, strategy) }
                 .subscribe({
                     val leftHeaderDataList = mutableListOf<CellConfiguration>()
                     it.leftHeader.forEach {

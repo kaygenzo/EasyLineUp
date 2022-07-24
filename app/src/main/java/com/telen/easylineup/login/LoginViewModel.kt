@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.export.ExportBase
 import io.reactivex.Completable
@@ -24,7 +24,7 @@ object GetTeamFailed: LoginEvent()
 
 class LoginViewModel : ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
     private val context: Context by inject()
 
     private val _loginEvent = PublishSubject.create<LoginEvent>()
@@ -41,7 +41,7 @@ class LoginViewModel : ViewModel(), KoinComponent {
                 it.use { stream ->
                     stream.bufferedReader().use { reader ->
                         val data = Gson().fromJson(reader, ExportBase::class.java)
-                        domain.importData(data, updateIfExists)
+                        domain.data().importData(data, updateIfExists)
                     }
                 }
             }
@@ -63,7 +63,7 @@ class LoginViewModel : ViewModel(), KoinComponent {
     }
 
     fun getMainTeam() {
-        val disposable = domain.getTeam()
+        val disposable = domain.teams().getTeam()
                 .subscribe({
                     _loginEvent.onNext(GetTeamSuccess(it))
                 }, {

@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.TeamStrategy
@@ -26,7 +26,7 @@ data class DeletePlayerFailure(val message: String?): Event()
 
 class PlayerViewModel: ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     private val disposables = CompositeDisposable()
 
@@ -42,7 +42,7 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     var strategies = mutableListOf<TeamStrategy>()
 
     fun observePlayer(): LiveData<Player> {
-        val disposable = domain.getPlayer(playerID)
+        val disposable = domain.players().getPlayer(playerID)
                 .subscribe({
                     _playerLiveData.postValue(it)
                 }, {
@@ -65,7 +65,7 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     }
 
     fun loadData() {
-        val disposable = domain.getTeamType()
+        val disposable = domain.teams().getTeamType()
                 .flatMapCompletable {
                     this.teamType = it
                     strategies.run {
@@ -85,7 +85,7 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     }
 
     fun observeLineups(): LiveData<Map<FieldPosition, Int>> {
-        val disposable = domain.getPlayerPositionsSummary(playerID)
+        val disposable = domain.players().getPlayerPositionsSummary(playerID)
                 .subscribe({
                     _lineupsLiveData.postValue(it)
                 }, {
@@ -101,7 +101,7 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     }
 
     fun savePlayer(name: String?, shirtNumber: Int?, licenseNumber: Long?, imageUri: Uri?, positions: Int, pitching: Int, batting: Int, email: String?, phone: String?) {
-        val disposable = domain.savePlayer(playerID, name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting, email, phone)
+        val disposable = domain.players().savePlayer(playerID, name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting, email, phone)
                 .subscribe({
                     _event.onNext(SavePlayerSuccess)
                 }, {
@@ -112,7 +112,7 @@ class PlayerViewModel: ViewModel(), KoinComponent {
     }
 
     fun deletePlayer() {
-        val disposable = domain.deletePlayer(playerID)
+        val disposable = domain.players().deletePlayer(playerID)
                 .subscribe({
                     _event.onNext(DeletePlayerSuccess)
                 }, {
@@ -125,7 +125,7 @@ class PlayerViewModel: ViewModel(), KoinComponent {
         return _event
     }
 
-    fun registerFormErrorResult() = domain.observeErrors()
+    fun registerPlayerFormErrorResult() = domain.players().observeErrors()
 
     fun onStrategySelected(index: Int) {
         _strategyLiveData.postValue(strategies[index])

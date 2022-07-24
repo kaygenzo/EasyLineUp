@@ -7,7 +7,7 @@ import android.os.Bundle
 import com.telen.easylineup.BaseImportActivity
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
 
 class SplashScreenActivity: BaseImportActivity(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +32,7 @@ class SplashScreenActivity: BaseImportActivity(), KoinComponent {
             checkDataUri(it)
         } ?: run {
             val disposable = Completable.timer(3000, TimeUnit.MILLISECONDS)
-                    .andThen(domain.getTeam())
+                    .andThen(domain.teams().getTeam())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
                         launchHome()

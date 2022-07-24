@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import io.reactivex.Completable
@@ -28,19 +28,19 @@ const val INDEX_SEND_OTHER = 2
 
 class DashboardViewModel: ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     val eventHandler = PublishSubject.create<EventCase>()
     val disposables = CompositeDisposable()
 
     fun registerTilesLiveData(): LiveData<List<DashboardTile>> {
-        return Transformations.switchMap(domain.observeTeams()) {
-            domain.getTiles()
+        return Transformations.switchMap(domain.teams().observeTeams()) {
+            domain.data().getDashboardConfigurations()
         }
     }
 
     fun saveTiles(tiles: List<DashboardTile>): Completable {
-        return domain.updateTiles(tiles)
+        return domain.data().updateDashboardConfiguration(tiles)
     }
 
     fun showNewReportIssueButtonFeature(context: Context): Single<Boolean> {
@@ -53,11 +53,11 @@ class DashboardViewModel: ViewModel(), KoinComponent {
     }
 
     fun getShirtNumberHistory(number: Int): Single<List<ShirtNumberEntry>> {
-        return domain.getShirtNumberHistory(number)
+        return domain.players().getShirtNumberHistory(number)
     }
 
     fun getEmails() {
-        val disposable = domain.getTeamEmails()
+        val disposable = domain.players().getTeamEmails()
                 .subscribe({
                     if(it.isNotEmpty())
                         eventHandler.onNext(GetTeamEmailsSuccess(it))
@@ -70,7 +70,7 @@ class DashboardViewModel: ViewModel(), KoinComponent {
     }
 
     fun getPhones() {
-        val disposable = domain.getTeamPhones()
+        val disposable = domain.players().getTeamPhones()
                 .subscribe({
                     if(it.isNotEmpty())
                         eventHandler.onNext(GetTeamPhonesSuccess(it))

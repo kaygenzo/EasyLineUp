@@ -202,9 +202,9 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
     }
 
     private fun initObserver() {
-        val disposable = viewModel.observeErrors().subscribe({
+        val disposable = viewModel.observeLineupErrors().subscribe({
             when(it) {
-                DomainErrors.DELETE_LINEUP_FAILED -> {
+                DomainErrors.Lineups.DELETE_LINEUP_FAILED -> {
                     activity?.run {
                         Toast.makeText(this, R.string.error_when_deleting_lineup, Toast.LENGTH_LONG).show()
                     }

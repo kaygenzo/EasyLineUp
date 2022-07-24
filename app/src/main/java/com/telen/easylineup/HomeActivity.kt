@@ -1,8 +1,10 @@
 package com.telen.easylineup
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -17,7 +19,7 @@ import com.google.android.material.navigation.NavigationView
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
-import com.telen.easylineup.team.swap.HostInterface
+import com.telen.easylineup.team.swap.SwapTeamActions
 import com.telen.easylineup.team.swap.SwapTeamFragment
 import com.telen.easylineup.utils.FeatureViewFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
@@ -28,7 +30,7 @@ import kotlinx.android.synthetic.main.nav_drawer_header.view.*
 import timber.log.Timber
 import java.io.Serializable
 
-class HomeActivity : BaseActivity(), HostInterface {
+class HomeActivity : BaseActivity(), SwapTeamActions {
 
     private lateinit var viewModel: HomeViewModel
 
@@ -36,6 +38,13 @@ class HomeActivity : BaseActivity(), HostInterface {
     private val navController by lazy { findNavController(R.id.nav_host_fragment) }
     private val navigationView by lazy { findViewById<NavigationView>(R.id.nav_view) }
     private lateinit var drawerHeader: DrawerHeader
+
+    private val createTeam =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                navController.popBackStack(R.id.navigation_home, false)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,10 +104,10 @@ class HomeActivity : BaseActivity(), HostInterface {
                 }
                 is SwapButtonSuccess -> {
                     val argument = Bundle()
-                    argument.putSerializable(Constants.EXTRA_TEAM, it.team as Serializable)
+                    argument.putSerializable(Constants.EXTRA_TEAMS, it.teams as Serializable)
                     val dialog = SwapTeamFragment()
                     dialog.arguments = argument
-                    dialog.setHostInterface(this)
+                    dialog.setSwapTeamActionsListener(this)
                     dialog.show(supportFragmentManager, "SwapTeamFragment")
                 }
                 else -> {}
@@ -138,7 +147,7 @@ class HomeActivity : BaseActivity(), HostInterface {
     override fun onResume() {
         super.onResume()
         supportFragmentManager.findFragmentByTag("SwapTeamFragment")?.let {
-            (it as SwapTeamFragment).setHostInterface(this)
+            (it as SwapTeamFragment).setSwapTeamActionsListener(this)
         }
     }
 
@@ -159,7 +168,7 @@ class HomeActivity : BaseActivity(), HostInterface {
         FirebaseAnalyticsUtils.startTutorial(this, false)
         val intent = Intent(this, TeamCreationActivity::class.java)
         intent.putExtra(Constants.EXTRA_CAN_EXIT, true)
-        startActivity(intent)
+        createTeam.launch(intent)
     }
 
     override fun onTeamClick(team: Team) {

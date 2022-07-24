@@ -38,18 +38,29 @@ class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayer
 
         availablePlayersBottomSheet = ListAvailablePlayersBottomSheet()
 
-        val disposable = viewModel.observeErrors().subscribe({
+        val playerFieldPositionDisposable = viewModel.observePlayerFieldPositionErrors().subscribe({
             when(it) {
-                DomainErrors.LIST_AVAILABLE_PLAYERS_EMPTY -> {
+                DomainErrors.PlayerFieldPositions.SAVE_PLAYER_FIELD_POSITION_FAILED ->  Timber.e(Exception("Save player field position failed"))
+                DomainErrors.PlayerFieldPositions.DELETE_PLAYER_FIELD_POSITION_FAILED -> Timber.e(Exception("Delete player field position failed"))
+                else -> {
+                    Timber.e("Not managed error")
+                }
+            }
+        }, {
+            Timber.e(it)
+        })
+        disposables.add(playerFieldPositionDisposable)
+
+        val lineupDisposable = viewModel.observeLineupErrors().subscribe({
+            when(it) {
+                DomainErrors.Lineups.LIST_AVAILABLE_PLAYERS_EMPTY -> {
                     activity?.let { activity ->
                         DialogFactory.getSimpleDialog(activity, R.string.players_list_empty).show()
                     }
                 }
-                DomainErrors.SAVE_PLAYER_FIELD_POSITION_FAILED ->  Timber.e(Exception("Save player field position failed"))
-                DomainErrors.DELETE_PLAYER_FIELD_POSITION_FAILED -> Timber.e(Exception("Delete player field position failed"))
-                DomainErrors.UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED -> Timber.e(Exception("Update players with lineup mode failed"))
-                DomainErrors.SAVE_LINEUP_MODE_FAILED -> Timber.e(Exception("Save lineup mode failed"))
-                DomainErrors.NEED_ASSIGN_PITCHER_FIRST -> {
+                DomainErrors.Lineups.UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED -> Timber.e(Exception("Update players with lineup mode failed"))
+                DomainErrors.Lineups.SAVE_LINEUP_MODE_FAILED -> Timber.e(Exception("Save lineup mode failed"))
+                DomainErrors.Lineups.NEED_ASSIGN_PITCHER_FIRST -> {
                     context?.run {
                         FirebaseAnalyticsUtils.missingPitcher(this)
                         DialogFactory.getErrorDialog(
@@ -58,7 +69,7 @@ class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayer
                                 message = R.string.error_need_assign_pitcher_first_message).show()
                     }
                 }
-                DomainErrors.DP_OR_FLEX_NOT_ASSIGNED -> {
+                DomainErrors.Lineups.DP_OR_FLEX_NOT_ASSIGNED -> {
                     context?.run {
                         FirebaseAnalyticsUtils.missingDpFlex(this)
                         DialogFactory.getErrorDialog(
@@ -74,7 +85,7 @@ class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayer
         }, {
             Timber.e(it)
         })
-        disposables.add(disposable)
+        disposables.add(lineupDisposable)
 
         val eventsDisposable = viewModel.eventHandler.subscribe({ event ->
             when(event) {

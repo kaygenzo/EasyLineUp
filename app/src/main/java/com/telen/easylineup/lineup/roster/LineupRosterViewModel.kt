@@ -2,7 +2,7 @@ package com.telen.easylineup.lineup.roster
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -11,7 +11,7 @@ import org.koin.core.inject
 
 class LineupRosterViewModel: ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
     var lineupID: Long = 0
     private val rosterItems = mutableListOf<RosterItem>()
 
@@ -35,12 +35,12 @@ class LineupRosterViewModel: ViewModel(), KoinComponent {
     }
 
     fun getRoster(): Single<List<RosterPlayerStatus>> {
-        return domain.getRoster(lineupID)
+        return domain.lineups().getRoster(lineupID)
                 .map { it.players }
     }
 
     fun saveOverlays(): Completable {
-        return domain.saveOrUpdatePlayerNumberOverlays(rosterItems)
+        return domain.players().saveOrUpdatePlayerNumberOverlays(rosterItems)
     }
 
     fun numberChanged(number: Int, item: RosterItem) {
@@ -52,10 +52,10 @@ class LineupRosterViewModel: ViewModel(), KoinComponent {
     }
 
     fun saveUpdatedRoster(newRosterStatus: List<RosterPlayerStatus>): Completable {
-        return domain.updateRoster(lineupID, newRosterStatus)
+        return domain.lineups().updateRoster(lineupID, newRosterStatus)
     }
 
     fun observeLineup(): LiveData<Lineup> {
-        return domain.observeLineupById(lineupID)
+        return domain.lineups().observeLineupById(lineupID)
     }
 }

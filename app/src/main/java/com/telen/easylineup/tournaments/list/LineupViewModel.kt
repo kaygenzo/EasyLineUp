@@ -6,12 +6,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.Subject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
@@ -21,7 +21,7 @@ data class SaveSuccess(val lineupID: Long, val lineupName: String, val strategy:
 
 class LineupViewModel: ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     private val _categorizedLineupsLiveData = MutableLiveData<List<Pair<Tournament, List<Lineup>>>>()
 
@@ -43,16 +43,16 @@ class LineupViewModel: ViewModel(), KoinComponent {
     }
 
     fun getTournaments(): Single<List<Tournament>>{
-        return domain.getTournaments()
+        return domain.tournaments().getTournaments()
     }
 
     fun getTypeType(): Single<Int>{
-        return domain.getTeamType()
+        return domain.teams().getTeamType()
     }
 
     fun observeCategorizedLineups(): LiveData<List<Pair<Tournament, List<Lineup>>>> {
         return Transformations.switchMap(filterLiveData) { filter ->
-            val disposable = domain.getCategorizedLineups(filter)
+            val disposable = domain.tournaments().getCategorizedLineups(filter)
 
                     .subscribe({
                         _categorizedLineupsLiveData.value = it
@@ -69,11 +69,11 @@ class LineupViewModel: ViewModel(), KoinComponent {
     }
 
     fun deleteTournament(tournament: Tournament) : Completable {
-        return domain.deleteTournament(tournament)
+        return domain.tournaments().deleteTournament(tournament)
     }
 
     fun getCompleteRoster(): Single<TeamRosterSummary> {
-        return domain.getCompleteRoster().doOnSuccess { chosenRoster = it }
+        return domain.lineups().getCompleteRoster().doOnSuccess { chosenRoster = it }
     }
 
     fun getChosenRoster(): Single<TeamRosterSummary> {
@@ -81,7 +81,7 @@ class LineupViewModel: ViewModel(), KoinComponent {
     }
 
     fun saveLineup(tournament: Tournament, lineupTitle: String, lineupEventTime: Long, strategy: TeamStrategy, extraHitters: Int) {
-        val disposable = domain.saveLineup(tournament, lineupTitle, chosenRoster, lineupEventTime, strategy, extraHitters)
+        val disposable = domain.lineups().saveLineup(tournament, lineupTitle, chosenRoster, lineupEventTime, strategy, extraHitters)
                 .subscribe({
                     saveResult.value = SaveSuccess(it, lineupTitle, strategy, extraHitters)
                 }, {
@@ -110,11 +110,11 @@ class LineupViewModel: ViewModel(), KoinComponent {
         return Single.just(show)
     }
 
-    fun observeErrors(): PublishSubject<DomainErrors> {
-        return domain.observeErrors()
+    fun observeErrors(): Subject<DomainErrors.Lineups> {
+        return domain.lineups().observeErrors()
     }
 
     fun getTeamType(): Single<Int> {
-        return domain.getTeamType()
+        return domain.teams().getTeamType()
     }
 }

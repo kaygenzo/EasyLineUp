@@ -1,65 +1,85 @@
 package com.telen.easylineup.team
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.TeamType
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber
 
-class TeamViewModel: ViewModel(), KoinComponent {
+class TeamViewModel : ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
-
+    private val domain: ApplicationInteractor by inject()
+    private val _team: MutableLiveData<Team> by lazy {
+        MutableLiveData<Team>().apply { getCurrentTeam() }
+    }
+    private val _players: LiveData<List<Player>> by lazy {
+        Transformations.switchMap(_team) {
+            domain.players().observePlayers(it.id)
+        }
+    }
+    private val disposables = CompositeDisposable()
     private var playerSelectedID = 0L
     var team: Team? = null
 
-    private val _playersLiveData = MutableLiveData<List<Player>>()
-    private val _teamLiveData = MutableLiveData<Team>()
-
-    private val disposables = CompositeDisposable()
-
     fun observePlayers(): LiveData<List<Player>> {
-        val disposable = domain.getPlayers()
-                .subscribe({
-                    _playersLiveData.postValue(it)
-                }, {
-                    Timber.e(it)
-                })
-        disposables.add(disposable)
-        return _playersLiveData
+        return _players
     }
 
     fun clear() {
         disposables.clear()
     }
 
-    fun observeTeam(): LiveData<Team> {
-        val disposable = domain.getTeam()
-                .subscribe({
-                    this.team = it
-                    _teamLiveData.postValue(it)
-                }, {
-                    Timber.e(it)
-                })
-        disposables.add(disposable)
-        return _teamLiveData
+    fun observeCurrentTeamName(): LiveData<String> {
+        return Transformations.map(_team) {
+            it.name.trim()
+        }
+    }
+
+    fun observeCurrentTeamType(): LiveData<TeamType> {
+        return Transformations.map(_team) {
+            TeamType.getTypeById(it.type)
+        }
+    }
+
+    fun observeCurrentTeamImage(): LiveData<Uri?> {
+        return Transformations.map(_team) {
+            it.image.takeIf { it != null }?.let { Uri.parse(it) }
+        }
     }
 
     fun deleteTeam(team: Team): Completable {
-        return domain.deleteTeam(team)
+        return domain.teams().deleteTeam(team)
     }
 
-    fun getPlayerId() : Long {
+    fun getPlayerId(): Long {
         return playerSelectedID
     }
 
     fun setPlayerId(id: Long) {
         playerSelectedID = id
+    }
+
+    fun loadTeam() {
+        getCurrentTeam()
+    }
+
+    private fun getCurrentTeam() {
+        val disposable = domain.teams().getTeam()
+            .subscribe({
+                team = it
+                _team.postValue(it)
+            }, {
+                Timber.e(it)
+            })
+        disposables.add(disposable)
     }
 }

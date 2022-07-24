@@ -51,21 +51,21 @@ class PlayerEditFragment: BaseFragment("PlayerEditFragment"), PlayerFormListener
         viewModel = ViewModelProviders.of(this).get(PlayerViewModel::class.java)
         viewModel.playerID = arguments?.getLong(Constants.PLAYER_ID)
 
-        val errorsDisposable = viewModel.registerFormErrorResult().subscribe({ error ->
+        val errorsDisposable = viewModel.registerPlayerFormErrorResult().subscribe({ error ->
             when(error) {
-                DomainErrors.INVALID_PLAYER_NAME -> {
+                DomainErrors.Players.INVALID_PLAYER_NAME -> {
                     view?.editPlayerForm?.displayInvalidName()
                     FirebaseAnalyticsUtils.emptyPlayerName(activity)
                 }
-                DomainErrors.INVALID_PLAYER_ID -> {
+                DomainErrors.Players.INVALID_PLAYER_ID -> {
                     //case of a player creation
                     FirebaseAnalyticsUtils.emptyPlayerID(activity)
                 }
-                DomainErrors.INVALID_EMAIL_FORMAT -> {
+                DomainErrors.Players.INVALID_EMAIL_FORMAT -> {
                     view?.editPlayerForm?.displayInvalidEmail()
                     FirebaseAnalyticsUtils.invalidPlayerEmail(activity)
                 }
-                DomainErrors.INVALID_PHONE_NUMBER_FORMAT -> {
+                DomainErrors.Players.INVALID_PHONE_NUMBER_FORMAT -> {
                     view?.editPlayerForm?.displayInvalidPhoneNumber()
                     FirebaseAnalyticsUtils.invalidPlayerPhoneNumber(activity)
                 }

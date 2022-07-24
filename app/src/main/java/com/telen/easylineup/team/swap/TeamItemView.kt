@@ -24,32 +24,26 @@ import com.telen.easylineup.R
 import com.telen.easylineup.views.StateDefense
 import kotlinx.android.synthetic.main.team_item_view.view.*
 
-class TeamItemView: LinearLayout {
+class TeamItemView : LinearLayout {
 
-    private var mAvatarOnly = false
+    constructor(context: Context) : super(context) {
+        init(context)
+    }
 
-    constructor(context: Context) : super(context) { init(context) }
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init(context) }
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context) }
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        init(context)
+    }
 
     private fun init(context: Context) {
         LayoutInflater.from(context).inflate(R.layout.team_item_view, this, true)
-    }
-
-    /**
-     * When set to true, we display only the avatar of the person and hide everything else.
-     */
-    fun setAvatarOnly(avatarOnly: Boolean) {
-        mAvatarOnly = avatarOnly
-        details_container.visibility = if(avatarOnly) GONE else VISIBLE
-    }
-
-    fun isAvatarOnly() : Boolean {
-        return mAvatarOnly
-    }
-
-    fun setNameTextColor(color: Int) {
-        name.setTextColor(color)
     }
 
     fun setTeamName(teamName: String) {

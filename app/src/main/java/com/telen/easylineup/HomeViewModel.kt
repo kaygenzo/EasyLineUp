@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.Team
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -21,19 +21,19 @@ data class GetTeamsCountSuccess(val count: Int) : Event()
 object GetTeamsCountFailure : Event()
 object UpdateCurrentTeamSuccess : Event()
 object UpdateCurrentTeamFailure : Event()
-data class SwapButtonSuccess(val team: List<Team>): Event()
+data class SwapButtonSuccess(val teams: List<Team>): Event()
 object SwapButtonFailure: Event()
 
 class HomeViewModel: ViewModel(), KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     private val _event = PublishSubject.create<Event>()
 
     val disposables = CompositeDisposable()
 
     fun registerTeamUpdates(): LiveData<List<Team>> {
-        return domain.observeTeams()
+        return domain.teams().observeTeams()
     }
 
     fun clear() {
@@ -45,7 +45,7 @@ class HomeViewModel: ViewModel(), KoinComponent {
     }
 
     fun getTeam() {
-        val disposable = domain.getTeam()
+        val disposable = domain.teams().getTeam()
                 .subscribe({
                     _event.onNext(GetTeamSuccess(it))
                 }, {
@@ -56,7 +56,7 @@ class HomeViewModel: ViewModel(), KoinComponent {
     }
 
     fun getTeamsCount() {
-        val disposable = domain.getTeamsCount()
+        val disposable = domain.teams().getTeamsCount()
                 .subscribe({
                     _event.onNext(GetTeamsCountSuccess(it))
                 }, {
@@ -67,7 +67,7 @@ class HomeViewModel: ViewModel(), KoinComponent {
     }
 
     fun onSwapButtonClicked() {
-        val disposable = domain.getAllTeams()
+        val disposable = domain.teams().getAllTeams()
                 .subscribe({
                     _event.onNext(SwapButtonSuccess(it))
                 }, {
@@ -78,7 +78,7 @@ class HomeViewModel: ViewModel(), KoinComponent {
     }
 
     fun updateCurrentTeam(currentTeam: Team) {
-        val disposable = domain.updateCurrentTeam(currentTeam)
+        val disposable = domain.teams().updateCurrentTeam(currentTeam)
                 .subscribe({
                     _event.onNext(UpdateCurrentTeamSuccess)
                 }, {

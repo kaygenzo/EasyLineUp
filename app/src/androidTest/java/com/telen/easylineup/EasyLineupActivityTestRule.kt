@@ -6,13 +6,13 @@ import androidx.preference.PreferenceManager
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.application.ApplicationPort
+import com.telen.easylineup.domain.application.ApplicationInteractor
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
 class EasyLineupActivityTestRule<T : Activity?> : ActivityTestRule<T>, KoinComponent {
 
-    private val domain: ApplicationPort by inject()
+    private val domain: ApplicationInteractor by inject()
 
     constructor(activityClass: Class<T>?) : super(activityClass)
     constructor(activityClass: Class<T>?, initialTouchMode: Boolean, launchActivity: Boolean) : super(activityClass, initialTouchMode, launchActivity)
@@ -21,8 +21,8 @@ class EasyLineupActivityTestRule<T : Activity?> : ActivityTestRule<T>, KoinCompo
         super.beforeActivityLaunched()
 
 //        activity?.applicationContext?.run {
-            domain.deleteAllData()
-                    .andThen(domain.generateMockedData())
+            domain.data().deleteAllData()
+                    .andThen(domain.data().generateMockedData())
 //                    .andThen(Completable.timer(3, TimeUnit.SECONDS))
                     .blockingAwait()
 //        }
