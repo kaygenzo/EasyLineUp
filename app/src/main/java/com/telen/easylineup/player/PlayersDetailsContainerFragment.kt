@@ -34,8 +34,8 @@ class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFra
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        mAdapter = PlayersDetailsPagerAdapter(this)
-        val playerID = arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
+        val playerID = playerViewModel.playerID.takeIf { it > 0 }
+            ?: arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
         teamViewModel.setPlayerId(playerID)
     }
 
@@ -47,6 +47,7 @@ class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFra
         val binding = FragmentPlayersDetailsContainerBinding.inflate(inflater, container, false)
         this.binding = binding
 
+        mAdapter = PlayersDetailsPagerAdapter(this)
         binding.viewPagerPlayersDetails.apply {
             pager = this
             adapter = mAdapter
@@ -124,7 +125,9 @@ class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFra
 
     private fun pageSelected(position: Int) {
         if (position < mAdapter.getPlayersSize()) {
-            teamViewModel.setPlayerId(mAdapter.getPlayerID(position))
+            val playerID = mAdapter.getPlayerID(position)
+            playerViewModel.playerID = playerID
+            teamViewModel.setPlayerId(playerID)
         } else {
             Timber.e(
                 "player position is greater than the list size: " +

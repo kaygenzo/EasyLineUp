@@ -22,8 +22,15 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     private val disposables = CompositeDisposable()
     private val _teamTypeLiveData = MutableLiveData<Int>().apply { getTeamType() }
     private val _strategyLiveData = MutableLiveData<TeamStrategy>()
-    private val _lineupsLiveData = MutableLiveData<Map<FieldPosition, Int>>().apply { getLineups() }
-    private val _player by lazy { domain.players().getPlayer(playerID) }
+    private val _lineupsLiveData by lazy {
+        MutableLiveData<Map<FieldPosition, Int>>().apply { getLineups() }
+    }
+    private val _player by lazy {
+        playerID.takeIf { it > 0 }
+            ?.let { domain.players().getPlayer(it) }
+            ?: MutableLiveData()
+
+    }
 
     var playerID: Long = 0
     var teamType: Int = 0
