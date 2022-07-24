@@ -1,76 +1,74 @@
 package com.telen.easylineup.dashboard.tiles
 
 import android.content.Context
-import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
 import com.telen.easylineup.dashboard.TileClickListener
+import com.telen.easylineup.databinding.TileLastPlayerNumberBinding
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.tiles.ITileData
 import com.telen.easylineup.domain.model.tiles.KEY_DATA_HISTORY
-import kotlinx.android.synthetic.main.tile_last_player_number.view.*
+import timber.log.Timber
 
-class PlayerNumberSearchTile: ConstraintLayout {
+class PlayerNumberSearchTile(context: Context) : ConstraintLayout(context) {
 
-    constructor(context: Context) : super(context) {init(context)}
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs){init(context)}
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr){init(context)}
-
-    private fun init(context: Context) {
-        LayoutInflater.from(context).inflate(R.layout.tile_last_player_number, this)
-    }
+    private val binding =
+        TileLastPlayerNumberBinding.inflate(LayoutInflater.from(context), this, true)
 
     fun bind(data: ITileData, inEditMode: Boolean, listener: TileClickListener) {
 
-        progressBar.visibility = View.GONE
-        tilePlayerNumberResult.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
+        binding.tilePlayerNumberResult.visibility = View.GONE
 
-        mask.visibility = if (inEditMode) View.VISIBLE else View.INVISIBLE
-        tilePlayerNumberTextField.setOnEditorActionListener { view, actionId, _ ->
+        binding.mask.visibility = if (inEditMode) View.VISIBLE else View.INVISIBLE
+        binding.tilePlayerNumberTextField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 applyNumberSearch(listener)
                 true
-            }
-            else
+            } else {
                 false
+            }
         }
 
-        tilePlayerNumberLayout.setEndIconOnClickListener {
+        binding.tilePlayerNumberLayout.setEndIconOnClickListener {
             applyNumberSearch(listener)
         }
 
-        (data.getData()[KEY_DATA_HISTORY] as? List<ShirtNumberEntry>)?.let { history ->
+        (data.getData()[KEY_DATA_HISTORY] as? List<*>)
+            ?.mapNotNull { it as? ShirtNumberEntry }
+            ?.let { history ->
+                binding.tilePlayerNumberResult.apply {
+                    visibility = View.VISIBLE
+                    history.firstOrNull()?.let {
+                        text = it.playerName
+                    } ?: setText(R.string.generic_not_found)
+                }
 
-            tilePlayerNumberResult.visibility = View.VISIBLE
-            history.firstOrNull()?.let {
-                tilePlayerNumberResult.text = it.playerName
+                binding.tilePlayerNumberHistory.apply {
+                    setOnClickListener {
+                        listener.onTileSearchNumberHistoryClicked(history)
+                    }
+
+                    visibility = history.takeIf { it.isNotEmpty() }?.let {
+                        View.VISIBLE
+                    } ?: let {
+                        View.GONE
+                    }
+                }
             } ?: let {
-                tilePlayerNumberResult.setText(R.string.generic_not_found)
-            }
-
-            tilePlayerNumberHistory.setOnClickListener {
-                listener.onTileSearchNumberHistoryClicked(history)
-            }
-
-            history.takeIf { it.isNotEmpty() }?.let {
-                tilePlayerNumberHistory.visibility = View.VISIBLE
-            } ?: let {
-                tilePlayerNumberHistory.visibility = View.GONE
-            }
-        } ?: let {
-            tilePlayerNumberHistory.visibility = View.GONE
+            binding.tilePlayerNumberHistory.visibility = View.GONE
         }
     }
 
     private fun applyNumberSearch(listener: TileClickListener) {
         try {
-            val number = tilePlayerNumberTextField.text.toString().toInt()
+            val number = binding.tilePlayerNumberTextField.text.toString().toInt()
             listener.onTileSearchNumberClicked(number)
-        }
-        catch (e: NumberFormatException) {
+        } catch (e: NumberFormatException) {
+            Timber.d("Not a numeric text, skip")
         }
     }
 }
