@@ -21,8 +21,8 @@ class EasyLineupActivityTestRule<T : Activity?> : ActivityTestRule<T>, KoinCompo
         super.beforeActivityLaunched()
 
 //        activity?.applicationContext?.run {
-            domain.deleteAllData()
-                    .andThen(domain.generateMockedData())
+            domain.data().deleteAllData()
+                    .andThen(domain.data().generateMockedData())
 //                    .andThen(Completable.timer(3, TimeUnit.SECONDS))
                     .blockingAwait()
 //        }
