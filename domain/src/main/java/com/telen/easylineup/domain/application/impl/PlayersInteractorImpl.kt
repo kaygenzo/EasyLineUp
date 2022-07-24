@@ -11,7 +11,6 @@ import com.telen.easylineup.domain.usecases.*
 import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
-import com.telen.easylineup.domain.usecases.exceptions.NotExistingPlayer
 import com.telen.easylineup.domain.utils.ValidatorUtils
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -39,14 +38,8 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
         return playersRepo.insertPlayers(players)
     }
 
-    override fun getPlayer(playerID: Long?): Single<Player> {
-        return UseCaseHandler.execute(getPlayer, GetPlayer.RequestValues(playerID))
-            .map { it.player }
-            .doOnError {
-                if (it is NotExistingPlayer) {
-                    errors.onNext(DomainErrors.Players.INVALID_PLAYER_ID)
-                }
-            }
+    override fun getPlayer(playerID: Long): LiveData<Player> {
+        return playersRepo.getPlayerById(playerID)
     }
 
     override fun getPlayerPositionsSummary(playerID: Long?): Single<Map<FieldPosition, Int>> {
