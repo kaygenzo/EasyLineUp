@@ -12,11 +12,66 @@
         android:layout_height="match_parent"
         tools:context=".HomeActivity">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/teamPlayersRecyclerView"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical"/>
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/actions_list"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                tools:layout_height="30dp"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageButton
+                    android:id="@+id/sort_alpha"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_baseline_sort_by_alpha_24"
+                    app:layout_constraintEnd_toStartOf="@+id/sort_numeric"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:background="@android:color/transparent"
+                    app:tint="@color/text_orange"/>
+
+                <ImageButton
+                    android:id="@+id/sort_numeric"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_baseline_sort_by_numeric_24"
+                    app:layout_constraintEnd_toStartOf="@+id/display_type"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:background="@android:color/transparent"
+                    app:tint="@color/text_orange"/>
+
+                <ImageButton
+                    android:id="@+id/display_type"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    tools:src="@drawable/ic_baseline_grid_view_24"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:tint="@color/text_orange"
+                    android:background="@android:color/transparent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/teamPlayersRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:scrollbars="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/actions_list"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:listitem="@layout/item_players_list"
+                tools:itemCount="20" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
