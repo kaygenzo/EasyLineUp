@@ -3,84 +3,69 @@ package com.telen.easylineup.player
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.FragmentPlayersDetailsContainerBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
-import io.reactivex.Completable
-import kotlinx.android.synthetic.main.fragment_players_details_container.view.*
 import timber.log.Timber
 
-class PlayersDetailsContainerFragment: BaseFragment("PlayersDetailsContainerFragment"), ViewPager.OnPageChangeListener {
+class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFragment") {
+
+    private val teamViewModel by viewModels<TeamViewModel>()
+    private val playerViewModel by viewModels<PlayerViewModel>()
 
     private lateinit var mAdapter: PlayersDetailsPagerAdapter
-    private lateinit var teamViewModel: TeamViewModel
-    private lateinit var playerViewModel: PlayerViewModel
-    private lateinit var pager: ViewPager
+    private lateinit var pager: ViewPager2
+    private var binding: FragmentPlayersDetailsContainerBinding? = null
+
+    private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            pageSelected(position)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        mAdapter = PlayersDetailsPagerAdapter(childFragmentManager)
-        teamViewModel = ViewModelProviders.of(this)[TeamViewModel::class.java]
-        playerViewModel = ViewModelProviders.of(this)[PlayerViewModel::class.java]
-        val playerID = savedInstanceState?.getLong(Constants.PLAYER_ID) ?: arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
+        val playerID = playerViewModel.playerID.takeIf { it > 0 }
+            ?: arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
         teamViewModel.setPlayerId(playerID)
-
-        val disposable = playerViewModel.registerEvent().subscribe({
-            when(it) {
-                DeletePlayerSuccess -> {
-                    findNavController().popBackStack(R.id.navigation_team, false)
-                }
-                is DeletePlayerFailure -> {
-                    Toast.makeText(activity, "Something wrong happened: ${it.message}", Toast.LENGTH_LONG).show()
-                }
-                else -> {}
-            }
-        }, {
-            Timber.e(it)
-        })
-        disposables.add(disposable)
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putLong(Constants.PLAYER_ID, teamViewModel.getPlayerId())
-    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val binding = FragmentPlayersDetailsContainerBinding.inflate(inflater, container, false)
+        this.binding = binding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_players_details_container, container, false)
-
-        view.viewPagerPlayersDetails.apply {
+        mAdapter = PlayersDetailsPagerAdapter(this)
+        binding.viewPagerPlayersDetails.apply {
             pager = this
             adapter = mAdapter
-            addOnPageChangeListener(this@PlayersDetailsContainerFragment)
+            registerOnPageChangeCallback(pageChangeCallback)
         }
 
-        return view
+        teamViewModel.observePlayers().observe(viewLifecycleOwner) { players ->
+            mAdapter.setPlayerIDs(players)
+            val playerIndex = mAdapter.getPlayerIndex(teamViewModel.getPlayerId())
+            pager.setCurrentItem(playerIndex, false)
+        }
+
+        return binding.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-//        view?.viewPagerPlayersDetails?.apply {
-//            adapter = null
-//        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        teamViewModel.observePlayers().observe(viewLifecycleOwner, Observer { players ->
-            mAdapter.setPlayerIDs(players)
-            pager.setCurrentItem(mAdapter.getPlayerIndex(teamViewModel.getPlayerId()), false)
-        })
+        binding?.viewPagerPlayersDetails?.apply { adapter = null }
     }
 
     override fun onPause() {
@@ -95,16 +80,20 @@ class PlayersDetailsContainerFragment: BaseFragment("PlayersDetailsContainerFrag
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
         val selectedPlayerId = mAdapter.getPlayerID(pager.currentItem)
         teamViewModel.setPlayerId(selectedPlayerId)
 
         return when (item.itemId) {
             R.id.action_edit -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_player_details_edit")
-                val extras = Bundle()
-                extras.putLong(Constants.PLAYER_ID, selectedPlayerId)
-                findNavController().navigate(R.id.playerEditFragment, extras, NavigationUtils().getOptions())
+                val extras = Bundle().apply {
+                    putLong(Constants.PLAYER_ID, selectedPlayerId)
+                }
+                findNavController().navigate(
+                    R.id.playerEditFragment,
+                    extras,
+                    NavigationUtils().getOptions()
+                )
                 true
             }
             R.id.action_delete -> {
@@ -117,28 +106,33 @@ class PlayersDetailsContainerFragment: BaseFragment("PlayersDetailsContainerFrag
     }
 
     private fun askUserConsentForDeletePlayerWithId(playerID: Long) {
-        activity?.let {
+        activity?.let { activity ->
             playerViewModel.playerID = playerID
-            DialogFactory.getWarningTaskDialog(context = it,
-                            title = R.string.dialog_delete_player_title,
-                            message = R.string.dialog_delete_cannot_undo_message,
-                            task = Completable.create { emitter ->
-                                playerViewModel.deletePlayer()
-                                emitter.onComplete()
-                            })
-                    .show()
+            val task = playerViewModel.deletePlayer()
+                .doOnComplete { findNavController().popBackStack(R.id.navigation_team, false) }
+                .doOnError {
+                    val message = "Something wrong happened: ${it.message}"
+                    Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
+                }
+            DialogFactory.getWarningTaskDialog(
+                context = activity,
+                title = R.string.dialog_delete_player_title,
+                message = R.string.dialog_delete_cannot_undo_message,
+                task = task
+            ).show()
         }
     }
 
-    override fun onPageScrollStateChanged(state: Int) { }
-    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) { }
-
-    override fun onPageSelected(position: Int) {
-        if(position < mAdapter.getPlayersSize()) {
-            teamViewModel.setPlayerId(mAdapter.getPlayerID(position))
-        }
-        else {
-            Timber.e("player position is greater than the list size: position=$position but list size is ${mAdapter.getPlayersSize()} ")
+    private fun pageSelected(position: Int) {
+        if (position < mAdapter.getPlayersSize()) {
+            val playerID = mAdapter.getPlayerID(position)
+            playerViewModel.playerID = playerID
+            teamViewModel.setPlayerId(playerID)
+        } else {
+            Timber.e(
+                "player position is greater than the list size: " +
+                        "position=%d but list size is %d", position, mAdapter.getPlayersSize()
+            )
         }
     }
 }

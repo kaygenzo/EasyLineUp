@@ -17,7 +17,7 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 
-class TeamFragment : BaseFragment("TeamFragment"), OnPlayerClickListener {
+class PlayersFragment : BaseFragment("TeamFragment"), OnPlayerClickListener {
 
     private val playersAdapter = TeamAdapter(this)
     private val viewModel: TeamViewModel by viewModels()
@@ -29,7 +29,7 @@ class TeamFragment : BaseFragment("TeamFragment"), OnPlayerClickListener {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentPlayerListBinding.inflate(inflater, container, false).apply {
-            this@TeamFragment.binding = this
+            this@PlayersFragment.binding = this
         }
 
         binding.fab.setOnClickListener {

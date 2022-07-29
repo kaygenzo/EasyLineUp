@@ -10,7 +10,7 @@ import io.reactivex.subjects.Subject
 interface PlayersInteractor {
     /** @deprecated **/
     fun insertPlayers(players: List<Player>): Completable
-    fun getPlayer(playerID: Long?): Single<Player>
+    fun getPlayer(playerID: Long): LiveData<Player>
     fun getPlayerPositionsSummary(playerID: Long?): Single<Map<FieldPosition, Int>>
     fun savePlayer(
         playerID: Long?,

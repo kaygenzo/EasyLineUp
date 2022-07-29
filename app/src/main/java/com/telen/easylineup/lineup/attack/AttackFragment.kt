@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.getkeepsafe.taptargetview.TapTargetView
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.BatterState
@@ -16,10 +19,14 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.lineup.NewBatterOrderAvailable
 import com.telen.easylineup.lineup.PlayersPositionViewModel
 import com.telen.easylineup.lineup.SaveBattingOrderSuccess
+import com.telen.easylineup.utils.FeatureViewFactory
 import com.telen.easylineup.views.ItemDecoratorAttackRecycler
 import com.telen.easylineup.views.LineupTypeface
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
 import kotlinx.android.synthetic.main.fragment_list_batter.view.*
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
 
@@ -115,6 +122,24 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
                 }
             })
 
+        }
+
+        viewModel.observeHelpEvent().observe(viewLifecycleOwner) { show ->
+            if(show) {
+                Completable.timer(200, TimeUnit.MILLISECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        linearLayoutManager.findViewByPosition(0)?.let {
+                            FeatureViewFactory.apply(
+                                it.findViewById<ImageView>(R.id.reorderImage),
+                                activity as AppCompatActivity,
+                                getString(R.string.reorder_batter_title),
+                                getString(R.string.reorder_batter_description),
+                                object : TapTargetView.Listener() {}
+                            )
+                        }
+                    }
+            }
         }
 
         return view
