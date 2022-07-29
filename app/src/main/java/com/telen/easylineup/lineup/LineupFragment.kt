@@ -143,6 +143,12 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
                         else -> ""
                     }
                 }.attach()
+
+                pager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+                    override fun onPageSelected(position: Int) {
+                        viewModel.onTabSelected(activity, position)
+                    }
+                })
             }
 
             view.findViewById<ConstraintLayout>(R.id.fragment_defense_edition)?.let {
