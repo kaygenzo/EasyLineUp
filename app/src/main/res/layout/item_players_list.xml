@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    android:id="@+id/playerCardRootView"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="6dp"
+    app:cardElevation="2dp"
+    app:cardUseCompatPadding="true"
+    app:cardBackgroundColor="#a0FFFFFF">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/tile_player_most_used_background_color_light">
+
+        <com.telen.easylineup.views.MultipleStateDefenseIconButton
+            android:id="@+id/playerIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="24dp"/>
+
+        <com.telen.easylineup.views.NumberedStyledTextView
+            style="@style/Field.Green.Light.Auto"
+            android:id="@+id/playerShirtNumber"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toEndOf="@+id/playerIcon"
+            tools:text="999"
+            android:textColor="@color/number_blue"/>
+
+        <ImageView
+            android:id="@+id/separator"
+            android:layout_width="24dp"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/player_card_separator"
+            app:layout_constraintStart_toEndOf="@+id/playerShirtNumber"/>
+
+        <com.telen.easylineup.views.CollegedStyledTextView
+            style="@style/Field.Green.Lighter.Small.Auto"
+            android:id="@+id/playerName"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toEndOf="@+id/separator"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Awesome Player very long to test multi line name"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -6,12 +6,17 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.views.PlayerCard
+import com.telen.easylineup.views.PlayerGridCard
+import com.telen.easylineup.views.PlayerListCard
 
 interface OnPlayerClickListener {
     fun onPlayerSelected(player: Player)
 }
 
-class TeamAdapter(private val onPlayerClickListener: OnPlayerClickListener?) :
+class TeamAdapter(
+    private val onPlayerClickListener: OnPlayerClickListener?,
+    var displayType: TeamViewModel.DisplayType = TeamViewModel.DisplayType.GRID
+) :
     ListAdapter<Player, TeamAdapter.PlayerViewHolder>(DiffCallback()) {
 
     private class DiffCallback : DiffUtil.ItemCallback<Player>() {
@@ -22,17 +27,18 @@ class TeamAdapter(private val onPlayerClickListener: OnPlayerClickListener?) :
     class PlayerViewHolder(val card: PlayerCard) : RecyclerView.ViewHolder(card)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {
-        val viewItem = PlayerCard(parent.context)
+        val viewItem = when (displayType) {
+            TeamViewModel.DisplayType.LIST -> PlayerListCard(parent.context)
+            TeamViewModel.DisplayType.GRID -> PlayerGridCard(parent.context)
+        }
         return PlayerViewHolder(viewItem)
     }
 
     override fun onBindViewHolder(holder: PlayerViewHolder, position: Int) {
         val player = getItem(position)
         with(holder) {
-            card.setName(player.name)
-            card.setShirtNumber(player.shirtNumber)
+            card.bind(player)
             card.setOnClickListener { onPlayerClickListener?.onPlayerSelected(player) }
-            card.setImage(player.image)
         }
     }
 }

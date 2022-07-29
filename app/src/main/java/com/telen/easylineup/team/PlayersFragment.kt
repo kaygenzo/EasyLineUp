@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentPlayerListBinding
@@ -31,14 +32,6 @@ class PlayersFragment : BaseFragment("TeamFragment"), OnPlayerClickListener {
             this@PlayersFragment.binding = this
         }
 
-        binding.teamPlayersRecyclerView.apply {
-            layoutManager = GridLayoutManager(
-                activity as AppCompatActivity,
-                resources.getInteger(R.integer.player_list_column_count)
-            )
-            adapter = playersAdapter
-        }
-
         binding.fab.setOnClickListener {
             FirebaseAnalyticsUtils.onClick(activity, "click_team_players_create")
             findNavController().navigate(
@@ -52,13 +45,67 @@ class PlayersFragment : BaseFragment("TeamFragment"), OnPlayerClickListener {
             playersAdapter.submitList(it)
         }
 
+        viewModel.observeDisplayType().observe(viewLifecycleOwner) {
+            playersAdapter.displayType = it
+            when(it) {
+                TeamViewModel.DisplayType.LIST -> {
+                    binding.displayType.setImageResource(R.drawable.ic_baseline_grid_view_24)
+                    showList()
+                }
+                TeamViewModel.DisplayType.GRID -> {
+                    binding.displayType.setImageResource(R.drawable.ic_baseline_view_list_24)
+                    showGrid()
+                }
+            }
+        }
+
+        binding.displayType.setOnClickListener {
+            viewModel.switchDisplayType()
+            scrollTop()
+        }
+
+        binding.sortAlpha.setOnClickListener {
+            viewModel.setSortType(TeamViewModel.SortType.ALPHA)
+            scrollTop()
+        }
+
+        binding.sortNumeric.setOnClickListener {
+            viewModel.setSortType(TeamViewModel.SortType.NUMERIC)
+            scrollTop()
+        }
+
+        showGrid()
+
         return binding.root
+    }
+
+    private fun showList() {
+        binding?.teamPlayersRecyclerView?.apply {
+            layoutManager = LinearLayoutManager(activity as AppCompatActivity)
+            adapter = playersAdapter
+        }
+    }
+
+    private fun showGrid() {
+        binding?.teamPlayersRecyclerView?.apply {
+            layoutManager = GridLayoutManager(
+                activity as AppCompatActivity,
+                resources.getInteger(R.integer.player_list_column_count)
+            )
+            adapter = playersAdapter
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.clear()
         binding = null
+    }
+
+    private fun scrollTop() {
+        binding?.teamPlayersRecyclerView?.run {
+            postDelayed({ scrollToPosition(0) }, 100)
+        }
     }
 
     override fun onPlayerSelected(player: Player) {
