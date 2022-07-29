@@ -15,6 +15,7 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.utils.DialogFactory
@@ -84,6 +85,8 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
     private val _lineupTitle = MutableLiveData<String>()
     private val _designatedPlayerTitle = MutableLiveData<String>()
     private val _listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
+
+    private val _helpEvent = MutableLiveData(false)
 
     private val disposables = CompositeDisposable()
 
@@ -358,4 +361,20 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
 
     fun observeLineupErrors() = domain.lineups().observeErrors()
     fun observePlayerFieldPositionErrors() = domain.playerFieldPositions().observeErrors()
+
+    fun onTabSelected(context: Context, position: Int) {
+        val prefs = context
+            .getSharedPreferences(Constants.APPLICATION_PREFERENCES, Context.MODE_PRIVATE)
+        val show = prefs.getBoolean(Constants.PREF_FEATURE_SHOW_REORDER_HELP, true)
+        if(position == FRAGMENT_ATTACK_INDEX && editable && show) {
+            prefs.edit().putBoolean(Constants.PREF_FEATURE_SHOW_REORDER_HELP, false).apply()
+            _helpEvent.postValue(true)
+        } else {
+            _helpEvent.postValue(false)
+        }
+    }
+
+    fun observeHelpEvent(): LiveData<Boolean> {
+        return _helpEvent
+    }
 }

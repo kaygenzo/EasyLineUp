@@ -11,6 +11,7 @@ class Constants {
         const val PREF_FEATURE_SHOW_NEW_SWAP_TEAM = "pref_show_new_swap_team"
         const val PREF_FEATURE_SHOW_NEW_ROSTER = "pref_show_new_roster"
         const val PREF_FEATURE_SHOW_REPORT_ISSUE_BUTTON = "pref_show_report_issue_button"
+        const val PREF_FEATURE_SHOW_REORDER_HELP = "pref_show_reorder_help"
 
         const val LINEUP_ID = "lineup_id"
         const val PLAYER_ID = "player_id"
