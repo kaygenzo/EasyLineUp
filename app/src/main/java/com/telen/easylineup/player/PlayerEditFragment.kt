@@ -1,17 +1,15 @@
 package com.telen.easylineup.player
 
 import android.app.Activity
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.nguyenhoanglam.imagepicker.model.Config
-import com.nguyenhoanglam.imagepicker.model.Image
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentPlayerEditBinding
@@ -29,13 +27,22 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
     private val viewModel by viewModels<PlayerViewModel>()
     private var binding: FragmentPlayerEditBinding? = null
 
+    private val pickImage =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                it.data?.data?.let { imageUri ->
+                    binding?.editPlayerForm?.onImageUriReceived(imageUri)
+                }
+            }
+        }
+
     override fun onCancel() {
         onCancelForm()
     }
 
     override fun onImagePickerRequested() {
         FirebaseAnalyticsUtils.onClick(activity, "click_player_edit_image_pick")
-        ImagePickerUtils.launchPicker(this)
+        ImagePickerUtils.launchPicker(pickImage)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,7 +109,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
         }
 
         viewModel.observePlayerImage().observe(viewLifecycleOwner) {
-            it?.let { imageUriString -> binding.editPlayerForm.setImage(imageUriString) }
+            it?.let { imageUriString -> binding.editPlayerForm.setImage(Uri.parse(imageUriString)) }
         }
 
         viewModel.observePlayerPitchingSide().observe(viewLifecycleOwner) {
@@ -172,17 +179,6 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
             Timber.e(it)
         })
         disposables.add(saveDisposable)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == Config.RC_PICK_IMAGES && resultCode == Activity.RESULT_OK) {
-            data?.let {
-                it.getParcelableArrayListExtra<Image>(Config.EXTRA_IMAGES)
-                    ?.firstOrNull()
-                    ?.let { image -> binding?.editPlayerForm?.onImageUriReceived(image) }
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     fun onCancelForm() {

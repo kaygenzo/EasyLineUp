@@ -201,8 +201,6 @@ dependencies {
     implementation "com.squareup.picasso:picasso:$picassoVersion"
     implementation "com.makeramen:roundedimageview:$roundedImageView"
 
-    implementation "com.github.nguyenhoanglam:ImagePicker:$imagepickerVersion"
-
     implementation "io.insert-koin:koin-android:$koinVersion"
     implementation "com.getkeepsafe.taptargetview:taptargetview:$taptargetviewVersion"
 

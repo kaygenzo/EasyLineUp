@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
-import com.nguyenhoanglam.imagepicker.model.Image
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
@@ -86,11 +85,9 @@ class TeamFormView : ConstraintLayout {
         }
     }
 
-    fun onImageUriReceived(image: Image) {
-        val filePathUri =
-            Uri.parse(android.content.ContentResolver.SCHEME_FILE + ":///" + image.path)
-        setImage(filePathUri)
-        this.listener?.onImageChanged(filePathUri)
+    fun onImageUriReceived(imageUri: Uri) {
+        setImage(imageUri)
+        this.listener?.onImageChanged(imageUri)
     }
 
     fun getName(): String {

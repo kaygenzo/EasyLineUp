@@ -1,17 +1,20 @@
 package com.telen.easylineup.team.createTeam.teamMain
 
+import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentTeamEditBinding
 import com.telen.easylineup.team.createTeam.SetupViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.TeamFormListener
 import kotlinx.android.synthetic.main.view_create_team.*
 import timber.log.Timber
@@ -21,9 +24,18 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
     private val viewModel by activityViewModels<SetupViewModel>()
     private var binder: FragmentTeamEditBinding? = null
 
+    private val pickImage =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                it.data?.data?.let { imageUri ->
+                    binder?.editTeamForm?.onImageUriReceived(imageUri)
+                }
+            }
+        }
+
     override fun onImagePickerRequested() {
         FirebaseAnalyticsUtils.onClick(activity, "click_team_edit_image_pick")
-//        ImagePickerUtils.launchPicker(this)
+        ImagePickerUtils.launchPicker(pickImage)
     }
 
     override fun onNameChanged(name: String) {
@@ -82,13 +94,4 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
         super.onDestroyView()
         binder = null
     }
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        if (requestCode == ImagePickerUtils.REQUEST_CODE_PICK_IMAGE && resultCode == Activity.RESULT_OK) {
-//            data?.data?.let {
-//                teamForm?.onImageUriReceived(it)
-//            }
-//        }
-//        super.onActivityResult(requestCode, resultCode, data)
-//    }
 }

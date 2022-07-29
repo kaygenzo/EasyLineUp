@@ -9,7 +9,6 @@ import android.widget.GridLayout
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
-import com.nguyenhoanglam.imagepicker.model.Image
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
@@ -77,9 +76,8 @@ class PlayerFormView: ConstraintLayout {
         }
     }
 
-    fun onImageUriReceived(image: Image) {
-        val filePathUri = android.content.ContentResolver.SCHEME_FILE + ":///" + image.path
-        setImage(filePathUri)
+    fun onImageUriReceived(imageUri: Uri) {
+        setImage(imageUri)
     }
 
     fun getName(): String {
@@ -127,10 +125,8 @@ class PlayerFormView: ConstraintLayout {
                 .into(playerImage)
     }
 
-    fun setImage(imagePath: String) {
-
-        imageUri = Uri.parse(imagePath)
-
+    fun setImage(uri: Uri) {
+        imageUri = uri
         playerImage.post {
             try {
                 Picasso.get().load(imageUri)
