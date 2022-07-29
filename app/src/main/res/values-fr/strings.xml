@@ -194,6 +194,10 @@
     <string name="form_lineup_creation_extra_hitters_label">Batteurs supplém.</string>
     <string name="form_lineup_creation_strategy_label">Type de match</string>
 
+    <string name="report_sending_message">Le rapport de bug est en cours d\'envoi, veuillez patienter&#8230;</string>
+    <string name="report_sending_message_success">Envoyé avec succès! Merci!</string>
+    <string name="report_sending_message_failure">Une erreur est survenue, veuillez réessayer</string>
+
     <string name="reorder_batter_title">Réorganisez l\'ordre des batteurs</string>
     <string name="reorder_batter_description">Appuyez longuement sur l\'icône de réorganisation pour déplacer verticalement le batteur à la position désirée</string>
 </resources>
