@@ -1,31 +1,59 @@
-version: 2
+version: 2.1
 jobs:
   build:
-    working_directory: ~/easylineup
+    description: "CI build"
+#    working_directory: ~/easylineup
     docker:
-      - image: circleci/android:api-26-alpha
-    environment:
-      JVM_OPTS: -Xmx4096m
+      - image: kaygenzo/android-fastlane:30
+#    environment:
+#      JVM_OPTS: -Xmx4096m
     steps:
       - checkout
-      - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+workflows:
+  build:
+    jobs:
+      - build:
+        pre-steps:
+          - run:
+            command: |
+              echo $DEBUG_KEYSTORE_FILE | base64 -d > telen.debug.jks
+              echo $KEYSTORE_FILE | base64 -d > telen.release.jks
+              echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
+              echo $APP_DISTRIBUTION_SERVICE_FILE | base64 -d > easylineup-services.json
+              echo $APP_DISTRIBUTION_TESTERS_FILE | base64 -d > testers.txt
+              echo $PLAY_STORE_CREDENTIALS | base64 -d > play-store-credentials.json
+              git rev-parse --abbrev-ref HEAD > releasenotes.txt
+              git log -1 --pretty="%B %ad" >> releasenotes.txt
+              ruby --version
+              bundle install
+        post-steps:
+          - run:
+            command: |
+              rm telen.debug.jks
+              rm telen.release.jks
+              rm app/google-services.json
+              rm easylineup-services.json
+              rm testers.txt
+              rm releasenotes.txt
+              rm play-store-credentials.json
+#      - restore_cache:
+#          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
 #      - run:
 #         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
 #         command: sudo chmod +x ./gradlew
-      - run:
-          name: Download Dependencies
-          command: ./gradlew androidDependencies
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-      - run:
-          name: Run Tests
-          command: ./gradlew lint test
-      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
-          path: app/build/reports
-          destination: reports
-      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-          path: app/build/test-results
+#      - run:
+#          name: Download Dependencies
+#          command: ./gradlew androidDependencies
+#      - save_cache:
+#          paths:
+#            - ~/.gradle
+#          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+#      - run:
+#          name: Run Tests
+#          command: ./gradlew lint test
+#      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
+#          path: app/build/reports
+#          destination: reports
+#      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+#          path: app/build/test-results
       # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples
