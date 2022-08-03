@@ -2,40 +2,48 @@ version: 2.1
 jobs:
   build:
     description: "CI build"
-#    working_directory: ~/easylineup
     docker:
       - image: kaygenzo/android-fastlane:30
-#    environment:
-#      JVM_OPTS: -Xmx4096m
     steps:
       - checkout
+      - run: ./gradlew assembleProdRelease
+  firebase:
+    description: "Send built artifact to firebase"
+    docker:
+      - image: kaygenzo/android-fastlane:30
+    steps:
+      - run: ./gradlew appDistributionUploadProdRelease
 workflows:
-  build:
+  build-deploy:
     jobs:
       - build:
-        pre-steps:
-          - run:
-            command: |
-              echo $DEBUG_KEYSTORE_FILE | base64 -d > telen.debug.jks
-              echo $KEYSTORE_FILE | base64 -d > telen.release.jks
-              echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
-              echo $APP_DISTRIBUTION_SERVICE_FILE | base64 -d > easylineup-services.json
-              echo $APP_DISTRIBUTION_TESTERS_FILE | base64 -d > testers.txt
-              echo $PLAY_STORE_CREDENTIALS | base64 -d > play-store-credentials.json
-              git rev-parse --abbrev-ref HEAD > releasenotes.txt
-              git log -1 --pretty="%B %ad" >> releasenotes.txt
-              ruby --version
-              bundle install
-        post-steps:
-          - run:
-            command: |
-              rm telen.debug.jks
-              rm telen.release.jks
-              rm app/google-services.json
-              rm easylineup-services.json
-              rm testers.txt
-              rm releasenotes.txt
-              rm play-store-credentials.json
+          pre-steps:
+            - run:
+                command: |
+                  echo $KEYSTORE_FILE | base64 -d > telen.release.jks
+                  echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
+          post-steps:
+            - run:
+                command: |
+                  rm telen.release.jks
+                  rm app/google-services.json
+      - firebase:
+          pre-steps:
+            - run:
+                command: |
+                  echo $APP_DISTRIBUTION_SERVICE_FILE | base64 -d > easylineup-services.json
+                  echo $APP_DISTRIBUTION_TESTERS_FILE | base64 -d > testers.txt
+                  git rev-parse --abbrev-ref HEAD > releasenotes.txt
+                  git log -1 --pretty="%B %ad" >> releasenotes.txt
+          post-steps:
+            - run:
+                command: |
+                  rm easylineup-services.json
+                  rm testers.txt
+                  rm releasenotes.txt
+
+
+
 #      - restore_cache:
 #          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
 #      - run:
