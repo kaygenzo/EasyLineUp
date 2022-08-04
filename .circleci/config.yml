@@ -7,16 +7,16 @@ executors:
     working_directory: ~/easylineup
 
 jobs:
-  build:
+  checkout-sources: 
     executor: easylineup-executor
-    description: "Artifact build"
+    description: "Checkout sources"
     steps:
       - checkout
-      - run:
-          command: |
-            echo $KEYSTORE_FILE | base64 -d > telen.release.jks
-            echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
-            ./gradlew assembleProdRelease
+  build-prod:
+    executor: easylineup-executor
+    description: "Build artifacts"
+    steps:
+      - run: ./gradlew assembleProdRelease
       - persist_to_workspace:
             root: .
             paths:
@@ -31,7 +31,15 @@ jobs:
 workflows:
   build-deploy:
     jobs:
-      - build:
+      - checkout-sources
+      - build-prod:
+          requires:
+            - checkout-sources
+          pre-steps:
+            - run:
+                command: |
+                  echo $KEYSTORE_FILE | base64 -d > telen.release.jks
+                  echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
           post-steps:
             - run:
                 command: |
@@ -39,7 +47,7 @@ workflows:
                   rm app/google-services.json
       - firebase:
           requires: 
-            - build
+            - build-prod
           pre-steps:
             - run:
                 command: |
