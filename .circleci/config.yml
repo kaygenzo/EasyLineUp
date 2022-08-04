@@ -1,17 +1,17 @@
 version: 2.1
 jobs:
-  init:
-    description: "Initialize the project"
-    docker:
-      - image: kaygenzo/android-fastlane:30
-    steps:
-      - checkout
   build:
     description: "Artifact build"
     docker:
       - image: kaygenzo/android-fastlane:30
     steps:
-      - run: ./gradlew assembleProdRelease
+      - checkout
+      - run:
+          command: |
+            echo $KEYSTORE_FILE | base64 -d > telen.release.jks
+            echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
+            ./gradlew assembleProdRelease
+            
   firebase:
     description: "Send built artifact to firebase"
     docker:
@@ -22,13 +22,6 @@ workflows:
   build-deploy:
     jobs:
       - build:
-          requires: 
-            - init
-          pre-steps:
-            - run:
-                command: |
-                  echo $KEYSTORE_FILE | base64 -d > telen.release.jks
-                  echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
           post-steps:
             - run:
                 command: |
