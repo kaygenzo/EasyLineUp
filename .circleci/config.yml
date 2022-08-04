@@ -12,15 +12,17 @@ jobs:
     description: "Checkout sources"
     steps:
       - checkout
+      - persist_to_workspace:
+            root: .
+            paths:
+              - .
   build-prod:
     executor: easylineup-executor
     description: "Build artifacts"
     steps:
       - run: ./gradlew assembleProdRelease
-      - persist_to_workspace:
-            root: .
-            paths:
-              - .
+      - attach_workspace:
+          at: .
   firebase:
     executor: easylineup-executor
     description: "Send built artifact to firebase"
