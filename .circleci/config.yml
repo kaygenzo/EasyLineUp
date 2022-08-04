@@ -23,6 +23,8 @@ jobs:
           paths:
             - telen.release.jks
             - app/google-services.json
+            - easylineup-services.json
+            - testers.txt
   unit-tests:
     executor: easylineup-executor
     description: "Unit tests"
@@ -107,6 +109,11 @@ workflows:
       - firebase:
           requires: 
             - build-prod
+          pre-steps:
+            - run: 
+                command: |
+                    ruby --version
+                    bundle install
           post-steps:
             - run:
                 command: |
