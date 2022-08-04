@@ -7,36 +7,91 @@ executors:
     working_directory: ~/easylineup
 
 jobs:
-  checkout-sources: 
+  pre-build:
     executor: easylineup-executor
-    description: "Checkout sources"
+    description: "Unit tests"
+    steps:
+      - run:
+          command: |
+              echo $KEYSTORE_FILE | base64 -d > telen.release.jks
+              echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
+      - persist_to_workspace:
+          root: .
+          paths:
+            - telen.release.jks
+            - app/google-services.json
+  unit-tests:
+    executor: easylineup-executor
+    description: "Unit tests"
     steps:
       - checkout
+      - attach_workspace:
+          at: .
+      - run: ./gradlew testProdDebugUnitTest
       - persist_to_workspace:
-            root: .
-            paths:
-              - .
+          root: .
+          paths:
+            - build
+            - app/build
+            - domain/build
+            - repository/build
+
+  android-tests-build:
+    executor: easylineup-executor
+    description: "Android tests build"
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: ./gradlew assembleDemoDebug assembleDemoDebugAndroidTest
+      - store_artifacts:
+          path: app/build/outputs/apk/demo/debug
+          destination: androidTestBinaries
+      - store_artifacts:
+          path: app/build/outputs/apk/androidTest/demo/debug
+          destination: androidTestBinaries
+
   build-prod:
     executor: easylineup-executor
     description: "Build artifacts"
     steps:
-      - run: ./gradlew assembleProdRelease
+      - checkout
       - attach_workspace:
           at: .
+      - run: ./gradlew assembleProdRelease
+      - store_artifacts:
+          path: app/build/outputs/apk/prod/release
+          destination: release
+      - store_artifacts:
+          path: app/build/outputs/mapping/prodRelease/mapping.txt
+          destination: release
+      - persist_to_workspace:
+          root: .
+          paths:
+            - app/build/outputs/apk/prod/release
+            - app/build/outputs/mapping/prodRelease/mapping.txt
   firebase:
     executor: easylineup-executor
     description: "Send built artifact to firebase"
     steps:
-      - run: ./gradlew appDistributionUploadProdRelease
+      - checkout
       - attach_workspace:
           at: .
+      - run: ./gradlew appDistributionUploadProdRelease
+      
 workflows:
   build-deploy:
     jobs:
-      - checkout-sources
+      - pre-build
+      - unit-tests:
+          requires:
+            - pre-build
+      - android-tests-build:
+          requires:
+            - unit-tests
       - build-prod:
           requires:
-            - checkout-sources
+            - unit-tests
           pre-steps:
             - run:
                 command: |
