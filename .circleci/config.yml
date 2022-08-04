@@ -84,6 +84,8 @@ jobs:
           at: .
       - run: 
           command: |
+              ruby --version
+              bundle install
               git rev-parse --abbrev-ref HEAD > releasenotes.txt
               git log -1 --pretty="%B %ad" >> releasenotes.txt
               ./gradlew appDistributionUploadProdRelease
@@ -109,11 +111,6 @@ workflows:
       - firebase:
           requires: 
             - build-prod
-          pre-steps:
-            - run: 
-                command: |
-                    ruby --version
-                    bundle install
           post-steps:
             - run:
                 command: |
