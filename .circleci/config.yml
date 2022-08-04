@@ -18,6 +18,7 @@ jobs:
               echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
               echo $APP_DISTRIBUTION_SERVICE_FILE | base64 -d > easylineup-services.json
               echo $APP_DISTRIBUTION_TESTERS_FILE | base64 -d > testers.txt
+              echo $PLAY_STORE_CREDENTIALS | base64 -d > play-store-credentials.json
       - persist_to_workspace:
           root: .
           paths:
@@ -25,6 +26,7 @@ jobs:
             - app/google-services.json
             - easylineup-services.json
             - testers.txt
+            - play-store-credentials.json
   unit-tests:
     executor: easylineup-executor
     description: "Unit tests"
@@ -33,13 +35,13 @@ jobs:
       - attach_workspace:
           at: .
       - run: ./gradlew testProdDebugUnitTest
-      - persist_to_workspace:
-          root: .
-          paths:
-            - build
-            - app/build
-            - domain/build
-            - repository/build
+#     - persist_to_workspace:
+#          root: .
+#          paths:
+#            - build
+#            - app/build
+#            - domain/build
+#            - repository/build
 
   android-tests-build:
     executor: easylineup-executor
@@ -74,7 +76,6 @@ jobs:
           root: .
           paths:
             - app/build/outputs/apk/prod/release
-            - app/build/outputs/mapping/prodRelease/mapping.txt
   firebase:
     executor: easylineup-executor
     description: "Send built artifact to firebase"
