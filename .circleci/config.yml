@@ -1,9 +1,15 @@
 version: 2.1
-jobs:
-  build:
-    description: "Artifact build"
+
+executors:
+  easylineup-executor:
     docker:
       - image: kaygenzo/android-fastlane:30
+    working_directory: ~/easylineup
+
+jobs:
+  build:
+    executor: easylineup-executor
+    description: "Artifact build"
     steps:
       - checkout
       - run:
@@ -13,9 +19,8 @@ jobs:
             ./gradlew assembleProdRelease
             
   firebase:
+    executor: easylineup-executor
     description: "Send built artifact to firebase"
-    docker:
-      - image: kaygenzo/android-fastlane:30
     steps:
       - run: ./gradlew appDistributionUploadProdRelease
 workflows:
