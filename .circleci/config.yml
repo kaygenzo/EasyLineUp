@@ -28,6 +28,8 @@ workflows:
                   rm telen.release.jks
                   rm app/google-services.json
       - firebase:
+          requires: 
+            - build
           pre-steps:
             - run:
                 command: |
