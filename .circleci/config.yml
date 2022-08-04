@@ -20,6 +20,7 @@ workflows:
           pre-steps:
             - run:
                 command: |
+                  mkdir -p app
                   echo $KEYSTORE_FILE | base64 -d > telen.release.jks
                   echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
           post-steps:
