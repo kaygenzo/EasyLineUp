@@ -17,12 +17,17 @@ jobs:
             echo $KEYSTORE_FILE | base64 -d > telen.release.jks
             echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
             ./gradlew assembleProdRelease
-            
+      - persist_to_workspace:
+            root: .
+            paths:
+              - .
   firebase:
     executor: easylineup-executor
     description: "Send built artifact to firebase"
     steps:
       - run: ./gradlew appDistributionUploadProdRelease
+      - attach_workspace:
+          at: .
 workflows:
   build-deploy:
     jobs:
