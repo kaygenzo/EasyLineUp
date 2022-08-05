@@ -35,13 +35,6 @@ jobs:
       - attach_workspace:
           at: .
       - run: ./gradlew testProdDebugUnitTest
-#     - persist_to_workspace:
-#          root: .
-#          paths:
-#            - build
-#            - app/build
-#            - domain/build
-#            - repository/build
 
   android-tests-build:
     executor: easylineup-executor
@@ -85,12 +78,10 @@ jobs:
           at: .
       - run: 
           command: |
-              ls -l
-              ruby --version
               bundle install
               git rev-parse --abbrev-ref HEAD > releasenotes.txt
               git log -1 --pretty="%B %ad" >> releasenotes.txt
-              ./gradlew appDistributionUploadProdRelease
+              ./gradlew assembleProdRelease appDistributionUploadProdRelease
       
 workflows:
   build-deploy:
