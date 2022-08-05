@@ -85,6 +85,7 @@ jobs:
           at: .
       - run: 
           command: |
+              ls -l
               ruby --version
               bundle install
               git rev-parse --abbrev-ref HEAD > releasenotes.txt
