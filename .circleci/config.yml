@@ -90,9 +90,6 @@ workflows:
       - unit-tests:
           requires:
             - pre-build
-#      - android-tests-build:
-#          requires:
-#            - unit-tests
       - build-prod:
           requires:
             - unit-tests
@@ -101,6 +98,9 @@ workflows:
                 command: |
                   rm telen.release.jks
                   rm app/google-services.json
+      - android-tests-build:
+          requires:
+            - build-prod
       - firebase:
           requires: 
             - build-prod
