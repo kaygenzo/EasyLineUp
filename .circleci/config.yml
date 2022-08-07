@@ -91,7 +91,13 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: ./gradlew assembleProdRelease
+      - run:
+          command: |
+            ./gradlew bundleProdRelease
+            bundle exec fastlane deploy_to_alpha
+      - store_artifacts:
+          path: app/build/outputs/mapping/prodRelease/mapping.txt
+          destination: release/mapping.txt
       
 workflows:
   build-deploy:
