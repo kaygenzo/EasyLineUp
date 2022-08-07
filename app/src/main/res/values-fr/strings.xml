@@ -200,4 +200,9 @@
 
     <string name="reorder_batter_title">Réorganisez l\'ordre des batteurs</string>
     <string name="reorder_batter_description">Appuyez longuement sur l\'icône de réorganisation pour déplacer verticalement le batteur à la position désirée</string>
+
+    <string name="sort_by_name">Nom</string>
+    <string name="sort_by_shirt_number">N° Maillot</string>
+    <string name="display_grid">Grille</string>
+    <string name="display_list">Liste</string>
 </resources>

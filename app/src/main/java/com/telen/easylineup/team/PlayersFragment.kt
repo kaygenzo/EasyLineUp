@@ -49,27 +49,33 @@ class PlayersFragment : BaseFragment("TeamFragment"), OnPlayerClickListener {
             playersAdapter.displayType = it
             when(it) {
                 TeamViewModel.DisplayType.LIST -> {
-                    binding.displayType.setImageResource(R.drawable.ic_baseline_grid_view_24)
+                    binding.displayMode.apply {
+                        setChipIconResource(R.drawable.ic_baseline_grid_view_24)
+                        setText(R.string.display_grid)
+                    }
                     showList()
                 }
                 TeamViewModel.DisplayType.GRID -> {
-                    binding.displayType.setImageResource(R.drawable.ic_baseline_view_list_24)
+                    binding.displayMode.apply {
+                        setChipIconResource(R.drawable.ic_baseline_view_list_24)
+                        setText(R.string.display_list)
+                    }
                     showGrid()
                 }
             }
         }
 
-        binding.displayType.setOnClickListener {
+        binding.displayMode.setOnClickListener {
             viewModel.switchDisplayType()
             scrollTop()
         }
 
-        binding.sortAlpha.setOnClickListener {
+        binding.sortByName.setOnClickListener {
             viewModel.setSortType(TeamViewModel.SortType.ALPHA)
             scrollTop()
         }
 
-        binding.sortNumeric.setOnClickListener {
+        binding.sortByShirtNumber.setOnClickListener {
             viewModel.setSortType(TeamViewModel.SortType.NUMERIC)
             scrollTop()
         }

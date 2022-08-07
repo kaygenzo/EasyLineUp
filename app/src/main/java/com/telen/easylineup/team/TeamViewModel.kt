@@ -15,7 +15,7 @@ import timber.log.Timber
 class TeamViewModel : ViewModel(), KoinComponent {
 
     enum class SortType {
-        NONE, ALPHA, NUMERIC
+        ALPHA, NUMERIC
     }
 
     enum class DisplayType {
@@ -38,7 +38,7 @@ class TeamViewModel : ViewModel(), KoinComponent {
     private val disposables = CompositeDisposable()
     private var playerSelectedID = 0L
     var team: Team? = null
-    var sortType: SortType = SortType.NONE
+    var sortType: SortType = SortType.ALPHA
         private set
     var displayType: DisplayType = DisplayType.GRID
         private set
@@ -118,16 +118,14 @@ class TeamViewModel : ViewModel(), KoinComponent {
 
     fun setSortType(sortType: SortType) {
         this.sortType = sortType
-        when (sortType) {
-            SortType.NONE -> {
-                _players.postValue(playerList)
-            }
+        playerList = when (sortType) {
             SortType.ALPHA -> {
-                _players.postValue(playerList.sortedBy { it.name })
+                playerList.sortedBy { it.name }.toMutableList()
             }
             SortType.NUMERIC -> {
-                _players.postValue(playerList.sortedBy { it.shirtNumber })
+                playerList.sortedBy { it.shirtNumber }.toMutableList()
             }
         }
+        _players.postValue(playerList)
     }
 }

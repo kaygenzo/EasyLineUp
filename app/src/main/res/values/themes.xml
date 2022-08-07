@@ -307,4 +307,21 @@
         <item name="android:background">@color/white</item>
     </style>
 
+    <style name="Widget.App.Chip.Choice" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="chipIconTint">@color/chip_tint</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipStrokeColor">@color/chip_tint</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipIconVisible">true</item>
+        <item name="android:textColor">@color/chip_tint</item>
+        <item name="chipBackgroundColor">@color/chip_background_tint</item>
+    </style>
+
+    <style name="Widget.App.Chip.Action" parent="Widget.MaterialComponents.Chip.Action">
+        <item name="chipBackgroundColor">@color/white</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipStrokeColor">@color/chip_tint</item>
+        <item name="chipIconTint">@color/text_orange</item>
+    </style>
+
 </resources>

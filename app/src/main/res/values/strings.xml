@@ -230,4 +230,9 @@
 
     <string name="reorder_batter_title">Reorder the batters order</string>
     <string name="reorder_batter_description">Long press the reorder icon to drag and drop vertically at the desired position.</string>
+
+    <string name="sort_by_name">Name</string>
+    <string name="sort_by_shirt_number">Shirt n°</string>
+    <string name="display_grid">Grid</string>
+    <string name="display_list">List</string>
 </resources>
