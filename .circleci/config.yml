@@ -1,31 +1,143 @@
-version: 2
-jobs:
-  build:
-    working_directory: ~/easylineup
+version: 2.1
+
+executors:
+  easylineup-executor:
     docker:
-      - image: circleci/android:api-26-alpha
-    environment:
-      JVM_OPTS: -Xmx4096m
+      - image: kaygenzo/android-fastlane:30
+    working_directory: ~/easylineup
+
+jobs:
+  pre-build:
+    executor: easylineup-executor
+    description: "Unit tests"
+    steps:
+      - run:
+          command: |
+              mkdir -p app
+              echo $KEYSTORE_FILE | base64 -d > telen.release.jks
+              echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
+              echo $APP_DISTRIBUTION_SERVICE_FILE | base64 -d > easylineup-services.json
+              echo $APP_DISTRIBUTION_TESTERS_FILE | base64 -d > testers.txt
+              echo $PLAY_STORE_CREDENTIALS | base64 -d > play-store-credentials.json
+              echo $DEBUG_KEYSTORE_FILE | base64 -d > telen.debug.jks
+      - persist_to_workspace:
+          root: .
+          paths:
+            - telen.release.jks
+            - telen.debug.jks
+            - app/google-services.json
+            - easylineup-services.json
+            - testers.txt
+            - play-store-credentials.json
+  unit-tests:
+    executor: easylineup-executor
+    description: "Unit tests"
     steps:
       - checkout
-      - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-#      - run:
-#         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
-#         command: sudo chmod +x ./gradlew
-      - run:
-          name: Download Dependencies
-          command: ./gradlew androidDependencies
-      - save_cache:
+      - attach_workspace:
+          at: .
+      - run: ./gradlew testProdDebugUnitTest
+
+  android-tests-build:
+    executor: easylineup-executor
+    description: "Android tests build"
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: ./gradlew assembleDemoDebug assembleDemoDebugAndroidTest
+      - store_artifacts:
+          path: app/build/outputs/apk/demo/debug
+          destination: androidTestBinaries
+      - store_artifacts:
+          path: app/build/outputs/apk/androidTest/demo/debug
+          destination: androidTestBinaries
+
+  build-prod:
+    executor: easylineup-executor
+    description: "Build artifacts"
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: ./gradlew assembleProdRelease
+      - store_artifacts:
+          path: app/build/outputs/apk/prod/release
+          destination: release
+      - store_artifacts:
+          path: app/build/outputs/mapping/prodRelease/mapping.txt
+          destination: release/mapping.txt
+      - persist_to_workspace:
+          root: .
           paths:
-            - ~/.gradle
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+            - app/build/outputs/apk/prod/release
+  firebase:
+    executor: easylineup-executor
+    description: "Send built artifact to firebase"
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: 
+          command: |
+              bundle install
+              git rev-parse --abbrev-ref HEAD > releasenotes.txt
+              git log -1 --pretty="%B %ad" >> releasenotes.txt
+              ./gradlew assembleProdRelease appDistributionUploadProdRelease
+  deploy-alpha:
+    executor: easylineup-executor
+    description: "Build alpha version artifacts"
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
       - run:
-          name: Run Tests
-          command: ./gradlew lint test
-      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
-          path: app/build/reports
-          destination: reports
-      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-          path: app/build/test-results
-      # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples
+          command: |
+            ./gradlew bundleProdRelease
+            bundle exec fastlane deploy_to_alpha
+      - store_artifacts:
+          path: app/build/outputs/mapping/prodRelease/mapping.txt
+          destination: release/mapping.txt
+      
+workflows:
+  build-deploy:
+    jobs:
+      - pre-build
+      - unit-tests:
+          requires:
+            - pre-build
+      - build-prod:
+          requires:
+            - unit-tests
+          post-steps:
+            - run:
+                command: |
+                  rm telen.release.jks
+                  rm app/google-services.json
+      - android-tests-build:
+          requires:
+            - build-prod
+      - firebase:
+          requires: 
+            - build-prod
+          post-steps:
+            - run:
+                command: |
+                  rm easylineup-services.json
+                  rm testers.txt
+                  rm releasenotes.txt
+      - deploy-alpha:
+          requires:
+            - build-prod
+          filters:
+            tags:
+              only: /([0-9]+\.?){1,4}/
+            branches:
+              ignore: /.*/
+
+#      - restore_cache:
+#          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+#      - save_cache:
+#          paths:
+#            - ~/.gradle
+#          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
