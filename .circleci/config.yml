@@ -19,10 +19,12 @@ jobs:
               echo $APP_DISTRIBUTION_SERVICE_FILE | base64 -d > easylineup-services.json
               echo $APP_DISTRIBUTION_TESTERS_FILE | base64 -d > testers.txt
               echo $PLAY_STORE_CREDENTIALS | base64 -d > play-store-credentials.json
+              echo $DEBUG_KEYSTORE_FILE | base64 -d > telen.debug.jks
       - persist_to_workspace:
           root: .
           paths:
             - telen.release.jks
+            - telen.debug.jks
             - app/google-services.json
             - easylineup-services.json
             - testers.txt
@@ -82,6 +84,14 @@ jobs:
               git rev-parse --abbrev-ref HEAD > releasenotes.txt
               git log -1 --pretty="%B %ad" >> releasenotes.txt
               ./gradlew assembleProdRelease appDistributionUploadProdRelease
+  deploy-alpha:
+    executor: easylineup-executor
+    description: "Build alpha version artifacts"
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: ./gradlew assembleProdRelease
       
 workflows:
   build-deploy:
@@ -110,8 +120,9 @@ workflows:
                   rm easylineup-services.json
                   rm testers.txt
                   rm releasenotes.txt
-
-
+      - deploy-alpha:
+          requires:
+            - build-prod
 
 #      - restore_cache:
 #          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
