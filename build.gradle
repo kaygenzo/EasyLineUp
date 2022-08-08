@@ -55,6 +55,7 @@ buildscript {
         firebaseBOMVersion = "29.0.4"
 
         documentFileVersion = "1.0.1"
+        dexterVersion = "6.2.3"
     }
 
     repositories {

@@ -35,7 +35,7 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
 
     override fun onImagePickerRequested() {
         FirebaseAnalyticsUtils.onClick(activity, "click_team_edit_image_pick")
-        ImagePickerUtils.launchPicker(pickImage)
+        activity?.let { ImagePickerUtils.launchPicker(it, view, pickImage) }
     }
 
     override fun onNameChanged(name: String) {

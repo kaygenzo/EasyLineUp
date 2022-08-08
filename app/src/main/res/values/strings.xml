@@ -235,4 +235,8 @@
     <string name="sort_by_shirt_number">Shirt n°</string>
     <string name="display_grid">Grid</string>
     <string name="display_list">List</string>
+
+    <string name="permission_request_read_external_storage">"Media access is needed to display images"</string>
+    <string name="permission_request_settings_action">"Settings"</string>
+    <string name="permission_request_pick_image_title">"Pick an image..."</string>
 </resources>

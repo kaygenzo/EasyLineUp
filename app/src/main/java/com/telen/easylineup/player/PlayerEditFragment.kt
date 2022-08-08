@@ -42,7 +42,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
 
     override fun onImagePickerRequested() {
         FirebaseAnalyticsUtils.onClick(activity, "click_player_edit_image_pick")
-        ImagePickerUtils.launchPicker(pickImage)
+        activity?.let { ImagePickerUtils.launchPicker(it, view, pickImage) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
