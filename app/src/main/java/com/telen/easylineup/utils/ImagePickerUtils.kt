@@ -1,9 +1,10 @@
 package com.telen.easylineup.utils
 
 import android.Manifest
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
-import android.provider.MediaStore
+import android.net.Uri
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import com.karumi.dexter.Dexter
@@ -28,14 +29,11 @@ class ImagePickerUtils {
 
             val permissionListener = object : BasePermissionListener() {
                 override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-                    val intent =
-                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                    callback.launch(
-                        Intent.createChooser(
-                            intent,
-                            context.getString(R.string.permission_request_pick_image_title)
-                        )
-                    )
+                    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).applyImageTypes(arrayOf())
+                    intent.addCategory(Intent.CATEGORY_OPENABLE)
+                    intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    callback.launch(intent)
                 }
             }
             val compositePermissionListener =
@@ -45,6 +43,19 @@ class ImagePickerUtils {
                 .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .withListener(compositePermissionListener)
                 .check()
+        }
+
+        fun persistImage(resolver: ContentResolver, uri: Uri) {
+            resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+
+        private fun Intent.applyImageTypes(mimeTypes: Array<String>): Intent {
+            // Apply filter to show image only in intent
+            type = "image/*"
+            if (mimeTypes.isNotEmpty()) {
+                putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+            }
+            return this
         }
     }
 }

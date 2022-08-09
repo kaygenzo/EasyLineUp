@@ -28,6 +28,7 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
                 it.data?.data?.let { imageUri ->
+                    context?.contentResolver?.let { ImagePickerUtils.persistImage(it, imageUri) }
                     binder?.editTeamForm?.onImageUriReceived(imageUri)
                 }
             }

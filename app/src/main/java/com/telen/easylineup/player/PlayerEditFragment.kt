@@ -31,6 +31,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
                 it.data?.data?.let { imageUri ->
+                    context?.contentResolver?.let { ImagePickerUtils.persistImage(it, imageUri) }
                     binding?.editPlayerForm?.onImageUriReceived(imageUri)
                 }
             }
