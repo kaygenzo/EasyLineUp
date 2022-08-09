@@ -139,6 +139,7 @@ class DialogFactory {
             }
             if(resCancelText != 0) {
                 dialog.setNegativeButton(resCancelText, cancelClick)
+                dialog.setOnCancelListener { p0 -> cancelClick?.onClick(p0, 0) }
             }
             customView?.let {
                 dialog.setView(customView)

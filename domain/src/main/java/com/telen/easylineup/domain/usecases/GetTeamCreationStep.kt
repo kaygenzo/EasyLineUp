@@ -16,6 +16,13 @@ internal abstract class GetTeamCreationStep: UseCase<GetTeamCreationStep.Request
 internal class GetTeamCreationNextStep: GetTeamCreationStep() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         val responseValue: ResponseValue = when(requestValues.currentStep){
+            TeamCreationStep.CANCEL -> {
+                ResponseValue(StepConfiguration(TeamCreationStep.TEAM,
+                    nextButtonEnabled = true, previousButtonEnabled = true,
+                    nextButtonVisibility = View.VISIBLE, previousButtonVisibility = View.VISIBLE,
+                    nextButtonLabel = R.string.team_creation_label_next,
+                    previousButtonLabel = R.string.team_creation_label_cancel))
+            }
             TeamCreationStep.TEAM -> {
                 ResponseValue(StepConfiguration(TeamCreationStep.TYPE,
                         nextButtonEnabled = true, previousButtonEnabled = true,

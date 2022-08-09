@@ -54,6 +54,7 @@ class TeamCreationActivity : BaseActivity() {
                         title = R.string.discard_title,
                         message = R.string.discard_message,
                         confirmClick = { dialog, which -> finish() },
+                        cancelClick = { dialog, which -> viewModel.onCancelClicked() },
                         confirmText = R.string.generic_discard
                     ).show()
                     return@observe

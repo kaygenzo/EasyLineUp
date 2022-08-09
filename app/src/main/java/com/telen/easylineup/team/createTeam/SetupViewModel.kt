@@ -109,6 +109,10 @@ class SetupViewModel : ViewModel(), KoinComponent {
         disposables.add(saveDisposable)
     }
 
+    fun onCancelClicked() {
+        nextButtonClicked()
+    }
+
     private fun onNewStep(new: StepConfiguration) {
         _step.postValue(Pair(currentStep, new))
         currentStep = new
