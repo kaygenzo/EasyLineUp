@@ -36,3 +36,5 @@ testers.txt
 vendor/
 fastlane/metadata/
 .bundle
+
+*.jks
