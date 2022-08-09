@@ -142,9 +142,9 @@
     <string name="settings_import_error_message">Un problème est survenu durant l\'import. Veuillez réessayer et vérifiez si l\'application a bien accès à la mémoire externe.</string>
     <string name="error_need_assign_pitcher_first_message">Selectionnez un Pitcher avant.</string>
     <string name="error_need_assign_both_players_message">Non sauvergardé! Selectionnez à la fois le DP et le Flex</string>
-    <string name="discard_message">Voulez-vous vraiment tout effacer ? Vous perdrez toutes vos modifications.</string>
-    <string name="discard_title">Effacer les modifications ?</string>
-    <string name="generic_discard">Effacer</string>
+    <string name="discard_message">Jeter toutes les modifications ?</string>
+    <string name="discard_title">Annulation</string>
+    <string name="generic_discard">Jeter</string>
     <string name="settings_export_error_title">Impossible d\'exporter</string>
     <string name="settings_import_error_title">Impossible d\'importer</string>
     <string name="error_need_assign_pitcher_first_title">Non sauvergardé</string>
