@@ -50,7 +50,8 @@ internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private va
 
     override fun getPlayerById(playerID: Long): LiveData<Player> {
         return Transformations.map(playerDao.getPlayerById(playerID)) {
-            it.toPlayer()
+            // sometime the refresh it too quick and when the player is deleted, the player is null
+            it?.toPlayer() ?: Player(teamId = 0, name = "", shirtNumber = 0, licenseNumber = 0)
         }
     }
 
