@@ -32,6 +32,7 @@ class EasyLineupActivityTestRule<T : Activity?> : ActivityTestRule<T>, KoinCompo
         preferencesEditor.putBoolean(Constants.PREF_FEATURE_SHOW_NEW_ROSTER, false)
         preferencesEditor.putBoolean(Constants.PREF_FEATURE_SHOW_NEW_SWAP_TEAM, false)
         preferencesEditor.putBoolean(Constants.PREF_FEATURE_SHOW_REPORT_ISSUE_BUTTON, false)
+        preferencesEditor.putBoolean(Constants.PREF_FEATURE_SHOW_REORDER_HELP, false)
         preferencesEditor.commit()
     }
 }

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatTextView
@@ -15,19 +14,20 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.NavigationViewActions
-import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.viewpager2.widget.ViewPager2
+import com.adevinta.android.barista.assertion.BaristaCheckedAssertions
+import com.adevinta.android.barista.assertion.BaristaListAssertions
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions
 import com.adevinta.android.barista.interaction.*
+import com.adevinta.android.barista.internal.assertAny
 import com.adevinta.android.barista.internal.matcher.DisplayedMatchers
 import com.adevinta.android.barista.rule.cleardata.ClearPreferencesRule
 import com.google.android.libraries.cloudtesting.screenshots.ScreenShotter
-import com.telen.easylineup.dashboard.DashboardTileAdapter
-import com.telen.easylineup.team.TeamAdapter
+import com.google.android.material.chip.Chip
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.*
@@ -50,15 +50,19 @@ class GlobalNavigationTest {
 
     @Rule
     @JvmField
-    var mHomeTestRule = EasyLineupActivityTestRule(HomeActivity::class.java, initialTouchMode = true, launchActivity = false)
+    var mHomeTestRule = EasyLineupActivityTestRule(
+        HomeActivity::class.java,
+        initialTouchMode = true,
+        launchActivity = false
+    )
 
     @Rule
     @JvmField
     var clearPreferencesRule = ClearPreferencesRule()
 
 //    @Rule
-//    @JvmField
-//    var clearDatabaseRule = ClearDatabaseRule()
+////    @JvmField
+////    var clearDatabaseRule = ClearDatabaseRule()
 
     @Before
     fun init() {
@@ -71,52 +75,32 @@ class GlobalNavigationTest {
     }
 
     private fun takeScreenshot(name: String, activity: Activity) {
-
-        Thread.sleep(delay)
-        val testLabSetting = Settings.System.getString(activity.contentResolver, "firebase.test.lab")
+        BaristaSleepInteractions.sleep(delay)
+        val testLabSetting =
+            Settings.System.getString(activity.contentResolver, "firebase.test.lab")
         if ("true" == testLabSetting) {
             ScreenShotter.takeScreenshot(name, activity)
         }
-        //Screengrab.screenshot(name)
     }
 
     private fun applyRotation(name: String) {
 
         takeScreenshot("${name}_portrait", mHomeTestRule.activity)
 
-//        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-//        device.setOrientationLeft()
-
         onView(isRoot()).perform(OrientationChangeAction.orientationLandscape())
 
-        Thread.sleep(1000)
+        BaristaSleepInteractions.sleep(1000)
 
         takeScreenshot("${name}_landscape", mHomeTestRule.activity)
 
-//        device.setOrientationNatural()
         onView(isRoot()).perform(OrientationChangeAction.orientationPortrait())
 
-        Thread.sleep(1000)
-    }
-
-    private fun validateTapTarget() {
-//        Thread.sleep(delay)
-//
-//        //click on tap tap view button
-//        val tapTargetView = onView(
-//                allOf(withClassName(`is`("com.getkeepsafe.taptargetview.TapTargetView")), isDisplayed()))
-//        tapTargetView.perform(click())
-//
-//        Thread.sleep(delay)
+        BaristaSleepInteractions.sleep(2000)
     }
 
     private fun initialization() {
-
         takeScreenshot("dashboard", mHomeTestRule.activity)
-
         BaristaDrawerInteractions.openDrawer()
-
-        validateTapTarget()
     }
 
     @Test
@@ -126,19 +110,44 @@ class GlobalNavigationTest {
 
         //go to team players
         onView(withId(R.id.nav_view))
-                .perform(
-                        NavigationViewActions.navigateTo(R.id.navigation_team)
-                )
+            .perform(
+                NavigationViewActions.navigateTo(R.id.navigation_team)
+            )
 
         takeScreenshot("players", mHomeTestRule.activity)
 
         applyRotation("players")
 
-        //click on first player Albert
-        onView(withId(R.id.teamPlayersRecyclerView))
-                .perform(
-                        RecyclerViewActions.actionOnItemAtPosition<TeamAdapter.PlayerViewHolder>(0, click())
-                )
+        //check sort by name is checked
+        BaristaCheckedAssertions.assertChecked(R.id.sort_by_name)
+
+        //click on sort by shirt number
+        BaristaClickInteractions.clickOn(R.id.sort_by_shirt_number)
+
+        //check sort by shirt number is checked
+        BaristaCheckedAssertions.assertChecked(R.id.sort_by_shirt_number)
+
+        //assert first player is damien
+        BaristaListAssertions.assertDisplayedAtPosition(
+            R.id.teamPlayersRecyclerView,
+            0,
+            R.id.playerName,
+            "DAMIEN"
+        );
+
+        //click on sort by name
+        BaristaClickInteractions.clickOn(R.id.sort_by_name)
+
+        //assert first player is albert
+        BaristaListAssertions.assertDisplayedAtPosition(
+            R.id.teamPlayersRecyclerView,
+            0,
+            R.id.playerName,
+            "ALBERT"
+        );
+
+        // Click on first player Albert
+        BaristaListInteractions.clickListItem(R.id.teamPlayersRecyclerView, 0)
 
         takeScreenshot("albert_details", mHomeTestRule.activity)
 
@@ -148,106 +157,72 @@ class GlobalNavigationTest {
         applyRotation("albert_details")
 
         //click on edit action button
-        onView(withId(R.id.action_edit))
-                .perform(click())
+        BaristaMenuClickInteractions.clickMenu(R.id.action_edit)
 
         takeScreenshot("albert_edit", mHomeTestRule.activity)
 
         applyRotation("albert_edit")
 
         // 1. Check save button come back on details
-        BaristaClickInteractions.clickOn("Save")
+        BaristaClickInteractions.clickOn(R.id.playerSave)
 
         //check name is albert
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
 
-        onView(withId(R.id.action_edit))
-                .perform(click())
+        BaristaMenuClickInteractions.clickMenu(R.id.action_edit)
 
         // 2. Check cancel button come back on details
         BaristaClickInteractions.clickOn("Cancel")
 
         //confirm discard changes with dialog ok button
-        BaristaClickInteractions.clickOn(android.R.id.button1)
+        BaristaDialogInteractions.clickDialogPositiveButton()
 
         //check name is albert
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
 
-        onView(withId(R.id.action_edit))
-                .perform(click())
+        BaristaMenuClickInteractions.clickMenu(R.id.action_edit)
 
         // 3. Check back button come back on details
         pressBack()
 
         //confirm discard changes with dialog ok button
-        BaristaClickInteractions.clickOn(android.R.id.button1)
+        BaristaDialogInteractions.clickDialogPositiveButton()
 
         //check name is albert
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
 
         //click on delete action button
-        onView(withId(R.id.action_delete))
-                .perform(click())
+        BaristaMenuClickInteractions.clickMenu(R.id.action_delete)
 
         takeScreenshot("albert_delete_dialog", mHomeTestRule.activity)
 
         //confirm delete with dialog ok button
-        BaristaClickInteractions.clickOn(android.R.id.button1)
+        BaristaDialogInteractions.clickDialogPositiveButton()
 
         //click on the new first player Bernard
-        onView(withId(R.id.teamPlayersRecyclerView))
-                .perform(
-                        RecyclerViewActions.actionOnItemAtPosition<TeamAdapter.PlayerViewHolder>(0, click())
-                )
+        BaristaListInteractions.clickListItem(R.id.teamPlayersRecyclerView, 0)
 
         //check new first name is bernard
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "BERNARD")
 
         //click on edit action button
-        onView(withId(R.id.action_edit))
-                .perform(click())
+        BaristaMenuClickInteractions.clickMenu(R.id.action_edit)
 
         applyRotation("bernard_edit")
 
         //go back to bernard details
-        val appCompatImageButton2 = onView(
-                allOf(withContentDescription("Navigate up"),
-                        childAtPosition(
-                                allOf(withId(R.id.toolbar),
-                                        childAtPosition(
-                                                withClassName(`is`("com.google.android.material.appbar.AppBarLayout")),
-                                                0)),
-                                1),
-                        isDisplayed()))
-        appCompatImageButton2.perform(click())
+        clickNavigateUp()
 
         //slide in pager to estelle
         BaristaViewPagerInteractions.swipeViewPagerForward()
         BaristaViewPagerInteractions.swipeViewPagerForward()
         BaristaViewPagerInteractions.swipeViewPagerForward()
 
-        val textView4 = onView(
-                allOf(withId(R.id.playerName), withText("ESTELLE"),
-                        childAtPosition(
-                                allOf(withId(R.id.playerInformation),
-                                        childAtPosition(
-                                                IsInstanceOf.instanceOf(android.view.ViewGroup::class.java),
-                                                0)),
-                                1),
-                        isDisplayed()))
-        textView4.check(matches(withText("ESTELLE")))
+        // check the current player is Estelle
+        BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ESTELLE")
 
         //go back to list players
-        val appCompatImageButton3 = onView(
-                allOf(withContentDescription("Navigate up"),
-                        childAtPosition(
-                                allOf(withId(R.id.toolbar),
-                                        childAtPosition(
-                                                withClassName(`is`("com.google.android.material.appbar.AppBarLayout")),
-                                                0)),
-                                1),
-                        isDisplayed()))
-        appCompatImageButton3.perform(click())
+        clickNavigateUp()
 
         //add new player button clicked
         BaristaClickInteractions.clickOn(R.id.fab)
@@ -271,47 +246,26 @@ class GlobalNavigationTest {
         //save and go back to the list of players
         BaristaClickInteractions.clickOn("Save")
 
-        //TODO check new player is at the end of the list
-
         //go back to the dashboard
-        val appCompatImageButton4 = onView(
-                allOf(withContentDescription("Navigate up"),
-                        childAtPosition(
-                                allOf(withId(R.id.toolbar),
-                                        childAtPosition(
-                                                withClassName(`is`("com.google.android.material.appbar.AppBarLayout")),
-                                                0)),
-                                1),
-                        isDisplayed()))
-        appCompatImageButton4.perform(click())
+        clickNavigateUp()
 
         //click on the tile team size
-        onView(withId(R.id.tileRecyclerView))
-                .perform(
-                        RecyclerViewActions.actionOnItemAtPosition<DashboardTileAdapter.TileViewHolder>(0, click())
-                )
+        BaristaListInteractions.clickListItem(R.id.tileRecyclerView, 0)
 
         //check title Team Roster
         onView(allOf(instanceOf(AppCompatTextView::class.java), withParent(withId(R.id.toolbar))))
-                .check(matches(withText("Roster")))
+            .check(matches(withText("Roster")))
 
         //go back to dashboard
-        val appCompatImageButton5 = onView(
-                allOf(withContentDescription("Navigate up"),
-                        childAtPosition(
-                                allOf(withId(R.id.toolbar),
-                                        childAtPosition(
-                                                withClassName(`is`("com.google.android.material.appbar.AppBarLayout")),
-                                                0)),
-                                1),
-                        isDisplayed()))
-        appCompatImageButton5.perform(click())
-
-        // add some delay because of the diff utils
-        Thread.sleep(500)
+        clickNavigateUp()
 
         //check now the most used player is Bernard
-        onView(withId(R.id.tile_player_most_used_name)).check(matches(withText("BERNARD")))
+        BaristaListAssertions.assertDisplayedAtPosition(
+            R.id.tileRecyclerView,
+            1,
+            R.id.tile_player_most_used_name,
+            "BERNARD"
+        )
     }
 
     @Test
@@ -326,21 +280,19 @@ class GlobalNavigationTest {
         takeScreenshot("team_details", mHomeTestRule.activity)
 
         //click on team image button to expand card
-        onView(withId(R.id.teamTypeRepresentation))
-                .perform(click())
+        BaristaClickInteractions.clickOn(R.id.teamTypeRepresentation)
 
         // check team name is "DC UNIVERS"
         BaristaVisibilityAssertions.assertContains(R.id.teamTypeTitle, "DC Univers")
 
         // check team size is 20
-        BaristaVisibilityAssertions.assertContains( "Your team is composed of 20 members")
+        BaristaVisibilityAssertions.assertContains("Your team is composed of 20 members")
 
         // check team tournaments stats is 3T/8L
         BaristaVisibilityAssertions.assertContains("3 tournaments / 8 lineups")
 
         //click on edit action button
-        onView(withId(R.id.action_edit))
-                .perform(click())
+        BaristaMenuClickInteractions.clickMenu(R.id.action_edit)
 
         takeScreenshot("team_edit_name", mHomeTestRule.activity)
 
@@ -358,43 +310,32 @@ class GlobalNavigationTest {
         BaristaVisibilityAssertions.assertContains(R.id.buttonNext, "Finish")
 
         //choose softball type
-        onView(DisplayedMatchers.displayedAssignableFrom(ViewPager2::class.java)).perform(swipeLeft())
+        onView(DisplayedMatchers.displayedAssignableFrom(ViewPager2::class.java))
+            .perform(swipeLeft())
         //finish edit flow
         BaristaClickInteractions.clickOn(R.id.buttonNext)
 
         applyRotation("new_team_details")
 
         //click on team image button to expand card
-        onView(withId(R.id.teamTypeRepresentation))
-                .perform(click())
+        BaristaClickInteractions.clickOn(R.id.teamTypeRepresentation)
 
         // check team new name is "NewTeamName"
         BaristaVisibilityAssertions.assertContains(R.id.teamTypeTitle, "NewTeamName")
 
         // check team size is 21
-        BaristaVisibilityAssertions.assertContains( "Your team is composed of 20 members")
+        BaristaVisibilityAssertions.assertContains("Your team is composed of 20 members")
 
         // check team tournaments stats is 3T/8L
-        BaristaVisibilityAssertions.assertContains( "3 tournaments / 8 lineups")
+        BaristaVisibilityAssertions.assertContains("3 tournaments / 8 lineups")
 
         // click back on top left button
-        val appCompatImageButton7 = onView(
-                allOf(withContentDescription("Navigate up"),
-                        childAtPosition(
-                                allOf(withId(R.id.toolbar),
-                                        childAtPosition(
-                                                withClassName(`is`("com.google.android.material.appbar.AppBarLayout")),
-                                                0)),
-                                1),
-                        isDisplayed()))
-        appCompatImageButton7.perform(click())
+        clickNavigateUp()
 
         BaristaDrawerInteractions.openDrawer()
 
         //check team name is "NewTeamName"
         BaristaVisibilityAssertions.assertContains(R.id.drawerTitle, "NewTeamName")
-//        onView(allOf(instanceOf(MaterialTextView::class.java), withParent(withId(R.id.toolbar))))
-//                .check(matches(withText("NewTeamName")))
     }
 
     @Test
@@ -406,113 +347,83 @@ class GlobalNavigationTest {
 
         //go to the lineups list screen
         onView(withId(R.id.nav_view))
-                .perform(
-                        NavigationViewActions.navigateTo(R.id.navigation_lineups)
-                )
+            .perform(
+                NavigationViewActions.navigateTo(R.id.navigation_lineups)
+            )
 
         takeScreenshot("lineups_list", mHomeTestRule.activity)
 
         //click on stats tournament of the first tournament
-        val appCompatImageButton9 = onView(allOf(
-                withId(R.id.statsTournament),
-                hasSibling(withText("Paris Series")),
-                isDisplayed()))
-        appCompatImageButton9.perform(click())
+        BaristaListInteractions.clickListItemChild(R.id.recyclerView, 0, R.id.statsTournament)
 
         takeScreenshot("lineups_list_tournament_stats", mHomeTestRule.activity)
 
         applyRotation("lineups_list_tournament_stats")
 
         // go back to the list of tournaments
-        val appCompatImageButton10 = onView(
-                allOf(withContentDescription("Navigate up"),
-                        childAtPosition(
-                                allOf(withId(R.id.toolbar),
-                                        childAtPosition(
-                                                withClassName(`is`("com.google.android.material.appbar.AppBarLayout")),
-                                                0)),
-                                1),
-                        isDisplayed()))
-        appCompatImageButton10.perform(click())
+        clickNavigateUp()
 
         applyRotation("lineups_list")
 
         //click on the first lineup
         val constraintLayout = onView(
-                allOf(withId(R.id.rootView),
-                        isDescendantOfA(withId(R.id.lineupsOfTournamentRecycler)),
-                        hasDescendant(withText("DC vs DC 1")),
-                        isDisplayed()))
+            allOf(
+                withId(R.id.rootView),
+                isDescendantOfA(withId(R.id.lineupsOfTournamentRecycler)),
+                hasDescendant(withText("DC vs DC 1")),
+                isDisplayed()
+            )
+        )
         constraintLayout.perform(click())
 
         takeScreenshot("lineup_defense_fixed", mHomeTestRule.activity)
 
         //click on attack
-        onView(allOf(withText("ATTACK"), isDescendantOfA(withId(R.id.lineupTabLayout))))
-                .perform(click())
+        BaristaClickInteractions.clickOn("ATTACK")
 
         takeScreenshot("lineup_attack_fixed", mHomeTestRule.activity)
 
         //click on defense
-        onView(allOf(withText("DEFENSE"), isDescendantOfA(withId(R.id.lineupTabLayout))))
-                .perform(click())
+        BaristaClickInteractions.clickOn("DEFENSE")
 
         applyRotation("lineup_defense_fixed")
 
         //click on edit button
-        onView(withId(R.id.action_edit))
-                .perform(click())
+        BaristaMenuClickInteractions.clickMenu(R.id.action_edit)
 
         takeScreenshot("lineup_defense_editable", mHomeTestRule.activity)
 
         //click on attack
-        onView(allOf(withText("ATTACK"), isDescendantOfA(withId(R.id.lineupTabLayout))))
-                .perform(click())
+        BaristaClickInteractions.clickOn("ATTACK")
 
         takeScreenshot("lineup_attack_editable", mHomeTestRule.activity)
 
         //click on defense
-        onView(allOf(withText("DEFENSE"), isDescendantOfA(withId(R.id.lineupTabLayout))))
-                .perform(click())
+        BaristaClickInteractions.clickOn("DEFENSE")
 
         applyRotation("lineup_defense_editable")
 
         //go back to the lineup fixed
-        val appCompatImageButton11 = onView(
-                allOf(withContentDescription("Navigate up"),
-                        childAtPosition(
-                                allOf(withId(R.id.toolbar),
-                                        childAtPosition(
-                                                withClassName(`is`("com.google.android.material.appbar.AppBarLayout")),
-                                                0)),
-                                1),
-                        isDisplayed()))
-        appCompatImageButton11.perform(click())
+        clickNavigateUp()
 
         //click on edit button
-        onView(withMenuIdOrText(R.id.action_delete, R.string.action_delete))
-                .perform(click())
+        BaristaMenuClickInteractions.clickMenu(R.id.action_delete)
 
         //confirm delete with dialog ok button
-        BaristaClickInteractions.clickOn(android.R.id.button1)
+        BaristaDialogInteractions.clickDialogPositiveButton()
 
         BaristaListInteractions.scrollListToPosition(R.id.recyclerView, 0)
 
         //click on delete tournament
-
-        onView(allOf(withId(R.id.deleteTournament),
-                hasSibling(withText("PARIS SERIES")),
-                isDisplayed())).perform(click())
+        BaristaListInteractions.clickListItemChild(R.id.recyclerView, 0, R.id.deleteTournament)
 
         takeScreenshot("lineup_delete_popup", mHomeTestRule.activity)
 
         //confirm delete with dialog ok button
-        BaristaClickInteractions.clickOn(android.R.id.button1)
+        BaristaDialogInteractions.clickDialogPositiveButton()
 
         //click on add lineup
         BaristaClickInteractions.clickOn(R.id.fab)
-
-        validateTapTarget()
 
         BaristaEditTextInteractions.writeTo(R.id.lineupTitleInput, "NewLineup")
         BaristaEditTextInteractions.writeTo(R.id.tournamentChoiceAutoComplete, "NewTournament")
@@ -573,12 +484,24 @@ class GlobalNavigationTest {
         takeScreenshot("swap_team_dialog", mHomeTestRule.activity)
 
         //click on create
-        BaristaClickInteractions.clickOn(android.R.id.button1)
+        BaristaDialogInteractions.clickDialogPositiveButton()
 
         applyRotation("create_team")
 
         //call the new team toto
         BaristaEditTextInteractions.writeTo(R.id.teamNameInput, "toto")
+
+        // open dialog and clicking cancel button on dialog
+        BaristaClickInteractions.clickOn(R.id.buttonPrevious)
+        BaristaDialogInteractions.clickDialogNegativeButton()
+
+        // change screen and come back
+        BaristaClickInteractions.clickOn(R.id.buttonNext)
+        BaristaClickInteractions.clickOn(R.id.buttonPrevious)
+
+        // open dialog and close it by press physical back button
+        pressBack()
+        pressBack()
 
         //click next again
         BaristaClickInteractions.clickOn(R.id.buttonNext)
@@ -595,7 +518,7 @@ class GlobalNavigationTest {
 
         //click on team image button to expand card
         onView(withId(R.id.teamTypeRepresentation))
-                .perform(click())
+            .perform(click())
 
         // check team name is "TOTO"
         BaristaVisibilityAssertions.assertContains(R.id.teamTypeTitle, "toto")
@@ -612,33 +535,16 @@ class GlobalNavigationTest {
 
         BaristaClickInteractions.clickOn(R.id.changeTeam)
 
-        //check first entry is NewTeam
-        val textView20 = onView(
-                allOf(withId(R.id.name),
-                        withText("DC Univers"),
-                        childAtPosition(
-                                allOf(withId(R.id.details_container),
-                                        childAtPosition(
-                                                IsInstanceOf.instanceOf(android.widget.LinearLayout::class.java),
-                                                1)),
-                                0),
-                        isDisplayed()))
-        textView20.check(matches(withText("DC Univers")))
+        //check first entry is DC Univers
+        BaristaListAssertions.assertDisplayedAtPosition(R.id.list, 0, R.id.name, "DC Univers")
 
-//        val textView21 = onView(
-//                allOf(withId(R.id.name), withText("toto"),
-//                        childAtPosition(
-//                                allOf(withId(R.id.details_container),
-//                                        childAtPosition(
-//                                                IsInstanceOf.instanceOf(android.widget.LinearLayout::class.java),
-//                                                1)),
-//                                0),
-//                        isDisplayed()))
-//        textView21.check(matches(withText("toto")))
+        //check second entry is toto
+        BaristaListAssertions.assertDisplayedAtPosition(R.id.list, 1, R.id.name, "toto")
     }
 
     private fun childAtPosition(
-            parentMatcher: Matcher<View>, position: Int): Matcher<View> {
+        parentMatcher: Matcher<View>, position: Int
+    ): Matcher<View> {
 
         return object : TypeSafeMatcher<View>() {
             override fun describeTo(description: Description) {
@@ -660,8 +566,32 @@ class GlobalNavigationTest {
             onView(matcher).check(matches(isDisplayed()))
             matcher
         } catch (NoMatchingViewException: Exception) {
-            openActionBarOverflowOrOptionsMenu(InstrumentationRegistry.getInstrumentation().targetContext)
+            openActionBarOverflowOrOptionsMenu(
+                InstrumentationRegistry.getInstrumentation().targetContext
+            )
             withText(menuText)
         }
+    }
+
+    fun clickNavigateUp() {
+        val appCompatImageButton10 = onView(
+            allOf(
+                withContentDescription("Navigate up"),
+                childAtPosition(
+                    allOf(
+                        withId(R.id.toolbar),
+                        childAtPosition(
+                            withClassName(
+                                `is`("com.google.android.material.appbar.AppBarLayout")
+                            ),
+                            0
+                        )
+                    ),
+                    1
+                ),
+                isDisplayed()
+            )
+        )
+        appCompatImageButton10.perform(click())
     }
 }
