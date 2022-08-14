@@ -133,7 +133,7 @@ class GlobalNavigationTest {
             0,
             R.id.playerName,
             "DAMIEN"
-        );
+        )
 
         //click on sort by name
         BaristaClickInteractions.clickOn(R.id.sort_by_name)
@@ -144,7 +144,7 @@ class GlobalNavigationTest {
             0,
             R.id.playerName,
             "ALBERT"
-        );
+        )
 
         // Click on first player Albert
         BaristaListInteractions.clickListItem(R.id.teamPlayersRecyclerView, 0)
@@ -172,7 +172,7 @@ class GlobalNavigationTest {
         BaristaMenuClickInteractions.clickMenu(R.id.action_edit)
 
         // 2. Check cancel button come back on details
-        BaristaClickInteractions.clickOn("Cancel")
+        BaristaClickInteractions.clickOn(R.id.cancel)
 
         //confirm discard changes with dialog ok button
         BaristaDialogInteractions.clickDialogPositiveButton()
@@ -245,6 +245,23 @@ class GlobalNavigationTest {
 
         //save and go back to the list of players
         BaristaClickInteractions.clickOn("Save")
+
+        //add new player button clicked
+        BaristaClickInteractions.clickOn(R.id.fab)
+
+        //fill name with Aaa
+        BaristaEditTextInteractions.writeTo(R.id.playerNameInput, "Aaa")
+
+        //save and go back to the list of players
+        BaristaClickInteractions.clickOn("Save")
+
+        //assert first player is albert
+        BaristaListAssertions.assertDisplayedAtPosition(
+            R.id.teamPlayersRecyclerView,
+            0,
+            R.id.playerName,
+            "AAA"
+        )
 
         //go back to the dashboard
         clickNavigateUp()
