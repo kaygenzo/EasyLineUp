@@ -6,7 +6,6 @@ import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
-import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -42,18 +41,20 @@ class TeamViewModel : ViewModel(), KoinComponent {
         private set
     var displayType: DisplayType = DisplayType.GRID
         private set
-    private var playerList = mutableListOf<Player>()
+    private var playerList = listOf<Player>()
 
     init {
         val observer = Observer<List<Player>> {
-            playerList = it.toMutableList()
+            playerList = it
             _playersMediator.postValue(playerList)
         }
         _playersMediator.addSource(_playersFromDao, observer)
         _playersMediator.addSource(_players, observer)
     }
 
-    fun observePlayers(): MediatorLiveData<List<Player>> = _playersMediator
+    fun observePlayers(): LiveData<List<Player>> = Transformations.map(_playersMediator) {
+        sortPlayers(it)
+    }
 
     fun observeDisplayType(): LiveData<DisplayType> = _displayType
 
@@ -118,14 +119,17 @@ class TeamViewModel : ViewModel(), KoinComponent {
 
     fun setSortType(sortType: SortType) {
         this.sortType = sortType
-        playerList = when (sortType) {
+        _players.postValue(playerList)
+    }
+
+    private fun sortPlayers(listPlayers: List<Player>): List<Player> {
+        return when (sortType) {
             SortType.ALPHA -> {
-                playerList.sortedBy { it.name }.toMutableList()
+                listPlayers.sortedBy { it.name }.toMutableList()
             }
             SortType.NUMERIC -> {
-                playerList.sortedBy { it.shirtNumber }.toMutableList()
+                listPlayers.sortedBy { it.shirtNumber }.toMutableList()
             }
         }
-        _players.postValue(playerList)
     }
 }
