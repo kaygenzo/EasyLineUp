@@ -102,10 +102,16 @@ jobs:
 workflows:
   build-deploy:
     jobs:
-      - pre-build
+      - pre-build:
+          filters:
+            tags:
+              only: /([0-9]+\.?){1,4}/
       - unit-tests:
           requires:
             - pre-build
+          filters:
+            tags:
+              only: /([0-9]+\.?){1,4}/
       - build-prod:
           requires:
             - unit-tests
@@ -114,6 +120,9 @@ workflows:
                 command: |
                   rm telen.release.jks
                   rm app/google-services.json
+          filters:
+            tags:
+              only: /([0-9]+\.?){1,4}/
       - android-tests-build:
           requires:
             - build-prod
