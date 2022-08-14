@@ -80,7 +80,6 @@ jobs:
           at: .
       - run: 
           command: |
-              bundle install
               git rev-parse --abbrev-ref HEAD > releasenotes.txt
               git log -1 --pretty="%B %ad" >> releasenotes.txt
               ./gradlew assembleProdRelease appDistributionUploadProdRelease
@@ -94,6 +93,7 @@ jobs:
       - run:
           command: |
             ./gradlew bundleProdRelease
+            bundle install
             bundle exec fastlane deploy_to_alpha
       - store_artifacts:
           path: app/build/outputs/mapping/prodRelease/mapping.txt
