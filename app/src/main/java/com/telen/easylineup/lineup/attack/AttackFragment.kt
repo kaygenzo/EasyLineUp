@@ -63,7 +63,7 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
             disposables.add(eventsDisposable)
         }
 
-        val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
+        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val lineupValue = preferences.getString(getString(R.string.key_lineup_style), getString(R.string.lineup_style_default_value))
 
         val lineupMode = viewModel.lineupMode

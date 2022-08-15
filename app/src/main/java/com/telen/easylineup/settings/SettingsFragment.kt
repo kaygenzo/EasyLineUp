@@ -46,15 +46,15 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     override fun onResume() {
         super.onResume()
-        preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        preferenceManager.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onPause() {
         super.onPause()
-        preferenceManager.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        preferenceManager.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val v = super.onCreateView(inflater, container, savedInstanceState)
 
         val eventsDisposable = viewModel.observeEvent().subscribe({
@@ -122,8 +122,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         disposables.clear()
     }
 
-    override fun onPreferenceTreeClick(preference: Preference?): Boolean {
-        when(preference?.key) {
+    override fun onPreferenceTreeClick(preference: Preference): Boolean {
+        when(preference.key) {
             getString(R.string.key_play_store) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_play_store")
                 try {
@@ -176,7 +176,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     private fun updateLineupStyleSummary() {
         val lineupStylePreference = findPreference<Preference>(getString(R.string.key_lineup_style))
-        preferenceManager.sharedPreferences.getString(getString(R.string.key_lineup_style), getString(R.string.lineup_style_default_value))?.let {
+        preferenceManager.sharedPreferences?.getString(getString(R.string.key_lineup_style), getString(R.string.lineup_style_default_value))?.let {
             val styleValue = it.toInt()
             lineupStylePreference?.summary = resources.getStringArray(R.array.pref_lineup_font_style_labels)[styleValue]
         }

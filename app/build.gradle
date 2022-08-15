@@ -165,7 +165,7 @@ dependencies {
     ////////// ANDROID X //////////
 
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
-    implementation "androidx.preference:preference:$preferenceVersion"
+    implementation "androidx.preference:preference-ktx:$preferenceVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     // ViewModel and LiveData
