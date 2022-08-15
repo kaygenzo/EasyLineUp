@@ -8,9 +8,9 @@ import com.telen.easylineup.domain.model.TournamentWithLineup
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.repository.dao.LineupDao
 import com.telen.easylineup.repository.model.*
-import io.reactivex.Completable
-import io.reactivex.Maybe
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Maybe
+import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
 
 internal class LineupRepositoryImpl(private val lineupDao: LineupDao): LineupRepository {

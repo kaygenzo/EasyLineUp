@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
-import io.reactivex.Observable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 
 internal class SaveCurrentTeam(val dao: TeamRepository): UseCase<SaveCurrentTeam.RequestValues, SaveCurrentTeam.ResponseValue>() {
 

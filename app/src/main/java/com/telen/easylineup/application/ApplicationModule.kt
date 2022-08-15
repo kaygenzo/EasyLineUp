@@ -1,7 +1,7 @@
 package com.telen.easylineup.application
 
 import com.telen.easylineup.reporting.BugReporterManager
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 

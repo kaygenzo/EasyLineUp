@@ -3,7 +3,7 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.usecases.GetDPAndFlexFromPlayersInField
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
-import io.reactivex.observers.TestObserver
+import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test

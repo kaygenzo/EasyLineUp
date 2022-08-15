@@ -4,7 +4,7 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.model.*
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class DeletePlayerFieldPosition(private val dao: PlayerFieldPositionRepository): UseCase<DeletePlayerFieldPosition.RequestValues, DeletePlayerFieldPosition.ResponseValue>() {
 

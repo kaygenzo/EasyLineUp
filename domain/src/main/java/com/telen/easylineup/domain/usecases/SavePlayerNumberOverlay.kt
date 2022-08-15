@@ -5,7 +5,7 @@ import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class SavePlayerNumberOverlay(private val playerRepository: PlayerRepository): UseCase<SavePlayerNumberOverlay.RequestValues, SavePlayerNumberOverlay.ResponseValue>() {
 

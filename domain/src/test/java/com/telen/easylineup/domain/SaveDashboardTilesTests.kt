@@ -3,16 +3,11 @@ package com.telen.easylineup.domain
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.DashboardTile
-import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.tiles.TileType
-import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.repository.TilesRepository
-import com.telen.easylineup.domain.usecases.GetPlayer
 import com.telen.easylineup.domain.usecases.SaveDashboardTiles
-import com.telen.easylineup.domain.usecases.exceptions.NotExistingPlayer
-import io.reactivex.Completable
-import io.reactivex.Single
-import io.reactivex.observers.TestObserver
+import io.reactivex.rxjava3.observers.TestObserver
+import io.reactivex.rxjava3.core.Completable
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -21,7 +16,6 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
-import java.lang.IllegalStateException
 
 
 @RunWith(MockitoJUnitRunner::class)

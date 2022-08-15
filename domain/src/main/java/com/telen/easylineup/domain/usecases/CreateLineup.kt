@@ -9,8 +9,7 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
-import io.reactivex.Single
-import java.lang.Exception
+import io.reactivex.rxjava3.core.Single
 
 internal class CreateLineup(private val tournamentDao: TournamentRepository, private val lineupsDao: LineupRepository): UseCase<CreateLineup.RequestValues, CreateLineup.ResponseValue>() {
 

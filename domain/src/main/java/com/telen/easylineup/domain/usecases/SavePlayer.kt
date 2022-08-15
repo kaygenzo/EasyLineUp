@@ -8,7 +8,7 @@ import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.domain.utils.ValidatorUtils
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class SavePlayer(val dao: PlayerRepository): UseCase<SavePlayer.RequestValues, SavePlayer.ResponseValue>() {
 

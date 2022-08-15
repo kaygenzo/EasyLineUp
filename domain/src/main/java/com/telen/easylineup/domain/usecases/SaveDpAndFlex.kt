@@ -4,7 +4,7 @@ import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 
 internal class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPositionRepository): UseCase<SaveDpAndFlex.RequestValues, SaveDpAndFlex.ResponseValue>() {

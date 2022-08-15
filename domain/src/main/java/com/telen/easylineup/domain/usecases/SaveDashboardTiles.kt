@@ -2,11 +2,8 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.DashboardTile
-import com.telen.easylineup.domain.model.Team
-import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.repository.TilesRepository
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class SaveDashboardTiles(val dao: TilesRepository): UseCase<SaveDashboardTiles.RequestValues, SaveDashboardTiles.ResponseValue>() {
 

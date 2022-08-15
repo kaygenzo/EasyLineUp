@@ -5,9 +5,9 @@ import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.DeleteLineup
-import io.reactivex.Completable
-import io.reactivex.Single
-import io.reactivex.observers.TestObserver
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

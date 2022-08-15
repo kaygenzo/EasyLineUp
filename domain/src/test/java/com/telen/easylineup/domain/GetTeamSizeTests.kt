@@ -5,8 +5,8 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.tiles.KEY_DATA_SIZE
 import com.telen.easylineup.domain.model.tiles.KEY_DATA_TEAM_IMAGE
 import com.telen.easylineup.domain.repository.PlayerRepository
-import io.reactivex.Single
-import io.reactivex.observers.TestObserver
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test

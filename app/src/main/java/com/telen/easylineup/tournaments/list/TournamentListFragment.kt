@@ -24,8 +24,8 @@ import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.utils.hideSoftKeyboard
 import com.telen.easylineup.views.OnSearchBarListener
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_list_tournaments.*
 import kotlinx.android.synthetic.main.fragment_list_tournaments.view.*
 import timber.log.Timber

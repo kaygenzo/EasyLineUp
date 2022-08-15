@@ -11,8 +11,8 @@ import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.splashscreen.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject

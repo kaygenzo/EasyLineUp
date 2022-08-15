@@ -64,9 +64,9 @@ dependencies {
 
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-rxjava2:$room_version"
+    implementation "androidx.room:room-rxjava3:$room_version"
 
-    implementation "io.reactivex.rxjava2:rxjava:2.2.14"
+    implementation "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
     implementation project(path: ':domain')
 
     implementation "io.insert-koin:koin-android:$koinVersion"

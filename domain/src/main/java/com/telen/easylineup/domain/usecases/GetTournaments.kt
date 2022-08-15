@@ -3,7 +3,7 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.model.Tournament
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class GetTournaments(val dao: TournamentRepository): UseCase<GetTournaments.RequestValues, GetTournaments.ResponseValue>() {
 

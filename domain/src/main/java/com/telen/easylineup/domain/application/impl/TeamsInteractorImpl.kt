@@ -10,10 +10,10 @@ import com.telen.easylineup.domain.model.TeamCreationStep
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.*
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
-import io.reactivex.Completable
-import io.reactivex.Single
-import io.reactivex.subjects.PublishSubject
-import io.reactivex.subjects.Subject
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.subjects.PublishSubject
+import io.reactivex.rxjava3.subjects.Subject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 

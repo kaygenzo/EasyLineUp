@@ -1,7 +1,7 @@
 package com.telen.easylineup
 
 import androidx.appcompat.app.AppCompatActivity
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 abstract class BaseActivity: AppCompatActivity() {
     protected val disposables by lazy { CompositeDisposable() }

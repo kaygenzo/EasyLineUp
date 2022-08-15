@@ -5,9 +5,9 @@ import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.export.ExportBase
-import io.reactivex.Completable
-import io.reactivex.Single
-import io.reactivex.subjects.Subject
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.subjects.Subject
 
 interface DataInteractor {
     fun getDashboardConfigurations(): LiveData<List<DashboardTile>>

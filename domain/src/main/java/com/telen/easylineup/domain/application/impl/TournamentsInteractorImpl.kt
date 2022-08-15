@@ -9,8 +9,8 @@ import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.TournamentStatsUIConfig
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.*
-import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 

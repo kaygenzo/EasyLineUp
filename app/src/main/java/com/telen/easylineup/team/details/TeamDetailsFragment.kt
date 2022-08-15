@@ -16,7 +16,7 @@ import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.tournaments.list.LineupViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import io.reactivex.Completable
+import io.reactivex.rxjava3.core.Completable
 
 class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
 

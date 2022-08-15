@@ -14,8 +14,8 @@ import com.telen.easylineup.repository.model.RoomPlayer
 import com.telen.easylineup.repository.model.init
 import com.telen.easylineup.repository.model.toPlayer
 import com.telen.easylineup.repository.model.toPlayerWithPosition
-import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
 
 internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private val numberOverlayDao: PlayerNumberOverlayDao): PlayerRepository {

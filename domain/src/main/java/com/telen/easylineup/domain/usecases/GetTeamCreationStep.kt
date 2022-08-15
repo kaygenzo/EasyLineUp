@@ -5,7 +5,7 @@ import com.telen.easylineup.domain.R
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.StepConfiguration
 import com.telen.easylineup.domain.model.TeamCreationStep
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal abstract class GetTeamCreationStep: UseCase<GetTeamCreationStep.RequestValues, GetTeamCreationStep.ResponseValue>() {
     class ResponseValue(val config: StepConfiguration): UseCase.ResponseValue

@@ -6,8 +6,8 @@ import com.telen.easylineup.repository.dao.TilesDao
 import com.telen.easylineup.repository.model.RoomTile
 import com.telen.easylineup.repository.model.init
 import com.telen.easylineup.repository.model.toDashboardTile
-import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 
 internal class TileRepositoryImpl(private val tilesDao: TilesDao): TilesRepository {
     override fun getTiles(): Single<List<DashboardTile>> {

@@ -9,8 +9,8 @@ import com.telen.easylineup.domain.model.tiles.KEY_DATA_NAME
 import com.telen.easylineup.domain.model.tiles.KEY_DATA_SHIRT_NUMBER
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
-import io.reactivex.Single
-import io.reactivex.observers.TestObserver
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test

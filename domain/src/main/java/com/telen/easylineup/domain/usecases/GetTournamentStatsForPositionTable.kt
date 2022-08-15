@@ -5,7 +5,7 @@ import com.telen.easylineup.domain.R
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.repository.LineupRepository
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class GetTournamentStatsForPositionTable(val dao: LineupRepository): UseCase<GetTournamentStatsForPositionTable.RequestValues, GetTournamentStatsForPositionTable.ResponseValue>() {
 

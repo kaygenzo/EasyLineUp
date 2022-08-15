@@ -6,7 +6,7 @@ import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.exceptions.FirstPositionEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.SamePlayerException
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class SwitchPlayersPosition(val dao: PlayerFieldPositionRepository): UseCase<SwitchPlayersPosition.RequestValues, SwitchPlayersPosition.ResponseValue>() {
 

@@ -3,7 +3,7 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class CheckTeam: UseCase<CheckTeam.RequestValues, CheckTeam.ResponseValue>() {
 

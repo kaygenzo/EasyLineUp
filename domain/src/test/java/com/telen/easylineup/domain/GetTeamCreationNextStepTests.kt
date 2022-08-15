@@ -4,7 +4,7 @@ import android.view.View
 import com.telen.easylineup.domain.model.TeamCreationStep
 import com.telen.easylineup.domain.usecases.GetTeamCreationNextStep
 import com.telen.easylineup.domain.usecases.GetTeamCreationStep
-import io.reactivex.observers.TestObserver
+import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test

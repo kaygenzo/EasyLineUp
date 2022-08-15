@@ -2,7 +2,7 @@ package com.telen.easylineup
 
 import androidx.fragment.app.Fragment
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 abstract class BaseFragment(private val fragmentName: String): Fragment() {
     protected val disposables by lazy { CompositeDisposable() }

@@ -21,7 +21,7 @@ buildscript {
         espressoVersion = "3.3.0-alpha02"
         junitVersion = "4.12"
         lifecycle_version = "2.2.0"
-        room_version = "2.2.5"
+        room_version = "2.4.3"
         nav_version_ktx = "2.3.1"
         koinVersion = "2.0.1"
         detektVersion = "1.19.0"
@@ -43,7 +43,8 @@ buildscript {
         legacySupportVersion = "1.0.0"
 
         timberVersion = "4.7.1"
-        rxAndroidVersion = "2.1.1"
+        rxAndroidVersion = "3.0.0"
+        rxJavaVersion = "3.0.0"
         stepViewVersion = "1.5.1"
         roundedImageView = "2.3.0"
         expandablelayoutVersion = "2.9.2"

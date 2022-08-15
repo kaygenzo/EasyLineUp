@@ -13,9 +13,9 @@ import com.telen.easylineup.domain.model.TeamCreationStep
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.team.createTeam.teamType.TeamTypeCardItem
-import io.reactivex.Completable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.subjects.PublishSubject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber

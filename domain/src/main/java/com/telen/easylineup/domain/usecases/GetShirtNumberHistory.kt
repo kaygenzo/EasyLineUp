@@ -3,8 +3,8 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.repository.PlayerRepository
-import io.reactivex.Observable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 
 internal class GetShirtNumberHistory(private val playersRepo: PlayerRepository): UseCase<GetShirtNumberHistory.RequestValues, GetShirtNumberHistory.ResponseValue>() {
 

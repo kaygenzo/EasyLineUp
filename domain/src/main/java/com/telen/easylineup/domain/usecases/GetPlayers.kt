@@ -3,7 +3,7 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class GetPlayers(val dao: PlayerRepository): UseCase<GetPlayers.RequestValues, GetPlayers.ResponseValue>() {
 

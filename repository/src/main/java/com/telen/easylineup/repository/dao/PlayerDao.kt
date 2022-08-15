@@ -6,8 +6,8 @@ import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.repository.model.RoomPlayer
 import com.telen.easylineup.repository.model.RoomPlayerWithPosition
 import com.telen.easylineup.repository.model.RoomShirtNumberEntry
-import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 
 @Dao
 internal interface PlayerDao {

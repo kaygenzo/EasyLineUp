@@ -15,11 +15,11 @@ import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.usecases.*
-import io.reactivex.Completable
-import io.reactivex.Single
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
-import io.reactivex.subjects.Subject
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.subjects.PublishSubject
+import io.reactivex.rxjava3.subjects.Subject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.text.SimpleDateFormat

@@ -10,8 +10,8 @@ import com.telen.easylineup.domain.model.Tournament
 import com.telen.library.widget.tablemultiscroll.views.CellConfiguration
 import com.telen.library.widget.tablemultiscroll.views.Highlight
 import com.telen.library.widget.tablemultiscroll.views.StyleConfiguration
-import io.reactivex.Single
-import io.reactivex.disposables.Disposable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.Disposable
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import timber.log.Timber

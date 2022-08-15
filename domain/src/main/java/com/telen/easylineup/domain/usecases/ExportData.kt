@@ -4,9 +4,9 @@ import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.repository.*
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.model.export.*
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 
 internal interface ValidationCallback {
     fun isNetworkUrl(url: String?): Boolean

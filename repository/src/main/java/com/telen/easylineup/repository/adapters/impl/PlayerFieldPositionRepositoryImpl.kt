@@ -9,9 +9,9 @@ import com.telen.easylineup.domain.model.PositionWithLineup
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.repository.dao.PlayerFieldPositionsDao
 import com.telen.easylineup.repository.model.*
-import io.reactivex.Completable
-import io.reactivex.Maybe
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Maybe
+import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
 
 internal class PlayerFieldPositionRepositoryImpl(private val playerFieldPositionsDao: PlayerFieldPositionsDao): PlayerFieldPositionRepository {

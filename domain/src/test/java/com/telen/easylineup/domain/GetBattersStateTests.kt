@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.usecases.GetBattersState
-import io.reactivex.observers.TestObserver
+import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -428,7 +428,7 @@ internal abstract class GetBattersStateTests(protected val teamType: TeamType, p
     protected fun applyUserCase() {
         mGetBattersState.executeUseCase(GetBattersState.RequestValues(context, players, teamType.id, batterSize, extraHittersSize, false, isEditable))
                 .subscribe(observer)
-        observer.awaitTerminalEvent()
+        observer.await()
     }
 
     @Test

@@ -3,7 +3,7 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class GetDPAndFlexFromPlayersInField: UseCase<GetDPAndFlexFromPlayersInField.RequestValues, GetDPAndFlexFromPlayersInField.ResponseValue>() {
 

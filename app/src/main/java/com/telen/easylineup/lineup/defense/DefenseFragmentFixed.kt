@@ -8,12 +8,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.FieldPosition
-import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.lineup.PlayersPositionViewModel
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_lineup_defense_fixed.view.*
 import java.util.concurrent.TimeUnit
 

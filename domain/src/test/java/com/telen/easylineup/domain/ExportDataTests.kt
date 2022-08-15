@@ -6,8 +6,8 @@ import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.repository.*
 import com.telen.easylineup.domain.usecases.ExportData
 import com.telen.easylineup.domain.usecases.ValidationCallback
-import io.reactivex.Single
-import io.reactivex.observers.TestObserver
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test

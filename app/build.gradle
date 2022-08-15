@@ -25,11 +25,11 @@ else {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "com.telen.easylineup"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode appVersionCode
         versionName appVersionName
         testInstrumentationRunner "com.telen.easylineup.EasylineupAndroidTestRunner"
@@ -196,7 +196,7 @@ dependencies {
     ////////// OTHERS //////////
 
     implementation "com.jakewharton.timber:timber:$timberVersion"
-    implementation "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
+    implementation "io.reactivex.rxjava3:rxandroid:$rxAndroidVersion"
     implementation "com.github.PhilJay:MPAndroidChart:$androidchartVersion"
     implementation "com.squareup.picasso:picasso:$picassoVersion"
     implementation "com.makeramen:roundedimageview:$roundedImageView"

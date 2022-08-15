@@ -1,8 +1,8 @@
 package com.telen.easylineup.domain.repository
 
 import com.telen.easylineup.domain.model.Tournament
-import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 
 interface TournamentRepository {
     fun getTournaments(): Single<List<Tournament>>

@@ -2,7 +2,7 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.repository.LineupRepository
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 import java.lang.Exception
 
 internal class SaveLineupMode(private val lineupDao: LineupRepository): UseCase<SaveLineupMode.RequestValues, SaveLineupMode.ResponseValue>() {

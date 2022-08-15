@@ -4,8 +4,8 @@ import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.DeletePlayer
-import io.reactivex.Completable
-import io.reactivex.observers.TestObserver
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

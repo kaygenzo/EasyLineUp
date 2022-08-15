@@ -4,8 +4,7 @@ import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.exceptions.NotExistingPlayer
-import io.reactivex.Single
-import java.lang.Exception
+import io.reactivex.rxjava3.core.Single
 
 internal class GetPlayer(val dao: PlayerRepository): UseCase<GetPlayer.RequestValues, GetPlayer.ResponseValue>() {
 

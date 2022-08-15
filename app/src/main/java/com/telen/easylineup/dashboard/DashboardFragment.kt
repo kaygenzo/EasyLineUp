@@ -26,7 +26,7 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.tiles.*
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.*
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.home_main_content.*
 import timber.log.Timber
 import java.text.DateFormat

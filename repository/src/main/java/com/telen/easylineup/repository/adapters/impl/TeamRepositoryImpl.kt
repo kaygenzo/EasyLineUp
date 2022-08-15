@@ -8,8 +8,8 @@ import com.telen.easylineup.repository.dao.TeamDao
 import com.telen.easylineup.repository.model.RoomTeam
 import com.telen.easylineup.repository.model.init
 import com.telen.easylineup.repository.model.toTeam
-import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
 
 internal class TeamRepositoryImpl(private val teamDao: TeamDao): TeamRepository {

@@ -6,7 +6,7 @@ import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.toPlayerFieldPosition
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class SaveBattingOrder(private val lineupDao: PlayerFieldPositionRepository): UseCase<SaveBattingOrder.RequestValues, SaveBattingOrder.ResponseValue>() {
 

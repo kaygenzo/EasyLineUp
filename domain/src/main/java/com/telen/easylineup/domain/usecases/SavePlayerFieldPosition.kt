@@ -4,7 +4,7 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositionRepository): UseCase<SavePlayerFieldPosition.RequestValues, SavePlayerFieldPosition.ResponseValue>() {
 

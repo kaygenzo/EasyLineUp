@@ -3,12 +3,11 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
-import com.telen.easylineup.domain.model.RosterItem
-import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.TeamRosterSummary
+import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class GetRoster(private val dao: PlayerRepository, private val lineupDao: LineupRepository): UseCase<GetRoster.RequestValues, GetRoster.ResponseValue>() {
 

@@ -5,7 +5,7 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.toPlayer
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class GetOnlyPlayersInField: UseCase<GetOnlyPlayersInField.RequestValues, GetOnlyPlayersInField.ResponseValue>() {
 

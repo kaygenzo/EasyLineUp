@@ -1,8 +1,8 @@
 package com.telen.easylineup.domain
 
-import io.reactivex.Scheduler
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 

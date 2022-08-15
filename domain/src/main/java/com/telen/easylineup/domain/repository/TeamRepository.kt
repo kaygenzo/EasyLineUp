@@ -2,8 +2,8 @@ package com.telen.easylineup.domain.repository
 
 import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.Team
-import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 
 interface TeamRepository {
     fun insertTeam(team: Team): Single<Long>

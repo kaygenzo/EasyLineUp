@@ -4,7 +4,7 @@ import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.repository.TeamRepository
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 
 internal class SaveTeam(val dao: TeamRepository): UseCase<SaveTeam.RequestValues, SaveTeam.ResponseValue>() {
 

@@ -4,10 +4,9 @@ import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.StepConfiguration
 import com.telen.easylineup.domain.model.Team
-import io.reactivex.Completable
-import io.reactivex.Single
-import io.reactivex.subjects.PublishSubject
-import io.reactivex.subjects.Subject
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.subjects.Subject
 
 interface TeamsInteractor {
     fun getTeam(): Single<Team>
