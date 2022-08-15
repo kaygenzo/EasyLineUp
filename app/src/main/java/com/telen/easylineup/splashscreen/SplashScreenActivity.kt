@@ -14,8 +14,8 @@ import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.splashscreen.*
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.util.concurrent.TimeUnit
 
 class SplashScreenActivity: BaseImportActivity(), KoinComponent {

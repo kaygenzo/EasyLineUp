@@ -12,8 +12,8 @@ import com.telen.library.widget.tablemultiscroll.views.Highlight
 import com.telen.library.widget.tablemultiscroll.views.StyleConfiguration
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
 
 class TournamentStatisticsViewModel: ViewModel(), KoinComponent {

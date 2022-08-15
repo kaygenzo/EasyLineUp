@@ -7,8 +7,8 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
 
 class TeamViewModel : ViewModel(), KoinComponent {

@@ -1,7 +1,7 @@
 package com.telen.easylineup.domain.application
 
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 internal class ApplicationInteractorImpl : ApplicationInteractor, KoinComponent {
 
