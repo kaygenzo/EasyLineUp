@@ -10,27 +10,27 @@
         android:id="@+id/baseballFieldView"
         android:layout_width="@dimen/field_size"
         android:layout_height="@dimen/field_size"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.telen.easylineup.views.NormalUppercaseStyledTextView
         android:id="@+id/substituteLabel"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/baseballFieldView"
         android:layout_marginTop="@dimen/default_margin"
+        app:layout_constraintStart_toStartOf="@+id/baseballFieldView"
+        app:layout_constraintEnd_toEndOf="@+id/baseballFieldView"
         android:text="@string/new_lineup_substitute_label"/>
 
     <GridLayout
         android:id="@+id/substituteContainer"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="@id/baseballFieldView"
+        app:layout_constraintEnd_toEndOf="@id/baseballFieldView"
         app:layout_constraintTop_toBottomOf="@+id/substituteLabel"
-        android:background="@drawable/blackboard_border">
-
-    </GridLayout>
+        android:background="@drawable/blackboard_border"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

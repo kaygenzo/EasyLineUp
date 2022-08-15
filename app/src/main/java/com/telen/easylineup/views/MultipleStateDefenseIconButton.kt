@@ -67,14 +67,14 @@ class MultipleStateDefenseIconButton: ConstraintLayout {
             }
             StateDefense.PLAYER -> {
                 designatedPlayerLabel.visibility = View.GONE
-                fab.visibility = View.GONE
+                fab.visibility = View.INVISIBLE
                 fab.setImageResource(0)
                 imagePlayerContainer.visibility = View.VISIBLE
                 progressIcon.visibility = View.GONE
             }
             StateDefense.NONE -> {
                 designatedPlayerLabel.visibility = View.GONE
-                fab.visibility = View.GONE
+                fab.visibility = View.INVISIBLE
                 fab.setImageResource(0)
                 imagePlayerContainer.visibility = View.GONE
                 progressIcon.visibility = View.GONE

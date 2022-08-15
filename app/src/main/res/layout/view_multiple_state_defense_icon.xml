@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:fabSize="normal"
-        tools:visibility="visible"/>
+        tools:visibility="visible"
+        android:visibility="visible"/>
 
     <ProgressBar
         android:id="@+id/progressIcon"
@@ -68,7 +69,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/fab"
         app:layout_constraintLeft_toLeftOf="@+id/fab"
         app:layout_constraintRight_toRightOf="@+id/fab"
-        tools:visibility="invisible">
+        android:visibility="invisible">
 
         <ImageView
             android:id="@+id/playerImage"
