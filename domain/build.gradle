@@ -13,12 +13,11 @@ if (sonarPropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 28
-
+    compileSdkVersion compileVersion
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 28
+        minSdkVersion minVersion
+        targetSdkVersion targetVersion
         versionCode 1
         versionName "1.0"
 

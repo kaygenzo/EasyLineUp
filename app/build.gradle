@@ -25,11 +25,11 @@ else {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion compileVersion
     defaultConfig {
         applicationId "com.telen.easylineup"
-        minSdkVersion 21
-        targetSdkVersion 31
+        minSdkVersion minVersion
+        targetSdkVersion targetVersion
         versionCode appVersionCode
         versionName appVersionName
         testInstrumentationRunner "com.telen.easylineup.EasylineupAndroidTestRunner"

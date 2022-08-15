@@ -54,6 +54,7 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
                         adapterDataList.addAll(it.players)
                         playerAdapter.notifyDataSetChanged()
                     }
+                    else -> {}
                 }
             }, {
                 Timber.e(it)

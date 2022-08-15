@@ -66,6 +66,7 @@ class LineupFragmentEditable: LineupFragment("LineupFragmentEditable", R.layout.
                         TeamType.SOFTBALL -> {
                             menu.findItem(R.id.action_lineup_mode).setTitle(R.string.action_add_dp_flex)
                         }
+                        else -> {}
                     }
                 }, {
                     Timber.e(it)
