@@ -15,7 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.getkeepsafe.taptargetview.TapTargetView
-import com.github.kaygenzo.bugreporter.BugReporter
+import com.github.kaygenzo.bugreporter.api.BugReporter
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
@@ -28,6 +28,7 @@ import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.home_main_content.*
+import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.text.DateFormat
 import java.util.*
@@ -40,6 +41,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
     private val itemTouchedCallback = DashboardTileTouchCallback(tileAdapter)
     private val itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
     private var binding: FragmentDashboardBinding? = null
+    private val bugReporter by inject<BugReporter>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -263,7 +265,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                                 getString(R.string.shake_beta_description),
                                 object : TapTargetView.Listener() {
                                     override fun onTargetClick(view: TapTargetView?) {
-                                        BugReporter.startReport(activity)
+                                        bugReporter.startReport(activity)
                                         view?.dismiss(true)
                                     }
 
@@ -284,7 +286,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
         return when (item.itemId) {
             R.id.action_report_issue -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_report_issue")
-                activity?.run { BugReporter.startReport(this) }
+                activity?.run { bugReporter.startReport(this) }
                 true
             }
             else -> super.onOptionsItemSelected(item)
