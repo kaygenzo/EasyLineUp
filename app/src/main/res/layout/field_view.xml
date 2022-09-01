@@ -17,7 +17,7 @@
             android:id="@+id/baseballField"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/baseball_field" />
+            android:src="@drawable/baseball_field" />
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,7 +32,7 @@
             android:background="@color/team_type_bottom_view"
             android:translationZ="1dp"/>
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <ImageView
             android:id="@+id/teamTypeImage"
             android:layout_width="@dimen/card_team_type_ball_image_diameter"
             android:layout_height="@dimen/card_team_type_ball_image_diameter"
@@ -44,7 +44,7 @@
             tools:src="@drawable/image_softball_ball"
             android:translationZ="1dp"/>
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <ImageView
             android:id="@+id/teamTypeRepresentation"
             android:layout_width="0dp"
             android:layout_height="0dp"
