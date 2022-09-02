@@ -14,7 +14,7 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
@@ -43,4 +43,4 @@
     long producerNode;
     long consumerNode;
 }
-
+-keep public class * extends java.lang.Exception  # Optional: Keep custom exceptions.
