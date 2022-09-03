@@ -19,7 +19,7 @@ buildscript {
         extTruthVersion = '1.3.0-alpha02'
         coreVersion = "1.2.1-alpha02"
         espressoCoreVersion = "3.4.0"
-        extJUnitVersion = "1.1.2-alpha02"
+        extJUnitVersion = "1.1.3"
         kotestVersion = "4.3.1"
         runnerVersion = "1.3.0-alpha02"
         espressoVersion = "3.3.0-alpha02"
