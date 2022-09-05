@@ -58,7 +58,8 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
         pitching: Int,
         batting: Int,
         email: String?,
-        phone: String?
+        phone: String?,
+        sex: Int
     ): Completable {
         return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
@@ -75,7 +76,8 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
                     pitching,
                     batting,
                     email,
-                    phone
+                    phone,
+                    sex
                 )
                 UseCaseHandler.execute(savePlayer, req).ignoreElement()
             }

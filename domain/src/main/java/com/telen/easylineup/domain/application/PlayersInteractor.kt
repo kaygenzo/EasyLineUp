@@ -22,7 +22,8 @@ interface PlayersInteractor {
         pitching: Int,
         batting: Int,
         email: String?,
-        phone: String?
+        phone: String?,
+        sex: Int
     ): Completable
 
     fun deletePlayer(playerID: Long?): Completable

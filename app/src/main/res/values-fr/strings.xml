@@ -209,4 +209,6 @@
     <string name="permission_request_read_external_storage">"L\'accès aux media est requis pour afficher les images"</string>
     <string name="permission_request_settings_action">"Paramètres"</string>
     <string name="permission_request_pick_image_title">"Selection d\'image..."</string>
+
+    <string name="create_player_sex">Sexe</string>
 </resources>

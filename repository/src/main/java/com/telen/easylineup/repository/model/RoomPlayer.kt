@@ -5,26 +5,29 @@ import com.telen.easylineup.domain.model.Player
 import java.util.*
 
 @Entity(
-        tableName = "players",
-        indices = [Index(value = ["name", "licenseNumber", "teamID"])],
-        foreignKeys = [
-            ForeignKey(entity = RoomTeam::class, parentColumns = ["id"], childColumns = ["teamID"],
-                    onDelete = ForeignKey.CASCADE)
-        ]
+    tableName = "players",
+    indices = [Index(value = ["name", "licenseNumber", "teamID"])],
+    foreignKeys = [
+        ForeignKey(
+            entity = RoomTeam::class, parentColumns = ["id"], childColumns = ["teamID"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
 )
 internal data class RoomPlayer(
-        @PrimaryKey(autoGenerate = true) var id: Long = 0,
-        @ColumnInfo(name = "teamID") var teamId: Long = 0,
-        @ColumnInfo(name = "name") var name: String = "",
-        @ColumnInfo(name = "shirtNumber") var shirtNumber: Int = 0,
-        @ColumnInfo(name = "licenseNumber") var licenseNumber: Long = 0L,
-        @ColumnInfo(name = "image") var image: String? = null,
-        @ColumnInfo(name = "positions") var positions: Int = 0,
-        @ColumnInfo(name = "pitching") var pitching: Int = 0,
-        @ColumnInfo(name = "batting") var batting: Int = 0,
-        @ColumnInfo(name = "email") var email: String? = null,
-        @ColumnInfo(name = "phone") var phone: String? = null,
-        @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
+    @PrimaryKey(autoGenerate = true) var id: Long = 0,
+    @ColumnInfo(name = "teamID") var teamId: Long = 0,
+    @ColumnInfo(name = "name") var name: String = "",
+    @ColumnInfo(name = "shirtNumber") var shirtNumber: Int = 0,
+    @ColumnInfo(name = "licenseNumber") var licenseNumber: Long = 0L,
+    @ColumnInfo(name = "image") var image: String? = null,
+    @ColumnInfo(name = "positions") var positions: Int = 0,
+    @ColumnInfo(name = "pitching") var pitching: Int = 0,
+    @ColumnInfo(name = "batting") var batting: Int = 0,
+    @ColumnInfo(name = "email") var email: String? = null,
+    @ColumnInfo(name = "phone") var phone: String? = null,
+    @ColumnInfo(name = "sex") var sex: Int = 0,
+    @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -43,6 +46,7 @@ internal data class RoomPlayer(
         if (batting != other.batting) return false
         if (email != other.email) return false
         if (phone != other.phone) return false
+        if (sex != other.sex) return false
         if (hash != other.hash) return false
 
         return true
@@ -58,6 +62,7 @@ internal data class RoomPlayer(
         result = 31 * result + positions
         result = 31 * result + pitching
         result = 31 * result + batting
+        result = 31 * result + sex
         result = 31 * result + (email?.hashCode() ?: 0)
         result = 31 * result + (phone?.hashCode() ?: 0)
         result = 31 * result + (hash?.hashCode() ?: 0)
@@ -78,9 +83,24 @@ internal fun RoomPlayer.init(player: Player): RoomPlayer {
     email = player.email
     phone = player.phone
     hash = player.hash
+    sex = player.sex
     return this
 }
 
 internal fun RoomPlayer.toPlayer(): Player {
-    return Player(id, teamId, name, shirtNumber,licenseNumber, image, positions, pitching, batting, email, phone, hash)
+    return Player(
+        id,
+        teamId,
+        name,
+        shirtNumber,
+        licenseNumber,
+        image,
+        positions,
+        pitching,
+        batting,
+        email,
+        phone,
+        sex,
+        hash
+    )
 }

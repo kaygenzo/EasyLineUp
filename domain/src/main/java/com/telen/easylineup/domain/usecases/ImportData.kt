@@ -111,7 +111,7 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
         val p = Player(id = 0L, teamId = teamID, name = playerExport.name,
                 shirtNumber = playerExport.shirtNumber, licenseNumber = licenseNumber,
                 image = playerExport.image, positions = playerExport.positions, pitching = playerExport.pitching,
-                batting = playerExport.batting, hash = playerExport.id)
+                batting = playerExport.batting, sex = playerExport.sex, hash = playerExport.id)
 
         return playerDao.getPlayerByHash(playerExport.id)
                 .flatMap { playerDB ->

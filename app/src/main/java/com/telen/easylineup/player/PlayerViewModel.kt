@@ -45,6 +45,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     var savedBatting: Int? = null
     var savedEmail: String? = null
     var savedPhoneNumber: String? = null
+    var savedSex: Int? = null
 
     fun observePlayerName(): LiveData<String> {
         return Transformations.map(_player) { savedName ?: it.name }
@@ -80,6 +81,10 @@ class PlayerViewModel : ViewModel(), KoinComponent {
 
     fun observePlayerPhoneNumber(): LiveData<String> {
         return Transformations.map(_player) { savedPhoneNumber ?: it.phone }
+    }
+
+    fun observePlayerSex(): LiveData<Int> {
+        return Transformations.map(_player) { savedSex ?: it.sex }
     }
 
     fun observeStrategy(): LiveData<TeamStrategy> {
@@ -127,7 +132,8 @@ class PlayerViewModel : ViewModel(), KoinComponent {
         pitching: Int,
         batting: Int,
         email: String?,
-        phone: String?
+        phone: String?,
+        sex: Int
     ): Completable {
         return domain.players().savePlayer(
             playerID,
@@ -139,7 +145,8 @@ class PlayerViewModel : ViewModel(), KoinComponent {
             pitching,
             batting,
             email,
-            phone
+            phone,
+            sex
         )
     }
 

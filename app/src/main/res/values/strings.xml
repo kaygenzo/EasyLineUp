@@ -181,6 +181,7 @@
     <string name="create_player_favorite_positions">Favorite positions: (Max 3)</string>
     <string name="create_player_pitching_side">Pitching</string>
     <string name="create_player_batting_side">Batting</string>
+    <string name="create_player_sex">Sex</string>
     <string name="generic_left">Left</string>
     <string name="generic_right">Right</string>
     <string name="generic_both">Both</string>
