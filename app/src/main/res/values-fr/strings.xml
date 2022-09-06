@@ -211,4 +211,19 @@
     <string name="permission_request_pick_image_title">"Selection d\'image..."</string>
 
     <string name="create_player_sex">Sexe</string>
+
+    <plurals name="women_count">
+        <item quantity="one">%d femme</item>
+        <item quantity="other">%d femmes</item>
+    </plurals>
+
+    <plurals name="men_count">
+        <item quantity="one">%d homme</item>
+        <item quantity="other">%d hommes</item>
+    </plurals>
+
+    <plurals name="unset_sex_count">
+        <item quantity="one">%d joueur sans sexe</item>
+        <item quantity="other">%d joueurs sans sexe</item>
+    </plurals>
 </resources>

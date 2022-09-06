@@ -240,4 +240,19 @@
     <string name="permission_request_read_external_storage">"Media access is needed to display images"</string>
     <string name="permission_request_settings_action">"Settings"</string>
     <string name="permission_request_pick_image_title">"Pick an image..."</string>
+
+    <plurals name="women_count">
+        <item quantity="one">%d woman</item>
+        <item quantity="other">%d women</item>
+    </plurals>
+
+    <plurals name="men_count">
+        <item quantity="one">%d man</item>
+        <item quantity="other">%d men</item>
+    </plurals>
+
+    <plurals name="unset_sex_count">
+        <item quantity="one">%d player with sex unset</item>
+        <item quantity="other">%d players with sex unset</item>
+    </plurals>
 </resources>

@@ -99,6 +99,12 @@
                     <com.telen.easylineup.views.TeamCardItemView
                         android:id="@+id/teamLineupsItem"
                         android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/default_margin"/>
+
+                    <com.telen.easylineup.views.TeamCardItemView
+                        android:id="@+id/teamSexStats"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
                 </LinearLayout>

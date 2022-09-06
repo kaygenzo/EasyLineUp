@@ -80,7 +80,7 @@ class PlayerFormView : ConstraintLayout {
             val batting = getBattingSide()?.flag ?: 0
             val email = getEmail()
             val phone = getPhone()
-            val sex = getSex()?.id ?: 0
+            val sex = getSex()?.id ?: Sex.UNKNOWN.id
 
             listener?.onSaveClicked(
                 name,

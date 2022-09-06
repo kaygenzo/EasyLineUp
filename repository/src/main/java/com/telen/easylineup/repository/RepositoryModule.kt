@@ -3,6 +3,7 @@ package com.telen.easylineup.repository
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.tiles.TileType
 import com.telen.easylineup.domain.repository.*
@@ -249,7 +250,7 @@ object RepositoryModule {
     private fun migration_15_16(): Migration {
         return object: Migration(15,16) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE players ADD COLUMN sex INTEGER NOT NULL DEFAULT 0")
+                database.execSQL("ALTER TABLE players ADD COLUMN sex INTEGER NOT NULL DEFAULT ${Sex.UNKNOWN.id}")
             }
         }
     }
