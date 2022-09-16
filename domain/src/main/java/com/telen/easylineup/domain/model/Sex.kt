@@ -9,8 +9,8 @@ enum class Sex(val id: Int, @ColorRes val colorRes: Int) {
     FEMALE(2, R.color.yellow);
 
     companion object {
-        fun getById(id: Int): Sex? {
-            return values().firstOrNull { it.id == id }
+        fun getById(id: Int): Sex {
+            return values().firstOrNull { it.id == id } ?: UNKNOWN
         }
     }
 }

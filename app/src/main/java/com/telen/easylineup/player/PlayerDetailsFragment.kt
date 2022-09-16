@@ -117,8 +117,8 @@ class PlayerDetailsFragment : BaseFragment("PlayerDetailsFragment"),
 
         viewModel.observePlayerSex().observe(viewLifecycleOwner) {
             val sex = Sex.getById(it)
-            binding.sexSymbol.visibility = sex?.let { View.VISIBLE } ?: View.GONE
-            when(Sex.getById(it)) {
+            binding.sexSymbol.visibility = if (sex != Sex.UNKNOWN) View.VISIBLE else View.GONE
+            when(sex) {
                 Sex.MALE -> binding.sexSymbol.setImageResource(R.drawable.ic_male_black)
                 Sex.FEMALE -> binding.sexSymbol.setImageResource(R.drawable.ic_female_black)
                 else -> { /* sex is not defined for this player */ }
