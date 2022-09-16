@@ -109,6 +109,18 @@ class PlayerFormView : ConstraintLayout {
             setImageResource(R.drawable.add_image)
             setOnClickListener(null)
         }
+
+        sexMale.setOnClickListener {
+            if(sexFemale.isChecked) {
+                setSex(Sex.MALE)
+            }
+        }
+
+        sexFemale.setOnClickListener {
+            if(sexMale.isChecked) {
+                setSex(Sex.FEMALE)
+            }
+        }
     }
 
     fun onImageUriReceived(imageUri: Uri) {
