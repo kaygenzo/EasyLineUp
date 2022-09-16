@@ -61,7 +61,7 @@ enum class FieldPosition(val id: Int, val mask: Int, private val position: Int) 
             }
         }
 
-        fun getPositionCoordinates(position: FieldPosition, strategy: TeamStrategy): PointF {
+        fun getPositionPercentage(position: FieldPosition, strategy: TeamStrategy): PointF {
             return when(strategy) {
                 TeamStrategy.B5_DEFAULT -> {
                     when (position) {

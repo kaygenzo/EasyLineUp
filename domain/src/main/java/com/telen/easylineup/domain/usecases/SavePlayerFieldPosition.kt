@@ -46,7 +46,7 @@ internal class SavePlayerFieldPosition(private val lineupDao: PlayerFieldPositio
                 if(order == 0)
                     order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
 
-                val coordinate = FieldPosition.getPositionCoordinates(requestValues.position, requestValues.strategy)
+                val coordinate = FieldPosition.getPositionPercentage(requestValues.position, requestValues.strategy)
                 x = coordinate.x
                 y = coordinate.y
             }

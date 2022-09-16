@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.ImageView
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.*
 import kotlinx.android.synthetic.main.field_view.view.*
@@ -27,6 +26,8 @@ class DefenseFixedView: DefenseView {
 
     fun setListPlayerInField(players: List<PlayerWithPosition>, lineupMode: Int) {
 
+        cleanSexIndicators()
+
         val emptyPositions = mutableListOf<FieldPosition>()
         positionMarkers.keys.forEach { emptyPositions.add(it) }
 
@@ -44,40 +45,19 @@ class DefenseFixedView: DefenseView {
                         positionMarkers[position]?.apply {
                             emptyPositions.remove(it)
                             setState(StateDefense.PLAYER)
-                            if(lineupMode == MODE_ENABLED) {
-                                if(player.flags and PlayerFieldPosition.FLAG_FLEX > 0 || it == FieldPosition.DP_DH) {
-                                    setPlayerImage(player.image, player.playerName, iconSize, Color.RED, 3f)
-                                }
-                                else {
-                                    setPlayerImage(player.image, player.playerName, iconSize)
-                                }
-                            }
-                            else
+                            setSexIndicator(player.toPlayer(), position)
+
+                            val needLink = player.flags and PlayerFieldPosition.FLAG_FLEX > 0
+                                    || it == FieldPosition.DP_DH
+                            if (lineupMode == MODE_ENABLED && needLink) {
+                                setPlayerImage(player.image, player.playerName, iconSize, Color.RED, 3f)
+                            } else {
                                 setPlayerImage(player.image, player.playerName, iconSize)
+                            }
                         }
                     }
                 }
             }
-
-            processNonDefensePositions(emptyPositions, lineupMode)
-        }
-    }
-
-    @Deprecated("Will be remove in the future if no use case need it")
-    fun setSmallPlayerPosition(positions: List<FieldPosition>, lineupMode: Int) {
-
-        val emptyPositions = mutableListOf<FieldPosition>()
-        positionMarkers.keys.forEach { emptyPositions.add(it) }
-
-        getContainerSize { containerSize ->
-            positions.filter { FieldPosition.isDefensePlayer(it.id) }
-                    .forEach { position ->
-                        positionMarkers[position]?.apply {
-                            emptyPositions.remove(position)
-                            setState(StateDefense.PLAYER)
-                            setPlayerImage(R.drawable.baseball_ball_icon, ImageView.ScaleType.CENTER_INSIDE)
-                        }
-                    }
 
             processNonDefensePositions(emptyPositions, lineupMode)
         }

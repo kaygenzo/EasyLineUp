@@ -60,6 +60,8 @@ class DefenseEditableView: DefenseView {
 
     fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int) {
 
+        cleanSexIndicators()
+
         this.players.clear()
         this.players.addAll(players)
 
@@ -96,6 +98,8 @@ class DefenseEditableView: DefenseView {
                             } else {
                                 setPlayerImage(player.image, player.name, iconSize)
                             }
+
+                            setSexIndicator(player, pos)
 
                             setOnDragListener { v, event ->
                                 when (event.action) {
@@ -263,6 +267,7 @@ class DefenseEditableView: DefenseView {
                         val player = listPlayers.first().toPlayer()
                         setState(StateDefense.PLAYER)
                         setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
+                        setSexIndicator(player, position)
                         setOnLongClickListener {
                             val playerID = ClipData.Item(player.id.toString())
                             val playerPosition = ClipData.Item(position.name)

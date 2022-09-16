@@ -1,37 +1,44 @@
 package com.telen.easylineup.domain.model
 
 data class PlayerWithPosition(
-        val playerName: String,
-        var shirtNumber: Int,
-        val licenseNumber: Long,
-        val teamId: Long,
-        val image: String?,
-        var position: Int = 0,
-        var x: Float = 0f,
-        var y: Float = 0f,
-        var flags: Int = 0,
-        var order: Int = 0,
-        var fieldPositionID: Long = 0,
-        var playerID: Long = 0,
-        val lineupId: Long,
-        val playerPositions: Int
+    val playerName: String,
+    val playerSex: Int,
+    var shirtNumber: Int,
+    val licenseNumber: Long,
+    val teamId: Long,
+    val image: String?,
+    var position: Int = 0,
+    var x: Float = 0f,
+    var y: Float = 0f,
+    var flags: Int = 0,
+    var order: Int = 0,
+    var fieldPositionID: Long = 0,
+    var playerID: Long = 0,
+    val lineupId: Long,
+    val playerPositions: Int
 ) {
 
     companion object {
         // here we exclude the position itself because it's also a candidate for the order.
         // For instance, if the order is 1, order 1 is a new candidate as well as others because it will
         // be a free order
-        fun getNextAvailableOrder(players: List<PlayerWithPosition>, exclude: List<Int>? = null): Int {
+        fun getNextAvailableOrder(
+            players: List<PlayerWithPosition>,
+            exclude: List<Int>? = null
+        ): Int {
             var availableOrder = 1
             players
-                    .filter { it.fieldPositionID > 0 && it.order > 0 && !(exclude?.contains(it.order) ?: false)}
-                    .sortedBy { it.order }
-                    .forEach {
-                        if(it.order == availableOrder)
-                            availableOrder++
-                        else
-                            return availableOrder
-                    }
+                .filter {
+                    it.fieldPositionID > 0 && it.order > 0 && !(exclude?.contains(it.order)
+                        ?: false)
+                }
+                .sortedBy { it.order }
+                .forEach {
+                    if (it.order == availableOrder)
+                        availableOrder++
+                    else
+                        return availableOrder
+                }
             return availableOrder
         }
     }
@@ -56,6 +63,7 @@ data class PlayerWithPosition(
         if (playerID != other.playerID) return false
         if (lineupId != other.lineupId) return false
         if (playerPositions != other.playerPositions) return false
+        if (playerSex != other.playerSex) return false
 
         return true
     }
@@ -75,16 +83,27 @@ data class PlayerWithPosition(
         result = 31 * result + lineupId.hashCode()
         result = 31 * result + playerPositions
         result = 31 * result + flags
+        result = 31 * result + playerSex
         return result
     }
 }
 
 fun PlayerWithPosition.toPlayer(): Player {
-    return Player(id = playerID, teamId = teamId, name = playerName, shirtNumber = shirtNumber, licenseNumber = licenseNumber,
-            image = image, positions = playerPositions)
+    return Player(
+        id = playerID,
+        teamId = teamId,
+        name = playerName,
+        shirtNumber = shirtNumber,
+        licenseNumber = licenseNumber,
+        image = image,
+        positions = playerPositions,
+        sex = playerSex
+    )
 }
 
 fun PlayerWithPosition.toPlayerFieldPosition(): PlayerFieldPosition {
-    return PlayerFieldPosition(id = fieldPositionID, playerId = playerID, position = position, x = x, y = y,
-            order = order, lineupId = lineupId, flags = flags)
+    return PlayerFieldPosition(
+        id = fieldPositionID, playerId = playerID, position = position, x = x, y = y,
+        order = order, lineupId = lineupId, flags = flags
+    )
 }

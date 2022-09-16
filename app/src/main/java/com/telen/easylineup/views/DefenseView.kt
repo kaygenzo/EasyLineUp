@@ -1,15 +1,20 @@
 package com.telen.easylineup.views
 
 import android.content.Context
+import android.graphics.*
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
+import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.utils.drawn
 import com.telen.easylineup.utils.ready
@@ -24,6 +29,7 @@ abstract class DefenseView: ConstraintLayout {
     private var containerSize: Float? = 0f
     protected val positionMarkers: MutableMap<FieldPosition, MultipleStateDefenseIconButton> = mutableMapOf()
     private var strategy: TeamStrategy = TeamStrategy.STANDARD
+    private var canvas: Canvas? = null
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -39,6 +45,12 @@ abstract class DefenseView: ConstraintLayout {
         positionMarkers.clear()
 
         getContainerSize {
+
+            Bitmap.createBitmap(it.toInt(), it.toInt(), Bitmap.Config.ARGB_8888).let { bitmap ->
+                imageCanvas.setImageBitmap(bitmap)
+                canvas = Canvas(bitmap).apply { drawColor(Color.TRANSPARENT) }
+            }
+
             val iconSize = (it * ICON_SIZE_SCALE).roundToInt()
             strategy.positions.forEach { position ->
                 val view = MultipleStateDefenseIconButton(context).apply {
@@ -49,7 +61,7 @@ abstract class DefenseView: ConstraintLayout {
                     }
                 }
                 positionMarkers[position] = view
-                val coordinates = FieldPosition.getPositionCoordinates(position, strategy)
+                val coordinates = FieldPosition.getPositionPercentage(position, strategy)
                 addPlayerOnFieldWithPercentage(it, view, coordinates.x, coordinates.y)
             }
 
@@ -71,10 +83,20 @@ abstract class DefenseView: ConstraintLayout {
         //cleanPlayerIcons()
     }
 
-    protected fun addPlayerOnFieldWithPercentage(containerSize: Float, view: View, x: Float, y: Float) {
-        val positionX = ((x * containerSize) / 100f)
-        val positionY = ((y * containerSize) / 100f)
-        addPlayerOnFieldWithCoordinate(view, containerSize, positionX, positionY)
+    protected fun addPlayerOnFieldWithPercentage(
+        containerSize: Float,
+        view: View,
+        x: Float,
+        y: Float
+    ) {
+        val point = percentageToCoordinates(containerSize, PointF(x, y))
+        addPlayerOnFieldWithCoordinate(view, containerSize, point.x, point.y)
+    }
+
+    private fun percentageToCoordinates(containerSize: Float, point: PointF): PointF {
+        val positionX = ((point.x * containerSize) / 100f)
+        val positionY = ((point.y * containerSize) / 100f)
+        return PointF(positionX, positionY)
     }
 
     protected fun addPlayerOnFieldWithCoordinate(view: View, parentWidth: Float, x: Float, y: Float) {
@@ -158,6 +180,39 @@ abstract class DefenseView: ConstraintLayout {
                 val size = min(fieldFrameLayout.width, fieldFrameLayout.height).toFloat()
                 this.containerSize = size
                 result(size)
+            }
+        }
+    }
+
+    protected fun setSexIndicator(player: Player, position: FieldPosition) {
+        when(val sex = Sex.getById(player.sex)) {
+            Sex.MALE, Sex.FEMALE -> {
+                drawIndicatorOnPositions(position, sex.colorRes)
+            }
+            else -> {
+                // set a color for unknown sex
+            }
+        }
+    }
+
+    protected fun cleanSexIndicators() {
+        this.canvas?.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+    }
+
+    private fun drawIndicatorOnPositions(position: FieldPosition, @ColorRes color: Int) {
+        getContainerSize {
+            val iconSize = (it * ICON_SIZE_SCALE).roundToInt()
+            val indicatorRadius = iconSize/6f
+            val percentage = FieldPosition.getPositionPercentage(position, strategy)
+            val pos = percentageToCoordinates(it, percentage)
+            val size = iconSize.toFloat()
+            checkBounds(it, pos.x, pos.y, size, size) { x: Float, y: Float ->
+                val cx = x + iconSize/2
+                val cy = y - iconSize/2
+                this.canvas?.drawCircle(cx, cy, indicatorRadius, Paint().apply {
+                    this.color = ContextCompat.getColor(context, color)
+                    style = Paint.Style.FILL
+                })
             }
         }
     }
