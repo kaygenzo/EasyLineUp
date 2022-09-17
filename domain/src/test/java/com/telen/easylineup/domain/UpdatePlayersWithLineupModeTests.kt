@@ -31,15 +31,15 @@ internal class UpdatePlayersWithLineupModeTests {
         MockitoAnnotations.initMocks(this)
         updatePlayersWithLineupMode = UpdatePlayersWithLineupMode(lineupDao)
         players = mutableListOf()
-        players.add(PlayerWithPosition("toto", 1, 1, 1, null,
+        players.add(PlayerWithPosition("toto",0, 1, 1, 1, null,
                 FieldPosition.SECOND_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,0, 1, 1, 1, 1))
-        players.add(PlayerWithPosition("tata", 2, 2, 1, null,
+        players.add(PlayerWithPosition("tata",0, 2, 2, 1, null,
                 FieldPosition.CATCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 2, 2, 1, 2))
-        players.add(PlayerWithPosition("titi", 3, 3, 1, null,
+        players.add(PlayerWithPosition("titi",0, 3, 3, 1, null,
                 FieldPosition.CENTER_FIELD.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,4, 3, 3, 1, 4))
-        players.add(PlayerWithPosition("tutu", 4, 4, 1, null,
+        players.add(PlayerWithPosition("tutu",0, 4, 4, 1, null,
                 FieldPosition.FIRST_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,6, 4, 4, 1, 8))
-        players.add(PlayerWithPosition("tete", 5, 5, 1, null,
+        players.add(PlayerWithPosition("tete",0, 5, 5, 1, null,
                 FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
 
         Mockito.`when`(lineupDao.updatePlayerFieldPosition(any())).thenReturn(Completable.complete())

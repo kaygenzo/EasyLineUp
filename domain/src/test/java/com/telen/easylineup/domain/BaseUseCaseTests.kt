@@ -17,6 +17,8 @@ open class BaseUseCaseTests {
                 fieldPositionID = id,
                 playerID = id,
                 lineupId = lineupID,
-                playerPositions = 1)
+                playerPositions = 1,
+                playerSex = 0
+        )
     }
 }

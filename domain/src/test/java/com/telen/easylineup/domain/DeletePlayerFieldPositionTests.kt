@@ -69,9 +69,21 @@ internal abstract class DeletePlayerFieldPositionTests(private val teamType: Tea
     }
 
     private fun createPlayerWithPosition(index: Int, flag: Int, position: FieldPosition, order: Int = index): PlayerWithPosition {
-        return PlayerWithPosition("t${index}", index, index.toLong(), 1L, null,
-                position.id, 0f, 0f, flag, order,
-                index.toLong(), index.toLong(), 1L, index)
+        return PlayerWithPosition("t${index}",
+            0,
+            index,
+            index.toLong(),
+            1L,
+            null,
+            position.id,
+            0f, 0f,
+            flag,
+            order,
+            index.toLong(),
+            index.toLong(),
+            1L,
+            index
+        )
     }
 
     @Test

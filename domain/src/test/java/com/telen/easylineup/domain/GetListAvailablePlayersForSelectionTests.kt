@@ -24,23 +24,23 @@ internal class GetListAvailablePlayersForSelectionTests {
         getListAvailablePlayersForSelection = GetListAvailablePlayersForSelection()
 
         players = mutableListOf()
-        players.add(PlayerWithPosition("toto", 1, 1, teamID, null,
+        players.add(PlayerWithPosition("toto", 0, 1, 1, teamID, null,
                 FieldPosition.PITCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,0, 1, 1, 1, 1))
-        players.add(PlayerWithPosition("tata", 2, 2, teamID, null,
+        players.add(PlayerWithPosition("tata", 0, 2, 2, teamID, null,
                 FieldPosition.CATCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 0, 2, 1, 2))
-        players.add(PlayerWithPosition("titi", 3, 3, teamID, null,
+        players.add(PlayerWithPosition("titi", 0, 3, 3, teamID, null,
                 FieldPosition.CENTER_FIELD.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,9, 3, 3, 1, 4))
-        players.add(PlayerWithPosition("tutu", 4, 4, teamID, null,
+        players.add(PlayerWithPosition("tutu", 0, 4, 4, teamID, null,
                 FieldPosition.FIRST_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,10, 0, 4, 1, 8))
-        players.add(PlayerWithPosition("tete", 5, 5, teamID, null,
+        players.add(PlayerWithPosition("tete", 0, 5, 5, teamID, null,
                 FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
 
         roster = mutableListOf()
-        roster.add(RosterPlayerStatus(Player(id = 1L, teamId = teamID, name = "toto", shirtNumber =  1, licenseNumber = 1, image = null, positions = 1), true, null))
-        roster.add(RosterPlayerStatus(Player(id = 2L, teamId = teamID, name = "tata", shirtNumber = 2, licenseNumber =  2, image = null, positions =1), true, null))
-        roster.add(RosterPlayerStatus(Player(id = 3L, teamId = teamID, name = "titi", shirtNumber = 3, licenseNumber = 3, image = null, positions =4), true, null))
-        roster.add(RosterPlayerStatus(Player(id = 4L, teamId = teamID, name = "tutu", shirtNumber = 4, licenseNumber = 4, image = null, positions =8), true, null))
-        roster.add(RosterPlayerStatus(Player(id = 5L, teamId = teamID, name = "tete", shirtNumber = 5, licenseNumber = 5, image = null, positions =16), true, null))
+        roster.add(RosterPlayerStatus(Player(id = 1L, teamId = teamID, name = "toto", shirtNumber = 1, licenseNumber = 1, image = null, positions = 1), true, null))
+        roster.add(RosterPlayerStatus(Player(id = 2L, teamId = teamID, name = "tata", shirtNumber = 2, licenseNumber = 2, image = null, positions = 1), true, null))
+        roster.add(RosterPlayerStatus(Player(id = 3L, teamId = teamID, name = "titi", shirtNumber = 3, licenseNumber = 3, image = null, positions = 4), true, null))
+        roster.add(RosterPlayerStatus(Player(id = 4L, teamId = teamID, name = "tutu", shirtNumber = 4, licenseNumber = 4, image = null, positions = 8), true, null))
+        roster.add(RosterPlayerStatus(Player(id = 5L, teamId = teamID, name = "tete", shirtNumber = 5, licenseNumber = 5, image = null, positions = 16), true, null))
     }
 
     @Test
