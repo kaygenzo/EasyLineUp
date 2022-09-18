@@ -63,6 +63,10 @@
             app:key="@string/key_app_version"/>
 
         <Preference
+            app:title="@string/setting_licenses_title"
+            app:key="@string/key_app_licenses"/>
+
+        <Preference
             app:title="@string/setting_play_store_title"
             app:key="@string/key_play_store"/>
 

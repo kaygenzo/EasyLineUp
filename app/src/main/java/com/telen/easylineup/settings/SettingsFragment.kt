@@ -15,6 +15,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
+import com.telen.easylineup.license.LicensesManager
 import com.telen.easylineup.login.ImportFailure
 import com.telen.easylineup.login.ImportSuccessfulEvent
 import com.telen.easylineup.login.LoginActivity
@@ -160,6 +161,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             getString(R.string.key_import_data) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_import_data")
                 importData()
+                return true
+            }
+            getString(R.string.key_app_licenses) -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_settings_licenses")
+                activity?.let { LicensesManager.getDialog(it).show() }
                 return true
             }
             else -> return super.onPreferenceTreeClick(preference)

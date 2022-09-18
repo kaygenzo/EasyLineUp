@@ -116,6 +116,7 @@
     <string name="setting_category_about_title">A propos</string>
     <string name="setting_delete_data_description">Supprimer toutes les données</string>
     <string name="setting_version_title">Version</string>
+    <string name="setting_licenses_title">Licences</string>
     <string name="setting_play_store_title">Page officielle du Google Play store</string>
 
     <string name="login_create">Créez votre première équipe</string>
@@ -226,4 +227,6 @@
         <item quantity="one">%d joueur sans sexe</item>
         <item quantity="other">%d joueurs sans sexe</item>
     </plurals>
+
+    <string name="libraries_title">Licence pour les librairies</string>
 </resources>

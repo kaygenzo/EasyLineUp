@@ -137,6 +137,7 @@
     <string name="setting_export_data_description">Export data to file</string>
     <string name="setting_delete_data_description">Delete all data</string>
     <string name="setting_version_title">Version</string>
+    <string name="setting_licenses_title">Licenses</string>
     <string name="setting_play_store_title">Google Play Store official page</string>
 
     <string name="key_lineup_style" translatable="false">key_lineup_style</string>
@@ -145,6 +146,7 @@
     <string name="key_import_data_update_object" translatable="false">key_import_data_update_object</string>
     <string name="key_delete_data" translatable="false">key_delete_data</string>
     <string name="key_app_version" translatable="false">key_app_version</string>
+    <string name="key_app_licenses" translatable="false">key_app_licenses</string>
     <string name="key_play_store" translatable="false">key_play_store</string>
 
     <string name="login_create">Create your first team</string>
@@ -255,4 +257,6 @@
         <item quantity="one">%d player with sex unset</item>
         <item quantity="other">%d players with sex unset</item>
     </plurals>
+
+    <string name="libraries_title">Notices for libraries</string>
 </resources>

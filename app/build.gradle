@@ -170,11 +170,11 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version_ktx"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version_ktx"
+    implementation "androidx.documentfile:documentfile:$documentFileVersion"
 
     ////////// GOOGLE //////////
 
     implementation platform("com.google.firebase:firebase-bom:$firebaseBOMVersion")
-
     implementation "com.google.android.material:material:$googleMaterialVersion"
     implementation "com.google.code.gson:gson:$googleGsonVersion"
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
@@ -189,6 +189,7 @@ dependencies {
     implementation project(path: ':repository')
     implementation project(path: ':domain')
     implementation "com.telen.library:tablemultiscroll:$tablemultiscrollVersion"
+    implementation "com.github.kaygenzo:bugreporter:$bugreportingVersion"
 
     ////////// OTHERS //////////
 
@@ -197,19 +198,15 @@ dependencies {
     implementation "com.github.PhilJay:MPAndroidChart:$androidchartVersion"
     implementation "com.squareup.picasso:picasso:$picassoVersion"
     implementation "com.makeramen:roundedimageview:$roundedImageView"
-
     implementation "io.insert-koin:koin-android:$koinVersion"
     implementation "com.getkeepsafe.taptargetview:taptargetview:$taptargetviewVersion"
+    implementation "com.karumi:dexter:$dexterVersion"
+    implementation 'com.github.marcoscgdev:Licenser:2.0.0'
 
     // only debug libraries
 
     debugImplementation "com.facebook.stetho:stetho:$stethoVersion"
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
-
-    implementation "com.github.kaygenzo:bugreporter:$bugreportingVersion"
-    implementation "androidx.documentfile:documentfile:$documentFileVersion"
-
-    implementation "com.karumi:dexter:$dexterVersion"
 }
 
 apply from: '../jacoco.gradle'
