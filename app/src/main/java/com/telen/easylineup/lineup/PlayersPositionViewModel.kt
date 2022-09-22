@@ -18,6 +18,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.DialogFactory
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
@@ -113,7 +114,11 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                 .subscribe({
                     eventHandler.onNext(GetAllAvailablePlayersSuccess(it, position))
                 }, {
-                    Timber.e(it)
+                    if (it is NoSuchElementException) {
+                        Timber.e(it.message)
+                    } else {
+                        Timber.e(it)
+                    }
                 })
         disposables.add(disposable)
     }
@@ -134,7 +139,11 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                 .subscribe({
                     _linkPlayersInField.value = it
                 }, {
-                    Timber.e(it)
+                    if (it is NoSuchElementException) {
+                        Timber.e(it.message)
+                    } else {
+                        Timber.e(it)
+                    }
                     _linkPlayersInField.value = listOf()
                 })
         disposables.add(disposable)
@@ -274,7 +283,11 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                         }
                         eventHandler.onNext(NeedLinkDpFlex(Pair(it.dp, it.flex), it.dpLocked, it.flexLocked, it.teamType, title))
                     }, {
-                        Timber.e(it)
+                        if (it is NeedAssignPitcherFirstException) {
+                            Timber.w(it.message)
+                        } else {
+                            Timber.e(it)
+                        }
                     })
             disposables.add(disposable)
         }

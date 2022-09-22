@@ -17,6 +17,9 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.Sex
+import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
+import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
+import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
@@ -185,7 +188,12 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
         ).subscribe({
             findNavController().navigateUp()
         }, {
-            Timber.e(it)
+            when(it) {
+                is NameEmptyException,
+                is InvalidEmailException,
+                is InvalidPhoneException -> Timber.w(it.message)
+                else -> Timber.e(it)
+            }
         })
         disposables.add(saveDisposable)
     }

@@ -70,7 +70,7 @@ open class App : MultiDexApplication() {
                     t?.let { crashlytics.recordException(t) }
                 }
                 Log.WARN -> {
-                    crashlytics.log("W/${tag ?: "TAG"}: $message")
+                    crashlytics.log("W/${tag ?: ""}: $message")
                 }
                 else -> {}
             }

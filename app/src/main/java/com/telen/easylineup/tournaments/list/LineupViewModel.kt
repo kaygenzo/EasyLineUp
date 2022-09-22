@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
+import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -85,7 +87,11 @@ class LineupViewModel: ViewModel(), KoinComponent {
                 .subscribe({
                     saveResult.value = SaveSuccess(it, lineupTitle, strategy, extraHitters)
                 }, {
-                    Timber.e(it)
+                    when(it) {
+                        is TournamentNameEmptyException,
+                        is LineupNameEmptyException -> Timber.w(it.message)
+                        else -> Timber.e(it)
+                    }
                 })
         disposables.add(disposable)
     }
