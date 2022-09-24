@@ -62,6 +62,8 @@ buildscript {
         documentFileVersion = "1.0.1"
         dexterVersion = "6.2.3"
         colorPickerVersion = "2.0.6"
+        licenserVersion = "2.0.0"
+        leakcanaryVersion = "2.3"
     }
 
     repositories {
