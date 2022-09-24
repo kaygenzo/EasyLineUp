@@ -7,7 +7,7 @@
     <string name="action_delete">Delete</string>
     <string name="action_share">Share</string>
     <string name="action_report_issue">Report an issue</string>
-    <string name="action_add_player_in_roster">Change players of roster</string>
+    <string name="action_add_player_in_roster">Edit roster</string>
     <string name="action_roster" translatable="false">@string/form_lineup_creation_roster_label</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>

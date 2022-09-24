@@ -3,6 +3,7 @@
     <string name="action_edit">Editer</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_share">Partager</string>
+    <string name="action_add_player_in_roster">Editer les joueurs</string>
     <string name="action_report_issue">Reporter un problème</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>
