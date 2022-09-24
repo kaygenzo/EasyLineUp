@@ -26,6 +26,22 @@
             android:key="@string/key_lineup_style"
             android:title="@string/setting_lineup_style_description" />
 
+        <com.skydoves.colorpickerpreference.ColorPickerPreference
+            android:key="@string/key_men_style"
+            android:title="@string/setting_men_style_description"
+            app:preference_colorBox_radius="8dp"
+            app:preference_dialog_positive="@android:string/ok"
+            app:default_color="@color/default_men_color"
+            android:summary="@string/picker_men_summary" />
+
+        <com.skydoves.colorpickerpreference.ColorPickerPreference
+            android:key="@string/key_women_style"
+            android:title="@string/setting_women_style_description"
+            app:preference_colorBox_radius="8dp"
+            app:preference_dialog_positive="@android:string/ok"
+            app:default_color="@color/default_women_color"
+            android:summary="@string/picker_women_summary"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/settings_category_export">

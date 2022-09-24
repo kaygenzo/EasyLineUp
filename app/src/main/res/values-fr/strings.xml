@@ -229,4 +229,10 @@
     </plurals>
 
     <string name="libraries_title">Licence pour les librairies</string>
+
+    <string name="setting_men_style_description">Hommes</string>
+    <string name="setting_women_style_description">Femmes</string>
+    <string name="picker_men_summary">Changer la couleur des hommes sur le terrain</string>
+    <string name="picker_women_summary">Changer la couleur des femmes sur le terrain</string>
+
 </resources>

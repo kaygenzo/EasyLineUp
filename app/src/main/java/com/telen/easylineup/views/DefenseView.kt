@@ -17,6 +17,7 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.utils.drawn
+import com.telen.easylineup.utils.getColor
 import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.field_view.view.*
 import kotlin.math.min
@@ -187,7 +188,7 @@ abstract class DefenseView: ConstraintLayout {
     protected fun setSexIndicator(player: Player, position: FieldPosition) {
         when(val sex = Sex.getById(player.sex)) {
             Sex.MALE, Sex.FEMALE -> {
-                drawIndicatorOnPositions(position, sex.colorRes)
+                drawIndicatorOnPositions(position, sex.getColor(context))
             }
             else -> {
                 // set a color for unknown sex
@@ -199,7 +200,7 @@ abstract class DefenseView: ConstraintLayout {
         this.canvas?.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
     }
 
-    private fun drawIndicatorOnPositions(position: FieldPosition, @ColorRes color: Int) {
+    private fun drawIndicatorOnPositions(position: FieldPosition, color: Int) {
         getContainerSize {
             val iconSize = (it * ICON_SIZE_SCALE).roundToInt()
             val indicatorRadius = iconSize/6f
@@ -210,7 +211,7 @@ abstract class DefenseView: ConstraintLayout {
                 val cx = x + iconSize/2
                 val cy = y - iconSize/2
                 this.canvas?.drawCircle(cx, cy, indicatorRadius, Paint().apply {
-                    this.color = ContextCompat.getColor(context, color)
+                    this.color = color
                     style = Paint.Style.FILL
                 })
             }

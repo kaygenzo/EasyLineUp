@@ -19,6 +19,7 @@ object LicensesManager {
         Library("Dexter", "https://github.com/Karumi/Dexter", License.APACHE2),
         Library("Licenser", "https://github.com/marcoscgdev/Licenser", License.MIT),
         Library("LeakCanary", "https://github.com/square/leakcanary", License.APACHE2),
+        Library("ColorPickerPreference", "https://github.com/skydoves/ColorPickerPreference", License.APACHE2),
         // AndroidX
         Library(
             "RecyclerView",

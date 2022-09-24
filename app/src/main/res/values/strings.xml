@@ -131,6 +131,8 @@
     </plurals>
 
     <string name="setting_lineup_style_description">Lineup font</string>
+    <string name="setting_men_style_description">Men</string>
+    <string name="setting_women_style_description">Women</string>
     <string name="setting_category_about_title">About</string>
     <string name="setting_import_data_description">Import data from file</string>
     <string name="setting_import_data_update_object_description">Update data if already exists ?</string>
@@ -141,6 +143,8 @@
     <string name="setting_play_store_title">Google Play Store official page</string>
 
     <string name="key_lineup_style" translatable="false">key_lineup_style</string>
+    <string name="key_men_style" translatable="false">key_men_style</string>
+    <string name="key_women_style" translatable="false">key_women_style</string>
     <string name="key_export_data" translatable="false">key_export_data</string>
     <string name="key_import_data" translatable="false">key_import_data</string>
     <string name="key_import_data_update_object" translatable="false">key_import_data_update_object</string>
@@ -259,4 +263,7 @@
     </plurals>
 
     <string name="libraries_title">Notices for libraries</string>
+
+    <string name="picker_men_summary">Change men color on field</string>
+    <string name="picker_women_summary">Change women color on field</string>
 </resources>

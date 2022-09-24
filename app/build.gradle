@@ -204,6 +204,7 @@ dependencies {
     implementation "com.getkeepsafe.taptargetview:taptargetview:$taptargetviewVersion"
     implementation "com.karumi:dexter:$dexterVersion"
     implementation 'com.github.marcoscgdev:Licenser:2.0.0'
+    implementation "com.github.skydoves:colorpickerpreference:$colorPickerVersion"
 
     // only debug libraries
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
