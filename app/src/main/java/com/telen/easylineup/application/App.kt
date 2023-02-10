@@ -1,5 +1,6 @@
 package com.telen.easylineup.application
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.multidex.MultiDexApplication
@@ -27,7 +28,7 @@ open class App : MultiDexApplication() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         } else {
-            Timber.plant(ReleaseTree())
+            Timber.plant(ReleaseTree(this))
         }
 
         val crashlytics: FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
@@ -61,10 +62,11 @@ open class App : MultiDexApplication() {
             }
     }
 
-    class ReleaseTree : Timber.DebugTree() {
+    class ReleaseTree(private val context: Context) : Timber.DebugTree() {
 
         override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
             val crashlytics: FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
+            crashlytics.setCustomKey("installer", getInstaller() ?: "unknown")
             when (priority) {
                 Log.ERROR -> {
                     t?.let { crashlytics.recordException(t) }
@@ -75,6 +77,10 @@ open class App : MultiDexApplication() {
                 else -> {}
             }
 
+        }
+
+        private fun getInstaller(): String? {
+            return context.packageManager.getInstallerPackageName(context.packageName)
         }
     }
 }
