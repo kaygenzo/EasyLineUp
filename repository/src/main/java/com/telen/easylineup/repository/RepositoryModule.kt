@@ -11,7 +11,6 @@ import com.telen.easylineup.repository.adapters.impl.*
 import com.telen.easylineup.repository.dao.AppDatabase
 import com.telen.easylineup.repository.dao.DATABASE_NAME
 import org.koin.dsl.module
-import java.util.*
 
 object RepositoryModule {
 
@@ -19,24 +18,24 @@ object RepositoryModule {
 
         single {
             val builder = Room.databaseBuilder(get(), AppDatabase::class.java, DATABASE_NAME)
-                    .addMigrations(migration_1_2())
-                    .addMigrations(migration_2_3())
-                    .addMigrations(migration_3_4())
-                    .addMigrations(migration_4_5())
-                    .addMigrations(migration_5_6())
-                    .addMigrations(migration_6_7())
-                    .addMigrations(migration_7_8())
-                    .addMigrations(migration_8_9())
-                    .addMigrations(migration_9_10())
-                    .addMigrations(migration_10_11())
-                    .addMigrations(migration_11_12())
-                    .addMigrations(migration_12_13())
-                    .addMigrations(migration_13_14())
-                    .addMigrations(migration_14_15())
-                    .addMigrations(migration_15_16())
-            if(BuildConfig.usePrefilledDatabase) {
+                .addMigrations(migration_1_2())
+                .addMigrations(migration_2_3())
+                .addMigrations(migration_3_4())
+                .addMigrations(migration_4_5())
+                .addMigrations(migration_5_6())
+                .addMigrations(migration_6_7())
+                .addMigrations(migration_7_8())
+                .addMigrations(migration_8_9())
+                .addMigrations(migration_9_10())
+                .addMigrations(migration_10_11())
+                .addMigrations(migration_11_12())
+                .addMigrations(migration_12_13())
+                .addMigrations(migration_13_14())
+                .addMigrations(migration_14_15())
+                .addMigrations(migration_15_16())
+            if (BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
-                        .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration()
             }
             builder.build()
         }
@@ -79,7 +78,7 @@ object RepositoryModule {
     }
 
     private fun migration_1_2(): Migration {
-        return object: Migration(1,2) {
+        return object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE Players ADD COLUMN positions INTEGER NOT NULL DEFAULT 0")
             }
@@ -87,7 +86,7 @@ object RepositoryModule {
     }
 
     private fun migration_2_3(): Migration {
-        return object: Migration(2,3) {
+        return object : Migration(2, 3) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE Lineups ADD COLUMN mode INTEGER NOT NULL DEFAULT 0")
                 database.execSQL("ALTER TABLE Teams ADD COLUMN type INTEGER NOT NULL DEFAULT 0")
@@ -96,7 +95,7 @@ object RepositoryModule {
     }
 
     private fun migration_3_4(): Migration {
-        return object: Migration(3,4) {
+        return object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE Teams ADD COLUMN main INTEGER NOT NULL DEFAULT 1")
             }
@@ -104,7 +103,7 @@ object RepositoryModule {
     }
 
     private fun migration_4_5(): Migration {
-        return object: Migration(4,5) {
+        return object : Migration(4, 5) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE Lineups ADD COLUMN roaster TEXT DEFAULT null")
             }
@@ -113,7 +112,7 @@ object RepositoryModule {
 
     //delete columns x and y + add new column hash in each table
     private fun migration_5_6(): Migration {
-        return object: Migration(5,6) {
+        return object : Migration(5, 6) {
             override fun migrate(database: SupportSQLiteDatabase) {
 //                database.execSQL("CREATE TABLE IF NOT EXISTS playerFieldPosition_tmp (" +
 //                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
@@ -143,7 +142,7 @@ object RepositoryModule {
     }
 
     private fun migration_6_7(): Migration {
-        return object: Migration(6,7) {
+        return object : Migration(6, 7) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE playerFieldPosition ADD COLUMN flags INTEGER NOT NULL DEFAULT 0")
             }
@@ -151,10 +150,11 @@ object RepositoryModule {
     }
 
     private fun migration_7_8(): Migration {
-        return object: Migration(7,8) {
+        return object : Migration(7, 8) {
             override fun migrate(database: SupportSQLiteDatabase) {
 //                database.execSQL("UPDATE playerFieldPosition set flags=1 where position=10")
-                database.execSQL("""
+                database.execSQL(
+                    """
                     update playerFieldPosition 
                     set flags=1 
                     where id in (
@@ -164,13 +164,14 @@ object RepositoryModule {
                         left join teams on lineups.teamID=teams.id 
                         where position=1 and mode=1
                     )
-                    """)
+                    """
+                )
             }
         }
     }
 
     private fun migration_8_9(): Migration {
-        return object: Migration(8,9) {
+        return object : Migration(8, 9) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE players ADD COLUMN pitching INTEGER NOT NULL DEFAULT 0")
                 database.execSQL("ALTER TABLE players ADD COLUMN batting INTEGER NOT NULL DEFAULT 0")
@@ -179,7 +180,7 @@ object RepositoryModule {
     }
 
     private fun migration_9_10(): Migration {
-        return object: Migration(9,10) {
+        return object : Migration(9, 10) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS tiles (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `position` INTEGER NOT NULL, `type` INTEGER NOT NULL, `enabled` INTEGER NOT NULL default 1)")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_tiles_position` ON tiles (`position`)")
@@ -192,7 +193,7 @@ object RepositoryModule {
     }
 
     private fun migration_10_11(): Migration {
-        return object: Migration(10,11) {
+        return object : Migration(10, 11) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS playerNumberOverlay (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lineupID` INTEGER NOT NULL, `playerID` INTEGER NOT NULL, `number` INTEGER NOT NULL, `hash` TEXT, FOREIGN KEY(`playerID`) REFERENCES `players`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`lineupID`) REFERENCES `lineups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_playerNumberOverlay_number` ON playerNumberOverlay (`number`)")
@@ -213,7 +214,7 @@ object RepositoryModule {
     }
 
     private fun migration_11_12(): Migration {
-        return object: Migration(11,12) {
+        return object : Migration(11, 12) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("INSERT INTO tiles (id, position, type, enabled) VALUES (5, 4, ${TileType.LAST_PLAYER_NUMBER.type}, 1)")
             }
@@ -221,7 +222,7 @@ object RepositoryModule {
     }
 
     private fun migration_12_13(): Migration {
-        return object: Migration(12,13) {
+        return object : Migration(12, 13) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE lineups ADD COLUMN eventTime INTEGER NOT NULL DEFAULT 0")
             }
@@ -229,7 +230,7 @@ object RepositoryModule {
     }
 
     private fun migration_13_14(): Migration {
-        return object: Migration(13,14) {
+        return object : Migration(13, 14) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE players ADD COLUMN email TEXT DEFAULT null")
                 database.execSQL("ALTER TABLE players ADD COLUMN phone TEXT DEFAULT null")
@@ -238,17 +239,16 @@ object RepositoryModule {
     }
 
     private fun migration_14_15(): Migration {
-        return object: Migration(14,15) {
+        return object : Migration(14, 15) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE lineups ADD COLUMN strategy INTEGER NOT NULL DEFAULT ${TeamStrategy.STANDARD.id}")
                 database.execSQL("ALTER TABLE lineups ADD COLUMN extraHitters INTEGER NOT NULL DEFAULT 0")
-                //TODO transformet tous les dh avec position == 10 to position == 255
             }
         }
     }
 
     private fun migration_15_16(): Migration {
-        return object: Migration(15,16) {
+        return object : Migration(15, 16) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE players ADD COLUMN sex INTEGER NOT NULL DEFAULT ${Sex.UNKNOWN.id}")
             }

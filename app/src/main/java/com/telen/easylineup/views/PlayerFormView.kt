@@ -5,15 +5,14 @@ import android.graphics.Color
 import android.net.Uri
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View.OnClickListener
 import android.widget.GridLayout
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.FieldPosition
-import com.telen.easylineup.domain.model.PlayerSide
-import com.telen.easylineup.domain.model.Sex
+import com.telen.easylineup.domain.model.*
 import kotlinx.android.synthetic.main.view_create_player.view.*
 import timber.log.Timber
 
@@ -71,7 +70,7 @@ class PlayerFormView : ConstraintLayout {
             listener?.onImagePickerRequested()
         }
 
-        playerSave.setOnClickListener {
+        actionContainer.saveClickListener = OnClickListener {
             val name = getName()
             val shirtNumber = getShirtNumber()
             val licenseNumber = getLicenseNumber()
@@ -96,7 +95,7 @@ class PlayerFormView : ConstraintLayout {
             )
         }
 
-        cancel.setOnClickListener {
+        actionContainer.cancelClickListener = OnClickListener {
             listener?.onCancel()
         }
 
@@ -111,13 +110,13 @@ class PlayerFormView : ConstraintLayout {
         }
 
         sexMale.setOnClickListener {
-            if(sexFemale.isChecked) {
+            if (sexFemale.isChecked) {
                 setSex(Sex.MALE)
             }
         }
 
         sexFemale.setOnClickListener {
-            if(sexMale.isChecked) {
+            if (sexMale.isChecked) {
                 setSex(Sex.FEMALE)
             }
         }
@@ -207,11 +206,11 @@ class PlayerFormView : ConstraintLayout {
     }
 
     fun enableSaveButton() {
-        playerSave.isEnabled = true
+        actionContainer.setSaveButtonEnabled(true)
     }
 
     fun disableSaveButton() {
-        playerSave.isEnabled = false
+        actionContainer.setSaveButtonEnabled(false)
     }
 
     fun getPlayerPositions(): Int {
@@ -223,12 +222,10 @@ class PlayerFormView : ConstraintLayout {
         this.playerPositions = positions
         this.positionState.clear()
 
-        val positionShortDescription = FieldPosition.getPositionShortNames(context, 0)
-
         favoritePositionsContainer.removeAllViews()
 
         FieldPosition.values()
-            .filter { FieldPosition.isDefensePlayer(it.id) }
+            .filter { it.isDefensePlayer() }
             .groupBy { it.mask }
             .map { it.value.first() }
             .forEach { position ->
@@ -236,7 +233,7 @@ class PlayerFormView : ConstraintLayout {
                 positionState[position] = isEnabled
 
                 val view = PlayerPositionFilterView(context)
-                view.setText(positionShortDescription[position.ordinal])
+                view.setText(position.getPositionShortName(context, TeamType.UNKNOWN.id))
                 applyFilterOnView(view, isEnabled)
 
                 view.setOnClickListener { _ ->

@@ -1,17 +1,12 @@
 package com.telen.easylineup.domain
 
-import com.nhaarman.mockitokotlin2.*
 import com.telen.easylineup.domain.model.*
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithLineupMode
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
@@ -23,121 +18,147 @@ internal class UpdatePlayersWithLineupModeTests {
     var observer = TestObserver<UpdatePlayersWithLineupMode.ResponseValue>()
     private val extraHitters = 0
     private val strategy = TeamStrategy.STANDARD
-
-    @Mock lateinit var lineupDao: PlayerFieldPositionRepository
+    private val lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitters)
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        updatePlayersWithLineupMode = UpdatePlayersWithLineupMode(lineupDao)
+        updatePlayersWithLineupMode = UpdatePlayersWithLineupMode()
         players = mutableListOf()
-        players.add(PlayerWithPosition("toto",0, 1, 1, 1, null,
-                FieldPosition.SECOND_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,0, 1, 1, 1, 1))
-        players.add(PlayerWithPosition("tata",0, 2, 2, 1, null,
-                FieldPosition.CATCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 2, 2, 1, 2))
-        players.add(PlayerWithPosition("titi",0, 3, 3, 1, null,
-                FieldPosition.CENTER_FIELD.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,4, 3, 3, 1, 4))
-        players.add(PlayerWithPosition("tutu",0, 4, 4, 1, null,
-                FieldPosition.FIRST_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,6, 4, 4, 1, 8))
-        players.add(PlayerWithPosition("tete",0, 5, 5, 1, null,
-                FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
+        players.add(
+            PlayerWithPosition(
+                "toto", 0, 1, 1, 1, null,
+                FieldPosition.SECOND_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, 0, 1, 1, 1, 1
+            )
+        )
+        players.add(
+            PlayerWithPosition(
+                "tata", 0, 2, 2, 1, null,
+                FieldPosition.CATCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, 2, 2, 2, 1, 2
+            )
+        )
+        players.add(
+            PlayerWithPosition(
+                "titi", 0, 3, 3, 1, null,
+                FieldPosition.CENTER_FIELD.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, 4, 3, 3, 1, 4
+            )
+        )
+        players.add(
+            PlayerWithPosition(
+                "tutu", 0, 4, 4, 1, null,
+                FieldPosition.FIRST_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, 6, 4, 4, 1, 8
+            )
+        )
+        players.add(
+            PlayerWithPosition(
+                "tete",
+                0,
+                5,
+                5,
+                1,
+                null,
+                FieldPosition.SUBSTITUTE.id,
+                0f,
+                0f,
+                PlayerFieldPosition.FLAG_NONE,
+                Constants.SUBSTITUTE_ORDER_VALUE,
+                5,
+                5,
+                1,
+                16
+            )
+        )
+    }
 
-        Mockito.`when`(lineupDao.updatePlayerFieldPosition(any())).thenReturn(Completable.complete())
-        Mockito.`when`(lineupDao.deletePosition(any())).thenReturn(Completable.complete())
+    private fun startUseCase(
+        teamType: TeamType?,
+        lineupMode: Boolean,
+        players: List<PlayerWithPosition> = this.players,
+        exception: Class<out Throwable>? = null
+    ) {
+        lineup.mode = if (lineupMode) MODE_ENABLED else MODE_DISABLED
+        val playersSize = players.size
+        updatePlayersWithLineupMode.executeUseCase(
+            UpdatePlayersWithLineupMode.RequestValues(
+                players,
+                lineup,
+                teamType?.id ?: 1000
+            )
+        ).subscribe(observer)
+        observer.await()
+        exception?.let {
+            observer.assertError(exception)
+        } ?: let {
+            observer.assertComplete()
+            Assert.assertEquals(playersSize, players.size)
+        }
     }
 
     @Test
     fun shouldTriggerAnExceptionIfTeamTypeIsUnknown() {
-        val teamType = 10
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true, teamType, strategy, extraHitters))
-                .subscribe(observer)
-        observer.await()
-        observer.assertError(IllegalArgumentException::class.java)
+        startUseCase(
+            teamType = null,
+            lineupMode = true,
+            exception = IllegalArgumentException::class.java
+        )
     }
 
     @Test
     fun shouldDoNothingIfListEmptyAndDPEnabled() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true, TeamType.BASEBALL.id, strategy, extraHitters))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
-        verifyZeroInteractions(lineupDao)
+        val playersCopy = players.map { it.copy() }
+        startUseCase(players = mutableListOf(), lineupMode = true, teamType = TeamType.BASEBALL)
+        Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
     }
 
     @Test
     fun shouldDoNothingIfListEmptyAndDPDisabled() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), false, TeamType.BASEBALL.id, strategy, extraHitters))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
-        verifyZeroInteractions(lineupDao)
+        val playersCopy = players.map { it.copy() }
+        startUseCase(players = mutableListOf(), lineupMode = false, teamType = TeamType.BASEBALL)
+        Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
     }
 
     @Test
     fun shouldDoNothingIfDesignatedPlayerEnabledAndSoftballTeam() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(mutableListOf(), true, TeamType.SOFTBALL.id, strategy, extraHitters))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
-        verifyZeroInteractions(lineupDao)
+        val playersCopy = players.map { it.copy() }
+        startUseCase(players = mutableListOf(), lineupMode = true, teamType = TeamType.SOFTBALL)
+        Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
     }
 
     @Test
     fun shouldDoNothingIfDPEnabledAndNoPitcherAssigned() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, true, TeamType.BASEBALL.id, strategy, extraHitters))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
-        verifyZeroInteractions(lineupDao)
+        val playersCopy = players.map { it.copy() }
+        startUseCase(teamType = TeamType.BASEBALL, lineupMode = true)
+        Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
     }
 
     @Test
     fun shouldDoNothingIfDPDisabledAndNoPitcherOrDPAssigned() {
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, false, TeamType.BASEBALL.id, strategy, extraHitters))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
-        verifyZeroInteractions(lineupDao)
+        val playersCopy = players.map { it.copy() }
+        startUseCase(teamType = TeamType.BASEBALL, lineupMode = false)
+        Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
     }
 
     @Test
     fun shouldUpdatePitcherOrderTo_10_ifAssignedAndDPEnabled() {
-        players[0].position = FieldPosition.PITCHER.id
-
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, true, TeamType.BASEBALL.id, strategy, extraHitters))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
-        verify(lineupDao).updatePlayerFieldPosition(check {
-            Assert.assertEquals(TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters), it.order)
-            Assert.assertEquals(PlayerFieldPosition.FLAG_FLEX, it.flags)
-            Assert.assertEquals(FieldPosition.PITCHER.id, it.position)
-        })
-        verify(lineupDao, never()).deletePosition(any())
+        players.first().position = FieldPosition.PITCHER.id
+        startUseCase(TeamType.BASEBALL, lineupMode = true)
+        val pitcher = players.first { it.isPitcher() }
+        val expectedOrder = TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters)
+        Assert.assertEquals(expectedOrder, pitcher.order)
+        Assert.assertEquals(PlayerFieldPosition.FLAG_FLEX, pitcher.flags)
     }
 
     @Test
     fun shouldDeletePitcherAndDPifAssignedAndDPDisabled() {
-        players[0].apply {
+        players.first().apply {
             position = FieldPosition.PITCHER.id
             flags = PlayerFieldPosition.FLAG_FLEX
         }
         players[1].position = FieldPosition.DP_DH.id
 
-        updatePlayersWithLineupMode.executeUseCase(UpdatePlayersWithLineupMode.RequestValues(players, false, TeamType.BASEBALL.id, strategy, extraHitters))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+        startUseCase(TeamType.BASEBALL, lineupMode = false)
 
-        verify(lineupDao, times(2)).deletePosition(check {
-            Assert.assertEquals(true, it.flags and PlayerFieldPosition.FLAG_FLEX > 0 || it.position == FieldPosition.DP_DH.id)
-        })
-        verify(lineupDao, never()).updatePlayerFieldPosition(any())
+        Assert.assertNull(players.firstOrNull { it.isPitcher() })
+        Assert.assertNull(players.firstOrNull { it.isDpDhOrFlex() })
     }
 }

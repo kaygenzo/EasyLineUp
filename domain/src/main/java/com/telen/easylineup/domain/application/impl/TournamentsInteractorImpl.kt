@@ -20,7 +20,7 @@ internal class TournamentsInteractorImpl(private val context: Context) : Tournam
     private val tournamentsRepo: TournamentRepository by inject()
     private val getTeam: GetTeam by inject()
     private val deleteTournamentUseCase: DeleteTournamentLineups by inject()
-    private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineups by inject()
+    private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineupsUseCase by inject()
     private val getTournamentsUseCase: GetTournaments by inject()
     private val tableDataUseCase: GetTournamentStatsForPositionTable by inject()
 
@@ -51,7 +51,7 @@ internal class TournamentsInteractorImpl(private val context: Context) : Tournam
             .flatMap {
                 UseCaseHandler.execute(
                     getAllTournamentsWithLineupsUseCase,
-                    GetAllTournamentsWithLineups.RequestValues(filter, it.team.id)
+                    GetAllTournamentsWithLineupsUseCase.RequestValues(filter, it.team.id)
                 )
             }
             .map { it.result }

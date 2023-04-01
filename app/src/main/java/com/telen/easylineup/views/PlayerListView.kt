@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.utils.getPositionShortNames
 import kotlinx.android.synthetic.main.view_bottom_sheet_player_list.view.*
 import timber.log.Timber
 
@@ -22,7 +23,7 @@ interface OnPlayerClickListener {
     fun onPlayerSelected(player: Player)
 }
 
-class PlayerListView: ConstraintLayout, OnPlayerClickListener {
+class PlayerListView : ConstraintLayout, OnPlayerClickListener {
 
     override fun onPlayerSelected(player: Player) {
         listener?.onPlayerSelected(player)
@@ -32,9 +33,21 @@ class PlayerListView: ConstraintLayout, OnPlayerClickListener {
     private lateinit var mAdapter: PlayerListAdapter
     private var listener: OnPlayerClickListener? = null
 
-    constructor(context: Context) : super(context) { init(context) }
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init(context) }
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context) }
+    constructor(context: Context) : super(context) {
+        init(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        init(context)
+    }
 
     private fun init(context: Context) {
         LayoutInflater.from(context).inflate(R.layout.view_bottom_sheet_player_list, this)
@@ -61,12 +74,16 @@ class PlayerListView: ConstraintLayout, OnPlayerClickListener {
     }
 }
 
-class PlayerListAdapter(val list: List<Player>, private val playerListener: OnPlayerClickListener?): RecyclerView.Adapter<PlayerListAdapter.PlayerViewHolder>() {
+class PlayerListAdapter(
+    val list: List<Player>,
+    private val playerListener: OnPlayerClickListener?
+) : RecyclerView.Adapter<PlayerListAdapter.PlayerViewHolder>() {
 
     private var filter: FieldPosition? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_player_simple, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_player_simple, parent, false)
         return PlayerViewHolder(view)
     }
 
@@ -80,14 +97,13 @@ class PlayerListAdapter(val list: List<Player>, private val playerListener: OnPl
 
         filter?.let {
             val isMatchingPosition = player.positions and it.mask > 0
-            if(isMatchingPosition) {
+            if (isMatchingPosition) {
                 holder.position.visibility = View.VISIBLE
-                val positionShortDescription = FieldPosition.getPositionShortNames(holder.position.context, 0)
+                val positionShortDescription = getPositionShortNames(holder.position.context, 0)
                 holder.position.setText(positionShortDescription[it.ordinal])
                 holder.position.setBackground(R.drawable.position_selected_background)
                 holder.position.setTextColor(R.color.white)
-            }
-            else {
+            } else {
                 holder.position.visibility = View.GONE
             }
         }
@@ -95,23 +111,22 @@ class PlayerListAdapter(val list: List<Player>, private val playerListener: OnPl
         holder.image.post {
             // I put this test here because untilReady is too long to complete so the adapter inflate too late the image.
             // this cause the images to be at the wrong place in the recycler
-            if(holder.image.width > 0 && holder.image.height > 0) {
+            if (holder.image.width > 0 && holder.image.height > 0) {
                 try {
                     Picasso.get().load(player.image)
-                            .resize(holder.image.width, holder.image.height)
-                            .centerCrop()
-                            .placeholder(R.drawable.ic_unknown_field_player)
-                            .error(R.drawable.ic_unknown_field_player)
-                            .into(holder.image)
+                        .resize(holder.image.width, holder.image.height)
+                        .centerCrop()
+                        .placeholder(R.drawable.ic_unknown_field_player)
+                        .error(R.drawable.ic_unknown_field_player)
+                        .into(holder.image)
                 } catch (e: IllegalArgumentException) {
                     Timber.e(e)
                 }
-            }
-            else {
+            } else {
                 Picasso.get().load(R.drawable.ic_unknown_field_player)
-                        .error(R.drawable.ic_unknown_field_player)
-                        .placeholder(R.drawable.ic_unknown_field_player)
-                        .into(holder.image)
+                    .error(R.drawable.ic_unknown_field_player)
+                    .placeholder(R.drawable.ic_unknown_field_player)
+                    .into(holder.image)
             }
         }
 
@@ -124,7 +139,7 @@ class PlayerListAdapter(val list: List<Player>, private val playerListener: OnPl
         this.filter = filter
     }
 
-    class PlayerViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    class PlayerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val root = view.findViewById<ConstraintLayout>(R.id.rootView)
         val image = view.findViewById<ImageView>(R.id.playerImage)
         val name = view.findViewById<TextView>(R.id.playerName)

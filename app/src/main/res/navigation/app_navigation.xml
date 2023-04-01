@@ -63,17 +63,17 @@
         android:id="@+id/lineupFragmentFixed"
         android:name="com.telen.easylineup.lineup.LineupFragmentFixed"
         android:label="@string/title_lineups"
-        tools:layout="@layout/fragment_lineup_fixed"/>
+        tools:layout="@layout/fragment_lineup"/>
 
     <fragment
         android:id="@+id/lineupFragmentEditable"
         android:name="com.telen.easylineup.lineup.LineupFragmentEditable"
         android:label="@string/title_lineups"
-        tools:layout="@layout/fragment_lineup_edition"/>
+        tools:layout="@layout/fragment_lineup"/>
 
     <fragment
         android:id="@+id/lineupRosterFragment"
-        android:name="com.telen.easylineup.lineup.roster.LineupRosterFragment"
+        android:name="com.telen.easylineup.lineup.edition.LineupEditionFragment"
         android:label="@string/title_lineup_roster"
         tools:layout="@layout/fragment_lineup_edition"/>
 

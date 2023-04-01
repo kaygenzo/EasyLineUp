@@ -12,6 +12,7 @@ import androidx.fragment.app.activityViewModels
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentTeamEditBinding
+import com.telen.easylineup.launch
 import com.telen.easylineup.team.createTeam.SetupViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
@@ -49,7 +50,7 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val errorsDisposable = viewModel.errors.subscribe({
+        launch(viewModel.errors, {
             when (it) {
                 SetupViewModel.StepError.NAME_EMPTY -> {
                     teamNameInputLayout.error = getString(R.string.team_creation_error_name_empty)
@@ -66,8 +67,6 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
         }, {
             Timber.e(it)
         })
-
-        disposables.add(errorsDisposable)
     }
 
     override fun onCreateView(

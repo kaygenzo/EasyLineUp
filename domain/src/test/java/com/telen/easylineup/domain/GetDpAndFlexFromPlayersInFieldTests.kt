@@ -11,98 +11,123 @@ import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-internal class GetDpAndFlexFromPlayersInFieldTests: BaseUseCaseTests() {
+internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
 
     lateinit var useCase: GetDPAndFlexFromPlayersInField
     lateinit var players: MutableList<PlayerWithPosition>
+    private val observer = TestObserver<GetDPAndFlexFromPlayersInField.ResponseValue>()
 
     @Before
     fun init() {
-
-        val teamID = 1L
-
         useCase = GetDPAndFlexFromPlayersInField()
+        val noFlag = PlayerFieldPosition.FLAG_NONE
+        players = mutableListOf(
+            generate(1L, FieldPosition.PITCHER, noFlag, 1),
+            generate(2L, FieldPosition.RIGHT_FIELD, noFlag, 2),
+            generate(3L, FieldPosition.DP_DH, noFlag, 3),
+            generate(4L, FieldPosition.SHORT_STOP, noFlag, 4),
+            generate(5L, FieldPosition.SUBSTITUTE, noFlag, Constants.SUBSTITUTE_ORDER_VALUE)
+        )
+    }
 
-        players = mutableListOf()
-        players.add(generatePlayerWithPosition(1L, teamID, FieldPosition.PITCHER, PlayerFieldPosition.FLAG_NONE, 1, 1))
-        players.add(generatePlayerWithPosition(2L, teamID, FieldPosition.RIGHT_FIELD, PlayerFieldPosition.FLAG_NONE, 2, 1))
-        players.add(generatePlayerWithPosition(3L, teamID, FieldPosition.DP_DH, PlayerFieldPosition.FLAG_NONE, 3, 1))
-        players.add(generatePlayerWithPosition(4L, teamID, FieldPosition.SHORT_STOP, PlayerFieldPosition.FLAG_NONE, 4, 1))
-        players.add(generatePlayerWithPosition(5L, teamID, FieldPosition.SUBSTITUTE, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 1))
+    private fun startUseCase(
+        players: List<PlayerWithPosition> = this.players,
+        teamType: TeamType,
+        exception: Class<out Throwable>? = null
+    ) {
+        val request = GetDPAndFlexFromPlayersInField.RequestValues(players, teamType.id)
+        val playersSize = players.size
+        useCase.executeUseCase(request).subscribe(observer)
+        observer.await()
+        exception?.let {
+            observer.assertError(exception)
+        } ?: let {
+            observer.assertComplete()
+            Assert.assertEquals("Size of player list must not change", playersSize, players.size)
+        }
     }
 
     @Test
     fun shouldTriggerNeedAssignPitcherFirstExceptionIfListEmpty() {
-        val observer = TestObserver<GetDPAndFlexFromPlayersInField.ResponseValue>()
-        useCase.executeUseCase(GetDPAndFlexFromPlayersInField.RequestValues(mutableListOf(), TeamType.BASEBALL.id))
-                .subscribe(observer)
-        observer.await()
-        observer.assertError(NeedAssignPitcherFirstException::class.java)
+        startUseCase(
+            players = mutableListOf(),
+            teamType = TeamType.BASEBALL,
+            exception = NeedAssignPitcherFirstException::class.java
+        )
     }
 
     @Test
     fun shouldTriggerNeedAssignPitcherFirstExceptionIf_PitcherNotAssigned_Baseball() {
-        val observer = TestObserver<GetDPAndFlexFromPlayersInField.ResponseValue>()
-        players.removeIf { it.position == FieldPosition.PITCHER.id }
-        useCase.executeUseCase(GetDPAndFlexFromPlayersInField.RequestValues(players, TeamType.BASEBALL.id))
-                .subscribe(observer)
-        observer.await()
-        observer.assertError(NeedAssignPitcherFirstException::class.java)
+        players.removeIf { it.isPitcher() }
+        startUseCase(
+            teamType = TeamType.BASEBALL,
+            exception = NeedAssignPitcherFirstException::class.java
+        )
     }
 
     @Test
-    fun shouldReturnDPAndFlexPitcher_baseball() {
-        val observer = TestObserver<GetDPAndFlexFromPlayersInField.ResponseValue>()
-        players.removeIf { it.position == FieldPosition.DP_DH.id }
-        useCase.executeUseCase(GetDPAndFlexFromPlayersInField.RequestValues(players, TeamType.BASEBALL.id))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertNull(observer.values().first().configResult.dp)
-        Assert.assertEquals(players[0].toPlayer(), observer.values().first().configResult.flex)
-        Assert.assertFalse(observer.values().first().configResult.dpLocked)
-        Assert.assertTrue(observer.values().first().configResult.flexLocked)
+    fun shouldReturnOnlyFlexPitcherBaseball() {
+        players.removeIf { it.isDpDh() }
+        startUseCase(teamType = TeamType.BASEBALL)
+        observer.values().first().configResult.let {
+            Assert.assertNull(it.dp)
+            Assert.assertEquals(players.first { it.playerID == 1L }, it.flex)
+            Assert.assertFalse(it.dpLocked)
+            Assert.assertTrue(it.flexLocked)
+        }
     }
 
     @Test
-    fun shouldReturnOnlyFlexPitcher_baseball() {
-        val observer = TestObserver<GetDPAndFlexFromPlayersInField.ResponseValue>()
-        useCase.executeUseCase(GetDPAndFlexFromPlayersInField.RequestValues(players, TeamType.BASEBALL.id))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(players[2].toPlayer(), observer.values().first().configResult.dp)
-        Assert.assertEquals(players[0].toPlayer(), observer.values().first().configResult.flex)
-        Assert.assertFalse(observer.values().first().configResult.dpLocked)
-        Assert.assertTrue(observer.values().first().configResult.flexLocked)
+    fun shouldReturnDPAndFlexPitcherBaseball() {
+        startUseCase(teamType = TeamType.BASEBALL)
+        observer.values().first().configResult.let {
+            Assert.assertEquals(players.first { it.playerID == 3L }, it.dp)
+            Assert.assertEquals(players.first { it.playerID == 1L }, it.flex)
+            Assert.assertFalse(it.dpLocked)
+            Assert.assertTrue(it.flexLocked)
+        }
     }
 
     @Test
-    fun shouldReturnDPAndFlexRightField_softball() {
-        val observer = TestObserver<GetDPAndFlexFromPlayersInField.ResponseValue>()
-        players.first { it.position == FieldPosition.RIGHT_FIELD.id }.flags = PlayerFieldPosition.FLAG_FLEX
-        useCase.executeUseCase(GetDPAndFlexFromPlayersInField.RequestValues(players, TeamType.SOFTBALL.id))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(players[2].toPlayer(), observer.values().first().configResult.dp)
-        Assert.assertEquals(players[1].toPlayer(), observer.values().first().configResult.flex)
-        Assert.assertFalse(observer.values().first().configResult.dpLocked)
-        Assert.assertFalse(observer.values().first().configResult.flexLocked)
+    fun shouldReturnDPAndFlexRightFieldSoftball() {
+        players.first { it.isRightField() }.flags = PlayerFieldPosition.FLAG_FLEX
+        startUseCase(teamType = TeamType.SOFTBALL)
+        observer.values().first().configResult.let {
+            Assert.assertEquals(players.first { it.playerID == 3L }, it.dp)
+            Assert.assertEquals(players.first { it.playerID == 2L }, it.flex)
+            Assert.assertFalse(it.dpLocked)
+            Assert.assertFalse(it.flexLocked)
+        }
     }
 
     @Test
-    fun shouldReturnOnlyFlexRightField_softball() {
-        val observer = TestObserver<GetDPAndFlexFromPlayersInField.ResponseValue>()
-        players.first { it.position == FieldPosition.RIGHT_FIELD.id }.flags = PlayerFieldPosition.FLAG_FLEX
-        players.removeIf { it.position == FieldPosition.DP_DH.id }
-        useCase.executeUseCase(GetDPAndFlexFromPlayersInField.RequestValues(players, TeamType.SOFTBALL.id))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertNull(observer.values().first().configResult.dp)
-        Assert.assertEquals(players[1].toPlayer(), observer.values().first().configResult.flex)
-        Assert.assertFalse(observer.values().first().configResult.dpLocked)
-        Assert.assertFalse(observer.values().first().configResult.flexLocked)
+    fun shouldReturnOnlyFlexRightFieldSoftball() {
+        players.first { it.isRightField() }.flags = PlayerFieldPosition.FLAG_FLEX
+        players.removeIf { it.isDpDh() }
+        startUseCase(teamType = TeamType.SOFTBALL)
+        observer.values().first().configResult.let {
+            Assert.assertNull(it.dp)
+            Assert.assertEquals(players.first { it.playerID == 2L }, it.flex)
+            Assert.assertFalse(it.dpLocked)
+            Assert.assertFalse(it.flexLocked)
+        }
+    }
+
+    @Test
+    fun shouldReturnDpAndFlexWithSlowPitch() {
+        players.add(generate(6L, FieldPosition.SLOWPITCH_RF, PlayerFieldPosition.FLAG_FLEX, 6))
+        startUseCase(teamType = TeamType.SOFTBALL)
+        observer.values().first().configResult.let {
+            Assert.assertEquals(players.first { it.playerID == 6L }, it.flex)
+        }
+    }
+
+    @Test
+    fun shouldReturnDpAndFlexWithBaseball5() {
+        players.add(generate(6L, FieldPosition.MID_FIELDER, PlayerFieldPosition.FLAG_FLEX, 6))
+        startUseCase(teamType = TeamType.SOFTBALL)
+        observer.values().first().configResult.let {
+            Assert.assertEquals(players.first { it.playerID == 6L }, it.flex)
+        }
     }
 }

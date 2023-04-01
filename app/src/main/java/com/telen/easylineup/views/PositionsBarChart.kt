@@ -19,10 +19,11 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.utils.getPositionShortNames
 import kotlinx.android.synthetic.main.view_bar_chart.view.*
 
 
-class PositionsBarChart: ConstraintLayout {
+class PositionsBarChart : ConstraintLayout {
 
     // positions reference to display in xAxis
     private var strategy: TeamStrategy = TeamStrategy.STANDARD
@@ -33,9 +34,21 @@ class PositionsBarChart: ConstraintLayout {
     // names from arrays.xml
     private var mPositions: Array<String>? = null
 
-    constructor(context: Context) : super(context) {init(context)}
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {init(context)}
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {init(context)}
+    constructor(context: Context) : super(context) {
+        init(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        init(context)
+    }
 
     private fun init(context: Context) {
         LayoutInflater.from(context).inflate(R.layout.view_bar_chart, this)
@@ -94,15 +107,14 @@ class PositionsBarChart: ConstraintLayout {
     private fun refreshXAxis() {
         teamType?.let {
             val xAxis = playerPositionsChart.xAxis
-            mPositions = FieldPosition.getPositionShortNames(context, it)
+            mPositions = getPositionShortNames(context, it)
             xAxis.valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
                     val index = value.toInt()
-                    if(index < strategy.positions.size) {
+                    if (index < strategy.positions.size) {
                         val position = strategy.positions[index]
                         return mPositions?.get(position.id) ?: "N/A"
-                    }
-                    else
+                    } else
                         return "N/A"
                 }
             }
@@ -112,7 +124,7 @@ class PositionsBarChart: ConstraintLayout {
     private fun refreshChart() {
 
         val positionsRef = strategy.positions
-        if(teamType == null || data.isEmpty()) {
+        if (teamType == null || data.isEmpty()) {
             return
         }
 

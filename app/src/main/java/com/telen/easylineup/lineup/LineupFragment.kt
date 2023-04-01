@@ -1,264 +1,197 @@
 package com.telen.easylineup.lineup
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidx.annotation.LayoutRes
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.annotation.IdRes
+import androidx.annotation.MenuRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuProvider
+import androidx.core.view.drawToBitmap
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.google.android.material.textview.MaterialTextView
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.BuildConfig
-import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.FragmentLineupBinding
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.isSubstitute
+import com.telen.easylineup.launch
 import com.telen.easylineup.lineup.attack.AttackFragment
 import com.telen.easylineup.lineup.defense.DefenseFragmentEditable
+import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 
-class LineupFragmentFixed: LineupFragment("LineupFragmentFixed", R.layout.fragment_lineup_fixed, false) {
+class LineupFragmentFixed : LineupFragment("LineupFragmentFixed", R.menu.menu_lineup_summary, false)
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_lineup_summary, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
+class LineupFragmentEditable :
+    LineupFragment("LineupFragmentEditable", R.menu.menu_lineup_edition, true)
 
-    override fun getRootScreen(): View? {
-        return view?.findViewById(R.id.lineupFixedRootView) ?: run {
-            val index = getExportType()
-            return pagerAdapter.getMapFragment()[index]
-        }
-    }
+abstract class LineupFragment(
+    fragmentName: String,
+    @MenuRes private val menuRes: Int,
+    private val isEditable: Boolean
+) : BaseFragment(fragmentName), MenuProvider {
 
-    override fun getExportType(): Int {
-        return view?.findViewById<ViewPager2>(R.id.viewpager)?.currentItem ?: -1
-    }
-
-}
-
-class LineupFragmentEditable: LineupFragment("LineupFragmentEditable", R.layout.fragment_lineup_edition, true) {
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_lineup_edition, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu) {
-
-        val teamTypeDisposable = viewModel.getTeamType()
-                .subscribe({
-                    val teamType = TeamType.getTypeById(viewModel.teamType)
-                    val item = menu.findItem(R.id.action_lineup_mode)
-                    when(teamType) {
-                        TeamType.UNKNOWN -> item.isVisible = false
-                        TeamType.BASEBALL -> {
-                            menu.findItem(R.id.action_lineup_mode).setTitle(R.string.action_add_dh)
-                        }
-                        TeamType.SOFTBALL -> {
-                            menu.findItem(R.id.action_lineup_mode).setTitle(R.string.action_add_dp_flex)
-                        }
-                        else -> {}
-                    }
-                }, {
-                    Timber.e(it)
-                })
-        disposables.add(teamTypeDisposable)
-
-        menu.findItem(R.id.action_lineup_mode).isChecked = viewModel.lineupMode == MODE_ENABLED
-
-        super.onPrepareOptionsMenu(menu)
-    }
-}
-
-abstract class LineupFragment(fragmentName: String, @LayoutRes private val layout: Int, private val isEditable: Boolean): BaseFragment(fragmentName) {
+    private val viewModel by viewModels<LineupViewModel>()
+    lateinit var pagerAdapter: LineupPagerAdapter
+    private var binder: FragmentLineupBinding? = null
 
     companion object {
-        const val REQUEST_WRITE_EXTERENAL_STORAGE_PERMISSION = 0
-
-        fun getArguments(lineupID: Long, lineupTitle: String, strategy: TeamStrategy, extraHitters: Int): Bundle {
+        fun getArguments(lineupID: Long): Bundle {
             val extras = Bundle()
             extras.putLong(Constants.LINEUP_ID, lineupID)
-            extras.putString(Constants.LINEUP_TITLE, lineupTitle)
-            extras.putSerializable(Constants.EXTRA_LINEUP_STRATEGY, strategy)
-            extras.putInt(Constants.EXTRA_LINEUP_EXTRA_HITTERS, extraHitters)
             return extras
         }
     }
 
-    lateinit var pagerAdapter: LineupPagerAdapter
-    lateinit var viewModel: PlayersPositionViewModel
-
-    open fun getRootScreen(): View? {
-        return null
-    }
-
-    open fun getExportType(): Int {
-        return -1
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-        viewModel = ViewModelProviders.of(this).get(PlayersPositionViewModel::class.java)
         viewModel.lineupID = arguments?.getLong(Constants.LINEUP_ID, 0) ?: 0
-        viewModel.lineupTitle = arguments?.getString(Constants.LINEUP_TITLE) ?: ""
         viewModel.editable = isEditable
-        viewModel.strategy = arguments?.getSerializable(Constants.EXTRA_LINEUP_STRATEGY) as TeamStrategy
-        viewModel.extraHitters = arguments?.getInt(Constants.EXTRA_LINEUP_EXTRA_HITTERS) as Int
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(layout, container, false)
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.clearData()
+    }
 
-        initObserver()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val binder = FragmentLineupBinding.inflate(inflater)
+        this.binder = binder
 
-        activity?.let { activity ->
-
-            pagerAdapter = LineupPagerAdapter(this, viewModel.editable)
-            view.findViewById<ViewPager2>(R.id.viewpager)?.let { pager ->
-
-                childFragmentManager.fragments.filterIsInstance<DefenseFragmentEditable>().forEach {
-                    childFragmentManager.beginTransaction().remove(it).commit()
+        if (isEditable) {
+            binder.substitutesIndication?.visibility = View.GONE
+            binder.bottomChoice?.apply {
+                visibility = View.VISIBLE
+                saveClickListener = View.OnClickListener {
+                    launch(viewModel.save(), {
+                        Timber.d("Successfully saved")
+                        goBack()
+                    }, {
+                        Timber.e(it)
+                    })
                 }
+                cancelClickListener = View.OnClickListener { goBack() }
+            }
 
-                childFragmentManager.fragments.filterIsInstance<AttackFragment>().forEach {
-                    childFragmentManager.beginTransaction().remove(it).commit()
-                }
+        } else {
+            binder.substitutesIndication?.visibility = View.VISIBLE
+            binder.bottomChoice?.visibility = View.GONE
+        }
 
-                pager.isSaveEnabled = false
-                pager.adapter = pagerAdapter
-                val tabLayout = view.findViewById<TabLayout>(R.id.lineupTabLayout)
-                TabLayoutMediator(tabLayout, pager) { tab, position ->
-                    tab.text = when(position) {
+        pagerAdapter = LineupPagerAdapter(this, viewModel.editable)
+        binder.viewpager?.let { pager ->
+            childFragmentManager.fragments.filterIsInstance<DefenseFragmentEditable>().forEach {
+                childFragmentManager.beginTransaction().remove(it).commit()
+            }
+
+            childFragmentManager.fragments.filterIsInstance<AttackFragment>().forEach {
+                childFragmentManager.beginTransaction().remove(it).commit()
+            }
+
+            pager.isSaveEnabled = false
+            pager.adapter = pagerAdapter
+            binder.lineupTabLayout?.let {
+                TabLayoutMediator(it, pager) { tab, position ->
+                    tab.text = when (position) {
                         FRAGMENT_DEFENSE_INDEX -> getString(R.string.new_lineup_tab_field_defense)
                         FRAGMENT_ATTACK_INDEX -> getString(R.string.new_lineup_tab_field_attack)
                         else -> ""
                     }
                 }.attach()
-
-                pager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
-                    override fun onPageSelected(position: Int) {
-                        viewModel.onTabSelected(activity, position)
-                    }
-                })
             }
 
-            view.findViewById<ConstraintLayout>(R.id.fragment_defense_edition)?.let {
-                childFragmentManager.fragments.filterIsInstance<DefenseFragmentEditable>().lastOrNull()?.let {
-                    if (!it.isRemoving) {
-                        childFragmentManager
-                                .beginTransaction()
-                                .replace(R.id.fragment_defense_edition, it)
-                                .commit()
-                    }
-                } ?: run {
-                    childFragmentManager
-                            .beginTransaction()
-                            .replace(R.id.fragment_defense_edition, DefenseFragmentEditable())
-                            .commit()
+            pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    activity?.let { viewModel.onScreenChanged(position) }
                 }
-            }
-
-            view.findViewById<ConstraintLayout>(R.id.fragment_attack_edition)?.let {
-                childFragmentManager.fragments.filterIsInstance<AttackFragment>().lastOrNull()?.let {
-                    if (!it.isRemoving) {
-                        childFragmentManager
-                                .beginTransaction()
-                                .replace(R.id.fragment_attack_edition, it)
-                                .commit()
-                    }
-                } ?: run {
-                    childFragmentManager
-                            .beginTransaction()
-                            .replace(R.id.fragment_attack_edition, AttackFragment())
-                            .commit()
-                }
-            }
-
-            viewModel.getLineupName().observe(viewLifecycleOwner, Observer {
-                (activity as HomeActivity).supportActionBar?.title = it
-            })
-
-            viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer {
-                val size = it.filter { item -> item.position == FieldPosition.SUBSTITUTE.id
-                        && item.fieldPositionID > 0 }.size
-                val substituteIndication = view.findViewById<MaterialTextView>(R.id.substitutesIndication)
-                substituteIndication?.text = resources.getQuantityString(R.plurals.lineups_substitutes_size, size, size)
             })
         }
 
-        return view
+        replaceFragmentIfNeeded(binder.fragmentDefenseEdition, R.id.fragment_defense_edition) {
+            DefenseFragmentEditable()
+        }
+
+        replaceFragmentIfNeeded(binder.fragmentAttackEdition, R.id.fragment_attack_edition) {
+            AttackFragment()
+        }
+
+        viewModel.observeLineupName().observe(viewLifecycleOwner) {
+            (activity as AppCompatActivity).supportActionBar?.title = it
+        }
+
+        viewModel.observeDefensePlayers().observe(viewLifecycleOwner) {
+            val size = it.filter { item -> item.isSubstitute() }.size
+            binder.substitutesIndication?.text =
+                resources.getQuantityString(R.plurals.lineups_substitutes_size, size, size)
+        }
+
+        return binder.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        activity?.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        viewModel.clear()
-        view?.findViewById<ViewPager2>(R.id.viewpager)?.let { pager ->
-            pager.adapter = null
-        }
+        binder?.viewpager?.let { it.adapter = null }
         disposables.clear()
+        binder = null
     }
 
-    private fun initObserver() {
-        val disposable = viewModel.observeLineupErrors().subscribe({
-            when(it) {
-                DomainErrors.Lineups.DELETE_LINEUP_FAILED -> {
-                    activity?.run {
-                        Toast.makeText(this, R.string.error_when_deleting_lineup, Toast.LENGTH_LONG).show()
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(menuRes, menu)
+    }
+
+    override fun onPrepareMenu(menu: Menu) {
+        launch(viewModel.getTeamType(), {
+            val teamType = TeamType.getTypeById(it)
+            menu.findItem(R.id.action_lineup_mode)?.apply {
+                when (teamType) {
+                    TeamType.UNKNOWN -> isVisible = false
+                    TeamType.BASEBALL -> {
+                        setTitle(R.string.action_add_dh)
                     }
+                    TeamType.SOFTBALL -> {
+                        setTitle(R.string.action_add_dp_flex)
+                    }
+                    else -> {}
                 }
-                else -> {}
+                isChecked = viewModel.lineup?.mode == MODE_ENABLED
             }
         }, {
             Timber.e(it)
         })
-        disposables.add(disposable)
-
-        val eventDisposable = viewModel.eventHandler.subscribe({
-            when(it) {
-                DeleteLineupSuccess -> {
-                    activity?.run {
-                        this.runOnUiThread {
-                            val isShortcut = arguments?.getBoolean(Constants.EXTRA_IS_FROM_SHORTCUT) ?: false
-                            if (isShortcut) {
-                                findNavController().popBackStack(R.id.navigation_home, false)
-                            }
-                            else {
-                                findNavController().popBackStack(R.id.navigation_lineups, false)
-                            }
-                        }
-                    }
-                }
-                else -> {}
-            }
-        }, {
-            Timber.e(it)
-        })
-        disposables.add(eventDisposable)
+        super.onPrepareMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+    override fun onMenuItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_edit -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_lineup_edit")
-                val extras = Companion.getArguments(lineupID = viewModel.lineupID ?: 0,
-                        lineupTitle = viewModel.lineupTitle ?: "",
-                        strategy = viewModel.strategy,
-                        extraHitters = viewModel.extraHitters
+                val extras = Companion.getArguments(lineupID = viewModel.lineupID ?: 0)
+                findNavController().navigate(
+                    R.id.lineupFragmentEditable,
+                    extras,
+                    NavigationUtils().getOptions()
                 )
-                findNavController().navigate(R.id.lineupFragmentEditable, extras, NavigationUtils().getOptions())
                 true
             }
             R.id.action_delete -> {
@@ -271,63 +204,82 @@ abstract class LineupFragment(fragmentName: String, @LayoutRes private val layou
                 exportLineupToExternalStorage()
                 true
             }
-            R.id.action_roster -> {
-                FirebaseAnalyticsUtils.onClick(activity, "click_lineup_roster")
-                showLineupRosterScreen()
-                true
-            }
             R.id.action_lineup_mode -> {
-                if(BuildConfig.DEBUG)
+                if (BuildConfig.DEBUG) {
                     Toast.makeText(activity, "Mode is ${item.isChecked}", Toast.LENGTH_SHORT).show()
+                }
                 FirebaseAnalyticsUtils.onClick(activity, "click_lineup_mode")
                 viewModel.onLineupModeChanged(!item.isChecked)
                 true
             }
-            else -> super.onOptionsItemSelected(item)
+            else -> false
         }
     }
 
     private fun askUserConsentForDelete() {
-        activity?.let {
-            viewModel.getUserDeleteConsentDialog(it).show()
+        activity?.let { ctx ->
+            DialogFactory
+                .getWarningTaskDialog(context = ctx,
+                    title = R.string.dialog_delete_lineup_title,
+                    message = R.string.dialog_delete_cannot_undo_message,
+                    task = viewModel.deleteLineup()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnComplete { goBack(showFixedView = false) }
+                        .doOnError {
+                            Toast.makeText(
+                                ctx, R.string.error_when_deleting_lineup, Toast.LENGTH_LONG
+                            ).show()
+                        })
+                .show()
         }
     }
 
     private fun exportLineupToExternalStorage() {
         activity?.let {
-            val disposable = viewModel.exportLineupToExternalStorage(it, getRootScreen(), getExportType())
-                    .subscribe({ intent ->
-                        startActivity(Intent.createChooser(intent, ""))
-                    }, { error ->
-                        if(error is InsufficientPermissions) {
-                            requestPermissions(error.permissionsNeeded, REQUEST_WRITE_EXTERENAL_STORAGE_PERMISSION)
-                        }
-                        else {
-                            Timber.e(error)
-                        }
-                    })
-            disposables.add(disposable)
+            val views = listOf(FRAGMENT_DEFENSE_INDEX, FRAGMENT_ATTACK_INDEX).associateWith {
+                pagerAdapter.map[it]?.drawToBitmap()
+            }
+            launch(viewModel.exportLineupToExternalStorage(it, views), { intent ->
+                startActivity(Intent.createChooser(intent, ""))
+            }, { error ->
+                Timber.e(error)
+            })
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
-        when (requestCode) {
-            REQUEST_WRITE_EXTERENAL_STORAGE_PERMISSION -> {
-                // If request is cancelled, the result arrays are empty.
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    exportLineupToExternalStorage()
-                }
-            }
-            else -> {
-                // Ignore all other requests.
+    private inline fun <reified E : Fragment> replaceFragmentIfNeeded(
+        root: View?,
+        @IdRes fragmentId: Int,
+        create: () -> E
+    ) {
+        root?.let {
+            childFragmentManager.fragments.filterIsInstance<E>()
+                .lastOrNull()?.let {
+                    if (!it.isRemoving) {
+                        childFragmentManager
+                            .beginTransaction()
+                            .replace(fragmentId, it)
+                            .commit()
+                    }
+                } ?: run {
+                childFragmentManager
+                    .beginTransaction()
+                    .replace(fragmentId, create())
+                    .commit()
             }
         }
     }
 
-    private fun showLineupRosterScreen() {
-        val bundle = Bundle()
-        bundle.putLong(Constants.LINEUP_ID, viewModel.lineupID ?: 0)
-        findNavController().navigate(R.id.lineupRosterFragment, bundle, NavigationUtils().getOptions())
+    private fun goBack(showFixedView: Boolean = true) {
+        val isShortcut = arguments?.getBoolean(Constants.EXTRA_IS_FROM_SHORTCUT) ?: false
+        if (isShortcut) {
+            findNavController().popBackStack(R.id.navigation_home, false)
+        } else {
+            val success =
+                !showFixedView && findNavController().popBackStack(R.id.navigation_lineups, false)
+            if (!success) {
+                findNavController().popBackStack()
+            }
+        }
     }
 }

@@ -4,49 +4,56 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProviders
 import com.telen.easylineup.BaseFragment
-import com.telen.easylineup.R
-import com.telen.easylineup.lineup.PlayersPositionViewModel
+import com.telen.easylineup.databinding.FragmentLineupDefenseFixedBinding
+import com.telen.easylineup.launch
+import com.telen.easylineup.lineup.LineupViewModel
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_lineup_defense_fixed.view.*
 import java.util.concurrent.TimeUnit
 
-class DefenseFragmentFixed: BaseFragment("DefenseFragmentFixed") {
-    lateinit var viewModel: PlayersPositionViewModel
+class DefenseFragmentFixed : BaseFragment("DefenseFragmentFixed") {
+    private var viewModel: LineupViewModel? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_lineup_defense_fixed, container, false)
+    private var binder: FragmentLineupDefenseFixedBinding? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val binder = FragmentLineupDefenseFixedBinding.inflate(inflater, container, false)
+        this.binder = binder
 
         parentFragment?.let { parent ->
-            viewModel = ViewModelProviders.of(parent).get(PlayersPositionViewModel::class.java)
+            viewModel = ViewModelProviders.of(parent).get(LineupViewModel::class.java)
 
-            view.cardDefenseView.init(viewModel.strategy)
+            viewModel?.run {
+                observeLineupStrategy().observe(viewLifecycleOwner) {
+                    binder.cardDefenseView.init(it)
+                }
 
-            viewModel.lineupID?.let {
-
-                viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer { players ->
-                    val displayDisposable = Completable.timer(100, TimeUnit.MILLISECONDS)
-                            .subscribeOn(Schedulers.computation())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({
-                                view.cardDefenseView.setListPlayer(players, viewModel.lineupMode)
-                            }, {
-
-                            })
-                    disposables.add(displayDisposable)
-                })
+                Transformations.switchMap(observeDefensePlayers()) { players ->
+                    Transformations.map(observeLineupMode()) { mode ->
+                        Pair(players, mode)
+                    }
+                }.observe(viewLifecycleOwner) {
+                    launch(Completable.timer(100, TimeUnit.MILLISECONDS), {
+                        binder.cardDefenseView.setListPlayer(it.first, it.second)
+                    }, {
+                        /* Nothing to do */
+                    }, Schedulers.computation())
+                }
             }
         }
 
-        return view
+        return binder.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        disposables.clear()
+        binder = null
     }
 }

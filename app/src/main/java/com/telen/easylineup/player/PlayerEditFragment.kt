@@ -20,6 +20,7 @@ import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
+import com.telen.easylineup.launch
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
@@ -59,7 +60,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
         })
         viewModel.playerID = arguments?.getLong(Constants.PLAYER_ID) ?: 0L
 
-        val errorsDisposable = viewModel.registerPlayerFormErrorResult().subscribe({ error ->
+        launch(viewModel.registerPlayerFormErrorResult(), { error ->
             when (error) {
                 DomainErrors.Players.INVALID_PLAYER_NAME -> {
                     binding?.editPlayerForm?.displayInvalidName()
@@ -84,7 +85,6 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
         }, {
             Timber.e(it)
         })
-        disposables.add(errorsDisposable)
     }
 
     override fun onCreateView(
@@ -174,7 +174,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
         phone: String?,
         sex: Int
     ) {
-        val saveDisposable = viewModel.savePlayer(
+        launch(viewModel.savePlayer(
             name,
             shirtNumber,
             licenseNumber,
@@ -185,17 +185,16 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
             email,
             phone,
             sex
-        ).subscribe({
+        ), {
             findNavController().navigateUp()
         }, {
-            when(it) {
+            when (it) {
                 is NameEmptyException,
                 is InvalidEmailException,
                 is InvalidPhoneException -> Timber.w(it.message)
                 else -> Timber.e(it)
             }
         })
-        disposables.add(saveDisposable)
     }
 
     fun onCancelForm() {

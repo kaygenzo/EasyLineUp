@@ -10,7 +10,12 @@ import com.telen.easylineup.views.OnActionsClickListener
 import com.telen.easylineup.views.TournamentItemView
 
 sealed class TimeLineItem
-data class TournamentItem(val tournament: Tournament, val start: Long?, val end: Long?, val lineups: List<Lineup>) : TimeLineItem()
+data class TournamentItem(
+    val tournament: Tournament,
+    val start: Long?,
+    val end: Long?,
+    val lineups: List<Lineup>
+) : TimeLineItem()
 
 const val TYPE_ITEM_TOURNAMENT = 1
 
@@ -18,10 +23,14 @@ interface OnItemClickedListener {
     fun onHeaderClicked()
     fun onLineupClicked(lineup: Lineup)
     fun onDeleteTournamentClicked(tournament: Tournament)
-    fun onStatisticsTournamentClicked(teamType:TeamType, tournament: Tournament)
+    fun onStatisticsTournamentClicked(teamType: TeamType, tournament: Tournament)
+    fun onEditLineupClicked(lineup: Lineup)
 }
 
-class TournamentsAdapter(private val itemClickListener: OnItemClickedListener, private var teamType: Int = TeamType.BASEBALL.id): RecyclerView.Adapter<TournamentsAdapter.TournamentsViewHolder>() {
+class TournamentsAdapter(
+    private val itemClickListener: OnItemClickedListener,
+    private var teamType: Int = TeamType.BASEBALL.id
+) : RecyclerView.Adapter<TournamentsAdapter.TournamentsViewHolder>() {
 
     private val items: MutableList<TimeLineItem> = mutableListOf()
 
@@ -46,27 +55,34 @@ class TournamentsAdapter(private val itemClickListener: OnItemClickedListener, p
         view.setTeamType(this.teamType)
         view.setLineups(item.lineups)
 
-        if(item.start != null && item.end != null)
+        if (item.start != null && item.end != null)
             view.setTournamentDate(item.start, item.end)
 
-        view.setOnActionsClickListener(object: OnActionsClickListener {
+        view.setOnActionsClickListener(object : OnActionsClickListener {
             override fun onDeleteClicked() {
                 itemClickListener.onDeleteTournamentClicked(item.tournament)
             }
 
             override fun onStatsClicked() {
-                itemClickListener.onStatisticsTournamentClicked(TeamType.getTypeById(teamType), item.tournament)
+                itemClickListener.onStatisticsTournamentClicked(
+                    TeamType.getTypeById(teamType),
+                    item.tournament
+                )
             }
         })
     }
 
-    class TournamentsViewHolder(val view: View): RecyclerView.ViewHolder(view)
+    class TournamentsViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     fun setList(tournaments: List<Pair<Tournament, List<Lineup>>>) {
         items.clear()
         tournaments.forEach {
-            val tournamentStart = it.second.map { it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }.minOrNull()
-            val tournamentEnd = it.second.map {it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }.maxOrNull()
+            val tournamentStart =
+                it.second.map { it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }
+                    .minOrNull()
+            val tournamentEnd =
+                it.second.map { it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }
+                    .maxOrNull()
             items.add(TournamentItem(it.first, tournamentStart, tournamentEnd, it.second))
         }
         notifyDataSetChanged()

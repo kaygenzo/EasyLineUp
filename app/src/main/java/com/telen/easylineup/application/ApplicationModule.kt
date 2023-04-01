@@ -4,6 +4,7 @@ import android.app.Application
 import com.github.kaygenzo.bugreporter.api.BugReporter
 import com.github.kaygenzo.bugreporter.api.ReportMethod
 import com.telen.easylineup.reporting.BugReporterManager
+import com.telen.easylineup.utils.SharedPreferencesHelper
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -24,4 +25,5 @@ val appModules = module {
             .setApplication(app)
             .build()
     }
+    single { SharedPreferencesHelper(get()) }
 }

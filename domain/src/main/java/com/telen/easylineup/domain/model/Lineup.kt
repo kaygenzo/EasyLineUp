@@ -9,19 +9,19 @@ const val MODE_DISABLED = 0
 const val MODE_ENABLED = 1
 
 data class Lineup(
-        var id: Long = 0,
-        var name: String = "",
-        var teamId: Long = 0,
-        var tournamentId: Long = 0,
-        var mode: Int = 0,
-        var strategy: Int,
-        var extraHitters: Int,
-        var eventTimeInMillis: Long,
-        var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
-        var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
-        var roster: String? = null,
-        var hash: String? = UUID.randomUUID().toString(),
-        val playerPositions: MutableList<FieldPosition> = mutableListOf()) {
+    var id: Long = 0,
+    var name: String = "",
+    var teamId: Long = 0,
+    var tournamentId: Long = 0,
+    var mode: Int = 0,
+    var strategy: Int = TeamStrategy.STANDARD.id,
+    var extraHitters: Int = 0,
+    var eventTimeInMillis: Long = 0L,
+    var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
+    var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
+    var roster: String? = null,
+    var hash: String? = UUID.randomUUID().toString()
+) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -57,10 +57,24 @@ data class Lineup(
         result = 31 * result + (hash?.hashCode() ?: 0)
         return result
     }
-
 }
 
-fun Lineup.toLineupExport(playerPositions: MutableList<PlayerPositionExport>, playerNumberOverlays: List<PlayerNumberOverlayExport>, rosterUUID: List<String>?): LineupExport {
-    return LineupExport(hash ?: UUID.randomUUID().toString(), name, eventTimeInMillis, createdTimeInMillis, editedTimeInMillis,
-            mode, strategy, extraHitters, rosterUUID, playerPositions, playerNumberOverlays)
+fun Lineup.toLineupExport(
+    playerPositions: MutableList<PlayerPositionExport>,
+    playerNumberOverlays: List<PlayerNumberOverlayExport>,
+    rosterUUID: List<String>?
+): LineupExport {
+    return LineupExport(
+        hash ?: UUID.randomUUID().toString(),
+        name,
+        eventTimeInMillis,
+        createdTimeInMillis,
+        editedTimeInMillis,
+        mode,
+        strategy,
+        extraHitters,
+        rosterUUID,
+        playerPositions,
+        playerNumberOverlays
+    )
 }

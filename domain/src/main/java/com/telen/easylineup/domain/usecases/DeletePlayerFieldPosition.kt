@@ -2,58 +2,52 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCase
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.model.*
 import io.reactivex.rxjava3.core.Single
 
-internal class DeletePlayerFieldPosition(private val dao: PlayerFieldPositionRepository): UseCase<DeletePlayerFieldPosition.RequestValues, DeletePlayerFieldPosition.ResponseValue>() {
+internal class DeletePlayerFieldPosition :
+    UseCase<DeletePlayerFieldPosition.RequestValues, DeletePlayerFieldPosition.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return try {
-            val toDelete = mutableListOf<PlayerWithPosition>()
-            val toUpdate = mutableListOf<PlayerWithPosition>()
-
+            val players = requestValues.players
             //substitutes have the same position, let's use player to get the good one
-            val player = requestValues.players.first {
-                it.position == requestValues.fieldPosition.id && it.playerID == requestValues.playerToDelete.id
-            }
+            val player = players.first { it.playerID == requestValues.playerToDelete.id }
 
-            if(requestValues.lineupMode == MODE_ENABLED &&
-                    (requestValues.fieldPosition == FieldPosition.DP_DH || player.flags and PlayerFieldPosition.FLAG_FLEX > 0)) {
-                toDelete.addAll(requestValues.players
-                        .filter { it.position == FieldPosition.DP_DH.id || it.flags and PlayerFieldPosition.FLAG_FLEX > 0 }
-                        .map { it }
-                )
-            }
-            else {
-                toDelete.add(player)
-            }
+            val playerIsSubstitute = player.isSubstitute()
+            val playerOrder = player.order
+            if (requestValues.lineupMode == MODE_ENABLED && player.isDpDhOrFlex()) {
+                players.filter { it.isDpDhOrFlex() }
+            } else {
+                listOf(player)
+            }.forEach { it.reset() }
 
-            //check if substitutes was a batter, update the next substitutes order to replace it if necessary
-            if(requestValues.fieldPosition == FieldPosition.SUBSTITUTE && player.order < Constants.SUBSTITUTE_ORDER_VALUE) {
-                val intermediateList = requestValues.players.subtract(toDelete).toList()
-                val substitutes = intermediateList.filter { FieldPosition.isSubstitute(it.position) && it.order > 0 }
+            // check if substitutes was a batter, update the next substitutes order to replace it
+            // if necessary
+            if (playerIsSubstitute && playerOrder < Constants.SUBSTITUTE_ORDER_VALUE) {
+                val substitutes = players.filter { it.isSubstitute() && it.order > 0 }
                 var found = false
                 substitutes.forEachIndexed { index, playerWithPosition ->
-                    if(!found && index < requestValues.extraHitterSize && playerWithPosition.order == Constants.SUBSTITUTE_ORDER_VALUE) {
-                        playerWithPosition.order = player.order
-                        toUpdate.add(playerWithPosition)
+                    if (!found && index < requestValues.extraHitterSize
+                        && playerWithPosition.order == Constants.SUBSTITUTE_ORDER_VALUE
+                    ) {
+                        playerWithPosition.order = playerOrder
                         found = true
                     }
                 }
             }
-
-            dao.deletePositions(toDelete.map { it.toPlayerFieldPosition() })
-                    .andThen(dao.updatePlayerFieldPositions(toUpdate.map { it.toPlayerFieldPosition() }))
-                    .andThen(Single.just(ResponseValue()))
-        }
-        catch (e: NoSuchElementException) {
+            Single.just(ResponseValue())
+        } catch (e: NoSuchElementException) {
             Single.error(e)
         }
     }
 
+    class RequestValues(
+        val players: List<PlayerWithPosition>,
+        val playerToDelete: Player,
+        val lineupMode: Int,
+        val extraHitterSize: Int
+    ) : UseCase.RequestValues
 
-    class RequestValues(val players: List<PlayerWithPosition>, val playerToDelete: Player, val fieldPosition: FieldPosition,
-                        val lineupMode: Int, val extraHitterSize: Int): UseCase.RequestValues
-    class ResponseValue: UseCase.ResponseValue
+    class ResponseValue : UseCase.ResponseValue
 }

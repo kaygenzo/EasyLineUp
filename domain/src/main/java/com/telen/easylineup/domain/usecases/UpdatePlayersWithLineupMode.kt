@@ -2,48 +2,49 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.*
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 
-internal class UpdatePlayersWithLineupMode(private val lineupDao: PlayerFieldPositionRepository): UseCase<UpdatePlayersWithLineupMode.RequestValues, UpdatePlayersWithLineupMode.ResponseValue>() {
+internal class UpdatePlayersWithLineupMode :
+    UseCase<UpdatePlayersWithLineupMode.RequestValues,
+            UpdatePlayersWithLineupMode.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        val playerTask: Completable = when(requestValues.isDesignatedPlayerEnabled) {
-            true -> {
-                when(requestValues.teamType) {
-                    TeamType.SOFTBALL.id -> {
-                        Completable.complete()
-                    }
-                    TeamType.BASEBALL.id -> {
-                        // find the pitcher if exists and set him at position 10 in lineup
-                        requestValues.players.firstOrNull { it.position == FieldPosition.PITCHER.id }?.let {
-                            val playerFieldPosition = it.toPlayerFieldPosition()
-                            //here we use directly the standard strategy because we only have one strategy in baseball
-                            playerFieldPosition.order = requestValues.strategy.getDesignatedPlayerOrder(requestValues.extraHittersSize)
-                            playerFieldPosition.flags = PlayerFieldPosition.FLAG_FLEX
-                            lineupDao.updatePlayerFieldPosition(playerFieldPosition)
-                        } ?: Completable.complete()
-                    }
-                    else -> {
-                        Completable.error(IllegalArgumentException())
-                    }
-                }
-            }
-            false -> {
-                requestValues.players.filter {
-                    it.position == FieldPosition.DP_DH.id || (it.flags and PlayerFieldPosition.FLAG_FLEX > 0)
-                }.let { list ->
-                    Observable.fromIterable(list).flatMapCompletable { playerPosition ->
-                        lineupDao.deletePosition(playerPosition.toPlayerFieldPosition())
+        return Single.defer {
+            val players = requestValues.players
+            val lineup = requestValues.lineup
+            when (lineup.mode) {
+                MODE_ENABLED -> {
+                    when (requestValues.teamType) {
+                        TeamType.SOFTBALL.id -> { /* nothing to do */
+                        }
+                        TeamType.BASEBALL.id -> {
+                            // find the pitcher if exists and set him at position 10 in lineup
+                            players.firstOrNull { it.isPitcher() }?.let {
+                                // here we use directly the standard strategy because we only have
+                                // one strategy in baseball
+                                val strategy = TeamStrategy.getStrategyById(lineup.strategy)
+                                it.order = strategy.getDesignatedPlayerOrder(lineup.extraHitters)
+                                it.flags = PlayerFieldPosition.FLAG_FLEX
+                            }
+                        }
+                        else -> {
+                            return@defer Single.error(IllegalArgumentException())
+                        }
                     }
                 }
+                MODE_DISABLED -> {
+                    players.filter { it.isDpDhOrFlex() }.forEach { it.reset() }
+                }
             }
+            Single.just(ResponseValue())
         }
-        return playerTask.andThen(Single.just(ResponseValue()))
     }
 
-    class RequestValues(val players: List<PlayerWithPosition>, val isDesignatedPlayerEnabled: Boolean, val teamType: Int, val strategy: TeamStrategy, val extraHittersSize: Int): UseCase.RequestValues
-    class ResponseValue: UseCase.ResponseValue
+    class RequestValues(
+        val players: List<PlayerWithPosition>,
+        val lineup: Lineup,
+        val teamType: Int
+    ) : UseCase.RequestValues
+
+    class ResponseValue : UseCase.ResponseValue
 }

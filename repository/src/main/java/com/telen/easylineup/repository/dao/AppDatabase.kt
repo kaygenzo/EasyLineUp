@@ -6,10 +6,12 @@ import com.telen.easylineup.repository.model.*
 
 const val DATABASE_NAME = "easylineup_database"
 
-@Database(entities = [RoomPlayer::class, RoomTeam::class, RoomLineup::class,
-    RoomPlayerFieldPosition::class, RoomTournament::class, RoomTile::class,
-    RoomPlayerNumberOverlay::class], version = 16)
-internal abstract class AppDatabase: RoomDatabase() {
+@Database(
+    entities = [RoomPlayer::class, RoomTeam::class, RoomLineup::class,
+        RoomPlayerFieldPosition::class, RoomTournament::class, RoomTile::class,
+        RoomPlayerNumberOverlay::class], version = 16, exportSchema = true
+)
+internal abstract class AppDatabase : RoomDatabase() {
     abstract fun playerDao(): PlayerDao
     abstract fun teamDao(): TeamDao
     abstract fun lineupDao(): LineupDao

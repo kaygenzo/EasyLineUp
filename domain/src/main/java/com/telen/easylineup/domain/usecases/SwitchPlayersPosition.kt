@@ -1,71 +1,73 @@
 package com.telen.easylineup.domain.usecases
 
-import android.annotation.SuppressLint
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.*
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.exceptions.FirstPositionEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.SamePlayerException
 import io.reactivex.rxjava3.core.Single
 
-internal class SwitchPlayersPosition(val dao: PlayerFieldPositionRepository): UseCase<SwitchPlayersPosition.RequestValues, SwitchPlayersPosition.ResponseValue>() {
+internal class SwitchPlayersPosition :
+    UseCase<SwitchPlayersPosition.RequestValues, SwitchPlayersPosition.ResponseValue>() {
 
-    @SuppressLint("ApplySharedPref")
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
 
+        val players = requestValues.players.toMutableList()
+        val extraHittersSize = requestValues.lineup.extraHitters
+        val lineupMode = requestValues.lineup.mode
+        val strategy = TeamStrategy.getStrategyById(requestValues.lineup.strategy)
+
         val player1 = try {
-            requestValues.players.first { it.position == requestValues.position1.id }
-        }
-        catch (e: NoSuchElementException) {
+            players.first { it.position == requestValues.position1.id }
+        } catch (e: NoSuchElementException) {
             return Single.error(FirstPositionEmptyException())
         }
 
-        val player2 = requestValues.players.firstOrNull { it.position == requestValues.position2.id }
+        val player2 = players.firstOrNull { it.position == requestValues.position2.id }
 
-        if(player1 == player2)
+        if (player1 == player2) {
             return Single.error(SamePlayerException())
+        }
 
-        val player1FieldPosition = player1.toPlayerFieldPosition()
-        val player2FieldPosition = player2?.toPlayerFieldPosition()
+        player1.position = requestValues.position2.id
+        player2?.position = requestValues.position1.id
 
-        player1FieldPosition.position = requestValues.position2.id
-        player2FieldPosition?.position = requestValues.position1.id
-
-        val playerPositions = arrayListOf(player1FieldPosition)
-        player2FieldPosition?.let {
+        val playerPositions = arrayListOf(player1)
+        player2?.let {
             playerPositions.add(it)
         }
 
-        val orderDesignatedPlayer = requestValues.strategy.getDesignatedPlayerOrder(requestValues.extraHittersSize)
+        val orderDesignatedPlayer =
+            strategy.getDesignatedPlayerOrder(extraHittersSize)
 
         // just keep reference of the first order different of 10
         val tmpOrder = playerPositions.firstOrNull { it.order != orderDesignatedPlayer }?.order
-        val oneIsFlex = playerPositions.any {it.flags and PlayerFieldPosition.FLAG_FLEX > 0}
-        val oneIsDp = playerPositions.any {it.position == FieldPosition.DP_DH.id}
+        val oneIsFlex = playerPositions.any { it.isFlex() }
+        val oneIsDp = playerPositions.any { it.isDpDh() }
 
         // if at least one player has a flag flex and it is a baseball team, the pitcher is always
         // the flex. Otherwise, the flex can be any other player. The only exception is the DP/DH
         playerPositions.forEach {
-            if(requestValues.lineupMode == MODE_ENABLED) {
+            if (lineupMode == MODE_ENABLED) {
                 val newPosition = FieldPosition.getFieldPositionById(it.position)
-                if(requestValues.teamType == TeamType.BASEBALL.id) {
-                    when(newPosition) {
+                if (requestValues.teamType == TeamType.BASEBALL.id) {
+                    when (newPosition) {
                         FieldPosition.PITCHER -> {
                             it.order = orderDesignatedPlayer
                             it.flags = PlayerFieldPosition.FLAG_FLEX
                         }
                         else -> {
                             it.flags = PlayerFieldPosition.FLAG_NONE
-                            //if possible, just keep order, but in case of a swap with a pitcher, exchange orders
-                            if(it.order == orderDesignatedPlayer) {
+                            // if possible, just keep order, but in case of a swap with a pitcher,
+                            // exchange orders
+                            if (it.order == orderDesignatedPlayer) {
                                 //we were a pitcher but not anymore.
-                                it.order = tmpOrder ?: PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
+                                it.order = tmpOrder
+                                    ?: players.getNextAvailableOrder(listOf(it.order))
                             }
 
                         }
                     }
-                }
-                else { //softball
+                } else { //softball
                     /*
                     * Rules:
                     * - Flex can be anyone except DP.
@@ -76,15 +78,15 @@ internal class SwitchPlayersPosition(val dao: PlayerFieldPositionRepository): Us
                     *   if it is the DP and a normal player, only positions change
                     *   if is is the DP and the FLEX, switch position, flags and order
                     */
-                    if(oneIsFlex && oneIsDp) {
-                        if(newPosition == FieldPosition.DP_DH) {
+                    if (oneIsFlex && oneIsDp) {
+                        if (newPosition == FieldPosition.DP_DH) {
                             it.flags = PlayerFieldPosition.FLAG_NONE
-                            if(it.order == orderDesignatedPlayer) {
+                            if (it.order == orderDesignatedPlayer) {
                                 //we were a pitcher but not anymore.
-                                it.order = tmpOrder ?: PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
+                                it.order = tmpOrder
+                                    ?: players.getNextAvailableOrder(listOf(it.order))
                             }
-                        }
-                        else {
+                        } else {
                             it.order = orderDesignatedPlayer
                             it.flags = PlayerFieldPosition.FLAG_FLEX
                         }
@@ -93,12 +95,15 @@ internal class SwitchPlayersPosition(val dao: PlayerFieldPositionRepository): Us
             }
         }
 
-        return dao.updatePlayerFieldPositions(playerPositions)
-                .andThen(Single.just(ResponseValue()))
+        return Single.just(ResponseValue())
     }
 
-    class ResponseValue: UseCase.ResponseValue
-    class RequestValues(val players: List<PlayerWithPosition>, val position1: FieldPosition,
-                        val position2: FieldPosition, val teamType: Int, val lineupMode: Int,
-                        val strategy: TeamStrategy, val extraHittersSize: Int): UseCase.RequestValues
+    class ResponseValue : UseCase.ResponseValue
+    class RequestValues(
+        val players: List<PlayerWithPosition>,
+        val position1: FieldPosition,
+        val position2: FieldPosition,
+        val teamType: Int,
+        val lineup: Lineup
+    ) : UseCase.RequestValues
 }

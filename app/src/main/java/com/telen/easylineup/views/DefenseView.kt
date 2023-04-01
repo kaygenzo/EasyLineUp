@@ -7,15 +7,10 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
-import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.FieldPosition
-import com.telen.easylineup.domain.model.Player
-import com.telen.easylineup.domain.model.Sex
-import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.utils.drawn
 import com.telen.easylineup.utils.getColor
 import com.telen.easylineup.utils.ready
@@ -25,16 +20,21 @@ import kotlin.math.roundToInt
 
 const val ICON_SIZE_SCALE = 0.12f
 
-abstract class DefenseView: ConstraintLayout {
+abstract class DefenseView : ConstraintLayout {
 
     private var containerSize: Float? = 0f
-    protected val positionMarkers: MutableMap<FieldPosition, MultipleStateDefenseIconButton> = mutableMapOf()
+    protected val positionMarkers: MutableMap<FieldPosition, MultipleStateDefenseIconButton> =
+        mutableMapOf()
     private var strategy: TeamStrategy = TeamStrategy.STANDARD
     private var canvas: Canvas? = null
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     protected open fun onFieldPositionClicked(position: FieldPosition) {
         // to implement if needed
@@ -62,12 +62,12 @@ abstract class DefenseView: ConstraintLayout {
                     }
                 }
                 positionMarkers[position] = view
-                val coordinates = FieldPosition.getPositionPercentage(position, strategy)
+                val coordinates = position.getPositionPercentage(strategy)
                 addPlayerOnFieldWithPercentage(it, view, coordinates.x, coordinates.y)
             }
 
             baseballField.ready {
-                val image = when(strategy) {
+                val image = when (strategy) {
                     TeamStrategy.B5_DEFAULT -> {
                         VectorDrawableCompat.create(resources, R.drawable.baseball5_field, null)
                     }
@@ -100,8 +100,13 @@ abstract class DefenseView: ConstraintLayout {
         return PointF(positionX, positionY)
     }
 
-    protected fun addPlayerOnFieldWithCoordinate(view: View, parentWidth: Float, x: Float, y: Float) {
-        if(fieldFrameLayout.findViewWithTag<MultipleStateDefenseIconButton>(view.tag)!=null)
+    protected fun addPlayerOnFieldWithCoordinate(
+        view: View,
+        parentWidth: Float,
+        x: Float,
+        y: Float
+    ) {
+        if (fieldFrameLayout.findViewWithTag<MultipleStateDefenseIconButton>(view.tag) != null)
             fieldFrameLayout.removeView(view)
 
         view.visibility = View.INVISIBLE
@@ -112,7 +117,13 @@ abstract class DefenseView: ConstraintLayout {
             val imageWidth = view.width.toFloat()
             val imageHeight = view.height.toFloat()
 
-            checkBounds(parentWidth, x, y, imageWidth, imageHeight) { correctedX: Float, correctedY: Float ->
+            checkBounds(
+                parentWidth,
+                x,
+                y,
+                imageWidth,
+                imageHeight
+            ) { correctedX: Float, correctedY: Float ->
                 val positionX = correctedX - imageWidth / 2
                 val positionY = correctedY - imageHeight / 2
                 //Timber.d("containerSize=$parentWidth x=$x y=$y correctedX=$correctedX correctedY=$correctedY positionX=$positionX positionY=$positionY")
@@ -129,21 +140,22 @@ abstract class DefenseView: ConstraintLayout {
                     invalidate()
                 }
 
-                (view as? MultipleStateDefenseIconButton)?.takeIf { it.getState() == StateDefense.ADD_PLAYER }?.let {
-                    val shake = AnimationUtils.loadAnimation(context, R.anim.shake_effect)
-                    view.animation = shake
-                }
+                (view as? MultipleStateDefenseIconButton)?.takeIf { it.getState() == StateDefense.ADD_PLAYER }
+                    ?.let {
+                        val shake = AnimationUtils.loadAnimation(context, R.anim.shake_effect)
+                        view.animation = shake
+                    }
             }
         }
 
         fieldFrameLayout.addView(view)
     }
 
-    private fun cleanPlayerIcons() {
-        if(fieldFrameLayout.childCount > 1) {
-            for (i in fieldFrameLayout.childCount-1 downTo 0) {
+    protected fun cleanPlayerIcons() {
+        if (fieldFrameLayout.childCount > 1) {
+            for (i in fieldFrameLayout.childCount - 1 downTo 0) {
                 val view = fieldFrameLayout.getChildAt(i)
-                if(view is MultipleStateDefenseIconButton || view is SmallBaseballImageView) {
+                if (view is MultipleStateDefenseIconButton || view is SmallBaseballImageView) {
                     view.clearAnimation()
                     view.setOnDragListener(null)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -155,20 +167,27 @@ abstract class DefenseView: ConstraintLayout {
         }
     }
 
-    private fun checkBounds(containerSize: Float, x: Float, y: Float, imageWidth: Float, imageHeight: Float, callback: (x: Float,y: Float) -> Unit) {
+    private fun checkBounds(
+        containerSize: Float,
+        x: Float,
+        y: Float,
+        imageWidth: Float,
+        imageHeight: Float,
+        callback: (x: Float, y: Float) -> Unit
+    ) {
 
         var positionX: Float = x
         var positionY: Float = y
 
-        if(positionX + imageWidth/2 > containerSize)
-            positionX = containerSize - imageWidth/2
-        if(positionX - imageWidth/2 < 0)
-            positionX = imageWidth/2
+        if (positionX + imageWidth / 2 > containerSize)
+            positionX = containerSize - imageWidth / 2
+        if (positionX - imageWidth / 2 < 0)
+            positionX = imageWidth / 2
 
-        if(positionY - imageHeight/2 < 0)
-            positionY = imageHeight/2
-        if(positionY + imageHeight/2 > containerSize)
-            positionY = containerSize - imageHeight/2
+        if (positionY - imageHeight / 2 < 0)
+            positionY = imageHeight / 2
+        if (positionY + imageHeight / 2 > containerSize)
+            positionY = containerSize - imageHeight / 2
 
         callback(positionX, positionY)
     }
@@ -186,7 +205,7 @@ abstract class DefenseView: ConstraintLayout {
     }
 
     protected fun setSexIndicator(player: Player, position: FieldPosition) {
-        when(val sex = Sex.getById(player.sex)) {
+        when (val sex = Sex.getById(player.sex)) {
             Sex.MALE, Sex.FEMALE -> {
                 drawIndicatorOnPositions(position, sex.getColor(context))
             }
@@ -203,13 +222,13 @@ abstract class DefenseView: ConstraintLayout {
     private fun drawIndicatorOnPositions(position: FieldPosition, color: Int) {
         getContainerSize {
             val iconSize = (it * ICON_SIZE_SCALE).roundToInt()
-            val indicatorRadius = iconSize/6f
-            val percentage = FieldPosition.getPositionPercentage(position, strategy)
+            val indicatorRadius = iconSize / 6f
+            val percentage = position.getPositionPercentage(strategy)
             val pos = percentageToCoordinates(it, percentage)
             val size = iconSize.toFloat()
             checkBounds(it, pos.x, pos.y, size, size) { x: Float, y: Float ->
-                val cx = x + iconSize/2
-                val cy = y - iconSize/2
+                val cx = x + iconSize / 2
+                val cy = y - iconSize / 2
                 this.canvas?.drawCircle(cx, cy, indicatorRadius, Paint().apply {
                     this.color = color
                     style = Paint.Style.FILL

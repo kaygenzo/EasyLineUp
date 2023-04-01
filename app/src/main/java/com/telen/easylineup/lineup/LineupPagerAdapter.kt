@@ -13,14 +13,15 @@ import com.telen.easylineup.lineup.defense.DefenseFragmentFixed
 const val FRAGMENT_DEFENSE_INDEX = 0
 const val FRAGMENT_ATTACK_INDEX = 1
 
-class LineupPagerAdapter(val fragment: Fragment, private val editable: Boolean): FragmentStateAdapter(fragment) {
+class LineupPagerAdapter(fragment: Fragment, private val editable: Boolean) :
+    FragmentStateAdapter(fragment) {
 
-    private val map: MutableMap<Int, View> = mutableMapOf()
+    val map: MutableMap<Int, View> = mutableMapOf()
 
     override fun createFragment(position: Int): Fragment {
-        val result = when(position) {
+        val result = when (position) {
             FRAGMENT_DEFENSE_INDEX -> {
-                if(editable)
+                if (editable)
                     DefenseFragmentEditable()
                 else
                     DefenseFragmentFixed()
@@ -42,11 +43,11 @@ class LineupPagerAdapter(val fragment: Fragment, private val editable: Boolean):
         return 2
     }
 
-    fun getMapFragment() : MutableMap<Int, View> {
-        return map
-    }
-
-    override fun onBindViewHolder(holder: FragmentViewHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(
+        holder: FragmentViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
         super.onBindViewHolder(holder, position, payloads)
         map[position] = holder.itemView
     }

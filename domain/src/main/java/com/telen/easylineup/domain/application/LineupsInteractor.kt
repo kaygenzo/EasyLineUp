@@ -24,25 +24,23 @@ interface LineupsInteractor {
     fun deleteLineup(lineupID: Long?): Completable
     fun updateLineupMode(
         isEnabled: Boolean,
-        lineupID: Long?,
-        lineupMode: Int,
-        list: List<PlayerWithPosition>,
-        strategy: TeamStrategy,
-        extraHittersSize: Int
+        lineup: Lineup,
+        list: List<PlayerWithPosition>
     ): Completable
 
-    fun saveBattingOrder(players: List<PlayerWithPosition>): Completable
+    fun updateLineup(lineup: Lineup, players: List<PlayerWithPosition>): Completable
     fun observeLineupById(id: Long): LiveData<Lineup>
+    fun getLineupById(id: Long): Single<Lineup>
     fun observeErrors(): Subject<DomainErrors.Lineups>
     fun observeTeamPlayersAndMaybePositionsForLineup(id: Long): LiveData<List<PlayerWithPosition>>
-    fun getDpAndFlexFromPlayersInField(list: List<PlayerWithPosition>): Single<DpAndFlexConfiguration>
+    fun getDpAndFlexFromPlayersInField(list: List<PlayerWithPosition>):
+            Single<DpAndFlexConfiguration>
+
     fun linkDpAndFlex(
         dp: Player?,
         flex: Player?,
-        lineupID: Long?,
-        list: List<PlayerWithPosition>,
-        strategy: TeamStrategy,
-        extraHittersSize: Int
+        lineup: Lineup,
+        list: List<PlayerWithPosition>
     ): Completable
 
     fun getBatterStates(
@@ -57,9 +55,9 @@ interface LineupsInteractor {
 
     fun getNotSelectedPlayersFromList(
         list: List<PlayerWithPosition>,
-        lineupID: Long?,
+        lineup: Lineup,
         sortBy: FieldPosition? = null
-    ): Single<List<Player>>
+    ): Single<List<PlayerWithPosition>>
 
-    fun getPlayersInFieldFromList(list: List<PlayerWithPosition>): Single<List<Player>>
+    fun getPlayersInFieldFromList(list: List<PlayerWithPosition>): Single<List<PlayerWithPosition>>
 }

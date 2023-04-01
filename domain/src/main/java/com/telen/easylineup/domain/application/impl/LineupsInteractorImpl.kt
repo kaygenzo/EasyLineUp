@@ -9,8 +9,6 @@ import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.*
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
-import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
-import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
@@ -28,10 +26,10 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
     private val createLineup: CreateLineup by inject()
     private val updateLineupRoster: UpdateLineupRoster by inject()
     private val deleteLineup: DeleteLineup by inject()
-    private val saveLineupMode: SaveLineupMode by inject()
+    private val setLineupMode: SetLineupMode by inject()
     private val updatePlayersWithLineupMode: UpdatePlayersWithLineupMode by inject()
     private val getRoster: GetRoster by inject()
-    private val saveBattingOrder: SaveBattingOrder by inject()
+    private val saveBattingOrderAndPosition: SaveBattingOrderAndPositions by inject()
     private val getDpAndFlexFromPlayersInField: GetDPAndFlexFromPlayersInField by inject()
     private val saveDpAndFlex: SaveDpAndFlex by inject()
     private val getBatterState: GetBattersState by inject()
@@ -100,52 +98,39 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
     override fun deleteLineup(lineupID: Long?): Completable {
         val requestValues = DeleteLineup.RequestValues(lineupID)
         return UseCaseHandler.execute(deleteLineup, requestValues).ignoreElement()
-            .doOnError {
-                errors.onNext(DomainErrors.Lineups.DELETE_LINEUP_FAILED)
-            }
     }
 
     override fun updateLineupMode(
         isEnabled: Boolean,
-        lineupID: Long?,
-        lineupMode: Int,
-        list: List<PlayerWithPosition>,
-        strategy: TeamStrategy,
-        extraHittersSize: Int
+        lineup: Lineup,
+        list: List<PlayerWithPosition>
     ): Completable {
-        return UseCaseHandler.execute(
-            saveLineupMode,
-            SaveLineupMode.RequestValues(lineupID, lineupMode)
-        )
-            .doOnError {
-                errors.onNext(DomainErrors.Lineups.SAVE_LINEUP_MODE_FAILED)
-            }
-            .flatMapCompletable {
-                UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
-                    .map { it.team }
-                    .flatMapCompletable {
-                        val requestValues = UpdatePlayersWithLineupMode.RequestValues(
-                            list,
-                            isEnabled,
-                            it.type,
-                            strategy,
-                            extraHittersSize
-                        )
-                        UseCaseHandler.execute(updatePlayersWithLineupMode, requestValues)
-                            .ignoreElement()
-                    }
-            }
+        return Completable.defer {
+            val lineupMode = if (isEnabled) MODE_ENABLED else MODE_DISABLED
+            val request = SetLineupMode.RequestValues(lineup, lineupMode)
+            UseCaseHandler.execute(setLineupMode, request)
+                .ignoreElement()
+                .andThen(UseCaseHandler.execute(getTeam, GetTeam.RequestValues()))
+                .map { it.team }
+                .flatMap {
+                    val update = UpdatePlayersWithLineupMode.RequestValues(list, lineup, it.type)
+                    UseCaseHandler.execute(updatePlayersWithLineupMode, update)
+                }
+                .ignoreElement()
+        }
     }
 
-    override fun saveBattingOrder(players: List<PlayerWithPosition>): Completable {
-        val requestValues = SaveBattingOrder.RequestValues(players)
-        return UseCaseHandler.execute(saveBattingOrder, requestValues)
-            .ignoreElement()
-            .doOnError { errors.onNext(DomainErrors.Lineups.SAVE_BATTING_ORDER_FAILED) }
+    override fun updateLineup(lineup: Lineup, players: List<PlayerWithPosition>): Completable {
+        val requestValues = SaveBattingOrderAndPositions.RequestValues(lineup, players)
+        return UseCaseHandler.execute(saveBattingOrderAndPosition, requestValues).ignoreElement()
     }
 
     override fun observeLineupById(id: Long): LiveData<Lineup> {
         return lineupsRepo.getLineupById(id)
+    }
+
+    override fun getLineupById(id: Long): Single<Lineup> {
+        return lineupsRepo.getLineupByIdSingle(id)
     }
 
     override fun observeErrors(): Subject<DomainErrors.Lineups> {
@@ -164,37 +149,17 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
                 UseCaseHandler.execute(getDpAndFlexFromPlayersInField, request)
             }
             .map { it.configResult }
-            .doOnError {
-                if (it is NeedAssignPitcherFirstException) {
-                    errors.onNext(DomainErrors.Lineups.NEED_ASSIGN_PITCHER_FIRST)
-                }
-            }
     }
 
     override fun linkDpAndFlex(
         dp: Player?,
         flex: Player?,
-        lineupID: Long?,
-        list: List<PlayerWithPosition>,
-        strategy: TeamStrategy,
-        extraHittersSize: Int
+        lineup: Lineup,
+        list: List<PlayerWithPosition>
     ): Completable {
-        return UseCaseHandler.execute(
-            saveDpAndFlex, SaveDpAndFlex.RequestValues(
-                lineupID = lineupID,
-                dp = dp,
-                flex = flex,
-                players = list,
-                strategy = strategy,
-                extraHittersSize = extraHittersSize
-            )
-        )
-            .ignoreElement()
-            .doOnError {
-                if (it is NeedAssignBothPlayersException) {
-                    errors.onNext(DomainErrors.Lineups.DP_OR_FLEX_NOT_ASSIGNED)
-                }
-            }
+        val request =
+            SaveDpAndFlex.RequestValues(lineup = lineup, dp = dp, flex = flex, players = list)
+        return UseCaseHandler.execute(saveDpAndFlex, request).ignoreElement()
     }
 
     override fun getBatterStates(
@@ -221,12 +186,17 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
 
     override fun getNotSelectedPlayersFromList(
         list: List<PlayerWithPosition>,
-        lineupID: Long?,
+        lineup: Lineup,
         sortBy: FieldPosition?
-    ): Single<List<Player>> {
+    ): Single<List<PlayerWithPosition>> {
         return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
-            .flatMap { UseCaseHandler.execute(getRoster, GetRoster.RequestValues(it.id, lineupID)) }
+            .flatMap {
+                UseCaseHandler.execute(
+                    getRoster,
+                    GetRoster.RequestValues(it.id, lineup.id)
+                )
+            }
             .flatMap {
                 val requestValues = GetListAvailablePlayersForSelection.RequestValues(
                     list,
@@ -236,14 +206,11 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
                 UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues)
             }
             .map { it.players }
-            .doOnError { errors.onNext(DomainErrors.Lineups.LIST_AVAILABLE_PLAYERS_EMPTY) }
     }
 
-    override fun getPlayersInFieldFromList(list: List<PlayerWithPosition>): Single<List<Player>> {
+    override fun getPlayersInFieldFromList(list: List<PlayerWithPosition>)
+            : Single<List<PlayerWithPosition>> {
         return UseCaseHandler.execute(getPlayersInField, GetOnlyPlayersInField.RequestValues(list))
             .map { it.playersInField }
-            .doOnError {
-                errors.onNext(DomainErrors.Lineups.LIST_AVAILABLE_PLAYERS_EMPTY)
-            }
     }
 }

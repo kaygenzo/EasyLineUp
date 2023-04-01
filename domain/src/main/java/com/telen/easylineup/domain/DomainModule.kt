@@ -1,16 +1,9 @@
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.application.*
-import com.telen.easylineup.domain.application.ApplicationInteractorImpl
 import com.telen.easylineup.domain.application.impl.*
-import com.telen.easylineup.domain.application.impl.DataInteractorImpl
-import com.telen.easylineup.domain.application.impl.LineupsInteractorImpl
-import com.telen.easylineup.domain.application.impl.PlayerFieldPositionsInteractorImpl
-import com.telen.easylineup.domain.application.impl.TeamsInteractorImpl
-import com.telen.easylineup.domain.application.impl.TournamentsInteractorImpl
 import com.telen.easylineup.domain.usecases.*
 import com.telen.easylineup.domain.utils.ValidatorUtils
-
 import org.koin.dsl.module
 
 object DomainModule {
@@ -31,7 +24,7 @@ object DomainModule {
         single { CreateDashboardTiles(get()) }
         single { CreateLineup(get(), get()) }
         single { GetTournaments(get()) }
-        single { GetAllTournamentsWithLineups(get()) }
+        single { GetAllTournamentsWithLineupsUseCase(get()) }
         single { DeleteTournamentLineups(get()) }
         single { GetPlayer(get()) }
         single { DeletePlayer(get()) }
@@ -42,17 +35,17 @@ object DomainModule {
         single { CheckTeam() }
         single { GetTeamCreationNextStep() }
         single { GetTeamCreationPreviousStep() }
-        single { SavePlayerFieldPosition(get()) }
-        single { DeletePlayerFieldPosition(get()) }
+        single { AssignPlayerFieldPosition() }
+        single { DeletePlayerFieldPosition() }
         single { GetListAvailablePlayersForSelection() }
-        single { SaveBattingOrder(get()) }
+        single { SaveBattingOrderAndPositions(get(), get()) }
         single { DeleteLineup(get()) }
-        single { SaveLineupMode(get()) }
-        single { UpdatePlayersWithLineupMode(get()) }
+        single { SetLineupMode() }
+        single { UpdatePlayersWithLineupMode() }
         single { GetRoster(get(), get()) }
         single { UpdateLineupRoster(get()) }
         single { DeleteTeam(get()) }
-        single { SwitchPlayersPosition(get()) }
+        single { SwitchPlayersPosition() }
         single { DeleteAllData(get(), get()) }
         single { GetTournamentStatsForPositionTable(get()) }
         single { CheckHashData(get(), get(), get(), get(), get()) }
@@ -60,7 +53,7 @@ object DomainModule {
         single { ImportData(get(), get(), get(), get(), get()) }
         single { GetOnlyPlayersInField() }
         single { GetDPAndFlexFromPlayersInField() }
-        single { SaveDpAndFlex(get()) }
+        single { SaveDpAndFlex() }
         single { SavePlayerNumberOverlay(get()) }
         single { GetShirtNumberHistory(get()) }
         single { ValidatorUtils() }

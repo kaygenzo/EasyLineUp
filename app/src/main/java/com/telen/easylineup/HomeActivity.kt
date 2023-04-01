@@ -75,19 +75,19 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
 
         drawerLayout.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
             override fun onDrawerOpened(drawerView: View) {
-                val disposable = viewModel.showNewSwapTeamFeature(this@HomeActivity)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            showFeatureTargetView(it)
-                        }, {
-                            Timber.e(it)
-                        })
+                val disposable = viewModel.showNewSwapTeamFeature()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        showFeatureTargetView(it)
+                    }, {
+                        Timber.e(it)
+                    })
                 disposables.add(disposable)
             }
         })
 
         val disposable = viewModel.observeEvents().subscribe({
-            when(it) {
+            when (it) {
                 is GetTeamSuccess -> {
                     drawerHeader.setImage(it.team.image)
                     drawerHeader.setTitle(it.team.name)
@@ -95,7 +95,11 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
                 is GetTeamsCountSuccess -> {
                     val argument = Bundle()
                     argument.putInt(Constants.EXTRA_TEAM_COUNT, it.count)
-                    navController.navigate(R.id.teamDetailsFragment, argument, NavigationUtils().getOptions())
+                    navController.navigate(
+                        R.id.teamDetailsFragment,
+                        argument,
+                        NavigationUtils().getOptions()
+                    )
                     closeDrawer()
                 }
                 UpdateCurrentTeamSuccess -> {
@@ -125,18 +129,21 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
     }
 
     private fun showFeatureTargetView(show: Boolean) {
-        if(show) {
-            FeatureViewFactory.apply(drawerHeader.changeTeam, this, getString(R.string.feature_manage_teams_title),
-                    getString(R.string.feature_manage_teams_description), object : TapTargetView.Listener() {
-                override fun onTargetClick(view: TapTargetView?) {
-                    showSwapDialog()
-                    view?.dismiss(true)
-                }
+        if (show) {
+            FeatureViewFactory.apply(drawerHeader.changeTeam,
+                this,
+                getString(R.string.feature_manage_teams_title),
+                getString(R.string.feature_manage_teams_description),
+                object : TapTargetView.Listener() {
+                    override fun onTargetClick(view: TapTargetView?) {
+                        showSwapDialog()
+                        view?.dismiss(true)
+                    }
 
-                override fun onOuterCircleClick(view: TapTargetView?) {
-                    view?.dismiss(false)
-                }
-            })
+                    override fun onOuterCircleClick(view: TapTargetView?) {
+                        view?.dismiss(false)
+                    }
+                })
         }
     }
 

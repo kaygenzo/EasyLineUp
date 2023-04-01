@@ -5,42 +5,47 @@ import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import io.reactivex.rxjava3.core.Single
 
-internal class GetDPAndFlexFromPlayersInField: UseCase<GetDPAndFlexFromPlayersInField.RequestValues, GetDPAndFlexFromPlayersInField.ResponseValue>() {
+internal class GetDPAndFlexFromPlayersInField :
+    UseCase<GetDPAndFlexFromPlayersInField.RequestValues,
+            GetDPAndFlexFromPlayersInField.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.just(requestValues.playersInLineup)
-                .map { list ->
-                    list.filter {
-                        it.position >= FieldPosition.PITCHER.id && it.position <= FieldPosition.DP_DH.id
-                    }
+            .map { list ->
+                list.filter {
+                    it.isAssigned() && !it.isSubstitute()
                 }
-                .map { players ->
-                    val dpLocked = false
-                    var flexLocked = false
-                    val dp: Player? = players.filter { it.position == FieldPosition.DP_DH.id }
-                            .map { it.toPlayer() }
-                            .firstOrNull()
+            }
+            .map { players ->
+                val dpLocked = false
+                var flexLocked = false
+                val dp = players.firstOrNull { it.isDpDh() }
 
-                    val flex = when(requestValues.teamType) {
-                        TeamType.SOFTBALL.id -> {
-                            players.filter { it.flags and PlayerFieldPosition.FLAG_FLEX > 0 }
-                                    .map { it.toPlayer() }
-                                    .firstOrNull()
-                        }
-                        else -> {
-                            flexLocked = true
-                            players.filter { it.position == FieldPosition.PITCHER.id }
-                                    .map { it.toPlayer() }
-                                    .firstOrNull()
-                        }
+                val flex = when (requestValues.teamType) {
+                    TeamType.SOFTBALL.id -> {
+                        players.firstOrNull { it.isFlex() }
                     }
-                    if(flex == null && requestValues.teamType == TeamType.BASEBALL.id) {
-                        throw NeedAssignPitcherFirstException()
+                    else -> {
+                        flexLocked = true
+                        players.firstOrNull { it.isPitcher() }
                     }
-                    ResponseValue(DpAndFlexConfiguration(dp, flex, dpLocked, flexLocked, requestValues.teamType))
                 }
+                if (flex == null && requestValues.teamType == TeamType.BASEBALL.id) {
+                    throw NeedAssignPitcherFirstException()
+                }
+                ResponseValue(
+                    DpAndFlexConfiguration(
+                        dp,
+                        flex,
+                        dpLocked,
+                        flexLocked,
+                        requestValues.teamType
+                    )
+                )
+            }
     }
 
-    class ResponseValue(val configResult: DpAndFlexConfiguration): UseCase.ResponseValue
-    class RequestValues(val playersInLineup: List<PlayerWithPosition>, val teamType: Int): UseCase.RequestValues
+    class ResponseValue(val configResult: DpAndFlexConfiguration) : UseCase.ResponseValue
+    class RequestValues(val playersInLineup: List<PlayerWithPosition>, val teamType: Int) :
+        UseCase.RequestValues
 }

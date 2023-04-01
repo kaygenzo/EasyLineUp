@@ -34,14 +34,18 @@ interface OnPlayerButtonCallback {
     fun onPlayerReassigned(player: PlayerWithPosition, newPosition: FieldPosition)
 }
 
-class DefenseEditableView: DefenseView {
+class DefenseEditableView : DefenseView {
 
     private var playerListener: OnPlayerButtonCallback? = null
     private val players: MutableCollection<PlayerWithPosition> = mutableListOf()
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     fun setOnPlayerListener(playerButtonCallback: OnPlayerButtonCallback) {
         playerListener = playerButtonCallback
@@ -82,15 +86,21 @@ class DefenseEditableView: DefenseView {
 
                     emptyPositions.remove(pos)
 
-                    if (FieldPosition.isDefensePlayer(pos.id)) {
+                    if (entry.isDefensePlayer()) {
 
                         positionMarkers[pos]?.apply {
 
                             setState(StateDefense.PLAYER)
 
                             if (lineupMode == MODE_ENABLED) {
-                                if (entry.flags and PlayerFieldPosition.FLAG_FLEX > 0 || entry.position == FieldPosition.DP_DH.id) {
-                                    setPlayerImage(player.image, player.name, iconSize, Color.RED, 3f)
+                                if (entry.isFlex() || entry.isDpDh()) {
+                                    setPlayerImage(
+                                        player.image,
+                                        player.name,
+                                        iconSize,
+                                        Color.RED,
+                                        3f
+                                    )
                                 } else {
                                     setPlayerImage(player.image, player.name, iconSize)
                                 }
@@ -107,7 +117,8 @@ class DefenseEditableView: DefenseView {
                                     DragEvent.ACTION_DRAG_ENDED -> true
                                     DragEvent.ACTION_DROP -> {
                                         val id: ClipData.Item = event.clipData.getItemAt(0)
-                                        val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
+                                        val playerFound =
+                                            players.firstOrNull { it.playerID.toString() == id.text.toString() }
                                         Timber.d("action=ACTION_DROP switch ${playerFound?.playerName} with ${entry.playerName}")
                                         playerFound?.let {
                                             playerListener?.onPlayersSwitched(entry, it)
@@ -121,7 +132,12 @@ class DefenseEditableView: DefenseView {
                             setOnLongClickListener {
                                 val playerID = ClipData.Item(playerTag)
                                 val playerPosition = ClipData.Item(pos.name)
-                                val dragData = ClipData(ClipDescription(playerTag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)), playerID)
+                                val dragData = ClipData(
+                                    ClipDescription(
+                                        playerTag,
+                                        arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)
+                                    ), playerID
+                                )
                                 dragData.addItem(playerPosition)
                                 val shadowBuilder = PlayerDragShadowBuilder(this)
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -156,7 +172,16 @@ class DefenseEditableView: DefenseView {
                     DragEvent.ACTION_DRAG_STARTED,
                     DragEvent.ACTION_DRAG_ENDED -> true
                     DragEvent.ACTION_DRAG_EXITED -> {
-                        val expand = ScaleAnimation(2f, 1f, 2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+                        val expand = ScaleAnimation(
+                            2f,
+                            1f,
+                            2f,
+                            1f,
+                            Animation.RELATIVE_TO_SELF,
+                            0.5f,
+                            Animation.RELATIVE_TO_SELF,
+                            0.5f
+                        )
                         expand.duration = 100
                         expand.interpolator = DecelerateInterpolator()
                         expand.fillAfter = true
@@ -164,7 +189,16 @@ class DefenseEditableView: DefenseView {
                         true
                     }
                     DragEvent.ACTION_DRAG_ENTERED -> {
-                        val btnAnim = ScaleAnimation(1f, 2f, 1f, 2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+                        val btnAnim = ScaleAnimation(
+                            1f,
+                            2f,
+                            1f,
+                            2f,
+                            Animation.RELATIVE_TO_SELF,
+                            0.5f,
+                            Animation.RELATIVE_TO_SELF,
+                            0.5f
+                        )
                         btnAnim.duration = 100
                         btnAnim.interpolator = AccelerateInterpolator()
                         btnAnim.fillAfter = true
@@ -174,7 +208,8 @@ class DefenseEditableView: DefenseView {
                     DragEvent.ACTION_DROP -> {
                         clearAnimation()
                         val id: ClipData.Item = event.clipData.getItemAt(0)
-                        val player = players.firstOrNull { it.playerID.toString() == id.text.toString() }
+                        val player =
+                            players.firstOrNull { it.playerID.toString() == id.text.toString() }
                         val position = event.clipData.getItemAt(1)
                         val fieldPosition = FieldPosition.valueOf(position.text.toString())
                         Timber.d("action=ACTION_DROP player=${player?.playerName} position=$fieldPosition")
@@ -207,7 +242,8 @@ class DefenseEditableView: DefenseView {
                         DragEvent.ACTION_DRAG_ENDED -> true
                         DragEvent.ACTION_DROP -> {
                             val id: ClipData.Item = event.clipData.getItemAt(0)
-                            val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
+                            val playerFound =
+                                players.firstOrNull { it.playerID.toString() == id.text.toString() }
                             Timber.d("action=ACTION_DROP reassigned ${playerFound?.playerName} to ${position}")
                             playerFound?.let {
                                 playerListener?.onPlayerReassigned(it, position)
@@ -223,12 +259,13 @@ class DefenseEditableView: DefenseView {
 
     private fun addSubstitutePlayers(containerSize: Float) {
         val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
-        val columnCount = (substituteContainer.width - substituteContainer.paddingStart - substituteContainer.paddingEnd) / iconSize
+        val columnCount =
+            (substituteContainer.width - substituteContainer.paddingStart - substituteContainer.paddingEnd) / iconSize
         substituteContainer.columnCount = columnCount
         substituteContainer.removeAllViews()
         val addSubstituteView = ImageView(context).run {
             layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-            setPadding(10,10,10,10)
+            setPadding(10, 10, 10, 10)
             setImageResource(R.drawable.ic_person_add_black_24dp)
 
             setOnClickListener {
@@ -240,27 +277,30 @@ class DefenseEditableView: DefenseView {
 
         substituteContainer.addView(addSubstituteView)
 
-        players.filter { FieldPosition.isSubstitute(it.position) && it.fieldPositionID > 0 }
-                .forEach { entry ->
-                    val playerView = MultipleStateDefenseIconButton(context).run {
-                        layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-                        setState(StateDefense.PLAYER)
-                        setPlayerImage(entry.image, entry.playerName, iconSize)
+        players.filter { it.isSubstitute() }
+            .forEach { entry ->
+                val playerView = MultipleStateDefenseIconButton(context).run {
+                    layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
+                    setState(StateDefense.PLAYER)
+                    setPlayerImage(entry.image, entry.playerName, iconSize)
 
-                        setOnLongClickListener {
-                            playerListener?.onPlayerButtonLongClicked(entry.toPlayer(), FieldPosition.SUBSTITUTE)
-                            true
-                        }
-
-                        this
+                    setOnLongClickListener {
+                        playerListener?.onPlayerButtonLongClicked(
+                            entry.toPlayer(),
+                            FieldPosition.SUBSTITUTE
+                        )
+                        true
                     }
-                    substituteContainer.addView(playerView)
+
+                    this
                 }
+                substituteContainer.addView(playerView)
+            }
     }
 
     private fun addDesignatedPlayerIfExists(lineupMode: Int, teamType: Int, iconSize: Int) {
         if (lineupMode == MODE_ENABLED) {
-            players.filter { it.position == FieldPosition.DP_DH.id }.let { listPlayers ->
+            players.filter { it.isDpDh() }.let { listPlayers ->
                 val position = FieldPosition.DP_DH
                 positionMarkers[position]?.apply {
                     try {
@@ -271,7 +311,12 @@ class DefenseEditableView: DefenseView {
                         setOnLongClickListener {
                             val playerID = ClipData.Item(player.id.toString())
                             val playerPosition = ClipData.Item(position.name)
-                            val dragData = ClipData(ClipDescription(player.id.toString(), arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)), playerID)
+                            val dragData = ClipData(
+                                ClipDescription(
+                                    player.id.toString(),
+                                    arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)
+                                ), playerID
+                            )
                             dragData.addItem(playerPosition)
                             val shadowBuilder = PlayerDragShadowBuilder(this)
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -288,7 +333,8 @@ class DefenseEditableView: DefenseView {
                                 DragEvent.ACTION_DRAG_ENDED -> true
                                 DragEvent.ACTION_DROP -> {
                                     val id: ClipData.Item = event.clipData.getItemAt(0)
-                                    val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
+                                    val playerFound =
+                                        players.firstOrNull { it.playerID.toString() == id.text.toString() }
                                     Timber.d("action=ACTION_DROP switch ${playerFound?.playerName} with ${listPlayers.first().playerName}")
                                     playerFound?.let {
                                         playerListener?.onPlayersSwitched(listPlayers.first(), it)
@@ -312,13 +358,14 @@ class DefenseEditableView: DefenseView {
                         }
 
                         setOnDragListener { v, event ->
-                            when(event.action) {
+                            when (event.action) {
                                 DragEvent.ACTION_DRAG_STARTED,
                                 DragEvent.ACTION_DRAG_ENDED -> true
                                 DragEvent.ACTION_DROP -> {
                                     val id: ClipData.Item = event.clipData.getItemAt(0)
-                                    val playerFound = players.firstOrNull { it.playerID.toString() == id.text.toString() }
-                                    Timber.d( "action=ACTION_DROP reassigned ${playerFound?.playerName} to ${FieldPosition.DP_DH}")
+                                    val playerFound =
+                                        players.firstOrNull { it.playerID.toString() == id.text.toString() }
+                                    Timber.d("action=ACTION_DROP reassigned ${playerFound?.playerName} to ${FieldPosition.DP_DH}")
                                     playerFound?.let {
                                         playerListener?.onPlayerReassigned(it, FieldPosition.DP_DH)
                                     }
@@ -342,7 +389,7 @@ class DefenseEditableView: DefenseView {
     }
 }
 
-class PlayerDragShadowBuilder(view: View): View.DragShadowBuilder(view) {
+class PlayerDragShadowBuilder(view: View) : View.DragShadowBuilder(view) {
 
     private var mScaleFactor: Point? = null
 

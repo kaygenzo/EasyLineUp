@@ -1,6 +1,9 @@
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
@@ -10,110 +13,116 @@ import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-internal class GetListAvailablePlayersForSelectionTests {
+internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
 
     lateinit var getListAvailablePlayersForSelection: GetListAvailablePlayersForSelection
     lateinit var players: MutableList<PlayerWithPosition>
     lateinit var roster: MutableList<RosterPlayerStatus>
+    private val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
 
     @Before
     fun init() {
-
-        val teamID = 1L
-
         getListAvailablePlayersForSelection = GetListAvailablePlayersForSelection()
 
-        players = mutableListOf()
-        players.add(PlayerWithPosition("toto", 0, 1, 1, teamID, null,
-                FieldPosition.PITCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,0, 1, 1, 1, 1))
-        players.add(PlayerWithPosition("tata", 0, 2, 2, teamID, null,
-                FieldPosition.CATCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,2, 0, 2, 1, 2))
-        players.add(PlayerWithPosition("titi", 0, 3, 3, teamID, null,
-                FieldPosition.CENTER_FIELD.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,9, 3, 3, 1, 4))
-        players.add(PlayerWithPosition("tutu", 0, 4, 4, teamID, null,
-                FieldPosition.FIRST_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE,10, 0, 4, 1, 8))
-        players.add(PlayerWithPosition("tete", 0, 5, 5, teamID, null,
-                FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, Constants.SUBSTITUTE_ORDER_VALUE, 5, 5, 1, 16))
+        players = mutableListOf(
+            generate(1L, FieldPosition.PITCHER, PlayerFieldPosition.FLAG_NONE, 0, 1),
+            generate(2L, null, PlayerFieldPosition.FLAG_NONE, 2, 2),
+            generate(3L, FieldPosition.CENTER_FIELD, PlayerFieldPosition.FLAG_NONE, 9, 4),
+            generate(4L, null, PlayerFieldPosition.FLAG_NONE, 10, 8),
+            generate(
+                5L,
+                FieldPosition.SUBSTITUTE,
+                PlayerFieldPosition.FLAG_NONE,
+                Constants.SUBSTITUTE_ORDER_VALUE,
+                16
+            )
+        )
 
-        roster = mutableListOf()
-        roster.add(RosterPlayerStatus(Player(id = 1L, teamId = teamID, name = "toto", shirtNumber = 1, licenseNumber = 1, image = null, positions = 1), true, null))
-        roster.add(RosterPlayerStatus(Player(id = 2L, teamId = teamID, name = "tata", shirtNumber = 2, licenseNumber = 2, image = null, positions = 1), true, null))
-        roster.add(RosterPlayerStatus(Player(id = 3L, teamId = teamID, name = "titi", shirtNumber = 3, licenseNumber = 3, image = null, positions = 4), true, null))
-        roster.add(RosterPlayerStatus(Player(id = 4L, teamId = teamID, name = "tutu", shirtNumber = 4, licenseNumber = 4, image = null, positions = 8), true, null))
-        roster.add(RosterPlayerStatus(Player(id = 5L, teamId = teamID, name = "tete", shirtNumber = 5, licenseNumber = 5, image = null, positions = 16), true, null))
+        roster = mutableListOf(
+            generateRosterPlayerStatus(1L, 1, true),
+            generateRosterPlayerStatus(2L, 2, true),
+            generateRosterPlayerStatus(3L, 4, true),
+            generateRosterPlayerStatus(4L, 8, true),
+            generateRosterPlayerStatus(5L, 16, true)
+        )
+    }
+
+    private fun startUseCase(
+        position: FieldPosition?,
+        players: List<PlayerWithPosition> = this.players,
+        roster: List<RosterPlayerStatus>? = this.roster,
+        exception: Class<out Throwable>? = null
+    ) {
+        val request = GetListAvailablePlayersForSelection.RequestValues(players, position, roster)
+        getListAvailablePlayersForSelection.executeUseCase(request).subscribe(observer)
+        observer.await()
+        exception?.let {
+            observer.assertError(exception)
+        } ?: let {
+            observer.assertComplete()
+        }
     }
 
     @Test
     fun shouldTriggerAnErrorIfListEmpty() {
-        val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
-        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(mutableListOf(), FieldPosition.PITCHER, roster))
-                .subscribe(observer)
-        observer.await()
-        observer.assertError(NoSuchElementException::class.java)
+        startUseCase(
+            players = mutableListOf(),
+            position = FieldPosition.PITCHER,
+            exception = NoSuchElementException::class.java
+        )
     }
 
     @Test
-    fun shouldOnlyReturnPlayersWithoutFieldPosition() {
-        val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
-        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.PITCHER, roster))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(2, observer.values().first().players.size)
-        Assert.assertEquals(1, observer.values().first().players.filter { it.id == 2L }.size)
-        Assert.assertEquals(1, observer.values().first().players.filter { it.id == 4L }.size)
+    fun shouldOnlyReturnPlayersWithoutFieldPositionOrSubstitutes() {
+        startUseCase(position = FieldPosition.PITCHER)
+        observer.values().first().players.let {
+            Assert.assertEquals(3, it.size)
+            Assert.assertEquals(1, it.filter { it.playerID == 2L }.size)
+            Assert.assertEquals(1, it.filter { it.playerID == 4L }.size)
+            Assert.assertEquals(1, it.filter { it.playerID == 5L }.size)
+        }
     }
 
     @Test
     fun shouldSortPlayersByFieldPositionCatcher() {
-        val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
-        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.CATCHER, roster))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(2, observer.values().first().players[0].id)
-        Assert.assertEquals(4, observer.values().first().players[1].id)
+        startUseCase(position = FieldPosition.CATCHER)
+        observer.values().first().players.let {
+            Assert.assertEquals(2, it[0].playerID)
+            Assert.assertEquals(4, it[1].playerID)
+        }
     }
 
     @Test
     fun shouldSortPlayersByFieldPositionSecondBase() {
-        val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
-        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.SECOND_BASE, roster))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(4, observer.values().first().players[0].id)
-        Assert.assertEquals(2, observer.values().first().players[1].id)
+        startUseCase(position = FieldPosition.SECOND_BASE)
+        observer.values().first().players.let {
+            Assert.assertEquals(4, it[0].playerID)
+            Assert.assertEquals(2, it[1].playerID)
+        }
     }
 
     @Test
     fun shouldReturnAllPlayersWhenRosterIsNull() {
-        val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
-        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.SECOND_BASE, null))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(2, observer.values().first().players.size)
+        startUseCase(position = FieldPosition.SECOND_BASE, roster = null)
+        observer.values().first().players.let {
+            Assert.assertEquals(3, it.size)
+        }
     }
 
     @Test
     fun shouldRTriggerAnExceptionWhenRosterIsEmpty() {
-        val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
-        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.SECOND_BASE, mutableListOf()))
-                .subscribe(observer)
-        observer.await()
-        observer.assertError(NoSuchElementException::class.java)
+        startUseCase(
+            roster = mutableListOf(),
+            position = FieldPosition.SECOND_BASE,
+            exception = NoSuchElementException::class.java
+        )
     }
 
     @Test
     fun shouldReturnSomePlayersWhenRosterIsNotNullAndNotEmpty() {
-        roster.removeAt(4)
-        roster.removeAt(3)
-        val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
-        getListAvailablePlayersForSelection.executeUseCase(GetListAvailablePlayersForSelection.RequestValues(players, FieldPosition.SECOND_BASE, roster))
-                .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+        roster.removeIf { it.player.id == 4L || it.player.id == 5L }
+        startUseCase(position = FieldPosition.SECOND_BASE)
         Assert.assertEquals(1, observer.values().first().players.size)
+        Assert.assertEquals(2L, observer.values().first().players.first().playerID)
     }
 }

@@ -22,11 +22,12 @@ import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentDashboardBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.ShirtNumberEntry
-import com.telen.easylineup.domain.model.TeamStrategy
-import com.telen.easylineup.domain.model.tiles.*
+import com.telen.easylineup.domain.model.tiles.ITileData
+import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_ID
+import com.telen.easylineup.domain.model.tiles.LastPlayerNumberResearchData
+import com.telen.easylineup.launch
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.*
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.home_main_content.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -89,12 +90,9 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
             Constants.TYPE_LAST_LINEUP -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_last_lineup")
                 val lineupID = data.getData()[KEY_LINEUP_ID] as? Long ?: 0L
-                val lineupName = data.getData()[KEY_LINEUP_NAME] as? String ?: ""
-                val lineupStrategy = data.getData()[KEY_LINEUP_STRATEGY] as TeamStrategy
-                val extraHitters = data.getData()[KEY_LINEUP_EXTRA_HITTERS] as? Int ?: 0
-                val extras =
-                    LineupFragment.getArguments(lineupID, lineupName, lineupStrategy, extraHitters)
-                extras.putBoolean(Constants.EXTRA_IS_FROM_SHORTCUT, true)
+                val extras = LineupFragment.getArguments(lineupID).apply {
+                    putBoolean(Constants.EXTRA_IS_FROM_SHORTCUT, true)
+                }
                 findNavController().navigate(
                     R.id.lineupFragmentFixed,
                     extras,
@@ -122,7 +120,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
         FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_search_player")
         hideSoftKeyboard()
 
-        val disposable = viewModel.getShirtNumberHistory(number).subscribe({ history ->
+        launch(viewModel.getShirtNumberHistory(number), { history ->
             val item = tileAdapter.currentList.firstOrNull {
                 it.data is LastPlayerNumberResearchData
             }
@@ -132,7 +130,6 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
         }, {
             Timber.e(it)
         })
-        disposables.add(disposable)
     }
 
     override fun onTileSearchNumberHistoryClicked(history: List<ShirtNumberEntry>) {
@@ -161,7 +158,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                 when (i) {
                     INDEX_SEND_MESSAGES -> {
                         FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_send_message")
-                        disposables.add(viewModel.getPhones().subscribe({
+                        launch(viewModel.getPhones(), {
                             if (it.isEmpty()) {
                                 DialogFactory.getErrorDialog(
                                     activity,
@@ -181,11 +178,11 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                             }
                         }, {
                             Timber.e(it)
-                        }))
+                        })
                     }
                     INDEX_SEND_EMAILS -> {
                         FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_send_email")
-                        disposables.add(viewModel.getEmails().subscribe({
+                        launch(viewModel.getEmails(), {
                             if (it.isEmpty()) {
                                 DialogFactory.getErrorDialog(
                                     activity,
@@ -205,7 +202,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                             }
                         }, {
                             Timber.e(it)
-                        }))
+                        })
                     }
                     INDEX_SEND_OTHER -> {
                         FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_send_other")
@@ -239,7 +236,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
     override fun onDestroyActionMode(mode: ActionMode?) {
         setActionMode(false)
         itemTouchedHelper.attachToRecyclerView(null)
-        val disposable = viewModel.saveTiles(tileAdapter.currentList).subscribe({
+        launch(viewModel.saveTiles(tileAdapter.currentList), {
             activity?.run {
                 if (BuildConfig.DEBUG)
                     Toast.makeText(this, "Save dashboard success", Toast.LENGTH_SHORT).show()
@@ -247,7 +244,6 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
         }, {
             Timber.e(it)
         })
-        this.disposables.add(disposable)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -255,31 +251,28 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
         super.onCreateOptionsMenu(menu, inflater)
 
         activity?.let { activity ->
-            val disposable = viewModel.showNewReportIssueButtonFeature(activity)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ show ->
-                    if (show) {
-                        (activity.toolbar as? Toolbar)?.let { toolbar ->
-                            FeatureViewFactory.apply(toolbar, R.id.action_report_issue,
-                                activity as AppCompatActivity,
-                                getString(R.string.shake_beta_title),
-                                getString(R.string.shake_beta_description),
-                                object : TapTargetView.Listener() {
-                                    override fun onTargetClick(view: TapTargetView?) {
-                                        bugReporter.startReport(activity)
-                                        view?.dismiss(true)
-                                    }
+            launch(viewModel.showNewReportIssueButtonFeature(), { show ->
+                if (show) {
+                    (activity.toolbar as? Toolbar)?.let { toolbar ->
+                        FeatureViewFactory.apply(toolbar, R.id.action_report_issue,
+                            activity as AppCompatActivity,
+                            getString(R.string.shake_beta_title),
+                            getString(R.string.shake_beta_description),
+                            object : TapTargetView.Listener() {
+                                override fun onTargetClick(view: TapTargetView?) {
+                                    bugReporter.startReport(activity)
+                                    view?.dismiss(true)
+                                }
 
-                                    override fun onOuterCircleClick(view: TapTargetView?) {
-                                        view?.dismiss(false)
-                                    }
-                                })
-                        }
+                                override fun onOuterCircleClick(view: TapTargetView?) {
+                                    view?.dismiss(false)
+                                }
+                            })
                     }
-                }, {
-                    Timber.e(it)
-                })
-            disposables.add(disposable)
+                }
+            }, {
+                Timber.e(it)
+            })
         }
     }
 

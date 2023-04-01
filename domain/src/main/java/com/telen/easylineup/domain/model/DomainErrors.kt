@@ -13,20 +13,8 @@ class DomainErrors {
     }
 
     enum class Lineups {
-        DELETE_LINEUP_FAILED,
-        LIST_AVAILABLE_PLAYERS_EMPTY,
-        SAVE_BATTING_ORDER_FAILED,
-        SAVE_LINEUP_MODE_FAILED,
-        UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED,
-        NEED_ASSIGN_PITCHER_FIRST,
-        DP_OR_FLEX_NOT_ASSIGNED,
         INVALID_LINEUP_NAME,
         INVALID_TOURNAMENT_NAME
-    }
-
-    enum class PlayerFieldPositions {
-        SAVE_PLAYER_FIELD_POSITION_FAILED,
-        DELETE_PLAYER_FIELD_POSITION_FAILED
     }
 
     enum class Configuration {

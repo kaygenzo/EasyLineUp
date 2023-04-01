@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -22,12 +23,19 @@ import java.text.DateFormat
 import java.util.*
 
 interface OnActionButtonListener {
-    fun onSaveClicked(lineupName: String, tournament: Tournament, lineupEventTime: Long, strategy: TeamStrategy, extraHitters: Int)
+    fun onSaveClicked(
+        lineupName: String,
+        tournament: Tournament,
+        lineupEventTime: Long,
+        strategy: TeamStrategy,
+        extraHitters: Int
+    )
+
     fun onCancelClicked()
     fun onRosterChangeClicked()
 }
 
-class LineupCreationFormView: ConstraintLayout, TextWatcher {
+class LineupCreationFormView : ConstraintLayout, TextWatcher {
 
     private val tournaments: MutableList<Tournament> = mutableListOf()
     private var strategy: TeamStrategy = TeamStrategy.STANDARD
@@ -40,9 +48,21 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
 
     private var fragmentManager: FragmentManager? = null
 
-    constructor(context: Context) : super(context) { init(context)}
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init(context)}
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context)}
+    constructor(context: Context) : super(context) {
+        init(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        init(context)
+    }
 
     private fun init(context: Context) {
         LayoutInflater.from(context).inflate(R.layout.dialog_create_lineup, this)
@@ -61,9 +81,9 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
 
         dateButton.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder
-                    .datePicker()
-                    .setSelection(eventTime.timeInMillis)
-                    .build()
+                .datePicker()
+                .setSelection(eventTime.timeInMillis)
+                .build()
             datePicker.addOnPositiveButtonClickListener {
                 eventTime.timeInMillis = it
                 setTournamentDateHeader(it)
@@ -77,22 +97,34 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
             actionClickListener?.onRosterChangeClicked()
         }
 
-        save.setOnClickListener {
-            actionClickListener?.onSaveClicked(lineupTitleInput.text.toString(), getSelectedTournament(), eventTime.timeInMillis, strategy, extraHitters)
+        actionContainer.saveClickListener = OnClickListener {
+            actionClickListener?.onSaveClicked(
+                lineupTitleInput.text.toString(),
+                getSelectedTournament(),
+                eventTime.timeInMillis,
+                strategy,
+                extraHitters
+            )
         }
 
-        cancel.setOnClickListener {
+        actionContainer.cancelClickListener = OnClickListener {
             actionClickListener?.onCancelClicked()
         }
 
         lineupExtraHittersSpinner.setSelection(extraHitters)
-        lineupExtraHittersSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
+        lineupExtraHittersSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(p0: AdapterView<*>?) {}
 
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, id: Long) {
-                extraHitters = resources.getIntArray(R.array.extra_hitters_values)[position]
+                override fun onItemSelected(
+                    p0: AdapterView<*>?,
+                    p1: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    extraHitters = resources.getIntArray(R.array.extra_hitters_values)[position]
+                }
             }
-        }
     }
 
     fun setFragmentManager(fm: FragmentManager) {
@@ -109,19 +141,24 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
     }
 
     fun setTeamType(teamType: TeamType) {
-        when(teamType) {
+        when (teamType) {
             TeamType.SOFTBALL -> {
                 val strategies = teamType.getStrategies()
                 val strategiesName = resources.getStringArray(R.array.softball_strategy_array)
                 strategyAdapter = ArrayAdapter(context, R.layout.item_team_strategy, strategiesName)
                 lineupStrategySpinner.apply {
                     adapter = strategyAdapter
-                    onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+                    onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                         override fun onNothingSelected(p0: AdapterView<*>?) {
 
                         }
 
-                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        override fun onItemSelected(
+                            parent: AdapterView<*>?,
+                            view: View?,
+                            position: Int,
+                            id: Long
+                        ) {
                             strategy = strategies[position]
                         }
                     }
@@ -158,22 +195,24 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
     private fun getSelectedTournament(): Tournament {
         val position = tournamentsNames.indexOf(tournamentChoiceAutoComplete.text.toString())
         Timber.d("position = $position")
-        return if(position >= 0) {
+        return if (position >= 0) {
 //            tournaments[position].createdAt = calendar.timeInMillis
             tournaments[position]
-        }
-        else
-            Tournament(name = tournamentChoiceAutoComplete.text.toString().trim(), createdAt = Calendar.getInstance().timeInMillis)
+        } else
+            Tournament(
+                name = tournamentChoiceAutoComplete.text.toString().trim(),
+                createdAt = Calendar.getInstance().timeInMillis
+            )
     }
 
     override fun afterTextChanged(s: Editable?) {
         //readyStateListener?.onFormStateChanged()
         val lineupName = lineupTitleInput.text
         val tournamentName = tournamentChoiceAutoComplete.text
-        if(!TextUtils.isEmpty(lineupName?.trim())) {
+        if (!TextUtils.isEmpty(lineupName?.trim())) {
             lineupTitleInputLayout.error = null
         }
-        if(!TextUtils.isEmpty(tournamentName.trim())){
+        if (!TextUtils.isEmpty(tournamentName.trim())) {
             tournamentTitleInputLayout.error = null
         }
     }

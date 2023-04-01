@@ -6,11 +6,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.BatterState
+import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.views.LineupTypeface
 import com.telen.easylineup.views.PlayerPositionFilterView
 import com.telen.easylineup.views.PreferencesStyledTextView
@@ -24,32 +24,26 @@ interface OnItemTouchedListener {
     fun onIdle()
 }
 
-interface OnDataChangedListener {
-    fun onOrderChanged()
-}
-
-class BattingOrderAdapter(val players: MutableList<BatterState>,
-                          private val dataListener: OnDataChangedListener?,
-                          var teamType: Int,
-                          private val lineupTypeface: LineupTypeface,
-                          var lineupMode: Int = MODE_DISABLED,
-                          var itemTouchHelper: ItemTouchHelper? = null
-): RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
+class BattingOrderAdapter(
+    val players: MutableList<BatterState>,
+    var lineupTypeface: LineupTypeface = LineupTypeface.NORMAL,
+    var lineupMode: Int = MODE_DISABLED,
+    var itemTouchHelper: ItemTouchHelper? = null
+) : RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
 
     override fun onDragStart() {}
     override fun onSwiped(position: Int) {}
-
-    override fun onIdle() {
-        dataListener?.onOrderChanged()
-    }
-
+    override fun onIdle() {}
     override fun onMoved(fromPosition: Int, toPosition: Int) {
-        Timber.d("Adapter: Try to move from position $fromPosition to position $toPosition from a list of ${players.size} elements")
+        Timber.d(
+            "Adapter: Try to move from position " +
+                    "$fromPosition to position $toPosition from a list of ${players.size} elements"
+        )
         val fromBatter = players[fromPosition]
         val toBatter = players[toPosition]
 
         Timber.d("Adapter: canMove from=${fromBatter.canMove} canMoveTo=${toBatter.canMove}")
-        if(fromBatter.canMove && toBatter.canMove) {
+        if (fromBatter.canMove && toBatter.canMove) {
 
             //we simply just swap orders
 
@@ -77,18 +71,20 @@ class BattingOrderAdapter(val players: MutableList<BatterState>,
         }
     }
 
-    class BatterViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    class BatterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val playerName = view.findViewById<PreferencesStyledTextView>(R.id.playerName)
         val shirtNumber = view.findViewById<PreferencesStyledTextView>(R.id.shirtNumber)
         val fieldPosition = view.findViewById<PreferencesStyledTextView>(R.id.fieldPosition)
         val order = view.findViewById<TextView>(R.id.order)
         val reorderImage = view.findViewById<ImageView>(R.id.reorderImage)
-        val positionDesc = view.findViewById<PlayerPositionFilterView>(R.id.fieldPositionDescription)
+        val positionDesc =
+            view.findViewById<PlayerPositionFilterView>(R.id.fieldPositionDescription)
         val itemPlayerAttack = view.findViewById<ConstraintLayout>(R.id.itemPlayerAttack)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BatterViewHolder {
-        val viewItem = LayoutInflater.from(parent.context).inflate(R.layout.item_player_attack, parent, false)
+        val viewItem = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_player_attack, parent, false)
         return BatterViewHolder(viewItem)
     }
 
@@ -112,7 +108,11 @@ class BattingOrderAdapter(val players: MutableList<BatterState>,
             playerName.text = batter.playerName.trim()
 
             fieldPosition.setTypeface(lineupTypeface)
-            fieldPosition.text = if(batter.canShowPosition) batter.playerPosition.getPositionOnField().toString() else ""
+            fieldPosition.text = if (batter.canShowPosition) {
+                batter.playerPosition.position.toString()
+            } else {
+                ""
+            }
 
             shirtNumber.setTypeface(lineupTypeface)
             shirtNumber.text = batter.playerNumber
@@ -125,13 +125,30 @@ class BattingOrderAdapter(val players: MutableList<BatterState>,
                 positionDesc.setText(batter.playerPositionDesc)
             }
 
-            order.visibility = if(batter.canShowOrder) View.VISIBLE else View.INVISIBLE
-            positionDesc.visibility = if(batter.canShowDescription) View.VISIBLE else View.GONE
-            reorderImage.visibility = if(batter.canMove) View.VISIBLE else if(batter.isEditable) View.INVISIBLE else View.GONE
-            if(batter.applyBackground)
+            order.visibility = if (batter.canShowOrder) {
+                View.VISIBLE
+            } else {
+                View.INVISIBLE
+            }
+            positionDesc.visibility = if (batter.canShowDescription) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+            reorderImage.visibility = if (batter.canMove) {
+                View.VISIBLE
+            } else {
+                if (batter.isEditable) {
+                    View.INVISIBLE
+                } else {
+                    View.GONE
+                }
+            }
+            if (batter.applyBackground) {
                 itemPlayerAttack.setBackgroundResource(R.color.grey_light)
-            else
+            } else {
                 itemPlayerAttack.setBackgroundResource(0)
+            }
             reorderImage.setOnTouchListener { view, motionEvent ->
                 itemTouchHelper?.startDrag(this)
                 true

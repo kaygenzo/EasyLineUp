@@ -2,64 +2,50 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.*
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import io.reactivex.rxjava3.core.Single
 
 
-internal class SaveDpAndFlex(private val playerFieldPositionDao: PlayerFieldPositionRepository): UseCase<SaveDpAndFlex.RequestValues, SaveDpAndFlex.ResponseValue>() {
+internal class SaveDpAndFlex : UseCase<SaveDpAndFlex.RequestValues, SaveDpAndFlex.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return requestValues.lineupID?.let { lineupID ->
-            val toUpdate = mutableListOf<PlayerWithPosition>()
-            val toInsert = mutableListOf<PlayerFieldPosition>()
+        val players = requestValues.players
+        val lineup = requestValues.lineup
+        val dp = requestValues.dp ?: return Single.error(NeedAssignBothPlayersException())
+        val flex = requestValues.flex ?: return Single.error(NeedAssignBothPlayersException())
+        val strategy = TeamStrategy.getStrategyById(lineup.strategy)
 
-            val dp = requestValues.dp ?: return Single.error(NeedAssignBothPlayersException())
-            val flex = requestValues.flex ?: return Single.error(NeedAssignBothPlayersException())
+        val oldFlex = players.filter { it.isFlex() }
 
-            // just find the player field position corresponding to the flexFieldPosition in which
-            // we will update the flag, and by the way, free the batting order
-            requestValues.players.firstOrNull { p -> p.playerID == flex.id }?.run {
-                flags = PlayerFieldPosition.FLAG_FLEX
-                order = requestValues.strategy.getDesignatedPlayerOrder(requestValues.extraHittersSize)
-                if(!toUpdate.contains(this))
-                    toUpdate.add(this)
-            }
+        // assign the new player as flex
+        players.firstOrNull { it.playerID == flex.id }?.run {
+            flags = PlayerFieldPosition.FLAG_FLEX
+            order = strategy.getDesignatedPlayerOrder(lineup.extraHitters)
+        }
 
-            //check if there are flex flags and reset them because there can be only one flex
-            requestValues.players.filter {
-                player -> player.flags and PlayerFieldPosition.FLAG_FLEX > 0 && player.playerID != flex.id
-            }.forEach {
-                it.flags = PlayerFieldPosition.FLAG_NONE
-                it.order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(it.order))
-                if(!toUpdate.contains(it))
-                    toUpdate.add(it)
-            }
+        // reset old flex flags and reset them because there can be only one flex
+        oldFlex.filter { it.playerID != flex.id }.forEach {
+            it.flags = PlayerFieldPosition.FLAG_NONE
+            it.order = players.getNextAvailableOrder(listOf(it.order))
+        }
 
-            requestValues.players.firstOrNull { p -> p.position == FieldPosition.DP_DH.id }?.run {
-                order = PlayerWithPosition.getNextAvailableOrder(requestValues.players, listOf(order))
-                playerID = dp.id
-                if(!toUpdate.contains(this))
-                    toUpdate.add(this)
-            } ?: run {
-                val newPosition = PlayerFieldPosition(playerId = dp.id, lineupId = lineupID, position = FieldPosition.DP_DH.id,
-                        order = PlayerWithPosition.getNextAvailableOrder(requestValues.players))
-                toInsert.add(newPosition)
-            }
+        // check if there is a dp and reset him because there can be only one dp
+        players.firstOrNull { it.isDpDh() }?.reset()
 
-            return playerFieldPositionDao.updatePlayerFieldPositions(toUpdate.map { it.toPlayerFieldPosition() })
-                    .andThen(playerFieldPositionDao.insertPlayerFieldPositions(toInsert))
-                    .andThen(Single.just(ResponseValue()))
+        players.firstOrNull { it.playerID == dp.id }?.run {
+            position = FieldPosition.DP_DH.id
+            order = players.getNextAvailableOrder(listOf(order))
+        }
 
-        } ?: Single.error(Exception("Lineup id is null!"))
+        return Single.just(ResponseValue())
     }
 
-    class RequestValues(val lineupID: Long?,
-                        val dp: Player?,
-                        val flex: Player?,
-                        val players: List<PlayerWithPosition>,
-                        val strategy: TeamStrategy,
-                        val extraHittersSize: Int
-    ): UseCase.RequestValues
-    inner class ResponseValue: UseCase.ResponseValue
+    class RequestValues(
+        val lineup: Lineup,
+        val dp: Player?,
+        val flex: Player?,
+        val players: List<PlayerWithPosition>
+    ) : UseCase.RequestValues
+
+    inner class ResponseValue : UseCase.ResponseValue
 }

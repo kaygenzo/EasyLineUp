@@ -2,7 +2,6 @@ package com.telen.easylineup.domain.application
 
 import com.telen.easylineup.domain.model.*
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.subjects.Subject
 
 interface PlayerFieldPositionsInteractor {
     /** @deprecated **/
@@ -10,17 +9,12 @@ interface PlayerFieldPositionsInteractor {
     fun savePlayerFieldPosition(
         player: Player,
         position: FieldPosition,
-        list: List<PlayerWithPosition>,
-        lineupID: Long?,
-        lineupMode: Int,
-        strategy: TeamStrategy,
-        batterSize: Int,
-        extraBatterSize: Int
+        lineup: Lineup,
+        list: List<PlayerWithPosition>
     ): Completable
 
     fun deletePlayerPosition(
         player: Player,
-        position: FieldPosition,
         list: List<PlayerWithPosition>,
         lineupMode: Int,
         extraHitterSize: Int
@@ -30,10 +24,6 @@ interface PlayerFieldPositionsInteractor {
         p1: FieldPosition,
         p2: FieldPosition,
         list: List<PlayerWithPosition>,
-        lineupMode: Int,
-        strategy: TeamStrategy,
-        extraHittersSize: Int
+        lineup: Lineup
     ): Completable
-
-    fun observeErrors(): Subject<DomainErrors.PlayerFieldPositions>
 }

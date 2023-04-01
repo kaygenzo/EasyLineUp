@@ -2,237 +2,238 @@ package com.telen.easylineup.lineup.defense
 
 import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
-import androidx.lifecycle.Observer
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.FragmentLineupDefenseEditableBinding
 import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
-import com.telen.easylineup.lineup.*
+import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
+import com.telen.easylineup.launch
+import com.telen.easylineup.lineup.LineupFragment
+import com.telen.easylineup.lineup.LineupViewModel
+import com.telen.easylineup.lineup.LinkDpFlex
+import com.telen.easylineup.lineup.ListAvailablePlayers
 import com.telen.easylineup.lineup.defense.available.ListAvailablePlayersBottomSheet
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.views.DpFlexLinkView
 import com.telen.easylineup.views.OnPlayerButtonCallback
 import com.telen.easylineup.views.OnPlayerClickListener
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_lineup_defense_editable.view.*
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayerButtonCallback {
+class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlayerButtonCallback {
 
-    lateinit var viewModel: PlayersPositionViewModel
+    lateinit var viewModel: LineupViewModel
     lateinit var availablePlayersBottomSheet: ListAvailablePlayersBottomSheet
+    private var binder: FragmentLineupDefenseEditableBinding? = null
+
+    companion object {
+        const val PLAYERS_BOTTOM_SHEET_TAG = "available_players_bottom_sheet"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProviders.of(parentFragment as LineupFragment).get(PlayersPositionViewModel::class.java)
-
+        viewModel =
+            ViewModelProviders.of(parentFragment as LineupFragment).get(LineupViewModel::class.java)
         availablePlayersBottomSheet = ListAvailablePlayersBottomSheet()
-
-        val playerFieldPositionDisposable = viewModel.observePlayerFieldPositionErrors().subscribe({
-            when(it) {
-                DomainErrors.PlayerFieldPositions.SAVE_PLAYER_FIELD_POSITION_FAILED ->  Timber.e(Exception("Save player field position failed"))
-                DomainErrors.PlayerFieldPositions.DELETE_PLAYER_FIELD_POSITION_FAILED -> Timber.e(Exception("Delete player field position failed"))
-                else -> {
-                    Timber.e("Not managed error")
-                }
-            }
-        }, {
-            Timber.e(it)
-        })
-        disposables.add(playerFieldPositionDisposable)
-
-        val lineupDisposable = viewModel.observeLineupErrors().subscribe({
-            when(it) {
-                DomainErrors.Lineups.LIST_AVAILABLE_PLAYERS_EMPTY -> {
-                    activity?.let { activity ->
-                        DialogFactory.getSimpleDialog(activity, R.string.players_list_empty).show()
-                    }
-                }
-                DomainErrors.Lineups.UPDATE_PLAYERS_WITH_LINEUP_MODE_FAILED -> Timber.e(Exception("Update players with lineup mode failed"))
-                DomainErrors.Lineups.SAVE_LINEUP_MODE_FAILED -> Timber.e(Exception("Save lineup mode failed"))
-                DomainErrors.Lineups.NEED_ASSIGN_PITCHER_FIRST -> {
-                    context?.run {
-                        FirebaseAnalyticsUtils.missingPitcher(this)
-                        DialogFactory.getErrorDialog(
-                                context = this,
-                                title = R.string.error_need_assign_pitcher_first_title,
-                                message = R.string.error_need_assign_pitcher_first_message).show()
-                    }
-                }
-                DomainErrors.Lineups.DP_OR_FLEX_NOT_ASSIGNED -> {
-                    context?.run {
-                        FirebaseAnalyticsUtils.missingDpFlex(this)
-                        DialogFactory.getErrorDialog(
-                                context = this,
-                                title = R.string.error_need_assign_both_players_title,
-                                message = R.string.error_need_assign_both_players_message).show()
-                    }
-                }
-                else -> {
-                    Timber.e("Not managed error")
-                }
-            }
-        }, {
-            Timber.e(it)
-        })
-        disposables.add(lineupDisposable)
-
-        val eventsDisposable = viewModel.eventHandler.subscribe({ event ->
-            when(event) {
-                SavePlayerPositionSuccess -> Timber.d("Successfully saved player field position")
-                DeletePlayerPositionSuccess -> Timber.d("Successfully deleted player field position")
-                is GetAllAvailablePlayersSuccess -> activity?.run {
-                    availablePlayersBottomSheet.setPlayers(event.players, event.position, object: OnPlayerClickListener {
-                        override fun onPlayerSelected(player: Player) {
-                            viewModel.onPlayerSelected(player, event.position)
-                            availablePlayersBottomSheet.dismiss()
-                        }
-                    })
-                    if(!availablePlayersBottomSheet.isAdded)
-                        availablePlayersBottomSheet.show(supportFragmentManager, "available_players_bottom_sheet")
-                }
-                is NeedLinkDpFlex -> activity?.run {
-                    getDialogLinkDpAndFlex(this, event.initialData, event.dpLocked, event.flexLocked, event.teamType, event.title).show()
-                }
-                else -> {}
-            }
-        }, {
-            Timber.e(it)
-        })
-
-        disposables.add(eventsDisposable)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_lineup_defense_editable, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val binder = FragmentLineupDefenseEditableBinding.inflate(inflater, container, false)
+        this.binder = binder
 
-        view.cardDefenseView.init(viewModel.strategy)
-
-        viewModel.registerLineupAndPositionsChanged().observe(viewLifecycleOwner, Observer { players ->
-            view.cardDefenseView.setPlayerStateListener(this)
-            val disposable = viewModel.getTeamType().subscribe({
-                val displayDisposable = Completable.timer(100, TimeUnit.MILLISECONDS)
-                        .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            view.cardDefenseView.setListPlayer(players, viewModel.lineupMode, viewModel.teamType)
-                        }, {
-
-                        })
-                disposables.add(displayDisposable)
+        viewModel.getTeamStrategy()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                binder.cardDefenseView.apply {
+                    init(it)
+                    setPlayerStateListener(this@DefenseFragmentEditable)
+                }
+                viewModel.observeDefensePlayers().observe(viewLifecycleOwner) { players ->
+                    val lineupMode = viewModel.lineup?.mode ?: MODE_DISABLED
+                    launch(viewModel.getTeamType().flatMap {
+                        Completable.timer(100, TimeUnit.MILLISECONDS).andThen(Single.just(it))
+                    }, { teamType ->
+                        binder.cardDefenseView.setListPlayer(players, lineupMode, teamType)
+                    }, {
+                        Timber.e(it)
+                    })
+                }
             }, {
                 Timber.e(it)
             })
-            disposables.add(disposable)
-        })
-
-        return view
+        return binder.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        view?.cardDefenseView?.clear()
+        binder?.cardDefenseView?.clear()
+        binder = null
     }
 
     override fun onPlayerButtonLongClicked(player: Player, position: FieldPosition) {
-        activity?.run {
-            getDialogDeletePosition(this, player, position).show()
-        }
+        activity?.run { getDialogDeletePosition(this, player).show() }
     }
 
     override fun onPlayerSentToTrash(player: Player, position: FieldPosition) {
-        viewModel.onDeletePosition(player, position)
+        viewModel.onDeletePosition(player)
     }
 
     override fun onPlayerButtonClicked(position: FieldPosition) {
-        viewModel.onPlayerClicked(position)
+        viewModel.onPlayerClicked(position).subscribe({ event ->
+            activity?.run {
+                when (event) {
+                    is LinkDpFlex -> onLinkDpWithFlex(this, event)
+                    is ListAvailablePlayers -> onListAvailablePlayers(this, event, position)
+                    else -> Timber.d("Nothing to do")
+                }
+            }
+        }, {
+            if (it is NeedAssignPitcherFirstException) {
+                activity?.run {
+                    FirebaseAnalyticsUtils.missingPitcher(this)
+                    DialogFactory.getErrorDialog(
+                        context = this,
+                        title = R.string.error_need_assign_pitcher_first_title,
+                        message = R.string.error_need_assign_pitcher_first_message
+                    ).show()
+                }
+            } else {
+                Timber.e(it)
+            }
+        }, {
+            // if we arrive here, it means no players have been found
+            activity?.run {
+                DialogFactory.getSimpleDialog(this, R.string.players_list_empty).show()
+            }
+        })
     }
 
     override fun onPlayersSwitched(player1: PlayerWithPosition, player2: PlayerWithPosition) {
         Timber.d("Switch ${player1.playerName} with ${player2.playerName}")
-        val disposable = viewModel.switchPlayersPosition(player1, player2).subscribe({}, {
+        launch(viewModel.switchPlayersPosition(player1, player2), {}, {
             Timber.e("Cannot switch players: ${it.message}")
         })
-        disposables.add(disposable)
     }
 
     override fun onPlayerReassigned(player: PlayerWithPosition, newPosition: FieldPosition) {
         Timber.d("${player.playerName} reassigned to $newPosition")
-        val disposable = viewModel.switchPlayersPosition(player, newPosition).subscribe({}, {
+        launch(viewModel.switchPlayersPosition(player, newPosition), {}, {
             Timber.e("Cannot change player position: ${it.message}")
         })
-        disposables.add(disposable)
     }
 
-    private fun getDialogLinkDpAndFlex(context: Context, initialData: Pair<Player?, Player?>,
-                                       dpLocked: Boolean, flexLocked: Boolean, teamType: Int, @StringRes title: Int): Dialog {
-
+    private fun getDialogLinkDpAndFlex(
+        context: Context,
+        initialData: Pair<PlayerWithPosition?, PlayerWithPosition?>,
+        dpLocked: Boolean,
+        flexLocked: Boolean,
+        teamType: Int,
+        @StringRes title: Int
+    ): Dialog {
         val dpFlexLinkView = DpFlexLinkView(context)
-        dpFlexLinkView.setDpAndFlex(initialData.first, initialData.second)
+        dpFlexLinkView.setDpAndFlex(initialData.first?.toPlayer(), initialData.second?.toPlayer())
         dpFlexLinkView.setTeamType(teamType)
-        dpFlexLinkView.setOnDpClickListener(dpLocked, View.OnClickListener {
-            viewModel.getPlayerSelectionForDp()
-        })
 
-        dpFlexLinkView.setOnFlexClickListener(flexLocked, View.OnClickListener {
-            viewModel.getPlayerSelectionForFlex()
-        })
+        dpFlexLinkView.setOnDpClickListener(dpLocked) {
+            launch(viewModel.getPlayerSelectionForDp(), {
+                dpFlexLinkView.setPlayerList(it.map { it.toPlayer() })
+            }, {
+                Timber.e(it)
+            })
+        }
 
-        viewModel.linkPlayersInField.observe(viewLifecycleOwner, Observer {
-            it?.run { dpFlexLinkView.setPlayerList(this) }
-        })
+        dpFlexLinkView.setOnFlexClickListener(flexLocked) {
+            launch(viewModel.getPlayerSelectionForFlex(), {
+                dpFlexLinkView.setPlayerList(it.map { it.toPlayer() })
+            }, {
+                Timber.e(it)
+            })
+        }
 
         val dialog = DialogFactory.getSimpleDialog(
-                context = context,
-                title = title,
-                view = dpFlexLinkView,
-                confirmClick = DialogInterface.OnClickListener { dialog, which ->
-                    val dp = dpFlexLinkView.getDp()
-                    val flex = dpFlexLinkView.getFlex()
-                    val disposable = viewModel.linkDpAndFlex(dp, flex)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({
-                                dialog.dismiss()
-                            }, {
-                                if (it is NeedAssignBothPlayersException) {
-                                    Timber.w(it.message)
-                                } else {
-                                    Timber.e(it)
-                                }
-                            })
-                    disposables.add(disposable)
-                }
+            context = context,
+            title = title,
+            view = dpFlexLinkView,
+            confirmClick = { dialog, _ ->
+                val dp = dpFlexLinkView.getDp()
+                val flex = dpFlexLinkView.getFlex()
+                launch(viewModel.linkDpAndFlex(dp, flex), {
+                    dialog.dismiss()
+                }, {
+                    if (it is NeedAssignBothPlayersException) {
+                        Timber.w(it.message)
+                        FirebaseAnalyticsUtils.missingDpFlex(context)
+                        DialogFactory.getErrorDialog(
+                            context = context,
+                            title = R.string.error_need_assign_both_players_title,
+                            message = R.string.error_need_assign_both_players_message
+                        ).show()
+                    } else {
+                        Timber.e(it)
+                    }
+                })
+            }
         )
-        dialog.setOnDismissListener {
-            viewModel.linkPlayersInField.removeObservers(viewLifecycleOwner)
-        }
         dialog.setCancelable(false)
         return dialog
     }
 
-    private fun getDialogDeletePosition(context: Context, player: Player, position: FieldPosition): Dialog {
-        return DialogFactory.getWarningTaskDialog(context = context,
-                title = R.string.dialog_delete_position_title,
-                message = R.string.dialog_delete_cannot_undo_message,
-                task = Completable.create { emitter ->
-                    viewModel.onDeletePosition(player, position)
-                    emitter.onComplete()
-                })
+    private fun getDialogDeletePosition(
+        context: Context,
+        player: Player
+    ): Dialog {
+        return DialogFactory.getWarningTaskDialog(
+            context = context,
+            title = R.string.dialog_delete_position_title,
+            message = R.string.dialog_delete_cannot_undo_message,
+            task = Completable.create { emitter ->
+                viewModel.onDeletePosition(player)
+                emitter.onComplete()
+            })
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        disposables.clear()
+    private fun onLinkDpWithFlex(context: Context, event: LinkDpFlex) {
+        event.run {
+            getDialogLinkDpAndFlex(context, initialData, dpLocked, flexLocked, teamType, title)
+                .show()
+        }
+    }
+
+    private fun onListAvailablePlayers(
+        activity: FragmentActivity,
+        event: ListAvailablePlayers,
+        position: FieldPosition
+    ) {
+        event.players.run {
+            val listener = object : OnPlayerClickListener {
+                override fun onPlayerSelected(player: Player) {
+                    viewModel.onPlayerSelected(player, event.position)
+                    availablePlayersBottomSheet.dismiss()
+                }
+            }
+            availablePlayersBottomSheet.setPlayers(this.map { it.toPlayer() }, position, listener)
+        }
+        if (!availablePlayersBottomSheet.isAdded) {
+            availablePlayersBottomSheet.show(
+                activity.supportFragmentManager,
+                PLAYERS_BOTTOM_SHEET_TAG
+            )
+        }
     }
 }
