@@ -208,6 +208,7 @@ dependencies {
 
     // only debug libraries
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanaryVersion"
+    implementation "androidx.core:core-splashscreen:$splashscreenVersion"
 }
 
 apply from: '../jacoco.gradle'

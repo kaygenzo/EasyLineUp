@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.telen.easylineup.BaseImportActivity
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
@@ -11,19 +12,19 @@ import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.splashscreen.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.concurrent.TimeUnit
 
 class SplashScreenActivity: BaseImportActivity(), KoinComponent {
 
     private val domain: ApplicationInteractor by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        splashScreen.setKeepOnScreenCondition { true }
         setContentView(R.layout.splashscreen)
         appVersion.text = BuildConfig.VERSION_NAME
 
@@ -31,8 +32,7 @@ class SplashScreenActivity: BaseImportActivity(), KoinComponent {
         data?.let {
             checkDataUri(it)
         } ?: run {
-            val disposable = Completable.timer(3000, TimeUnit.MILLISECONDS)
-                    .andThen(domain.teams().getTeam())
+            val disposable = domain.teams().getTeam()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
                         launchHome()
