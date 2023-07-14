@@ -30,10 +30,6 @@ class PreferencesStyledTextView: MaterialTextView {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
-    init {
-        setTextColor(ContextCompat.getColor(context, R.color.lineup_name))
-    }
-
     fun setTypeface(typeface: LineupTypeface) {
         when(typeface) {
             LineupTypeface.HAND_WRITING -> {

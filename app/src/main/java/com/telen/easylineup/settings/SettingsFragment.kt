@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
@@ -193,6 +194,20 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             getString(R.string.key_lineup_style) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_lineup_style")
                 updateLineupStyleSummary()
+            }
+            getString(R.string.key_day_night_theme) -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_settings_theme")
+                sharedPreferences?.getString(
+                    getString(R.string.key_day_night_theme),
+                    getString(R.string.lineup_theme_default_value)
+                )?.let {
+                    val styleValue = it.toInt()
+                    AppCompatDelegate.setDefaultNightMode(when(styleValue) {
+                        1 -> { AppCompatDelegate.MODE_NIGHT_NO }
+                        2 -> { AppCompatDelegate.MODE_NIGHT_YES }
+                        else -> { AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM }
+                    })
+                }
             }
         }
     }

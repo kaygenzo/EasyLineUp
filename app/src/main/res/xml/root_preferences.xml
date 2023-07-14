@@ -42,6 +42,14 @@
             app:default_color="@color/default_women_color"
             android:summary="@string/picker_women_summary"/>
 
+        <ListPreference
+            android:defaultValue="@string/lineup_theme_default_value"
+            android:entries="@array/pref_theme_style_labels"
+            android:entryValues="@array/pref_theme_style_values"
+            android:key="@string/key_day_night_theme"
+            android:title="@string/setting_day_night_style_description"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/settings_category_export">

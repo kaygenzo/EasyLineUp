@@ -22,15 +22,6 @@ class NormalUppercaseStyledTextView: MaterialTextView {
             a.recycle()
             textAllCaps
         } ?: true
-        val defaultColor = ContextCompat.getColor(context, R.color.normal_uppercase_style_text_color)
-        val textColor = attrs?.let {
-            val a = context.obtainStyledAttributes(attrs, R.styleable.NormalUppercaseStyledTextView, defStyle, 0)
-            val color = a.getColor(R.styleable.NormalUppercaseStyledTextView_normalUppercaseStyledTextColor, defaultColor)
-            a.recycle()
-            color
-        } ?: defaultColor
-
-        setTextColor(textColor)
     }
 
     override fun setTypeface(tf: Typeface?, style: Int) {

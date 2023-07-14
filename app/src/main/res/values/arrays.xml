@@ -33,4 +33,16 @@
         <item>4</item>
         <item>255</item>
     </integer-array>
+
+    <string-array name="pref_theme_style_labels" translatable="false">
+        <item>@string/lineup_theme_system_value</item>
+        <item>@string/lineup_theme_day_value</item>
+        <item>@string/lineup_theme_night_value</item>
+    </string-array>
+
+    <string-array name="pref_theme_style_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

@@ -3,7 +3,9 @@ package com.telen.easylineup.application
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDexApplication
+import androidx.preference.PreferenceManager
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
@@ -37,6 +39,18 @@ open class App : MultiDexApplication() {
         val koinApp = startKoin {
             androidContext(this@App)
             modules(ModuleProvider.modules)
+        }
+
+        PreferenceManager.getDefaultSharedPreferences(this)?.getString(
+            getString(R.string.key_day_night_theme),
+            getString(R.string.lineup_theme_default_value)
+        )?.let {
+            val styleValue = it.toInt()
+            AppCompatDelegate.setDefaultNightMode(when(styleValue) {
+                1 -> { AppCompatDelegate.MODE_NIGHT_NO }
+                2 -> { AppCompatDelegate.MODE_NIGHT_YES }
+                else -> { AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM }
+            })
         }
 
         val remoteConfig = Firebase.remoteConfig
