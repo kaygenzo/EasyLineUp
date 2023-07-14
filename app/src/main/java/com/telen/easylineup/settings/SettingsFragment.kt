@@ -10,10 +10,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.github.kaygenzo.bugreporter.api.BugReporter
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.license.LicensesManager
@@ -21,17 +22,21 @@ import com.telen.easylineup.login.ImportFailure
 import com.telen.easylineup.login.ImportSuccessfulEvent
 import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.login.LoginViewModel
+import com.telen.easylineup.reporting.getReportMethods
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import com.telen.easylineup.utils.SharedPreferencesUtils
 import com.telen.easylineup.utils.StorageUtils
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-    lateinit var viewModel: SettingsViewModel
-    lateinit var loginViewModel: LoginViewModel
+    private val viewModel by viewModels<SettingsViewModel>()
+    private val loginViewModel by viewModels<LoginViewModel>()
+    private val bugReporter by inject<BugReporter>()
 
     private val disposables = CompositeDisposable()
 
@@ -39,11 +44,6 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
         val about = findPreference<Preference>(getString(R.string.key_app_version))
         about?.summary = BuildConfig.VERSION_NAME
-
-        updateLineupStyleSummary()
-
-        viewModel = ViewModelProviders.of(this)[SettingsViewModel::class.java]
-        loginViewModel = ViewModelProviders.of(this)[LoginViewModel::class.java]
     }
 
     override fun onResume() {
@@ -181,26 +181,23 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         StorageUtils.createFile(this)
     }
 
-    private fun updateLineupStyleSummary() {
-        val lineupStylePreference = findPreference<Preference>(getString(R.string.key_lineup_style))
-        preferenceManager.sharedPreferences?.getString(getString(R.string.key_lineup_style), getString(R.string.lineup_style_default_value))?.let {
-            val styleValue = it.toInt()
-            lineupStylePreference?.summary = resources.getStringArray(R.array.pref_lineup_font_style_labels)[styleValue]
-        }
-    }
-
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when(key) {
             getString(R.string.key_lineup_style) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_lineup_style")
-                updateLineupStyleSummary()
+            }
+            getString(R.string.key_bug_report_trigger) -> {
+                FirebaseAnalyticsUtils.onClick(activity, "click_settings_bug_report_trigger")
+                bugReporter.setReportMethods(requireContext().getReportMethods())
+                bugReporter.restart()
             }
             getString(R.string.key_day_night_theme) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_theme")
-                sharedPreferences?.getString(
-                    getString(R.string.key_day_night_theme),
+                SharedPreferencesUtils.getStringSetting(
+                    requireContext(),
+                    R.string.key_day_night_theme,
                     getString(R.string.lineup_theme_default_value)
-                )?.let {
+                ).let {
                     val styleValue = it.toInt()
                     AppCompatDelegate.setDefaultNightMode(when(styleValue) {
                         1 -> { AppCompatDelegate.MODE_NIGHT_NO }

@@ -5,13 +5,14 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDexApplication
-import androidx.preference.PreferenceManager
+import com.github.kaygenzo.bugreporter.api.BugReporter
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
+import com.telen.easylineup.utils.SharedPreferencesUtils
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
@@ -39,12 +40,16 @@ open class App : MultiDexApplication() {
         val koinApp = startKoin {
             androidContext(this@App)
             modules(ModuleProvider.modules)
+        }.apply {
+            val hasPermission = koin.get<BugReporter>().hasPermissionOverlay(this@App)
+            Timber.d("has permission to display window overlay: $hasPermission")
         }
 
-        PreferenceManager.getDefaultSharedPreferences(this)?.getString(
-            getString(R.string.key_day_night_theme),
+        SharedPreferencesUtils.getStringSetting(
+            this,
+            R.string.key_day_night_theme,
             getString(R.string.lineup_theme_default_value)
-        )?.let {
+        ).let {
             val styleValue = it.toInt()
             AppCompatDelegate.setDefaultNightMode(when(styleValue) {
                 1 -> { AppCompatDelegate.MODE_NIGHT_NO }

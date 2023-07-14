@@ -140,6 +140,7 @@
     <string name="setting_import_data_update_object_description">Update data if already exists ?</string>
     <string name="setting_export_data_description">Export data to file</string>
     <string name="setting_delete_data_description">Delete all data</string>
+    <string name="setting_bug_report_trigger_description">Bug report trigger</string>
     <string name="setting_version_title">Version</string>
     <string name="setting_licenses_title">Licenses</string>
     <string name="setting_play_store_title">Google Play Store official page</string>
@@ -156,14 +157,14 @@
     <string name="key_app_version" translatable="false">key_app_version</string>
     <string name="key_app_licenses" translatable="false">key_app_licenses</string>
     <string name="key_play_store" translatable="false">key_play_store</string>
+    <string name="key_bug_report_trigger" translatable="false">key_bug_report_trigger</string>
 
     <string name="login_create">Create your first team</string>
     <string name="login_import">Import an existing team</string>
 
     <string name="settings_category_style">Style</string>
-    <string name="settings_category_export">Export</string>
-    <string name="settings_category_import">Import</string>
-    <string name="settings_category_delete">Delete</string>
+    <string name="settings_category_data">Data</string>
+    <string name="settings_category_support">Support</string>
 
     <string name="export_data_to_file_dialog_title">Please choose a file name for exportation</string>
     <string name="export_data_to_file_dialog_message">File name</string>
@@ -275,4 +276,7 @@
 
     <string name="picker_men_summary">Change men color on field</string>
     <string name="picker_women_summary">Change women color on field</string>
+    <string name="bug_report_trigger_shake">Shake</string>
+    <string name="bug_report_trigger_floating_button">Floating button</string>
+    <string name="bug_report_trigger_manual">Manual</string>
 </resources>
