@@ -64,6 +64,7 @@ android {
     productFlavors {
         dev {
             dimension 'version'
+            applicationIdSuffix = ".dev"
             matchingFallbacks = ['prod']
             buildConfigField "String", "reportStorageRoot", "\"reports.dev\""
         }
@@ -79,6 +80,7 @@ android {
         }
         demo {
             dimension 'version'
+            applicationIdSuffix = ".demo"
             matchingFallbacks = ['demo']
             buildConfigField "String", "reportStorageRoot", "\"reports.demo\""
         }
