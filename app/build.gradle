@@ -37,6 +37,11 @@ android {
         testInstrumentationRunner "com.telen.easylineup.EasylineupAndroidTestRunner"
         vectorDrawables.useSupportLibrary true
         buildConfigField "Boolean", "UseBetaTool", "true"
+        firebaseAppDistribution {
+            serviceCredentialsFile="easylineup-services.json"
+            releaseNotesFile="releasenotes.txt"
+            testersFile="testers.txt"
+        }
     }
 
     useLibrary 'android.test.runner'
@@ -70,11 +75,6 @@ android {
         }
         prod {
             dimension 'version'
-            firebaseAppDistribution {
-                serviceCredentialsFile="easylineup-services.json"
-                releaseNotesFile="releasenotes.txt"
-                testersFile="testers.txt"
-            }
             matchingFallbacks = ['prod']
             buildConfigField "String", "reportStorageRoot", "\"reports.prod\""
         }

@@ -82,7 +82,7 @@ jobs:
           command: |
               git rev-parse --abbrev-ref HEAD > releasenotes.txt
               git log -1 --pretty="%B %ad" >> releasenotes.txt
-              ./gradlew assembleProdRelease appDistributionUploadProdRelease
+              ./gradlew assembleRelease appDistributionUploadProdRelease appDistributionUploadDemoRelease appDistributionUploadDevRelease
   deploy-alpha:
     executor: easylineup-executor
     description: "Build alpha version artifacts"
