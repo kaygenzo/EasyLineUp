@@ -14,7 +14,6 @@ import androidx.fragment.app.viewModels
 import androidx.preference.CheckBoxPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.github.kaygenzo.bugreporter.api.BugReporter
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.license.LicensesManager
@@ -22,21 +21,18 @@ import com.telen.easylineup.login.ImportFailure
 import com.telen.easylineup.login.ImportSuccessfulEvent
 import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.login.LoginViewModel
-import com.telen.easylineup.reporting.getReportMethods
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.SharedPreferencesUtils
 import com.telen.easylineup.utils.StorageUtils
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val viewModel by viewModels<SettingsViewModel>()
     private val loginViewModel by viewModels<LoginViewModel>()
-    private val bugReporter by inject<BugReporter>()
 
     private val disposables = CompositeDisposable()
 
@@ -188,8 +184,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             }
             getString(R.string.key_bug_report_trigger) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_bug_report_trigger")
-                bugReporter.setReportMethods(requireContext().getReportMethods())
-                bugReporter.restart()
+                viewModel.onReportMethodsChosen(requireActivity())
             }
             getString(R.string.key_day_night_theme) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_theme")
