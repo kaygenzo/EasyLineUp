@@ -20,7 +20,6 @@ jobs:
               echo $APP_DISTRIBUTION_TESTERS_FILE | base64 -d > testers.txt
               echo $PLAY_STORE_CREDENTIALS | base64 -d > play-store-credentials.json
               echo $DEBUG_KEYSTORE_FILE | base64 -d > telen.debug.jks
-              echo "Gradle options: $GRADLE_OPT"
       - persist_to_workspace:
           root: .
           paths:
@@ -37,7 +36,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: ./gradlew testProdDebugUnitTest $GRADLE_OPT
+      - run: ./gradlew testProdDebugUnitTest --no-daemon
 
   android-tests-build:
     executor: easylineup-executor
@@ -46,7 +45,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: ./gradlew assembleDemoDebug assembleDemoDebugAndroidTest $GRADLE_OPT
+      - run: ./gradlew assembleDemoDebug assembleDemoDebugAndroidTest --no-daemon
       - store_artifacts:
           path: app/build/outputs/apk/demo/debug
           destination: androidTestBinaries
@@ -61,7 +60,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: ./gradlew assembleProdRelease $GRADLE_OPT
+      - run: ./gradlew assembleProdRelease --no-daemon
       - store_artifacts:
           path: app/build/outputs/apk/prod/release
           destination: release
@@ -83,7 +82,7 @@ jobs:
           command: |
               git rev-parse --abbrev-ref HEAD > releasenotes.txt
               git log -1 --pretty="%B %ad" >> releasenotes.txt
-              ./gradlew assembleRelease appDistributionUploadProdRelease appDistributionUploadDemoRelease appDistributionUploadDevRelease $GRADLE_OPT
+              ./gradlew assembleRelease appDistributionUploadProdRelease appDistributionUploadDemoRelease appDistributionUploadDevRelease --no-daemon
   deploy-alpha:
     executor: easylineup-executor
     description: "Build alpha version artifacts"
@@ -93,7 +92,7 @@ jobs:
           at: .
       - run:
           command: |
-            ./gradlew bundleProdRelease $GRADLE_OPT
+            ./gradlew bundleProdRelease --no-daemon
             bundle install
             bundle exec fastlane deploy_to_alpha
       - store_artifacts:
