@@ -4,6 +4,7 @@ executors:
   easylineup-executor:
     docker:
       - image: kaygenzo/android-fastlane:30
+    resource_class: large
     working_directory: ~/easylineup
 
 jobs:
@@ -36,7 +37,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: ./gradlew testProdDebugUnitTest
+      - run: ./gradlew testProdDebugUnitTest $GRADLE_OPTS
 
   android-tests-build:
     executor: easylineup-executor
@@ -45,7 +46,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: ./gradlew assembleDemoDebug assembleDemoDebugAndroidTest
+      - run: ./gradlew assembleDemoDebug assembleDemoDebugAndroidTest $GRADLE_OPTS
       - store_artifacts:
           path: app/build/outputs/apk/demo/debug
           destination: androidTestBinaries
@@ -60,7 +61,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: ./gradlew assembleProdRelease
+      - run: ./gradlew assembleProdRelease $GRADLE_OPTS
       - store_artifacts:
           path: app/build/outputs/apk/prod/release
           destination: release
@@ -82,7 +83,7 @@ jobs:
           command: |
               git rev-parse --abbrev-ref HEAD > releasenotes.txt
               git log -1 --pretty="%B %ad" >> releasenotes.txt
-              ./gradlew assembleRelease appDistributionUploadProdRelease appDistributionUploadDemoRelease appDistributionUploadDevRelease
+              ./gradlew assembleRelease appDistributionUploadProdRelease appDistributionUploadDemoRelease appDistributionUploadDevRelease $GRADLE_OPTS
   deploy-alpha:
     executor: easylineup-executor
     description: "Build alpha version artifacts"
@@ -92,7 +93,7 @@ jobs:
           at: .
       - run:
           command: |
-            ./gradlew bundleProdRelease
+            ./gradlew bundleProdRelease $GRADLE_OPTS
             bundle install
             bundle exec fastlane deploy_to_alpha
       - store_artifacts:
