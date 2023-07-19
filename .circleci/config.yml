@@ -20,6 +20,7 @@ jobs:
               echo $APP_DISTRIBUTION_TESTERS_FILE | base64 -d > testers.txt
               echo $PLAY_STORE_CREDENTIALS | base64 -d > play-store-credentials.json
               echo $DEBUG_KEYSTORE_FILE | base64 -d > telen.debug.jks
+              echo "Gradle options: $GRADLE_OPT"
       - persist_to_workspace:
           root: .
           paths:
