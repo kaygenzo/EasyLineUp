@@ -150,12 +150,20 @@ internal class GetBattersStateBaseballStandardEditableTests: GetBattersStateEdit
     TeamStrategy.STANDARD.batterSize, 0)
 
 @RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateBaseball5ManEditableTests: GetBattersStateEditableTests(TeamType.BASEBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballStandardEditableTests: GetBattersStateEditableTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
     TeamStrategy.STANDARD.batterSize, 0)
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballSlowpitchEditableTests: GetBattersStateEditableTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
     TeamStrategy.SLOWPITCH.batterSize, 0)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateSoftball5ManEditableTests: GetBattersStateEditableTests(TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0)
 
 ////////////// EDITABLE CUSTOM HITTER SIZE //////////////
 
@@ -164,12 +172,20 @@ internal class GetBattersStateBaseballCustomStandardEditableTests: GetBattersSta
     TeamStrategy.STANDARD.batterSize, 3)
 
 @RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateBaseballCustom5ManEditableTests: GetBattersStateEditableTests(TeamType.BASEBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballCustomStandardEditableTests: GetBattersStateEditableTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
     TeamStrategy.STANDARD.batterSize, 3)
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballCustomSlowpitchEditableTests: GetBattersStateEditableTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
     TeamStrategy.SLOWPITCH.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateSoftballCustom5ManEditableTests: GetBattersStateEditableTests(TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////// NOT EDITABLE //////////////////////////////////////////////////////////////////
@@ -308,12 +324,20 @@ internal class GetBattersStateBaseballStandardNotEditableTests: GetBattersStateN
     TeamStrategy.STANDARD.batterSize, 0)
 
 @RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateBaseball5ManNotEditableTests: GetBattersStateNotEditableTests(TeamType.BASEBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballStandardNotEditableTests: GetBattersStateNotEditableTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
     TeamStrategy.STANDARD.batterSize, 0)
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballSlowpitchNotEditableTests: GetBattersStateNotEditableTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
     TeamStrategy.SLOWPITCH.batterSize, 0)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateSoftball5ManNotEditableTests: GetBattersStateNotEditableTests(TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0)
 
 ////////////// NOT EDITABLE CUSTOM HITTER SIZE //////////////
 
@@ -322,12 +346,20 @@ internal class GetBattersStateBaseballCustomStandardNotEditableTests: GetBatters
     TeamStrategy.STANDARD.batterSize, 3)
 
 @RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateBaseballCustom5ManNotEditableTests: GetBattersStateNotEditableTests(TeamType.BASEBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballCustomStandardNotEditableTests: GetBattersStateNotEditableTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
     TeamStrategy.STANDARD.batterSize, 3)
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballCustomSlowpitchNotEditableTests: GetBattersStateNotEditableTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
     TeamStrategy.SLOWPITCH.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateSoftballCustom5ManNotEditableTests: GetBattersStateNotEditableTests(TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////// BASE /////////////////////////////////////////////////////////////////////
@@ -353,11 +385,11 @@ internal abstract class GetBattersStateTests(protected val teamType: TeamType, p
 
         Mockito.`when`(context.resources).thenReturn(resources)
         Mockito.`when`(resources.getStringArray(R.array.field_positions_baseball_list)).thenReturn(
-            arrayOf("SUB", "P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH", "LF", "LCF", "RCF", "RF")
+            arrayOf("SUB", "P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH", "LF", "LCF", "RCF", "RF", "MF")
         )
 
         Mockito.`when`(resources.getStringArray(R.array.field_positions_softball_list)).thenReturn(
-            arrayOf("SUB", "P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DP", "LF", "LCF", "RCF", "RF")
+            arrayOf("SUB", "P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DP", "LF", "LCF", "RCF", "RF", "MF")
         )
     }
 

@@ -25,12 +25,20 @@ internal class SavePlayerFieldPositionBaseballStandardTests: SavePlayerFieldPosi
     TeamStrategy.STANDARD.batterSize, 0)
 
 @RunWith(MockitoJUnitRunner::class)
+internal class SavePlayerFieldPositionBaseball5ManTests: SavePlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0)
+
+@RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerFieldPositionSoftballStandardTests: SavePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
     TeamStrategy.STANDARD.batterSize, 0)
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerFieldPositionSoftballSlowpitchTests: SavePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
     TeamStrategy.SLOWPITCH.batterSize, 0)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class SavePlayerFieldPositionSoftball5ManTests: SavePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0)
 
 ////////////// CUSTOM HITTER SIZE //////////////
 
@@ -39,12 +47,20 @@ internal class SavePlayerFieldPositionBaseballCustomStandardTests: SavePlayerFie
     TeamStrategy.STANDARD.batterSize, 3)
 
 @RunWith(MockitoJUnitRunner::class)
+internal class SavePlayerFieldPositionBaseballCustom5ManTests: SavePlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerFieldPositionSoftballCustomStandardTests: SavePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
     TeamStrategy.STANDARD.batterSize, 3)
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerFieldPositionSoftballCustomSlowpitchTests: SavePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
     TeamStrategy.SLOWPITCH.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class SavePlayerFieldPositionSoftballCustom5ManTests: SavePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3)
 
 @RunWith(MockitoJUnitRunner::class)
 internal abstract class SavePlayerFieldPositionTests(val teamType: TeamType, val strategy: TeamStrategy, val batterSize: Int, val extraHitterSize: Int) {

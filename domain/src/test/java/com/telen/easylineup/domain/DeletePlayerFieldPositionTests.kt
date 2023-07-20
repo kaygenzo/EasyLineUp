@@ -24,12 +24,20 @@ internal class DeletePlayerFieldPositionBaseballStandardTests: DeletePlayerField
         TeamStrategy.STANDARD.batterSize, 0)
 
 @RunWith(MockitoJUnitRunner::class)
+internal class DeletePlayerFieldPositionBaseball5ManTests: DeletePlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0)
+
+@RunWith(MockitoJUnitRunner::class)
 internal class DeletePlayerFieldPositionSoftballStandardTests: DeletePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
         TeamStrategy.STANDARD.batterSize, 0)
 
 @RunWith(MockitoJUnitRunner::class)
 internal class DeletePlayerFieldPositionSoftballSlowpitchTests: DeletePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
         TeamStrategy.SLOWPITCH.batterSize, 0)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class DeletePlayerFieldPositionSoftball5ManTests: DeletePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0)
 
 ////////////// CUSTOM HITTER SIZE //////////////
 
@@ -38,12 +46,20 @@ internal class DeletePlayerFieldPositionBaseballCustomStandardTests: DeletePlaye
         TeamStrategy.STANDARD.batterSize, 3)
 
 @RunWith(MockitoJUnitRunner::class)
+internal class DeletePlayerFieldPositionBaseballCustom5ManTests: DeletePlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner::class)
 internal class DeletePlayerFieldPositionSoftballCustomStandardTests: DeletePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.STANDARD,
         TeamStrategy.STANDARD.batterSize, 3)
 
 @RunWith(MockitoJUnitRunner::class)
 internal class DeletePlayerFieldPositionSoftballCustomSlowpitchTests: DeletePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
         TeamStrategy.SLOWPITCH.batterSize, 3)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class DeletePlayerFieldPositionSoftballCustom5ManTests: DeletePlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3)
 
 @RunWith(MockitoJUnitRunner::class)
 internal abstract class DeletePlayerFieldPositionTests(private val teamType: TeamType, private val strategy: TeamStrategy, private val batterSize: Int, private val extraHitterSize: Int) {

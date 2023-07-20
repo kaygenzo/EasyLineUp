@@ -22,57 +22,9 @@ enum class TeamType(val id: Int, val position: Int, @StringRes val title: Int, @
 
     fun getStrategies(): Array<TeamStrategy> {
         return when(this) {
-            SOFTBALL -> arrayOf(TeamStrategy.STANDARD, TeamStrategy.SLOWPITCH)
+            SOFTBALL -> arrayOf(TeamStrategy.STANDARD, TeamStrategy.FIVE_MAN_STANDARD, TeamStrategy.SLOWPITCH)
             BASEBALL_5 -> arrayOf(TeamStrategy.B5_DEFAULT)
-            else -> arrayOf(TeamStrategy.STANDARD)
-        }
-    }
-
-    fun getValidPositions(strategy: TeamStrategy): List<FieldPosition> {
-        return when(this) {
-            UNKNOWN, BASEBALL -> {
-                listOf(
-                        FieldPosition.PITCHER,
-                        FieldPosition.CATCHER,
-                        FieldPosition.FIRST_BASE,
-                        FieldPosition.SECOND_BASE,
-                        FieldPosition.THIRD_BASE,
-                        FieldPosition.SHORT_STOP,
-                        FieldPosition.LEFT_FIELD,
-                        FieldPosition.CENTER_FIELD,
-                        FieldPosition.RIGHT_FIELD
-                )
-            }
-            SOFTBALL -> {
-                when(strategy) {
-                    TeamStrategy.SLOWPITCH -> {
-                        listOf(
-                                FieldPosition.PITCHER,
-                                FieldPosition.CATCHER,
-                                FieldPosition.FIRST_BASE,
-                                FieldPosition.SECOND_BASE,
-                                FieldPosition.THIRD_BASE,
-                                FieldPosition.SHORT_STOP,
-                                FieldPosition.SLOWPITCH_LF,
-                                FieldPosition.SLOWPITCH_LCF,
-                                FieldPosition.SLOWPITCH_RCF,
-                                FieldPosition.SLOWPITCH_RF
-                        )
-                    }
-                    else -> { //default
-                        BASEBALL.getValidPositions(TeamStrategy.STANDARD)
-                    }
-                }
-            }
-            BASEBALL_5 -> {
-                listOf(
-                        FieldPosition.FIRST_BASE,
-                        FieldPosition.SECOND_BASE,
-                        FieldPosition.THIRD_BASE,
-                        FieldPosition.SHORT_STOP,
-                        FieldPosition.MID_FIELDER
-                )
-            }
+            else -> arrayOf(TeamStrategy.STANDARD, TeamStrategy.FIVE_MAN_STANDARD)
         }
     }
 }
