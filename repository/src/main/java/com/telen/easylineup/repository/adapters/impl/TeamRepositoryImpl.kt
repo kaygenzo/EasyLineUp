@@ -1,7 +1,7 @@
 package com.telen.easylineup.repository.adapters.impl
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.repository.dao.TeamDao
@@ -51,7 +51,7 @@ internal class TeamRepositoryImpl(private val teamDao: TeamDao): TeamRepository 
     }
 
     override fun getTeams(): LiveData<List<Team>> {
-        return Transformations.map(teamDao.getTeams()) {
+        return teamDao.getTeams().map {
             it.map { it.toTeam() }
         }
     }

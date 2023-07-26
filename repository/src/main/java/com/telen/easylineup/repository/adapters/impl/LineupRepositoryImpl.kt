@@ -1,7 +1,7 @@
 package com.telen.easylineup.repository.adapters.impl
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.PlayerInLineup
 import com.telen.easylineup.domain.model.TournamentWithLineup
@@ -44,7 +44,7 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao): LineupRep
     }
 
     override fun getAllLineup(): LiveData<List<Lineup>> {
-        return Transformations.map(lineupDao.getAllLineup()) {
+        return lineupDao.getAllLineup().map {
             it.map { it.toLineup() }
         }
     }
@@ -54,8 +54,8 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao): LineupRep
     }
 
     override fun getLineupById(lineupId: Long): LiveData<Lineup> {
-        return Transformations.map(lineupDao.getLineupById(lineupId)) {
-            it?.toLineup()
+        return lineupDao.getLineupById(lineupId).map {
+            it.toLineup()
         }
     }
 
@@ -68,7 +68,7 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao): LineupRep
     }
 
     override fun getLineupsForTournament(tournamentId: Long, teamID: Long): LiveData<List<Lineup>> {
-        return Transformations.map(lineupDao.getLineupsForTournament(tournamentId, teamID)) {
+        return lineupDao.getLineupsForTournament(tournamentId, teamID).map{
             it.map { it.toLineup() }
         }
     }

@@ -3,8 +3,8 @@ package com.telen.easylineup.tournaments.list
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.*
@@ -53,7 +53,7 @@ class LineupViewModel: ViewModel(), KoinComponent {
     }
 
     fun observeCategorizedLineups(): LiveData<List<Pair<Tournament, List<Lineup>>>> {
-        return Transformations.switchMap(filterLiveData) { filter ->
+        return filterLiveData.switchMap { filter ->
             val disposable = domain.tournaments().getCategorizedLineups(filter)
 
                     .subscribe({

@@ -3,8 +3,8 @@ package com.telen.easylineup.player
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamStrategy
@@ -48,43 +48,43 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     var savedSex: Int? = null
 
     fun observePlayerName(): LiveData<String> {
-        return Transformations.map(_player) { savedName ?: it.name }
+        return _player.map { savedName ?: it.name }
     }
 
     fun observePlayerShirtNumber(): LiveData<Int> {
-        return Transformations.map(_player) { savedShirtNumber ?: it.shirtNumber }
+        return _player.map { savedShirtNumber ?: it.shirtNumber }
     }
 
     fun observePlayerLicenseNumber(): LiveData<Long> {
-        return Transformations.map(_player) { savedLicenseNumber ?: it.licenseNumber }
+        return _player.map { savedLicenseNumber ?: it.licenseNumber }
     }
 
     fun observePlayerImage(): LiveData<String?> {
-        return Transformations.map(_player) { savedImage ?: it.image }
+        return _player.map { savedImage ?: it.image }
     }
 
     fun observePlayerPosition(): LiveData<Int> {
-        return Transformations.map(_player) { savedPositions ?: it.positions }
+        return _player.map { savedPositions ?: it.positions }
     }
 
     fun observePlayerPitchingSide(): LiveData<Int> {
-        return Transformations.map(_player) { savedPitching ?: it.pitching }
+        return _player.map { savedPitching ?: it.pitching }
     }
 
     fun observePlayerBattingSide(): LiveData<Int> {
-        return Transformations.map(_player) { savedBatting ?: it.batting }
+        return _player.map { savedBatting ?: it.batting }
     }
 
     fun observePlayerEmail(): LiveData<String> {
-        return Transformations.map(_player) { savedEmail ?: it.email }
+        return _player.map { savedEmail ?: it.email ?: "" }
     }
 
     fun observePlayerPhoneNumber(): LiveData<String> {
-        return Transformations.map(_player) { savedPhoneNumber ?: it.phone }
+        return _player.map { savedPhoneNumber ?: it.phone ?: "" }
     }
 
     fun observePlayerSex(): LiveData<Int> {
-        return Transformations.map(_player) { savedSex ?: it.sex }
+        return _player.map { savedSex ?: it.sex }
     }
 
     fun observeStrategy(): LiveData<TeamStrategy> {
@@ -92,7 +92,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
 
     fun observeStrategies(): LiveData<List<TeamStrategy>> {
-        return Transformations.map(observeTeamType()) { teamType ->
+        return observeTeamType().map { teamType ->
             strategies.apply {
                 clear()
                 addAll(TeamType.getTypeById(teamType).getStrategies())

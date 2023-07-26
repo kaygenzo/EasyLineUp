@@ -6,7 +6,7 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.gms.google-services")
     id("com.google.firebase.appdistribution")
-    id("com.google.firebase.crashlytics")
+    id 'com.google.firebase.crashlytics'
 }
 
 def keystorePropertiesFile = rootProject.file("keystore-upload.properties")
@@ -192,7 +192,7 @@ dependencies {
 
     implementation project(path: ':repository')
     implementation project(path: ':domain')
-    implementation "com.telen.library:tablemultiscroll:$tablemultiscrollVersion"
+    implementation "io.github.kaygenzo:androidtable:$tablemultiscrollVersion"
     implementation "com.github.kaygenzo:bugreporter:$bugreportingVersion"
 
     ////////// OTHERS //////////
