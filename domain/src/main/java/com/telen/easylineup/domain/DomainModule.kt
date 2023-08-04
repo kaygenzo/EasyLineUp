@@ -12,7 +12,7 @@ object DomainModule {
         single<PlayersInteractor> { PlayersInteractorImpl() }
         single<TeamsInteractor> { TeamsInteractorImpl() }
         single<LineupsInteractor> { LineupsInteractorImpl(get()) }
-        single<TournamentsInteractor> { TournamentsInteractorImpl(get()) }
+        single<TournamentsInteractor> { TournamentsInteractorImpl() }
         single<PlayerFieldPositionsInteractor> { PlayerFieldPositionsInteractorImpl() }
         single<DataInteractor> { DataInteractorImpl(get()) }
 
@@ -47,7 +47,7 @@ object DomainModule {
         single { DeleteTeam(get()) }
         single { SwitchPlayersPosition() }
         single { DeleteAllData(get(), get()) }
-        single { GetTournamentStatsForPositionTable(get()) }
+        single { GetTournamentStatsForPositionTable(get(), get()) }
         single { CheckHashData(get(), get(), get(), get(), get()) }
         single { ExportData(get(), get(), get(), get(), get()) }
         single { ImportData(get(), get(), get(), get(), get()) }

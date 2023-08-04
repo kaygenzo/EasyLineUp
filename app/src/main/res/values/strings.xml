@@ -266,4 +266,6 @@
 
     <string name="picker_men_summary">Change men color on field</string>
     <string name="picker_women_summary">Change women color on field</string>
+
+    <string name="lineup_name_hint">Lineup name</string>
 </resources>

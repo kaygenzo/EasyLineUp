@@ -29,6 +29,7 @@ interface LineupsInteractor {
     ): Completable
 
     fun updateLineup(lineup: Lineup, players: List<PlayerWithPosition>): Completable
+    fun updateLineup(lineup: Lineup): Completable
     fun observeLineupById(id: Long): LiveData<Lineup>
     fun getLineupById(id: Long): Single<Lineup>
     fun observeErrors(): Subject<DomainErrors.Lineups>

@@ -35,10 +35,10 @@ class RosterAdapter(
         holder.view.setTextListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 try {
-                    listener.onNumberChanged(s.toString().toInt(), item)
+                    listener.onNumberChanged(item.player, s.toString().toInt())
                 } catch (e: NumberFormatException) {
                     Timber.e(e.message)
-                    listener.onNumberChanged(0, item)
+                    listener.onNumberChanged(item.player, 0)
                 }
             }
 
@@ -46,5 +46,10 @@ class RosterAdapter(
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
         })
+        holder.view.setSelectedStateListener(null)
+        holder.view.setSelectedState(item.selected)
+        holder.view.setSelectedStateListener { _, isChecked ->
+            listener.onPlayerSelectedChanged(item.player, isChecked)
+        }
     }
 }

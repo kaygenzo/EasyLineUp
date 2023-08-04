@@ -1,17 +1,19 @@
 package com.telen.easylineup.lineup.edition
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.BaseFragment
-import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentLineupEditionBinding
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.RosterItem
 import com.telen.easylineup.launch
-import com.telen.easylineup.utils.DialogFactory
 import timber.log.Timber
 
 class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapterCallback {
@@ -30,7 +32,6 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
         viewModel.lineupID = arguments?.getLong(Constants.LINEUP_ID) ?: 0
         rosterAdapter = RosterAdapter(rosterItems, this)
     }
@@ -49,7 +50,7 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
         }
 
         binding.containerActions.saveClickListener = View.OnClickListener {
-            launch(viewModel.saveOverlays(), {
+            launch(viewModel.saveClicked(), {
                 findNavController().popBackStack()
             }, {
                 Timber.e(it)
@@ -66,14 +67,10 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
             rosterAdapter.notifyDataSetChanged()
         }
 
-        launch(viewModel.loadRoster(), { }, {
-            Timber.e(it)
-        })
-
-        viewModel.observeRosterItems().observe(viewLifecycleOwner) {
-            this.rosterItems.run {
-                clear()
-                addAll(it)
+        viewModel.observeLineup().observe(viewLifecycleOwner) {
+            binding.lineupNameEditText.setText(it.name)
+            binding.lineupNameEditText.addTextChangedListener {
+                viewModel.onLineupNameChanged(it.toString())
             }
         }
 
@@ -85,39 +82,11 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
         binding = null
     }
 
-    override fun onNumberChanged(number: Int, item: RosterItem) {
-        viewModel.numberChanged(number, item)
+    override fun onNumberChanged(player: Player, number: Int) {
+        viewModel.numberChanged(player, number)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_roaster_edition, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        activity?.let { activity ->
-            launch(viewModel.getRoster(), { roster ->
-                val names = mutableListOf<CharSequence>().apply {
-                    addAll(roster.map { it.player.name })
-                }
-                val checked = mutableListOf<Boolean>().apply {
-                    addAll(roster.map { it.status })
-                }
-
-                DialogFactory.getMultiChoiceDialog(
-                    context = activity,
-                    title = R.string.roster_list_player_dialog_title,
-                    items = names.toTypedArray(),
-                    checkedItems = checked.toBooleanArray(),
-                    listener = { _, which, isChecked -> roster[which].status = isChecked },
-                    confirmClick = { _, _ ->
-                        launch(viewModel.saveUpdatedRoster(roster), {}, { Timber.e(it) })
-                    }
-                ).show()
-            }, {
-                Timber.e(it)
-            })
-        }
-        return super.onOptionsItemSelected(item)
+    override fun onPlayerSelectedChanged(player: Player, selected: Boolean) {
+        viewModel.playerSelectStatusChanged(player, selected)
     }
 }

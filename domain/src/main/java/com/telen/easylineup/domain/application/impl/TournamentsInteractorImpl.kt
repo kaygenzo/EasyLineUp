@@ -1,6 +1,5 @@
 package com.telen.easylineup.domain.application.impl
 
-import android.content.Context
 import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.application.TournamentsInteractor
 import com.telen.easylineup.domain.model.Lineup
@@ -14,8 +13,7 @@ import io.reactivex.rxjava3.core.Single
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-internal class TournamentsInteractorImpl(private val context: Context) : TournamentsInteractor,
-    KoinComponent {
+internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent {
 
     private val tournamentsRepo: TournamentRepository by inject()
     private val getTeam: GetTeam by inject()
@@ -63,12 +61,8 @@ internal class TournamentsInteractorImpl(private val context: Context) : Tournam
     ): Single<TournamentStatsUIConfig> {
         return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .flatMap {
-                val request = GetTournamentStatsForPositionTable.RequestValues(
-                    tournament,
-                    it.team,
-                    context,
-                    strategy
-                )
+                val request =
+                    GetTournamentStatsForPositionTable.RequestValues(tournament, it.team, strategy)
                 UseCaseHandler.execute(tableDataUseCase, request)
             }
             .map { it.uiConfig }

@@ -39,7 +39,7 @@ class TournamentStatisticsViewModel: ViewModel(), KoinComponent {
         }
 
     fun getPlayersPositionForTournament() {
-        disposable = Single.create<Tournament> { emitter ->
+        disposable = Single.create { emitter ->
             tournament?.let {
                 emitter.onSuccess(it)
             } ?: run {

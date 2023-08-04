@@ -8,8 +8,11 @@ import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.utils.getPositionShortNames
 import io.reactivex.rxjava3.core.Single
 
-internal class GetTournamentStatsForPositionTable(val dao: LineupRepository) :
-    UseCase<GetTournamentStatsForPositionTable.RequestValues, GetTournamentStatsForPositionTable.ResponseValue>() {
+internal class GetTournamentStatsForPositionTable(
+    private val context: Context,
+    val dao: LineupRepository
+) : UseCase<GetTournamentStatsForPositionTable.RequestValues,
+        GetTournamentStatsForPositionTable.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return dao.getAllPlayerPositionsForTournament(
@@ -28,10 +31,8 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository) :
 
                 list.forEach { player ->
                     player.playerID?.let { playerID ->
-                        if (!playersIdToPlayerName.containsKey(playerID)) {
-                            playersIdToPlayerName[playerID] = player.playerName
-                                ?: requestValues.context.getString(R.string.tournament_stats_unknown_player_name)
-                        }
+                        playersIdToPlayerName[playerID] = player.playerName
+                            ?: context.getString(R.string.tournament_stats_unknown_player_name)
 
                         if (!playerIdToData.containsKey(playerID))
                             playerIdToData[playerID] = mutableListOf()
@@ -40,15 +41,10 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository) :
                     }
                 }
 
-                val positionsArray =
-                    getPositionShortNames(requestValues.context, requestValues.team.type)
+                val positionsArray = getPositionShortNames(context, requestValues.team.type)
 
-                topHeaderData.add(
-                    Pair(
-                        requestValues.context.getString(R.string.tournament_stats_label_games_played),
-                        -1
-                    )
-                )
+                topHeaderData
+                    .add(Pair(context.getString(R.string.tournament_stats_label_games_played), -1))
 
                 possiblePositions.forEach { fieldPosition ->
                     topHeaderData.add(Pair(positionsArray[fieldPosition.id], fieldPosition.id))
@@ -83,8 +79,9 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository) :
                 var topLeftCell: List<String>? = null
                 when (TeamType.getTypeById(requestValues.team.type)) {
                     TeamType.SOFTBALL -> {
-                        topLeftCell = requestValues.context.resources
-                            .getStringArray(R.array.softball_strategy_array).toList()
+                        topLeftCell = context.resources
+                            .getStringArray(R.array.softball_strategy_array)
+                            .toList()
                     }
                     else -> {
                         //nothing to do, just use standard strategy
@@ -96,7 +93,7 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository) :
                         leftHeaderData,
                         topHeaderData,
                         mainData,
-                        mutableListOf(FieldPosition.SUBSTITUTE.id),
+                        mutableListOf(),
                         topLeftCell
                     )
                 )
@@ -108,7 +105,6 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository) :
     class RequestValues(
         val tournament: Tournament,
         val team: Team,
-        val context: Context,
         val strategy: TeamStrategy
     ) : UseCase.RequestValues
 }

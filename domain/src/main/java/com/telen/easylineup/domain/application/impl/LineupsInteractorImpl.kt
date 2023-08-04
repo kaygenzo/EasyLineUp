@@ -125,6 +125,10 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
         return UseCaseHandler.execute(saveBattingOrderAndPosition, requestValues).ignoreElement()
     }
 
+    override fun updateLineup(lineup: Lineup): Completable {
+        return Completable.complete()
+    }
+
     override fun observeLineupById(id: Long): LiveData<Lineup> {
         return lineupsRepo.getLineupById(id)
     }

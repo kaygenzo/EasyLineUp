@@ -4,64 +4,98 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.application.ApplicationInteractor
-import com.telen.easylineup.domain.model.PlayerNumberOverlay
-import com.telen.easylineup.domain.model.RosterItem
-import com.telen.easylineup.domain.model.RosterPlayerStatus
+import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
 class LineupEditionViewModel : ViewModel(), KoinComponent {
 
     private val domain: ApplicationInteractor by inject()
     var lineupID: Long = 0
+        set(value) {
+            field = value
+            loadData()
+        }
     private val rosterItems = mutableListOf<RosterItem>()
     private val _rosterItemsLiveData = MutableLiveData<List<RosterItem>>()
+    private val _lineupLiveData = MutableLiveData<Lineup>()
+    private var lineup: Lineup? = null
+
+    private fun loadData() {
+        domain.lineups().getLineupById(lineupID)
+            .flatMap {
+                this.lineup = it
+                _lineupLiveData.postValue(it)
+                getRoster()
+            }
+            .map { it.map { RosterItem(it.player, it.status, it.playerNumberOverlay) } }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                synchronized(rosterItems) {
+                    rosterItems.run {
+                        clear()
+                        addAll(it)
+                        _rosterItemsLiveData.postValue(this)
+                    }
+                }
+            }, { Timber.e(it) })
+    }
+
+    fun observeLineup(): LiveData<Lineup> {
+        return _lineupLiveData
+    }
 
     fun observeRosterItems(): LiveData<List<RosterItem>> {
         return _rosterItemsLiveData
     }
 
-    fun loadRoster(): Completable {
-        return getRoster()
-            .map { it.filter { it.status } }
-            .map { it.map { RosterItem(it.player, it.playerNumberOverlay) } }
-            .doOnSuccess {
-                this.rosterItems.run {
-                    clear()
-                    addAll(it)
-                    _rosterItemsLiveData.postValue(this)
-                }
-            }
-            .ignoreElement()
-    }
-
-    fun getRoster(): Single<List<RosterPlayerStatus>> {
+    private fun getRoster(): Single<List<RosterPlayerStatus>> {
         return domain.lineups().getRoster(lineupID).map { it.players }
     }
 
-    fun saveOverlays(): Completable {
-        return domain.players().saveOrUpdatePlayerNumberOverlays(rosterItems)
-    }
-
-    fun numberChanged(number: Int, item: RosterItem) {
-        item.playerNumberOverlay?.let {
-            it.number = number
-        } ?: let {
-            item.playerNumberOverlay =
-                PlayerNumberOverlay(lineupID = lineupID, playerID = item.player.id, number = number)
+    fun saveClicked(): Completable {
+        return Completable.defer {
+            lineup?.let {
+                domain.lineups().updateLineup(it)
+                    .andThen(domain.lineups().updateRoster(lineupID, rosterItems.map {
+                        it.toRosterPlayerStatus()
+                    }))
+                    .andThen(domain.players().saveOrUpdatePlayerNumberOverlays(rosterItems))
+            } ?: Completable.error(LineupNameEmptyException())
         }
     }
 
-    fun saveUpdatedRoster(newRosterStatus: List<RosterPlayerStatus>): Completable {
-        return Completable.create {
-            this.rosterItems.run {
-                clear()
-                addAll(newRosterStatus.filter { it.status }
-                    .map { RosterItem(it.player, it.playerNumberOverlay) })
-                _rosterItemsLiveData.postValue(this)
+    fun numberChanged(player: Player, number: Int) {
+        synchronized(rosterItems) {
+            rosterItems.firstOrNull { it.player.id == player.id }?.let { rosterItem ->
+                rosterItem.playerNumberOverlay?.let {
+                    it.number = number
+                } ?: let {
+                    rosterItem.playerNumberOverlay = PlayerNumberOverlay(
+                        lineupID = lineupID,
+                        playerID = rosterItem.player.id,
+                        number = number
+                    )
+                }
             }
         }
+    }
+
+    fun playerSelectStatusChanged(player: Player, state: Boolean) {
+        synchronized(rosterItems) {
+            rosterItems.firstOrNull { it.player.id == player.id }?.selected = state
+            _rosterItemsLiveData.postValue(rosterItems)
+        }
+    }
+
+    fun onLineupNameChanged(name: String) {
+        lineup?.name = name
     }
 }
