@@ -34,7 +34,7 @@ internal interface PlayerDao {
     fun getPlayerByHash(hash: String): Single<RoomPlayer>
 
     @Query("SELECT * from players WHERE id = :playerID" )
-    fun getPlayerById(playerID: Long): LiveData<RoomPlayer>
+    fun getPlayerById(playerID: Long): LiveData<RoomPlayer?>
 
     @Query("SELECT * from players WHERE id = :playerID" )
     fun getPlayerByIdAsSingle(playerID: Long): Single<RoomPlayer>

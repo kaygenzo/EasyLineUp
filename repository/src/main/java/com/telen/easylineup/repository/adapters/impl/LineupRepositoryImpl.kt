@@ -55,7 +55,7 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao): LineupRep
 
     override fun getLineupById(lineupId: Long): LiveData<Lineup> {
         return lineupDao.getLineupById(lineupId).map {
-            it.toLineup()
+            it?.toLineup() ?: Lineup()
         }
     }
 
