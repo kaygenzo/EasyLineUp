@@ -4,8 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.databinding.FragmentLineupDefenseFixedBinding
 import com.telen.easylineup.launch
@@ -35,8 +36,8 @@ class DefenseFragmentFixed : BaseFragment("DefenseFragmentFixed") {
                     binder.cardDefenseView.init(it)
                 }
 
-                Transformations.switchMap(observeDefensePlayers()) { players ->
-                    Transformations.map(observeLineupMode()) { mode ->
+                observeDefensePlayers().switchMap { players ->
+                    observeLineupMode().map { mode ->
                         Pair(players, mode)
                     }
                 }.observe(viewLifecycleOwner) {

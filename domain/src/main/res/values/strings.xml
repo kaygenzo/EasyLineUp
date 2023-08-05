@@ -8,7 +8,11 @@
     <string name="tournament_stats_label_games_played">Total</string>
 
     <string name="softball_strategy_fastpitch" translatable="false">Fastpitch</string>
+    <string name="softball_strategy_fastpitch_five_man" translatable="false">Fastpitch 5th man</string>
     <string name="softball_strategy_slowpitch" translatable="false">Slowpitch</string>
+
+    <string name="baseball_strategy_standard" translatable="false">Standard</string>
+    <string name="baseball_strategy_five_man" translatable="false">5th man</string>
 
     <string name="title_baseball" translatable="false">Baseball</string>
     <string name="title_softball" translatable="false">Softball</string>

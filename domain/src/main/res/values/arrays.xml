@@ -42,7 +42,13 @@
 
     <string-array name="softball_strategy_array" translatable="false">
         <item>@string/softball_strategy_fastpitch</item>
+        <item>@string/softball_strategy_fastpitch_five_man</item>
         <item>@string/softball_strategy_slowpitch</item>
+    </string-array>
+
+    <string-array name="baseball_strategy_array" translatable="false">
+        <item>@string/baseball_strategy_standard</item>
+        <item>@string/baseball_strategy_five_man</item>
     </string-array>
 
 </resources>

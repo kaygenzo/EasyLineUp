@@ -133,11 +133,14 @@
     <string name="setting_lineup_style_description">Lineup font</string>
     <string name="setting_men_style_description">Men</string>
     <string name="setting_women_style_description">Women</string>
+    <string name="setting_day_night_style_description">Theme</string>
+
     <string name="setting_category_about_title">About</string>
     <string name="setting_import_data_description">Import data from file</string>
     <string name="setting_import_data_update_object_description">Update data if already exists ?</string>
     <string name="setting_export_data_description">Export data to file</string>
     <string name="setting_delete_data_description">Delete all data</string>
+    <string name="setting_bug_report_trigger_description">Bug report trigger</string>
     <string name="setting_version_title">Version</string>
     <string name="setting_licenses_title">Licenses</string>
     <string name="setting_play_store_title">Google Play Store official page</string>
@@ -145,6 +148,8 @@
     <string name="key_lineup_style" translatable="false">key_lineup_style</string>
     <string name="key_men_style" translatable="false">key_men_style</string>
     <string name="key_women_style" translatable="false">key_women_style</string>
+    <string name="key_day_night_theme" translatable="false">key_day_night_theme</string>
+
     <string name="key_export_data" translatable="false">key_export_data</string>
     <string name="key_import_data" translatable="false">key_import_data</string>
     <string name="key_import_data_update_object" translatable="false">key_import_data_update_object</string>
@@ -152,14 +157,14 @@
     <string name="key_app_version" translatable="false">key_app_version</string>
     <string name="key_app_licenses" translatable="false">key_app_licenses</string>
     <string name="key_play_store" translatable="false">key_play_store</string>
+    <string name="key_bug_report_trigger" translatable="false">key_bug_report_trigger</string>
 
     <string name="login_create">Create your first team</string>
     <string name="login_import">Import an existing team</string>
 
     <string name="settings_category_style">Style</string>
-    <string name="settings_category_export">Export</string>
-    <string name="settings_category_import">Import</string>
-    <string name="settings_category_delete">Delete</string>
+    <string name="settings_category_data">Data</string>
+    <string name="settings_category_support">Support</string>
 
     <string name="export_data_to_file_dialog_title">Please choose a file name for exportation</string>
     <string name="export_data_to_file_dialog_message">File name</string>
@@ -211,6 +216,11 @@
     <string name="lineup_style_normal_label">Normal</string>
     <string name="lineup_style_hand_writing_label">Hand writing</string>
     <string name="lineup_style_default_value" translatable="false">0</string>
+
+    <string name="lineup_theme_default_value" translatable="false">0</string>
+    <string name="lineup_theme_system_value">System</string>
+    <string name="lineup_theme_day_value">Day</string>
+    <string name="lineup_theme_night_value">Night</string>
 
     <string name="generic_not_found">Not found</string>
 
@@ -268,4 +278,7 @@
     <string name="picker_women_summary">Change women color on field</string>
 
     <string name="lineup_name_hint">Lineup name</string>
+    <string name="bug_report_trigger_shake">Shake</string>
+    <string name="bug_report_trigger_floating_button">Floating button</string>
+    <string name="bug_report_trigger_manual">Manual</string>
 </resources>

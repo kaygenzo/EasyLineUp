@@ -7,9 +7,9 @@ import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
-import com.telen.library.widget.tablemultiscroll.views.CellConfiguration
-import com.telen.library.widget.tablemultiscroll.views.Highlight
-import com.telen.library.widget.tablemultiscroll.views.StyleConfiguration
+import io.github.kaygenzo.androidtable.api.CellConfiguration
+import io.github.kaygenzo.androidtable.api.Highlight
+import io.github.kaygenzo.androidtable.api.StyleConfiguration
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import org.koin.core.component.KoinComponent

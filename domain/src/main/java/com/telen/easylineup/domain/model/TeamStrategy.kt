@@ -35,19 +35,20 @@ enum class TeamStrategy(val id: Int, val batterSize: Int, vararg val positions: 
         FieldPosition.THIRD_BASE,
         FieldPosition.SHORT_STOP,
         FieldPosition.MID_FIELDER
-    );/*,
-    FIVE_MAN_SLOWPITCH(
-            FieldPosition.CATCHER,
-            FieldPosition.PITCHER,
-            FieldPosition.FIRST_BASE,
-            FieldPosition.SECOND_BASE,
-            FieldPosition.THIRD_BASE,
-            FieldPosition.SHORT_STOP,
-
-            FieldPosition.LEFT_FIELD,
-            FieldPosition.CENTER_FIELD,
-            FieldPosition.RIGHT_FIELD
-    )*/
+    ),
+    FIVE_MAN_STANDARD(
+        3, 9,
+        FieldPosition.CATCHER,
+        FieldPosition.PITCHER,
+        FieldPosition.FIRST_BASE,
+        FieldPosition.SECOND_BASE,
+        FieldPosition.THIRD_BASE,
+        FieldPosition.SHORT_STOP,
+        FieldPosition.LEFT_FIELD,
+        FieldPosition.MID_FIELDER,
+        FieldPosition.RIGHT_FIELD,
+        FieldPosition.DP_DH
+    );
 
     fun getDesignatedPlayerOrder(extraHitterSize: Int): Int {
         return batterSize + extraHitterSize + 1

@@ -1,8 +1,8 @@
 package com.telen.easylineup.dashboard
 
 import androidx.appcompat.view.ActionMode
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.DashboardTile
@@ -18,7 +18,7 @@ class DashboardViewModel : ViewModel(), KoinComponent {
 
     var actionMode: ActionMode? = null
 
-    fun registerTilesLiveData() = Transformations.switchMap(domain.teams().observeTeams()) {
+    fun registerTilesLiveData() = domain.teams().observeTeams().switchMap {
         domain.data().getDashboardConfigurations()
     }
 

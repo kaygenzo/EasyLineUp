@@ -47,7 +47,6 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        activity?.let { bugReporter.listen(it) }
     }
 
     override fun onCreateView(

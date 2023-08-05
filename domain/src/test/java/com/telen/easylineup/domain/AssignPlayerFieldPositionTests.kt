@@ -17,8 +17,16 @@ internal class SavePlayerFieldPositionBaseballStandardTests :
     AssignPlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.STANDARD, 0)
 
 @RunWith(MockitoJUnitRunner::class)
+internal class SavePlayerFieldPositionBaseball5ManTests :
+    AssignPlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.FIVE_MAN_STANDARD, 0)
+
+@RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerFieldPositionSoftballStandardTests :
     AssignPlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.STANDARD, 0)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class SavePlayerFieldPositionSoftball5ManTests :
+    AssignPlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD, 0)
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerFieldPositionSoftballSlowpitchTests :
@@ -31,8 +39,16 @@ internal class SavePlayerFieldPositionBaseballCustomStandardTests :
     AssignPlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.STANDARD, 3)
 
 @RunWith(MockitoJUnitRunner::class)
+internal class SavePlayerFieldPositionBaseballCustom5ManTests :
+    AssignPlayerFieldPositionTests(TeamType.BASEBALL, TeamStrategy.FIVE_MAN_STANDARD, 3)
+
+@RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerFieldPositionSoftballCustomStandardTests :
     AssignPlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.STANDARD, 3)
+
+@RunWith(MockitoJUnitRunner::class)
+internal class SavePlayerFieldPositionSoftballCustom5ManTests :
+    AssignPlayerFieldPositionTests(TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD, 3)
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerFieldPositionSoftballCustomSlowpitchTests :

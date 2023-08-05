@@ -87,15 +87,15 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun observeLineupName(): LiveData<String> {
-        return Transformations.map(_lineup) { it.name }
+        return _lineup.map { it.name }
     }
 
     fun observeLineupStrategy(): LiveData<TeamStrategy> {
-        return Transformations.map(_lineup) { TeamStrategy.getStrategyById(it.strategy) }
+        return _lineup.map { TeamStrategy.getStrategyById(it.strategy) }
     }
 
     fun observeLineupMode(): LiveData<Int> {
-        return Transformations.map(_lineup) { it.mode }
+        return _lineup.map { it.mode }
     }
 
     fun observeLineup(): LiveData<Lineup> {
@@ -277,8 +277,8 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun observeBatters(): LiveData<List<BatterState>> {
-        return Transformations.switchMap(_players) { players ->
-            Transformations.switchMap(_lineup) { lineup ->
+        return _players.switchMap { players ->
+            _lineup.switchMap { lineup ->
                 val batterSize = TeamStrategy.getStrategyById(lineup.strategy).batterSize
                 val extraHitters = lineup.extraHitters
                 val lineupMode = lineup.mode
@@ -312,20 +312,20 @@ class LineupViewModel : ViewModel(), KoinComponent {
         val currentLineupID = lineupID ?: 0
 
         val getLineup = domain.lineups().observeLineupById(currentLineupID)
-        val getPositions = Transformations.switchMap(getLineup) {
+        val getPositions = getLineup.switchMap {
             domain.lineups().observeTeamPlayersAndMaybePositionsForLineup(it.id)
         }
 
-        val getPlayerNumberOverlays = Transformations.switchMap(getPositions) { positions ->
+        val getPlayerNumberOverlays = getPositions.switchMap { positions ->
             val playerMap = mutableMapOf<Long, PlayerWithPosition>()
             positions.forEach { playerMap[it.playerID] = it }
-            Transformations.map(domain.players().observePlayerNumberOverlays(currentLineupID)) {
+            domain.players().observePlayerNumberOverlays(currentLineupID).map {
                 it.forEach { overlay -> playerMap[overlay.playerID]?.shirtNumber = overlay.number }
                 positions
             }
         }
 
-        return Transformations.map(getPlayerNumberOverlays) {
+        return getPlayerNumberOverlays.map {
             _listPlayersWithPosition.clear()
             _listPlayersWithPosition.addAll(it)
             it
@@ -333,7 +333,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getLineup(): LiveData<Lineup> {
-        return Transformations.map(domain.lineups().observeLineupById(lineupID ?: 0)) {
+        return domain.lineups().observeLineupById(lineupID ?: 0).map {
             it.apply {
                 this@LineupViewModel.lineup = this
             }

@@ -49,6 +49,7 @@ fun FieldPosition.getPositionShortName(context: Context, teamType: Int): String 
         TeamType.SOFTBALL.id -> {
             context.resources.getStringArray(R.array.field_positions_softball_list)[ordinal]
         }
+
         else -> {
             context.resources.getStringArray(R.array.field_positions_baseball_list)[ordinal]
         }
@@ -68,15 +69,16 @@ fun FieldPosition.getPositionPercentage(strategy: TeamStrategy): PointF {
                 else -> throw Exception("Not a valid position for strategy $strategy")
             }
         }
+
         else -> {
             when (this) {
                 FieldPosition.OLD_SUBSTITUTE, FieldPosition.SUBSTITUTE -> PointF(0f, 0f)
-                FieldPosition.PITCHER -> PointF(50f, 60f)
+                FieldPosition.PITCHER -> PointF(50f, 59f)
                 FieldPosition.CATCHER -> PointF(50f, 87f)
                 FieldPosition.FIRST_BASE -> PointF(74f, 57f)
                 FieldPosition.SECOND_BASE -> PointF(63f, 44f)
-                FieldPosition.THIRD_BASE -> PointF(27f, 59f)
-                FieldPosition.SHORT_STOP -> PointF(37f, 43f)
+                FieldPosition.THIRD_BASE -> PointF(27f, 57f)
+                FieldPosition.SHORT_STOP -> PointF(37f, 44f)
                 FieldPosition.DP_DH -> PointF(0f, 100f)
                 else -> {
                     when (strategy) {
@@ -88,6 +90,7 @@ fun FieldPosition.getPositionPercentage(strategy: TeamStrategy): PointF {
                                 else -> throw Exception("Not a valid position $this for strategy $strategy")
                             }
                         }
+
                         TeamStrategy.SLOWPITCH -> {
                             when (this) {
                                 FieldPosition.SLOWPITCH_LF -> PointF(14f, 20f)
@@ -97,6 +100,16 @@ fun FieldPosition.getPositionPercentage(strategy: TeamStrategy): PointF {
                                 else -> throw Exception("Not a valid position for strategy $strategy")
                             }
                         }
+
+                        TeamStrategy.FIVE_MAN_STANDARD -> {
+                            when (this) {
+                                FieldPosition.LEFT_FIELD -> PointF(30f, 15f)
+                                FieldPosition.RIGHT_FIELD -> PointF(70f, 15f)
+                                FieldPosition.MID_FIELDER -> PointF(50f, 35f)
+                                else -> throw Exception("Not a valid position for strategy $strategy")
+                            }
+                        }
+
                         else -> PointF(0f, 0f)
                     }
                 }

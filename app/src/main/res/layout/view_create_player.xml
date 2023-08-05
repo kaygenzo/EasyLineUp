@@ -35,7 +35,8 @@
                 android:layout_marginBottom="5dp"
                 android:layout_marginEnd="5dp"
                 app:layout_constraintBottom_toBottomOf="@+id/playerImage"
-                app:layout_constraintRight_toRightOf="@+id/playerImage" />
+                app:layout_constraintRight_toRightOf="@+id/playerImage"
+                tools:src="@drawable/remove_image"/>
 
             <LinearLayout
                 android:orientation="vertical"

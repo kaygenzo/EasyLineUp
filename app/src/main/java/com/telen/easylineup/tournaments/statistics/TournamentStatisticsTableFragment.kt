@@ -15,8 +15,8 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
-import com.telen.library.widget.tablemultiscroll.views.StyleConfiguration
-import com.telen.library.widget.tablemultiscroll.views.TableConfiguration
+import io.github.kaygenzo.androidtable.api.StyleConfiguration
+import io.github.kaygenzo.androidtable.api.TableConfiguration
 import kotlinx.android.synthetic.main.fragment_tournament_statistics_table.view.*
 
 class TournamentStatisticsTableFragment: BaseFragment("TournamentStatisticsTableFragment"), AdapterView.OnItemSelectedListener {

@@ -254,9 +254,23 @@ internal class GetBattersStateSoftballStandardEditableTests : GetBattersStateEdi
 )
 
 @RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateBaseball5ManEditableTests : GetBattersStateEditableTests(
+    TeamType.BASEBALL,
+    TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize,
+    0
+)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballSlowpitchEditableTests : GetBattersStateEditableTests(
     TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
     TeamStrategy.SLOWPITCH.batterSize, 0
+)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateSoftball5ManEditableTests : GetBattersStateEditableTests(
+    TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0
 )
 
 ////////////// EDITABLE CUSTOM HITTER SIZE //////////////
@@ -274,9 +288,23 @@ internal class GetBattersStateSoftballCustomStandardEditableTests : GetBattersSt
 )
 
 @RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateBaseballCustom5ManEditableTests : GetBattersStateEditableTests(
+    TeamType.BASEBALL,
+    TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize,
+    3
+)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballCustomSlowpitchEditableTests : GetBattersStateEditableTests(
     TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
     TeamStrategy.SLOWPITCH.batterSize, 3
+)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateSoftballCustom5ManEditableTests : GetBattersStateEditableTests(
+    TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3
 )
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -520,9 +548,21 @@ internal class GetBattersStateSoftballStandardNotEditableTests : GetBattersState
 )
 
 @RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateBaseball5ManNotEditableTests : GetBattersStateNotEditableTests(
+    TeamType.BASEBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0
+)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballSlowpitchNotEditableTests : GetBattersStateNotEditableTests(
     TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
     TeamStrategy.SLOWPITCH.batterSize, 0
+)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateSoftball5ManNotEditableTests : GetBattersStateNotEditableTests(
+    TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0
 )
 
 ////////////// NOT EDITABLE CUSTOM HITTER SIZE //////////////
@@ -542,11 +582,25 @@ internal class GetBattersStateSoftballCustomStandardNotEditableTests :
     )
 
 @RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateBaseballCustom5ManNotEditableTests : GetBattersStateNotEditableTests(
+    TeamType.BASEBALL,
+    TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize,
+    3
+)
+
+@RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballCustomSlowpitchNotEditableTests :
     GetBattersStateNotEditableTests(
         TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
         TeamStrategy.SLOWPITCH.batterSize, 3
     )
+
+@RunWith(MockitoJUnitRunner.Silent::class)
+internal class GetBattersStateSoftballCustom5ManNotEditableTests : GetBattersStateNotEditableTests(
+    TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
+    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3
+)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////// BASE /////////////////////////////////////////////////////////////////////
@@ -561,6 +615,7 @@ internal abstract class GetBattersStateTests(
 
     @Mock
     lateinit var context: Context
+
     @Mock
     lateinit var resources: Resources
     lateinit var mGetBattersState: GetBattersState

@@ -17,10 +17,20 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
-import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
+import kotlinx.android.synthetic.main.dialog_create_lineup.view.actionContainer
+import kotlinx.android.synthetic.main.dialog_create_lineup.view.dateButton
+import kotlinx.android.synthetic.main.dialog_create_lineup.view.dateSummary
+import kotlinx.android.synthetic.main.dialog_create_lineup.view.lineupExtraHittersSpinner
+import kotlinx.android.synthetic.main.dialog_create_lineup.view.lineupStrategyContainer
+import kotlinx.android.synthetic.main.dialog_create_lineup.view.lineupStrategySpinner
+import kotlinx.android.synthetic.main.dialog_create_lineup.view.lineupTitleInput
+import kotlinx.android.synthetic.main.dialog_create_lineup.view.lineupTitleInputLayout
+import kotlinx.android.synthetic.main.dialog_create_lineup.view.rosterExpandableEdit
+import kotlinx.android.synthetic.main.dialog_create_lineup.view.tournamentChoiceAutoComplete
+import kotlinx.android.synthetic.main.dialog_create_lineup.view.tournamentTitleInputLayout
 import timber.log.Timber
 import java.text.DateFormat
-import java.util.*
+import java.util.Calendar
 
 interface OnActionButtonListener {
     fun onSaveClicked(
@@ -141,34 +151,34 @@ class LineupCreationFormView : ConstraintLayout, TextWatcher {
     }
 
     fun setTeamType(teamType: TeamType) {
-        when (teamType) {
-            TeamType.SOFTBALL -> {
-                val strategies = teamType.getStrategies()
-                val strategiesName = resources.getStringArray(R.array.softball_strategy_array)
-                strategyAdapter = ArrayAdapter(context, R.layout.item_team_strategy, strategiesName)
-                lineupStrategySpinner.apply {
-                    adapter = strategyAdapter
-                    onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                        override fun onNothingSelected(p0: AdapterView<*>?) {
-
-                        }
-
-                        override fun onItemSelected(
-                            parent: AdapterView<*>?,
-                            view: View?,
-                            position: Int,
-                            id: Long
-                        ) {
-                            strategy = strategies[position]
-                        }
-                    }
-                }
-                lineupStrategyContainer.visibility = View.VISIBLE
-            }
+        val strategies = teamType.getStrategies()
+        val strategiesName = when (teamType) {
+            TeamType.BASEBALL -> resources.getStringArray(R.array.baseball_strategy_array)
+            TeamType.SOFTBALL -> resources.getStringArray(R.array.softball_strategy_array)
             else -> {
                 strategy = teamType.defaultStrategy
+                return
             }
         }
+        strategyAdapter = ArrayAdapter(context, R.layout.item_team_strategy, strategiesName)
+        lineupStrategySpinner.apply {
+            adapter = strategyAdapter
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                }
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    strategy = strategies[position]
+                }
+            }
+        }
+        lineupStrategyContainer.visibility = View.VISIBLE
     }
 
     fun setLineupNameError(error: String) {

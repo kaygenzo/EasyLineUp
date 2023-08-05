@@ -13,7 +13,7 @@ import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
-import com.telen.easylineup.utils.StringUtils
+import com.telen.easylineup.utils.toLetters
 import kotlinx.android.synthetic.main.view_multiple_state_defense_icon.view.*
 import timber.log.Timber
 
@@ -115,7 +115,7 @@ class MultipleStateDefenseIconButton: ConstraintLayout {
     }
 
     fun setPlayerImage(url: String?, fallbackName: String, size: Int, @ColorInt borderColor: Int, borderWidth: Float) {
-        val nameFallback = StringUtils().nameToLetters(fallbackName)
+        val nameFallback = fallbackName.toLetters()
         playerNameFallback.text = nameFallback
         playerNameFallback.visibility = View.VISIBLE
         playerImage.visibility = View.INVISIBLE

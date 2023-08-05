@@ -5,6 +5,7 @@
     <color name="colorPrimaryVariant">#2d5100</color>
     <color name="colorSecondary">#2d5100</color>
     <color name="colorOnSecondary">#FFFFFF</color>
+    <color name="colorOnPrimary">@color/white</color>
 
     <color name="number_blue">#FF2D3783</color>
     <color name="text_orange">#FFd37240</color>
@@ -37,10 +38,9 @@
     <color name="tournaments_timeline_color">@color/colorPrimaryVariant</color>
 
     <color name="list_empty_text">#6d6d6d</color>
-    <color name="grey_light">#DCDCDC</color>
-    <color name="teams_list_text_primary">#4d4d4d</color>
 
     <color name="blue_grey_80">#ff37474f</color>
 
     <color name="team_type_bottom_view">@color/colorPrimaryVariant</color>
+    <color name="lineup_batter_list_highlight">#DCDCDC</color>
 </resources>

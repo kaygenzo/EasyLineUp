@@ -66,6 +66,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tilePlayerNumberLayout"
                 android:text="@string/tile_last_player_number_label_last"
                 android:gravity="center"
+                android:textColor="@color/white"
                 android:layout_marginTop="@dimen/default_margin"
                 app:normalUppercaseStyledTextColor="@color/white"/>
 

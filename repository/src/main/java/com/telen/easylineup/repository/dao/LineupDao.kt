@@ -38,7 +38,7 @@ internal interface LineupDao {
     fun getLineups(): Single<List<RoomLineup>>
 
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
-    fun getLineupById(lineupId: Long): LiveData<RoomLineup>
+    fun getLineupById(lineupId: Long): LiveData<RoomLineup?>
 
     @Query("SELECT * FROM lineups WHERE hash = :hash")
     fun getLineupByHash(hash: String): Single<RoomLineup>

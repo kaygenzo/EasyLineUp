@@ -17,7 +17,9 @@ import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.lineup.LineupViewModel
 import com.telen.easylineup.utils.FeatureViewFactory
+import com.telen.easylineup.utils.SharedPreferencesUtils
 import com.telen.easylineup.views.ItemDecoratorAttackRecycler
+import com.telen.easylineup.views.LineupTypeface
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import java.util.concurrent.TimeUnit
@@ -45,6 +47,13 @@ class AttackFragment : BaseFragment("AttackFragment") {
         itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
         itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
         playerAdapter.itemTouchHelper = itemTouchedHelper
+        val lineupValue = SharedPreferencesUtils.getStringSetting(
+            requireContext(),
+            R.string.key_lineup_style,
+            getString(R.string.lineup_style_default_value)
+        )
+        val lineupTypeface = LineupTypeface.getByValue(lineupValue)
+        playerAdapter.lineupTypeface = lineupTypeface
     }
 
     override fun onCreateView(

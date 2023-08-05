@@ -42,7 +42,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:text="Visitor vs Home"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:layout_margin="2dp"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

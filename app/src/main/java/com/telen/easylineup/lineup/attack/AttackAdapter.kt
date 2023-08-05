@@ -145,7 +145,7 @@ class BattingOrderAdapter(
                 }
             }
             if (batter.applyBackground) {
-                itemPlayerAttack.setBackgroundResource(R.color.grey_light)
+                itemPlayerAttack.setBackgroundResource(R.color.lineup_batter_list_highlight)
             } else {
                 itemPlayerAttack.setBackgroundResource(0)
             }
