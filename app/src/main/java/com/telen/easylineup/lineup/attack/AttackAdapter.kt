@@ -51,8 +51,6 @@ class BattingOrderAdapter(
             val fromOrder = fromBatter.playerOrder
             val toOrder = toBatter.playerOrder
 
-            fromBatter.origin.order = toOrder
-            toBatter.origin.order = fromOrder
             fromBatter.playerOrder = toOrder
             toBatter.playerOrder = fromOrder
 

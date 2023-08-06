@@ -112,7 +112,6 @@ internal class GetBattersState :
                         canMove,
                         canShowDescription,
                         canShowIndex,
-                        player,
                         applyBackground,
                         requestValues.isEditable
                     )

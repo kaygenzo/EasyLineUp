@@ -51,7 +51,6 @@ internal abstract class GetBattersStateEditableTests(
             canMove = true,
             canShowDescription = true,
             canShowOrder = true,
-            origin = players[0],
             applyBackground = false,
             isEditable = isEditable
         )
@@ -90,7 +89,6 @@ internal abstract class GetBattersStateEditableTests(
             canMove = false,
             canShowDescription = false,
             canShowOrder = false,
-            origin = players[0],
             applyBackground = true,
             isEditable = isEditable
         )
@@ -126,7 +124,6 @@ internal abstract class GetBattersStateEditableTests(
                 canMove = true,
                 canShowDescription = false,
                 canShowOrder = true,
-                origin = players[batterSize - i],
                 applyBackground = false,
                 isEditable = isEditable
             )
@@ -160,7 +157,6 @@ internal abstract class GetBattersStateEditableTests(
                     canMove = subAllowBatting,
                     canShowDescription = true,
                     canShowOrder = subAllowBatting,
-                    origin = players[i - 1],
                     applyBackground = false,
                     isEditable = isEditable
                 )
@@ -193,7 +189,6 @@ internal abstract class GetBattersStateEditableTests(
                     canMove = subAllowBatting,
                     canShowDescription = true,
                     canShowOrder = subAllowBatting,
-                    origin = players[i - 1],
                     applyBackground = false,
                     isEditable = isEditable
                 )
@@ -229,7 +224,6 @@ internal abstract class GetBattersStateEditableTests(
                     canMove = subAllowBatting,
                     canShowDescription = true,
                     canShowOrder = subAllowBatting,
-                    origin = players[i - 2],
                     applyBackground = false,
                     isEditable = isEditable
                 )
@@ -344,7 +338,6 @@ internal abstract class GetBattersStateNotEditableTests(
             canMove = false,
             canShowDescription = true,
             canShowOrder = true,
-            origin = players[0],
             applyBackground = false,
             isEditable = isEditable
         )
@@ -383,7 +376,6 @@ internal abstract class GetBattersStateNotEditableTests(
             canMove = false,
             canShowDescription = true,
             canShowOrder = false,
-            origin = players[0],
             applyBackground = true,
             isEditable = isEditable
         )
@@ -419,7 +411,6 @@ internal abstract class GetBattersStateNotEditableTests(
                 canMove = false,
                 canShowDescription = true,
                 canShowOrder = true,
-                origin = players[batterSize - i],
                 applyBackground = false,
                 isEditable = isEditable
             )
@@ -453,7 +444,6 @@ internal abstract class GetBattersStateNotEditableTests(
                     canMove = false,
                     canShowDescription = true,
                     canShowOrder = subAllowBatting,
-                    origin = players[i - 1],
                     applyBackground = false,
                     isEditable = isEditable
                 )
@@ -486,7 +476,6 @@ internal abstract class GetBattersStateNotEditableTests(
                     canMove = false,
                     canShowDescription = true,
                     canShowOrder = subAllowBatting,
-                    origin = players[i - 1],
                     applyBackground = false,
                     isEditable = isEditable
                 )
@@ -522,7 +511,6 @@ internal abstract class GetBattersStateNotEditableTests(
                     canMove = false,
                     canShowDescription = true,
                     canShowOrder = subAllowBatting,
-                    origin = players[i - 2],
                     applyBackground = false,
                     isEditable = isEditable
                 )
