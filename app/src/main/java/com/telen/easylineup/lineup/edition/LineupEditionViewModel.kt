@@ -4,7 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.application.ApplicationInteractor
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerNumberOverlay
+import com.telen.easylineup.domain.model.RosterItem
+import com.telen.easylineup.domain.model.RosterPlayerStatus
+import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.toRosterPlayerStatus
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -97,5 +103,13 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
 
     fun onLineupNameChanged(name: String) {
         lineup?.name = name
+    }
+
+    fun getTournaments(): Single<List<Tournament>> {
+        return domain.tournaments().getTournaments()
+    }
+
+    fun onTournamentChanged(tournament: Tournament) {
+        lineup?.tournamentId = tournament.id
     }
 }

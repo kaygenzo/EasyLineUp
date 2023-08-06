@@ -26,6 +26,7 @@ class LineupPagerAdapter(fragment: Fragment, private val editable: Boolean) :
                 else
                     DefenseFragmentFixed()
             }
+
             FRAGMENT_ATTACK_INDEX -> {
                 val bundle = Bundle()
                 bundle.putBoolean(Constants.EXTRA_EDITABLE, editable)
@@ -33,6 +34,7 @@ class LineupPagerAdapter(fragment: Fragment, private val editable: Boolean) :
                     arguments = bundle
                 }
             }
+
             else -> Fragment()
         }
 

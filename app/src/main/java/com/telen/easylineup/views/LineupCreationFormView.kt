@@ -14,20 +14,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.DialogCreateLineupBinding
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
-import kotlinx.android.synthetic.main.dialog_create_lineup.view.actionContainer
-import kotlinx.android.synthetic.main.dialog_create_lineup.view.dateButton
-import kotlinx.android.synthetic.main.dialog_create_lineup.view.dateSummary
-import kotlinx.android.synthetic.main.dialog_create_lineup.view.lineupExtraHittersSpinner
-import kotlinx.android.synthetic.main.dialog_create_lineup.view.lineupStrategyContainer
-import kotlinx.android.synthetic.main.dialog_create_lineup.view.lineupStrategySpinner
-import kotlinx.android.synthetic.main.dialog_create_lineup.view.lineupTitleInput
-import kotlinx.android.synthetic.main.dialog_create_lineup.view.lineupTitleInputLayout
-import kotlinx.android.synthetic.main.dialog_create_lineup.view.rosterExpandableEdit
-import kotlinx.android.synthetic.main.dialog_create_lineup.view.tournamentChoiceAutoComplete
-import kotlinx.android.synthetic.main.dialog_create_lineup.view.tournamentTitleInputLayout
 import timber.log.Timber
 import java.text.DateFormat
 import java.util.Calendar
@@ -48,93 +38,91 @@ interface OnActionButtonListener {
 class LineupCreationFormView : ConstraintLayout, TextWatcher {
 
     private val tournaments: MutableList<Tournament> = mutableListOf()
+    private val tournamentAdapter: ArrayAdapter<String>
+    private val tournamentsNames: MutableList<String>
+
     private var strategy: TeamStrategy = TeamStrategy.STANDARD
     private var extraHitters = 0
-    private lateinit var tournamentAdapter: ArrayAdapter<String>
-    private lateinit var strategyAdapter: ArrayAdapter<String>
-    private lateinit var tournamentsNames: MutableList<String>
     private var actionClickListener: OnActionButtonListener? = null
-    private lateinit var eventTime: Calendar
+    private var eventTime: Calendar
+
+    val binding: DialogCreateLineupBinding =
+        DialogCreateLineupBinding.inflate(LayoutInflater.from(context), this, true)
 
     private var fragmentManager: FragmentManager? = null
 
-    constructor(context: Context) : super(context) {
-        init(context)
-    }
+    constructor(context: Context) : super(context)
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        init(context)
-    }
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
         defStyleAttr
-    ) {
-        init(context)
-    }
+    )
 
-    private fun init(context: Context) {
-        LayoutInflater.from(context).inflate(R.layout.dialog_create_lineup, this)
+    init {
+        with(binding) {
+            lineupTitleInput.addTextChangedListener(this@LineupCreationFormView)
+            tournamentChoiceAutoComplete.addTextChangedListener(this@LineupCreationFormView)
 
-        lineupTitleInput.addTextChangedListener(this)
-        tournamentChoiceAutoComplete.addTextChangedListener(this)
+            tournamentsNames = mutableListOf()
 
-        tournamentsNames = mutableListOf()
+            eventTime = Calendar.getInstance()
 
-        eventTime = Calendar.getInstance()
+            setTournamentDateHeader(eventTime.timeInMillis)
 
-        setTournamentDateHeader(eventTime.timeInMillis)
+            tournamentAdapter =
+                ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
+            tournamentChoiceAutoComplete.setAdapter(tournamentAdapter)
 
-        tournamentAdapter = ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
-        tournamentChoiceAutoComplete.setAdapter(tournamentAdapter)
-
-        dateButton.setOnClickListener {
-            val datePicker = MaterialDatePicker.Builder
-                .datePicker()
-                .setSelection(eventTime.timeInMillis)
-                .build()
-            datePicker.addOnPositiveButtonClickListener {
-                eventTime.timeInMillis = it
-                setTournamentDateHeader(it)
-            }
-            fragmentManager?.let {
-                datePicker.show(it, "createLineupDatePicker")
-            }
-        }
-
-        rosterExpandableEdit.setOnClickListener {
-            actionClickListener?.onRosterChangeClicked()
-        }
-
-        actionContainer.saveClickListener = OnClickListener {
-            actionClickListener?.onSaveClicked(
-                lineupTitleInput.text.toString(),
-                getSelectedTournament(),
-                eventTime.timeInMillis,
-                strategy,
-                extraHitters
-            )
-        }
-
-        actionContainer.cancelClickListener = OnClickListener {
-            actionClickListener?.onCancelClicked()
-        }
-
-        lineupExtraHittersSpinner.setSelection(extraHitters)
-        lineupExtraHittersSpinner.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(p0: AdapterView<*>?) {}
-
-                override fun onItemSelected(
-                    p0: AdapterView<*>?,
-                    p1: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    extraHitters = resources.getIntArray(R.array.extra_hitters_values)[position]
+            dateButton.setOnClickListener {
+                val datePicker = MaterialDatePicker.Builder
+                    .datePicker()
+                    .setSelection(eventTime.timeInMillis)
+                    .build()
+                datePicker.addOnPositiveButtonClickListener {
+                    eventTime.timeInMillis = it
+                    setTournamentDateHeader(it)
+                }
+                fragmentManager?.let {
+                    datePicker.show(it, "createLineupDatePicker")
                 }
             }
+
+            rosterExpandableEdit.setOnClickListener {
+                actionClickListener?.onRosterChangeClicked()
+            }
+
+            actionContainer.saveClickListener = OnClickListener {
+                actionClickListener?.onSaveClicked(
+                    lineupTitleInput.text.toString(),
+                    getSelectedTournament(),
+                    eventTime.timeInMillis,
+                    strategy,
+                    extraHitters
+                )
+            }
+
+            actionContainer.cancelClickListener = OnClickListener {
+                actionClickListener?.onCancelClicked()
+            }
+
+            lineupExtraHittersSpinner.setSelection(extraHitters)
+            lineupExtraHittersSpinner.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+                    override fun onItemSelected(
+                        p0: AdapterView<*>?,
+                        p1: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        extraHitters = resources.getIntArray(R.array.extra_hitters_values)[position]
+                    }
+                }
+        }
     }
 
     fun setFragmentManager(fm: FragmentManager) {
@@ -143,7 +131,7 @@ class LineupCreationFormView : ConstraintLayout, TextWatcher {
 
     private fun setTournamentDateHeader(date: Long) {
         val formattedDate = DateFormat.getDateInstance().format(date)
-        dateSummary.text = formattedDate
+        binding.dateSummary.text = formattedDate
     }
 
     fun setOnActionClickListener(listener: OnActionButtonListener) {
@@ -160,8 +148,8 @@ class LineupCreationFormView : ConstraintLayout, TextWatcher {
                 return
             }
         }
-        strategyAdapter = ArrayAdapter(context, R.layout.item_team_strategy, strategiesName)
-        lineupStrategySpinner.apply {
+        val strategyAdapter = ArrayAdapter(context, R.layout.item_team_strategy, strategiesName)
+        binding.lineupStrategySpinner.apply {
             adapter = strategyAdapter
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -178,15 +166,15 @@ class LineupCreationFormView : ConstraintLayout, TextWatcher {
                 }
             }
         }
-        lineupStrategyContainer.visibility = View.VISIBLE
+        binding.lineupStrategyContainer.visibility = View.VISIBLE
     }
 
     fun setLineupNameError(error: String) {
-        lineupTitleInputLayout.error = error
+        binding.lineupTitleInputLayout.error = error
     }
 
     fun setTournamentNameError(error: String) {
-        tournamentTitleInputLayout.error = error
+        binding.tournamentTitleInputLayout.error = error
     }
 
     fun setList(tournaments: List<Tournament>) {
@@ -203,27 +191,29 @@ class LineupCreationFormView : ConstraintLayout, TextWatcher {
     }
 
     private fun getSelectedTournament(): Tournament {
-        val position = tournamentsNames.indexOf(tournamentChoiceAutoComplete.text.toString())
+        val position =
+            tournamentsNames.indexOf(binding.tournamentChoiceAutoComplete.text.toString())
         Timber.d("position = $position")
         return if (position >= 0) {
 //            tournaments[position].createdAt = calendar.timeInMillis
             tournaments[position]
         } else
             Tournament(
-                name = tournamentChoiceAutoComplete.text.toString().trim(),
+                name = binding.tournamentChoiceAutoComplete.text.toString().trim(),
                 createdAt = Calendar.getInstance().timeInMillis
             )
     }
 
     override fun afterTextChanged(s: Editable?) {
-        //readyStateListener?.onFormStateChanged()
-        val lineupName = lineupTitleInput.text
-        val tournamentName = tournamentChoiceAutoComplete.text
-        if (!TextUtils.isEmpty(lineupName?.trim())) {
-            lineupTitleInputLayout.error = null
-        }
-        if (!TextUtils.isEmpty(tournamentName.trim())) {
-            tournamentTitleInputLayout.error = null
+        with(binding) {
+            val lineupName = lineupTitleInput.text
+            val tournamentName = tournamentChoiceAutoComplete.text
+            if (!TextUtils.isEmpty(lineupName?.trim())) {
+                lineupTitleInputLayout.error = null
+            }
+            if (!TextUtils.isEmpty(tournamentName.trim())) {
+                tournamentTitleInputLayout.error = null
+            }
         }
     }
 

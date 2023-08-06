@@ -85,8 +85,6 @@ class TournamentListFragment : BaseFragment("TournamentListFragment"), OnItemCli
 
         launch(viewModel.getTeamType(), {
             tournamentsAdapter.setTeamType(it)
-        }, {
-            Timber.e(it)
         })
 
         viewModel.setFilter("")

@@ -82,8 +82,6 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
                     Timber.e("Unknown error: $error")
                 }
             }
-        }, {
-            Timber.e(it)
         })
     }
 

@@ -2,7 +2,12 @@ package com.telen.easylineup.lineup
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.annotation.MenuRes
@@ -82,8 +87,6 @@ abstract class LineupFragment(
                     launch(viewModel.save(), {
                         Timber.d("Successfully saved")
                         goBack()
-                    }, {
-                        Timber.e(it)
                     })
                 }
                 cancelClickListener = View.OnClickListener { goBack() }
@@ -169,15 +172,15 @@ abstract class LineupFragment(
                     TeamType.BASEBALL -> {
                         setTitle(R.string.action_add_dh)
                     }
+
                     TeamType.SOFTBALL -> {
                         setTitle(R.string.action_add_dp_flex)
                     }
+
                     else -> {}
                 }
                 isChecked = viewModel.lineup?.mode == MODE_ENABLED
             }
-        }, {
-            Timber.e(it)
         })
         super.onPrepareMenu(menu)
     }
@@ -194,16 +197,19 @@ abstract class LineupFragment(
                 )
                 true
             }
+
             R.id.action_delete -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_lineup_delete")
                 askUserConsentForDelete()
                 true
             }
+
             R.id.action_share -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_lineup_share")
                 exportLineupToExternalStorage()
                 true
             }
+
             R.id.action_lineup_mode -> {
                 if (BuildConfig.DEBUG) {
                     Toast.makeText(activity, "Mode is ${item.isChecked}", Toast.LENGTH_SHORT).show()
@@ -212,6 +218,7 @@ abstract class LineupFragment(
                 viewModel.onLineupModeChanged(!item.isChecked)
                 true
             }
+
             else -> false
         }
     }
@@ -241,8 +248,6 @@ abstract class LineupFragment(
             }
             launch(viewModel.exportLineupToExternalStorage(it, views), { intent ->
                 startActivity(Intent.createChooser(intent, ""))
-            }, { error ->
-                Timber.e(error)
             })
         }
     }

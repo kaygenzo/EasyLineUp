@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.getkeepsafe.taptargetview.TapTargetView
@@ -15,38 +15,32 @@ import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentListBatterBinding
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.launch
 import com.telen.easylineup.lineup.LineupViewModel
 import com.telen.easylineup.utils.FeatureViewFactory
 import com.telen.easylineup.utils.SharedPreferencesUtils
 import com.telen.easylineup.views.ItemDecoratorAttackRecycler
 import com.telen.easylineup.views.LineupTypeface
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import java.util.concurrent.TimeUnit
 
 class AttackFragment : BaseFragment("AttackFragment") {
-
-    private lateinit var viewModel: LineupViewModel
-    private lateinit var playerAdapter: BattingOrderAdapter
-    private lateinit var itemTouchedCallback: AttackItemTouchCallback
-    private lateinit var itemTouchedHelper: ItemTouchHelper
-
-    private val adapterDataList = mutableListOf<BatterState>()
     private var binder: FragmentListBatterBinding? = null
+    private val adapterDataList = mutableListOf<BatterState>()
+    private val playerAdapter = BattingOrderAdapter(players = adapterDataList).apply {
+        setHasStableIds(true)
+    }
+    private val itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
+    private val itemTouchedHelper = ItemTouchHelper(itemTouchedCallback).apply {
+        playerAdapter.itemTouchHelper = this
+    }
+
+    private val viewModel by viewModels<LineupViewModel>(
+        ownerProducer = { requireParentFragment() }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        parentFragment?.let { parent ->
-            viewModel = ViewModelProviders.of(parent).get(LineupViewModel::class.java)
-        }
-
-        playerAdapter = BattingOrderAdapter(players = adapterDataList).apply {
-            setHasStableIds(true)
-        }
-        itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
-        itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
-        playerAdapter.itemTouchHelper = itemTouchedHelper
         val lineupValue = SharedPreferencesUtils.getStringSetting(
             requireContext(),
             R.string.key_lineup_style,
@@ -109,19 +103,17 @@ class AttackFragment : BaseFragment("AttackFragment") {
 
         viewModel.observeHelpEvent().observe(viewLifecycleOwner) { show ->
             if (show) {
-                Completable.timer(200, TimeUnit.MILLISECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        linearLayoutManager.findViewByPosition(0)?.let {
-                            FeatureViewFactory.apply(
-                                it.findViewById<ImageView>(R.id.reorderImage),
-                                activity as AppCompatActivity,
-                                getString(R.string.reorder_batter_title),
-                                getString(R.string.reorder_batter_description),
-                                object : TapTargetView.Listener() {}
-                            )
-                        }
+                launch(Completable.timer(200, TimeUnit.MILLISECONDS), {
+                    linearLayoutManager.findViewByPosition(0)?.let {
+                        FeatureViewFactory.apply(
+                            it.findViewById<ImageView>(R.id.reorderImage),
+                            activity as AppCompatActivity,
+                            getString(R.string.reorder_batter_title),
+                            getString(R.string.reorder_batter_description),
+                            object : TapTargetView.Listener() {}
+                        )
                     }
+                })
             }
         }
 

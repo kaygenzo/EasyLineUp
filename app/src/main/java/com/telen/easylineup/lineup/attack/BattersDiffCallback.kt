@@ -3,10 +3,13 @@ package com.telen.easylineup.lineup.attack
 import androidx.recyclerview.widget.DiffUtil
 import com.telen.easylineup.domain.model.BatterState
 
-class BattersDiffCallback(private val mOldBatters: List<BatterState>, private val mNewBatters: List<BatterState>): DiffUtil.Callback() {
+class BattersDiffCallback(
+    private val mOldBatters: List<BatterState>,
+    private val mNewBatters: List<BatterState>
+) : DiffUtil.Callback() {
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return if(oldItemPosition < mOldBatters.size && newItemPosition < mOldBatters.size)
+        return if (oldItemPosition < mOldBatters.size && newItemPosition < mOldBatters.size)
             mOldBatters[oldItemPosition].playerID == mOldBatters[newItemPosition].playerID
         else
             false
@@ -21,7 +24,7 @@ class BattersDiffCallback(private val mOldBatters: List<BatterState>, private va
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return if(oldItemPosition < mOldBatters.size && newItemPosition < mOldBatters.size)
+        return if (oldItemPosition < mOldBatters.size && newItemPosition < mOldBatters.size)
             mOldBatters[oldItemPosition] == mNewBatters[newItemPosition]
         else
             false

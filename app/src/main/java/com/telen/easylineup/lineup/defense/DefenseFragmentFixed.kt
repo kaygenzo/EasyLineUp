@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.telen.easylineup.BaseFragment
@@ -16,7 +16,9 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class DefenseFragmentFixed : BaseFragment("DefenseFragmentFixed") {
-    private var viewModel: LineupViewModel? = null
+    private val viewModel by viewModels<LineupViewModel>(
+        ownerProducer = { requireParentFragment() }
+    )
 
     private var binder: FragmentLineupDefenseFixedBinding? = null
 
@@ -25,32 +27,25 @@ class DefenseFragmentFixed : BaseFragment("DefenseFragmentFixed") {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binder = FragmentLineupDefenseFixedBinding.inflate(inflater, container, false)
-        this.binder = binder
+        return FragmentLineupDefenseFixedBinding.inflate(inflater, container, false).apply {
+            this@DefenseFragmentFixed.binder = this
 
-        parentFragment?.let { parent ->
-            viewModel = ViewModelProviders.of(parent).get(LineupViewModel::class.java)
-
-            viewModel?.run {
-                observeLineupStrategy().observe(viewLifecycleOwner) {
-                    binder.cardDefenseView.init(it)
-                }
-
-                observeDefensePlayers().switchMap { players ->
-                    observeLineupMode().map { mode ->
-                        Pair(players, mode)
-                    }
-                }.observe(viewLifecycleOwner) {
-                    launch(Completable.timer(100, TimeUnit.MILLISECONDS), {
-                        binder.cardDefenseView.setListPlayer(it.first, it.second)
-                    }, {
-                        /* Nothing to do */
-                    }, Schedulers.computation())
-                }
+            viewModel.observeLineupStrategy().observe(viewLifecycleOwner) {
+                cardDefenseView.init(it)
             }
-        }
 
-        return binder.root
+            viewModel.observeDefensePlayers().switchMap { players ->
+                viewModel.observeLineupMode().map { mode ->
+                    Pair(players, mode)
+                }
+            }.observe(viewLifecycleOwner) {
+                launch(Completable.timer(100, TimeUnit.MILLISECONDS), {
+                    cardDefenseView.setListPlayer(it.first, it.second)
+                }, {
+                    /* Nothing to do */
+                }, Schedulers.computation())
+            }
+        }.root
     }
 
     override fun onDestroyView() {

@@ -64,8 +64,6 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
                     ).show()
                 }
             }
-        }, {
-            Timber.e(it)
         })
     }
 

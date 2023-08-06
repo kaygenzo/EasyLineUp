@@ -4,10 +4,35 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.application.LineupsInteractor
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.BatterState
+import com.telen.easylineup.domain.model.DomainErrors
+import com.telen.easylineup.domain.model.DpAndFlexConfiguration
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.MODE_DISABLED
+import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.RosterPlayerStatus
+import com.telen.easylineup.domain.model.TeamRosterSummary
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
-import com.telen.easylineup.domain.usecases.*
+import com.telen.easylineup.domain.usecases.CreateLineup
+import com.telen.easylineup.domain.usecases.DeleteLineup
+import com.telen.easylineup.domain.usecases.GetBattersState
+import com.telen.easylineup.domain.usecases.GetDPAndFlexFromPlayersInField
+import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
+import com.telen.easylineup.domain.usecases.GetOnlyPlayersInField
+import com.telen.easylineup.domain.usecases.GetRoster
+import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
+import com.telen.easylineup.domain.usecases.SaveDpAndFlex
+import com.telen.easylineup.domain.usecases.SetLineupMode
+import com.telen.easylineup.domain.usecases.UpdateLineup
+import com.telen.easylineup.domain.usecases.UpdateLineupRoster
+import com.telen.easylineup.domain.usecases.UpdatePlayersWithLineupMode
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import io.reactivex.rxjava3.core.Completable
@@ -35,6 +60,7 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
     private val getBatterState: GetBattersState by inject()
     private val getListAvailablePlayersForLineup: GetListAvailablePlayersForSelection by inject()
     private val getPlayersInField: GetOnlyPlayersInField by inject()
+    private val updateLineup: UpdateLineup by inject()
 
     private val errors: PublishSubject<DomainErrors.Lineups> = PublishSubject.create()
 
@@ -126,7 +152,8 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
     }
 
     override fun updateLineup(lineup: Lineup): Completable {
-        return Completable.complete()
+        return UseCaseHandler.execute(updateLineup, UpdateLineup.RequestValues(lineup))
+            .ignoreElement()
     }
 
     override fun observeLineupById(id: Long): LiveData<Lineup> {

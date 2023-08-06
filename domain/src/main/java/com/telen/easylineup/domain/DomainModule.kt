@@ -58,5 +58,6 @@ object DomainModule {
         single { GetShirtNumberHistory(get()) }
         single { ValidatorUtils() }
         single { GetBattersState() }
+        single { UpdateLineup(get()) }
     }
 }

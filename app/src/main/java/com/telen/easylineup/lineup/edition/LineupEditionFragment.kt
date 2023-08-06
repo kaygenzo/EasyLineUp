@@ -4,17 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.ArrayAdapter
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.BaseFragment
+import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentLineupEditionBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.RosterItem
 import com.telen.easylineup.launch
-import timber.log.Timber
 
 class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapterCallback {
 
@@ -41,40 +44,51 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentLineupEditionBinding.inflate(inflater, container, false)
-        this.binding = binding
+        return FragmentLineupEditionBinding.inflate(inflater, container, false).apply {
+            this@LineupEditionFragment.binding = this
 
-        binding.rosterListItems.apply {
-            adapter = rosterAdapter
-            layoutManager = LinearLayoutManager(context)
-        }
-
-        binding.containerActions.saveClickListener = View.OnClickListener {
-            launch(viewModel.saveClicked(), {
-                findNavController().popBackStack()
-            }, {
-                Timber.e(it)
-            })
-        }
-
-        binding.containerActions.cancelClickListener = View.OnClickListener {
-            findNavController().popBackStack()
-        }
-
-        viewModel.observeRosterItems().observe(viewLifecycleOwner) {
-            this.rosterItems.clear()
-            this.rosterItems.addAll(it)
-            rosterAdapter.notifyDataSetChanged()
-        }
-
-        viewModel.observeLineup().observe(viewLifecycleOwner) {
-            binding.lineupNameEditText.setText(it.name)
-            binding.lineupNameEditText.addTextChangedListener {
-                viewModel.onLineupNameChanged(it.toString())
+            rosterListItems.apply {
+                adapter = rosterAdapter
+                layoutManager = LinearLayoutManager(context)
             }
-        }
 
-        return binding.root
+            containerActions.saveClickListener = View.OnClickListener {
+                launch(viewModel.saveClicked(), {
+                    findNavController().popBackStack()
+                })
+            }
+
+            containerActions.cancelClickListener = View.OnClickListener {
+                findNavController().popBackStack()
+            }
+
+            viewModel.observeRosterItems().observe(viewLifecycleOwner) {
+                rosterItems.clear()
+                rosterItems.addAll(it)
+                rosterAdapter.notifyDataSetChanged()
+            }
+
+            viewModel.observeLineup().observe(viewLifecycleOwner) { lineup ->
+                lineupNameEditText.setText(lineup.name)
+                lineupNameEditText.addTextChangedListener {
+                    viewModel.onLineupNameChanged(it.toString())
+                }
+                launch(viewModel.getTournaments(), { tournaments ->
+                    val index = tournaments.indexOfFirst { it.id == lineup.tournamentId }
+                    val adapter = ArrayAdapter(
+                        requireContext(),
+                        R.layout.item_auto_completion,
+                        tournaments.map { it.name })
+                    with(tournamentChoice) {
+                        this.adapter = adapter
+                        setSelection(index)
+                        onItemSelectedListener = TournamentSelectionListener {
+                            viewModel.onTournamentChanged(tournaments[it])
+                        }
+                    }
+                })
+            }
+        }.root
     }
 
     override fun onDestroyView() {
@@ -88,5 +102,14 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
 
     override fun onPlayerSelectedChanged(player: Player, selected: Boolean) {
         viewModel.playerSelectStatusChanged(player, selected)
+    }
+
+    private class TournamentSelectionListener(private val onSelect: (Int) -> Unit) :
+        OnItemSelectedListener {
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            onSelect(position)
+        }
+
+        override fun onNothingSelected(parent: AdapterView<*>?) {}
     }
 }

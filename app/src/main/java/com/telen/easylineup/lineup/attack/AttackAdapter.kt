@@ -1,5 +1,6 @@
 package com.telen.easylineup.lineup.attack
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -100,6 +101,7 @@ class BattingOrderAdapter(
         return 0
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: BatterViewHolder, position: Int) {
         val batter = players[position]
 

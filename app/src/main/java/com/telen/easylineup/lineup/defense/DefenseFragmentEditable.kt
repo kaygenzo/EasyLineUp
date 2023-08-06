@@ -8,15 +8,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentLineupDefenseEditableBinding
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.MODE_DISABLED
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.toPlayer
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.launch
-import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.lineup.LineupViewModel
 import com.telen.easylineup.lineup.LinkDpFlex
 import com.telen.easylineup.lineup.ListAvailablePlayers
@@ -26,7 +29,6 @@ import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.views.DpFlexLinkView
 import com.telen.easylineup.views.OnPlayerButtonCallback
 import com.telen.easylineup.views.OnPlayerClickListener
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
@@ -34,9 +36,11 @@ import java.util.concurrent.TimeUnit
 
 class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlayerButtonCallback {
 
-    lateinit var viewModel: LineupViewModel
     lateinit var availablePlayersBottomSheet: ListAvailablePlayersBottomSheet
     private var binder: FragmentLineupDefenseEditableBinding? = null
+    private val viewModel by viewModels<LineupViewModel>(
+        ownerProducer = { requireParentFragment() }
+    )
 
     companion object {
         const val PLAYERS_BOTTOM_SHEET_TAG = "available_players_bottom_sheet"
@@ -44,8 +48,6 @@ class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlaye
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel =
-            ViewModelProviders.of(parentFragment as LineupFragment).get(LineupViewModel::class.java)
         availablePlayersBottomSheet = ListAvailablePlayersBottomSheet()
     }
 
@@ -54,13 +56,11 @@ class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlaye
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binder = FragmentLineupDefenseEditableBinding.inflate(inflater, container, false)
-        this.binder = binder
+        return FragmentLineupDefenseEditableBinding.inflate(inflater, container, false).apply {
+            this@DefenseFragmentEditable.binder = this
 
-        viewModel.getTeamStrategy()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                binder.cardDefenseView.apply {
+            launch(viewModel.getTeamStrategy(), {
+                cardDefenseView.apply {
                     init(it)
                     setPlayerStateListener(this@DefenseFragmentEditable)
                 }
@@ -69,15 +69,11 @@ class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlaye
                     launch(viewModel.getTeamType().flatMap {
                         Completable.timer(100, TimeUnit.MILLISECONDS).andThen(Single.just(it))
                     }, { teamType ->
-                        binder.cardDefenseView.setListPlayer(players, lineupMode, teamType)
-                    }, {
-                        Timber.e(it)
+                        cardDefenseView.setListPlayer(players, lineupMode, teamType)
                     })
                 }
-            }, {
-                Timber.e(it)
             })
-        return binder.root
+        }.root
     }
 
     override fun onDestroyView() {
@@ -95,7 +91,7 @@ class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlaye
     }
 
     override fun onPlayerButtonClicked(position: FieldPosition) {
-        viewModel.onPlayerClicked(position).subscribe({ event ->
+        launch(viewModel.onPlayerClicked(position), { event ->
             activity?.run {
                 when (event) {
                     is LinkDpFlex -> onLinkDpWithFlex(this, event)
@@ -153,16 +149,12 @@ class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlaye
         dpFlexLinkView.setOnDpClickListener(dpLocked) {
             launch(viewModel.getPlayerSelectionForDp(), {
                 dpFlexLinkView.setPlayerList(it.map { it.toPlayer() })
-            }, {
-                Timber.e(it)
             })
         }
 
         dpFlexLinkView.setOnFlexClickListener(flexLocked) {
             launch(viewModel.getPlayerSelectionForFlex(), {
                 dpFlexLinkView.setPlayerList(it.map { it.toPlayer() })
-            }, {
-                Timber.e(it)
             })
         }
 

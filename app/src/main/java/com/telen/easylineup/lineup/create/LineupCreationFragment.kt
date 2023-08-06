@@ -6,14 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.getkeepsafe.taptargetview.TapTargetView
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.FragmentLineupCreationBinding
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.DomainErrors
+import com.telen.easylineup.domain.model.TeamRosterSummary
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.launch
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.tournaments.list.LineupViewModel
@@ -24,32 +28,29 @@ import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.LineupCreationFormView
 import com.telen.easylineup.views.OnActionButtonListener
-import kotlinx.android.synthetic.main.dialog_create_lineup.view.*
-import kotlinx.android.synthetic.main.fragment_lineup_creation.view.*
 import timber.log.Timber
 
 class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
-
-    private lateinit var lineupViewModel: LineupViewModel
+    private val lineupViewModel by viewModels<LineupViewModel>()
+    private var binding: FragmentLineupCreationBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lineupViewModel = ViewModelProviders.of(this).get(LineupViewModel::class.java)
 
         launch(lineupViewModel.observeErrors(), {
             when (it) {
                 DomainErrors.Lineups.INVALID_TOURNAMENT_NAME -> {
-                    view?.lineupCreationForm?.setTournamentNameError(getString(R.string.lineup_creation_error_name_empty))
+                    binding?.lineupCreationForm?.setTournamentNameError(getString(R.string.lineup_creation_error_name_empty))
                     FirebaseAnalyticsUtils.emptyTournamentName(activity)
                 }
+
                 DomainErrors.Lineups.INVALID_LINEUP_NAME -> {
-                    view?.lineupCreationForm?.setLineupNameError(getString(R.string.lineup_creation_error_tournament_empty))
+                    binding?.lineupCreationForm?.setLineupNameError(getString(R.string.lineup_creation_error_tournament_empty))
                     FirebaseAnalyticsUtils.emptyLineupName(activity)
                 }
+
                 else -> {}
             }
-        }, {
-            Timber.e(it)
         })
     }
 
@@ -57,73 +58,72 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_lineup_creation, container, false)
+    ): View {
+        return FragmentLineupCreationBinding.inflate(inflater, container, false).apply {
+            this@LineupCreationFragment.binding = this
+            launch(lineupViewModel.getTournaments(), {
+                lineupCreationForm.setList(it)
+            })
 
-        launch(lineupViewModel.getTournaments(), {
-            view.lineupCreationForm.setList(it)
-        }, {
-            Timber.e(it)
-        })
+            launch(lineupViewModel.getTeamType(), {
+                lineupCreationForm.setTeamType(TeamType.getTypeById(it))
+            })
 
-        launch(lineupViewModel.getTeamType(), {
-            view.lineupCreationForm.setTeamType(TeamType.getTypeById(it))
-        }, {
-            Timber.e(it)
-        })
+            lineupCreationForm.setFragmentManager(childFragmentManager)
 
-        view.lineupCreationForm.setFragmentManager(childFragmentManager)
+            lineupCreationForm.setOnActionClickListener(object : OnActionButtonListener {
+                override fun onRosterChangeClicked() {
+                    showRosterDialog(lineupCreationForm)
+                }
 
-        view.lineupCreationForm.setOnActionClickListener(object : OnActionButtonListener {
-            override fun onRosterChangeClicked() {
-                showRosterDialog(view.lineupCreationForm)
-            }
-
-            override fun onSaveClicked(
-                lineupName: String,
-                tournament: Tournament,
-                lineupEventTime: Long,
-                strategy: TeamStrategy,
-                extraHitters: Int
-            ) {
-                lineupViewModel.saveLineup(
-                    tournament,
-                    lineupName,
-                    lineupEventTime,
-                    strategy,
-                    extraHitters
-                )
-            }
-
-            override fun onCancelClicked() {
-                findNavController().popBackStack()
-            }
-        })
-
-        launch(lineupViewModel.getCompleteRoster(), {
-            updateRosterSize(view.playerCount, it)
-        }, {
-            Timber.e(it)
-        })
-
-        lineupViewModel.registerSaveResults().observe(viewLifecycleOwner, Observer {
-            when (it) {
-                is SaveSuccess -> {
-                    Timber.d("successfully inserted new lineup, new id: ${it.lineupID}")
-                    val extras = LineupFragment.getArguments(it.lineupID)
-                    findNavController().navigate(
-                        R.id.lineupFragmentEditable,
-                        extras,
-                        NavigationUtils().getOptionsWithPopDestination(
-                            R.id.navigation_lineups,
-                            false
-                        )
+                override fun onSaveClicked(
+                    lineupName: String,
+                    tournament: Tournament,
+                    lineupEventTime: Long,
+                    strategy: TeamStrategy,
+                    extraHitters: Int
+                ) {
+                    lineupViewModel.saveLineup(
+                        tournament,
+                        lineupName,
+                        lineupEventTime,
+                        strategy,
+                        extraHitters
                     )
                 }
-            }
-        })
 
-        return view
+                override fun onCancelClicked() {
+                    findNavController().popBackStack()
+                }
+            })
+
+            launch(lineupViewModel.getCompleteRoster(), {
+                updateRosterSize(lineupCreationForm.binding.playerCount, it)
+            })
+
+            lineupViewModel.registerSaveResults().observe(viewLifecycleOwner) {
+                when (it) {
+                    is SaveSuccess -> {
+                        Timber.d("successfully inserted new lineup, new id: ${it.lineupID}")
+                        val extras = LineupFragment.getArguments(it.lineupID)
+                        findNavController().navigate(
+                            R.id.lineupFragmentEditable,
+                            extras,
+                            NavigationUtils().getOptionsWithPopDestination(
+                                R.id.navigation_lineups,
+                                false
+                            )
+                        )
+                    }
+                }
+            }
+
+        }.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
     }
 
     private fun showRosterDialog(formView: LineupCreationFormView) {
@@ -140,12 +140,10 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
                     checkedItems = checked.toBooleanArray(),
                     listener = { _, which, isChecked ->
                         lineupViewModel.rosterPlayerStatusChanged(which, isChecked)
-                        updateRosterSize(formView.playerCount, response)
+                        updateRosterSize(formView.binding.playerCount, response)
                     }
                 ).show()
             }
-        }, {
-            Timber.e(it)
         })
     }
 
@@ -154,8 +152,8 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
         activity?.let { activity ->
             launch(lineupViewModel.showNewRosterFeature(), { show ->
                 if (show) {
-                    view?.lineupCreationForm?.let { form ->
-                        FeatureViewFactory.apply(form.rosterExpandableEdit,
+                    binding?.lineupCreationForm?.let { form ->
+                        FeatureViewFactory.apply(form.binding.rosterExpandableEdit,
                             activity as AppCompatActivity,
                             getString(R.string.feature_roster_title),
                             getString(R.string.feature_roster_description),
@@ -171,8 +169,6 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
                             })
                     }
                 }
-            }, {
-                Timber.e(it)
             })
         }
     }
@@ -182,6 +178,7 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
             Constants.STATUS_ALL -> {
                 view.text = getString(R.string.roster_size_status_all)
             }
+
             else -> {
                 val size = response.players.filter { it.status }.size
                 view.text =

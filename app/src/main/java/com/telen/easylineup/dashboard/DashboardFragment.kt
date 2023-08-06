@@ -126,8 +126,6 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
             (item?.data as? LastPlayerNumberResearchData)?.setHistory(history)
             val indexOfTile = tileAdapter.currentList.indexOfFirst { it == item }
             tileAdapter.notifyItemChanged(indexOfTile)
-        }, {
-            Timber.e(it)
         })
     }
 
@@ -175,8 +173,6 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                                     startActivity(smsIntent)
                                 }
                             }
-                        }, {
-                            Timber.e(it)
                         })
                     }
                     INDEX_SEND_EMAILS -> {
@@ -199,8 +195,6 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                                     startActivity(intent)
                                 }
                             }
-                        }, {
-                            Timber.e(it)
                         })
                     }
                     INDEX_SEND_OTHER -> {
@@ -240,8 +234,6 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                 if (BuildConfig.DEBUG)
                     Toast.makeText(this, "Save dashboard success", Toast.LENGTH_SHORT).show()
             }
-        }, {
-            Timber.e(it)
         })
     }
 
@@ -269,8 +261,6 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                             })
                     }
                 }
-            }, {
-                Timber.e(it)
             })
         }
     }
