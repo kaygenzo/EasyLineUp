@@ -25,8 +25,13 @@ interface OnItemTouchedListener {
     fun onIdle()
 }
 
+interface BatterListener {
+    fun onBattersChanged(batters: List<BatterState>)
+}
+
 class BattingOrderAdapter(
     val players: MutableList<BatterState>,
+    private val batterListener: BatterListener,
     var lineupTypeface: LineupTypeface = LineupTypeface.NORMAL,
     var lineupMode: Int = MODE_DISABLED,
     var itemTouchHelper: ItemTouchHelper? = null
@@ -62,6 +67,10 @@ class BattingOrderAdapter(
                 for (i in fromPosition downTo toPosition + 1) {
                     Collections.swap(players, i, i - 1)
                 }
+            }
+
+            if (fromBatter != toBatter) {
+                batterListener.onBattersChanged(listOf(fromBatter, toBatter))
             }
 
             notifyItemChanged(fromPosition)

@@ -40,14 +40,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.Calendar
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.MutableList
-import kotlin.collections.arrayListOf
-import kotlin.collections.forEach
-import kotlin.collections.listOf
-import kotlin.collections.mutableListOf
-import kotlin.collections.mutableMapOf
 import kotlin.collections.set
 
 sealed class EventCase
@@ -162,8 +154,9 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun save(): Completable {
-        return lineup?.let { domain.lineups().updateLineup(it, _listPlayersWithPosition) }
-            ?: Completable.error(IllegalArgumentException("Lineup is not supposed to be null"))
+        return lineup?.let {
+            domain.lineups().updateLineup(it, _listPlayersWithPosition)
+        } ?: Completable.error(IllegalArgumentException("Lineup is not supposed to be null"))
     }
 
     fun deleteLineup(): Completable {
@@ -402,6 +395,11 @@ class LineupViewModel : ViewModel(), KoinComponent {
                     .doOnComplete { refreshPlayers(_listPlayersWithPosition) }
             } ?: Completable.error(IllegalStateException("Lineup cannot be null"))
         }
+    }
+
+    fun onBattersChanged(batters: List<BatterState>): Completable {
+        return domain.lineups()
+            .updatePlayersWithBatters(_listPlayersWithPosition, batters)
     }
 }
 

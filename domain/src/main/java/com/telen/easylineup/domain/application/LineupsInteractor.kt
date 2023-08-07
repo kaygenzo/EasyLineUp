@@ -54,6 +54,11 @@ interface LineupsInteractor {
         isEditable: Boolean
     ): Single<List<BatterState>>
 
+    fun updatePlayersWithBatters(
+        players: List<PlayerWithPosition>,
+        batters: List<BatterState>
+    ): Completable
+
     fun getNotSelectedPlayersFromList(
         list: List<PlayerWithPosition>,
         lineup: Lineup,

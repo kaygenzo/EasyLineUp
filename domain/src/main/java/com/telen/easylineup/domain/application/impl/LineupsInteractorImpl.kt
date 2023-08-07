@@ -32,6 +32,7 @@ import com.telen.easylineup.domain.usecases.SaveDpAndFlex
 import com.telen.easylineup.domain.usecases.SetLineupMode
 import com.telen.easylineup.domain.usecases.UpdateLineup
 import com.telen.easylineup.domain.usecases.UpdateLineupRoster
+import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithLineupMode
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
@@ -61,6 +62,7 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
     private val getListAvailablePlayersForLineup: GetListAvailablePlayersForSelection by inject()
     private val getPlayersInField: GetOnlyPlayersInField by inject()
     private val updateLineup: UpdateLineup by inject()
+    private val updatePlayersWithBatters: UpdatePlayersWithBatters by inject()
 
     private val errors: PublishSubject<DomainErrors.Lineups> = PublishSubject.create()
 
@@ -213,6 +215,18 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
                 isEditable = isEditable
             )
         ).map { it.players }
+    }
+
+    override fun updatePlayersWithBatters(
+        players: List<PlayerWithPosition>,
+        batters: List<BatterState>
+    ): Completable {
+        return UseCaseHandler.execute(
+            updatePlayersWithBatters, UpdatePlayersWithBatters.RequestValues(
+                players = players,
+                batters = batters
+            )
+        ).ignoreElement()
     }
 
     override fun getNotSelectedPlayersFromList(

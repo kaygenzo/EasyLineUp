@@ -22,12 +22,13 @@ import com.telen.easylineup.utils.SharedPreferencesUtils
 import com.telen.easylineup.views.ItemDecoratorAttackRecycler
 import com.telen.easylineup.views.LineupTypeface
 import io.reactivex.rxjava3.core.Completable
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-class AttackFragment : BaseFragment("AttackFragment") {
+class AttackFragment : BaseFragment("AttackFragment"), BatterListener {
     private var binder: FragmentListBatterBinding? = null
     private val adapterDataList = mutableListOf<BatterState>()
-    private val playerAdapter = BattingOrderAdapter(players = adapterDataList).apply {
+    private val playerAdapter = BattingOrderAdapter(players = adapterDataList, this).apply {
         setHasStableIds(true)
     }
     private val itemTouchedCallback = AttackItemTouchCallback(playerAdapter)
@@ -123,5 +124,9 @@ class AttackFragment : BaseFragment("AttackFragment") {
     override fun onDestroyView() {
         super.onDestroyView()
         binder = null
+    }
+
+    override fun onBattersChanged(batters: List<BatterState>) {
+        launch(viewModel.onBattersChanged(batters), { /* Nothing to do */ }, { Timber.e(it) })
     }
 }

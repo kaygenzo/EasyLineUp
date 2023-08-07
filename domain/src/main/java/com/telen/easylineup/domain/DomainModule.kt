@@ -59,5 +59,6 @@ object DomainModule {
         single { ValidatorUtils() }
         single { GetBattersState() }
         single { UpdateLineup(get()) }
+        single { UpdatePlayersWithBatters()}
     }
 }
