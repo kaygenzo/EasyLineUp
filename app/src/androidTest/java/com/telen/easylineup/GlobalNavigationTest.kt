@@ -23,16 +23,13 @@ import com.adevinta.android.barista.assertion.BaristaCheckedAssertions
 import com.adevinta.android.barista.assertion.BaristaListAssertions
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions
 import com.adevinta.android.barista.interaction.*
-import com.adevinta.android.barista.internal.assertAny
 import com.adevinta.android.barista.internal.matcher.DisplayedMatchers
 import com.adevinta.android.barista.rule.cleardata.ClearPreferencesRule
 import com.google.android.libraries.cloudtesting.screenshots.ScreenShotter
-import com.google.android.material.chip.Chip
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.*
 import org.hamcrest.TypeSafeMatcher
-import org.hamcrest.core.IsInstanceOf
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -164,7 +161,7 @@ class GlobalNavigationTest {
         applyRotation("albert_edit")
 
         // 1. Check save button come back on details
-        BaristaClickInteractions.clickOn(R.id.playerSave)
+        BaristaClickInteractions.clickOn(R.id.save)
 
         //check name is albert
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
@@ -447,45 +444,52 @@ class GlobalNavigationTest {
 
         takeScreenshot("lineups_create_lineup", mHomeTestRule.activity)
 
-        //TODO think something to perform click on calendar view
-
-//        //open date expendable
-//        val constraintLayout2 = onView(
-//                allOf(withId(R.id.dateExpandableButton),
-//                        childAtPosition(
-//                                allOf(withId(R.id.dateExpandableContainer),
-//                                        childAtPosition(
-//                                                withClassName(`is`("androidx.appcompat.widget.LinearLayoutCompat")),
-//                                                2)),
-//                                0)))
-//        constraintLayout2.perform(scrollTo(), click())
-//
-//
-//        //choose 01/01/2020
-//
-//        onView(allOf(withContentDescription("Previous month"),
-//                isDisplayed())).perform(click())
-//
-//        val appCompatImageButton13 = onView(
-//                allOf(withClassName(`is`("androidx.appcompat.widget.AppCompatImageButton")), withContentDescription("Previous month"),
-//                        childAtPosition(
-//                                allOf(withId(R.id.calendarView),
-//                                        childAtPosition(
-//                                                withId(R.id.calendarView),
-//                                                0)),
-//                                1),
-//                        isDisplayed()))
-//        appCompatImageButton13.perform(click())
-//
         //save the new lineup
         BaristaClickInteractions.clickOn(R.id.save)
 
         //go to the list of lineups
         pressBack()
 
-//        onView(allOf(withId(R.id.tournamentDate),
-//                hasSibling(withText("NewTournament")),
-//                isDisplayed())).check(matches(withText("01/01/2020")))
+        // edit lineup
+        onView(
+            allOf(
+                withId(R.id.editLineup),
+                isDescendantOfA(withId(R.id.lineupsOfTournamentRecycler)),
+                hasSibling(withText("NewLineup")),
+                isDisplayed()
+            )
+        ).perform(click())
+
+        // set a new title
+        BaristaEditTextInteractions.clearText(R.id.lineupNameEditText)
+        BaristaEditTextInteractions.writeTo(R.id.lineupNameEditText, "LineupTest")
+        // move lineup in another tournament
+        BaristaClickInteractions.clickOn(R.id.tournamentChoice)
+        BaristaClickInteractions.clickOn("London Series")
+        // save
+        BaristaClickInteractions.clickOn(R.id.save)
+
+        BaristaVisibilityAssertions.assertDisplayed("LineupTest")
+        BaristaVisibilityAssertions.assertNotExist("NewLineup")
+
+        // check lineup attached to London series tournament
+        onView(
+            allOf(
+                withText("LineupTest"),
+                isDescendantOfA(allOf(
+                    hasSibling(allOf(
+                        hasDescendant(allOf(
+                            withId(R.id.tournamentName),
+                            withText("London Series")
+                        )
+                    ))
+                ))),
+                isDisplayed()
+            )
+        ).check(matches(isDisplayed()))
+
+        // TODO test calendar date
+        // TODO test contextual shirt numbers
     }
 
     @Test
@@ -590,7 +594,7 @@ class GlobalNavigationTest {
         }
     }
 
-    fun clickNavigateUp() {
+    private fun clickNavigateUp() {
         val appCompatImageButton10 = onView(
             allOf(
                 withContentDescription("Navigate up"),
