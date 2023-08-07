@@ -42,5 +42,5 @@
     <color name="blue_grey_80">#ff37474f</color>
 
     <color name="team_type_bottom_view">@color/colorPrimaryVariant</color>
-    <color name="lineup_batter_list_highlight">#DCDCDC</color>
+    <color name="lineup_batter_list_highlight">#DCCCAD</color>
 </resources>
