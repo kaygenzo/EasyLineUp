@@ -66,6 +66,9 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository): Us
                         TeamType.SOFTBALL -> {
                             topLeftCell = requestValues.context.resources.getStringArray(R.array.softball_strategy_array).toList()
                         }
+                        TeamType.BASEBALL -> {
+                            topLeftCell = requestValues.context.resources.getStringArray(R.array.baseball_strategy_array).toList()
+                        }
                         else -> {
                             //nothing to do, just use standard strategy
                         }
