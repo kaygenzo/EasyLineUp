@@ -103,6 +103,7 @@ class PlayerDetailsFragment : BaseFragment("PlayerDetailsFragment"),
 
         viewModel.observeStrategies().observe(viewLifecycleOwner) {
             binding.positionsBarChart.teamStrategy.apply {
+                //TODO check the team type
                 visibility = if (it.size > 1) View.VISIBLE else View.GONE
                 val strategiesName = resources.getStringArray(R.array.softball_strategy_array)
                 adapter = ArrayAdapter(context, R.layout.item_team_strategy, strategiesName)

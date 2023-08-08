@@ -9,7 +9,7 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 class LineupsAdapter(private val lineups: List<Lineup>, private val itemClickedListener: OnItemClickedListener?, var teamType: TeamType = TeamType.BASEBALL): RecyclerView.Adapter<LineupsViewHolder>() {
 
@@ -30,16 +30,28 @@ class LineupsAdapter(private val lineups: List<Lineup>, private val itemClickedL
         holder.lineupDate.text = builder.toString()
 
         val strategy = TeamStrategy.getStrategyById(lineup.strategy)
-        when(teamType) {
-            TeamType.SOFTBALL -> {
-                holder.lineupStrategy.apply {
-                    visibility = View.VISIBLE
-                    val array = context.resources.getStringArray(R.array.softball_strategy_array)
-                    val strategyName = strategy.id.takeIf { it < array.count() }?.let { array[it] } ?: array[0]
-                    text = context.getString(R.string.lineup_list_strategy_type, strategyName)
+        holder.lineupStrategy.apply {
+            when (teamType) {
+                TeamType.SOFTBALL -> {
+                    context.resources.getStringArray(R.array.softball_strategy_array)
                 }
+
+                TeamType.BASEBALL -> {
+                    context.resources.getStringArray(R.array.baseball_strategy_array)
+                }
+
+                else -> null
+            }?.let { array ->
+                val strategies = teamType.getStrategies()
+                strategies.indexOf(strategy).takeIf { it != -1 }?.let {
+                    visibility = View.VISIBLE
+                    text = context.getString(R.string.lineup_list_strategy_type, array[it])
+                }?: let {
+                    visibility = View.GONE
+                }
+            } ?: let {
+                visibility = View.GONE
             }
-            else -> holder.lineupStrategy.visibility = View.GONE
         }
 
         holder.lineupExtraHitters.apply {
