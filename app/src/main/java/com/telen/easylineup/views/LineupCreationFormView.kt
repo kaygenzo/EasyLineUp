@@ -109,29 +109,29 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
     }
 
     fun setTeamType(teamType: TeamType) {
-        when(teamType) {
-            TeamType.SOFTBALL -> {
-                val strategies = teamType.getStrategies()
-                val strategiesName = resources.getStringArray(R.array.softball_strategy_array)
-                strategyAdapter = ArrayAdapter(context, R.layout.item_team_strategy, strategiesName)
-                lineupStrategySpinner.apply {
-                    adapter = strategyAdapter
-                    onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-                        override fun onNothingSelected(p0: AdapterView<*>?) {
-
-                        }
-
-                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                            strategy = strategies[position]
-                        }
-                    }
-                }
-                lineupStrategyContainer.visibility = View.VISIBLE
-            }
+        val strategies = teamType.getStrategies()
+        val strategiesName = when(teamType) {
+            TeamType.BASEBALL -> resources.getStringArray(R.array.baseball_strategy_array)
+            TeamType.SOFTBALL -> resources.getStringArray(R.array.softball_strategy_array)
             else -> {
                 strategy = teamType.defaultStrategy
+                return
             }
         }
+        strategyAdapter = ArrayAdapter(context, R.layout.item_team_strategy, strategiesName)
+        lineupStrategySpinner.apply {
+            adapter = strategyAdapter
+            onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                }
+
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    strategy = strategies[position]
+                }
+            }
+        }
+        lineupStrategyContainer.visibility = View.VISIBLE
     }
 
     fun setLineupNameError(error: String) {

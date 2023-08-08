@@ -17,7 +17,13 @@
             android:id="@+id/baseballField"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/baseball_field" />
+            android:src="@drawable/baseball_field" />
+
+        <ImageView
+            android:id="@+id/imageCanvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#00000000"/>
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

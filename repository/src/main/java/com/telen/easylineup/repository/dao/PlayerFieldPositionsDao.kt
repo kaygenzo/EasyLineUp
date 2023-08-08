@@ -57,6 +57,7 @@ internal interface PlayerFieldPositionsDao {
 
     @Query("""
         SELECT players.name as playerName,
+        players.sex as playerSex,
         players.shirtNumber, players.licenseNumber,
         playerFieldPosition.position,
         playerFieldPosition.x, playerFieldPosition.y,
@@ -76,6 +77,7 @@ internal interface PlayerFieldPositionsDao {
 
     @Query("""
         SELECT players.name as playerName,
+        players.sex as playerSex,
         players.shirtNumber, players.licenseNumber,
         playerFieldPosition.position,
         playerFieldPosition.x, playerFieldPosition.y,

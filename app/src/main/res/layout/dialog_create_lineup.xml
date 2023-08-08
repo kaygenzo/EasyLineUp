@@ -99,7 +99,7 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         android:gravity="center_vertical"
-                        app:srcCompat="@drawable/ic_date_range_black_24dp"/>
+                        android:src="@drawable/ic_date_range_black_24dp"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -148,7 +148,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     android:gravity="center_vertical"
-                    app:srcCompat="@drawable/ic_edition_black_24dp"/>
+                    android:src="@drawable/ic_edition_black_24dp"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

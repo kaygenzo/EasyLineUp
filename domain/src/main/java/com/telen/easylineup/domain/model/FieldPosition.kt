@@ -61,7 +61,7 @@ enum class FieldPosition(val id: Int, val mask: Int, private val position: Int) 
             }
         }
 
-        fun getPositionCoordinates(position: FieldPosition, strategy: TeamStrategy): PointF {
+        fun getPositionPercentage(position: FieldPosition, strategy: TeamStrategy): PointF {
             return when(strategy) {
                 TeamStrategy.B5_DEFAULT -> {
                     when (position) {
@@ -77,12 +77,12 @@ enum class FieldPosition(val id: Int, val mask: Int, private val position: Int) 
                 else -> {
                     when(position) {
                         SUBSTITUTE -> PointF(0f, 0f)
-                        PITCHER -> PointF(50f, 60f)
+                        PITCHER -> PointF(50f, 59f)
                         CATCHER -> PointF(50f, 87f)
                         FIRST_BASE -> PointF(74f, 57f)
                         SECOND_BASE -> PointF(63f, 44f)
-                        THIRD_BASE -> PointF(27f, 59f)
-                        SHORT_STOP -> PointF(37f, 43f)
+                        THIRD_BASE -> PointF(27f, 57f)
+                        SHORT_STOP -> PointF(37f, 44f)
                         DP_DH -> PointF(0f, 100f)
                         else -> {
                             when(strategy) {
@@ -100,6 +100,14 @@ enum class FieldPosition(val id: Int, val mask: Int, private val position: Int) 
                                         SLOWPITCH_LCF -> PointF(38f, 10f)
                                         SLOWPITCH_RCF -> PointF(62f, 10f)
                                         SLOWPITCH_RF -> PointF(86f, 20f)
+                                        else -> throw Exception("Not a valid position for strategy $strategy")
+                                    }
+                                }
+                                TeamStrategy.FIVE_MAN_STANDARD -> {
+                                    when (position) {
+                                        LEFT_FIELD -> PointF(30f, 15f)
+                                        RIGHT_FIELD -> PointF(70f, 15f)
+                                        MID_FIELDER -> PointF(50f, 35f)
                                         else -> throw Exception("Not a valid position for strategy $strategy")
                                     }
                                 }

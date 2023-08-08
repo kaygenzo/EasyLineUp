@@ -143,7 +143,7 @@ class RosterAdapter(private val items: List<RosterItem>, private val listener: R
                     listener.onNumberChanged(s.toString().toInt(), item)
                 }
                 catch (e: NumberFormatException) {
-                    Timber.e(e)
+                    Timber.e(e.message)
                     listener.onNumberChanged(0, item)
                 }
             }

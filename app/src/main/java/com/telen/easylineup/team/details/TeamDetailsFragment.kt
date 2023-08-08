@@ -11,6 +11,7 @@ import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentTeamDetailsBinding
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.tournaments.list.LineupViewModel
@@ -64,6 +65,21 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
             val description =
                 resources.getQuantityString(R.plurals.team_details_team_size, it.size, it.size)
             binding.teamTypeRootView.setPlayersSize(R.drawable.ic_team, description)
+
+            val womenCount = it.filter { it.sex == Sex.FEMALE.id }.size.let {
+                resources.getQuantityString(R.plurals.women_count, it, it)
+            }
+            val menCount = it.filter { it.sex == Sex.MALE.id }.size.let {
+                resources.getQuantityString(R.plurals.men_count, it, it)
+            }
+            val sexUnsetCount = it.filter { it.sex == Sex.UNKNOWN.id }.size.let {
+                resources.getQuantityString(R.plurals.unset_sex_count, it, it)
+            }
+            val sexRepartitionCountMessage = "$womenCount, $menCount, $sexUnsetCount"
+            binding.teamTypeRootView.setSexStats(
+                R.drawable.ic_baseline_diversity_2_24,
+                sexRepartitionCountMessage
+            )
         }
 
         lineupViewModel.observeCategorizedLineups().observe(viewLifecycleOwner) {

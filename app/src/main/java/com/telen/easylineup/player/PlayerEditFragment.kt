@@ -16,6 +16,10 @@ import com.telen.easylineup.databinding.FragmentPlayerEditBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.PlayerSide
+import com.telen.easylineup.domain.model.Sex
+import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
+import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
+import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
@@ -129,6 +133,10 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
             binding.editPlayerForm.setPhone(it)
         }
 
+        viewModel.observePlayerSex().observe(viewLifecycleOwner) {
+            binding.editPlayerForm.setSex(Sex.getById(it))
+        }
+
         return binding.root
     }
 
@@ -149,6 +157,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
                 savedBatting = getBattingSide()?.flag
                 savedEmail = getEmail()
                 savedPhoneNumber = getPhone()
+                savedSex = getSex()?.id
             }
         }
     }
@@ -162,7 +171,8 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
         pitching: Int,
         batting: Int,
         email: String?,
-        phone: String?
+        phone: String?,
+        sex: Int
     ) {
         val saveDisposable = viewModel.savePlayer(
             name,
@@ -173,11 +183,17 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
             pitching,
             batting,
             email,
-            phone
+            phone,
+            sex
         ).subscribe({
             findNavController().navigateUp()
         }, {
-            Timber.e(it)
+            when(it) {
+                is NameEmptyException,
+                is InvalidEmailException,
+                is InvalidPhoneException -> Timber.w(it.message)
+                else -> Timber.e(it)
+            }
         })
         disposables.add(saveDisposable)
     }

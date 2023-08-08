@@ -14,6 +14,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentPlayerDetailsBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.PlayerSide
+import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ready
 import kotlinx.android.synthetic.main.view_bar_chart.view.*
@@ -112,6 +113,16 @@ class PlayerDetailsFragment : BaseFragment("PlayerDetailsFragment"),
 
         viewModel.observeStrategy().observe(viewLifecycleOwner) {
             binding.positionsBarChart.apply { setStrategy(it) }
+        }
+
+        viewModel.observePlayerSex().observe(viewLifecycleOwner) {
+            val sex = Sex.getById(it)
+            binding.sexSymbol.visibility = if (sex != Sex.UNKNOWN) View.VISIBLE else View.GONE
+            when(sex) {
+                Sex.MALE -> binding.sexSymbol.setImageResource(R.drawable.ic_male_black)
+                Sex.FEMALE -> binding.sexSymbol.setImageResource(R.drawable.ic_female_black)
+                else -> { /* sex is not defined for this player */ }
+            }
         }
 
         return binding.root

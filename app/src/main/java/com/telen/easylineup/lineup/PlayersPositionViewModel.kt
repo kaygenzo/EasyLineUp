@@ -11,13 +11,15 @@ import androidx.core.content.FileProvider
 import androidx.core.view.drawToBitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.DialogFactory
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
@@ -113,7 +115,11 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                 .subscribe({
                     eventHandler.onNext(GetAllAvailablePlayersSuccess(it, position))
                 }, {
-                    Timber.e(it)
+                    if (it is NoSuchElementException) {
+                        Timber.e(it.message)
+                    } else {
+                        Timber.e(it)
+                    }
                 })
         disposables.add(disposable)
     }
@@ -134,7 +140,11 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                 .subscribe({
                     _linkPlayersInField.value = it
                 }, {
-                    Timber.e(it)
+                    if (it is NoSuchElementException) {
+                        Timber.e(it.message)
+                    } else {
+                        Timber.e(it)
+                    }
                     _linkPlayersInField.value = listOf()
                 })
         disposables.add(disposable)
@@ -274,7 +284,11 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
                         }
                         eventHandler.onNext(NeedLinkDpFlex(Pair(it.dp, it.flex), it.dpLocked, it.flexLocked, it.teamType, title))
                     }, {
-                        Timber.e(it)
+                        if (it is NeedAssignPitcherFirstException) {
+                            Timber.w(it.message)
+                        } else {
+                            Timber.e(it)
+                        }
                     })
             disposables.add(disposable)
         }
@@ -306,17 +320,17 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
         val currentLineupID = lineupID ?: 0
 
         val getLineup = domain.lineups().observeLineupById(currentLineupID)
-        val getPositions = Transformations.switchMap(getLineup) {
-            this.lineupMode = it?.mode ?: 0
+        val getPositions = getLineup.switchMap {
+            this.lineupMode = it.mode
             domain.lineups().observeTeamPlayersAndMaybePositionsForLineup(currentLineupID)
         }
 
-        val getPlayerNumberOverlays = Transformations.switchMap(getPositions) { positions ->
+        val getPlayerNumberOverlays = getPositions.switchMap { positions ->
             val playerMap = mutableMapOf<Long, PlayerWithPosition>()
             positions.forEach {
                 playerMap[it.playerID] = it
             }
-            Transformations.map(domain.players().observePlayerNumberOverlays(currentLineupID)) {
+            domain.players().observePlayerNumberOverlays(currentLineupID).map {
                 it.forEach {  overlay ->
                     playerMap[overlay.playerID]?.shirtNumber = overlay.number
                 }
@@ -324,7 +338,7 @@ class PlayersPositionViewModel: ViewModel(), KoinComponent {
             }
         }
 
-        return Transformations.map(getPlayerNumberOverlays) {
+        return getPlayerNumberOverlays.map {
             _listPlayersWithPosition.clear()
             _listPlayersWithPosition.addAll(it)
             it

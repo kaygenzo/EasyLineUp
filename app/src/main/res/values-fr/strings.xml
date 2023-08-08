@@ -3,6 +3,7 @@
     <string name="action_edit">Editer</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_share">Partager</string>
+    <string name="action_add_player_in_roster">Editer les joueurs</string>
     <string name="action_report_issue">Reporter un problème</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>
@@ -113,9 +114,12 @@
     </plurals>
 
     <string name="setting_lineup_style_description">Police d\'écriture des lineups</string>
+    <string name="setting_day_night_style_description">Thème</string>
     <string name="setting_category_about_title">A propos</string>
     <string name="setting_delete_data_description">Supprimer toutes les données</string>
+    <string name="setting_bug_report_trigger_description">Déclancheur du rapport de bug</string>
     <string name="setting_version_title">Version</string>
+    <string name="setting_licenses_title">Licences</string>
     <string name="setting_play_store_title">Page officielle du Google Play store</string>
 
     <string name="login_create">Créez votre première équipe</string>
@@ -126,10 +130,12 @@
     <string name="setting_export_data_description">Exporter les données vers un fichier</string>
 
     <string name="settings_category_style">Style</string>
-    <string name="settings_category_export">Exportation</string>
-    <string name="settings_category_import">Importation</string>
-    <string name="settings_category_delete">Suppression</string>
+    <string name="bug_report_trigger_shake">Secouer</string>
+    <string name="bug_report_trigger_floating_button">Bouton flottant</string>
+    <string name="bug_report_trigger_manual">Manuel</string>
 
+    <string name="settings_category_data">Données</string>
+    <string name="settings_category_support">Assistance</string>
     <string name="export_data_to_file_dialog_title">Veuillez choisir un nom de fichier pour l\'exportation</string>
     <string name="export_data_to_file_dialog_message">Nom du fichier</string>
     <string name="export_button">Exporter</string>
@@ -174,6 +180,9 @@
 
     <string name="tile_last_player_number_message">Hist. N° maillot</string>
     <string name="tile_last_player_number_label_last">Dernier:</string>
+    <string name="lineup_theme_system_value">Système</string>
+    <string name="lineup_theme_day_value">Clair</string>
+    <string name="lineup_theme_night_value">Sombre</string>
     <string name="generic_not_found">Non trouvé</string>
 
     <string name="player_hint_email">Email</string>
@@ -209,4 +218,29 @@
     <string name="permission_request_read_external_storage">"L\'accès aux media est requis pour afficher les images"</string>
     <string name="permission_request_settings_action">"Paramètres"</string>
     <string name="permission_request_pick_image_title">"Selection d\'image..."</string>
+
+    <string name="create_player_sex">Sexe</string>
+
+    <plurals name="women_count">
+        <item quantity="one">%d femme</item>
+        <item quantity="other">%d femmes</item>
+    </plurals>
+
+    <plurals name="men_count">
+        <item quantity="one">%d homme</item>
+        <item quantity="other">%d hommes</item>
+    </plurals>
+
+    <plurals name="unset_sex_count">
+        <item quantity="one">%d joueur sans sexe</item>
+        <item quantity="other">%d joueurs sans sexe</item>
+    </plurals>
+
+    <string name="libraries_title">Licence pour les librairies</string>
+
+    <string name="setting_men_style_description">Hommes</string>
+    <string name="setting_women_style_description">Femmes</string>
+    <string name="picker_men_summary">Changer la couleur des hommes sur le terrain</string>
+    <string name="picker_women_summary">Changer la couleur des femmes sur le terrain</string>
+
 </resources>

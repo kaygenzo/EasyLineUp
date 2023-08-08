@@ -8,13 +8,13 @@
     tools:context=".splashscreen.SplashScreenActivity"
     android:theme="@style/AppTheme.NoActionBar.FullScreen">
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/splashscreen" />
+        android:src="@drawable/splashscreen" />
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#000000"

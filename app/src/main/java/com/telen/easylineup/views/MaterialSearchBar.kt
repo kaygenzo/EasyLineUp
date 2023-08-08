@@ -3,13 +3,11 @@ package com.telen.easylineup.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.textfield.TextInputLayout
 import com.telen.easylineup.R
-import com.telen.easylineup.utils.hideSoftKeyboard
 import kotlinx.android.synthetic.main.view_material_search_bar.view.*
 
 interface OnSearchBarListener {
@@ -36,14 +34,14 @@ class MaterialSearchBar: ConstraintLayout {
                         onSearchConfirmed(text)
                         // if the text is blank, we just hide the trailing icon
                         if (text.isNotBlank()) {
-                            endIcon = R.drawable.ic_close_white_24dp
+                            endIcon = R.drawable.ic_close_24dp
                             setEndIconDrawable(endIcon)
                         } else {
                             endIcon = 0
                             endIconMode = TextInputLayout.END_ICON_NONE
                         }
                     }
-                    R.drawable.ic_close_white_24dp -> {
+                    R.drawable.ic_close_24dp -> {
                         this.editText?.text?.clear()
                         onSearchConfirmed("")
                         endIcon = 0

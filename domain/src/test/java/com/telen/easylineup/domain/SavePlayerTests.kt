@@ -51,7 +51,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() {
-        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 1L, teamID = 1, name = "", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001")
+        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 1L, teamID = 1, name = "", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001", sex = 0)
         val observer = TestObserver<SavePlayer.ResponseValue>()
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -60,7 +60,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsWhitespaces() {
-        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 1L, teamID = 1, name = "     ", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001")
+        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 1L, teamID = 1, name = "     ", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001", sex = 0)
         val observer = TestObserver<SavePlayer.ResponseValue>()
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -69,7 +69,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsNull() {
-        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 1L, teamID = 1, name = null, positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001")
+        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 1L, teamID = 1, name = null, positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001", sex = 0)
         val observer = TestObserver<SavePlayer.ResponseValue>()
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -78,7 +78,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldInsertEventIfShirtNumberIsNull() {
-        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 0L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = null, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001")
+        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 0L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = null, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001", sex = 0)
         val observer = TestObserver<SavePlayer.ResponseValue>()
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -88,7 +88,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldInsertIfNewPlayer() {
-        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 0L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001")
+        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 0L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001", sex = 0)
         val observer = TestObserver<SavePlayer.ResponseValue>()
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()
@@ -99,7 +99,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldUpdateIfKnownPlayer() {
-        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 1L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001")
+        val request = SavePlayer.RequestValues(validatorUtils = validatorUtils, playerID = 1L, teamID = 1, name = "Test", positions = 1, licenseNumber = 1, shirtNumber = 1, imageUri = null, pitching = 0, batting = 0, email = "p1@test.com", phone = "001", sex = 0)
         val observer = TestObserver<SavePlayer.ResponseValue>()
         mSavePlayer.executeUseCase(request).subscribe(observer)
         observer.await()

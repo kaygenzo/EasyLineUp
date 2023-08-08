@@ -2,8 +2,9 @@ package com.telen.easylineup.application
 
 import android.app.Application
 import com.github.kaygenzo.bugreporter.api.BugReporter
-import com.github.kaygenzo.bugreporter.api.ReportMethod
+import com.telen.easylineup.R
 import com.telen.easylineup.reporting.BugReporterManager
+import com.telen.easylineup.reporting.getReportMethods
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -19,9 +20,9 @@ val appModules = module {
             .setImagePreviewScale(0.3f)
             .setFields(null)
             .setEmail("developer@telen.fr")
-            .setReportMethods(listOf(ReportMethod.SHAKE))
+            .setReportMethods(app.getReportMethods())
+            .setReportFloatingImage(R.drawable.image_baseball_ball)
             .observeResult(reporterManager)
-            .setApplication(app)
-            .build()
+            .build(app)
     }
 }

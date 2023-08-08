@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 android:id="@+id/teamTypeRepresentation"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -76,13 +76,19 @@
                 <com.telen.easylineup.views.TeamCardItemView
                     android:id="@+id/teamLineupsItem"
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/default_margin"/>
+
+                <com.telen.easylineup.views.TeamCardItemView
+                    android:id="@+id/teamSexStats"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <ImageView
             android:id="@+id/teamTypeImage"
             android:layout_width="@dimen/card_team_type_ball_image_diameter"
             android:layout_height="@dimen/card_team_type_ball_image_diameter"

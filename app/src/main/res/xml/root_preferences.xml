@@ -24,18 +24,41 @@
             android:entries="@array/pref_lineup_font_style_labels"
             android:entryValues="@array/pref_lineup_font_style_values"
             android:key="@string/key_lineup_style"
-            android:title="@string/setting_lineup_style_description" />
+            android:title="@string/setting_lineup_style_description"
+            app:useSimpleSummaryProvider="true" />
+
+        <com.skydoves.colorpickerpreference.ColorPickerPreference
+            android:key="@string/key_men_style"
+            android:title="@string/setting_men_style_description"
+            app:preference_colorBox_radius="8dp"
+            app:preference_dialog_positive="@android:string/ok"
+            app:default_color="@color/default_men_color"
+            android:summary="@string/picker_men_summary" />
+
+        <com.skydoves.colorpickerpreference.ColorPickerPreference
+            android:key="@string/key_women_style"
+            android:title="@string/setting_women_style_description"
+            app:preference_colorBox_radius="8dp"
+            app:preference_dialog_positive="@android:string/ok"
+            app:default_color="@color/default_women_color"
+            android:summary="@string/picker_women_summary"/>
+
+        <ListPreference
+            android:defaultValue="@string/lineup_theme_default_value"
+            android:entries="@array/pref_theme_style_labels"
+            android:entryValues="@array/pref_theme_style_values"
+            android:key="@string/key_day_night_theme"
+            android:title="@string/setting_day_night_style_description"
+            app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/settings_category_export">
+    <PreferenceCategory app:title="@string/settings_category_data">
 
         <Preference
             app:title="@string/setting_export_data_description"
             app:key="@string/key_export_data"/>
-    </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/settings_category_import">
         <Preference
             app:title="@string/setting_import_data_description"
             app:key="@string/key_import_data"/>
@@ -46,14 +69,19 @@
             android:key="@string/key_import_data_update_object"
             android:title="@string/setting_import_data_update_object_description"/>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/settings_category_delete">
-
         <Preference
             app:title="@string/setting_delete_data_description"
             app:key="@string/key_delete_data"/>
+    </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/settings_category_support">
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/bug_report_trigger"
+            android:entryValues="@array/bug_report_trigger_values"
+            android:key="@string/key_bug_report_trigger"
+            android:title="@string/setting_bug_report_trigger_description"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/setting_category_about_title">
@@ -61,6 +89,10 @@
         <Preference
             app:title="@string/setting_version_title"
             app:key="@string/key_app_version"/>
+
+        <Preference
+            app:title="@string/setting_licenses_title"
+            app:key="@string/key_app_licenses"/>
 
         <Preference
             app:title="@string/setting_play_store_title"

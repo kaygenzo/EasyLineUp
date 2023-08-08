@@ -8,7 +8,6 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.getkeepsafe.taptargetview.TapTargetView
@@ -20,6 +19,7 @@ import com.telen.easylineup.lineup.NewBatterOrderAvailable
 import com.telen.easylineup.lineup.PlayersPositionViewModel
 import com.telen.easylineup.lineup.SaveBattingOrderSuccess
 import com.telen.easylineup.utils.FeatureViewFactory
+import com.telen.easylineup.utils.SharedPreferencesUtils
 import com.telen.easylineup.views.ItemDecoratorAttackRecycler
 import com.telen.easylineup.views.LineupTypeface
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -63,8 +63,11 @@ class AttackFragment: BaseFragment("AttackFragment"), OnDataChangedListener {
             disposables.add(eventsDisposable)
         }
 
-        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val lineupValue = preferences.getString(getString(R.string.key_lineup_style), getString(R.string.lineup_style_default_value))
+        val lineupValue = SharedPreferencesUtils.getStringSetting(
+            requireContext(),
+            R.string.key_lineup_style,
+            getString(R.string.lineup_style_default_value)
+        )
 
         val lineupMode = viewModel.lineupMode
 

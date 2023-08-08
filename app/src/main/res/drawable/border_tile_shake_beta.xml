@@ -2,9 +2,6 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:drawable="@color/tile_shake_beta_background_color"/>
-
-    <item
         android:drawable="@drawable/shape_tile_big_border_dark"
         android:id="@+id/background_add_image"
         android:top="10dp"

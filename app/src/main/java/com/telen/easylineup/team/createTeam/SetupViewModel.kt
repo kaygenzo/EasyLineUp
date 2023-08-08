@@ -3,8 +3,8 @@ package com.telen.easylineup.team.createTeam
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.StepConfiguration
@@ -37,15 +37,15 @@ class SetupViewModel : ViewModel(), KoinComponent {
     var errors = PublishSubject.create<StepError>()
 
     fun observeTeamName(): LiveData<String> {
-        return Transformations.map(_team) { it.name }
+        return _team.map { it.name }
     }
 
     fun observeTeamType(): LiveData<Int> {
-        return Transformations.map(_team) { it.type }
+        return _team.map { it.type }
     }
 
     fun observeTeamImage(): LiveData<Uri?> {
-        return Transformations.map(_team) {
+        return _team.map {
             it.takeIf { it.image != null }?.let { Uri.parse(it.image) }
         }
     }

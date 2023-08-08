@@ -26,7 +26,7 @@ class TeamViewModel : ViewModel(), KoinComponent {
         MutableLiveData<Team>().apply { getCurrentTeam() }
     }
     private val _playersFromDao by lazy {
-        Transformations.switchMap(_team) {
+        _team.switchMap {
             domain.players().observePlayers(it.id)
         }
     }
@@ -52,7 +52,7 @@ class TeamViewModel : ViewModel(), KoinComponent {
         _playersMediator.addSource(_players, observer)
     }
 
-    fun observePlayers(): LiveData<List<Player>> = Transformations.map(_playersMediator) {
+    fun observePlayers(): LiveData<List<Player>> = _playersMediator.map {
         sortPlayers(it)
     }
 
@@ -63,19 +63,19 @@ class TeamViewModel : ViewModel(), KoinComponent {
     }
 
     fun observeCurrentTeamName(): LiveData<String> {
-        return Transformations.map(_team) {
+        return _team.map {
             it.name.trim()
         }
     }
 
     fun observeCurrentTeamType(): LiveData<TeamType> {
-        return Transformations.map(_team) {
+        return _team.map {
             TeamType.getTypeById(it.type)
         }
     }
 
     fun observeCurrentTeamImage(): LiveData<Uri?> {
-        return Transformations.map(_team) {
+        return _team.map {
             it.image.takeIf { it != null }?.let { Uri.parse(it) }
         }
     }

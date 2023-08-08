@@ -34,7 +34,7 @@ internal interface PlayerDao {
     fun getPlayerByHash(hash: String): Single<RoomPlayer>
 
     @Query("SELECT * from players WHERE id = :playerID" )
-    fun getPlayerById(playerID: Long): LiveData<RoomPlayer>
+    fun getPlayerById(playerID: Long): LiveData<RoomPlayer?>
 
     @Query("SELECT * from players WHERE id = :playerID" )
     fun getPlayerByIdAsSingle(playerID: Long): Single<RoomPlayer>
@@ -55,7 +55,8 @@ internal interface PlayerDao {
         SELECT result.*, position, x, y, `order`, playerFieldPosition.id as fieldPositionID, flags
         FROM (
             SELECT lineups.id as lineupID, 
-                players.name as playerName, 
+                players.name as playerName,
+                players.sex as playerSex,
                 players.shirtNumber, 
                 players.licenseNumber, 
                 players.id as playerID, 
@@ -65,7 +66,6 @@ internal interface PlayerDao {
             FROM lineups, players where lineups.id = :lineupID AND players.teamID = lineups.teamID) as result
         LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = result.lineupID and playerFieldPosition.playerID = result.playerID
         ORDER BY result.playerID
-
     """)
     fun getTeamPlayersAndMaybePositions(lineupID: Long): LiveData<List<RoomPlayerWithPosition>>
 

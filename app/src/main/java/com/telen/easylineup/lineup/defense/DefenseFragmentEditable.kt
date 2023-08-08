@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import com.telen.easylineup.lineup.*
 import com.telen.easylineup.lineup.defense.available.ListAvailablePlayersBottomSheet
 import com.telen.easylineup.utils.DialogFactory
@@ -204,7 +205,11 @@ class DefenseFragmentEditable: BaseFragment("DefenseFragmentEditable"), OnPlayer
                             .subscribe({
                                 dialog.dismiss()
                             }, {
-                                Timber.e(it)
+                                if (it is NeedAssignBothPlayersException) {
+                                    Timber.w(it.message)
+                                } else {
+                                    Timber.e(it)
+                                }
                             })
                     disposables.add(disposable)
                 }

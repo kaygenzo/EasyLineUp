@@ -13,27 +13,50 @@ import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
+import com.telen.easylineup.domain.model.Sex
 import kotlinx.android.synthetic.main.view_create_player.view.*
 import timber.log.Timber
 
 interface PlayerFormListener {
-    fun onSaveClicked(name: String?, shirtNumber: Int?, licenseNumber: Long?,
-                      imageUri: Uri?, positions: Int, pitching: Int, batting: Int,
-                      email: String?, phone: String?)
+    fun onSaveClicked(
+        name: String?,
+        shirtNumber: Int?,
+        licenseNumber: Long?,
+        imageUri: Uri?,
+        positions: Int,
+        pitching: Int,
+        batting: Int,
+        email: String?,
+        phone: String?,
+        sex: Int
+    )
+
     fun onCancel()
     fun onImagePickerRequested()
 }
 
-class PlayerFormView: ConstraintLayout {
+class PlayerFormView : ConstraintLayout {
 
     private var listener: PlayerFormListener? = null
     private var imageUri: Uri? = null
     private var playerPositions = 0
     private val positionState: MutableMap<FieldPosition, Boolean> = mutableMapOf()
 
-    constructor(context: Context) : super(context) {initView(context)}
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {initView(context)}
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {initView(context)}
+    constructor(context: Context) : super(context) {
+        initView(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        initView(context)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        initView(context)
+    }
 
     fun setListener(listener: PlayerFormListener) {
         this.listener = listener
@@ -57,8 +80,20 @@ class PlayerFormView: ConstraintLayout {
             val batting = getBattingSide()?.flag ?: 0
             val email = getEmail()
             val phone = getPhone()
+            val sex = getSex()?.id ?: Sex.UNKNOWN.id
 
-            listener?.onSaveClicked(name, shirtNumber, licenseNumber, imageUri, positions, pitching, batting, email, phone)
+            listener?.onSaveClicked(
+                name,
+                shirtNumber,
+                licenseNumber,
+                imageUri,
+                positions,
+                pitching,
+                batting,
+                email,
+                phone,
+                sex
+            )
         }
 
         cancel.setOnClickListener {
@@ -74,6 +109,18 @@ class PlayerFormView: ConstraintLayout {
             setImageResource(R.drawable.add_image)
             setOnClickListener(null)
         }
+
+        sexMale.setOnClickListener {
+            if(sexFemale.isChecked) {
+                setSex(Sex.MALE)
+            }
+        }
+
+        sexFemale.setOnClickListener {
+            if(sexMale.isChecked) {
+                setSex(Sex.FEMALE)
+            }
+        }
     }
 
     fun onImageUriReceived(imageUri: Uri) {
@@ -87,8 +134,7 @@ class PlayerFormView: ConstraintLayout {
     fun getShirtNumber(): Int? {
         return try {
             playerShirtNumberInput.text.toString().toInt()
-        }
-        catch (exception: NumberFormatException) {
+        } catch (exception: NumberFormatException) {
             null
         }
     }
@@ -96,8 +142,7 @@ class PlayerFormView: ConstraintLayout {
     fun getLicenseNumber(): Long? {
         return try {
             playerLicenseNumberInput.text.toString().toLong()
-        }
-        catch (exception: NumberFormatException) {
+        } catch (exception: NumberFormatException) {
             null
         }
     }
@@ -120,9 +165,9 @@ class PlayerFormView: ConstraintLayout {
 
     fun setPlayerImage(@DrawableRes resId: Int) {
         Picasso.get().load(resId)
-                .placeholder(R.drawable.unknown_player)
-                .error(R.drawable.unknown_player)
-                .into(playerImage)
+            .placeholder(R.drawable.unknown_player)
+            .error(R.drawable.unknown_player)
+            .into(playerImage)
     }
 
     fun setImage(uri: Uri) {
@@ -130,17 +175,19 @@ class PlayerFormView: ConstraintLayout {
         playerImage.post {
             try {
                 Picasso.get().load(imageUri)
-                        .resize(playerImage.width, playerImage.height)
-                        .centerCrop()
-                        .transform(RoundedTransformationBuilder()
-                                .borderColor(Color.BLACK)
-                                .borderWidthDp(2f)
-                                .cornerRadiusDp(16f)
-                                .oval(true)
-                                .build())
-                        .placeholder(R.drawable.unknown_player)
-                        .error(R.drawable.unknown_player)
-                        .into(playerImage)
+                    .resize(playerImage.width, playerImage.height)
+                    .centerCrop()
+                    .transform(
+                        RoundedTransformationBuilder()
+                            .borderColor(Color.BLACK)
+                            .borderWidthDp(2f)
+                            .cornerRadiusDp(16f)
+                            .oval(true)
+                            .build()
+                    )
+                    .placeholder(R.drawable.unknown_player)
+                    .error(R.drawable.unknown_player)
+                    .into(playerImage)
             } catch (e: IllegalArgumentException) {
                 Timber.e(e)
             }
@@ -167,7 +214,7 @@ class PlayerFormView: ConstraintLayout {
         playerSave.isEnabled = false
     }
 
-    fun getPlayerPositions() : Int {
+    fun getPlayerPositions(): Int {
         return playerPositions
     }
 
@@ -181,44 +228,44 @@ class PlayerFormView: ConstraintLayout {
         favoritePositionsContainer.removeAllViews()
 
         FieldPosition.values()
-                .filter { FieldPosition.isDefensePlayer(it.id) }
-                .groupBy { it.mask }
-                .map { it.value.first() }
-                .forEach { position ->
-            val isEnabled = (positions and position.mask) != 0
-            positionState[position] = isEnabled
+            .filter { FieldPosition.isDefensePlayer(it.id) }
+            .groupBy { it.mask }
+            .map { it.value.first() }
+            .forEach { position ->
+                val isEnabled = (positions and position.mask) != 0
+                positionState[position] = isEnabled
 
-            val view = PlayerPositionFilterView(context)
-            view.setText(positionShortDescription[position.ordinal])
-            applyFilterOnView(view, isEnabled)
+                val view = PlayerPositionFilterView(context)
+                view.setText(positionShortDescription[position.ordinal])
+                applyFilterOnView(view, isEnabled)
 
-            view.setOnClickListener { _ ->
+                view.setOnClickListener { _ ->
 
-                positionState[position]?.let { oldState ->
-                    val newState = !oldState
+                    positionState[position]?.let { oldState ->
+                        val newState = !oldState
 
-                    if(newState) {
-                        if(positionState.filterValues { it == true }.size >= 3) {
-                            return@setOnClickListener
+                        if (newState) {
+                            if (positionState.filterValues { it == true }.size >= 3) {
+                                return@setOnClickListener
+                            }
+                        }
+
+                        positionState[position] = newState
+                        applyFilterOnView(view, newState)
+                        playerPositions = if (newState) {
+                            playerPositions or position.mask
+                        } else {
+                            playerPositions and position.mask.inv()
                         }
                     }
-
-                    positionState[position] = newState
-                    applyFilterOnView(view, newState)
-                    playerPositions = if(newState) {
-                        playerPositions or position.mask
-                    } else {
-                        playerPositions and position.mask.inv()
-                    }
                 }
-            }
 
-            favoritePositionsContainer.addView(view)
-        }
+                favoritePositionsContainer.addView(view)
+            }
     }
 
     private fun applyFilterOnView(view: PlayerPositionFilterView, isEnabled: Boolean) {
-        when(isEnabled) {
+        when (isEnabled) {
             true -> {
                 view.setBackground(R.drawable.position_selected_background)
                 view.setTextColor(R.color.white)
@@ -245,36 +292,48 @@ class PlayerFormView: ConstraintLayout {
 
     fun displayInvalidEmail() {
         playerNameInputLayout.error = null
-        playerEmailInputLayout.error = resources.getString(R.string.player_creation_error_invalid_email_format)
+        playerEmailInputLayout.error =
+            resources.getString(R.string.player_creation_error_invalid_email_format)
         playerPhoneInputLayout.error = null
     }
 
     fun displayInvalidPhoneNumber() {
         playerNameInputLayout.error = null
         playerEmailInputLayout.error = null
-        playerPhoneInputLayout.error = resources.getString(R.string.player_creation_error_invalid_phone_format)
+        playerPhoneInputLayout.error =
+            resources.getString(R.string.player_creation_error_invalid_phone_format)
     }
 
     fun getPitchingSide(): PlayerSide? {
         var pitching = 0
-        if(pitchingSideLeft.isChecked)
+        if (pitchingSideLeft.isChecked)
             pitching = pitching or PlayerSide.LEFT.flag
-        if(pitchingSideRight.isChecked)
+        if (pitchingSideRight.isChecked)
             pitching = pitching or PlayerSide.RIGHT.flag
         return PlayerSide.getSideByValue(pitching)
     }
 
     fun getBattingSide(): PlayerSide? {
         var batting = 0
-        if(battingSideLeft.isChecked)
+        if (battingSideLeft.isChecked)
             batting = batting or PlayerSide.LEFT.flag
-        if(battingSideRight.isChecked)
+        if (battingSideRight.isChecked)
             batting = batting or PlayerSide.RIGHT.flag
         return PlayerSide.getSideByValue(batting)
     }
 
+    fun getSex(): Sex? {
+        return if (sexMale.isChecked) {
+            Sex.MALE
+        } else if (sexFemale.isChecked) {
+            Sex.FEMALE
+        } else {
+            null
+        }
+    }
+
     fun setPitchingSide(side: PlayerSide?) {
-        when(side) {
+        when (side) {
             PlayerSide.LEFT -> {
                 pitchingSideLeft.isChecked = true
                 pitchingSideRight.isChecked = false
@@ -294,8 +353,25 @@ class PlayerFormView: ConstraintLayout {
         }
     }
 
+    fun setSex(sex: Sex?) {
+        when (sex) {
+            Sex.MALE -> {
+                sexMale.isChecked = true
+                sexFemale.isChecked = false
+            }
+            Sex.FEMALE -> {
+                sexMale.isChecked = false
+                sexFemale.isChecked = true
+            }
+            else -> {
+                sexMale.isChecked = false
+                sexFemale.isChecked = false
+            }
+        }
+    }
+
     fun setBattingSide(side: PlayerSide?) {
-        when(side) {
+        when (side) {
             PlayerSide.LEFT -> {
                 battingSideLeft.isChecked = true
                 battingSideRight.isChecked = false

@@ -11,4 +11,7 @@
     <color name="violet">#9d77a6</color>
     <color name="beige">#ffebcd</color>
     <color name="lavanda">#b5c2ff</color>
+
+    <color name="default_men_color">@color/red</color>
+    <color name="default_women_color">@color/yellow</color>
 </resources>

@@ -1,11 +1,13 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
-apply plugin: "androidx.navigation.safeargs.kotlin"
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.appdistribution'
-apply plugin: 'com.google.firebase.crashlytics'
+plugins {
+    id("com.android.application")
+    id("kotlin-android")
+    id("kotlin-android-extensions")
+    id("kotlin-kapt")
+    id("androidx.navigation.safeargs.kotlin")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.appdistribution")
+    id 'com.google.firebase.crashlytics'
+}
 
 def keystorePropertiesFile = rootProject.file("keystore-upload.properties")
 def keystoreProperties = new Properties()
@@ -35,6 +37,11 @@ android {
         testInstrumentationRunner "com.telen.easylineup.EasylineupAndroidTestRunner"
         vectorDrawables.useSupportLibrary true
         buildConfigField "Boolean", "UseBetaTool", "true"
+        firebaseAppDistribution {
+            serviceCredentialsFile="easylineup-services.json"
+            releaseNotesFile="releasenotes.txt"
+            testersFile="testers.txt"
+        }
     }
 
     useLibrary 'android.test.runner'
@@ -62,21 +69,18 @@ android {
     productFlavors {
         dev {
             dimension 'version'
+            applicationIdSuffix = ".dev"
             matchingFallbacks = ['prod']
             buildConfigField "String", "reportStorageRoot", "\"reports.dev\""
         }
         prod {
             dimension 'version'
-            firebaseAppDistribution {
-                serviceCredentialsFile="easylineup-services.json"
-                releaseNotesFile="releasenotes.txt"
-                testersFile="testers.txt"
-            }
             matchingFallbacks = ['prod']
             buildConfigField "String", "reportStorageRoot", "\"reports.prod\""
         }
         demo {
             dimension 'version'
+            applicationIdSuffix = ".demo"
             matchingFallbacks = ['demo']
             buildConfigField "String", "reportStorageRoot", "\"reports.demo\""
         }
@@ -149,7 +153,6 @@ dependencies {
     androidTestImplementation('androidx.test.espresso:espresso-core:' + rootProject.espressoCoreVersion) {
         exclude group: "com.google.protobuf"
     }
-    androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:' + rootProject.espressoCoreVersion
     androidTestImplementation (name:'cloudtestingscreenshotter_lib', ext:'aar')
     androidTestImplementation 'com.squareup.rx.idler:rx2-idler:0.10.0'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
@@ -158,26 +161,31 @@ dependencies {
         exclude group: 'org.jetbrains.kotlin' // Only if you already use Kotlin in your project
     }
 
-    testImplementation 'androidx.test:core:' + rootProject.coreVersion
     testImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion
-    testImplementation "junit:junit:$junitVersion"
 
     ////////// ANDROID X //////////
 
+    implementation "androidx.activity:activity-ktx:1.6.1"
+    implementation "androidx.fragment:fragment-ktx:1.5.7"
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
+
     // ViewModel and LiveData
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation "androidx.navigation:navigation-runtime-ktx:$nav_version_ktx"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version_ktx"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version_ktx"
+    implementation "androidx.documentfile:documentfile:$documentFileVersion"
+    implementation "androidx.core:core-splashscreen:$splashscreenVersion"
+    implementation "androidx.core:core-ktx:1.9.0"
 
     ////////// GOOGLE //////////
 
     implementation platform("com.google.firebase:firebase-bom:$firebaseBOMVersion")
-
     implementation "com.google.android.material:material:$googleMaterialVersion"
     implementation "com.google.code.gson:gson:$googleGsonVersion"
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
@@ -191,7 +199,8 @@ dependencies {
 
     implementation project(path: ':repository')
     implementation project(path: ':domain')
-    implementation "com.telen.library:tablemultiscroll:$tablemultiscrollVersion"
+    implementation "io.github.kaygenzo:androidtable:$tablemultiscrollVersion"
+    implementation "com.github.kaygenzo:bugreporter:$bugreportingVersion"
 
     ////////// OTHERS //////////
 
@@ -200,19 +209,14 @@ dependencies {
     implementation "com.github.PhilJay:MPAndroidChart:$androidchartVersion"
     implementation "com.squareup.picasso:picasso:$picassoVersion"
     implementation "com.makeramen:roundedimageview:$roundedImageView"
-
     implementation "io.insert-koin:koin-android:$koinVersion"
     implementation "com.getkeepsafe.taptargetview:taptargetview:$taptargetviewVersion"
+    implementation "com.karumi:dexter:$dexterVersion"
+    implementation "com.github.marcoscgdev:Licenser:$licenserVersion"
+    implementation "com.github.skydoves:colorpickerpreference:$colorPickerVersion"
 
     // only debug libraries
-
-    debugImplementation "com.facebook.stetho:stetho:$stethoVersion"
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.3'
-
-    implementation "com.github.kaygenzo:bugreporter:$bugreportingVersion"
-    implementation "androidx.documentfile:documentfile:$documentFileVersion"
-
-    implementation "com.karumi:dexter:$dexterVersion"
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanaryVersion"
 }
 
 apply from: '../jacoco.gradle'

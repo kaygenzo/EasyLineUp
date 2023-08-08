@@ -1,7 +1,7 @@
 package com.telen.easylineup.repository.adapters.impl
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
@@ -49,7 +49,7 @@ internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private va
     }
 
     override fun getPlayerById(playerID: Long): LiveData<Player> {
-        return Transformations.map(playerDao.getPlayerById(playerID)) {
+        return playerDao.getPlayerById(playerID).map {
             // sometime the refresh it too quick and when the player is deleted, the player is null
             it?.toPlayer() ?: Player(teamId = 0, name = "", shirtNumber = 0, licenseNumber = 0)
         }
@@ -68,13 +68,13 @@ internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private va
     }
 
     override fun observePlayers(teamID: Long): LiveData<List<Player>> {
-        return Transformations.map(playerDao.getPlayersAsLiveData(teamID)) {
+        return playerDao.getPlayersAsLiveData(teamID).map {
             it.map { it.toPlayer() }
         }
     }
 
     override fun getTeamPlayersAndMaybePositions(lineupID: Long): LiveData<List<PlayerWithPosition>> {
-        return Transformations.map(playerDao.getTeamPlayersAndMaybePositions(lineupID)) {
+        return playerDao.getTeamPlayersAndMaybePositions(lineupID).map {
             it.map { it.toPlayerWithPosition() }
         }
     }
@@ -92,7 +92,7 @@ internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private va
     }
 
     override fun observePlayersNumberOverlay(lineupID: Long): LiveData<List<PlayerNumberOverlay>> {
-        return Transformations.map(numberOverlayDao.observePlayerNumberOverlays(lineupID)) {
+        return numberOverlayDao.observePlayerNumberOverlays(lineupID).map{
             it.map { it.toPlayerNumberOverlay() }
         }
     }

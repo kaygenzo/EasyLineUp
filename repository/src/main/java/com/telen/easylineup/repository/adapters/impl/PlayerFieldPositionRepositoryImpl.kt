@@ -1,7 +1,7 @@
 package com.telen.easylineup.repository.adapters.impl
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerGamesCount
 import com.telen.easylineup.domain.model.PlayerWithPosition
@@ -49,7 +49,7 @@ internal class PlayerFieldPositionRepositoryImpl(private val playerFieldPosition
     }
 
     override fun getAllPlayerFieldPositions(): LiveData<List<PlayerFieldPosition>> {
-        return Transformations.map(playerFieldPositionsDao.getAllPlayerFieldPositions()) {
+        return playerFieldPositionsDao.getAllPlayerFieldPositions().map {
             it.map { it.toPlayerFieldPosition() }
         }
     }
@@ -71,7 +71,7 @@ internal class PlayerFieldPositionRepositoryImpl(private val playerFieldPosition
     }
 
     override fun getAllPlayersWithPositionsForLineup(lineupId: Long): LiveData<List<PlayerWithPosition>> {
-        return Transformations.map(playerFieldPositionsDao.getAllPlayersWithPositionsForLineup(lineupId)) {
+        return playerFieldPositionsDao.getAllPlayersWithPositionsForLineup(lineupId).map {
             it.map { it.toPlayerWithPosition() }
         }
     }

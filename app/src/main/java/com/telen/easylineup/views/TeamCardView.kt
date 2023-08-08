@@ -154,4 +154,10 @@ class TeamCardView: ConstraintLayout {
         teamLineupsItem.setDescription(message)
     }
 
+    fun setSexStats(@DrawableRes icon: Int?, message: String) {
+        icon?.let {
+            teamSexStats.setIcon(it)
+        }
+        teamSexStats.setDescription(message)
+    }
 }
