@@ -83,6 +83,11 @@ internal class GetTournamentStatsForPositionTable(
                             .getStringArray(R.array.softball_strategy_array)
                             .toList()
                     }
+                    TeamType.BASEBALL -> {
+                        topLeftCell = context.resources
+                            .getStringArray(R.array.baseball_strategy_array)
+                            .toList()
+                    }
                     else -> {
                         //nothing to do, just use standard strategy
                     }

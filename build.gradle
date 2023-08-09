@@ -4,7 +4,7 @@ buildscript {
 
     ext {
         appVersionName = "1.8.0"
-        appVersionCode = 1800
+        appVersionCode = 1801
 
         minVersion = 21
         targetVersion = 33
