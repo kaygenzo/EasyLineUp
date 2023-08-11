@@ -56,7 +56,7 @@ buildscript {
         stethoVersion = "1.5.1"
         bugreportingVersion = "2.1.2"
 
-        firebaseBOMVersion = "29.0.4"
+        firebaseBOMVersion = "32.2.2"
 
         documentFileVersion = "1.0.1"
         dexterVersion = "6.2.3"
