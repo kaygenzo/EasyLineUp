@@ -4,17 +4,13 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.ItemPlayerAttackBinding
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.views.LineupTypeface
-import com.telen.easylineup.views.PlayerPositionFilterView
-import com.telen.easylineup.views.PreferencesStyledTextView
 import timber.log.Timber
 import java.util.*
 
@@ -79,21 +75,13 @@ class BattingOrderAdapter(
         }
     }
 
-    class BatterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val playerName = view.findViewById<PreferencesStyledTextView>(R.id.playerName)
-        val shirtNumber = view.findViewById<PreferencesStyledTextView>(R.id.shirtNumber)
-        val fieldPosition = view.findViewById<PreferencesStyledTextView>(R.id.fieldPosition)
-        val order = view.findViewById<TextView>(R.id.order)
-        val reorderImage = view.findViewById<ImageView>(R.id.reorderImage)
-        val positionDesc =
-            view.findViewById<PlayerPositionFilterView>(R.id.fieldPositionDescription)
-        val itemPlayerAttack = view.findViewById<ConstraintLayout>(R.id.itemPlayerAttack)
-    }
+    class BatterViewHolder(val binding: ItemPlayerAttackBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BatterViewHolder {
-        val viewItem = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_player_attack, parent, false)
-        return BatterViewHolder(viewItem)
+        val binding =
+            ItemPlayerAttackBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return BatterViewHolder(binding)
     }
 
     override fun getItemCount(): Int {
@@ -111,8 +99,7 @@ class BattingOrderAdapter(
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: BatterViewHolder, position: Int) {
         val batter = players[position]
-
-        with(holder) {
+        with(holder.binding) {
             playerName.setTypeface(lineupTypeface)
             playerName.text = batter.playerName.trim()
 
@@ -128,10 +115,10 @@ class BattingOrderAdapter(
 
             order.text = batter.playerOrder.toString()
 
-            positionDesc?.apply {
+            fieldPositionDescription.apply {
                 setBackground(R.drawable.position_unselected_background)
                 setTextColor(R.color.tile_team_size_background_color)
-                positionDesc.setText(batter.playerPositionDesc)
+                setText(batter.playerPositionDesc)
             }
 
             order.visibility = if (batter.canShowOrder) {
@@ -139,7 +126,7 @@ class BattingOrderAdapter(
             } else {
                 View.INVISIBLE
             }
-            positionDesc.visibility = if (batter.canShowDescription) {
+            fieldPositionDescription.visibility = if (batter.canShowDescription) {
                 View.VISIBLE
             } else {
                 View.GONE
@@ -158,8 +145,8 @@ class BattingOrderAdapter(
             } else {
                 itemPlayerAttack.setBackgroundResource(0)
             }
-            reorderImage.setOnTouchListener { view, motionEvent ->
-                itemTouchHelper?.startDrag(this)
+            reorderImage.setOnTouchListener { _, _ ->
+                itemTouchHelper?.startDrag(holder)
                 true
             }
         }

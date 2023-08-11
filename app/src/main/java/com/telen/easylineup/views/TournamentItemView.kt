@@ -1,18 +1,16 @@
 package com.telen.easylineup.views
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
-import com.telen.easylineup.R
+import com.telen.easylineup.databinding.ItemAdapterTournamentsBinding
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.tournaments.list.LineupsAdapter
 import com.telen.easylineup.tournaments.list.OnItemClickedListener
-import kotlinx.android.synthetic.main.item_adapter_tournaments.view.*
-import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -21,34 +19,34 @@ interface OnActionsClickListener {
     fun onStatsClicked()
 }
 
-class TournamentItemView : ConstraintLayout {
+@SuppressLint("ViewConstructor")
+class TournamentItemView(context: Context, itemClickedListener: OnItemClickedListener?) :
+    ConstraintLayout(context) {
 
     lateinit var lineupsAdapter: LineupsAdapter
     private val lineups = mutableListOf<Lineup>()
     private var listener: OnActionsClickListener? = null
 
-    constructor(context: Context, itemClickedListener: OnItemClickedListener?) : super(context) {initView(context, itemClickedListener)}
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {initView(context, null)}
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {initView(context, null)}
+    private val binding =
+        ItemAdapterTournamentsBinding.inflate(LayoutInflater.from(context), this, true)
 
-    private fun initView(context: Context, itemClickedListener: OnItemClickedListener?) {
-        LayoutInflater.from(context).inflate(R.layout.item_adapter_tournaments, this)
+    init {
         lineupsAdapter = LineupsAdapter(lineups, itemClickedListener)
 
         val layoutMgr = GridLayoutManager(context, 1)
         val dividerItemDecoration = DividerItemDecoration(context, layoutMgr.orientation)
 
-        lineupsOfTournamentRecycler.apply {
+        binding.lineupsOfTournamentRecycler.apply {
             layoutManager = layoutMgr
             addItemDecoration(dividerItemDecoration)
             adapter = lineupsAdapter
         }
 
-        deleteTournament.setOnClickListener {
+        binding.deleteTournament.setOnClickListener {
             listener?.onDeleteClicked()
         }
 
-        statsTournament.setOnClickListener {
+        binding.statsTournament.setOnClickListener {
             listener?.onStatsClicked()
         }
     }
@@ -60,14 +58,14 @@ class TournamentItemView : ConstraintLayout {
     }
 
     fun setTournamentName(tournamentName: String) {
-        this.tournamentName.text = tournamentName
+        binding.tournamentName.text = tournamentName
     }
 
     fun setTournamentDate(start: Long, end: Long) {
         val builder = StringBuilder(SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(start))
-        if(start != end)
+        if (start != end)
             builder.append(" - ").append(SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(end))
-        tournamentDate.text = builder.toString()
+        binding.tournamentDate.text = builder.toString()
     }
 
     fun setOnActionsClickListener(listener: OnActionsClickListener) {

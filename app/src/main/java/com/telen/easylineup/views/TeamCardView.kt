@@ -16,15 +16,16 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.ItemCardTeamTypeBinding
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.drawn
-import com.telen.easylineup.utils.ready
-import kotlinx.android.synthetic.main.item_card_team_type.view.*
 import timber.log.Timber
 
-class TeamCardView: ConstraintLayout {
+class TeamCardView : ConstraintLayout {
 
     private var behavior: BottomSheetBehavior<ConstraintLayout>? = null
+
+    private val binding = ItemCardTeamTypeBinding.inflate(LayoutInflater.from(context), this, true)
 
     private val blockedBottomSheetBehaviour = object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onSlide(bottomSheet: View, slideOffset: Float) {}
@@ -38,21 +39,25 @@ class TeamCardView: ConstraintLayout {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.item_card_team_type, this)
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
 
-        bottomSheet?.let {
-            behavior = BottomSheetBehavior.from(bottomSheet)
+        binding.bottomSheet?.let {
+            behavior = BottomSheetBehavior.from(binding.bottomSheet)
             behavior?.isFitToContents = false
             behavior?.setExpandedOffset(resources.getDimensionPixelOffset(R.dimen.card_team_type_ball_image_radius))
         }
 
-        teamTypeTitle.drawn {
-            val imageRadius = resources.getDimensionPixelSize(R.dimen.card_team_type_ball_image_radius)
-            val textSize = teamTypeTitle.height
+        binding.teamTypeTitle.drawn {
+            val imageRadius =
+                resources.getDimensionPixelSize(R.dimen.card_team_type_ball_image_radius)
+            val textSize = binding.teamTypeTitle.height
             val margin = resources.getDimensionPixelSize(R.dimen.default_margin)
             val peekHeight = imageRadius + textSize + margin
             Timber.d("peekHeight=${peekHeight}")
@@ -61,16 +66,14 @@ class TeamCardView: ConstraintLayout {
     }
 
     fun setDragEnabled(enabled: Boolean) {
-        if(!enabled) {
+        if (!enabled) {
             behavior?.addBottomSheetCallback(blockedBottomSheetBehaviour)
-        }
-        else {
+        } else {
             behavior?.removeBottomSheetCallback(blockedBottomSheetBehaviour)
-            teamTypeImage.setOnClickListener {
-                if(behavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
+            binding.teamTypeImage.setOnClickListener {
+                if (behavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
                     behavior?.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
-                else {
+                } else {
                     behavior?.state = BottomSheetBehavior.STATE_EXPANDED
                 }
             }
@@ -87,53 +90,71 @@ class TeamCardView: ConstraintLayout {
     }
 
     fun setImage(@DrawableRes image: Int) {
-        teamTypeImage.setImageDrawable(VectorDrawableCompat.create(resources, image, null))
+        binding.teamTypeImage.setImageDrawable(VectorDrawableCompat.create(resources, image, null))
     }
 
     fun setTeamName(name: String) {
-        teamTypeTitle.text = name
+        binding.teamTypeTitle.text = name
     }
 
     fun setTeamType(teamType: Int) {
-        when(teamType) {
+        when (teamType) {
             TeamType.BASEBALL.id -> {
-                Picasso.get().load(TeamType.BASEBALL.sportResId).into(teamTypeRepresentation)
+                Picasso.get().load(TeamType.BASEBALL.sportResId)
+                    .into(binding.teamTypeRepresentation)
             }
+
             TeamType.SOFTBALL.id -> {
-                Picasso.get().load(TeamType.SOFTBALL.sportResId).into(teamTypeRepresentation)
+                Picasso.get().load(TeamType.SOFTBALL.sportResId)
+                    .into(binding.teamTypeRepresentation)
             }
+
             TeamType.BASEBALL_5.id -> {
-                Picasso.get().load(TeamType.BASEBALL_5.sportResId).into(teamTypeRepresentation)
+                Picasso.get().load(TeamType.BASEBALL_5.sportResId)
+                    .into(binding.teamTypeRepresentation)
             }
         }
     }
 
-    private fun setTeamImage(request: RequestCreator, @DrawableRes placeholderRes: Int, @DrawableRes errorRes: Int) {
-        teamTypeImage.drawn {
+    private fun setTeamImage(
+        request: RequestCreator,
+        @DrawableRes placeholderRes: Int,
+        @DrawableRes errorRes: Int
+    ) {
+        binding.teamTypeImage.drawn {
             try {
-                val size = resources.getDimensionPixelSize(R.dimen.card_team_type_ball_image_diameter)
-                val cradleRadius = resources.getDimension(R.dimen.card_team_type_ball_image_cradle_radius)
+                val size =
+                    resources.getDimensionPixelSize(R.dimen.card_team_type_ball_image_diameter)
+                val cradleRadius =
+                    resources.getDimension(R.dimen.card_team_type_ball_image_cradle_radius)
                 request
-                        .resize(size, size)
-                        .centerCrop()
-                        .transform(RoundedTransformationBuilder()
-                                .borderColor(ContextCompat.getColor(context, R.color.team_type_bottom_view))
-                                .borderWidth(cradleRadius)
-                                .cornerRadiusDp(16f)
-                                .oval(true)
-                                .build())
-                        .placeholder(placeholderRes)
-                        .error(errorRes)
-                        .into(teamTypeImage, object : Callback {
-                            override fun onSuccess() {
-                                Timber.d("Successfully loaded image")
-                            }
+                    .resize(size, size)
+                    .centerCrop()
+                    .transform(
+                        RoundedTransformationBuilder()
+                            .borderColor(
+                                ContextCompat.getColor(
+                                    context,
+                                    R.color.team_type_bottom_view
+                                )
+                            )
+                            .borderWidth(cradleRadius)
+                            .cornerRadiusDp(16f)
+                            .oval(true)
+                            .build()
+                    )
+                    .placeholder(placeholderRes)
+                    .error(errorRes)
+                    .into(binding.teamTypeImage, object : Callback {
+                        override fun onSuccess() {
+                            Timber.d("Successfully loaded image")
+                        }
 
-                            override fun onError(e: Exception?) {
-                                Timber.e(e)
-                            }
+                        override fun onError(e: Exception?) {
+                            Timber.e(e)
+                        }
 
-                        })
+                    })
             } catch (e: IllegalArgumentException) {
                 Timber.e(e)
             }
@@ -142,22 +163,22 @@ class TeamCardView: ConstraintLayout {
 
     fun setPlayersSize(@DrawableRes icon: Int?, message: String) {
         icon?.let {
-            teamPlayersItem.setIcon(it)
+            binding.teamPlayersItem.setIcon(it)
         }
-        teamPlayersItem.setDescription(message)
+        binding.teamPlayersItem.setDescription(message)
     }
 
     fun setLineupsSize(@DrawableRes icon: Int?, message: String) {
         icon?.let {
-            teamLineupsItem.setIcon(it)
+            binding.teamLineupsItem.setIcon(it)
         }
-        teamLineupsItem.setDescription(message)
+        binding.teamLineupsItem.setDescription(message)
     }
 
     fun setSexStats(@DrawableRes icon: Int?, message: String) {
         icon?.let {
-            teamSexStats.setIcon(it)
+            binding.teamSexStats.setIcon(it)
         }
-        teamSexStats.setDescription(message)
+        binding.teamSexStats.setDescription(message)
     }
 }

@@ -17,13 +17,14 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.ViewBarChartBinding
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.utils.getPositionShortNames
-import kotlinx.android.synthetic.main.view_bar_chart.view.*
-
 
 class PositionsBarChart : ConstraintLayout {
+
+    val binding = ViewBarChartBinding.inflate(LayoutInflater.from(context), this, true)
 
     // positions reference to display in xAxis
     private var strategy: TeamStrategy = TeamStrategy.STANDARD
@@ -34,26 +35,16 @@ class PositionsBarChart : ConstraintLayout {
     // names from arrays.xml
     private var mPositions: Array<String>? = null
 
-    constructor(context: Context) : super(context) {
-        init(context)
-    }
-
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        init(context)
-    }
-
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
         defStyleAttr
-    ) {
-        init(context)
-    }
+    )
 
-    private fun init(context: Context) {
-        LayoutInflater.from(context).inflate(R.layout.view_bar_chart, this)
-
-        val chart: BarChart = playerPositionsChart
+    init {
+        val chart: BarChart = binding.playerPositionsChart
         // create a custom MarkerView (extend MarkerView) and specify the layout
         // to use for it
 
@@ -106,7 +97,7 @@ class PositionsBarChart : ConstraintLayout {
 
     private fun refreshXAxis() {
         teamType?.let {
-            val xAxis = playerPositionsChart.xAxis
+            val xAxis = binding.playerPositionsChart.xAxis
             mPositions = getPositionShortNames(context, it)
             xAxis.valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
@@ -128,7 +119,7 @@ class PositionsBarChart : ConstraintLayout {
             return
         }
 
-        val chart = playerPositionsChart
+        val chart = binding.playerPositionsChart
 
         val xAxis = chart.xAxis
         xAxis.labelCount = positionsRef.size

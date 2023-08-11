@@ -1,20 +1,30 @@
 package com.telen.easylineup.views
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.PointF
+import android.graphics.PorterDuff
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.Sex
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.getPositionPercentage
 import com.telen.easylineup.utils.drawn
 import com.telen.easylineup.utils.getColor
 import com.telen.easylineup.utils.ready
-import kotlinx.android.synthetic.main.field_view.view.*
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -36,6 +46,10 @@ abstract class DefenseView : ConstraintLayout {
         defStyleAttr
     )
 
+    abstract fun getFieldCanvas(): ImageView
+    abstract fun getFieldImage(): ImageView
+    abstract fun getContainerView(): ViewGroup
+
     protected open fun onFieldPositionClicked(position: FieldPosition) {
         // to implement if needed
     }
@@ -48,7 +62,7 @@ abstract class DefenseView : ConstraintLayout {
         getContainerSize {
 
             Bitmap.createBitmap(it.toInt(), it.toInt(), Bitmap.Config.ARGB_8888).let { bitmap ->
-                imageCanvas.setImageBitmap(bitmap)
+                getFieldCanvas().setImageBitmap(bitmap)
                 canvas = Canvas(bitmap).apply { drawColor(Color.TRANSPARENT) }
             }
 
@@ -66,16 +80,17 @@ abstract class DefenseView : ConstraintLayout {
                 addPlayerOnFieldWithPercentage(it, view, coordinates.x, coordinates.y)
             }
 
-            baseballField.ready {
+            getFieldImage().ready {
                 val image = when (strategy) {
                     TeamStrategy.B5_DEFAULT -> {
                         VectorDrawableCompat.create(resources, R.drawable.baseball5_field, null)
                     }
+
                     else -> {
                         VectorDrawableCompat.create(resources, R.drawable.baseball_field, null)
                     }
                 }
-                baseballField.setImageDrawable(image)
+                getFieldImage().setImageDrawable(image)
             }
         }
     }
@@ -100,14 +115,15 @@ abstract class DefenseView : ConstraintLayout {
         return PointF(positionX, positionY)
     }
 
-    protected fun addPlayerOnFieldWithCoordinate(
+    private fun addPlayerOnFieldWithCoordinate(
         view: View,
         parentWidth: Float,
         x: Float,
         y: Float
     ) {
-        if (fieldFrameLayout.findViewWithTag<MultipleStateDefenseIconButton>(view.tag) != null)
-            fieldFrameLayout.removeView(view)
+        getContainerView().findViewWithTag<MultipleStateDefenseIconButton>(view.tag)?.let {
+            getContainerView().removeView(view)
+        }
 
         view.visibility = View.INVISIBLE
 
@@ -148,20 +164,20 @@ abstract class DefenseView : ConstraintLayout {
             }
         }
 
-        fieldFrameLayout.addView(view)
+        getContainerView().addView(view)
     }
 
     protected fun cleanPlayerIcons() {
-        if (fieldFrameLayout.childCount > 1) {
-            for (i in fieldFrameLayout.childCount - 1 downTo 0) {
-                val view = fieldFrameLayout.getChildAt(i)
-                if (view is MultipleStateDefenseIconButton || view is SmallBaseballImageView) {
+        if (getContainerView().childCount > 1) {
+            for (i in getContainerView().childCount - 1 downTo 0) {
+                val view = getContainerView().getChildAt(i)
+                if (view is MultipleStateDefenseIconButton) {
                     view.clearAnimation()
                     view.setOnDragListener(null)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         view.cancelDragAndDrop()
                     }
-                    fieldFrameLayout.removeView(fieldFrameLayout.getChildAt(i))
+                    getContainerView().removeView(getContainerView().getChildAt(i))
                 }
             }
         }
@@ -196,8 +212,9 @@ abstract class DefenseView : ConstraintLayout {
         containerSize?.takeIf { it > 0f }?.let {
             result(it)
         } ?: let {
-            fieldFrameLayout.drawn {
-                val size = min(fieldFrameLayout.width, fieldFrameLayout.height).toFloat()
+            getContainerView().drawn {
+                val size =
+                    min(getContainerView().width, getContainerView().height).toFloat()
                 this.containerSize = size
                 result(size)
             }
@@ -209,6 +226,7 @@ abstract class DefenseView : ConstraintLayout {
             Sex.MALE, Sex.FEMALE -> {
                 drawIndicatorOnPositions(position, sex.getColor(context))
             }
+
             else -> {
                 // set a color for unknown sex
             }

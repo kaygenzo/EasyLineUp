@@ -4,37 +4,38 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.lifecycle.ViewModelProviders
-import com.telen.easylineup.login.*
+import androidx.activity.viewModels
+import com.telen.easylineup.login.GetTeamFailed
 import com.telen.easylineup.login.GetTeamSuccess
+import com.telen.easylineup.login.ImportFailure
+import com.telen.easylineup.login.ImportSuccessfulEvent
+import com.telen.easylineup.login.LoginViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.StorageUtils
 import timber.log.Timber
-import java.io.FileNotFoundException
 
 
-abstract class BaseImportActivity: BaseActivity() {
+abstract class BaseImportActivity : BaseActivity() {
 
     companion object {
 
         const val REQUEST_CREATE_TEAM = 2
     }
 
-    private lateinit var viewModel: LoginViewModel
+    private val viewModel by viewModels<LoginViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
-
         val disposable = viewModel.observeEvents().subscribe({
-            when(it) {
+            when (it) {
                 ImportSuccessfulEvent -> {
                     FirebaseAnalyticsUtils.importData(this)
-                    val dialog = DialogFactory.getSuccessDialog(context = this@BaseImportActivity,
-                            title = R.string.settings_import_success_title,
-                            message = R.string.settings_import_success_message
+                    val dialog = DialogFactory.getSuccessDialog(
+                        context = this@BaseImportActivity,
+                        title = R.string.settings_import_success_title,
+                        message = R.string.settings_import_success_message
                     )
                     dialog.setOnDismissListener {
                         //check teams
@@ -42,13 +43,16 @@ abstract class BaseImportActivity: BaseActivity() {
                     }
                     dialog.show()
                 }
+
                 ImportFailure -> {
                     displayImportFailure()
                 }
+
                 is GetTeamSuccess -> {
                     //the file contains at least one main team
                     launchHome()
                 }
+
                 GetTeamFailed -> {
                     // no main team selected, let's create new one
                     launchTeamCreation()
@@ -71,7 +75,7 @@ abstract class BaseImportActivity: BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 StorageUtils.REQUEST_CODE_OPEN_DOCUMENT -> {
                     val uri = data?.data ?: return
@@ -105,8 +109,9 @@ abstract class BaseImportActivity: BaseActivity() {
 
     protected open fun displayImportFailure() {
         DialogFactory.getErrorDialog(
-                context = this@BaseImportActivity,
-                title = R.string.settings_import_error_title,
-                message = R.string.settings_import_error_message).show()
+            context = this@BaseImportActivity,
+            title = R.string.settings_import_error_title,
+            message = R.string.settings_import_error_message
+        ).show()
     }
 }

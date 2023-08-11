@@ -13,8 +13,8 @@ import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.ViewCreateTeamBinding
 import com.telen.easylineup.utils.ready
-import kotlinx.android.synthetic.main.view_create_team.view.*
 import timber.log.Timber
 
 interface TeamFormListener {
@@ -28,29 +28,20 @@ class TeamFormView : ConstraintLayout {
     private var listener: TeamFormListener? = null
     private var imageUri: Uri? = null
 
-    constructor(context: Context) : super(context) {
-        initView(context)
-    }
+    val binding: ViewCreateTeamBinding =
+        ViewCreateTeamBinding.inflate(LayoutInflater.from(context), this, true)
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        initView(context)
-    }
+    constructor(context: Context) : super(context)
+
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
         defStyleAttr
-    ) {
-        initView(context)
-    }
+    )
 
-    fun setListener(listener: TeamFormListener) {
-        this.listener = listener
-    }
-
-    private fun initView(context: Context?) {
-        LayoutInflater.from(context).inflate(R.layout.view_create_team, this)
-
+    init {
         Picasso.get().load(R.drawable.ic_unknown_team)
             .fit()
             .transform(
@@ -63,13 +54,13 @@ class TeamFormView : ConstraintLayout {
             )
             .placeholder(R.drawable.ic_unknown_team)
             .error(R.drawable.ic_unknown_team)
-            .into(teamImage)
+            .into(binding.teamImage)
 
-        teamImage.setOnClickListener {
+        binding.teamImage.setOnClickListener {
             listener?.onImagePickerRequested()
         }
 
-        teamNameInput.addTextChangedListener(object : TextWatcher {
+        binding.teamNameInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun afterTextChanged(s: Editable?) {}
@@ -79,10 +70,14 @@ class TeamFormView : ConstraintLayout {
             }
         })
 
-        teamImageAction.run {
+        binding.teamImageAction.run {
             setImageResource(R.drawable.add_image)
             setOnClickListener(null)
         }
+    }
+
+    fun setListener(listener: TeamFormListener) {
+        this.listener = listener
     }
 
     fun onImageUriReceived(imageUri: Uri) {
@@ -91,7 +86,7 @@ class TeamFormView : ConstraintLayout {
     }
 
     fun getName(): String {
-        return teamNameInput.text.toString()
+        return binding.teamNameInput.text.toString()
     }
 
     fun getImageUri(): Uri? {
@@ -99,22 +94,22 @@ class TeamFormView : ConstraintLayout {
     }
 
     fun setName(name: String) {
-        teamNameInput.setText(name)
+        binding.teamNameInput.setText(name)
     }
 
     fun setTeamImage(@DrawableRes resId: Int) {
         Picasso.get().load(resId)
             .placeholder(R.drawable.ic_unknown_team)
             .error(R.drawable.ic_unknown_team)
-            .into(teamImage)
+            .into(binding.teamImage)
     }
 
     fun setImage(uri: Uri) {
         imageUri = uri
-        teamImage.ready {
+        binding.teamImage.ready {
             try {
                 Picasso.get().load(uri)
-                    .resize(teamImage.width, teamImage.height)
+                    .resize(binding.teamImage.width, binding.teamImage.height)
                     .centerCrop()
                     .transform(
                         RoundedTransformationBuilder()
@@ -126,7 +121,7 @@ class TeamFormView : ConstraintLayout {
                     )
                     .placeholder(R.drawable.ic_unknown_team)
                     .error(R.drawable.ic_unknown_team)
-                    .into(teamImage, object : Callback {
+                    .into(binding.teamImage, object : Callback {
                         override fun onSuccess() {
                             Timber.e("Successfully loaded image")
                         }
@@ -142,7 +137,7 @@ class TeamFormView : ConstraintLayout {
         }
 
         imageUri?.let {
-            teamImageAction.run {
+            binding.teamImageAction.run {
                 setImageResource(R.drawable.remove_image)
                 setOnClickListener {
                     imageUri = null
@@ -156,6 +151,7 @@ class TeamFormView : ConstraintLayout {
     }
 
     fun displayInvalidName() {
-        teamNameInputLayout.error = resources.getString(R.string.team_creation_error_name_empty)
+        binding.teamNameInputLayout.error =
+            resources.getString(R.string.team_creation_error_name_empty)
     }
 }

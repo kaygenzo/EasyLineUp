@@ -13,85 +13,93 @@ import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.ViewMultipleStateDefenseIconBinding
 import com.telen.easylineup.utils.toLetters
-import kotlinx.android.synthetic.main.view_multiple_state_defense_icon.view.*
 import timber.log.Timber
 
 enum class StateDefense {
     LOADING, ADD_PLAYER, DP_DH, PLAYER, NONE, EMPTY
 }
 
-class MultipleStateDefenseIconButton: ConstraintLayout {
+class MultipleStateDefenseIconButton : ConstraintLayout {
+
+    private val binding =
+        ViewMultipleStateDefenseIconBinding.inflate(LayoutInflater.from(context), this, true)
 
     private var state = StateDefense.LOADING
 
-    constructor(context: Context) : super(context) { init(context) }
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init(context) }
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context) }
-
-    private fun init(context: Context) {
-        LayoutInflater.from(context).inflate(R.layout.view_multiple_state_defense_icon, this)
-    }
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     override fun setOnClickListener(l: OnClickListener?) {
         super.setOnClickListener(l)
-        fab.setOnClickListener(l)
+        binding.fab.setOnClickListener(l)
     }
 
     fun getState() = state
 
     fun setState(state: StateDefense) {
         this.state = state
-        fab.scaleType = ImageView.ScaleType.CENTER
-        when(state) {
+        binding.fab.scaleType = ImageView.ScaleType.CENTER
+        when (state) {
             StateDefense.LOADING -> {
-                designatedPlayerLabel.visibility = View.GONE
-                fab.setImageResource(0)
-                imagePlayerContainer.visibility = View.GONE
-                fab.visibility = View.VISIBLE
-                progressIcon.visibility = View.VISIBLE
+                binding.designatedPlayerLabel.visibility = View.GONE
+                binding.fab.setImageResource(0)
+                binding.imagePlayerContainer.visibility = View.GONE
+                binding.fab.visibility = View.VISIBLE
+                binding.progressIcon.visibility = View.VISIBLE
             }
+
             StateDefense.ADD_PLAYER -> {
-                designatedPlayerLabel.visibility = View.GONE
-                fab.visibility = View.VISIBLE
-                fab.setImageResource(R.drawable.ic_add_white_24dp)
-                imagePlayerContainer.visibility = View.GONE
-                progressIcon.visibility = View.GONE
+                binding.designatedPlayerLabel.visibility = View.GONE
+                binding.fab.visibility = View.VISIBLE
+                binding.fab.setImageResource(R.drawable.ic_add_white_24dp)
+                binding.imagePlayerContainer.visibility = View.GONE
+                binding.progressIcon.visibility = View.GONE
             }
+
             StateDefense.DP_DH -> {
-                designatedPlayerLabel.visibility = View.VISIBLE
-                fab.visibility = View.VISIBLE
-                fab.setImageResource(0)
-                imagePlayerContainer.visibility = View.GONE
-                progressIcon.visibility = View.GONE
+                binding.designatedPlayerLabel.visibility = View.VISIBLE
+                binding.fab.visibility = View.VISIBLE
+                binding.fab.setImageResource(0)
+                binding.imagePlayerContainer.visibility = View.GONE
+                binding.progressIcon.visibility = View.GONE
             }
+
             StateDefense.PLAYER -> {
-                designatedPlayerLabel.visibility = View.GONE
-                fab.visibility = View.INVISIBLE
-                fab.setImageResource(0)
-                imagePlayerContainer.visibility = View.VISIBLE
-                progressIcon.visibility = View.GONE
+                binding.designatedPlayerLabel.visibility = View.GONE
+                binding.fab.visibility = View.INVISIBLE
+                binding.fab.setImageResource(0)
+                binding.imagePlayerContainer.visibility = View.VISIBLE
+                binding.progressIcon.visibility = View.GONE
             }
+
             StateDefense.NONE -> {
-                designatedPlayerLabel.visibility = View.GONE
-                fab.visibility = View.INVISIBLE
-                fab.setImageResource(0)
-                imagePlayerContainer.visibility = View.GONE
-                progressIcon.visibility = View.GONE
+                binding.designatedPlayerLabel.visibility = View.GONE
+                binding.fab.visibility = View.INVISIBLE
+                binding.fab.setImageResource(0)
+                binding.imagePlayerContainer.visibility = View.GONE
+                binding.progressIcon.visibility = View.GONE
             }
+
             StateDefense.EMPTY -> {
-                designatedPlayerLabel.visibility = View.GONE
-                fab.visibility = View.VISIBLE
-                fab.isEnabled = false
-                fab.setImageResource(0)
-                imagePlayerContainer.visibility = View.GONE
-                progressIcon.visibility = View.GONE
+                binding.designatedPlayerLabel.visibility = View.GONE
+                binding.fab.visibility = View.VISIBLE
+                binding.fab.isEnabled = false
+                binding.fab.setImageResource(0)
+                binding.imagePlayerContainer.visibility = View.GONE
+                binding.progressIcon.visibility = View.GONE
             }
         }
     }
 
     fun setLabel(label: String) {
-        designatedPlayerLabel.text = label
+        binding.designatedPlayerLabel.text = label
     }
 
     fun setPlayerImage(url: String?, fallbackName: String, size: Int) {
@@ -99,58 +107,65 @@ class MultipleStateDefenseIconButton: ConstraintLayout {
     }
 
     fun setBorderColor(@ColorInt borderColor: Int) {
-        if(borderColor == Color.RED) {
-            playerNameFallback.setBackgroundResource(R.drawable.circle_shape_letters_border_red)
-        }
-        else {
-            playerNameFallback.setBackgroundResource(R.drawable.circle_shape_letters_border_black)
+        if (borderColor == Color.RED) {
+            binding.playerNameFallback.setBackgroundResource(R.drawable.circle_shape_letters_border_red)
+        } else {
+            binding.playerNameFallback.setBackgroundResource(R.drawable.circle_shape_letters_border_black)
         }
     }
 
     fun setPlayerImage(@DrawableRes resId: Int, scaleType: ImageView.ScaleType) {
-        playerImage.apply {
+        binding.playerImage.apply {
             setImageResource(resId)
             setScaleType(scaleType)
         }
     }
 
-    fun setPlayerImage(url: String?, fallbackName: String, size: Int, @ColorInt borderColor: Int, borderWidth: Float) {
+    fun setPlayerImage(
+        url: String?,
+        fallbackName: String,
+        size: Int,
+        @ColorInt borderColor: Int,
+        borderWidth: Float
+    ) {
         val nameFallback = fallbackName.toLetters()
-        playerNameFallback.text = nameFallback
-        playerNameFallback.visibility = View.VISIBLE
-        playerImage.visibility = View.INVISIBLE
+        binding.playerNameFallback.text = nameFallback
+        binding.playerNameFallback.visibility = View.VISIBLE
+        binding.playerImage.visibility = View.INVISIBLE
 
         setBorderColor(borderColor)
 
         url?.let {
-            playerImage.post {
+            binding.playerImage.post {
                 try {
                     Picasso.get().load(url)
-                            .resize(size, size)
-                            .centerCrop()
-                            .transform(RoundedTransformationBuilder()
-                                    .borderColor(borderColor)
-                                    .borderWidthDp(borderWidth)
-                                    .cornerRadiusDp(16f)
-                                    .oval(true)
-                                    .build())
-                            .into(playerImage, object : Callback {
+                        .resize(size, size)
+                        .centerCrop()
+                        .transform(
+                            RoundedTransformationBuilder()
+                                .borderColor(borderColor)
+                                .borderWidthDp(borderWidth)
+                                .cornerRadiusDp(16f)
+                                .oval(true)
+                                .build()
+                        )
+                        .into(binding.playerImage, object : Callback {
 
-                                override fun onSuccess() {
-                                    playerImage.visibility = View.VISIBLE
-                                    playerNameFallback.visibility = View.INVISIBLE
-                                }
+                            override fun onSuccess() {
+                                binding.playerImage.visibility = View.VISIBLE
+                                binding.playerNameFallback.visibility = View.INVISIBLE
+                            }
 
-                                override fun onError(e: Exception?) {
-                                    playerImage.visibility = View.INVISIBLE
-                                    playerNameFallback.visibility = View.VISIBLE
-                                }
+                            override fun onError(e: Exception?) {
+                                binding.playerImage.visibility = View.INVISIBLE
+                                binding.playerNameFallback.visibility = View.VISIBLE
+                            }
 
-                            })
+                        })
                 } catch (e: Exception) {
                     Timber.e(e)
-                    playerNameFallback.visibility = View.VISIBLE
-                    playerImage.visibility = View.INVISIBLE
+                    binding.playerNameFallback.visibility = View.VISIBLE
+                    binding.playerImage.visibility = View.INVISIBLE
                 }
             }
         }

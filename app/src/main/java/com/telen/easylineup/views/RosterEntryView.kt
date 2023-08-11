@@ -7,12 +7,12 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.CompoundButton
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.telen.easylineup.R
-import kotlinx.android.synthetic.main.item_roster_entry.view.*
+import com.telen.easylineup.databinding.ItemRosterEntryBinding
 
 class RosterEntryView : ConstraintLayout, TextWatcher {
 
     private var watcherListener: TextWatcher? = null
+    private val binding = ItemRosterEntryBinding.inflate(LayoutInflater.from(context), this, true)
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -23,17 +23,16 @@ class RosterEntryView : ConstraintLayout, TextWatcher {
     )
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.item_roster_entry, this)
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-        rosterShirtNumberTextField.addTextChangedListener(this)
+        binding.rosterShirtNumberTextField.addTextChangedListener(this)
     }
 
     fun setPlayerName(name: String) {
-        rosterPlayerName.text = name
+        binding.rosterPlayerName.text = name
     }
 
     fun setNumber(number: Int) {
-        rosterShirtNumberTextField.setText(number.toString())
+        binding.rosterShirtNumberTextField.setText(number.toString())
     }
 
     fun setTextListener(watcher: TextWatcher?) {
@@ -53,10 +52,10 @@ class RosterEntryView : ConstraintLayout, TextWatcher {
     }
 
     fun setSelectedStateListener(listener: CompoundButton.OnCheckedChangeListener?) {
-        selectedState.setOnCheckedChangeListener(listener)
+        binding.selectedState.setOnCheckedChangeListener(listener)
     }
 
     fun setSelectedState(state: Boolean) {
-        selectedState.isChecked = state
+        binding.selectedState.isChecked = state
     }
 }

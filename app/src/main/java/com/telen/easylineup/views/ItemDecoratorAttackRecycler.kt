@@ -7,7 +7,12 @@ import android.view.View
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 
-class ItemDecoratorAttackRecycler(context: Context?, orientation: Int, batterSize: Int, extraHitterSize: Int = 0) : DividerItemDecoration(context, orientation) {
+class ItemDecoratorAttackRecycler(
+    context: Context?,
+    orientation: Int,
+    batterSize: Int,
+    extraHitterSize: Int = 0
+) : DividerItemDecoration(context, orientation) {
 
     private val mExtraDividerHeight: Int = 15
     private val mExtraDividerIndex = (batterSize + extraHitterSize) - 1
@@ -27,7 +32,7 @@ class ItemDecoratorAttackRecycler(context: Context?, orientation: Int, batterSiz
         if (parent.clipToPadding) {
             left = parent.paddingLeft
             right = parent.width - parent.paddingRight
-            canvas.clipRect(left, parent.paddingTop, right,parent.height - parent.paddingBottom)
+            canvas.clipRect(left, parent.paddingTop, right, parent.height - parent.paddingBottom)
         } else {
             left = 0
             right = parent.width
@@ -53,10 +58,15 @@ class ItemDecoratorAttackRecycler(context: Context?, orientation: Int, batterSiz
         canvas.restore()
     }
 
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
         drawable?.let {
             val position = parent.getChildAdapterPosition(view)
-            if(position == mExtraDividerIndex)
+            if (position == mExtraDividerIndex)
                 outRect.set(0, 0, 0, it.intrinsicHeight + mExtraDividerHeight)
             else
                 outRect.set(0, 0, 0, it.intrinsicHeight)

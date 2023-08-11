@@ -23,43 +23,46 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
-import com.telen.easylineup.R
-import kotlinx.android.synthetic.main.list_empty_view.view.*
+import com.telen.easylineup.databinding.ListEmptyViewBinding
 
 /**
  * A common reusable view that shows a hint image and text for an empty list view.
  */
-class ListEmptyView: LinearLayout {
+class ListEmptyView : LinearLayout {
 
-    constructor(context: Context) : super(context) { init(context) }
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs){ init(context) }
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr){ init(context) }
+    private val binding = ListEmptyViewBinding.inflate(LayoutInflater.from(context), this, true)
 
-    fun init(context: Context) {
-        LayoutInflater.from(context).inflate(R.layout.list_empty_view, this)
-    }
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     fun setImageHint(resId: Int) {
-        mEmptyImageHint?.setImageResource(resId)
+        binding.mEmptyImageHint?.setImageResource(resId)
     }
 
     fun setTextHint(resId: Int) {
-        mEmptyTextHint?.text = resources.getText(resId)
+        binding.mEmptyTextHint?.text = resources.getText(resId)
     }
 
     fun setTextHint(hintText: CharSequence) {
-        mEmptyTextHint?.text = hintText
+        binding.mEmptyTextHint?.text = hintText
     }
 
     fun setIsImageVisible(isImageVisible: Boolean) {
-        mEmptyImageHint?.visibility = if (isImageVisible) View.VISIBLE else View.GONE
+        binding.mEmptyImageHint?.visibility = if (isImageVisible) View.VISIBLE else View.GONE
     }
 
     fun setIsVerticallyCentered(isVerticallyCentered: Boolean) {
-        val gravity = if (isVerticallyCentered) Gravity.CENTER else Gravity.TOP or Gravity.CENTER_HORIZONTAL
-        (mEmptyImageHint?.layoutParams as LayoutParams).gravity = gravity
-        (mEmptyTextHint?.layoutParams as LayoutParams).gravity = gravity
-        layoutParams.height = if (isVerticallyCentered) LayoutParams.WRAP_CONTENT else LayoutParams.MATCH_PARENT
+        val gravity =
+            if (isVerticallyCentered) Gravity.CENTER else Gravity.TOP or Gravity.CENTER_HORIZONTAL
+        (binding.mEmptyImageHint?.layoutParams as LayoutParams).gravity = gravity
+        (binding.mEmptyTextHint?.layoutParams as LayoutParams).gravity = gravity
+        layoutParams.height =
+            if (isVerticallyCentered) LayoutParams.WRAP_CONTENT else LayoutParams.MATCH_PARENT
         requestLayout()
     }
 }

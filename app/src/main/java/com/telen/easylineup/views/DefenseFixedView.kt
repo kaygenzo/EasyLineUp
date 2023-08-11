@@ -4,36 +4,47 @@ import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.*
-import kotlinx.android.synthetic.main.field_view.view.*
+import android.view.ViewGroup
+import android.widget.ImageView
+import com.telen.easylineup.databinding.BaseballFieldOnlyBinding
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.MODE_DISABLED
+import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.isFlex
+import com.telen.easylineup.domain.model.isSubstitute
+import com.telen.easylineup.domain.model.toPlayer
 import kotlin.math.roundToInt
 
 class DefenseFixedView : DefenseView {
 
-    constructor(context: Context) : super(context) {
-        init(context)
-    }
+    private val binding = BaseballFieldOnlyBinding.inflate(LayoutInflater.from(context), this, true)
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        init(context)
-    }
-
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
         defStyleAttr
-    ) {
-        init(context)
+    )
+
+    init {
+        getContainerSize { containerSize ->
+            getContainerView().layoutParams.height = containerSize.toInt()
+            getContainerView().layoutParams.width = containerSize.toInt()
+        }
     }
 
-    fun init(context: Context?) {
-        LayoutInflater.from(context).inflate(R.layout.baseball_field_only, this)
+    override fun getFieldCanvas(): ImageView {
+        return binding.baseballFieldView.binding.imageCanvas
+    }
 
-        getContainerSize { containerSize ->
-            fieldFrameLayout.layoutParams.height = containerSize.toInt()
-            fieldFrameLayout.layoutParams.width = containerSize.toInt()
-        }
+    override fun getFieldImage(): ImageView {
+        return binding.baseballFieldView.binding.baseballField
+    }
+
+    override fun getContainerView(): ViewGroup {
+        return binding.baseballFieldView.binding.fieldFrameLayout
     }
 
     fun setListPlayerInField(players: List<PlayerWithPosition>, lineupMode: Int) {
@@ -46,10 +57,8 @@ class DefenseFixedView : DefenseView {
         getContainerSize { containerSize ->
 
             val iconSize = (containerSize * ICON_SIZE_SCALE).roundToInt()
-
-            //Timber.d("DefenseFixedView: iconSize=$iconSize containerWidth=${containerSize} containerHeight=${fieldFrameLayout.height}")
-
-            //here we process the player positions only for those who are really set, and excluded substitutes
+            // here we process the player positions only for those who are really set, and excluded
+            // substitutes
             players.filter { !it.isSubstitute() }.let { filteredPlayers ->
                 filteredPlayers.forEach { player ->
                     val position = FieldPosition.getFieldPositionById(player.position)

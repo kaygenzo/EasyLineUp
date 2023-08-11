@@ -6,23 +6,29 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
-import kotlinx.android.synthetic.main.header_player_attack.view.*
+import com.telen.easylineup.databinding.HeaderPlayerAttackBinding
 
-class PlayerBattingHeader: ConstraintLayout {
+class PlayerBattingHeader : ConstraintLayout {
 
-    constructor(context: Context) : super(context) { init(context) }
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init(context) }
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context) }
+    private val binding =
+        HeaderPlayerAttackBinding.inflate(LayoutInflater.from(context), this, true)
 
-    private fun init(context: Context) {
-        LayoutInflater.from(context).inflate(R.layout.header_player_attack, this)
-        reorderImage.visibility = View.INVISIBLE
-        playerName.setText(R.string.header_batting_order_player_name)
-        fieldPosition.setText(R.string.header_batting_order_player_position)
-        shirtNumber.setText(R.string.header_batting_order_player_shirt)
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
+
+    init {
+        binding.reorderImage.visibility = View.INVISIBLE
+        binding.playerName.setText(R.string.header_batting_order_player_name)
+        binding.fieldPosition.setText(R.string.header_batting_order_player_position)
+        binding.shirtNumber.setText(R.string.header_batting_order_player_shirt)
     }
 
     fun setIsEditable(isEditable: Boolean) {
-        reorderImage.visibility = if(isEditable) View.INVISIBLE else View.GONE
+        binding.reorderImage.visibility = if (isEditable) View.INVISIBLE else View.GONE
     }
 }

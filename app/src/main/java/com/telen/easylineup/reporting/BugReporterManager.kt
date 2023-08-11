@@ -13,25 +13,23 @@ import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
 import timber.log.Timber
 
-class BugReporterManager(private val context: Context): Observer<Intent> {
+class BugReporterManager(private val context: Context) : Observer<Intent> {
 
-    override fun onSubscribe(d: Disposable?) {
+    override fun onSubscribe(d: Disposable) {
 
     }
 
-    override fun onNext(t: Intent?) {
-        t?.let {  intent ->
-            val remoteConfig = Firebase.remoteConfig
-            val sendByFireStore = remoteConfig.getBoolean("report_by_firestore")
-            if(sendByFireStore) {
-                intent.component = ComponentName(context, SendReportActivity::class.java)
-            }
-            context.startActivity(intent)
+    override fun onNext(t: Intent) {
+        val remoteConfig = Firebase.remoteConfig
+        val sendByFireStore = remoteConfig.getBoolean("report_by_firestore")
+        if (sendByFireStore) {
+            t.component = ComponentName(context, SendReportActivity::class.java)
         }
+        context.startActivity(t)
     }
 
-    override fun onError(e: Throwable?) {
-        e?.printStackTrace()
+    override fun onError(e: Throwable) {
+        e.printStackTrace()
         Timber.e(e)
     }
 

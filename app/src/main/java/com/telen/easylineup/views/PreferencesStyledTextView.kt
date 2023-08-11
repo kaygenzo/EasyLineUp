@@ -3,11 +3,7 @@ package com.telen.easylineup.views
 import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import com.google.android.material.textview.MaterialTextView
-import com.telen.easylineup.R
-import java.lang.StringBuilder
 
 enum class LineupTypeface(val valueType: Int) {
     NORMAL(0),
@@ -15,7 +11,7 @@ enum class LineupTypeface(val valueType: Int) {
 
     companion object {
         fun getByValue(value: String?): LineupTypeface {
-            return when(value) {
+            return when (value) {
                 HAND_WRITING.valueType.toString() -> HAND_WRITING
                 else -> NORMAL
             }
@@ -23,18 +19,27 @@ enum class LineupTypeface(val valueType: Int) {
     }
 }
 
-class PreferencesStyledTextView: MaterialTextView {
+class PreferencesStyledTextView : MaterialTextView {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     fun setTypeface(typeface: LineupTypeface) {
-        when(typeface) {
+        when (typeface) {
             LineupTypeface.HAND_WRITING -> {
-                super.setTypeface(Typeface.createFromAsset(context.assets, "HomemadeApple-Regular.ttf"))
+                super.setTypeface(
+                    Typeface.createFromAsset(
+                        context.assets,
+                        "HomemadeApple-Regular.ttf"
+                    )
+                )
             }
+
             else -> {
                 // nothing for now
             }

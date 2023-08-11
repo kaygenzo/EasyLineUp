@@ -21,38 +21,28 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.TeamItemViewBinding
 import com.telen.easylineup.views.StateDefense
-import kotlinx.android.synthetic.main.team_item_view.view.*
 
 class TeamItemView : LinearLayout {
 
-    constructor(context: Context) : super(context) {
-        init(context)
-    }
+    private val binding = TeamItemViewBinding.inflate(LayoutInflater.from(context), this)
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        init(context)
-    }
-
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
         defStyleAttr
-    ) {
-        init(context)
-    }
-
-    private fun init(context: Context) {
-        LayoutInflater.from(context).inflate(R.layout.team_item_view, this, true)
-    }
+    )
 
     fun setTeamName(teamName: String) {
-        name.text = teamName
+        binding.name.text = teamName
     }
 
     fun setImage(stringUri: String?, teamName: String) {
         val size = resources.getDimensionPixelSize(R.dimen.teams_list_icon_size)
-        teamIcon.setState(StateDefense.PLAYER)
-        teamIcon.setPlayerImage(stringUri, teamName, size)
+        binding.teamIcon.setState(StateDefense.PLAYER)
+        binding.teamIcon.setPlayerImage(stringUri, teamName, size)
     }
 }

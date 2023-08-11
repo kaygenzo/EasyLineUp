@@ -4,20 +4,17 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.telen.easylineup.R
+import com.telen.easylineup.databinding.FieldViewBinding
 
-class BaseballFieldView: ConstraintLayout {
-    constructor(context: Context) : super(context) {
-        init(context)
-    }
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        init(context)
-    }
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        init(context)
-    }
+class BaseballFieldView : ConstraintLayout {
 
-    private fun init(context: Context?) {
-        LayoutInflater.from(context).inflate(R.layout.field_view, this)
-    }
+    val binding = FieldViewBinding.inflate(LayoutInflater.from(context), this, true)
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 }

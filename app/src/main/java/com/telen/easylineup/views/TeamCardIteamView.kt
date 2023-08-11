@@ -5,25 +5,25 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.telen.easylineup.R
-import kotlinx.android.synthetic.main.view_item_team_card.view.*
+import com.telen.easylineup.databinding.ViewItemTeamCardBinding
 
-class TeamCardItemView: ConstraintLayout {
+class TeamCardItemView : ConstraintLayout {
+
+    private val binding = ViewItemTeamCardBinding.inflate(LayoutInflater.from(context), this, true)
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-
-    init {
-        LayoutInflater.from(context).inflate(R.layout.view_item_team_card, this)
-    }
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     fun setIcon(@DrawableRes icon: Int) {
-        itemTeamCardIcon.setImageResource(icon)
+        binding.itemTeamCardIcon.setImageResource(icon)
     }
 
     fun setDescription(description: String) {
-        itemTeamCardDescription.text = description
+        binding.itemTeamCardDescription.text = description
     }
-
-
 }

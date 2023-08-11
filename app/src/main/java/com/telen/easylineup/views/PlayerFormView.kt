@@ -12,8 +12,13 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.*
-import kotlinx.android.synthetic.main.view_create_player.view.*
+import com.telen.easylineup.databinding.ViewCreatePlayerBinding
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.PlayerSide
+import com.telen.easylineup.domain.model.Sex
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.getPositionShortName
+import com.telen.easylineup.domain.model.isDefensePlayer
 import timber.log.Timber
 
 interface PlayerFormListener {
@@ -36,41 +41,29 @@ interface PlayerFormListener {
 
 class PlayerFormView : ConstraintLayout {
 
+    private val binding = ViewCreatePlayerBinding.inflate(LayoutInflater.from(context), this, true)
+
     private var listener: PlayerFormListener? = null
     private var imageUri: Uri? = null
     private var playerPositions = 0
     private val positionState: MutableMap<FieldPosition, Boolean> = mutableMapOf()
 
-    constructor(context: Context) : super(context) {
-        initView(context)
-    }
-
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        initView(context)
-    }
-
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
         defStyleAttr
-    ) {
-        initView(context)
-    }
+    )
 
-    fun setListener(listener: PlayerFormListener) {
-        this.listener = listener
-    }
+    init {
+        binding.playerImage.setImageResource(R.drawable.unknown_player)
 
-    private fun initView(context: Context) {
-        LayoutInflater.from(context).inflate(R.layout.view_create_player, this)
-
-        playerImage.setImageResource(R.drawable.unknown_player)
-
-        playerImage.setOnClickListener {
+        binding.playerImage.setOnClickListener {
             listener?.onImagePickerRequested()
         }
 
-        actionContainer.saveClickListener = OnClickListener {
+        binding.actionContainer.saveClickListener = OnClickListener {
             val name = getName()
             val shirtNumber = getShirtNumber()
             val licenseNumber = getLicenseNumber()
@@ -95,31 +88,35 @@ class PlayerFormView : ConstraintLayout {
             )
         }
 
-        actionContainer.cancelClickListener = OnClickListener {
+        binding.actionContainer.cancelClickListener = OnClickListener {
             listener?.onCancel()
         }
 
-        favoritePositionsContainer.useDefaultMargins = true
-        favoritePositionsContainer.alignmentMode = GridLayout.ALIGN_MARGINS
+        binding.favoritePositionsContainer.useDefaultMargins = true
+        binding.favoritePositionsContainer.alignmentMode = GridLayout.ALIGN_MARGINS
 
         setPositionsFilter(0)
 
-        playerImageAction.run {
+        binding.playerImageAction.run {
             setImageResource(R.drawable.add_image)
             setOnClickListener(null)
         }
 
-        sexMale.setOnClickListener {
-            if (sexFemale.isChecked) {
+        binding.sexMale.setOnClickListener {
+            if (binding.sexFemale.isChecked) {
                 setSex(Sex.MALE)
             }
         }
 
-        sexFemale.setOnClickListener {
-            if (sexMale.isChecked) {
+        binding.sexFemale.setOnClickListener {
+            if (binding.sexMale.isChecked) {
                 setSex(Sex.FEMALE)
             }
         }
+    }
+
+    fun setListener(listener: PlayerFormListener) {
+        this.listener = listener
     }
 
     fun onImageUriReceived(imageUri: Uri) {
@@ -127,12 +124,12 @@ class PlayerFormView : ConstraintLayout {
     }
 
     fun getName(): String {
-        return playerNameInput.text.toString()
+        return binding.playerNameInput.text.toString()
     }
 
     fun getShirtNumber(): Int? {
         return try {
-            playerShirtNumberInput.text.toString().toInt()
+            binding.playerShirtNumberInput.text.toString().toInt()
         } catch (exception: NumberFormatException) {
             null
         }
@@ -140,7 +137,7 @@ class PlayerFormView : ConstraintLayout {
 
     fun getLicenseNumber(): Long? {
         return try {
-            playerLicenseNumberInput.text.toString().toLong()
+            binding.playerLicenseNumberInput.text.toString().toLong()
         } catch (exception: NumberFormatException) {
             null
         }
@@ -151,30 +148,30 @@ class PlayerFormView : ConstraintLayout {
     }
 
     fun setName(name: String) {
-        playerNameInput.setText(name)
+        binding.playerNameInput.setText(name)
     }
 
     fun setShirtNumber(shirtNumber: Int) {
-        playerShirtNumberInput.setText(shirtNumber.toString())
+        binding.playerShirtNumberInput.setText(shirtNumber.toString())
     }
 
     fun setLicenseNumber(licenseNumber: Long) {
-        playerLicenseNumberInput.setText(licenseNumber.toString())
+        binding.playerLicenseNumberInput.setText(licenseNumber.toString())
     }
 
     fun setPlayerImage(@DrawableRes resId: Int) {
         Picasso.get().load(resId)
             .placeholder(R.drawable.unknown_player)
             .error(R.drawable.unknown_player)
-            .into(playerImage)
+            .into(binding.playerImage)
     }
 
     fun setImage(uri: Uri) {
         imageUri = uri
-        playerImage.post {
+        binding.playerImage.post {
             try {
                 Picasso.get().load(imageUri)
-                    .resize(playerImage.width, playerImage.height)
+                    .resize(binding.playerImage.width, binding.playerImage.height)
                     .centerCrop()
                     .transform(
                         RoundedTransformationBuilder()
@@ -186,14 +183,14 @@ class PlayerFormView : ConstraintLayout {
                     )
                     .placeholder(R.drawable.unknown_player)
                     .error(R.drawable.unknown_player)
-                    .into(playerImage)
+                    .into(binding.playerImage)
             } catch (e: IllegalArgumentException) {
                 Timber.e(e)
             }
         }
 
         imageUri?.let {
-            playerImageAction.run {
+            binding.playerImageAction.run {
                 setImageResource(R.drawable.remove_image)
                 setOnClickListener {
                     imageUri = null
@@ -206,11 +203,11 @@ class PlayerFormView : ConstraintLayout {
     }
 
     fun enableSaveButton() {
-        actionContainer.setSaveButtonEnabled(true)
+        binding.actionContainer.setSaveButtonEnabled(true)
     }
 
     fun disableSaveButton() {
-        actionContainer.setSaveButtonEnabled(false)
+        binding.actionContainer.setSaveButtonEnabled(false)
     }
 
     fun getPlayerPositions(): Int {
@@ -222,7 +219,7 @@ class PlayerFormView : ConstraintLayout {
         this.playerPositions = positions
         this.positionState.clear()
 
-        favoritePositionsContainer.removeAllViews()
+        binding.favoritePositionsContainer.removeAllViews()
 
         FieldPosition.values()
             .filter { it.isDefensePlayer() }
@@ -257,7 +254,7 @@ class PlayerFormView : ConstraintLayout {
                     }
                 }
 
-                favoritePositionsContainer.addView(view)
+                binding.favoritePositionsContainer.addView(view)
             }
     }
 
@@ -267,6 +264,7 @@ class PlayerFormView : ConstraintLayout {
                 view.setBackground(R.drawable.position_selected_background)
                 view.setTextColor(R.color.white)
             }
+
             else -> {
                 view.setBackground(R.drawable.position_unselected_background)
                 view.setTextColor(R.color.tile_team_size_background_color)
@@ -282,47 +280,48 @@ class PlayerFormView : ConstraintLayout {
 //    }
 
     fun displayInvalidName() {
-        playerNameInputLayout.error = resources.getString(R.string.player_creation_error_name_empty)
-        playerEmailInputLayout.error = null
-        playerPhoneInputLayout.error = null
+        binding.playerNameInputLayout.error =
+            resources.getString(R.string.player_creation_error_name_empty)
+        binding.playerEmailInputLayout.error = null
+        binding.playerPhoneInputLayout.error = null
     }
 
     fun displayInvalidEmail() {
-        playerNameInputLayout.error = null
-        playerEmailInputLayout.error =
+        binding.playerNameInputLayout.error = null
+        binding.playerEmailInputLayout.error =
             resources.getString(R.string.player_creation_error_invalid_email_format)
-        playerPhoneInputLayout.error = null
+        binding.playerPhoneInputLayout.error = null
     }
 
     fun displayInvalidPhoneNumber() {
-        playerNameInputLayout.error = null
-        playerEmailInputLayout.error = null
-        playerPhoneInputLayout.error =
+        binding.playerNameInputLayout.error = null
+        binding.playerEmailInputLayout.error = null
+        binding.playerPhoneInputLayout.error =
             resources.getString(R.string.player_creation_error_invalid_phone_format)
     }
 
     fun getPitchingSide(): PlayerSide? {
         var pitching = 0
-        if (pitchingSideLeft.isChecked)
+        if (binding.pitchingSideLeft.isChecked)
             pitching = pitching or PlayerSide.LEFT.flag
-        if (pitchingSideRight.isChecked)
+        if (binding.pitchingSideRight.isChecked)
             pitching = pitching or PlayerSide.RIGHT.flag
         return PlayerSide.getSideByValue(pitching)
     }
 
     fun getBattingSide(): PlayerSide? {
         var batting = 0
-        if (battingSideLeft.isChecked)
+        if (binding.battingSideLeft.isChecked)
             batting = batting or PlayerSide.LEFT.flag
-        if (battingSideRight.isChecked)
+        if (binding.battingSideRight.isChecked)
             batting = batting or PlayerSide.RIGHT.flag
         return PlayerSide.getSideByValue(batting)
     }
 
     fun getSex(): Sex? {
-        return if (sexMale.isChecked) {
+        return if (binding.sexMale.isChecked) {
             Sex.MALE
-        } else if (sexFemale.isChecked) {
+        } else if (binding.sexFemale.isChecked) {
             Sex.FEMALE
         } else {
             null
@@ -332,20 +331,23 @@ class PlayerFormView : ConstraintLayout {
     fun setPitchingSide(side: PlayerSide?) {
         when (side) {
             PlayerSide.LEFT -> {
-                pitchingSideLeft.isChecked = true
-                pitchingSideRight.isChecked = false
+                binding.pitchingSideLeft.isChecked = true
+                binding.pitchingSideRight.isChecked = false
             }
+
             PlayerSide.RIGHT -> {
-                pitchingSideLeft.isChecked = false
-                pitchingSideRight.isChecked = true
+                binding.pitchingSideLeft.isChecked = false
+                binding.pitchingSideRight.isChecked = true
             }
+
             PlayerSide.BOTH -> {
-                pitchingSideLeft.isChecked = true
-                pitchingSideRight.isChecked = true
+                binding.pitchingSideLeft.isChecked = true
+                binding.pitchingSideRight.isChecked = true
             }
+
             null -> {
-                pitchingSideLeft.isChecked = false
-                pitchingSideRight.isChecked = false
+                binding.pitchingSideLeft.isChecked = false
+                binding.pitchingSideRight.isChecked = false
             }
         }
     }
@@ -353,16 +355,18 @@ class PlayerFormView : ConstraintLayout {
     fun setSex(sex: Sex?) {
         when (sex) {
             Sex.MALE -> {
-                sexMale.isChecked = true
-                sexFemale.isChecked = false
+                binding.sexMale.isChecked = true
+                binding.sexFemale.isChecked = false
             }
+
             Sex.FEMALE -> {
-                sexMale.isChecked = false
-                sexFemale.isChecked = true
+                binding.sexMale.isChecked = false
+                binding.sexFemale.isChecked = true
             }
+
             else -> {
-                sexMale.isChecked = false
-                sexFemale.isChecked = false
+                binding.sexMale.isChecked = false
+                binding.sexFemale.isChecked = false
             }
         }
     }
@@ -370,37 +374,40 @@ class PlayerFormView : ConstraintLayout {
     fun setBattingSide(side: PlayerSide?) {
         when (side) {
             PlayerSide.LEFT -> {
-                battingSideLeft.isChecked = true
-                battingSideRight.isChecked = false
+                binding.battingSideLeft.isChecked = true
+                binding.battingSideRight.isChecked = false
             }
+
             PlayerSide.RIGHT -> {
-                battingSideLeft.isChecked = false
-                battingSideRight.isChecked = true
+                binding.battingSideLeft.isChecked = false
+                binding.battingSideRight.isChecked = true
             }
+
             PlayerSide.BOTH -> {
-                battingSideLeft.isChecked = true
-                battingSideRight.isChecked = true
+                binding.battingSideLeft.isChecked = true
+                binding.battingSideRight.isChecked = true
             }
+
             null -> {
-                battingSideLeft.isChecked = false
-                battingSideRight.isChecked = false
+                binding.battingSideLeft.isChecked = false
+                binding.battingSideRight.isChecked = false
             }
         }
     }
 
     fun getEmail(): String? {
-        return playerEmailInput.text.toString()
+        return binding.playerEmailInput.text.toString()
     }
 
     fun setEmail(email: String?) {
-        playerEmailInput.setText(email ?: "")
+        binding.playerEmailInput.setText(email ?: "")
     }
 
     fun getPhone(): String? {
-        return playerPhoneInput.text.toString()
+        return binding.playerPhoneInput.text.toString()
     }
 
     fun setPhone(phone: String?) {
-        playerPhoneInput.setText(phone ?: "")
+        binding.playerPhoneInput.setText(phone ?: "")
     }
 }

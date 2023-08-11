@@ -5,14 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.FragmentListTournamentsBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamType
@@ -26,10 +26,6 @@ import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.utils.hideSoftKeyboard
 import com.telen.easylineup.views.OnSearchBarListener
 import io.reactivex.rxjava3.core.Completable
-import kotlinx.android.synthetic.main.fragment_list_tournaments.*
-import kotlinx.android.synthetic.main.fragment_list_tournaments.view.*
-import timber.log.Timber
-
 
 class LineupsScrollListener(private val view: FloatingActionButton) :
     RecyclerView.OnScrollListener() {
@@ -47,63 +43,63 @@ class TournamentListFragment : BaseFragment("TournamentListFragment"), OnItemCli
     OnSearchBarListener {
 
     private lateinit var tournamentsAdapter: TournamentsAdapter
-    private lateinit var viewModel: LineupViewModel
+    private val viewModel by viewModels<LineupViewModel>()
+    private var binding: FragmentListTournamentsBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         tournamentsAdapter = TournamentsAdapter(this)
-        viewModel = ViewModelProviders.of(this).get(LineupViewModel::class.java)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_list_tournaments, container, false)
+    ): View {
+        return FragmentListTournamentsBinding.inflate(layoutInflater, container, false).apply {
+            binding = this
 
-        view.recyclerView.apply {
-            layoutManager = GridLayoutManager(view.context, 1)
-            adapter = tournamentsAdapter
+            recyclerView.apply {
+                layoutManager = GridLayoutManager(context, 1)
+                adapter = tournamentsAdapter
 
-            //display or hide the fab when scrolling
-            addOnScrollListener(LineupsScrollListener(view.fab))
-        }
+                //display or hide the fab when scrolling
+                addOnScrollListener(LineupsScrollListener(fab))
+            }
 
-        view.fab.setOnClickListener {
-            FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_create")
-            findNavController().navigate(
-                R.id.lineupCreationFragment,
-                null,
-                NavigationUtils().getOptions()
-            )
-        }
+            fab.setOnClickListener {
+                FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_create")
+                findNavController().navigate(
+                    R.id.lineupCreationFragment,
+                    null,
+                    NavigationUtils().getOptions()
+                )
+            }
 
-        viewModel.observeCategorizedLineups().observe(viewLifecycleOwner, Observer {
-            tournamentsAdapter.setList(it)
-        })
+            viewModel.observeCategorizedLineups().observe(viewLifecycleOwner) {
+                tournamentsAdapter.setList(it)
+            }
 
-        launch(viewModel.getTeamType(), {
-            tournamentsAdapter.setTeamType(it)
-        })
+            launch(viewModel.getTeamType(), {
+                tournamentsAdapter.setTeamType(it)
+            })
 
-        viewModel.setFilter("")
+            viewModel.setFilter("")
 
-        view.materialSearchBar.onSearchBarListener = this
-
-        return view
+            materialSearchBar.onSearchBarListener = this@TournamentListFragment
+        }.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        view?.recyclerView?.apply {
+        binding?.recyclerView?.apply {
             adapter = null
         }
     }
 
     override fun onResume() {
         super.onResume()
-        materialSearchBar.setIdle()
+        binding?.materialSearchBar?.setIdle()
     }
 
     override fun onDeleteTournamentClicked(tournament: Tournament) {

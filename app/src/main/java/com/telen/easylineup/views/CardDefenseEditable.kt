@@ -5,38 +5,42 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.core.content.ContextCompat
 import com.google.android.material.card.MaterialCardView
-import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.databinding.CardDefenseEditableBinding
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
-import kotlinx.android.synthetic.main.card_defense_editable.view.*
 
-class CardDefenseEditable: MaterialCardView {
+class CardDefenseEditable : MaterialCardView {
 
-    constructor(context: Context) : super(context) { init(context)}
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs){ init(context)}
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr){ init(context)}
+    private val binding =
+        CardDefenseEditableBinding.inflate(LayoutInflater.from(context), this, true)
 
-    private fun init(context: Context?) {
-        LayoutInflater.from(context).inflate(R.layout.card_defense_editable, this)
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
+
+    init {
         context?.let {
             setBackgroundColor(ContextCompat.getColor(it, android.R.color.transparent))
         }
     }
 
     fun init(strategy: TeamStrategy) {
-        fieldAndPlayersRootView.initField(strategy)
+        binding.fieldAndPlayersRootView.initField(strategy)
     }
 
     fun setListPlayer(players: List<PlayerWithPosition>, lineupMode: Int, teamType: Int) {
-        fieldAndPlayersRootView.setListPlayer(players, lineupMode, teamType)
+        binding.fieldAndPlayersRootView.setListPlayer(players, lineupMode, teamType)
     }
 
     fun setPlayerStateListener(playerButtonCallback: OnPlayerButtonCallback) {
-        fieldAndPlayersRootView.setOnPlayerListener(playerButtonCallback)
+        binding.fieldAndPlayersRootView.setOnPlayerListener(playerButtonCallback)
     }
 
     fun clear() {
-        fieldAndPlayersRootView.clear()
+        binding.fieldAndPlayersRootView.clear()
     }
 }

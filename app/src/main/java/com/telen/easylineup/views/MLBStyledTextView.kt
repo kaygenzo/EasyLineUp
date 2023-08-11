@@ -9,12 +9,15 @@ import com.google.android.material.textview.MaterialTextView
 import com.telen.easylineup.R
 import java.lang.StringBuilder
 
-class MLBStyledTextView: MaterialTextView {
+class MLBStyledTextView : MaterialTextView {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     init {
         setTextColor(ContextCompat.getColor(context, R.color.lineup_name))

@@ -3,31 +3,37 @@ package com.telen.easylineup.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View.OnClickListener
 import android.view.inputmethod.EditorInfo
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.textfield.TextInputLayout
 import com.telen.easylineup.R
-import kotlinx.android.synthetic.main.view_material_search_bar.view.*
+import com.telen.easylineup.databinding.ViewMaterialSearchBarBinding
 
 interface OnSearchBarListener {
     fun onSearchConfirmed(text: String?)
 }
 
-class MaterialSearchBar: ConstraintLayout {
+class MaterialSearchBar : ConstraintLayout {
 
-    @DrawableRes private var endIcon: Int = 0
+    @DrawableRes
+    private var endIcon: Int = 0
     var onSearchBarListener: OnSearchBarListener? = null
+    private val binding =
+        ViewMaterialSearchBarBinding.inflate(LayoutInflater.from(context), this, true)
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.view_material_search_bar, this)
-
         val clickListener = OnClickListener {
-            searchBarLayout.apply {
+            binding.searchBarLayout.apply {
                 when (endIcon) {
                     R.drawable.ic_baseline_search_24 -> {
                         val text = this.editText?.text.toString()
@@ -41,12 +47,14 @@ class MaterialSearchBar: ConstraintLayout {
                             endIconMode = TextInputLayout.END_ICON_NONE
                         }
                     }
+
                     R.drawable.ic_close_24dp -> {
                         this.editText?.text?.clear()
                         onSearchConfirmed("")
                         endIcon = 0
                         endIconMode = TextInputLayout.END_ICON_NONE
                     }
+
                     else -> {
                     }
                 }
@@ -54,9 +62,9 @@ class MaterialSearchBar: ConstraintLayout {
             }
         }
 
-        searchBarInput.setOnFocusChangeListener { _, focused ->
-            if(focused) {
-                searchBarLayout.run {
+        binding.searchBarInput.setOnFocusChangeListener { _, focused ->
+            if (focused) {
+                binding.searchBarLayout.run {
                     endIconMode = TextInputLayout.END_ICON_CUSTOM
                     endIcon = R.drawable.ic_baseline_search_24
                     setEndIconDrawable(endIcon)
@@ -65,13 +73,14 @@ class MaterialSearchBar: ConstraintLayout {
             }
         }
 
-        searchBarInput.setOnEditorActionListener { _, actionId, _ ->
-            when(actionId) {
+        binding.searchBarInput.setOnEditorActionListener { _, actionId, _ ->
+            when (actionId) {
                 EditorInfo.IME_ACTION_DONE,
                 EditorInfo.IME_ACTION_SEARCH -> {
-                    clickListener.onClick(searchBarInput)
+                    clickListener.onClick(binding.searchBarInput)
                     true
                 }
+
                 else -> false
             }
         }
@@ -82,6 +91,6 @@ class MaterialSearchBar: ConstraintLayout {
     }
 
     fun setIdle() {
-        searchBarInput.clearFocus()
+        binding.searchBarInput.clearFocus()
     }
 }

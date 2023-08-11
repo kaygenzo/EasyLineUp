@@ -7,17 +7,19 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.ViewDpFlexLinkBinding
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.TeamType
-import kotlinx.android.synthetic.main.view_dp_flex_link.view.*
 
-class DpFlexLinkView: ConstraintLayout {
+class DpFlexLinkView : ConstraintLayout {
 
     companion object {
         const val TYPE_NONE = 0
         const val TYPE_DP = 1
         const val TYPE_FLEX = 2
     }
+
+    private val binding = ViewDpFlexLinkBinding.inflate(LayoutInflater.from(context), this, true)
 
     private var playerTypeChoice = TYPE_NONE
     private var dp: Player? = null
@@ -26,56 +28,58 @@ class DpFlexLinkView: ConstraintLayout {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.view_dp_flex_link, this)
-        linkDpFlexPlayerList.visibility = View.GONE
+        binding.linkDpFlexPlayerList.visibility = View.GONE
         iconeSize = resources.getDimensionPixelSize(R.dimen.link_dp_flex_icon_size)
-        player_dp.setState(StateDefense.PLAYER)
-        player_flex.setState(StateDefense.PLAYER)
+        binding.playerDp.setState(StateDefense.PLAYER)
+        binding.playerFlex.setState(StateDefense.PLAYER)
     }
 
     fun setTeamType(type: Int) {
-        when(type) {
+        when (type) {
             TeamType.BASEBALL.id -> {
-                player_dp_label.setText(R.string.field_position_dh)
-                player_flex_label.setText(R.string.field_position_pitcher)
+                binding.playerDpLabel.setText(R.string.field_position_dh)
+                binding.playerFlexLabel.setText(R.string.field_position_pitcher)
             }
+
             TeamType.SOFTBALL.id -> {
-                player_dp_label.setText(R.string.field_position_dp)
-                player_flex_label.setText(R.string.field_position_flex)
+                binding.playerDpLabel.setText(R.string.field_position_dp)
+                binding.playerFlexLabel.setText(R.string.field_position_flex)
             }
         }
     }
 
     fun setOnDpClickListener(dpLocked: Boolean, listener: OnClickListener) {
-        if(!dpLocked) {
-            player_dp.alpha = 1f
-            player_dp.setOnClickListener {
-                player_dp.setBorderColor(Color.RED)
-                player_flex.setBorderColor(Color.BLACK)
+        if (!dpLocked) {
+            binding.playerDp.alpha = 1f
+            binding.playerDp.setOnClickListener {
+                binding.playerDp.setBorderColor(Color.RED)
+                binding.playerFlex.setBorderColor(Color.BLACK)
                 playerTypeChoice = TYPE_DP
                 listener.onClick(it)
             }
-        }
-        else {
-            player_dp.alpha = 0.5f
+        } else {
+            binding.playerDp.alpha = 0.5f
         }
     }
 
     fun setOnFlexClickListener(flexLocked: Boolean, listener: OnClickListener) {
-        if(!flexLocked) {
-            player_flex.alpha = 1f
-            player_flex.setOnClickListener {
-                player_dp.setBorderColor(Color.BLACK)
-                player_flex.setBorderColor(Color.RED)
+        if (!flexLocked) {
+            binding.playerFlex.alpha = 1f
+            binding.playerFlex.setOnClickListener {
+                binding.playerDp.setBorderColor(Color.BLACK)
+                binding.playerFlex.setBorderColor(Color.RED)
                 playerTypeChoice = TYPE_FLEX
                 listener.onClick(it)
             }
-        }
-        else {
-            player_flex.alpha = 0.5f
+        } else {
+            binding.playerFlex.alpha = 0.5f
         }
     }
 
@@ -94,25 +98,24 @@ class DpFlexLinkView: ConstraintLayout {
 
     private fun setDpPlayer(player: Player) {
         this.dp = player
-        player_dp.setPlayerImage(player.image, player.name, iconeSize)
+        binding.playerDp.setPlayerImage(player.image, player.name, iconeSize)
     }
 
     private fun setFlexPlayer(player: Player) {
         this.flex = player
-        player_flex.setPlayerImage(player.image, player.name, iconeSize)
+        binding.playerFlex.setPlayerImage(player.image, player.name, iconeSize)
     }
 
     fun setPlayerList(players: List<Player>) {
-        linkDpFlexPlayerList.visibility = View.VISIBLE
-        linkDpFlexPlayerList.setPlayers(players)
-        linkDpFlexPlayerList.setOnPlayerClickListener(object : OnPlayerClickListener {
+        binding.linkDpFlexPlayerList.visibility = View.VISIBLE
+        binding.linkDpFlexPlayerList.setPlayers(players)
+        binding.linkDpFlexPlayerList.setOnPlayerClickListener(object : OnPlayerClickListener {
             override fun onPlayerSelected(player: Player) {
-                linkDpFlexPlayerList.visibility = View.GONE
-                if(getCurrentTypeSelected() == TYPE_FLEX) {
+                binding.linkDpFlexPlayerList.visibility = View.GONE
+                if (getCurrentTypeSelected() == TYPE_FLEX) {
                     flex = player
                     setFlexPlayer(player)
-                }
-                else {
+                } else {
                     dp = player
                     setDpPlayer(player)
                 }

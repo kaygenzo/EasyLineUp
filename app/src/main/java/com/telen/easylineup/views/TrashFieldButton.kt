@@ -5,24 +5,26 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.telen.easylineup.R
-import kotlinx.android.synthetic.main.view_add_player_button.view.*
+import com.telen.easylineup.databinding.ViewTrashFieldButtonBinding
 
-class TrashFieldButton: ConstraintLayout {
+class TrashFieldButton : ConstraintLayout {
 
-    constructor(context: Context) : super(context) { init(context) }
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init(context) }
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init(context) }
+    private val binding: ViewTrashFieldButtonBinding =
+        ViewTrashFieldButtonBinding.inflate(LayoutInflater.from(context), this, true)
 
-    private fun init(context: Context) {
-        LayoutInflater.from(context).inflate(R.layout.view_trash_field_button, this)
-    }
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     fun setScaleType(scaleType: ImageView.ScaleType) {
-        fab.scaleType = scaleType
+        binding.fab.scaleType = scaleType
     }
 
     override fun setOnClickListener(l: OnClickListener?) {
-        fab.setOnClickListener(l)
+        binding.fab.setOnClickListener(l)
     }
 }

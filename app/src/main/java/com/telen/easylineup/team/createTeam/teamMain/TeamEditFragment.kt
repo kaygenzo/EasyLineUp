@@ -17,20 +17,18 @@ import com.telen.easylineup.team.createTeam.SetupViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.TeamFormListener
-import kotlinx.android.synthetic.main.view_create_team.*
-import timber.log.Timber
 
 class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
 
     private val viewModel by activityViewModels<SetupViewModel>()
-    private var binder: FragmentTeamEditBinding? = null
+    private var binding: FragmentTeamEditBinding? = null
 
     private val pickImage =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
                 it.data?.data?.let { imageUri ->
                     context?.contentResolver?.let { ImagePickerUtils.persistImage(it, imageUri) }
-                    binder?.editTeamForm?.onImageUriReceived(imageUri)
+                    binding?.editTeamForm?.onImageUriReceived(imageUri)
                 }
             }
         }
@@ -53,9 +51,13 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
         launch(viewModel.errors, {
             when (it) {
                 SetupViewModel.StepError.NAME_EMPTY -> {
-                    teamNameInputLayout.error = getString(R.string.team_creation_error_name_empty)
+                    binding?.run {
+                        editTeamForm.binding.teamNameInputLayout.error =
+                            getString(R.string.team_creation_error_name_empty)
+                    }
                     FirebaseAnalyticsUtils.emptyTeamName(activity)
                 }
+
                 else -> {
                     Toast.makeText(
                         activity,
@@ -72,24 +74,25 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binder = FragmentTeamEditBinding.inflate(inflater, container, false)
-        this.binder = binder
+        return FragmentTeamEditBinding.inflate(inflater, container, false).apply {
+            binding = this
 
-        binder.editTeamForm.setListener(this@TeamEditFragment)
+            with(editTeamForm) {
+                setListener(this@TeamEditFragment)
 
-        viewModel.observeTeamName().observe(viewLifecycleOwner) {
-            binder.editTeamForm.setName(it)
-        }
+                viewModel.observeTeamName().observe(viewLifecycleOwner) {
+                    setName(it)
+                }
 
-        viewModel.observeTeamImage().observe(viewLifecycleOwner) {
-            it?.let { binder.editTeamForm.setImage(it) }
-        }
-
-        return binder.root
+                viewModel.observeTeamImage().observe(viewLifecycleOwner) {
+                    it?.let { setImage(it) }
+                }
+            }
+        }.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binder = null
+        binding = null
     }
 }

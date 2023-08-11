@@ -28,7 +28,6 @@ import com.telen.easylineup.domain.model.tiles.LastPlayerNumberResearchData
 import com.telen.easylineup.launch
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.*
-import kotlinx.android.synthetic.main.home_main_content.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.text.DateFormat
@@ -54,21 +53,20 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentDashboardBinding.inflate(inflater, container, false)
-        this.binding = binding
-        val columnCount = resources.getInteger(R.integer.dashboard_tile_count)
-        val gridLayoutManager = GridLayoutManager(context, columnCount)
+        return FragmentDashboardBinding.inflate(inflater, container, false).apply {
+            binding = this
+            val columnCount = resources.getInteger(R.integer.dashboard_tile_count)
+            val gridLayoutManager = GridLayoutManager(context, columnCount)
 
-        binding.tileRecyclerView.apply {
-            layoutManager = gridLayoutManager
-            adapter = tileAdapter
-        }
+            tileRecyclerView.apply {
+                layoutManager = gridLayoutManager
+                adapter = tileAdapter
+            }
 
-        viewModel.registerTilesLiveData().observe(viewLifecycleOwner) {
-            tileAdapter.submitList(it)
-        }
-
-        return binding.root
+            viewModel.registerTilesLiveData().observe(viewLifecycleOwner) {
+                tileAdapter.submitList(it)
+            }
+        }.root
     }
 
     override fun onDestroyView() {
@@ -86,6 +84,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                     NavigationUtils().getOptions()
                 )
             }
+
             Constants.TYPE_LAST_LINEUP -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_last_lineup")
                 val lineupID = data.getData()[KEY_LINEUP_ID] as? Long ?: 0L
@@ -98,6 +97,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                     NavigationUtils().getOptions()
                 )
             }
+
             else -> {
                 Timber.d("Click on that tile is not supported, skip")
             }
@@ -175,6 +175,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                             }
                         })
                     }
+
                     INDEX_SEND_EMAILS -> {
                         FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_send_email")
                         launch(viewModel.getEmails(), {
@@ -197,6 +198,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                             }
                         })
                     }
+
                     INDEX_SEND_OTHER -> {
                         FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_send_other")
                         val intent = Intent(Intent.ACTION_SEND).apply {
@@ -244,7 +246,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
         activity?.let { activity ->
             launch(viewModel.showNewReportIssueButtonFeature(), { show ->
                 if (show) {
-                    (activity.toolbar as? Toolbar)?.let { toolbar ->
+                    (activity.findViewById<Toolbar>(R.id.toolbar))?.let { toolbar ->
                         FeatureViewFactory.apply(toolbar, R.id.action_report_issue,
                             activity as AppCompatActivity,
                             getString(R.string.shake_beta_title),
@@ -272,6 +274,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                 activity?.run { bugReporter.startReport(this) }
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }

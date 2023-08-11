@@ -7,27 +7,28 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.ItemPlayersListBinding
 import com.telen.easylineup.domain.model.Player
-import kotlinx.android.synthetic.main.item_players_list.view.*
 
 class PlayerListCard(context: Context) : PlayerCard(context) {
 
+    private val binding = ItemPlayersListBinding.inflate(LayoutInflater.from(context), this, true)
+
     init {
-        LayoutInflater.from(context).inflate(R.layout.item_players_list, this)
         setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent))
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     override fun getCardRootView(): View {
-        return playerCardRootView
+        return binding.playerCardRootView
     }
 
     override fun bind(player: Player) {
-        setName(playerName, player.name)
-        setShirtNumber(playerShirtNumber, player.shirtNumber)
-        playerIcon.setState(StateDefense.PLAYER)
-        playerIcon.setBorderColor(Color.BLACK)
+        setName(binding.playerName, player.name)
+        setShirtNumber(binding.playerShirtNumber, player.shirtNumber)
+        binding.playerIcon.setState(StateDefense.PLAYER)
+        binding.playerIcon.setBorderColor(Color.BLACK)
         val size = resources.getDimensionPixelSize(R.dimen.teams_list_icon_size)
-        playerIcon.setPlayerImage(player.image, player.name, size)
+        binding.playerIcon.setPlayerImage(player.image, player.name, size)
     }
 }
