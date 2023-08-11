@@ -6,8 +6,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDexApplication
 import com.github.kaygenzo.bugreporter.api.BugReporter
+import com.google.firebase.appcheck.ktx.appCheck
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.initialize
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.telen.easylineup.BuildConfig
@@ -36,6 +39,12 @@ open class App : MultiDexApplication() {
 
         val crashlytics: FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
         crashlytics.setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
+
+        Firebase.initialize(context = this)
+
+        Firebase.appCheck.installAppCheckProviderFactory(
+            PlayIntegrityAppCheckProviderFactory.getInstance(),
+        )
 
         val koinApp = startKoin {
             androidContext(this@App)
