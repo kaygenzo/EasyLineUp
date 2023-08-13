@@ -45,7 +45,7 @@ class TournamentStatisticsTableFragment : BaseFragment("TournamentStatisticsTabl
             val headersStyle = StyleConfiguration(
                 cellTextSize = R.dimen.app_max_text_size_middle,
                 cellTextTypeface = Typeface.DEFAULT_BOLD,
-                cellDefaultBackgroundColor = R.color.tile_player_most_used_header_color,
+                cellDefaultBackgroundColor = R.color.colorTertiaryContainer,
                 cellDefaultTextColor = R.color.black
             )
 

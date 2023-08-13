@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <com.google.android.material.card.MaterialCardView
+    style="@style/Widget.Material3.CardView.Elevated"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -29,7 +30,7 @@
             android:layout_height="match_parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/verticalGuideline"
-            android:background="@color/team_type_bottom_view"
+            android:background="?attr/colorPrimary"
             android:translationZ="1dp"/>
 
         <ImageView

@@ -14,7 +14,6 @@
     <dimen name="player_details_picture_height">250dp</dimen>
 
     <dimen name="dashboard_tile_height">320dp</dimen>
-    <dimen name="tile_most_used_player_image_size">100dp</dimen>
 
     <dimen name="player_bar_chart_x_axis_size">10dp</dimen>
 

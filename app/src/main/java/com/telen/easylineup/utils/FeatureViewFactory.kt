@@ -31,7 +31,7 @@ class FeatureViewFactory {
                             .descriptionTextDimen(R.dimen.app_max_text_size_big)            // Specify the size (in sp) of the description text
                             .descriptionTypeface(Typeface.SANS_SERIF)
                             .textColor(R.color.white)            // Specify a color for both the title and description text
-                            .dimColor(R.color.blue_grey_80)            // If set, will dim behind the view with 30% opacity of the given color
+                            .dimColor(R.color.grey)            // If set, will dim behind the view with 30% opacity of the given color
                             .drawShadow(true)                   // Whether to draw a drop shadow or not
                             .cancelable(true)                  // Whether tapping outside the outer circle dismisses the view
                             .tintTarget(false)                   // Whether to tint the target view's color

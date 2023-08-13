@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.AdapterView.OnItemClickListener
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import androidx.core.widget.addTextChangedListener
@@ -80,10 +81,10 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
                         R.layout.item_auto_completion,
                         tournaments.map { it.name })
                     with(tournamentChoice) {
-                        this.adapter = adapter
-                        setSelection(index)
-                        onItemSelectedListener = TournamentSelectionListener {
-                            viewModel.onTournamentChanged(tournaments[it])
+                        setAdapter(adapter)
+                        hint = tournaments[index].name
+                        onItemClickListener = OnItemClickListener { _, _, position, _ ->
+                            viewModel.onTournamentChanged(tournaments[position])
                         }
                     }
                 })

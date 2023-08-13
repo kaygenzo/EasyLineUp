@@ -303,7 +303,7 @@ class DefenseEditableView : DefenseView {
         val addSubstituteView = ImageView(context).run {
             layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
             setPadding(10, 10, 10, 10)
-            setImageResource(R.drawable.ic_person_add_black_24dp)
+            setImageResource(R.drawable.ic_person_add_24dp)
 
             setOnClickListener {
                 playerListener?.onPlayerButtonClicked(FieldPosition.SUBSTITUTE)

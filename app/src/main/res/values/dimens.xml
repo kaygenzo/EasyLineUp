@@ -24,11 +24,6 @@
     <dimen name="player_details_picture_width">120dp</dimen>
     <dimen name="player_details_picture_height">150dp</dimen>
 
-    <dimen name="tile_most_used_player_image_size">80dp</dimen>
-
-    <dimen name="timeline_radio_margin_left">32dp</dimen>
-    <dimen name="timeline_radio_margin_left_reverse">-32dp</dimen>
-
     <dimen name="list_empty_text_left_right_margin">60dp</dimen>
     <dimen name="list_empty_text_top_margin">20dp</dimen>
     <dimen name="teams_list_first_item_extra_padding">8dp</dimen>

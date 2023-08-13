@@ -3,7 +3,6 @@
     <string name="action_edit">Editer</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_share">Partager</string>
-    <string name="action_add_player_in_roster">Editer les joueurs</string>
     <string name="action_report_issue">Reporter un problème</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>
@@ -32,8 +31,6 @@
     <string name="team_creation_error_name_empty">Le nom de l\'équipe ne peut pas être vide</string>
 
     <string name="player_creation_error_name_empty">Le nom du joueur ne peut pas être vide</string>
-    <string name="player_creation_error_shirt_empty">Le numéro de maillot de peut pas être vide</string>
-    <string name="player_creation_error_license_empty">Le numéro de licence ne peut pas être vide</string>
 
     <string name="lineup_creation_error_name_empty">Le nom du lineup ne peut pas être vide</string>
     <string name="lineup_creation_error_tournament_empty">Le nom du tournoi ne peut pas être vide</string>
@@ -48,7 +45,6 @@
     <string name="dialog_delete_cannot_undo_message">Cette action ne peut pas être annulée, êtes-vous sûr ?</string>
     <string name="dialog_delete_progress_message">Suppression&#8230;</string>
 
-    <string name="tile_team_size_message">%d joueurs dans votre équipe</string>
     <string name="tile_team_size_warning_message">Pas assez de joueurs pour avoir une équipe complète!</string>
     <string name="tile_most_used_player_header">Joueur le plus utilisé</string>
     <string name="tile_most_used_player_games_played">Matchs joués</string>
@@ -60,8 +56,6 @@
     <string name="form_lineup_creation_date_label">Date</string>
     <string name="form_lineup_creation_roster_label">Joueurs</string>
 
-    <string name="lineup_list_empty_label">Vide</string>
-    <string name="lineup_list_filter_focused_hint">Tapez un nom</string>
     <string name="lineup_list_filter_unfocused_hint">Filtrer par nom</string>
 
     <string name="shake_beta_title">Un problème ? </string>
@@ -82,8 +76,6 @@
 
     <string name="players_list_empty">Plus aucun joueur disponible</string>
 
-    <string name="gallery_picker_default_title">Albums</string>
-
     <string name="share_lineup_subject">Voici le lineup de: %s</string>
 
     <string name="team_list_empty_text">Une fois que vous aurez créé votre équipe, elle sera visible ici</string>
@@ -103,10 +95,6 @@
     <string name="feature_roster_description">Vous pouvez changer les joueurs qui participeront au match</string>
 
     <string name="roster_list_player_dialog_title">Liste des joueurs de l\'équipe</string>
-
-    <string name="team_details_type_baseball">Equipe de Baseball</string>
-    <string name="team_details_type_softball">Equipe de Softball</string>
-    <string name="team_details_type_unknown">Type d\'équipe non défini</string>
 
     <plurals name="team_details_team_size">
         <item quantity="one">Votre équipe est composée de %d membre</item>
@@ -136,9 +124,6 @@
 
     <string name="settings_category_data">Données</string>
     <string name="settings_category_support">Assistance</string>
-    <string name="export_data_to_file_dialog_title">Veuillez choisir un nom de fichier pour l\'exportation</string>
-    <string name="export_data_to_file_dialog_message">Nom du fichier</string>
-    <string name="export_button">Exporter</string>
 
     <string name="link_dp_and_flex_dialog_title">Associez votre DP et votre Flex</string>
     <string name="link_dh_and_pitcher_dialog_title">Associez votre DH et votre Pitcher</string>
@@ -187,13 +172,11 @@
 
     <string name="player_hint_email">Email</string>
     <string name="player_hint_phone">Numéro de téléphone</string>
-    <string name="player_hint_phone_short">N° tél.</string>
     <string name="player_creation_error_invalid_email_format">Format d\'email invalide</string>
     <string name="player_creation_error_invalid_phone_format">Format de n° de téléphone invalide</string>
     <string name="tile_team_size_send_text_message">SMS</string>
     <string name="tile_team_size_send_email">Email</string>
     <string name="tile_team_size_send_other">Autre</string>
-    <string name="tile_team_size_send_title">Envoyer un message avec</string>
     <string name="tile_team_size_send_empty_title">Un problème est survenu</string>
     <string name="tile_team_size_send_empty_emails">Aucun email trouvé dans la liste des joueurs</string>
     <string name="tile_team_size_send_empty_phones">Aucun n° de téléphone trouvé dans la liste des joueurs</string>
@@ -217,7 +200,6 @@
 
     <string name="permission_request_read_external_storage">"L\'accès aux media est requis pour afficher les images"</string>
     <string name="permission_request_settings_action">"Paramètres"</string>
-    <string name="permission_request_pick_image_title">"Selection d\'image..."</string>
 
     <string name="create_player_sex">Sexe</string>
 

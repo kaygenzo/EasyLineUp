@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorSecondary">#89ad59</color>
     <color name="lineup_name">#4d5bc9</color>
-    <color name="tile_player_most_used_header_color">#b08e4c</color>
-    <color name="lineup_batter_list_highlight">#585858</color>
+    <color name="colorPrimary">@color/md_theme_dark_primary</color>
+    <color name="colorTertiaryContainer">@color/md_theme_dark_tertiaryContainer</color>
 </resources>

@@ -4,7 +4,7 @@
     android:shape="oval" >
 
     <solid
-        android:color="@color/team_type_bottom_view" />
+        android:color="?attr/colorPrimary" />
 
     <corners
         android:radius="16dp"/>

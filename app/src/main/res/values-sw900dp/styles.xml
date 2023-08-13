@@ -1,17 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-<!--    <style name="AppTheme.MaterialTextView" parent="Widget.MaterialComponents.TextView">-->
-<!--        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Headline5</item>-->
-<!--    </style>-->
-
-<!--    <style name="MaterialAlertDialog.App.Title.Text" parent="MaterialAlertDialog.MaterialComponents.Title.Text">-->
-<!--        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Headline4</item>-->
-<!--    </style>-->
-
-<!--    <style name="MaterialAlertDialog.App.Body.Text" parent="TextAppearance.MaterialComponents.Headline5"/>-->
-
-<!--    <style name="AppTheme.PreferenceTheme" parent="PreferenceThemeOverlay">-->
-<!--    </style>-->
-
 </resources>

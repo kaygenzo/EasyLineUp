@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <com.google.android.material.card.MaterialCardView
+    style="@style/Widget.Material3.CardView.Elevated"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -34,7 +35,7 @@
             android:id="@+id/bottomSheet"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/team_type_bottom_view"
+            android:background="?attr/colorPrimary"
             app:behavior_hideable="false">
 
             <com.telen.easylineup.views.SwashedStyledTextView
@@ -59,12 +60,11 @@
                 android:layout_marginTop="@dimen/default_margin"
                 tools:visibility="visible">
 
-                <View
+                <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/teamTypeSeparator"
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
+                    android:layout_height="wrap_content"
                     app:layout_constraintTop_toBottomOf="@+id/teamTypeTitle"
-                    android:background="@color/white"
                     android:layout_marginBottom="@dimen/default_margin"/>
 
                 <com.telen.easylineup.views.TeamCardItemView

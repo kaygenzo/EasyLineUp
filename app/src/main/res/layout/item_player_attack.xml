@@ -11,7 +11,7 @@
         android:id="@+id/reorderImage"
         android:layout_width="@dimen/item_attack_width"
         android:layout_height="match_parent"
-        android:src="@drawable/ic_reorder_black_24dp"
+        android:src="@drawable/ic_reorder_24dp"
         android:padding="8dp"
         app:layout_constraintLeft_toLeftOf="parent"/>
 

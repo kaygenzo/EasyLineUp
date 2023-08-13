@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#5a7e2d</color>
-    <color name="colorPrimaryLight">#89ad59</color>
-    <color name="colorPrimaryVariant">#2d5100</color>
-    <color name="colorSecondary">#2d5100</color>
-    <color name="colorOnSecondary">#FFFFFF</color>
-    <color name="colorOnPrimary">@color/white</color>
+    <color name="colorPrimary">@color/md_theme_light_primary</color>
+    <color name="colorTertiaryContainer">@color/md_theme_light_tertiaryContainer</color>
 
     <color name="number_blue">#FF2D3783</color>
     <color name="text_orange">#FFd37240</color>
@@ -13,34 +9,21 @@
 
     <color name="infield">#a18e3c</color>
     <color name="infield_stroke">#85881b</color>
+    <color name="baseball_field_color">#5a7e2d</color>
 
-    <color name="selected_step_circle">#FFFFFFFF</color>
-    <color name="selected_step_text">#FF505050</color>
     <color name="white">#FFFFFFFF</color>
     <color name="black">#000000</color>
+    <color name="grey">#6d6d6d</color>
 
     <color name="tile_team_size_background_color">#1D2E2A</color>
-    <color name="tile_shake_beta_background_color">@color/white</color>
     <color name="tile_player_most_used_background_color_dark">#5A7E2D</color>
     <color name="tile_player_most_used_background_color">#719948</color>
     <color name="tile_player_most_used_background_color_light">#8EAD6D</color>
     <color name="tile_player_most_used_background_color_lighter">#C8C9A3</color>
-    <color name="tile_player_most_used_header_color">#DCCCAD</color>
 
     <color name="tile_big_border_dark">#1D2E2A</color>
     <color name="tile_small_border_dark">#1D2E2A</color>
 
-    <color name="normal_uppercase_style_text_color">#1C2B06</color>
-
-    <color name="tile_player_size_warning">#CC0000</color>
-
-    <color name="baseball_field_color">@color/colorPrimary</color>
-    <color name="tournaments_timeline_color">@color/colorPrimaryVariant</color>
-
-    <color name="list_empty_text">#6d6d6d</color>
-
-    <color name="blue_grey_80">#ff37474f</color>
-
-    <color name="team_type_bottom_view">@color/colorPrimaryVariant</color>
-    <color name="lineup_batter_list_highlight">#DCCCAD</color>
+    <color name="team_type_bottom_view">@color/colorPrimary</color>
+    <color name="lineup_batter_list_highlight">@color/colorTertiaryContainer</color>
 </resources>

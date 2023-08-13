@@ -29,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/header_batting_order_player_shirt"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 app:layout_constraintTop_toBottomOf="@+id/tile_player_number_header"
                 android:layout_marginStart="2dp"
                 android:layout_marginEnd="2dp"

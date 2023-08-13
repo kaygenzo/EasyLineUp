@@ -135,7 +135,7 @@ class TeamCardView : ConstraintLayout {
                             .borderColor(
                                 ContextCompat.getColor(
                                     context,
-                                    R.color.team_type_bottom_view
+                                    R.color.colorPrimary
                                 )
                             )
                             .borderWidth(cradleRadius)

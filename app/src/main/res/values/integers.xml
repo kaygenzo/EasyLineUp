@@ -3,6 +3,4 @@
     <integer name="player_list_column_count">2</integer>
     <integer name="dashboard_tile_count">2</integer>
 
-    <integer name="timeline_radio_radius">25</integer>
-    <integer name="timeline_radio_radius_outline">30</integer>
 </resources>

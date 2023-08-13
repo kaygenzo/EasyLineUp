@@ -7,8 +7,6 @@
     <string name="action_delete">Delete</string>
     <string name="action_share">Share</string>
     <string name="action_report_issue">Report an issue</string>
-    <string name="action_add_player_in_roster">Edit roster</string>
-    <string name="action_roster" translatable="false">@string/form_lineup_creation_roster_label</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_attack">Attack</string>
@@ -25,7 +23,6 @@
     <string name="player_hint_license_number_short">License N°</string>
     <string name="player_hint_email">Email</string>
     <string name="player_hint_phone">Phone number</string>
-    <string name="player_hint_phone_short">Phone n°</string>
 
     <string name="title_last_lineup">Dashboard</string>
     <string name="title_team">Roster</string>
@@ -40,8 +37,6 @@
     <string name="team_creation_error_name_empty">Team name cannot be empty</string>
 
     <string name="player_creation_error_name_empty">Player name cannot be empty</string>
-    <string name="player_creation_error_shirt_empty">Player shirt number cannot be empty</string>
-    <string name="player_creation_error_license_empty">Player license cannot be empty</string>
     <string name="player_creation_error_invalid_email_format">Invalid email format</string>
     <string name="player_creation_error_invalid_phone_format">Invalid phone number format</string>
 
@@ -58,7 +53,6 @@
     <string name="dialog_delete_cannot_undo_message">This action cannot be undo, are you sure ?</string>
     <string name="dialog_delete_progress_message">Deleting&#8230;</string>
 
-    <string name="tile_team_size_message">%d players in your team</string>
     <string name="tile_team_size_warning_message">Not enough players to have a complete team!</string>
     <string name="tile_most_used_player_header">Most used player</string>
     <string name="tile_most_used_player_games_played">Games played</string>
@@ -71,8 +65,6 @@
     <string name="form_lineup_creation_date_label">Date</string>
     <string name="form_lineup_creation_roster_label">Roster</string>
 
-    <string name="lineup_list_empty_label">Empty</string>
-    <string name="lineup_list_filter_focused_hint">Enter name</string>
     <string name="lineup_list_filter_unfocused_hint">Filter name</string>
 
     <string name="shake_beta_title">Any problem ?</string>
@@ -100,7 +92,6 @@
 
     <string name="players_list_empty">No player available</string>
 
-    <string name="gallery_picker_default_title">Albums</string>
     <string name="share_lineup_subject">Here is the lineup of: %s</string>
 
     <string name="team_list_empty_text">Once you create a team, you’ll see it listed here</string>
@@ -120,10 +111,6 @@
     <string name="feature_roster_description">You can now change players who will play the game!</string>
 
     <string name="roster_list_player_dialog_title">List of all team players</string>
-
-    <string name="team_details_type_baseball">Baseball team</string>
-    <string name="team_details_type_softball">Softball team</string>
-    <string name="team_details_type_unknown">Team type undefined</string>
 
     <plurals name="team_details_team_size">
         <item quantity="one">Your team is composed of %d member</item>
@@ -165,10 +152,6 @@
     <string name="settings_category_style">Style</string>
     <string name="settings_category_data">Data</string>
     <string name="settings_category_support">Support</string>
-
-    <string name="export_data_to_file_dialog_title">Please choose a file name for exportation</string>
-    <string name="export_data_to_file_dialog_message">File name</string>
-    <string name="export_button">Export</string>
 
     <string name="link_dp_and_flex_dialog_title">Link your DP and your Flex</string>
     <string name="link_dh_and_pitcher_dialog_title">Link your DH and your Pitcher</string>
@@ -228,7 +211,6 @@
     <string name="tile_team_size_send_email">Email</string>
     <string name="tile_team_size_send_other">Other</string>
 
-    <string name="tile_team_size_send_title">Send message with</string>
     <string name="tile_team_size_send_empty_title">Something went wrong</string>
     <string name="tile_team_size_send_empty_emails">No emails found into players</string>
     <string name="tile_team_size_send_empty_phones">No phone numbers found into players</string>
@@ -255,7 +237,6 @@
 
     <string name="permission_request_read_external_storage">"Media access is needed to display images"</string>
     <string name="permission_request_settings_action">"Settings"</string>
-    <string name="permission_request_pick_image_title">"Pick an image..."</string>
 
     <plurals name="women_count">
         <item quantity="one">%d woman</item>

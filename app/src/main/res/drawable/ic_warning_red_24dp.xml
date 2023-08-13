@@ -1,6 +1,6 @@
 <vector
     android:height="24dp"
-    android:tint="@color/tile_player_size_warning"
+    android:tint="?attr/colorError"
     android:viewportHeight="24.0"
     android:viewportWidth="24.0"
     android:width="24dp"

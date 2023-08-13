@@ -23,7 +23,7 @@
 
         <ImageView
             android:id="@+id/playerImage"
-            tools:src="@color/colorSecondary"
+            tools:src="?attr/colorPrimary"
             android:layout_width="@dimen/player_details_picture_width"
             android:layout_height="@dimen/player_details_picture_height"
             app:layout_constraintTop_toTopOf="parent"
@@ -269,7 +269,7 @@
                 tools:text="42"/>
 
             <TextView
-                android:background="@color/normal_uppercase_style_text_color"
+                android:background="?attr/colorControlNormal"
                 android:id="@+id/separator"
                 android:layout_width="@dimen/player_details_container_separator_width"
                 android:layout_height="60dp"

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/itemTeamCardContainer"
-    tools:background="@color/team_type_bottom_view">
+    tools:background="?attr/colorPrimary">
 
     <ImageView
         android:id="@+id/itemTeamCardIcon"

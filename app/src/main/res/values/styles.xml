@@ -27,31 +27,14 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
-        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.App.Title.Text</item>
-        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.App.Body.Text</item>
-    </style>
-
-    <style name="Tile" parent="Widget.MaterialComponents.CardView">
+    <style name="Tile" parent="Widget.Material3.CardView.Outlined">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/dashboard_tile_height</item>
-        <item name="cardCornerRadius">6dp</item>
-        <item name="cardElevation">6dp</item>
-        <item name="cardPreventCornerOverlap">false</item>
         <item name="cardUseCompatPadding">true</item>
     </style>
 
     <style name="TileTeamSize" parent="Tile">
         <item name="android:background">@color/tile_team_size_background_color</item>
-    </style>
-
-    <style name="TileShakeBeta" parent="Tile">
-        <item name="android:background">@drawable/border_tile_shake_beta</item>
-    </style>
-
-    <style name="TileLastLineup" parent="Tile">
-        <item name="android:background">@drawable/border_tile_shake_beta</item>
     </style>
 
     <style name="TilePlayerMostUsed" parent="Tile">
@@ -64,10 +47,6 @@
         <item name="android:gravity">center</item>
         <item name="android:padding">10dp</item>
         <item name="android:textColor">?attr/colorControlNormal</item>
-    </style>
-
-    <style name="Field.Auto" parent="Field">
-        <item name="autoSizeTextType">uniform</item>
     </style>
 
     <!-- DARK -->
@@ -91,21 +70,8 @@
         <item name="autoSizeTextType">uniform</item>
     </style>
 
-    <style name="Field.Green.Big" parent="Field.Green">
-        <item name="android:textAppearance">@style/TextBig</item>
-    </style>
-
     <style name="Field.Green.Middle" parent="Field.Green">
         <item name="android:textAppearance">@style/TextMiddle</item>
-    </style>
-
-    <style name="Field.Green.Small" parent="Field.Green">
-        <item name="android:textAppearance">@style/TextSmall</item>
-    </style>
-
-    <style name="Field.Green.Small.Auto" parent="Field.Green.Small">
-        <item name="autoSizeMaxTextSize">@dimen/app_max_text_size_small</item>
-        <item name="autoSizeTextType">uniform</item>
     </style>
 
     <!-- LIGHT -->
@@ -164,7 +130,7 @@
     <!-- HEADER -->
 
     <style name="Field.Header" parent="Field">
-        <item name="android:background">@color/tile_player_most_used_header_color</item>
+        <item name="android:background">?attr/colorTertiaryContainer</item>
     </style>
 
     <style name="Field.Header.Rounded" parent="Field.Header">
@@ -181,7 +147,7 @@
     <!-- Swap team dialog begin-->
 
     <style name="ListEmptyText">
-        <item name="android:textColor">@color/list_empty_text</item>
+        <item name="android:textColor">@color/grey</item>
     </style>
 
     <style name="ContactListItemLinearLayoutStyle">
@@ -209,27 +175,14 @@
 
     <style name="ButtonCancel">
         <item name="android:backgroundTint">@color/white</item>
-        <item name="android:textColor">@color/colorPrimaryVariant</item>
-        <item name="strokeColor">@color/colorPrimaryVariant</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="strokeColor">?attr/colorPrimary</item>
         <item name="strokeWidth">1dp</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
     </style>
 
     <!-- Material components theming -->
-
-    <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">8dp</item>
-    </style>
-    <style name="ShapeAppearance.App.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">12dp</item>
-    </style>
-    <style name="ShapeAppearance.App.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">16dp</item>
-    </style>
 
     <style name="LineupName">
         <item name="android:textAppearance">@style/TextMiddle</item>
@@ -264,29 +217,11 @@
         <item name="android:layout_marginTop">5dp</item>
     </style>
 
-    <style name="ActivityLoadingView" parent="Widget.MaterialComponents.CardView">
+    <style name="ActivityLoadingView" parent="Widget.Material3.CardView.Outlined">
         <item name="android:layout_width">280dp</item>
         <item name="android:layout_height">120dp</item>
-        <item name="cardCornerRadius">6dp</item>
-        <item name="cardElevation">6dp</item>
-        <item name="cardPreventCornerOverlap">false</item>
         <item name="cardUseCompatPadding">true</item>
         <item name="android:background">@color/white</item>
-    </style>
-
-    <style name="Widget.App.Chip.Choice" parent="Widget.MaterialComponents.Chip.Choice">
-        <item name="chipIconTint">@color/chip_tint</item>
-        <item name="chipStrokeWidth">1dp</item>
-        <item name="chipStrokeColor">@color/chip_tint</item>
-        <item name="checkedIconVisible">false</item>
-        <item name="chipIconVisible">true</item>
-        <item name="chipBackgroundColor">@color/chip_background_tint</item>
-    </style>
-
-    <style name="Widget.App.Chip.Action" parent="Widget.MaterialComponents.Chip.Action">
-        <item name="chipStrokeWidth">1dp</item>
-        <item name="chipStrokeColor">@color/chip_tint</item>
-        <item name="chipIconTint">@color/text_orange</item>
     </style>
 
 </resources>

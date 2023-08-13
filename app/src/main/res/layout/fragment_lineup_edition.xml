@@ -27,18 +27,28 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <androidx.appcompat.widget.AppCompatSpinner
-            android:id="@+id/tournamentChoice"
-            app:layout_constraintTop_toBottomOf="@+id/lineupNameInput"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:id="@+id/tournamentChoiceContainer"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="2dp" />
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/lineupNameInput"
+            android:layout_marginTop="2dp"
+            tools:hint="@string/dialog_create_lineup_tournament">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/tournamentChoice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rosterListItems"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@+id/tournamentChoice"
+            app:layout_constraintTop_toBottomOf="@+id/tournamentChoiceContainer"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:listitem="@layout/item_roster_entry"
             android:layout_marginTop="@dimen/default_margin"/>

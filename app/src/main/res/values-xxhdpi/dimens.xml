@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="dashboard_tile_height">250dp</dimen>
-    <dimen name="tile_most_used_player_image_size">80dp</dimen>
 
     <dimen name="card_team_type_ball_image_diameter">120dp</dimen>
     <dimen name="card_team_type_ball_image_radius">60dp</dimen>

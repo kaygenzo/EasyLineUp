@@ -69,7 +69,7 @@ class TournamentStatisticsViewModel: ViewModel(), KoinComponent {
 
                     val columnHighlights = mutableListOf<Highlight>()
                     it.columnToHighlight.forEach {
-                        columnHighlights.add(it, Highlight(it, StyleConfiguration( cellDefaultBackgroundColor = R.color.list_empty_text, cellDefaultTextColor = R.color.white )))
+                        columnHighlights.add(it, Highlight(it, StyleConfiguration( cellDefaultBackgroundColor = R.color.grey, cellDefaultTextColor = R.color.white )))
                     }
 
                     this.topHeadersData.value = topHeaderDataList
