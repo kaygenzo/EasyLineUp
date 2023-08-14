@@ -243,12 +243,12 @@ abstract class LineupFragment(
 
     private fun exportLineupToExternalStorage() {
         activity?.let {
-            val views = listOf(FRAGMENT_DEFENSE_INDEX, FRAGMENT_ATTACK_INDEX).associateWith {
-                pagerAdapter.map[it]?.drawToBitmap()
+            binder?.viewpager?.currentItem?.let { index ->
+                val views = mapOf(index to pagerAdapter.map[index]?.drawToBitmap())
+                launch(viewModel.exportLineupToExternalStorage(it, views), { intent ->
+                    startActivity(Intent.createChooser(intent, ""))
+                })
             }
-            launch(viewModel.exportLineupToExternalStorage(it, views), { intent ->
-                startActivity(Intent.createChooser(intent, ""))
-            })
         }
     }
 
