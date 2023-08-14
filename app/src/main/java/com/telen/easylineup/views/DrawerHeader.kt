@@ -15,35 +15,16 @@ class DrawerHeader(context: Context) : ConstraintLayout(context) {
 
     val binding = NavDrawerHeaderBinding.inflate(LayoutInflater.from(context), this, true)
 
-    fun setImage(image: String?) {
-        binding.drawerImage.ready {
-            try {
-                Picasso.get().load(image)
-                    .resize(binding.drawerImage.width, binding.drawerImage.height)
-                    .centerCrop()
-                    .transform(
-                        RoundedTransformationBuilder()
-                            .borderColor(Color.BLACK)
-                            .borderWidthDp(2f)
-                            .cornerRadiusDp(16f)
-                            .oval(true)
-                            .build()
-                    )
-                    .placeholder(R.drawable.ic_unknown_team)
-                    .error(R.drawable.ic_unknown_team)
-                    .into(binding.drawerImage)
-            } catch (e: IllegalArgumentException) {
-                Timber.e(e)
-            }
-        }
+    fun setImage(image: String?, teamName: String) {
+       binding.teamItem.setImage(image, teamName)
     }
 
     fun setTitle(title: String) {
-        binding.drawerTitle.text = title
+        binding.teamItem.setTeamName(title)
     }
 
-    fun setOnImageClickListener(l: OnClickListener?) {
-        binding.drawerImage.setOnClickListener(l)
+    fun setOnItemClickListener(l: OnClickListener?) {
+        binding.teamItem.setOnClickListener(l)
     }
 
     fun setOnSwapTeamClickListener(l: OnClickListener?) {

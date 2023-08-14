@@ -63,7 +63,7 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
 
             navigationView.addHeaderView(drawerHeader)
 
-            drawerHeader.setOnImageClickListener {
+            drawerHeader.setOnItemClickListener {
                 viewModel.getTeamsCount()
             }
 
@@ -87,7 +87,7 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
             val disposable = viewModel.observeEvents().subscribe({
                 when (it) {
                     is GetTeamSuccess -> {
-                        drawerHeader.setImage(it.team.image)
+                        drawerHeader.setImage(it.team.image, it.team.name)
                         drawerHeader.setTitle(it.team.name)
                     }
 
