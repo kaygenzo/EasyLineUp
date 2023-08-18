@@ -110,13 +110,10 @@ class LineupCreationFormView: ConstraintLayout, TextWatcher {
 
     fun setTeamType(teamType: TeamType) {
         val strategies = teamType.getStrategies()
-        val strategiesName = when(teamType) {
-            TeamType.BASEBALL -> resources.getStringArray(R.array.baseball_strategy_array)
-            TeamType.SOFTBALL -> resources.getStringArray(R.array.softball_strategy_array)
-            else -> {
-                strategy = teamType.defaultStrategy
-                return
-            }
+        val strategiesName = teamType.getStrategiesDisplayName(context)
+        if (strategiesName == null) {
+            strategy = teamType.defaultStrategy
+            return
         }
         strategyAdapter = ArrayAdapter(context, R.layout.item_team_strategy, strategiesName)
         lineupStrategySpinner.apply {

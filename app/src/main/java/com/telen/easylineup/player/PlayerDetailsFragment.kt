@@ -17,7 +17,7 @@ import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ready
-import kotlinx.android.synthetic.main.view_bar_chart.view.*
+import kotlinx.android.synthetic.main.view_bar_chart.view.teamStrategy
 import timber.log.Timber
 
 const val EMPTY_MARKER = "-"
@@ -101,12 +101,10 @@ class PlayerDetailsFragment : BaseFragment("PlayerDetailsFragment"),
             binding.positionsBarChart.setTeamType(it)
         })
 
-        viewModel.observeStrategies().observe(viewLifecycleOwner) {
+        viewModel.observeStrategies(requireContext()).observe(viewLifecycleOwner) {
             binding.positionsBarChart.teamStrategy.apply {
-                //TODO check the team type
                 visibility = if (it.size > 1) View.VISIBLE else View.GONE
-                val strategiesName = resources.getStringArray(R.array.softball_strategy_array)
-                adapter = ArrayAdapter(context, R.layout.item_team_strategy, strategiesName)
+                adapter = ArrayAdapter(context, R.layout.item_team_strategy, it)
                 setSelection(0, false)
                 onItemSelectedListener = this@PlayerDetailsFragment
             }

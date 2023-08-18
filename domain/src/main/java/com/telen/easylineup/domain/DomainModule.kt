@@ -54,7 +54,7 @@ object DomainModule {
         single { DeleteTeam(get()) }
         single { SwitchPlayersPosition(get()) }
         single { DeleteAllData(get(), get()) }
-        single { GetTournamentStatsForPositionTable(get()) }
+        single { GetTournamentStatsForPositionTable(get(), get()) }
         single { CheckHashData(get(), get(), get(), get(), get()) }
         single { ExportData(get(), get(), get(), get(), get()) }
         single { ImportData(get(), get(), get(), get(), get()) }

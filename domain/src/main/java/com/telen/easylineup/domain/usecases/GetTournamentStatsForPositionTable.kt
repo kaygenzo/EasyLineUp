@@ -7,7 +7,7 @@ import com.telen.easylineup.domain.model.*
 import com.telen.easylineup.domain.repository.LineupRepository
 import io.reactivex.rxjava3.core.Single
 
-internal class GetTournamentStatsForPositionTable(val dao: LineupRepository): UseCase<GetTournamentStatsForPositionTable.RequestValues, GetTournamentStatsForPositionTable.ResponseValue>() {
+internal class GetTournamentStatsForPositionTable(val context: Context, val dao: LineupRepository): UseCase<GetTournamentStatsForPositionTable.RequestValues, GetTournamentStatsForPositionTable.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return dao.getAllPlayerPositionsForTournament(requestValues.tournament.id, requestValues.team.id)
@@ -62,16 +62,10 @@ internal class GetTournamentStatsForPositionTable(val dao: LineupRepository): Us
                     }
 
                     var topLeftCell: List<String>? = null
-                    when(TeamType.getTypeById(requestValues.team.type)) {
-                        TeamType.SOFTBALL -> {
-                            topLeftCell = requestValues.context.resources.getStringArray(R.array.softball_strategy_array).toList()
-                        }
-                        TeamType.BASEBALL -> {
-                            topLeftCell = requestValues.context.resources.getStringArray(R.array.baseball_strategy_array).toList()
-                        }
-                        else -> {
-                            //nothing to do, just use standard strategy
-                        }
+                    TeamType.getTypeById(requestValues.team.type).getStrategiesDisplayName(context)?.let {
+                        topLeftCell = it.toList()
+                    } ?: let {
+                        //nothing to do, just use standard strategy
                     }
 
                     ResponseValue(TournamentStatsUIConfig(leftHeaderData, topHeaderData, mainData, mutableListOf(FieldPosition.SUBSTITUTE.id), topLeftCell))
