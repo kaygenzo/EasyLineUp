@@ -11,6 +11,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.NavigationViewActions
@@ -557,6 +558,59 @@ class GlobalNavigationTest {
 
         //check second entry is toto
         BaristaListAssertions.assertDisplayedAtPosition(R.id.list, 1, R.id.name, "toto")
+    }
+
+    @Test
+    fun applyTeamTypeTests() {
+        initialization()
+
+        fun changeTeamType(count: Int, onLeft: Boolean) {
+            BaristaDrawerInteractions.openDrawer()
+            BaristaClickInteractions.clickOn(R.id.drawerImage)
+            BaristaMenuClickInteractions.clickMenu(R.id.action_edit)
+            BaristaClickInteractions.clickOn(R.id.buttonNext)
+            for (i in 0 until count) {
+                if (onLeft) {
+                    BaristaViewPagerInteractions.swipeViewPagerBack()
+                } else {
+                    BaristaViewPagerInteractions.swipeViewPagerForward()
+                }
+            }
+            BaristaClickInteractions.clickOn(R.id.buttonNext)
+        }
+
+        fun goToFirstPlayer() {
+
+            BaristaDrawerInteractions.openDrawer()
+            //go to team players
+            onView(withId(R.id.nav_view))
+                .perform(NavigationViewActions.navigateTo(R.id.navigation_team))
+            // Click on first player Albert
+            BaristaListInteractions.clickListItem(R.id.teamPlayersRecyclerView, 0)
+            BaristaScrollInteractions.scrollTo(R.id.positionsBarChart)
+        }
+
+        fun checkSpinnerElement(minPosition: Int, maxPosition: Int) {
+            BaristaSpinnerInteractions.clickSpinnerItem(R.id.teamStrategy, minPosition)
+            BaristaSpinnerInteractions.clickSpinnerItem(R.id.teamStrategy, maxPosition)
+        }
+
+        // two times to ensure to be on the baseball element
+        changeTeamType(count = 2, onLeft = true)
+        goToFirstPlayer()
+        BaristaVisibilityAssertions.assertDisplayed(R.id.teamStrategy)
+        checkSpinnerElement(minPosition = 0, maxPosition = 1)
+
+        // softball element
+        changeTeamType(count = 1, onLeft = false)
+        BaristaClickInteractions.clickBack()
+        BaristaVisibilityAssertions.assertDisplayed(R.id.teamStrategy)
+        checkSpinnerElement(minPosition = 0, maxPosition = 2)
+
+        // b5 element
+        changeTeamType(count = 1, onLeft = false)
+        BaristaClickInteractions.clickBack()
+        BaristaVisibilityAssertions.assertNotDisplayed(R.id.teamStrategy)
     }
 
     private fun childAtPosition(
