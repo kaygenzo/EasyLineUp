@@ -36,26 +36,31 @@ class LoginViewModel : ViewModel(), KoinComponent {
     }
 
     fun importData(uri: Uri, updateIfExists: Boolean) {
-        val task: Completable = context.contentResolver.openInputStream(uri)?.let {
-            Completable.defer {
-                it.use { stream ->
-                    stream.bufferedReader().use { reader ->
-                        val data = Gson().fromJson(reader, ExportBase::class.java)
-                        domain.data().importData(data, updateIfExists)
+        try {
+            val task = context.contentResolver.openInputStream(uri)?.let {
+                Completable.defer {
+                    it.use { stream ->
+                        stream.bufferedReader().use { reader ->
+                            val data = Gson().fromJson(reader, ExportBase::class.java)
+                            domain.data().importData(data, updateIfExists)
+                        }
                     }
                 }
+            } ?: let {
+                Completable.error(IllegalArgumentException("Cannot open uri"))
             }
-        } ?: let {
-            Completable.error(IllegalArgumentException("Cannot open uri"))
-        }
 
-        val disposable = task.subscribe({
-            _loginEvent.onNext(ImportSuccessfulEvent)
-        }, {
-            Timber.e(it)
+            val disposable = task.subscribe({
+                _loginEvent.onNext(ImportSuccessfulEvent)
+            }, {
+                Timber.e(it)
+                _loginEvent.onNext(ImportFailure)
+            })
+            disposables.add(disposable)
+        } catch (e: Exception) {
+            Timber.e(e)
             _loginEvent.onNext(ImportFailure)
-        })
-        disposables.add(disposable)
+        }
     }
 
     fun clear() {
