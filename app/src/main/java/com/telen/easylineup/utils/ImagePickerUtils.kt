@@ -1,11 +1,13 @@
 package com.telen.easylineup.utils
 
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.PermissionGrantedResponse
@@ -33,7 +35,11 @@ class ImagePickerUtils {
                     intent.addCategory(Intent.CATEGORY_OPENABLE)
                     intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    callback.launch(intent)
+                    try {
+                        callback.launch(intent)
+                    } catch (e: ActivityNotFoundException) {
+                        Toast.makeText(context, context.getString(R.string.file_explorer_not_found), Toast.LENGTH_LONG).show()
+                    }
                 }
             }
             val compositePermissionListener =

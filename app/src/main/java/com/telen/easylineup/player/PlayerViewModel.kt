@@ -1,5 +1,6 @@
 package com.telen.easylineup.player
 
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -34,7 +35,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
 
     var playerID: Long = 0
     var teamType: Int = 0
-    var strategies = mutableListOf<TeamStrategy>()
+    var strategies = mutableListOf<String>()
 
     var savedName: String? = null
     var savedShirtNumber: Int? = null
@@ -91,12 +92,14 @@ class PlayerViewModel : ViewModel(), KoinComponent {
         return _strategyLiveData
     }
 
-    fun observeStrategies(): LiveData<List<TeamStrategy>> {
+    fun observeStrategies(context: Context): LiveData<List<String>> {
         return observeTeamType().map { teamType ->
+            val teamType = TeamType.getTypeById(teamType)
+            val names = teamType.getStrategiesDisplayName(context) ?: arrayOf()
             strategies.apply {
                 clear()
-                addAll(TeamType.getTypeById(teamType).getStrategies())
-                _strategyLiveData.postValue(this[0])
+                addAll(names)
+                _strategyLiveData.postValue(teamType.getStrategies()[0])
             }
         }
     }
@@ -157,7 +160,8 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     fun registerPlayerFormErrorResult() = domain.players().observeErrors()
 
     fun onStrategySelected(index: Int) {
-        _strategyLiveData.postValue(strategies[index])
+        val teamType = TeamType.getTypeById(this.teamType)
+        _strategyLiveData.postValue(teamType.getStrategies()[index])
     }
 
     private fun getLineups() {

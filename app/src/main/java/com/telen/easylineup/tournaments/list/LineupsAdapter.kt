@@ -41,17 +41,7 @@ class LineupsAdapter(
 
             val strategy = TeamStrategy.getStrategyById(lineup.strategy)
             lineupStrategy.apply {
-                when (teamType) {
-                    TeamType.SOFTBALL -> {
-                        context.resources.getStringArray(R.array.softball_strategy_array)
-                    }
-
-                    TeamType.BASEBALL -> {
-                        context.resources.getStringArray(R.array.baseball_strategy_array)
-                    }
-
-                    else -> null
-                }?.let { array ->
+                teamType.getStrategiesDisplayName(context)?.let { array ->
                     val strategies = teamType.getStrategies()
                     strategies.indexOf(strategy).takeIf { it != -1 }?.let {
                         visibility = View.VISIBLE

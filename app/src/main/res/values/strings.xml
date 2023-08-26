@@ -262,4 +262,5 @@
     <string name="bug_report_trigger_shake">Shake</string>
     <string name="bug_report_trigger_floating_button">Floating button</string>
     <string name="bug_report_trigger_manual">Manual</string>
+    <string name="file_explorer_not_found">Cannot find any file explorer on this device</string>
 </resources>

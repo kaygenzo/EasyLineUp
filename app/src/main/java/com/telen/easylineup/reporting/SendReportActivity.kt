@@ -95,19 +95,27 @@ class SendReportActivity : BaseActivity() {
         return Completable.create { emitter ->
             val auth: FirebaseAuth = Firebase.auth
             auth.currentUser?.let {
-                emitter.onComplete()
+                if (!emitter.isDisposed) {
+                    emitter.onComplete()
+                }
             } ?: let {
                 auth.signInAnonymously()
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             auth.currentUser?.let {
-                                emitter.onComplete()
+                                if (!emitter.isDisposed) {
+                                    emitter.onComplete()
+                                }
                             } ?: let {
-                                emitter.onError(IllegalStateException())
+                                if (!emitter.isDisposed) {
+                                    emitter.onError(IllegalStateException())
+                                }
                             }
                         } else {
                             task.exception?.let {
-                                emitter.onError(it)
+                                if (!emitter.isDisposed) {
+                                    emitter.onError(it)
+                                }
                             }
                         }
                     }

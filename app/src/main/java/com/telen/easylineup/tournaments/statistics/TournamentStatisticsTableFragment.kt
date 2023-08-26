@@ -78,20 +78,19 @@ class TournamentStatisticsTableFragment : BaseFragment("TournamentStatisticsTabl
                     setColumnHighlights(it)
                 })
 
-                viewModel.topLeftCell.observe(viewLifecycleOwner, Observer { strategies ->
-                    activity?.let {
-                        val strategyAdapter: ArrayAdapter<String> =
-                            ArrayAdapter(it, R.layout.item_team_strategy, strategies.toTypedArray())
-                        val spinner = Spinner(it).apply {
+
+                activity?.let { context ->
+                    viewModel.getStrategiesNames(context)?.let { strategies ->
+                        val strategyAdapter = ArrayAdapter(context, R.layout.item_team_strategy, strategies)
+                        val spinner = Spinner(context).apply {
                             adapter = strategyAdapter
                             setSelection(viewModel.strategy.id, false)
                             onItemSelectedListener = this@TournamentStatisticsTableFragment
                         }
-                        setTopLeftCellCustomView(spinner)
+                        tableMultiScroll.setTopLeftCellCustomView(spinner)
                     }
-                })
+                }
             }
-
             viewModel.getPlayersPositionForTournament()
         }.root
     }

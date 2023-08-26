@@ -77,21 +77,10 @@ internal class GetTournamentStatsForPositionTable(
                 }
 
                 var topLeftCell: List<String>? = null
-                when (TeamType.getTypeById(requestValues.team.type)) {
-                    TeamType.SOFTBALL -> {
-                        topLeftCell = context.resources
-                            .getStringArray(R.array.softball_strategy_array)
-                            .toList()
-                    }
-                    TeamType.BASEBALL -> {
-                        topLeftCell = context.resources
-                            .getStringArray(R.array.baseball_strategy_array)
-                            .toList()
-                    }
-                    else -> {
-                        //nothing to do, just use standard strategy
-                    }
-                }
+                TeamType.getTypeById(requestValues.team.type)
+                    .getStrategiesDisplayName(context)?.let {
+                        topLeftCell = it.toList()
+                    } ?: let { /* nothing to do, just use standard strategy */ }
 
                 ResponseValue(
                     TournamentStatsUIConfig(

@@ -1,5 +1,6 @@
 package com.telen.easylineup.domain.model
 
+import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.telen.easylineup.domain.R
@@ -25,6 +26,20 @@ enum class TeamType(val id: Int, val position: Int, @StringRes val title: Int, @
             SOFTBALL -> arrayOf(TeamStrategy.STANDARD, TeamStrategy.FIVE_MAN_STANDARD, TeamStrategy.SLOWPITCH)
             BASEBALL_5 -> arrayOf(TeamStrategy.B5_DEFAULT)
             else -> arrayOf(TeamStrategy.STANDARD, TeamStrategy.FIVE_MAN_STANDARD)
+        }
+    }
+
+    fun getStrategiesDisplayName(context: Context): Array<String>? {
+        return when (this) {
+            SOFTBALL -> {
+                context.resources.getStringArray(R.array.softball_strategy_array)
+            }
+
+            BASEBALL -> {
+                context.resources.getStringArray(R.array.baseball_strategy_array)
+            }
+
+            else -> null
         }
     }
 }

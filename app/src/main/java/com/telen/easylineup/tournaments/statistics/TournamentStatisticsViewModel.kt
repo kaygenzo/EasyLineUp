@@ -1,5 +1,6 @@
 package com.telen.easylineup.tournaments.statistics
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.R
@@ -24,7 +25,6 @@ class TournamentStatisticsViewModel: ViewModel(), KoinComponent {
     val leftHeadersData = MutableLiveData<List<CellConfiguration>>()
     val mainTableData = MutableLiveData<List<List<CellConfiguration>>>()
     val columnHighlights = MutableLiveData<List<Highlight>>()
-    val topLeftCell = MutableLiveData<List<String>>()
 
     private val domain: ApplicationInteractor by inject()
     var strategy = TeamStrategy.STANDARD
@@ -77,21 +77,24 @@ class TournamentStatisticsViewModel: ViewModel(), KoinComponent {
                     this.mainTableData.value = mainDataList
                     this.columnHighlights.value = columnHighlights
 
-                    it.topLeftCell?.let {
-                        this.topLeftCell.value = it
-                    }
-
                 }, {
                     Timber.e(it)
                 })
     }
 
     fun onStrategyChosen(index: Int) {
-        strategy = TeamStrategy.getStrategyById(index)
+        val strategies = teamType?.getStrategies() ?: arrayOf()
+        if (index < strategies.size) {
+            strategy = strategies[index]
+        }
         getPlayersPositionForTournament()
     }
 
     fun clear() {
         disposable?.dispose()
+    }
+
+    fun getStrategiesNames(context: Context): Array<String>? {
+        return teamType?.getStrategiesDisplayName(context)
     }
 }
