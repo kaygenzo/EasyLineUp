@@ -26,8 +26,6 @@ internal class TeamsInteractorImpl : TeamsInteractor, KoinComponent {
     private val deleteTeamUseCase: DeleteTeam by inject()
     private val saveTeamUseCase: SaveTeam by inject()
     private val checkTeamUseCase: CheckTeam by inject()
-    private val getTeamCreationNextStep: GetTeamCreationNextStep by inject()
-    private val getTeamCreationPreviousStep: GetTeamCreationPreviousStep by inject()
 
     private val errors: PublishSubject<DomainErrors.Teams> = PublishSubject.create()
 
@@ -72,36 +70,6 @@ internal class TeamsInteractorImpl : TeamsInteractor, KoinComponent {
     override fun deleteTeam(team: Team): Completable {
         return UseCaseHandler.execute(deleteTeamUseCase, DeleteTeam.RequestValues(team))
             .ignoreElement()
-    }
-
-    override fun getTeamCreationNextStep(currentStep: Int, team: Team): Single<StepConfiguration> {
-        val requestValue = GetTeamCreationStep.RequestValues(
-            TeamCreationStep.getStepById(currentStep) ?: TeamCreationStep.TEAM
-        )
-        return UseCaseHandler.execute(checkTeamUseCase, CheckTeam.RequestValues(team))
-            .ignoreElement()
-            .andThen(UseCaseHandler.execute(getTeamCreationNextStep, requestValue))
-            .map { it.config }
-    }
-
-    override fun getTeamCreationPreviousStep(
-        currentStep: Int,
-        team: Team
-    ): Single<StepConfiguration> {
-        val requestValue = GetTeamCreationStep.RequestValues(
-            TeamCreationStep.getStepById(currentStep) ?: TeamCreationStep.TEAM
-        )
-        return UseCaseHandler.execute(checkTeamUseCase, CheckTeam.RequestValues(team))
-            .ignoreElement()
-            .onErrorResumeNext {
-                if (it is NameEmptyException && currentStep == TeamCreationStep.TEAM.id) {
-                    Completable.complete()
-                } else {
-                    Completable.error(it)
-                }
-            }
-            .andThen(UseCaseHandler.execute(getTeamCreationPreviousStep, requestValue))
-            .map { it.config }
     }
 
     override fun observeTeams(): LiveData<List<Team>> {

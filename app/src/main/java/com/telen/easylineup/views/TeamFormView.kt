@@ -1,35 +1,57 @@
 package com.telen.easylineup.views
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.ViewCreateTeamBinding
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.ready
 import timber.log.Timber
+import kotlin.math.abs
 
 interface TeamFormListener {
     fun onNameChanged(name: String)
     fun onImageChanged(imageUri: Uri?)
+    fun onTeamTypeChanged(teamType: TeamType)
     fun onImagePickerRequested()
 }
 
-class TeamFormView : ConstraintLayout {
+data class TeamTypeCardItem(
+    val type: Int,
+    @StringRes val title: Int,
+    @DrawableRes val ballResourceId: Int,
+    @DrawableRes val compatBallResourceId: Int,
+    @DrawableRes val representationId: Int
+)
+
+class TeamFormView : ConstraintLayout, TextWatcher {
 
     private var listener: TeamFormListener? = null
     private var imageUri: Uri? = null
 
     val binding: ViewCreateTeamBinding =
         ViewCreateTeamBinding.inflate(LayoutInflater.from(context), this, true)
+
+    private val teamTypeList = mutableListOf<TeamTypeCardItem>()
+    private val teamTypeAdapter = CardPagerAdapter(teamTypeList)
 
     constructor(context: Context) : super(context)
 
@@ -60,19 +82,37 @@ class TeamFormView : ConstraintLayout {
             listener?.onImagePickerRequested()
         }
 
-        binding.teamNameInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                listener?.onNameChanged(s.toString())
-            }
-        })
+        binding.teamNameInput.addTextChangedListener(this)
 
         binding.teamImageAction.run {
             setImageResource(R.drawable.add_image)
             setOnClickListener(null)
+        }
+
+        binding.teamTypeCarousel.apply {
+            this.offscreenPageLimit = 1
+            this.adapter = teamTypeAdapter
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    Timber.d("onPageSelected position=$position")
+                    val teamType = TeamType.getTypeById(teamTypeList[position].type)
+                    listener?.onTeamTypeChanged(teamType)
+                }
+            })
+            setPageTransformer(TeamTypePageTransformer())
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setTeamTypes(types: List<TeamTypeCardItem>) {
+        this.teamTypeList.clear()
+        this.teamTypeList.addAll(types)
+        teamTypeAdapter.notifyDataSetChanged()
+    }
+
+    fun setTeamType(type: TeamType) {
+        binding.teamTypeCarousel.ready {
+            binding.teamTypeCarousel.currentItem = type.position
         }
     }
 
@@ -95,13 +135,6 @@ class TeamFormView : ConstraintLayout {
 
     fun setName(name: String) {
         binding.teamNameInput.setText(name)
-    }
-
-    fun setTeamImage(@DrawableRes resId: Int) {
-        Picasso.get().load(resId)
-            .placeholder(R.drawable.ic_unknown_team)
-            .error(R.drawable.ic_unknown_team)
-            .into(binding.teamImage)
     }
 
     fun setImage(uri: Uri) {
@@ -150,8 +183,57 @@ class TeamFormView : ConstraintLayout {
         }
     }
 
-    fun displayInvalidName() {
-        binding.teamNameInputLayout.error =
-            resources.getString(R.string.team_creation_error_name_empty)
+    private fun setTeamImage(@DrawableRes resId: Int) {
+        Picasso.get().load(resId)
+            .placeholder(R.drawable.ic_unknown_team)
+            .error(R.drawable.ic_unknown_team)
+            .into(binding.teamImage)
+    }
+
+    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+    override fun afterTextChanged(s: Editable?) {}
+
+    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        listener?.onNameChanged(s.toString())
+    }
+}
+
+private class CardPagerAdapter(private val mData: MutableList<TeamTypeCardItem>) :
+    RecyclerView.Adapter<CardPagerAdapter.CardViewHolder>() {
+
+    data class CardViewHolder(private val view: TeamCardView) : RecyclerView.ViewHolder(view) {
+        fun bind(item: TeamTypeCardItem) {
+            view.setTeamName(view.context.getString(item.title))
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                view.setImage(item.ballResourceId)
+            } else {
+                view.setImage(item.compatBallResourceId)
+            }
+            view.setTeamType(item.type)
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
+        val view = TeamCardView(parent.context)
+        view.setDragEnabled(false)
+        view.setDragState(BottomSheetBehavior.STATE_COLLAPSED)
+        return CardViewHolder(view)
+    }
+
+    override fun getItemCount(): Int {
+        return mData.size
+    }
+
+    override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
+        holder.bind(mData[position])
+    }
+}
+
+private class TeamTypePageTransformer : ViewPager2.PageTransformer {
+
+    override fun transformPage(view: View, position: Float) {
+        view.translationX = 0f
+        view.scaleY = 1 - (0.25f * abs(position))
     }
 }

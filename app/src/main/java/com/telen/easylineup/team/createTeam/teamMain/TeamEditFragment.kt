@@ -6,12 +6,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentTeamEditBinding
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.launch
 import com.telen.easylineup.team.createTeam.SetupViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
@@ -46,6 +46,10 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
         viewModel.setTeamImage(imageUri?.toString())
     }
 
+    override fun onTeamTypeChanged(teamType: TeamType) {
+        viewModel.setTeamType(teamType.position)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         launch(viewModel.errors, {
@@ -56,14 +60,6 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
                             getString(R.string.team_creation_error_name_empty)
                     }
                     FirebaseAnalyticsUtils.emptyTeamName(activity)
-                }
-
-                else -> {
-                    Toast.makeText(
-                        activity,
-                        "Something wrong happened, please try again",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
             }
         })
@@ -86,6 +82,11 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
 
                 viewModel.observeTeamImage().observe(viewLifecycleOwner) {
                     it?.let { setImage(it) }
+                }
+
+                viewModel.observeTeamType().observe(viewLifecycleOwner) {
+                    setTeamTypes(viewModel.getTeamTypeCardItems())
+                    setTeamType(TeamType.getTypeById(it))
                 }
             }
         }.root

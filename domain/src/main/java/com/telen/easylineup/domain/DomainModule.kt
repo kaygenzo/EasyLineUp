@@ -33,8 +33,6 @@ object DomainModule {
         single { GetPlayers(get()) }
         single { SaveTeam(get()) }
         single { CheckTeam() }
-        single { GetTeamCreationNextStep() }
-        single { GetTeamCreationPreviousStep() }
         single { AssignPlayerFieldPosition() }
         single { DeletePlayerFieldPosition() }
         single { GetListAvailablePlayersForSelection() }

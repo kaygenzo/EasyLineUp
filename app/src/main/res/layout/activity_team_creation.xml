@@ -18,55 +18,10 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/teamCreationActionButtons"/>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.telen.easylineup.views.BottomChoiceView
         android:id="@+id/teamCreationActionButtons"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:background="?attr/colorPrimary">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/buttonNext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintRight_toLeftOf="@+id/arrowRight"
-            android:text="@string/team_creation_label_next"
-            android:textColor="?attr/colorOnPrimary"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:textAllCaps="true"/>
-
-        <ImageView
-            android:id="@+id/arrowRight"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:src="@drawable/ic_arrow_right_white_24dp"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/buttonNext"
-            app:layout_constraintBottom_toBottomOf="@+id/buttonNext"
-            />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/buttonPrevious"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toRightOf="@+id/arrowLeft"
-            android:text="@string/team_creation_label_cancel"
-            android:textColor="?attr/colorOnPrimary"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:textAllCaps="true"/>
-
-        <ImageView
-            android:id="@+id/arrowLeft"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:src="@drawable/ic_arrow_left_white_24dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/buttonNext"
-            app:layout_constraintBottom_toBottomOf="@+id/buttonNext"
-            />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

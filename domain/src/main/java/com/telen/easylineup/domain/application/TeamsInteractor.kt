@@ -2,7 +2,6 @@ package com.telen.easylineup.domain.application
 
 import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.DomainErrors
-import com.telen.easylineup.domain.model.StepConfiguration
 import com.telen.easylineup.domain.model.Team
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
@@ -19,8 +18,6 @@ interface TeamsInteractor {
     fun saveTeam(team: Team): Completable
     fun getTeamType(): Single<Int>
     fun deleteTeam(team: Team): Completable
-    fun getTeamCreationNextStep(currentStep: Int, team: Team): Single<StepConfiguration>
-    fun getTeamCreationPreviousStep(currentStep: Int, team: Team): Single<StepConfiguration>
     fun observeTeams(): LiveData<List<Team>>
     fun observeErrors(): Subject<DomainErrors.Teams>
 }
