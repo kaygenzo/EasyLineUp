@@ -15,8 +15,6 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.TeamRosterSummary
-import com.telen.easylineup.domain.model.TeamStrategy
-import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.CreateLineup
@@ -36,6 +34,7 @@ import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithLineupMode
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
+import com.telen.easylineup.domain.usecases.exceptions.TournamentNullException
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -92,32 +91,17 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
             .ignoreElement()
     }
 
-    override fun saveLineup(
-        tournament: Tournament,
-        lineupTitle: String,
-        rosterFilter: TeamRosterSummary,
-        lineupEventTime: Long,
-        strategy: TeamStrategy,
-        extraHittersSize: Int
-    ): Single<Long> {
+    override fun saveLineup(lineup: Lineup, rosterFilter: TeamRosterSummary): Single<Lineup> {
         return UseCaseHandler.execute(getTeam, GetTeam.RequestValues()).map { it.team }
             .flatMap { team ->
-                val request = CreateLineup.RequestValues(
-                    team.id,
-                    tournament,
-                    lineupTitle,
-                    lineupEventTime,
-                    rosterFilter.players,
-                    strategy,
-                    extraHittersSize
-                )
+                val request = CreateLineup.RequestValues(team.id, lineup, rosterFilter.players)
                 UseCaseHandler.execute(createLineup, request)
             }
-            .map { it.lineupID }
+            .map { it.lineup }
             .doOnError {
                 if (it is LineupNameEmptyException) {
                     errors.onNext(DomainErrors.Lineups.INVALID_LINEUP_NAME)
-                } else if (it is TournamentNameEmptyException) {
+                } else if (it is TournamentNameEmptyException || it is TournamentNullException) {
                     errors.onNext(DomainErrors.Lineups.INVALID_TOURNAMENT_NAME)
                 }
             }

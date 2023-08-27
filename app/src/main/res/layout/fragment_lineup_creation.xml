@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<com.telen.easylineup.views.LineupCreationFormView
-    android:id="@+id/lineupCreationForm"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    <com.telen.easylineup.views.LineupCreationFormView
+        android:id="@+id/lineupCreationForm"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

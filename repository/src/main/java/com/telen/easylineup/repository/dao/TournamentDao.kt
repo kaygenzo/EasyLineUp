@@ -1,5 +1,6 @@
 package com.telen.easylineup.repository.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.telen.easylineup.repository.model.RoomTournament
 import io.reactivex.rxjava3.core.Completable
@@ -14,8 +15,14 @@ internal interface TournamentDao {
     @Query("SELECT * from tournaments ORDER BY createdAt DESC")
     fun getTournaments(): Single<List<RoomTournament>>
 
+    @Query("SELECT * from tournaments ORDER BY createdAt DESC")
+    fun observeTournaments(): LiveData<List<RoomTournament>>
+
     @Query("SELECT * from tournaments where hash = :hash")
     fun getTournamentByHash(hash: String): Single<RoomTournament>
+
+    @Query("SELECT * from tournaments where name = :name")
+    fun getTournamentByName(name: String): Single<RoomTournament>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTournament(tournament: RoomTournament): Single<Long>

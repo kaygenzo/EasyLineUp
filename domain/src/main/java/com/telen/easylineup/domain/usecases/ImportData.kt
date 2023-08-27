@@ -134,7 +134,8 @@ internal class ImportData(private val teamDao: TeamRepository, private val playe
 
     private fun processTournament(export: TournamentExport, insertedArray: IntArray, updatedArray: IntArray,
                                   updateIfExists: Boolean): Single<Tournament> {
-        val t = Tournament(0L, export.name,export.createdAt, export.id)
+        val t = Tournament(0L, export.name,export.createdAt, export.startTime, export.endTime,
+            export.address, export.id)
 
         return tournamentDao.getTournamentByHash(export.id)
                 .flatMap { tournamentDB ->

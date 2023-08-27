@@ -252,17 +252,26 @@
     {
       "id": 1,
       "name": "Paris Series",
+      "startTime": 1688169600000,
+      "endTime": 1690848000000,
+      "address": null,
       "createdAt": 1514977200000
     },
     {
       "id": 2,
       "name": "AllStars Series",
+      "startTime": 1672531200000,
+      "endTime": 1675209600000,
+      "address": null,
       "createdAt": 1514890800000
     },
     {
       "id": 3,
       "name": "London Series",
-      "createdAt": 1514804400000
+      "createdAt": 1514804400000,
+      "startTime": 0,
+      "endTime": 0,
+      "address": null
     }
   ],
   "lineups": [

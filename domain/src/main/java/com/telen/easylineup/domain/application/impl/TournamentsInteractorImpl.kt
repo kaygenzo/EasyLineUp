@@ -1,5 +1,6 @@
 package com.telen.easylineup.domain.application.impl
 
+import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.application.TournamentsInteractor
 import com.telen.easylineup.domain.model.Lineup
@@ -7,7 +8,12 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.TournamentStatsUIConfig
 import com.telen.easylineup.domain.repository.TournamentRepository
-import com.telen.easylineup.domain.usecases.*
+import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
+import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineupsUseCase
+import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.GetTournamentStatsForPositionTable
+import com.telen.easylineup.domain.usecases.GetTournaments
+import com.telen.easylineup.domain.usecases.SaveTournament
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import org.koin.core.component.KoinComponent
@@ -21,10 +27,15 @@ internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent 
     private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineupsUseCase by inject()
     private val getTournamentsUseCase: GetTournaments by inject()
     private val tableDataUseCase: GetTournamentStatsForPositionTable by inject()
+    private val saveTournament: SaveTournament by inject()
 
     override fun getTournaments(): Single<List<Tournament>> {
         return UseCaseHandler.execute(getTournamentsUseCase, GetTournaments.RequestValues())
             .map { it.tournaments }
+    }
+
+    override fun observeTournaments(): LiveData<List<Tournament>> {
+        return tournamentsRepo.observeTournaments()
     }
 
     override fun insertTournaments(tournaments: List<Tournament>): Completable {
@@ -66,5 +77,10 @@ internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent 
                 UseCaseHandler.execute(tableDataUseCase, request)
             }
             .map { it.uiConfig }
+    }
+
+    override fun saveTournament(tournament: Tournament): Completable {
+        return UseCaseHandler.execute(saveTournament, SaveTournament.RequestValues(tournament))
+            .ignoreElement()
     }
 }

@@ -13,54 +13,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 For support, please feel free to contact me at https://www.linkedin.com/in/syedabsar */
 
-
-data class LineupExport (
-
-		@SerializedName("id") val id : String,
-		@SerializedName("name") val name : String,
-		@SerializedName("eventTime") val eventTime: Long,
-		@SerializedName("createdAt") val createdAt : Long,
-		@SerializedName("editedAt") val editedAt : Long,
-		@SerializedName("mode") val mode : Int,
-		@SerializedName("strategy") val strategy : Int,
-		@SerializedName("extraHitters") var extraHitters: Int,
-		@SerializedName("roster") val roster : List<String>?,
-		@SerializedName("playerPositions") val playerPositions : List<PlayerPositionExport>,
-		@SerializedName("playerNumberOverlays") val playerNumberOverlays : List<PlayerNumberOverlayExport>
-) {
-	override fun equals(other: Any?): Boolean {
-		if (this === other) return true
-		if (javaClass != other?.javaClass) return false
-
-		other as LineupExport
-
-		if (id != other.id) return false
-		if (name != other.name) return false
-		if (eventTime != other.eventTime) return false
-		if (createdAt != other.createdAt) return false
-		if (editedAt != other.editedAt) return false
-		if (mode != other.mode) return false
-		if (strategy != other.strategy) return false
-		if (extraHitters != other.extraHitters) return false
-		if (roster != other.roster) return false
-		if (playerPositions != other.playerPositions) return false
-		if (playerNumberOverlays != other.playerNumberOverlays) return false
-
-		return true
-	}
-
-	override fun hashCode(): Int {
-		var result = id.hashCode()
-		result = 31 * result + name.hashCode()
-		result = 31 * result + eventTime.hashCode()
-		result = 31 * result + createdAt.hashCode()
-		result = 31 * result + editedAt.hashCode()
-		result = 31 * result + mode
-		result = 31 * result + strategy
-		result = 31 * result + extraHitters
-		result = 31 * result + (roster?.hashCode() ?: 0)
-		result = 31 * result + playerPositions.hashCode()
-		result = 31 * result + playerNumberOverlays.hashCode()
-		return result
-	}
-}
+data class LineupExport(
+    @SerializedName("id") val id: String,
+    @SerializedName("name") val name: String,
+    @SerializedName("eventTime") val eventTime: Long,
+    @SerializedName("createdAt") val createdAt: Long,
+    @SerializedName("editedAt") val editedAt: Long,
+    @SerializedName("mode") val mode: Int,
+    @SerializedName("strategy") val strategy: Int,
+    @SerializedName("extraHitters") var extraHitters: Int,
+    @SerializedName("roster") val roster: List<String>?,
+    @SerializedName("playerPositions") val playerPositions: List<PlayerPositionExport>,
+    @SerializedName("playerNumberOverlays") val playerNumberOverlays: List<PlayerNumberOverlayExport>
+)

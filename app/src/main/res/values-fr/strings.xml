@@ -14,6 +14,7 @@
     <string name="dialog_create_lineup_title">Creation&#8230;</string>
     <string name="dialog_create_lineup_name">Titre</string>
     <string name="dialog_create_lineup_tournament">Tournoi</string>
+    <string name="dialog_error_select_tournament_first_message">Selectionnez un tournoi d\'abord.</string>
     <string name="player_hint_name">Nom</string>
     <string name="player_hint_shirt_number">Numéro de maillot</string>
     <string name="player_hint_license_number">Numéro de Licence</string>
@@ -227,4 +228,9 @@
 
     <string name="lineup_name_hint">Nom du lineup</string>
     <string name="file_explorer_not_found">Impossible de trouver d\'explorateur de fichier sur ce terminal</string>
+    <string name="form_tournament_creation_start_label">Début</string>
+    <string name="form_tournament_creation_end_label">Fin</string>
+    <string name="form_tournament_creation_address">Adresse (optionnel)</string>
+    <string name="form_tournament_creation_name">Nom</string>
+    <string name="form_tournament_creation_title">Création de tournoi...</string>
 </resources>

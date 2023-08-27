@@ -13,33 +13,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 For support, please feel free to contact me at https://www.linkedin.com/in/syedabsar */
 
-
-data class TournamentExport (
-
-		@SerializedName("id") val id : String,
-		@SerializedName("name") val name : String,
-		@SerializedName("createdAt") val createdAt : Long,
-		@SerializedName("lineups") val lineups : List<LineupExport>
-) {
-	override fun equals(other: Any?): Boolean {
-		if (this === other) return true
-		if (javaClass != other?.javaClass) return false
-
-		other as TournamentExport
-
-		if (id != other.id) return false
-		if (name != other.name) return false
-		if (createdAt != other.createdAt) return false
-		if (lineups != other.lineups) return false
-
-		return true
-	}
-
-	override fun hashCode(): Int {
-		var result = id.hashCode()
-		result = 31 * result + name.hashCode()
-		result = 31 * result + createdAt.hashCode()
-		result = 31 * result + lineups.hashCode()
-		return result
-	}
-}
+data class TournamentExport(
+    @SerializedName("id") val id: String,
+    @SerializedName("name") val name: String,
+    @SerializedName("createdAt") val createdAt: Long,
+    @SerializedName("startTime") val startTime: Long,
+    @SerializedName("endTime") val endTime: Long,
+    @SerializedName("address") val address: String?,
+    @SerializedName("lineups") val lineups: List<LineupExport>
+)

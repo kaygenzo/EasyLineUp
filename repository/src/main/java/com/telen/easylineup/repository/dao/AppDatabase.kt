@@ -9,7 +9,7 @@ const val DATABASE_NAME = "easylineup_database"
 @Database(
     entities = [RoomPlayer::class, RoomTeam::class, RoomLineup::class,
         RoomPlayerFieldPosition::class, RoomTournament::class, RoomTile::class,
-        RoomPlayerNumberOverlay::class], version = 16, exportSchema = true
+        RoomPlayerNumberOverlay::class], version = 17, exportSchema = true
 )
 internal abstract class AppDatabase : RoomDatabase() {
     abstract fun playerDao(): PlayerDao

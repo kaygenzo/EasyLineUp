@@ -17,6 +17,8 @@
     <string name="dialog_create_lineup_title">Creation&#8230;</string>
     <string name="dialog_create_lineup_name">Title</string>
     <string name="dialog_create_lineup_tournament">Tournament</string>
+    <string name="dialog_error_select_tournament_first_message">Please select or create a tournament first</string>
+
     <string name="player_hint_name">Name</string>
     <string name="player_hint_shirt_number">Shirt number</string>
     <string name="player_hint_license_number">License number</string>
@@ -263,4 +265,10 @@
     <string name="bug_report_trigger_floating_button">Floating button</string>
     <string name="bug_report_trigger_manual">Manual</string>
     <string name="file_explorer_not_found">Cannot find any file explorer on this device</string>
+
+    <string name="form_tournament_creation_start_label">Start</string>
+    <string name="form_tournament_creation_end_label">End</string>
+    <string name="form_tournament_creation_address">Address (optional)</string>
+    <string name="form_tournament_creation_name">Name</string>
+    <string name="form_tournament_creation_title">Tournament creation...</string>
 </resources>

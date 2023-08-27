@@ -73,7 +73,10 @@ class DatabaseMockProvider : KoinComponent {
                             Tournament(
                                 line["id"].asLong,
                                 line["name"].asString,
-                                line["createdAt"].asLong
+                                line["createdAt"].asLong,
+                                line["startTime"].asLong,
+                                line["endTime"].asLong,
+                                line["address"].asString
                             )
                         )
                     }

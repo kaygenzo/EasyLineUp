@@ -12,15 +12,7 @@ interface LineupsInteractor {
     fun getCompleteRoster(): Single<TeamRosterSummary>
     fun getRoster(lineupID: Long): Single<TeamRosterSummary>
     fun updateRoster(lineupID: Long, roster: List<RosterPlayerStatus>): Completable
-    fun saveLineup(
-        tournament: Tournament,
-        lineupTitle: String,
-        rosterFilter: TeamRosterSummary,
-        lineupEventTime: Long,
-        strategy: TeamStrategy,
-        extraHittersSize: Int
-    ): Single<Long>
-
+    fun saveLineup(lineup: Lineup, rosterFilter: TeamRosterSummary): Single<Lineup>
     fun deleteLineup(lineupID: Long?): Completable
     fun updateLineupMode(
         isEnabled: Boolean,

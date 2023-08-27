@@ -76,14 +76,25 @@ class TournamentsAdapter(
 
     fun setList(tournaments: List<Pair<Tournament, List<Lineup>>>) {
         items.clear()
-        tournaments.forEach {
-            val tournamentStart =
-                it.second.map { it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }
-                    .minOrNull()
-            val tournamentEnd =
-                it.second.map { it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis }
-                    .maxOrNull()
-            items.add(TournamentItem(it.first, tournamentStart, tournamentEnd, it.second))
+        tournaments.forEach { tournament ->
+            val tournamentStart = tournament.first.startTime.takeIf { it > 0L } ?: let {
+                tournament.second.minOfOrNull {
+                    it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis
+                }
+            }
+            val tournamentEnd = tournament.first.endTime.takeIf { it > 0L } ?: let {
+                tournament.second.maxOfOrNull {
+                    it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis
+                }
+            }
+            items.add(
+                TournamentItem(
+                    tournament.first,
+                    tournamentStart,
+                    tournamentEnd,
+                    tournament.second
+                )
+            )
         }
         notifyDataSetChanged()
     }

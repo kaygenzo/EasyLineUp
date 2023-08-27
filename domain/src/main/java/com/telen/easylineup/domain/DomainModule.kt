@@ -22,7 +22,7 @@ object DomainModule {
         single { GetDashboardTiles(get(), get(), get(), get()) }
         single { SaveDashboardTiles(get()) }
         single { CreateDashboardTiles(get()) }
-        single { CreateLineup(get(), get()) }
+        single { CreateLineup(get()) }
         single { GetTournaments(get()) }
         single { GetAllTournamentsWithLineupsUseCase(get()) }
         single { DeleteTournamentLineups(get()) }
@@ -58,5 +58,6 @@ object DomainModule {
         single { GetBattersState() }
         single { UpdateLineup(get()) }
         single { UpdatePlayersWithBatters()}
+        single { SaveTournament(get()) }
     }
 }
