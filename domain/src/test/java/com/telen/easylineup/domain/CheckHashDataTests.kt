@@ -45,8 +45,8 @@ internal class CheckHashDataTests {
         )
 
         val mTournaments = mutableListOf(
-                Tournament(1L, "A", 1L, null),
-                Tournament(2L, "B", 2L, null)
+                Tournament(1L, "A", 1L, 2L, 3L, null, null),
+                Tournament(2L, "B", 2L, 3L, 4L, null, null)
         )
 
         val mLineups = mutableListOf(

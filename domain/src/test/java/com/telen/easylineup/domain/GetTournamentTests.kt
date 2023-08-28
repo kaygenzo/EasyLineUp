@@ -28,9 +28,9 @@ internal class GetTournamentTests {
         mGetTournaments = GetTournaments(tournamentDao)
 
         tournaments = mutableListOf()
-        tournaments.add(Tournament(1, "toto", 1L))
-        tournaments.add(Tournament(2, "tata", 2L))
-        tournaments.add(Tournament(3, "titi", 3L))
+        tournaments.add(Tournament(1, "toto", 1L, 2L, 3L, null))
+        tournaments.add(Tournament(2, "tata", 2L, 3L, 4L, null))
+        tournaments.add(Tournament(3, "titi", 3L, 4L, 5L, null))
 
         Mockito.`when`(tournamentDao.getTournaments()).thenReturn(Single.just(tournaments))
     }

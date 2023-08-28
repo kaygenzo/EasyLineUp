@@ -33,9 +33,9 @@ internal class DeleteAllDataTests {
         MockitoAnnotations.initMocks(this)
         mDeleteAllData = DeleteAllData(teamDao, tournamentDao)
 
-        tournaments.add(Tournament(1, "t1", 1L))
-        tournaments.add(Tournament(2, "t2", 2L))
-        tournaments.add(Tournament(3, "t3", 3L))
+        tournaments.add(Tournament(1, "t1", 1L, 2L, 3L, null))
+        tournaments.add(Tournament(2, "t2", 2L, 3L, 4L, null))
+        tournaments.add(Tournament(3, "t3", 3L, 4L, 5L, null))
 
         teams.add(Team(1, "t1", null, TeamType.BASEBALL.id, true))
         teams.add(Team(2, "t2", null, TeamType.SOFTBALL.id, false))

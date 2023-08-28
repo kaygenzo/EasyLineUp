@@ -36,7 +36,7 @@ internal class DeleteTournamentLineupsTests {
         MockitoAnnotations.initMocks(this)
         mDeleteTournament = DeleteTournamentLineups(lineupsDao)
 
-        tournament = Tournament(id = 1L, name = "toto", createdAt = Calendar.getInstance().timeInMillis)
+        tournament = Tournament(id = 1L, name = "toto", createdAt = 1L, 2L, 3L, null)
         team = Team(id = 1L, name = "toto", main = true)
         lineups.addAll(listOf(
                 Lineup(id = 1L,teamId = team.id, tournamentId = tournament.id, eventTimeInMillis = 1L, strategy = TeamStrategy.STANDARD.id, extraHitters = 0),
