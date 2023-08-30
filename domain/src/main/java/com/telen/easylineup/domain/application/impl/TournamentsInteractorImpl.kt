@@ -11,6 +11,7 @@ import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
 import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineupsUseCase
 import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.GetTournamentStatsForPositionTable
 import com.telen.easylineup.domain.usecases.GetTournaments
 import com.telen.easylineup.domain.usecases.SaveTournament
@@ -28,6 +29,7 @@ internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent 
     private val getTournamentsUseCase: GetTournaments by inject()
     private val tableDataUseCase: GetTournamentStatsForPositionTable by inject()
     private val saveTournament: SaveTournament by inject()
+    private val getTournamentMapLink: GetTournamentMapLink by inject()
 
     override fun getTournaments(): Single<List<Tournament>> {
         return UseCaseHandler.execute(getTournamentsUseCase, GetTournaments.RequestValues())
@@ -82,5 +84,17 @@ internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent 
     override fun saveTournament(tournament: Tournament): Completable {
         return UseCaseHandler.execute(saveTournament, SaveTournament.RequestValues(tournament))
             .ignoreElement()
+    }
+
+    override fun getTournamentMapLink(
+        tournament: Tournament,
+        apiKey: String?,
+        width: Int,
+        height: Int
+    ): Single<String> {
+        return UseCaseHandler.execute(
+            getTournamentMapLink,
+            GetTournamentMapLink.RequestValues(tournament, apiKey, width, height)
+        ).map { it.mapLink }
     }
 }

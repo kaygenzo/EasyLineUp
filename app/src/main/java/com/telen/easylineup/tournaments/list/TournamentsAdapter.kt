@@ -12,10 +12,25 @@ import com.telen.easylineup.views.TournamentItemView
 sealed class TimeLineItem
 data class TournamentItem(
     val tournament: Tournament,
-    val start: Long?,
-    val end: Long?,
+    val mapAddress: String?,
     val lineups: List<Lineup>
 ) : TimeLineItem()
+
+fun TournamentItem.getStart(): Long? {
+    return tournament.startTime.takeIf { it > 0L } ?: let {
+        lineups.minOfOrNull {
+            it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis
+        }
+    }
+}
+
+fun TournamentItem.getEnd(): Long? {
+    return tournament.endTime.takeIf { it > 0L } ?: let {
+        lineups.maxOfOrNull {
+            it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis
+        }
+    }
+}
 
 const val TYPE_ITEM_TOURNAMENT = 1
 
@@ -54,9 +69,13 @@ class TournamentsAdapter(
         view.setTournamentName(item.tournament.name)
         view.setTeamType(this.teamType)
         view.setLineups(item.lineups)
+        view.setTournamentAddress(item.mapAddress)
 
-        if (item.start != null && item.end != null)
-            view.setTournamentDate(item.start, item.end)
+        val start = item.getStart()
+        val end = item.getEnd()
+        if (start != null && end != null) {
+            view.setTournamentDate(start, end)
+        }
 
         view.setOnActionsClickListener(object : OnActionsClickListener {
             override fun onDeleteClicked() {
@@ -74,28 +93,9 @@ class TournamentsAdapter(
 
     class TournamentsViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
-    fun setList(tournaments: List<Pair<Tournament, List<Lineup>>>) {
+    fun setList(list: List<TournamentItem>) {
         items.clear()
-        tournaments.forEach { tournament ->
-            val tournamentStart = tournament.first.startTime.takeIf { it > 0L } ?: let {
-                tournament.second.minOfOrNull {
-                    it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis
-                }
-            }
-            val tournamentEnd = tournament.first.endTime.takeIf { it > 0L } ?: let {
-                tournament.second.maxOfOrNull {
-                    it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis
-                }
-            }
-            items.add(
-                TournamentItem(
-                    tournament.first,
-                    tournamentStart,
-                    tournamentEnd,
-                    tournament.second
-                )
-            )
-        }
+        items.addAll(list)
         notifyDataSetChanged()
     }
 

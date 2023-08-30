@@ -17,5 +17,12 @@ interface TournamentsInteractor {
         tournament: Tournament,
         strategy: TeamStrategy
     ): Single<TournamentStatsUIConfig>
+
     fun saveTournament(tournament: Tournament): Completable
+    fun getTournamentMapLink(
+        tournament: Tournament,
+        apiKey: String?,
+        width: Int,
+        height: Int
+    ): Single<String>
 }

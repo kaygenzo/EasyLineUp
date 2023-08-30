@@ -1,5 +1,6 @@
 package com.telen.easylineup.domain
 
+import android.location.Geocoder
 import com.telen.easylineup.domain.application.*
 import com.telen.easylineup.domain.application.impl.*
 import com.telen.easylineup.domain.usecases.*
@@ -59,5 +60,7 @@ object DomainModule {
         single { UpdateLineup(get()) }
         single { UpdatePlayersWithBatters()}
         single { SaveTournament(get()) }
+        single { GetTournamentMapLink(get()) }
+        factory { Geocoder(get())}
     }
 }

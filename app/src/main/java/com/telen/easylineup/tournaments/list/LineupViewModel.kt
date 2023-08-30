@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.DomainErrors
@@ -15,6 +17,7 @@ import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.Subject
@@ -30,8 +33,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val domain: ApplicationInteractor by inject()
     private val prefsHelper by inject<SharedPreferencesHelper>()
 
-    private val _categorizedLineupsLiveData =
-        MutableLiveData<List<Pair<Tournament, List<Lineup>>>>()
+    private val _categorizedLineupsLiveData = MutableLiveData<List<TournamentItem>>()
 
     private val filterLiveData: MutableLiveData<String> by lazy {
         MutableLiveData("")
@@ -57,10 +59,19 @@ class LineupViewModel : ViewModel(), KoinComponent {
         return domain.tournaments().observeTournaments()
     }
 
-    fun observeCategorizedLineups(): LiveData<List<Pair<Tournament, List<Lineup>>>> {
+    fun observeCategorizedLineups(): LiveData<List<TournamentItem>> {
         return filterLiveData.switchMap { filter ->
             val disposable = domain.tournaments().getCategorizedLineups(filter)
-
+                .flatMapObservable { Observable.fromIterable(it) }
+                .flatMapSingle { pair ->
+                    val apiKey = Firebase.remoteConfig.getString("maps_api_key")
+                    domain.tournaments().getTournamentMapLink(pair.first, apiKey, 500, 500)
+                        .map { url -> TournamentItem(pair.first, url, pair.second) }
+                        .onErrorResumeNext {
+                            Single.just(TournamentItem(pair.first, null, pair.second))
+                        }
+                }
+                .toList()
                 .subscribe({
                     _categorizedLineupsLiveData.value = it
                 }, {

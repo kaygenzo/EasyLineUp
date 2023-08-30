@@ -84,7 +84,7 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
 
         lineupViewModel.observeCategorizedLineups().observe(viewLifecycleOwner) {
             val tournamentsSize = it.size
-            val lineupsSize = it.sumOf { pair -> pair.second.size }
+            val lineupsSize = it.sumOf { item -> item.lineups.count() }
             val tournamentsQuantity = resources.getQuantityString(
                 R.plurals.tournaments_quantity,
                 tournamentsSize,

@@ -3,14 +3,17 @@ package com.telen.easylineup.views
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
+import com.squareup.picasso.Picasso
 import com.telen.easylineup.databinding.ItemAdapterTournamentsBinding
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.tournaments.list.LineupsAdapter
 import com.telen.easylineup.tournaments.list.OnItemClickedListener
+import com.telen.easylineup.utils.drawn
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -76,6 +79,21 @@ class TournamentItemView(context: Context, itemClickedListener: OnItemClickedLis
         this.lineupsAdapter.apply {
             this.teamType = TeamType.getTypeById(teamType)
             notifyDataSetChanged()
+        }
+    }
+
+    fun setTournamentAddress(address: String?) {
+        with(binding.mapAddress) {
+            address?.let {
+                drawn {
+                    Picasso.get()
+                        .load(it)
+                        .resize(width, height)
+                        .centerCrop()
+                        .into(binding.image)
+                    visibility = View.VISIBLE
+                }
+            } ?: let { visibility = View.GONE }
         }
     }
 }

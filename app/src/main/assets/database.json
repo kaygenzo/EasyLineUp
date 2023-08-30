@@ -254,7 +254,7 @@
       "name": "Paris Series",
       "startTime": 1688169600000,
       "endTime": 1690848000000,
-      "address": null,
+      "address": "Cathédrale Notre Dame, 6 Parvis Notre-Dame - Pl. Jean-Paul II, 75004 Paris",
       "createdAt": 1514977200000
     },
     {
@@ -262,7 +262,7 @@
       "name": "AllStars Series",
       "startTime": 1672531200000,
       "endTime": 1675209600000,
-      "address": null,
+      "address": "1 E 161 St, Bronx, NY 10451, United States",
       "createdAt": 1514890800000
     },
     {
