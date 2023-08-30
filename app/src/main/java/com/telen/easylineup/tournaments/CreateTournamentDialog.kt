@@ -57,7 +57,7 @@ class CreateTournamentDialog(private val callback: OnTournamentCreated) : Dialog
     }
 
     override fun onAddressChanged(address: String) {
-        tournament.name = address
+        tournament.address = address
     }
 
 }
