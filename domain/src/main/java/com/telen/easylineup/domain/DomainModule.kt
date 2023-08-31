@@ -61,6 +61,6 @@ object DomainModule {
         single { UpdatePlayersWithBatters()}
         single { SaveTournament(get()) }
         single { GetTournamentMapLink(get()) }
-        factory { Geocoder(get())}
+        factory { Geocoder(get()) }
     }
 }

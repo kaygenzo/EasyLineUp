@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +27,8 @@ import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.utils.hideSoftKeyboard
 import com.telen.easylineup.views.OnSearchBarListener
 import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class LineupsScrollListener(private val view: FloatingActionButton) :
     RecyclerView.OnScrollListener() {
@@ -39,7 +42,7 @@ class LineupsScrollListener(private val view: FloatingActionButton) :
     }
 }
 
-class TournamentListFragment : BaseFragment("TournamentListFragment"), OnItemClickedListener,
+class TournamentListFragment : BaseFragment("TournamentListFragment"), OnTournamentItemListener,
     OnSearchBarListener {
 
     private lateinit var tournamentsAdapter: TournamentsAdapter
@@ -58,6 +61,10 @@ class TournamentListFragment : BaseFragment("TournamentListFragment"), OnItemCli
     ): View {
         return FragmentListTournamentsBinding.inflate(layoutInflater, container, false).apply {
             binding = this
+
+            viewModel.mapsFlow
+                .onEach { tournamentsAdapter.setMapToTournament(it.first, it.second) }
+                .launchIn(viewLifecycleOwner.lifecycleScope)
 
             recyclerView.apply {
                 layoutManager = GridLayoutManager(context, 1)

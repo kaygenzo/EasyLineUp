@@ -14,7 +14,7 @@ import java.util.Locale
 
 class LineupsAdapter(
     private val lineups: List<Lineup>,
-    private val itemClickedListener: OnItemClickedListener?,
+    private val itemClickedListener: OnTournamentItemListener?,
     var teamType: TeamType = TeamType.BASEBALL
 ) : RecyclerView.Adapter<LineupsAdapter.LineupsViewHolder>() {
 

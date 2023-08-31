@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
@@ -28,6 +29,27 @@ abstract class BaseFragment(private val fragmentName: String) : Fragment() {
         super.onDestroy()
         disposables.clear()
     }
+}
+
+inline fun <reified T : Any> BaseFragment.launch(
+    process: Flowable<T>,
+    onNext: Consumer<T>,
+    onError: Consumer<in Throwable>? = null,
+    onComplete: Action? = null,
+    subscribeScheduler: Scheduler = Schedulers.computation(),
+    observeScheduler: Scheduler = AndroidSchedulers.mainThread()
+) {
+    this.disposables.add(
+        process
+            .subscribeOn(subscribeScheduler)
+            .observeOn(observeScheduler)
+            .subscribe(onNext,
+                onError ?: Consumer {
+                    Timber.e(it)
+                },
+                onComplete ?: Action { }
+            )
+    )
 }
 
 inline fun <reified T : Any> BaseFragment.launch(

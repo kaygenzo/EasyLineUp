@@ -12,7 +12,7 @@ import com.telen.easylineup.databinding.ItemAdapterTournamentsBinding
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.tournaments.list.LineupsAdapter
-import com.telen.easylineup.tournaments.list.OnItemClickedListener
+import com.telen.easylineup.tournaments.list.OnTournamentItemListener
 import com.telen.easylineup.utils.drawn
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,15 +23,14 @@ interface OnActionsClickListener {
 }
 
 @SuppressLint("ViewConstructor")
-class TournamentItemView(context: Context, itemClickedListener: OnItemClickedListener?) :
+class TournamentItemView(context: Context, itemClickedListener: OnTournamentItemListener?) :
     ConstraintLayout(context) {
 
     lateinit var lineupsAdapter: LineupsAdapter
     private val lineups = mutableListOf<Lineup>()
     private var listener: OnActionsClickListener? = null
 
-    private val binding =
-        ItemAdapterTournamentsBinding.inflate(LayoutInflater.from(context), this, true)
+    val binding = ItemAdapterTournamentsBinding.inflate(LayoutInflater.from(context), this, true)
 
     init {
         lineupsAdapter = LineupsAdapter(lineups, itemClickedListener)
@@ -82,9 +81,13 @@ class TournamentItemView(context: Context, itemClickedListener: OnItemClickedLis
         }
     }
 
-    fun setTournamentAddress(address: String?) {
+    fun setTournamentMapVisible(visible: Boolean) {
+        binding.mapAddress.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    fun setTournamentMap(url: String?) {
         with(binding.mapAddress) {
-            address?.let {
+            url?.let {
                 drawn {
                     Picasso.get()
                         .load(it)

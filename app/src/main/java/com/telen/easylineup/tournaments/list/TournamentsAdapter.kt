@@ -3,58 +3,26 @@ package com.telen.easylineup.tournaments.list
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.views.OnActionsClickListener
 import com.telen.easylineup.views.TournamentItemView
 
-sealed class TimeLineItem
-data class TournamentItem(
-    val tournament: Tournament,
-    val mapAddress: String?,
-    val lineups: List<Lineup>
-) : TimeLineItem()
-
-fun TournamentItem.getStart(): Long? {
-    return tournament.startTime.takeIf { it > 0L } ?: let {
-        lineups.minOfOrNull {
-            it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis
-        }
-    }
-}
-
-fun TournamentItem.getEnd(): Long? {
-    return tournament.endTime.takeIf { it > 0L } ?: let {
-        lineups.maxOfOrNull {
-            it.eventTimeInMillis.takeIf { it > 0L } ?: it.createdTimeInMillis
-        }
-    }
-}
-
 const val TYPE_ITEM_TOURNAMENT = 1
 
-interface OnItemClickedListener {
-    fun onHeaderClicked()
-    fun onLineupClicked(lineup: Lineup)
-    fun onDeleteTournamentClicked(tournament: Tournament)
-    fun onStatisticsTournamentClicked(teamType: TeamType, tournament: Tournament)
-    fun onEditLineupClicked(lineup: Lineup)
-}
-
 class TournamentsAdapter(
-    private val itemClickListener: OnItemClickedListener,
+    private val tournamentItemListener: OnTournamentItemListener,
+    private val items: MutableList<TournamentItem> = mutableListOf(),
+    private val mapsMap: MutableMap<Long, String> = mutableMapOf(),
     private var teamType: Int = TeamType.BASEBALL.id
 ) : RecyclerView.Adapter<TournamentsAdapter.TournamentsViewHolder>() {
-
-    private val items: MutableList<TimeLineItem> = mutableListOf()
 
     override fun getItemViewType(position: Int): Int {
         return TYPE_ITEM_TOURNAMENT
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TournamentsViewHolder {
-        val view = TournamentItemView(parent.context, itemClickListener)
+        val view = TournamentItemView(parent.context, tournamentItemListener)
         return TournamentsViewHolder(view)
     }
 
@@ -69,7 +37,9 @@ class TournamentsAdapter(
         view.setTournamentName(item.tournament.name)
         view.setTeamType(this.teamType)
         view.setLineups(item.lineups)
-        view.setTournamentAddress(item.mapAddress)
+
+        view.setTournamentMapVisible(item.tournament.address != null)
+        view.setTournamentMap(mapsMap[item.tournament.id])
 
         val start = item.getStart()
         val end = item.getEnd()
@@ -79,11 +49,11 @@ class TournamentsAdapter(
 
         view.setOnActionsClickListener(object : OnActionsClickListener {
             override fun onDeleteClicked() {
-                itemClickListener.onDeleteTournamentClicked(item.tournament)
+                tournamentItemListener.onDeleteTournamentClicked(item.tournament)
             }
 
             override fun onStatsClicked() {
-                itemClickListener.onStatisticsTournamentClicked(
+                tournamentItemListener.onStatisticsTournamentClicked(
                     TeamType.getTypeById(teamType),
                     item.tournament
                 )
@@ -102,5 +72,12 @@ class TournamentsAdapter(
     fun setTeamType(teamType: Int) {
         this.teamType = teamType
         notifyDataSetChanged()
+    }
+
+    fun setMapToTournament(tournament: Tournament, url: String) {
+        mapsMap[tournament.id] = url
+        items.indexOfFirst { it.tournament.id == tournament.id }.takeIf { it >= 0 }?.let {
+            notifyItemChanged(it)
+        }
     }
 }

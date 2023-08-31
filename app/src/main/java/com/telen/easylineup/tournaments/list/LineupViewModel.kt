@@ -21,6 +21,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.Subject
+import kotlinx.coroutines.flow.MutableSharedFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -34,6 +35,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val prefsHelper by inject<SharedPreferencesHelper>()
 
     private val _categorizedLineupsLiveData = MutableLiveData<List<TournamentItem>>()
+    private val tournamentItems = mutableListOf<TournamentItem>()
 
     private val filterLiveData: MutableLiveData<String> by lazy {
         MutableLiveData("")
@@ -46,6 +48,9 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val disposables = CompositeDisposable()
     private var tournament: Tournament? = null
     private val lineup = Lineup()
+
+    private val remoteConfig = Firebase.remoteConfig
+    val mapsFlow = MutableSharedFlow<Pair<Tournament, String>>(extraBufferCapacity = 1, replay = 1)
 
     fun setFilter(filter: String) {
         filterLiveData.value = filter
@@ -61,25 +66,40 @@ class LineupViewModel : ViewModel(), KoinComponent {
 
     fun observeCategorizedLineups(): LiveData<List<TournamentItem>> {
         return filterLiveData.switchMap { filter ->
-            val disposable = domain.tournaments().getCategorizedLineups(filter)
-                .flatMapObservable { Observable.fromIterable(it) }
-                .flatMapSingle { pair ->
-                    val apiKey = Firebase.remoteConfig.getString("maps_api_key")
-                    domain.tournaments().getTournamentMapLink(pair.first, apiKey, 500, 500)
-                        .map { url -> TournamentItem(pair.first, url, pair.second) }
-                        .onErrorResumeNext {
-                            Single.just(TournamentItem(pair.first, null, pair.second))
-                        }
-                }
-                .toList()
-                .subscribe({
-                    _categorizedLineupsLiveData.value = it
-                }, {
-                    Timber.e(it)
-                })
-            disposables.add(disposable)
-            _categorizedLineupsLiveData
+            _categorizedLineupsLiveData.apply {
+                val disposable = domain.tournaments().getCategorizedLineups(filter)
+                    .flatMapObservable { Observable.fromIterable(it) }
+                    .flatMapSingle { Single.just(TournamentItem(it.first, it.second)) }
+                    .toList()
+                    .subscribe({
+                        tournamentItems.clear()
+                        tournamentItems.addAll(it)
+                        _categorizedLineupsLiveData.postValue(tournamentItems)
+                        loadMaps(it)
+                    }, {
+                        Timber.e(it)
+                    })
+                disposables.add(disposable)
+            }
         }
+    }
+
+    private fun loadMaps(tournamentItems: List<TournamentItem>) {
+        val apiKey = remoteConfig.getString("maps_api_key")
+        val items = tournamentItems.filter { it.tournament.address != null }
+        val disposable = Observable.fromIterable(items)
+            .flatMapSingle { item ->
+                domain.tournaments().getTournamentMapLink(item.tournament, apiKey, 500, 500)
+                    .map { Pair(item.tournament, it) }
+                    .onErrorResumeNext { Single.just(Pair(item.tournament, "")) }
+            }
+            .filter { it.second.isNotEmpty() }
+            .subscribe({
+                mapsFlow.tryEmit(it)
+            }, {
+                Timber.e(it)
+            })
+        disposables.add(disposable)
     }
 
     fun clear() {
