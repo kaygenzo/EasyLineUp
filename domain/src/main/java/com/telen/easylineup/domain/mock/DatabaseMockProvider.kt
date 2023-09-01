@@ -76,7 +76,7 @@ class DatabaseMockProvider : KoinComponent {
                                 line["createdAt"].asLong,
                                 line["startTime"].asLong,
                                 line["endTime"].asLong,
-                                line["address"].asString
+                                try { line["address"].asString } catch (e: Exception) { null }
                             )
                         )
                     }

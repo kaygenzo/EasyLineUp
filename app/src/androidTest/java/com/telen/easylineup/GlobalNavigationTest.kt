@@ -11,10 +11,10 @@ import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.NavigationViewActions
+import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -290,7 +290,7 @@ class GlobalNavigationTest {
 
         BaristaDrawerInteractions.openDrawer()
 
-        BaristaClickInteractions.clickOn(R.id.drawerImage)
+        BaristaClickInteractions.clickOn(R.id.teamItem)
 
         takeScreenshot("team_details", mHomeTestRule.activity)
 
@@ -309,26 +309,16 @@ class GlobalNavigationTest {
         //click on edit action button
         BaristaMenuClickInteractions.clickMenu(R.id.action_edit)
 
-        takeScreenshot("team_edit_name", mHomeTestRule.activity)
-
         applyRotation("team_edit_name")
 
         //fill name with NewTeamName
         BaristaEditTextInteractions.writeTo(R.id.teamNameInput, "NewTeamName")
 
-        //click next
-        BaristaClickInteractions.clickOn(R.id.buttonNext)
-
-        takeScreenshot("team_edit_team_type", mHomeTestRule.activity)
-
-        //assert button name is Finish
-        BaristaVisibilityAssertions.assertContains(R.id.buttonNext, "Finish")
-
         //choose softball type
         onView(DisplayedMatchers.displayedAssignableFrom(ViewPager2::class.java))
             .perform(swipeLeft())
         //finish edit flow
-        BaristaClickInteractions.clickOn(R.id.buttonNext)
+        BaristaClickInteractions.clickOn(R.id.save)
 
         applyRotation("new_team_details")
 
@@ -350,7 +340,7 @@ class GlobalNavigationTest {
         BaristaDrawerInteractions.openDrawer()
 
         //check team name is "NewTeamName"
-        BaristaVisibilityAssertions.assertContains(R.id.drawerTitle, "NewTeamName")
+        BaristaVisibilityAssertions.assertContains(R.id.name, "NewTeamName")
     }
 
     @Test
@@ -394,12 +384,12 @@ class GlobalNavigationTest {
         takeScreenshot("lineup_defense_fixed", mHomeTestRule.activity)
 
         //click on attack
-        BaristaClickInteractions.clickOn("ATTACK")
+        BaristaClickInteractions.clickOn("Attack")
 
         takeScreenshot("lineup_attack_fixed", mHomeTestRule.activity)
 
         //click on defense
-        BaristaClickInteractions.clickOn("DEFENSE")
+        BaristaClickInteractions.clickOn("Defense")
 
         applyRotation("lineup_defense_fixed")
 
@@ -409,12 +399,12 @@ class GlobalNavigationTest {
         takeScreenshot("lineup_defense_editable", mHomeTestRule.activity)
 
         //click on attack
-        BaristaClickInteractions.clickOn("ATTACK")
+        BaristaClickInteractions.clickOn("Attack")
 
         takeScreenshot("lineup_attack_editable", mHomeTestRule.activity)
 
         //click on defense
-        BaristaClickInteractions.clickOn("DEFENSE")
+        BaristaClickInteractions.clickOn("Defense")
 
         applyRotation("lineup_defense_editable")
 
@@ -441,7 +431,10 @@ class GlobalNavigationTest {
         BaristaClickInteractions.clickOn(R.id.fab)
 
         BaristaEditTextInteractions.writeTo(R.id.lineupTitleInput, "NewLineup")
-        BaristaEditTextInteractions.writeTo(R.id.tournamentChoiceAutoComplete, "NewTournament")
+
+        BaristaClickInteractions.clickOn(R.id.createTournament)
+        BaristaEditTextInteractions.writeTo(R.id.nameInput, "NewTournament")
+        BaristaDialogInteractions.clickDialogPositiveButton()
 
         takeScreenshot("lineups_create_lineup", mHomeTestRule.activity)
 
@@ -466,7 +459,7 @@ class GlobalNavigationTest {
         BaristaEditTextInteractions.writeTo(R.id.lineupNameEditText, "LineupTest")
         // move lineup in another tournament
         BaristaClickInteractions.clickOn(R.id.tournamentChoice)
-        BaristaClickInteractions.clickOn("London Series")
+        clickSpinnerItem(3)
         // save
         BaristaClickInteractions.clickOn(R.id.save)
 
@@ -514,29 +507,20 @@ class GlobalNavigationTest {
         BaristaEditTextInteractions.writeTo(R.id.teamNameInput, "toto")
 
         // open dialog and clicking cancel button on dialog
-        BaristaClickInteractions.clickOn(R.id.buttonPrevious)
+        BaristaClickInteractions.clickOn(R.id.cancel)
         BaristaDialogInteractions.clickDialogNegativeButton()
-
-        // change screen and come back
-        BaristaClickInteractions.clickOn(R.id.buttonNext)
-        BaristaClickInteractions.clickOn(R.id.buttonPrevious)
 
         // open dialog and close it by press physical back button
         pressBack()
         pressBack()
 
-        //click next again
-        BaristaClickInteractions.clickOn(R.id.buttonNext)
-
-        //assert button name is Finish
-        BaristaVisibilityAssertions.assertContains(R.id.buttonNext, "Finish")
         //click finish
-        BaristaClickInteractions.clickOn(R.id.buttonNext)
+        BaristaClickInteractions.clickOn(R.id.save)
 
         BaristaDrawerInteractions.openDrawer()
 
         //click on image in drawer header
-        BaristaClickInteractions.clickOn(R.id.drawerImage)
+        BaristaClickInteractions.clickOn(R.id.teamItem)
 
         //click on team image button to expand card
         onView(withId(R.id.teamTypeRepresentation))
@@ -570,9 +554,8 @@ class GlobalNavigationTest {
 
         fun changeTeamType(count: Int, onLeft: Boolean) {
             BaristaDrawerInteractions.openDrawer()
-            BaristaClickInteractions.clickOn(R.id.drawerImage)
+            BaristaClickInteractions.clickOn(R.id.teamItem)
             BaristaMenuClickInteractions.clickMenu(R.id.action_edit)
-            BaristaClickInteractions.clickOn(R.id.buttonNext)
             for (i in 0 until count) {
                 if (onLeft) {
                     BaristaViewPagerInteractions.swipeViewPagerBack()
@@ -580,7 +563,7 @@ class GlobalNavigationTest {
                     BaristaViewPagerInteractions.swipeViewPagerForward()
                 }
             }
-            BaristaClickInteractions.clickOn(R.id.buttonNext)
+            BaristaClickInteractions.clickOn(R.id.save)
         }
 
         fun goToFirstPlayer() {
@@ -615,6 +598,13 @@ class GlobalNavigationTest {
         changeTeamType(count = 1, onLeft = false)
         BaristaClickInteractions.clickBack()
         BaristaVisibilityAssertions.assertNotDisplayed(R.id.teamStrategy)
+    }
+
+    private fun clickSpinnerItem(position: Int) {
+        onData(anything())
+            .inRoot(RootMatchers.isPlatformPopup())
+            .atPosition(position)
+            .perform(click())
     }
 
     private fun childAtPosition(

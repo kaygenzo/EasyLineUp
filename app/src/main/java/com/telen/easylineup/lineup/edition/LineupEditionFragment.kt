@@ -82,7 +82,7 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
                         tournaments.map { it.name })
                     with(tournamentChoice) {
                         setAdapter(adapter)
-                        hint = tournaments[index].name
+                        setText(tournaments[index].name, false)
                         onItemClickListener = OnItemClickListener { _, _, position, _ ->
                             viewModel.onTournamentChanged(tournaments[position])
                         }
