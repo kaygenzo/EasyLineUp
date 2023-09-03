@@ -285,7 +285,7 @@
                     tools:text="42"/>
 
                 <TextView
-                    android:background="?attr/colorControlNormal"
+                    android:background="@color/grey"
                     android:id="@+id/separator"
                     android:layout_width="@dimen/player_details_container_separator_width"
                     android:layout_height="70dp"
