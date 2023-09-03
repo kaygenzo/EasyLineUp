@@ -503,6 +503,8 @@ class GlobalNavigationTest {
 
         applyRotation("create_team")
 
+        BaristaKeyboardInteractions.closeKeyboard()
+
         //call the new team toto
         BaristaEditTextInteractions.writeTo(R.id.teamNameInput, "toto")
 
