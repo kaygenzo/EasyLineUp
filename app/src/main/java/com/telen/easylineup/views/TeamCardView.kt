@@ -98,20 +98,19 @@ class TeamCardView : ConstraintLayout {
     }
 
     fun setTeamType(teamType: Int) {
-        when (teamType) {
-            TeamType.BASEBALL.id -> {
-                Picasso.get().load(TeamType.BASEBALL.sportResId)
-                    .into(binding.teamTypeRepresentation)
-            }
-
-            TeamType.SOFTBALL.id -> {
-                Picasso.get().load(TeamType.SOFTBALL.sportResId)
-                    .into(binding.teamTypeRepresentation)
-            }
-
-            TeamType.BASEBALL_5.id -> {
-                Picasso.get().load(TeamType.BASEBALL_5.sportResId)
-                    .into(binding.teamTypeRepresentation)
+        with(binding.teamTypeRepresentation) {
+            drawn {
+                when (teamType) {
+                    TeamType.BASEBALL.id -> TeamType.BASEBALL.sportResId
+                    TeamType.SOFTBALL.id -> TeamType.SOFTBALL.sportResId
+                    TeamType.BASEBALL_5.id -> TeamType.BASEBALL_5.sportResId
+                    else -> null
+                }?.let {
+                    Picasso.get().load(it)
+                        .resize(width, height)
+                        .centerCrop()
+                        .into(binding.teamTypeRepresentation)
+                }
             }
         }
     }

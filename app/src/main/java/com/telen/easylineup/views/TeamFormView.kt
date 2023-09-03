@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
@@ -16,13 +15,14 @@ import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
+import com.telen.easylineup.databinding.TeamTypeCarouselItemBinding
 import com.telen.easylineup.databinding.ViewCreateTeamBinding
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.utils.drawn
 import com.telen.easylineup.utils.ready
 import timber.log.Timber
 import kotlin.math.abs
@@ -202,22 +202,41 @@ class TeamFormView : ConstraintLayout, TextWatcher {
 private class CardPagerAdapter(private val mData: MutableList<TeamTypeCardItem>) :
     RecyclerView.Adapter<CardPagerAdapter.CardViewHolder>() {
 
-    data class CardViewHolder(private val view: TeamCardView) : RecyclerView.ViewHolder(view) {
+    data class CardViewHolder(private val view: TeamTypeCarouselItemBinding) :
+        RecyclerView.ViewHolder(view.root) {
         fun bind(item: TeamTypeCardItem) {
-            view.setTeamName(view.context.getString(item.title))
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-                view.setImage(item.ballResourceId)
-            } else {
-                view.setImage(item.compatBallResourceId)
+            view.teamTypeRepresentation.drawn {
+                view.teamTypeRepresentation.apply {
+                    when (item.type) {
+                        TeamType.BASEBALL.id -> {
+                            Picasso.get().load(TeamType.BASEBALL.sportResId)
+                                .resize(width, height)
+                                .centerCrop()
+                                .into(view.teamTypeRepresentation)
+                        }
+
+                        TeamType.SOFTBALL.id -> {
+                            Picasso.get().load(TeamType.SOFTBALL.sportResId)
+                                .resize(width, height)
+                                .centerCrop()
+                                .into(view.teamTypeRepresentation)
+                        }
+
+                        TeamType.BASEBALL_5.id -> {
+                            Picasso.get().load(TeamType.BASEBALL_5.sportResId)
+                                .resize(width, height)
+                                .centerCrop()
+                                .into(view.teamTypeRepresentation)
+                        }
+                    }
+                }
             }
-            view.setTeamType(item.type)
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
-        val view = TeamCardView(parent.context)
-        view.setDragEnabled(false)
-        view.setDragState(BottomSheetBehavior.STATE_COLLAPSED)
+        val view =
+            TeamTypeCarouselItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return CardViewHolder(view)
     }
 
