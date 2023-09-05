@@ -375,7 +375,7 @@ class GlobalNavigationTest {
             allOf(
                 withId(R.id.rootView),
                 isDescendantOfA(withId(R.id.lineupsOfTournamentRecycler)),
-                hasDescendant(withText("DC vs DC 1")),
+                hasDescendant(withText("DC vs DC 5")),
                 isDisplayed()
             )
         )
