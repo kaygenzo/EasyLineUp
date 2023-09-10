@@ -3,6 +3,7 @@ package com.telen.easylineup.tournaments.list
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.telen.easylineup.domain.model.MapInfo
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.views.OnActionsClickListener
@@ -13,7 +14,7 @@ const val TYPE_ITEM_TOURNAMENT = 1
 class TournamentsAdapter(
     private val tournamentItemListener: OnTournamentItemListener,
     private val items: MutableList<TournamentItem> = mutableListOf(),
-    private val mapsMap: MutableMap<Long, String> = mutableMapOf(),
+    private val mapsMap: MutableMap<Long, MapInfo> = mutableMapOf(),
     private var teamType: Int = TeamType.BASEBALL.id
 ) : RecyclerView.Adapter<TournamentsAdapter.TournamentsViewHolder>() {
 
@@ -39,7 +40,14 @@ class TournamentsAdapter(
         view.setLineups(item.lineups)
 
         view.setTournamentMapVisible(item.tournament.address != null)
-        view.setTournamentMap(mapsMap[item.tournament.id])
+        mapsMap[item.tournament.id]?.let {
+            it.url?.let { view.setTournamentMap(it) }
+            it.location?.let { location ->
+                view.setOnMapClickListener {
+                    tournamentItemListener.onMapClicked(location)
+                }
+            }
+        }
 
         val start = item.getStart()
         val end = item.getEnd()
@@ -74,8 +82,8 @@ class TournamentsAdapter(
         notifyDataSetChanged()
     }
 
-    fun setMapToTournament(tournament: Tournament, url: String) {
-        mapsMap[tournament.id] = url
+    fun setMapToTournament(tournament: Tournament, mapInfo: MapInfo) {
+        mapsMap[tournament.id] = mapInfo
         items.indexOfFirst { it.tournament.id == tournament.id }.takeIf { it >= 0 }?.let {
             notifyItemChanged(it)
         }

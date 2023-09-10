@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.application.TournamentsInteractor
 import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.MapInfo
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.TournamentStatsUIConfig
@@ -86,15 +87,15 @@ internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent 
             .ignoreElement()
     }
 
-    override fun getTournamentMapLink(
+    override fun getTournamentMapInfo(
         tournament: Tournament,
         apiKey: String?,
         width: Int,
         height: Int
-    ): Single<String> {
+    ): Single<MapInfo> {
         return UseCaseHandler.execute(
             getTournamentMapLink,
             GetTournamentMapLink.RequestValues(tournament, apiKey, width, height)
-        ).map { it.mapLink }
+        ).map { it.mapInfo }
     }
 }

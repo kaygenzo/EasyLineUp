@@ -19,10 +19,10 @@ interface TournamentsInteractor {
     ): Single<TournamentStatsUIConfig>
 
     fun saveTournament(tournament: Tournament): Completable
-    fun getTournamentMapLink(
+    fun getTournamentMapInfo(
         tournament: Tournament,
         apiKey: String?,
         width: Int,
         height: Int
-    ): Single<String>
+    ): Single<MapInfo>
 }

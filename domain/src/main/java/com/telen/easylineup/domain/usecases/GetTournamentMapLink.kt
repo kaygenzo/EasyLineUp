@@ -2,6 +2,8 @@ package com.telen.easylineup.domain.usecases
 
 import android.location.Geocoder
 import com.telen.easylineup.domain.UseCase
+import com.telen.easylineup.domain.model.GeoLocation
+import com.telen.easylineup.domain.model.MapInfo
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.usecases.exceptions.AddressNotFoundException
 import com.telen.easylineup.domain.usecases.exceptions.MapApiKeyNotFoundException
@@ -28,12 +30,12 @@ internal class GetTournamentMapLink(private val geocoder: Geocoder) :
                 val imageHeight = height
                 val link = "$basUrl/$style/$long,$lat,$zoom/${imageWidth}x${imageHeight}.png" +
                         "?apikey=$apiKey"
-                ResponseValue(link)
+                ResponseValue(MapInfo(link, GeoLocation(lat, long)))
             }
         }
     }
 
-    data class ResponseValue(val mapLink: String) : UseCase.ResponseValue
+    data class ResponseValue(val mapInfo: MapInfo) : UseCase.ResponseValue
     data class RequestValues(
         val tournament: Tournament,
         val apiKey: String?,

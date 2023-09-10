@@ -1,5 +1,7 @@
 package com.telen.easylineup.tournaments.list
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +17,7 @@ import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentListTournamentsBinding
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.GeoLocation
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
@@ -151,6 +154,11 @@ class TournamentListFragment : BaseFragment("TournamentListFragment"), OnTournam
             LineupEditionFragment.getBundle(lineup.id),
             NavigationUtils().getOptions()
         )
+    }
+
+    override fun onMapClicked(location: GeoLocation) {
+        val urlString = "geo:${location.latitude},${location.longitude}"
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(urlString)))
     }
 
     override fun onHeaderClicked() {

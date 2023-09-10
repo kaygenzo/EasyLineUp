@@ -99,4 +99,8 @@ class TournamentItemView(context: Context, itemClickedListener: OnTournamentItem
             } ?: let { visibility = View.GONE }
         }
     }
+
+    fun setOnMapClickListener(listener: OnClickListener) {
+        binding.image.setOnClickListener(listener)
+    }
 }

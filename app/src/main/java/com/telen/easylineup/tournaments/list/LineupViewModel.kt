@@ -10,6 +10,7 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.MapInfo
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
@@ -50,7 +51,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val lineup = Lineup()
 
     private val remoteConfig = Firebase.remoteConfig
-    val mapsFlow = MutableSharedFlow<Pair<Tournament, String>>(extraBufferCapacity = 1, replay = 1)
+    val mapsFlow = MutableSharedFlow<Pair<Tournament, MapInfo>>(extraBufferCapacity = 1, replay = 1)
 
     fun setFilter(filter: String) {
         filterLiveData.value = filter
@@ -89,11 +90,11 @@ class LineupViewModel : ViewModel(), KoinComponent {
         val items = tournamentItems.filter { it.tournament.address != null }
         val disposable = Observable.fromIterable(items)
             .flatMapSingle { item ->
-                domain.tournaments().getTournamentMapLink(item.tournament, apiKey, 500, 500)
+                domain.tournaments().getTournamentMapInfo(item.tournament, apiKey, 500, 500)
                     .map { Pair(item.tournament, it) }
-                    .onErrorResumeNext { Single.just(Pair(item.tournament, "")) }
+                    .onErrorResumeNext { Single.just(Pair(item.tournament, MapInfo())) }
             }
-            .filter { it.second.isNotEmpty() }
+            .filter { it.second.url?.isNotEmpty() ?: false }
             .subscribe({
                 mapsFlow.tryEmit(it)
             }, {
