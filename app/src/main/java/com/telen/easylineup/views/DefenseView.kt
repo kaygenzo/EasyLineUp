@@ -58,6 +58,7 @@ abstract class DefenseView : ConstraintLayout {
 
         this.strategy = strategy
         positionMarkers.clear()
+        cleanPlayerIcons()
 
         getContainerSize {
 

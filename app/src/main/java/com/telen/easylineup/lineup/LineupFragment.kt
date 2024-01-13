@@ -31,6 +31,7 @@ import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.launch
 import com.telen.easylineup.lineup.attack.AttackFragment
 import com.telen.easylineup.lineup.defense.DefenseFragmentEditable
+import com.telen.easylineup.lineup.defense.DefenseFragmentFixed
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
@@ -100,6 +101,10 @@ abstract class LineupFragment(
         pagerAdapter = LineupPagerAdapter(this, viewModel.editable)
         binder.viewpager?.let { pager ->
             childFragmentManager.fragments.filterIsInstance<DefenseFragmentEditable>().forEach {
+                childFragmentManager.beginTransaction().remove(it).commit()
+            }
+
+            childFragmentManager.fragments.filterIsInstance<DefenseFragmentFixed>().forEach {
                 childFragmentManager.beginTransaction().remove(it).commit()
             }
 
