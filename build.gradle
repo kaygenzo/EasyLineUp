@@ -89,6 +89,7 @@ buildscript {
 
 plugins {
     id "io.gitlab.arturbosch.detekt" version "1.19.0"
+    id "com.diffplug.spotless" version "6.23.3"
 }
 
 apply from: 'sonar.gradle'
@@ -105,6 +106,17 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
+task cleanAll(type: Delete) {
     delete rootProject.buildDir
+}
+
+spotless {
+    java {
+        target("**/*.java")
+        targetExclude("**/build/**")
+        importOrder()
+        removeUnusedImports()
+        googleJavaFormat().aosp()
+        formatAnnotations()
+    }
 }
