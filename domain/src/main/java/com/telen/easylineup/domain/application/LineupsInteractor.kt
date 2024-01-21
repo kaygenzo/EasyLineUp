@@ -1,33 +1,46 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.application
 
 import androidx.lifecycle.LiveData
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.BatterState
+import com.telen.easylineup.domain.model.DomainErrors
+import com.telen.easylineup.domain.model.DpAndFlexConfiguration
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.RosterPlayerStatus
+import com.telen.easylineup.domain.model.TeamRosterSummary
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.Subject
 
 interface LineupsInteractor {
-    /** @deprecated **/
+    /** @deprecated
+     * @return **/
     fun insertLineups(lineups: List<Lineup>): Completable
     fun getCompleteRoster(): Single<TeamRosterSummary>
-    fun getRoster(lineupID: Long): Single<TeamRosterSummary>
-    fun updateRoster(lineupID: Long, roster: List<RosterPlayerStatus>): Completable
+    fun getRoster(lineupId: Long): Single<TeamRosterSummary>
+    fun updateRoster(lineupId: Long, roster: List<RosterPlayerStatus>): Completable
     fun saveLineup(lineup: Lineup, rosterFilter: TeamRosterSummary): Single<Lineup>
-    fun deleteLineup(lineupID: Long?): Completable
+    fun deleteLineup(lineupId: Long?): Completable
     fun updateLineupMode(
         isEnabled: Boolean,
         lineup: Lineup,
         list: List<PlayerWithPosition>
     ): Completable
 
-    fun updateLineup(lineup: Lineup, players: List<PlayerWithPosition>): Completable
+    fun updateLineupAndPlayers(lineup: Lineup, players: List<PlayerWithPosition>): Completable
     fun updateLineup(lineup: Lineup): Completable
     fun observeLineupById(id: Long): LiveData<Lineup>
     fun getLineupById(id: Long): Single<Lineup>
     fun observeErrors(): Subject<DomainErrors.Lineups>
     fun observeTeamPlayersAndMaybePositionsForLineup(id: Long): LiveData<List<PlayerWithPosition>>
     fun getDpAndFlexFromPlayersInField(list: List<PlayerWithPosition>):
-            Single<DpAndFlexConfiguration>
+    Single<DpAndFlexConfiguration>
 
     fun linkDpAndFlex(
         dp: Player?,

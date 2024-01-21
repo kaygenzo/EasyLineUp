@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.splashscreen
 
 import android.content.Intent
@@ -14,7 +18,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class SplashScreenActivity : BaseImportActivity(), KoinComponent {
-
     private val domain: ApplicationInteractor by inject()
     private var binding: SplashscreenBinding? = null
     private val activityResult =
@@ -50,8 +53,9 @@ class SplashScreenActivity : BaseImportActivity(), KoinComponent {
     }
 
     private fun launchImportActivity(data: Uri) {
-        val intent = Intent(this, ImportDataActivity::class.java)
-        intent.data = data
+        val intent = Intent(this, ImportDataActivity::class.java).apply {
+            this.data = data
+        }
         activityResult.launch(intent)
     }
 }

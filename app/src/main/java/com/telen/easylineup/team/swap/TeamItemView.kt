@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.team.swap
 
 /*
@@ -25,7 +29,6 @@ import com.telen.easylineup.databinding.TeamItemViewBinding
 import com.telen.easylineup.views.StateDefense
 
 class TeamItemView : LinearLayout {
-
     private val binding = TeamItemViewBinding.inflate(LayoutInflater.from(context), this)
 
     constructor(context: Context) : super(context)

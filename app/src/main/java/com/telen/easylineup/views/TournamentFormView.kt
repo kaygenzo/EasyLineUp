@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -12,14 +16,6 @@ import com.telen.easylineup.databinding.ViewCreateTournamentFormBinding
 import java.text.DateFormat
 
 class TournamentFormView : ConstraintLayout {
-
-    interface TournamentFormCallback {
-        fun onStartTimeChanged(timeInMillis: Long)
-        fun onEndTimeChanged(timeInMillis: Long)
-        fun onNameChanged(name: String)
-        fun onAddressChanged(address: String)
-    }
-
     private val binding =
         ViewCreateTournamentFormBinding.inflate(LayoutInflater.from(context), this, true)
     var callback: TournamentFormCallback? = null
@@ -31,14 +27,6 @@ class TournamentFormView : ConstraintLayout {
     var fragmentManager: FragmentManager? = null
     private var startTime = System.currentTimeMillis()
     private var endTime = System.currentTimeMillis()
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    )
 
     init {
         with(binding) {
@@ -70,6 +58,14 @@ class TournamentFormView : ConstraintLayout {
         }
     }
 
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
+
     private fun showDatePicker(tag: String, initialTime: Long, value: (Long) -> Unit) {
         val datePicker = MaterialDatePicker.Builder
             .datePicker()
@@ -81,5 +77,12 @@ class TournamentFormView : ConstraintLayout {
 
     private fun setDateDisplay(view: TextView, time: Long) {
         view.text = DateFormat.getDateInstance(DateFormat.SHORT).format(time)
+    }
+
+    interface TournamentFormCallback {
+        fun onStartTimeChanged(timeInMillis: Long)
+        fun onEndTimeChanged(timeInMillis: Long)
+        fun onNameChanged(name: String)
+        fun onAddressChanged(address: String)
     }
 }

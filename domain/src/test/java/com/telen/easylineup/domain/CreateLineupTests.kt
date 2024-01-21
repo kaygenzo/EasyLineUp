@@ -1,8 +1,15 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.RosterPlayerStatus
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.CreateLineup
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
@@ -19,45 +26,89 @@ import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-internal class CreateLineupBaseballStandardTests : CreateLineupTests(TeamStrategy.STANDARD, 0)
+internal class CreateLineupBaseballStandardTests : CreateLineupTests() {
+    @Before
+    override fun init() {
+        strategy = TeamStrategy.STANDARD
+        extraHitters = 0
+        super.init()
+    }
+}
 
 @RunWith(MockitoJUnitRunner::class)
-internal class CreateLineupSoftballStandardTests : CreateLineupTests(TeamStrategy.STANDARD, 0)
+internal class CreateLineupSoftballStandardTests : CreateLineupTests() {
+    @Before
+    override fun init() {
+        strategy = TeamStrategy.STANDARD
+        extraHitters = 0
+        super.init()
+    }
+}
 
 @RunWith(MockitoJUnitRunner::class)
-internal class CreateLineupSoftballSlowpitchTests : CreateLineupTests(TeamStrategy.SLOWPITCH, 0)
+internal class CreateLineupSoftballSlowpitchTests : CreateLineupTests() {
+    @Before
+    override fun init() {
+        strategy = TeamStrategy.SLOWPITCH
+        extraHitters = 0
+        super.init()
+    }
+}
 
 ////////////// CUSTOM HITTER SIZE //////////////
 
 @RunWith(MockitoJUnitRunner::class)
-internal class CreateLineupBaseballCustomStandardTests : CreateLineupTests(TeamStrategy.STANDARD, 3)
+internal class CreateLineupBaseballCustomStandardTests : CreateLineupTests() {
+    @Before
+    override fun init() {
+        strategy = TeamStrategy.STANDARD
+        extraHitters = 3
+        super.init()
+    }
+}
 
 @RunWith(MockitoJUnitRunner::class)
-internal class CreateLineupSoftballCustomStandardTests : CreateLineupTests(TeamStrategy.STANDARD, 3)
+internal class CreateLineupSoftballCustomStandardTests : CreateLineupTests() {
+    @Before
+    override fun init() {
+        strategy = TeamStrategy.STANDARD
+        extraHitters = 3
+        super.init()
+    }
+}
 
 @RunWith(MockitoJUnitRunner::class)
-internal class CreateLineupSoftballCustomSlowpitchTests :
-    CreateLineupTests(TeamStrategy.SLOWPITCH, 3)
+internal class CreateLineupSoftballCustomSlowpitchTests : CreateLineupTests() {
+    @Before
+    override fun init() {
+        strategy = TeamStrategy.SLOWPITCH
+        extraHitters = 3
+        super.init()
+    }
+}
 
-@RunWith(MockitoJUnitRunner::class)
-internal abstract class CreateLineupTests(strategy: TeamStrategy, extraHitters: Int) {
+internal open class CreateLineupTests {
+    var strategy: TeamStrategy = TeamStrategy.STANDARD
+    var extraHitters: Int = 0
+    private val observer: TestObserver<CreateLineup.ResponseValue> = TestObserver()
+    private lateinit var lineup: Lineup
 
     @Mock
     private lateinit var lineupDao: LineupRepository
-    private lateinit var mCreateLineup: CreateLineup
+    private lateinit var createLineup: CreateLineup
     private lateinit var roster: MutableList<RosterPlayerStatus>
-    private val lineup = Lineup(
-        name = "title",
-        strategy = strategy.id,
-        extraHitters = extraHitters,
-        tournamentId = 1L
-    )
-    private val observer = TestObserver<CreateLineup.ResponseValue>()
 
     @Before
-    fun init() {
+    open fun init() {
         MockitoAnnotations.initMocks(this)
-        mCreateLineup = CreateLineup(lineupDao)
+        createLineup = CreateLineup(lineupDao)
+
+        lineup = Lineup(
+            name = "title",
+            strategy = strategy.id,
+            extraHitters = extraHitters,
+            tournamentId = 1L
+        )
 
         roster = mutableListOf(
             RosterPlayerStatus(Player(1, 1, "toto", 1, 1), true, null),
@@ -69,7 +120,7 @@ internal abstract class CreateLineupTests(strategy: TeamStrategy, extraHitters: 
     }
 
     private fun startUseCase(roster: List<RosterPlayerStatus>) {
-        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, lineup, roster))
+        createLineup.executeUseCase(CreateLineup.RequestValues(1L, lineup, roster))
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -101,7 +152,7 @@ internal abstract class CreateLineupTests(strategy: TeamStrategy, extraHitters: 
     @Test
     fun shouldTriggerAnExceptionIfLineupNameEmpty() {
         lineup.name = "      "
-        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, lineup, roster))
+        createLineup.executeUseCase(CreateLineup.RequestValues(1L, lineup, roster))
             .subscribe(observer)
         observer.await()
         observer.assertError(LineupNameEmptyException::class.java)
@@ -110,7 +161,7 @@ internal abstract class CreateLineupTests(strategy: TeamStrategy, extraHitters: 
     @Test
     fun shouldTriggerAnExceptionIfTournamentNameEmpty() {
         lineup.tournamentId = 0
-        mCreateLineup.executeUseCase(CreateLineup.RequestValues(1L, lineup, roster))
+        createLineup.executeUseCase(CreateLineup.RequestValues(1L, lineup, roster))
             .subscribe(observer)
         observer.await()
         observer.assertError(TournamentNameEmptyException::class.java)

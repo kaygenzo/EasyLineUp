@@ -1,13 +1,21 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.UseCase
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.RosterPlayerStatus
+import com.telen.easylineup.domain.model.isAssigned
+import com.telen.easylineup.domain.model.isDefensePlayer
+import com.telen.easylineup.domain.model.isSubstitute
 import io.reactivex.rxjava3.core.Single
 
 internal class GetListAvailablePlayersForSelection :
     UseCase<GetListAvailablePlayersForSelection.RequestValues,
-            GetListAvailablePlayersForSelection.ResponseValue>() {
-
+GetListAvailablePlayersForSelection.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         val players = requestValues.players
         val playersSelectedForLineup = requestValues.rosterPlayers
@@ -22,7 +30,7 @@ internal class GetListAvailablePlayersForSelection :
                 !it.isAssigned() || (it.isSubstitute() && !setAsSubstitute)
             }
             // no player excluded from the lineup roster
-            .filter { playersSelectedForLineup?.contains(it.playerID) ?: true }
+            .filter { playersSelectedForLineup?.contains(it.playerId) ?: true }
 
         requestValues.position?.run {
             if (isDefensePlayer()) {
@@ -39,24 +47,32 @@ internal class GetListAvailablePlayersForSelection :
     }
 
     private fun getPlayerComparator(position: FieldPosition): Comparator<PlayerWithPosition> {
-        return Comparator { p1, p2 ->
-            val firstHasPosition = p1.playerPositions and position.mask > 0
-            val secondHasPosition = p2.playerPositions and position.mask > 0
+        return Comparator { position1, position2 ->
+            val firstHasPosition = position1.playerPositions and position.mask > 0
+            val secondHasPosition = position2.playerPositions and position.mask > 0
             if (firstHasPosition && !secondHasPosition) {
                 -1
             } else if (!firstHasPosition && secondHasPosition) {
                 1
             } else {
-                p1.playerName.compareTo(p2.playerName)
+                position1.playerName.compareTo(position2.playerName)
             }
         }
     }
 
+    /**
+     * @property players
+     * @property position
+     * @property rosterPlayers
+     */
     class RequestValues(
         val players: List<PlayerWithPosition>,
         val position: FieldPosition?,
         val rosterPlayers: List<RosterPlayerStatus>?
     ) : UseCase.RequestValues
 
+    /**
+     * @property players
+     */
     class ResponseValue(val players: List<PlayerWithPosition>) : UseCase.ResponseValue
 }

@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.lineup
 
 import android.content.Intent
@@ -48,22 +52,13 @@ abstract class LineupFragment(
     @MenuRes private val menuRes: Int,
     private val isEditable: Boolean
 ) : BaseFragment(fragmentName), MenuProvider {
-
     private val viewModel by viewModels<LineupViewModel>()
-    lateinit var pagerAdapter: LineupPagerAdapter
     private var binder: FragmentLineupBinding? = null
-
-    companion object {
-        fun getArguments(lineupID: Long): Bundle {
-            val extras = Bundle()
-            extras.putLong(Constants.LINEUP_ID, lineupID)
-            return extras
-        }
-    }
+    lateinit var pagerAdapter: LineupPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.lineupID = arguments?.getLong(Constants.LINEUP_ID, 0) ?: 0
+        viewModel.lineupId = arguments?.getLong(Constants.LINEUP_ID, 0) ?: 0
         viewModel.editable = isEditable
     }
 
@@ -92,7 +87,6 @@ abstract class LineupFragment(
                 }
                 cancelClickListener = View.OnClickListener { goBack() }
             }
-
         } else {
             binder.substitutesIndication?.visibility = View.VISIBLE
             binder.bottomChoice?.visibility = View.GONE
@@ -146,7 +140,7 @@ abstract class LineupFragment(
         viewModel.observeDefensePlayers().observe(viewLifecycleOwner) {
             val size = it.filter { item -> item.isSubstitute() }.size
             binder.substitutesIndication?.text =
-                resources.getQuantityString(R.plurals.lineups_substitutes_size, size, size)
+                    resources.getQuantityString(R.plurals.lineups_substitutes_size, size, size)
         }
 
         return binder.root
@@ -174,13 +168,9 @@ abstract class LineupFragment(
             menu.findItem(R.id.action_lineup_mode)?.apply {
                 when (teamType) {
                     TeamType.UNKNOWN -> isVisible = false
-                    TeamType.BASEBALL -> {
-                        setTitle(R.string.action_add_dh)
-                    }
+                    TeamType.BASEBALL -> setTitle(R.string.action_add_dh)
 
-                    TeamType.SOFTBALL -> {
-                        setTitle(R.string.action_add_dp_flex)
-                    }
+                    TeamType.SOFTBALL -> setTitle(R.string.action_add_dp_flex)
 
                     else -> {}
                 }
@@ -194,7 +184,7 @@ abstract class LineupFragment(
         return when (item.itemId) {
             R.id.action_edit -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_lineup_edit")
-                val extras = Companion.getArguments(lineupID = viewModel.lineupID ?: 0)
+                val extras = Companion.getArguments(lineupId = viewModel.lineupId ?: 0)
                 findNavController().navigate(
                     R.id.lineupFragmentEditable,
                     extras,
@@ -290,6 +280,14 @@ abstract class LineupFragment(
             if (!success) {
                 findNavController().popBackStack()
             }
+        }
+    }
+
+    companion object {
+        fun getArguments(lineupId: Long): Bundle {
+            val extras = Bundle()
+            extras.putLong(Constants.LINEUP_ID, lineupId)
+            return extras
         }
     }
 }

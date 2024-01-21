@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 /*
@@ -16,7 +20,6 @@ package com.telen.easylineup.views
  * limitations under the License.
  */
 
-
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
@@ -29,7 +32,6 @@ import com.telen.easylineup.databinding.ListEmptyViewBinding
  * A common reusable view that shows a hint image and text for an empty list view.
  */
 class ListEmptyView : LinearLayout {
-
     private val binding = ListEmptyViewBinding.inflate(LayoutInflater.from(context), this, true)
 
     constructor(context: Context) : super(context)
@@ -62,7 +64,7 @@ class ListEmptyView : LinearLayout {
         (binding.mEmptyImageHint?.layoutParams as LayoutParams).gravity = gravity
         (binding.mEmptyTextHint?.layoutParams as LayoutParams).gravity = gravity
         layoutParams.height =
-            if (isVerticallyCentered) LayoutParams.WRAP_CONTENT else LayoutParams.MATCH_PARENT
+                if (isVerticallyCentered) LayoutParams.WRAP_CONTENT else LayoutParams.MATCH_PARENT
         requestLayout()
     }
 }

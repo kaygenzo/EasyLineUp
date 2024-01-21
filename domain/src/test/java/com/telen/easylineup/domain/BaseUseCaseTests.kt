@@ -1,30 +1,43 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.model.PlayerNumberOverlay
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.RosterPlayerStatus
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.isDefensePlayer
+import com.telen.easylineup.domain.model.isPitcher
 
 open class BaseUseCaseTests {
     private fun generatePlayerWithPosition(
         id: Long,
-        teamID: Long,
+        teamId: Long,
         position: FieldPosition?,
         flag: Int,
         order: Int,
-        lineupID: Long,
+        lineupId: Long,
         positions: Int = 1
     ): PlayerWithPosition {
         return PlayerWithPosition(
             playerName = "player${id.toInt()}",
             shirtNumber = id.toInt(),
             licenseNumber = id,
-            teamId = teamID,
+            teamId = teamId,
             image = null,
             position = position?.id ?: -1,
             x = 0f, y = 0f,
             flags = flag,
             order = order,
-            fieldPositionID = id,
-            playerID = id,
-            lineupId = lineupID,
+            fieldPositionId = id,
+            playerId = id,
+            lineupId = lineupId,
             playerPositions = positions,
             playerSex = 0
         )
@@ -65,7 +78,7 @@ open class BaseUseCaseTests {
         strategy: TeamStrategy,
         withDpDh: Boolean
     ): List<PlayerWithPosition> {
-        val players = mutableListOf<PlayerWithPosition>()
+        val players: MutableList<PlayerWithPosition> = mutableListOf()
         var index = 1
         var order = 1
         strategy.positions.forEach {

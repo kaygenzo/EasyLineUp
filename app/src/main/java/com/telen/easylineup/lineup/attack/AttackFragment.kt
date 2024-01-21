@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.lineup.attack
 
 import android.os.Bundle
@@ -27,7 +31,7 @@ import java.util.concurrent.TimeUnit
 
 class AttackFragment : BaseFragment("AttackFragment"), BatterListener {
     private var binder: FragmentListBatterBinding? = null
-    private val adapterDataList = mutableListOf<BatterState>()
+    private val adapterDataList: MutableList<BatterState> = mutableListOf()
     private val playerAdapter = BattingOrderAdapter(players = adapterDataList, this).apply {
         setHasStableIds(true)
     }
@@ -35,7 +39,6 @@ class AttackFragment : BaseFragment("AttackFragment"), BatterListener {
     private val itemTouchedHelper = ItemTouchHelper(itemTouchedCallback).apply {
         playerAdapter.itemTouchHelper = this
     }
-
     private val viewModel by viewModels<LineupViewModel>(
         ownerProducer = { requireParentFragment() }
     )

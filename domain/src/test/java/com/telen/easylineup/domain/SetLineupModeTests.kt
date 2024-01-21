@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.Lineup
@@ -15,16 +19,15 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SetLineupModeTests {
-
-    lateinit var mSetLineupMode: SetLineupMode
-    lateinit var lineup: Lineup
     private val extraHitters = 0
-    private val observer = TestObserver<SetLineupMode.ResponseValue>()
+    private val observer: TestObserver<SetLineupMode.ResponseValue> = TestObserver()
+    lateinit var setLineupMode: SetLineupMode
+    lateinit var lineup: Lineup
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        mSetLineupMode = SetLineupMode()
+        setLineupMode = SetLineupMode()
 
         lineup = Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id, extraHitters, 3L)
     }
@@ -32,7 +35,7 @@ internal class SetLineupModeTests {
     private fun startUseCase(mode: Boolean) {
         lineup.mode = if (mode) MODE_DISABLED else MODE_ENABLED
         val lineupMode = if (mode) MODE_ENABLED else MODE_DISABLED
-        mSetLineupMode.executeUseCase(SetLineupMode.RequestValues(lineup, lineupMode))
+        setLineupMode.executeUseCase(SetLineupMode.RequestValues(lineup, lineupMode))
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -45,7 +48,7 @@ internal class SetLineupModeTests {
     }
 
     @Test
-    fun shouldSaveTheLineupModeDH() {
+    fun shouldSaveTheLineupModeDh() {
         startUseCase(true)
     }
 }

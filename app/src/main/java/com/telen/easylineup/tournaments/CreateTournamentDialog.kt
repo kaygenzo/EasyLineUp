@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.tournaments
 
 import android.app.Dialog
@@ -15,8 +19,7 @@ fun interface OnTournamentCreated {
 }
 
 class CreateTournamentDialog(private val callback: OnTournamentCreated) : DialogFragment(),
-    TournamentFormView.TournamentFormCallback {
-
+TournamentFormView.TournamentFormCallback {
     private val tournament =
         Tournament(name = "", createdAt = System.currentTimeMillis(), startTime = 0L, endTime = 0L)
 
@@ -59,5 +62,4 @@ class CreateTournamentDialog(private val callback: OnTournamentCreated) : Dialog
     override fun onAddressChanged(address: String) {
         tournament.address = address
     }
-
 }

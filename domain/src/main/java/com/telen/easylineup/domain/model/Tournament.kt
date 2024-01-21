@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.model
 
 import com.telen.easylineup.domain.model.export.LineupExport
@@ -5,6 +9,15 @@ import com.telen.easylineup.domain.model.export.TournamentExport
 import java.io.Serializable
 import java.util.UUID
 
+/**
+ * @property id
+ * @property name
+ * @property createdAt
+ * @property startTime
+ * @property endTime
+ * @property address
+ * @property hash
+ */
 data class Tournament(
     var id: Long = 0,
     var name: String,
@@ -15,17 +28,33 @@ data class Tournament(
     var hash: String? = UUID.randomUUID().toString()
 ) : Serializable {
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (this === other) {
+            return true
+        }
+        if (javaClass != other?.javaClass) {
+            return false
+        }
 
         other as Tournament
 
-        if (id != other.id) return false
-        if (name != other.name) return false
-        if (createdAt != other.createdAt) return false
-        if (startTime != other.startTime) return false
-        if (endTime != other.endTime) return false
-        if (address != other.address) return false
+        if (id != other.id) {
+            return false
+        }
+        if (name != other.name) {
+            return false
+        }
+        if (createdAt != other.createdAt) {
+            return false
+        }
+        if (startTime != other.startTime) {
+            return false
+        }
+        if (endTime != other.endTime) {
+            return false
+        }
+        if (address != other.address) {
+            return false
+        }
 
         return true
     }
@@ -39,7 +68,6 @@ data class Tournament(
         result = 31 * result + (address?.hashCode() ?: 0)
         return result
     }
-
 }
 
 fun Tournament.toTournamentExport(lineups: List<LineupExport>): TournamentExport {

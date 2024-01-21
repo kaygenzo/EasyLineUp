@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.tournaments.list
 
 import android.view.View
@@ -17,7 +21,6 @@ class TournamentsAdapter(
     private val mapsMap: MutableMap<Long, MapInfo> = mutableMapOf(),
     private var teamType: Int = TeamType.BASEBALL.id
 ) : RecyclerView.Adapter<TournamentsAdapter.TournamentsViewHolder>() {
-
     override fun getItemViewType(position: Int): Int {
         return TYPE_ITEM_TOURNAMENT
     }
@@ -69,8 +72,6 @@ class TournamentsAdapter(
         })
     }
 
-    class TournamentsViewHolder(val view: View) : RecyclerView.ViewHolder(view)
-
     fun setList(list: List<TournamentItem>) {
         items.clear()
         items.addAll(list)
@@ -88,4 +89,9 @@ class TournamentsAdapter(
             notifyItemChanged(it)
         }
     }
+
+    /**
+     * @property view
+     */
+    class TournamentsViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 }

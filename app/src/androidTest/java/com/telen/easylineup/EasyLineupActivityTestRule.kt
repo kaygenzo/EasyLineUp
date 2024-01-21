@@ -1,8 +1,10 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup
 
 import android.app.Activity
-import android.content.Context
-import androidx.preference.PreferenceManager
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import com.telen.easylineup.domain.Constants
@@ -11,21 +13,21 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class EasyLineupActivityTestRule<T : Activity?> : ActivityTestRule<T>, KoinComponent {
-
     private val domain: ApplicationInteractor by inject()
 
     constructor(activityClass: Class<T>?) : super(activityClass)
-    constructor(activityClass: Class<T>?, initialTouchMode: Boolean, launchActivity: Boolean) : super(activityClass, initialTouchMode, launchActivity)
+    constructor(activityClass: Class<T>?, initialTouchMode: Boolean, launchActivity: Boolean) : super(activityClass,
+        initialTouchMode, launchActivity)
 
     override fun beforeActivityLaunched() {
         super.beforeActivityLaunched()
 
-//        activity?.applicationContext?.run {
-            domain.data().deleteAllData()
-                    .andThen(domain.data().generateMockedData())
-//                    .andThen(Completable.timer(3, TimeUnit.SECONDS))
-                    .blockingAwait()
-//        }
+        // activity?.applicationContext?.run {
+        domain.data().deleteAllData()
+            .andThen(domain.data().generateMockedData())
+            // .andThen(Completable.timer(3, TimeUnit.SECONDS))
+            .blockingAwait()
+        // }
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val preferencesEditor = context.getSharedPreferences(Constants.APPLICATION_PREFERENCES, 0).edit()

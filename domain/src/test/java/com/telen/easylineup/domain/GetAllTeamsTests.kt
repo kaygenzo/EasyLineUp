@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.Team
@@ -14,18 +18,17 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
-
 @RunWith(MockitoJUnitRunner::class)
 internal class GetAllTeamsTests {
-
+    val observer: TestObserver<GetAllTeams.ResponseValue> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
-    lateinit var mGetAllTeams: GetAllTeams
+    lateinit var getAllTeams: GetAllTeams
     lateinit var teams: MutableList<Team>
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        mGetAllTeams = GetAllTeams(teamDao)
+        getAllTeams = GetAllTeams(teamDao)
 
         teams = mutableListOf()
         teams.add(Team(1, "toto", null, 0, true))
@@ -36,9 +39,8 @@ internal class GetAllTeamsTests {
 
     @Test
     fun shouldDeleteTournament() {
-        val observer = TestObserver<GetAllTeams.ResponseValue>()
-        mGetAllTeams.executeUseCase(GetAllTeams.RequestValues())
-                .subscribe(observer)
+        getAllTeams.executeUseCase(GetAllTeams.RequestValues())
+            .subscribe(observer)
         observer.await()
         observer.assertComplete()
         Assert.assertEquals(teams, observer.values().first().teams)

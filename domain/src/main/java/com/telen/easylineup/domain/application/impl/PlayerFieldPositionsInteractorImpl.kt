@@ -1,8 +1,16 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.application.impl
 
 import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.application.PlayerFieldPositionsInteractor
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.DeletePlayerFieldPosition
@@ -13,7 +21,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 internal class PlayerFieldPositionsInteractorImpl : PlayerFieldPositionsInteractor, KoinComponent {
-
     private val playerFieldPositionRepo: PlayerFieldPositionRepository by inject()
     private val getTeam: GetTeam by inject()
     private val savePlayerFieldPosition: AssignPlayerFieldPosition by inject()
@@ -21,7 +28,7 @@ internal class PlayerFieldPositionsInteractorImpl : PlayerFieldPositionsInteract
     private val switchPlayersPosition: SwitchPlayersPosition by inject()
 
     override fun insertPlayerFieldPositions(playerFieldPositions: List<PlayerFieldPosition>):
-            Completable {
+    Completable {
         return playerFieldPositionRepo.insertPlayerFieldPositions(playerFieldPositions)
     }
 
@@ -62,8 +69,8 @@ internal class PlayerFieldPositionsInteractorImpl : PlayerFieldPositionsInteract
     }
 
     override fun switchPlayersPosition(
-        p1: FieldPosition,
-        p2: FieldPosition,
+        position1: FieldPosition,
+        position2: FieldPosition,
         list: List<PlayerWithPosition>,
         lineup: Lineup
     ): Completable {
@@ -72,8 +79,8 @@ internal class PlayerFieldPositionsInteractorImpl : PlayerFieldPositionsInteract
             .flatMap {
                 val request = SwitchPlayersPosition.RequestValues(
                     players = list,
-                    position1 = p1,
-                    position2 = p2,
+                    position1 = position1,
+                    position2 = position2,
                     teamType = it.type,
                     lineup = lineup
                 )

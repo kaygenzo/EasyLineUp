@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.login
 
 import android.content.Context
@@ -14,21 +18,20 @@ import io.reactivex.rxjava3.subjects.Subject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
-import java.io.*
 
 sealed class LoginEvent
-object ImportSuccessfulEvent: LoginEvent()
-object ImportFailure: LoginEvent()
-data class GetTeamSuccess(val team: Team): LoginEvent()
-object GetTeamFailed: LoginEvent()
+object ImportSuccessfulEvent : LoginEvent()
+object ImportFailure : LoginEvent()
+/**
+ * @property team
+ */
+data class GetTeamSuccess(val team: Team) : LoginEvent()
+object GetTeamFailed : LoginEvent()
 
 class LoginViewModel : ViewModel(), KoinComponent {
-
     private val domain: ApplicationInteractor by inject()
     private val context: Context by inject()
-
-    private val _loginEvent = PublishSubject.create<LoginEvent>()
-
+    private val _loginEvent: Subject<LoginEvent> = PublishSubject.create()
     val disposables = CompositeDisposable()
 
     fun observeEvents(): Subject<LoginEvent> {
@@ -69,12 +72,12 @@ class LoginViewModel : ViewModel(), KoinComponent {
 
     fun getMainTeam() {
         val disposable = domain.teams().getTeam()
-                .subscribe({
-                    _loginEvent.onNext(GetTeamSuccess(it))
-                }, {
-                    Timber.e(it)
-                    _loginEvent.onNext(GetTeamFailed)
-                })
+            .subscribe({
+                _loginEvent.onNext(GetTeamSuccess(it))
+            }, {
+                Timber.e(it)
+                _loginEvent.onNext(GetTeamFailed)
+            })
         disposables.add(disposable)
     }
 }

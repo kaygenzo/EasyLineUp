@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.model.tiles
 
 import com.telen.easylineup.domain.Constants
@@ -7,10 +11,20 @@ const val KEY_DATA_NAME = 1
 const val KEY_DATA_SHIRT_NUMBER = 2
 const val KEY_DATA_MATCH_PLAYED = 3
 
-class MostUsedPlayerData(val image: String?, val name: String, val shirtNumber: Int, val matchPlayed: Int): ITileData {
-
+/**
+ * @property image
+ * @property name
+ * @property shirtNumber
+ * @property matchPlayed
+ */
+class MostUsedPlayerData(
+    val image: String?,
+    val name: String,
+    val shirtNumber: Int,
+    val matchPlayed: Int
+) : TileData {
     override fun getData(): Map<Int, Any> {
-        val map = mutableMapOf<Int, Any>()
+        val map: MutableMap<Int, Any> = mutableMapOf()
         image?.let {
             map[KEY_DATA_IMAGE] = it
         }

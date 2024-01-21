@@ -1,7 +1,26 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.model
 
+/**
+ * @property playerId
+ * @property playerFlag
+ * @property playerOrder
+ * @property playerName
+ * @property playerNumber
+ * @property playerPosition
+ * @property playerPositionDesc
+ * @property canShowPosition
+ * @property canMove
+ * @property canShowDescription
+ * @property canShowOrder
+ * @property applyBackground
+ * @property isEditable
+ */
 data class BatterState(
-    val playerID: Long,
+    val playerId: Long,
     val playerFlag: Int,
     var playerOrder: Int,
     val playerName: String,

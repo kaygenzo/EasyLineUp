@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -12,19 +16,18 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.TeamType
 
 class DpFlexLinkView : ConstraintLayout {
-
-    companion object {
-        const val TYPE_NONE = 0
-        const val TYPE_DP = 1
-        const val TYPE_FLEX = 2
-    }
-
     private val binding = ViewDpFlexLinkBinding.inflate(LayoutInflater.from(context), this, true)
-
     private var playerTypeChoice = TYPE_NONE
     private var dp: Player? = null
     private var flex: Player? = null
     private val iconeSize: Int
+
+    init {
+        binding.linkDpFlexPlayerList.visibility = View.GONE
+        iconeSize = resources.getDimensionPixelSize(R.dimen.link_dp_flex_icon_size)
+        binding.playerDp.setState(StateDefense.PLAYER)
+        binding.playerFlex.setState(StateDefense.PLAYER)
+    }
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -33,13 +36,6 @@ class DpFlexLinkView : ConstraintLayout {
         attrs,
         defStyleAttr
     )
-
-    init {
-        binding.linkDpFlexPlayerList.visibility = View.GONE
-        iconeSize = resources.getDimensionPixelSize(R.dimen.link_dp_flex_icon_size)
-        binding.playerDp.setState(StateDefense.PLAYER)
-        binding.playerFlex.setState(StateDefense.PLAYER)
-    }
 
     fun setTeamType(type: Int) {
         when (type) {
@@ -129,5 +125,11 @@ class DpFlexLinkView : ConstraintLayout {
 
     fun getFlex(): Player? {
         return flex
+    }
+
+    companion object {
+        const val TYPE_NONE = 0
+        const val TYPE_DP = 1
+        const val TYPE_FLEX = 2
     }
 }

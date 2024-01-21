@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.lineup.create
 
 import android.os.Bundle
@@ -41,12 +45,16 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment"), OnActionB
         launch(lineupViewModel.observeErrors(), {
             when (it) {
                 DomainErrors.Lineups.INVALID_TOURNAMENT_NAME -> {
-                    binding?.lineupCreationForm?.setTournamentNameError(getString(R.string.lineup_creation_error_tournament_empty))
+                    binding?.lineupCreationForm?.setTournamentNameError(getString(
+                        R.string.lineup_creation_error_tournament_empty
+                    ))
                     FirebaseAnalyticsUtils.emptyTournamentName(activity)
                 }
 
                 DomainErrors.Lineups.INVALID_LINEUP_NAME -> {
-                    binding?.lineupCreationForm?.setLineupNameError(getString(R.string.lineup_creation_error_name_empty))
+                    binding?.lineupCreationForm?.setLineupNameError(getString(
+                        R.string.lineup_creation_error_name_empty
+                    ))
                     FirebaseAnalyticsUtils.emptyLineupName(activity)
                 }
 
@@ -93,7 +101,6 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment"), OnActionB
                     }
                 }
             }
-
         }.root
     }
 
@@ -105,9 +112,9 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment"), OnActionB
     private fun showRosterDialog(formView: LineupCreationFormView) {
         launch(lineupViewModel.getChosenRoster(), { response ->
             activity?.let { activity ->
-                val names = mutableListOf<CharSequence>()
+                val names: MutableList<CharSequence> = mutableListOf()
                 names.addAll(response.players.map { it.player.name })
-                val checked = mutableListOf<Boolean>()
+                val checked: MutableList<Boolean> = mutableListOf()
                 checked.addAll(response.players.map { it.status })
                 DialogFactory.getMultiChoiceDialog(
                     context = activity,
@@ -151,14 +158,12 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment"), OnActionB
 
     private fun updateRosterSize(view: TextView, response: TeamRosterSummary) {
         when (response.status) {
-            Constants.STATUS_ALL -> {
-                view.text = getString(R.string.roster_size_status_all)
-            }
+            Constants.STATUS_ALL -> view.text = getString(R.string.roster_size_status_all)
 
             else -> {
                 val size = response.players.filter { it.status }.size
                 view.text =
-                    resources.getQuantityString(R.plurals.roster_size_status_selection, size, size)
+                        resources.getQuantityString(R.plurals.roster_size_status_selection, size, size)
             }
         }
     }

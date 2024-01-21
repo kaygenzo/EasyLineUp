@@ -1,13 +1,14 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.utils
 
 import android.telephony.PhoneNumberUtils
-import android.text.TextUtils
-import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 open class ValidatorUtils {
-
     /**
      * method is used for checking valid email id format.
      *

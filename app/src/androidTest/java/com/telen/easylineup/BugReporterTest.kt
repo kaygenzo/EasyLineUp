@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup
 
 import android.app.Activity
@@ -19,27 +23,25 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import timber.log.Timber
 
-
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class BugReporterTest {
-
-    private var mCurrentDisplayedActivity: Activity? = null
-
+    private var currentDisplayedActivity: Activity? = null
     private val lifecycleCallback: ActivityLifecycleCallback = ActivityLifecycleCallback { activity, stage ->
         if (stage === Stage.RESUMED) {
-            Timber.e("RESUMED: " + activity.javaClass.simpleName)
-            mCurrentDisplayedActivity = activity
+            Timber.e("RESUMED: ${activity.javaClass.simpleName}")
+            currentDisplayedActivity = activity
         }
     }
 
     @Rule
     @JvmField
-    var mHomeTestRule = EasyLineupActivityTestRule(HomeActivity::class.java, initialTouchMode = true, launchActivity = false)
+    var homeTestRule = EasyLineupActivityTestRule(HomeActivity::class.java, initialTouchMode = true,
+        launchActivity = false)
 
     @Before
     fun init() {
-        mHomeTestRule.launchActivity(Intent())
+        homeTestRule.launchActivity(Intent())
         monitorCurrentActivity()
     }
 
@@ -50,29 +52,28 @@ class BugReporterTest {
 
     @Test
     fun testReportSending() {
-
-        //click on report issue action button
+        // click on report issue action button
         onView(withId(R.id.action_report_issue))
-                .perform(click())
+            .perform(click())
 
-        Thread.sleep(2000)
+        Thread.sleep(2_000)
 
-        //add description Test
+        // add description Test
         BaristaEditTextInteractions.writeTo(R.id.bugReporterDescription, "Test")
-        //close keyboard
+        // close keyboard
         BaristaKeyboardInteractions.closeKeyboard()
 
-        //enter edit screenshot view
+        // enter edit screenshot view
         onView(withId(R.id.bugReporterScreenshotPreview))
-                .perform(click())
+            .perform(click())
 
-        //click okay action
+        // click okay action
         onView(withId(R.id.paintActionCheck))
-                .perform(click())
+            .perform(click())
 
-        //send report
+        // send report
         onView(withId(R.id.action_send_report))
-                .perform(click())
+            .perform(click())
     }
 
     private fun monitorCurrentActivity() {

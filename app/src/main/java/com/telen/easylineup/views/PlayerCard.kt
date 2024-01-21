@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -5,14 +9,12 @@ import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.google.android.material.card.MaterialCardView
 import com.squareup.picasso.Picasso
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.Player
 import timber.log.Timber
 
 abstract class PlayerCard(context: Context) : ConstraintLayout(context) {
-
     abstract fun getCardRootView(): View
     abstract fun bind(player: Player)
 
@@ -51,7 +53,7 @@ abstract class PlayerCard(context: Context) : ConstraintLayout(context) {
         textView.text = shirtNumber.toString()
     }
 
-    override fun setOnClickListener(l: OnClickListener?) {
-        getCardRootView().setOnClickListener(l)
+    override fun setOnClickListener(listener: OnClickListener?) {
+        getCardRootView().setOnClickListener(listener)
     }
 }

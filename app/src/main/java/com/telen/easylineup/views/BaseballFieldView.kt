@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -7,7 +11,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.databinding.FieldViewBinding
 
 class BaseballFieldView : ConstraintLayout {
-
     val binding = FieldViewBinding.inflate(LayoutInflater.from(context), this, true)
 
     constructor(context: Context) : super(context)

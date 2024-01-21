@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -5,9 +9,13 @@ import android.graphics.Typeface
 import android.util.AttributeSet
 import com.google.android.material.textview.MaterialTextView
 
+/**
+ * @property valueType
+ */
 enum class LineupTypeface(val valueType: Int) {
     NORMAL(0),
-    HAND_WRITING(1);
+    HAND_WRITING(1),
+    ;
 
     companion object {
         fun getByValue(value: String?): LineupTypeface {
@@ -20,7 +28,6 @@ enum class LineupTypeface(val valueType: Int) {
 }
 
 class PreferencesStyledTextView : MaterialTextView {
-
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
@@ -31,14 +38,12 @@ class PreferencesStyledTextView : MaterialTextView {
 
     fun setTypeface(typeface: LineupTypeface) {
         when (typeface) {
-            LineupTypeface.HAND_WRITING -> {
-                super.setTypeface(
-                    Typeface.createFromAsset(
-                        context.assets,
-                        "HomemadeApple-Regular.ttf"
-                    )
+            LineupTypeface.HAND_WRITING -> super.setTypeface(
+                Typeface.createFromAsset(
+                    context.assets,
+                    "HomemadeApple-Regular.ttf"
                 )
-            }
+            )
 
             else -> {
                 // nothing for now

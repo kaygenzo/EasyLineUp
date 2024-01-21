@@ -1,5 +1,14 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.model
 
+/**
+ * @property id
+ * @property batterSize
+ * @property positions
+ */
 enum class TeamStrategy(val id: Int, val batterSize: Int, vararg val positions: FieldPosition) {
     STANDARD(
         0, 9,
@@ -48,7 +57,8 @@ enum class TeamStrategy(val id: Int, val batterSize: Int, vararg val positions: 
         FieldPosition.MID_FIELDER,
         FieldPosition.RIGHT_FIELD,
         FieldPosition.DP_DH
-    );
+    ),
+    ;
 
     fun getDesignatedPlayerOrder(extraHitterSize: Int): Int {
         return batterSize + extraHitterSize + 1
@@ -57,8 +67,9 @@ enum class TeamStrategy(val id: Int, val batterSize: Int, vararg val positions: 
     companion object {
         fun getStrategyById(id: Int): TeamStrategy {
             values().forEach {
-                if (it.id == id)
+                if (it.id == id) {
                     return it
+                }
             }
             return STANDARD
         }

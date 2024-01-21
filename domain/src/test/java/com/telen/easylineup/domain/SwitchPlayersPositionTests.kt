@@ -1,6 +1,21 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.MODE_DISABLED
+import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.isCatcher
+import com.telen.easylineup.domain.model.isDpDh
+import com.telen.easylineup.domain.model.isFirstBase
+import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.exceptions.FirstPositionEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.SamePlayerException
@@ -12,23 +27,20 @@ import org.junit.runner.RunWith
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
-
 @RunWith(MockitoJUnitRunner::class)
 internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
-
-    lateinit var mSwitchPlayersPosition: SwitchPlayersPosition
-
-    private lateinit var player2bis: PlayerWithPosition
-    private val players = mutableListOf<PlayerWithPosition>()
+    private val players: MutableList<PlayerWithPosition> = mutableListOf()
     private val strategy = TeamStrategy.STANDARD
     private val extraHitters = 0
+    private val observer: TestObserver<SwitchPlayersPosition.ResponseValue> = TestObserver()
+    lateinit var switchPlayersPosition: SwitchPlayersPosition
+    private lateinit var player2bis: PlayerWithPosition
     private lateinit var lineup: Lineup
-    private val observer = TestObserver<SwitchPlayersPosition.ResponseValue>()
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        mSwitchPlayersPosition = SwitchPlayersPosition()
+        switchPlayersPosition = SwitchPlayersPosition()
 
         players.add(generate(1L, FieldPosition.PITCHER, PlayerFieldPosition.FLAG_FLEX, 10))
         players.add(generate(2L, FieldPosition.CATCHER, PlayerFieldPosition.FLAG_NONE, 2))
@@ -60,7 +72,7 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
         )
         val playersSize = players.size
         val originalPlayers = players.map { it.copy() }
-        mSwitchPlayersPosition.executeUseCase(request).subscribe(observer)
+        switchPlayersPosition.executeUseCase(request).subscribe(observer)
         observer.await()
         exception?.let {
             observer.assertError(exception)
@@ -68,14 +80,14 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
             observer.assertComplete()
             Assert.assertEquals("Size of player list must not change", playersSize, players.size)
             Assert.assertEquals(
-                originalPlayers.first { it.position == fromPosition.id }.playerID,
-                players.first { it.position == toPosition.id }.playerID
+                originalPlayers.first { it.position == fromPosition.id }.playerId,
+                players.first { it.position == toPosition.id }.playerId
             )
             // if the destination is not empty, we can check the players are switched
             originalPlayers.firstOrNull { it.position == toPosition.id }?.let {
                 Assert.assertEquals(
-                    it.playerID,
-                    players.first { it.position == fromPosition.id }.playerID
+                    it.playerId,
+                    players.first { it.position == fromPosition.id }.playerId
                 )
             }
         }
@@ -106,14 +118,14 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
     /////// BASEBALL TESTS /////////
 
     @Test
-    fun shouldSwitch_baseball_Another_Player_With_Another_Player() {
+    fun shouldSwitchBaseballAnotherPlayerWithAnotherPlayer() {
         startUseCase(FieldPosition.FIRST_BASE, FieldPosition.CENTER_FIELD, true, TeamType.BASEBALL)
         assertVerification(4, 4, FieldPosition.CENTER_FIELD.id, PlayerFieldPosition.FLAG_NONE, 6)
         assertVerification(3, 3, FieldPosition.FIRST_BASE.id, PlayerFieldPosition.FLAG_NONE, 4)
     }
 
     @Test
-    fun shouldSwitch_baseball_DH_and_Pitcher() {
+    fun shouldSwitchBaseballDhAndPitcher() {
         startUseCase(FieldPosition.DP_DH, FieldPosition.PITCHER, true, TeamType.BASEBALL)
         assertVerification(
             6,
@@ -126,14 +138,14 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldSwitch_baseball_DH_and_Another_Player() {
+    fun shouldSwitchBaseballDhAndAnotherPlayer() {
         startUseCase(FieldPosition.DP_DH, FieldPosition.FIRST_BASE, true, TeamType.BASEBALL)
         assertVerification(6, 6, FieldPosition.FIRST_BASE.id, PlayerFieldPosition.FLAG_NONE, 8)
         assertVerification(4, 4, FieldPosition.DP_DH.id, PlayerFieldPosition.FLAG_NONE, 6)
     }
 
     @Test
-    fun shouldSwitch_baseball_Pitcher_and_Another_Player() {
+    fun shouldSwitchBaseballPitcherAndAnotherPlayer() {
         startUseCase(FieldPosition.PITCHER, FieldPosition.FIRST_BASE, true, TeamType.BASEBALL)
         assertVerification(1, 1, FieldPosition.FIRST_BASE.id, PlayerFieldPosition.FLAG_NONE, 6)
         assertVerification(
@@ -146,21 +158,21 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldSwitch_baseball_Pitcher_and_Empty() {
+    fun shouldSwitchBaseballPitcherAndEmpty() {
         startUseCase(FieldPosition.PITCHER, FieldPosition.SECOND_BASE, true, TeamType.BASEBALL)
         assertVerification(1, 1, FieldPosition.SECOND_BASE.id, PlayerFieldPosition.FLAG_NONE, 1)
         Assert.assertNull(players.firstOrNull { it.isPitcher() })
     }
 
     @Test
-    fun shouldSwitch_baseball_DH_and_Empty() {
+    fun shouldSwitchBaseballDhAndEmpty() {
         startUseCase(FieldPosition.DP_DH, FieldPosition.SECOND_BASE, true, TeamType.BASEBALL)
         assertVerification(6, 6, FieldPosition.SECOND_BASE.id, PlayerFieldPosition.FLAG_NONE, 8)
         Assert.assertNull(players.firstOrNull { it.isDpDh() })
     }
 
     @Test
-    fun shouldSwitch_baseball_Another_and_Empty() {
+    fun shouldSwitchBaseballAnotherAndEmpty() {
         startUseCase(FieldPosition.FIRST_BASE, FieldPosition.SECOND_BASE, true, TeamType.BASEBALL)
         assertVerification(4, 4, FieldPosition.SECOND_BASE.id, PlayerFieldPosition.FLAG_NONE, 6)
         Assert.assertNull(players.firstOrNull { it.isFirstBase() })
@@ -180,14 +192,14 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
     */
 
     @Test
-    fun shouldSwitch_softball_normal_with_normal() {
+    fun shouldSwitchSoftballNormalWithNormal() {
         startUseCase(FieldPosition.FIRST_BASE, FieldPosition.CENTER_FIELD, true, TeamType.SOFTBALL)
         assertVerification(4, 4, FieldPosition.CENTER_FIELD.id, PlayerFieldPosition.FLAG_NONE, 6)
         assertVerification(3, 3, FieldPosition.FIRST_BASE.id, PlayerFieldPosition.FLAG_NONE, 4)
     }
 
     @Test
-    fun shouldSwitch_softball_flex_with_normal() {
+    fun shouldSwitchSoftballFlexWithNormal() {
         players.first { it.isPitcher() }.apply {
             flags = PlayerFieldPosition.FLAG_NONE
             order = 1
@@ -210,14 +222,14 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldSwitch_softball_dp_with_normal() {
+    fun shouldSwitchSoftballDpWithNormal() {
         startUseCase(FieldPosition.DP_DH, FieldPosition.CENTER_FIELD, true, TeamType.SOFTBALL)
         assertVerification(6, 6, FieldPosition.CENTER_FIELD.id, PlayerFieldPosition.FLAG_NONE, 8)
         assertVerification(3, 3, FieldPosition.DP_DH.id, PlayerFieldPosition.FLAG_NONE, 4)
     }
 
     @Test
-    fun shouldSwitch_softball_flex_with_dp() {
+    fun shouldSwitchSoftballFlexWithDp() {
         players.first { it.isPitcher() }.apply {
             flags = PlayerFieldPosition.FLAG_NONE
             order = 1
@@ -240,7 +252,7 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldSwitch_softball_dp_with_flex() {
+    fun shouldSwitchSoftballDpWithFlex() {
         players.first { it.isPitcher() }.apply {
             flags = PlayerFieldPosition.FLAG_NONE
             order = 1
@@ -264,14 +276,14 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
 
     private fun assertVerification(
         id: Long,
-        playerID: Long,
+        playerId: Long,
         position: Int,
         flags: Int,
         order: Int
     ) {
         players.first { it.position == position }.let {
-            Assert.assertEquals(id, it.fieldPositionID)
-            Assert.assertEquals(playerID, it.playerID)
+            Assert.assertEquals(id, it.fieldPositionId)
+            Assert.assertEquals(playerId, it.playerId)
             Assert.assertEquals(position, it.position)
             Assert.assertEquals(flags, it.flags)
             Assert.assertEquals(order, it.order)

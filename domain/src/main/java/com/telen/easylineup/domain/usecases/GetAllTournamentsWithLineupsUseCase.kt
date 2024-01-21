@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.UseCase
@@ -6,12 +10,14 @@ import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.LineupRepository
 import io.reactivex.rxjava3.core.Single
 
+/**
+ * @property dao
+ */
 internal class GetAllTournamentsWithLineupsUseCase(val dao: LineupRepository) :
     UseCase<GetAllTournamentsWithLineupsUseCase.RequestValues,
-            GetAllTournamentsWithLineupsUseCase.ResponseValue>() {
-
+GetAllTournamentsWithLineupsUseCase.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return dao.getAllTournamentsWithLineups(requestValues.filter, requestValues.teamID)
+        return dao.getAllTournamentsWithLineups(requestValues.filter, requestValues.teamId)
             .map {
                 val result: MutableMap<Tournament, MutableList<Lineup>> = mutableMapOf()
                 val lineups: MutableMap<Long, Lineup> = mutableMapOf()
@@ -20,21 +26,19 @@ internal class GetAllTournamentsWithLineupsUseCase(val dao: LineupRepository) :
                     val tournament = item.toTournament()
                     val lineup = item.toLineup()
 
-                    if (result[tournament] == null) {
+                    result[tournament] ?: run {
                         result[tournament] = mutableListOf()
                     }
 
-                    if (lineup.id > 0) {
-                        if (lineups[lineup.id] == null) {
-                            lineups[lineup.id] = lineup
-                            result[tournament]?.add(lineup)
-                        }
+                    if (lineup.id > 0 && lineups[lineup.id] == null) {
+                        lineups[lineup.id] = lineup
+                        result[tournament]?.add(lineup)
                     }
                 }
                 result
             }
             .map {
-                val list = mutableListOf<Pair<Tournament, List<Lineup>>>()
+                val list: MutableList<Pair<Tournament, List<Lineup>>> = mutableListOf()
                 it.forEach { item ->
                     val tournament = item.key
                     val lineups = item.value.sortedByDescending {
@@ -46,6 +50,13 @@ internal class GetAllTournamentsWithLineupsUseCase(val dao: LineupRepository) :
             }
     }
 
+    /**
+     * @property result
+     */
     class ResponseValue(val result: List<Pair<Tournament, List<Lineup>>>) : UseCase.ResponseValue
-    class RequestValues(val filter: String, val teamID: Long) : UseCase.RequestValues
+    /**
+     * @property filter
+     * @property teamId
+     */
+    class RequestValues(val filter: String, val teamId: Long) : UseCase.RequestValues
 }

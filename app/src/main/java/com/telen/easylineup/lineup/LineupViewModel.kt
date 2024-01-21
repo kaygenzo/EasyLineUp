@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.lineup
 
 import android.content.Context
@@ -40,10 +44,16 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.Calendar
-import kotlin.collections.set
 
 sealed class EventCase
 
+/**
+ * @property initialData
+ * @property dpLocked
+ * @property flexLocked
+ * @property teamType
+ * @property title
+ */
 data class LinkDpFlex(
     val initialData: Pair<PlayerWithPosition?, PlayerWithPosition?>,
     val dpLocked: Boolean,
@@ -52,6 +62,10 @@ data class LinkDpFlex(
     @StringRes val title: Int
 ) : EventCase()
 
+/**
+ * @property players
+ * @property position
+ */
 data class ListAvailablePlayers(
     val players: List<PlayerWithPosition>,
     val position: FieldPosition
@@ -61,8 +75,8 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val prefsHelper by inject<SharedPreferencesHelper>()
     private val domain: ApplicationInteractor by inject()
 
-    //    private val _designatedPlayerTitle = MutableLiveData<String>()
-    private val _helpEvent = MutableLiveData(false)
+    // private val _designatedPlayerTitle = MutableLiveData<String>()
+    private val _helpEvent: MutableLiveData<Boolean> = MutableLiveData(false)
 
     // players
     private val _listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
@@ -81,8 +95,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
             addSource(getLineup()) { this.postValue(it) }
         }
     }
-
-    var lineupID: Long? = 0
+    var lineupId: Long? = 0
     var editable = false
     private val disposables = CompositeDisposable()
 
@@ -140,7 +153,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun getTeamStrategy(): Single<TeamStrategy> {
-        return domain.lineups().getLineupById(lineupID ?: 0)
+        return domain.lineups().getLineupById(lineupId ?: 0)
             .map { TeamStrategy.getStrategyById(it.strategy) }
             .subscribeOn(Schedulers.io())
     }
@@ -155,12 +168,12 @@ class LineupViewModel : ViewModel(), KoinComponent {
 
     fun save(): Completable {
         return lineup?.let {
-            domain.lineups().updateLineup(it, _listPlayersWithPosition)
+            domain.lineups().updateLineupAndPlayers(it, _listPlayersWithPosition)
         } ?: Completable.error(IllegalArgumentException("Lineup is not supposed to be null"))
     }
 
     fun deleteLineup(): Completable {
-        return domain.lineups().deleteLineup(lineupID)
+        return domain.lineups().deleteLineup(lineupId)
     }
 
     fun getTeamType(): Single<Int> {
@@ -181,7 +194,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    //TODO use case ?
+    // TODO use case ?
     fun exportLineupToExternalStorage(
         context: Context,
         views: Map<Int, Bitmap?>
@@ -190,7 +203,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
             val tmpPath = context.cacheDir.path
             val timeInMillis = Calendar.getInstance().timeInMillis
 
-            val uris = arrayListOf<Uri>()
+            val uris: ArrayList<Uri> = arrayListOf()
 
             views.forEach { entry ->
                 val pathBuilder = StringBuilder(tmpPath)
@@ -228,22 +241,31 @@ class LineupViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun switchPlayersPosition(p1: PlayerWithPosition, p2: PlayerWithPosition): Completable {
-        val position1 = FieldPosition.getFieldPositionById(p1.position) ?: FieldPosition.FIRST_BASE
-        val position2 = FieldPosition.getFieldPositionById(p2.position) ?: FieldPosition.FIRST_BASE
+    fun switchPlayersPosition(
+        player1: PlayerWithPosition,
+        player2: PlayerWithPosition
+    ): Completable {
+        val position1 = FieldPosition.getFieldPositionById(player1.position)
+            ?: FieldPosition.FIRST_BASE
+        val position2 = FieldPosition.getFieldPositionById(player2.position)
+            ?: FieldPosition.FIRST_BASE
         return switchPlayersPosition(position1, position2)
     }
 
-    fun switchPlayersPosition(p1: PlayerWithPosition, position2: FieldPosition): Completable {
-        val position1 = FieldPosition.getFieldPositionById(p1.position) ?: FieldPosition.FIRST_BASE
+    fun switchPlayersPosition(player1: PlayerWithPosition, position2: FieldPosition): Completable {
+        val position1 = FieldPosition.getFieldPositionById(player1.position)
+            ?: FieldPosition.FIRST_BASE
         return switchPlayersPosition(position1, position2)
     }
 
-    private fun switchPlayersPosition(p1: FieldPosition, p2: FieldPosition): Completable {
+    private fun switchPlayersPosition(
+        position1: FieldPosition,
+        position2: FieldPosition
+    ): Completable {
         return Completable.defer {
             lineup?.let {
                 domain.playerFieldPositions()
-                    .switchPlayersPosition(p1, p2, _listPlayersWithPosition, it)
+                    .switchPlayersPosition(position1, position2, _listPlayersWithPosition, it)
                     .doOnComplete { refreshPlayers(_listPlayersWithPosition) }
             } ?: Completable.error(IllegalArgumentException("Lineup is not supposed to be null"))
         }
@@ -328,13 +350,13 @@ class LineupViewModel : ViewModel(), KoinComponent {
                 _listPlayersWithPosition.clear()
                 _listPlayersWithPosition.addAll(positions)
                 val playerMap = mutableMapOf(
-                    *positions.map { Pair(it.playerID, it) }.toTypedArray()
+                    *positions.map { Pair(it.playerId, it) }.toTypedArray()
                 )
-                val currentLineupID = lineupID ?: 0
-                domain.players().observePlayerNumberOverlays(currentLineupID)
+                val currentLineupId = lineupId ?: 0
+                domain.players().observePlayerNumberOverlays(currentLineupId)
                     .map {
                         it.forEach { overlay ->
-                            playerMap[overlay.playerID]?.shirtNumber = overlay.number
+                            playerMap[overlay.playerId]?.shirtNumber = overlay.number
                         }
                         positions
                     }
@@ -342,7 +364,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getLineup(): LiveData<Lineup> {
-        return domain.lineups().observeLineupById(lineupID ?: 0).map {
+        return domain.lineups().observeLineupById(lineupId ?: 0).map {
             it.apply {
                 this@LineupViewModel.lineup = this
             }

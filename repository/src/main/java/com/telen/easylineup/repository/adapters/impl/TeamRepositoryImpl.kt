@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.repository.adapters.impl
 
 import androidx.lifecycle.LiveData
@@ -12,8 +16,7 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
 
-internal class TeamRepositoryImpl(private val teamDao: TeamDao): TeamRepository {
-
+internal class TeamRepositoryImpl(private val teamDao: TeamDao) : TeamRepository {
     init {
         Timber.i("TeamRepositoryImpl.init")
     }

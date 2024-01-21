@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.UseCase
@@ -14,8 +18,7 @@ internal class SaveBattingOrderAndPositions(
     private val lineupRepository: LineupRepository,
     private val pfpRepository: PlayerFieldPositionRepository
 ) : UseCase<SaveBattingOrderAndPositions.RequestValues,
-        SaveBattingOrderAndPositions.ResponseValue>() {
-
+SaveBattingOrderAndPositions.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.defer {
             if (requestValues.lineup.id <= 0) {
@@ -24,7 +27,7 @@ internal class SaveBattingOrderAndPositions(
                 val playersOperations: MutableList<Completable> = mutableListOf()
                 requestValues.players.forEach {
                     val playerPosition = it.toPlayerFieldPosition()
-                    if (!it.isAssigned() && it.fieldPositionID > 0) {
+                    if (!it.isAssigned() && it.fieldPositionId > 0) {
                         // it is an old position that can be safely removed
                         playersOperations.add(pfpRepository.deletePosition(playerPosition))
                     } else if (playerPosition.id == 0L) {
@@ -46,6 +49,10 @@ internal class SaveBattingOrderAndPositions(
         }
     }
 
+    /**
+     * @property lineup
+     * @property players
+     */
     class RequestValues(val lineup: Lineup, val players: List<PlayerWithPosition>) :
         UseCase.RequestValues
 

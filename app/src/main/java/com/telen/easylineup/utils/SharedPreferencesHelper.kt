@@ -1,10 +1,13 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.utils
 
 import android.content.Context
 import com.telen.easylineup.domain.Constants
 
 class SharedPreferencesHelper(private val context: Context) {
-
     private val prefs =
         context.getSharedPreferences(Constants.APPLICATION_PREFERENCES, Context.MODE_PRIVATE)
 

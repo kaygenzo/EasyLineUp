@@ -1,19 +1,32 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.usecases
 
 import android.content.Context
 import com.telen.easylineup.domain.R
 import com.telen.easylineup.domain.UseCase
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.PlayerInLineup
+import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.TournamentStatsUiConfig
+import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.utils.getPositionShortNames
 import io.reactivex.rxjava3.core.Single
 
+/**
+ * @property dao
+ */
 internal class GetTournamentStatsForPositionTable(
     private val context: Context,
     val dao: LineupRepository
 ) : UseCase<GetTournamentStatsForPositionTable.RequestValues,
-        GetTournamentStatsForPositionTable.ResponseValue>() {
-
+GetTournamentStatsForPositionTable.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return dao.getAllPlayerPositionsForTournament(
             requestValues.tournament.id,
@@ -22,22 +35,23 @@ internal class GetTournamentStatsForPositionTable(
             .map { list ->
                 val possiblePositions = requestValues.strategy.positions
 
-                val topHeaderData = mutableListOf<Pair<String, Int>>()
-                val leftHeaderData = mutableListOf<Pair<String, Int>>()
-                val mainData = mutableListOf<List<Pair<String, Int>>>()
+                val topHeaderData: MutableList<Pair<String, Int>> = mutableListOf()
+                val leftHeaderData: MutableList<Pair<String, Int>> = mutableListOf()
+                val mainData: MutableList<List<Pair<String, Int>>> = mutableListOf()
 
-                val playersIdToPlayerName = mutableMapOf<Long, String>()
-                val playerIdToData = mutableMapOf<Long, MutableList<PlayerInLineup>>()
+                val playersIdToPlayerName: MutableMap<Long, String> = mutableMapOf()
+                val playerIdToData: MutableMap<Long, MutableList<PlayerInLineup>> = mutableMapOf()
 
                 list.forEach { player ->
-                    player.playerID?.let { playerID ->
-                        playersIdToPlayerName[playerID] = player.playerName
+                    player.playerId?.let { playerId ->
+                        playersIdToPlayerName[playerId] = player.playerName
                             ?: context.getString(R.string.tournament_stats_unknown_player_name)
 
-                        if (!playerIdToData.containsKey(playerID))
-                            playerIdToData[playerID] = mutableListOf()
+                        if (!playerIdToData.containsKey(playerId)) {
+                            playerIdToData[playerId] = mutableListOf()
+                        }
 
-                        playerIdToData[playerID]?.add(player)
+                        playerIdToData[playerId]?.add(player)
                     }
                 }
 
@@ -52,10 +66,10 @@ internal class GetTournamentStatsForPositionTable(
 
                 playersIdToPlayerName.forEach { entry ->
                     leftHeaderData.add(Pair(entry.value, 0))
-                    val data = mutableListOf<Pair<String, Int>>()
+                    val data: MutableList<Pair<String, Int>> = mutableListOf()
                     mainData.add(data)
 
-                    //games played
+                    // games played
                     val gamesCount = playerIdToData[entry.key]
                         ?.filter {
                             it.position?.let {
@@ -83,7 +97,7 @@ internal class GetTournamentStatsForPositionTable(
                     } ?: let { /* nothing to do, just use standard strategy */ }
 
                 ResponseValue(
-                    TournamentStatsUIConfig(
+                    TournamentStatsUiConfig(
                         leftHeaderData,
                         topHeaderData,
                         mainData,
@@ -94,8 +108,16 @@ internal class GetTournamentStatsForPositionTable(
             }
     }
 
-    class ResponseValue(val uiConfig: TournamentStatsUIConfig) : UseCase.ResponseValue
+    /**
+     * @property uiConfig
+     */
+    class ResponseValue(val uiConfig: TournamentStatsUiConfig) : UseCase.ResponseValue
 
+    /**
+     * @property tournament
+     * @property team
+     * @property strategy
+     */
     class RequestValues(
         val tournament: Tournament,
         val team: Team,

@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.team.createTeam
 
 import android.app.Activity
@@ -14,7 +18,6 @@ import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import timber.log.Timber
 
 class TeamCreationActivity : BaseActivity() {
-
     val viewModel by viewModels<SetupViewModel>()
     private var binding: ActivityTeamCreationBinding? = null
 

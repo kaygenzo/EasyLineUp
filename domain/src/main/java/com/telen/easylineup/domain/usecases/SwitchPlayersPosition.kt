@@ -1,16 +1,27 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.UseCase
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.getNextAvailableOrder
+import com.telen.easylineup.domain.model.isDpDh
+import com.telen.easylineup.domain.model.isFlex
 import com.telen.easylineup.domain.usecases.exceptions.FirstPositionEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.SamePlayerException
 import io.reactivex.rxjava3.core.Single
 
 internal class SwitchPlayersPosition :
     UseCase<SwitchPlayersPosition.RequestValues, SwitchPlayersPosition.ResponseValue>() {
-
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-
         val players = requestValues.players.toMutableList()
         val extraHittersSize = requestValues.lineup.extraHitters
         val lineupMode = requestValues.lineup.mode
@@ -60,14 +71,14 @@ internal class SwitchPlayersPosition :
                             // if possible, just keep order, but in case of a swap with a pitcher,
                             // exchange orders
                             if (it.order == orderDesignatedPlayer) {
-                                //we were a pitcher but not anymore.
+                                // we were a pitcher but not anymore.
                                 it.order = tmpOrder
                                     ?: players.getNextAvailableOrder(listOf(it.order))
                             }
-
                         }
                     }
-                } else { //softball
+                } else {
+                    // softball
                     /*
                     * Rules:
                     * - Flex can be anyone except DP.
@@ -82,7 +93,7 @@ internal class SwitchPlayersPosition :
                         if (newPosition == FieldPosition.DP_DH) {
                             it.flags = PlayerFieldPosition.FLAG_NONE
                             if (it.order == orderDesignatedPlayer) {
-                                //we were a pitcher but not anymore.
+                                // we were a pitcher but not anymore.
                                 it.order = tmpOrder
                                     ?: players.getNextAvailableOrder(listOf(it.order))
                             }
@@ -99,6 +110,13 @@ internal class SwitchPlayersPosition :
     }
 
     class ResponseValue : UseCase.ResponseValue
+    /**
+     * @property players
+     * @property position1
+     * @property position2
+     * @property teamType
+     * @property lineup
+     */
     class RequestValues(
         val players: List<PlayerWithPosition>,
         val position1: FieldPosition,

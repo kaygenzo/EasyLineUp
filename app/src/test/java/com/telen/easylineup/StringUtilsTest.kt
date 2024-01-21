@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup
 
 import com.telen.easylineup.utils.toLetters
@@ -5,7 +9,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class StringUtilsTest {
-
     @Test
     fun shouldEmptyStringReturnQuestionMarksString() {
         assertEquals("?", "".toLetters())
@@ -15,13 +18,13 @@ class StringUtilsTest {
 
     @Test
     fun shouldUniqueStringReturn1Letter() {
-        assertEquals("T", "Test".toLetters(), )
+        assertEquals("T", "Test".toLetters())
     }
 
     @Test
     fun shouldComposedStringReturn2Letters() {
-        assertEquals("TB", "Test Blabla".toLetters(), )
-        assertEquals("TB", "Test-Blabla".toLetters(), )
+        assertEquals("TB", "Test Blabla".toLetters())
+        assertEquals("TB", "Test-Blabla".toLetters())
     }
 
     @Test

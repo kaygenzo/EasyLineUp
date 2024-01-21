@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.dashboard
 
 import android.view.View
@@ -11,45 +15,27 @@ import com.telen.easylineup.dashboard.tiles.PlayerNumberSearchTile
 import com.telen.easylineup.dashboard.tiles.TeamSizeTile
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DashboardTile
-import java.util.*
+import java.util.Collections
 
 const val INDEX_SEND_MESSAGES = 0
 const val INDEX_SEND_EMAILS = 1
 const val INDEX_SEND_OTHER = 2
 
+/**
+ * @property inEditMode
+ */
 class DashboardTileAdapter(
     private val tileClickListener: TileClickListener,
     var inEditMode: Boolean = false
 ) : ListAdapter<DashboardTile, DashboardTileAdapter.TileViewHolder>(DiffCallback()),
-    ItemTouchHelperAdapter {
-
-    private class DiffCallback : DiffUtil.ItemCallback<DashboardTile>() {
-        override fun areItemsTheSame(oldItem: DashboardTile, newItem: DashboardTile) =
-            oldItem.id == newItem.id
-
-        override fun areContentsTheSame(oldItem: DashboardTile, newItem: DashboardTile) =
-            oldItem == newItem
-    }
-
-    inner class TileViewHolder(val view: View) : RecyclerView.ViewHolder(view)
-
+ItemTouchHelperAdapter {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TileViewHolder {
         return when (viewType) {
-            Constants.TYPE_TEAM_SIZE -> {
-                TileViewHolder(TeamSizeTile(parent.context))
-            }
-            Constants.TYPE_MOST_USED_PLAYER -> {
-                TileViewHolder(MostUsedPlayerTile(parent.context))
-            }
-            Constants.TYPE_LAST_LINEUP -> {
-                TileViewHolder(LastLineupTile(parent.context))
-            }
-            Constants.TYPE_LAST_PLAYER_NUMBER -> {
-                TileViewHolder(PlayerNumberSearchTile(parent.context))
-            }
-            else -> {
-                throw NotImplementedError()
-            }
+            Constants.TYPE_TEAM_SIZE -> TileViewHolder(TeamSizeTile(parent.context))
+            Constants.TYPE_MOST_USED_PLAYER -> TileViewHolder(MostUsedPlayerTile(parent.context))
+            Constants.TYPE_LAST_LINEUP -> TileViewHolder(LastLineupTile(parent.context))
+            Constants.TYPE_LAST_PLAYER_NUMBER -> TileViewHolder(PlayerNumberSearchTile(parent.context))
+            else -> throw NotImplementedError()
         }
     }
 
@@ -65,6 +51,9 @@ class DashboardTileAdapter(
                     is MostUsedPlayerTile -> bind(data, inEditMode)
                     is LastLineupTile -> bind(data, inEditMode)
                     is PlayerNumberSearchTile -> bind(data, inEditMode, tileClickListener)
+                    else -> {
+                        // this is a generated else block
+                    }
                 }
                 setOnClickListener {
                     if (!inEditMode) {
@@ -81,7 +70,7 @@ class DashboardTileAdapter(
 
     override fun onItemMove(fromPosition: Int, toPosition: Int) {
         if (inEditMode) {
-            val newList = mutableListOf<DashboardTile>().apply {
+            val newList: MutableList<DashboardTile> = mutableListOf<DashboardTile>().apply {
                 addAll(currentList)
             }
             if (fromPosition < toPosition) {
@@ -96,4 +85,17 @@ class DashboardTileAdapter(
             submitList(newList)
         }
     }
+
+    private class DiffCallback : DiffUtil.ItemCallback<DashboardTile>() {
+        override fun areItemsTheSame(oldItem: DashboardTile, newItem: DashboardTile) =
+            oldItem.id == newItem.id
+
+        override fun areContentsTheSame(oldItem: DashboardTile, newItem: DashboardTile) =
+            oldItem == newItem
+    }
+
+    /**
+     * @property view
+     */
+    inner class TileViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 }

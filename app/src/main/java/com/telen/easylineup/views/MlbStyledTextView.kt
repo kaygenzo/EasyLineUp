@@ -1,15 +1,20 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import com.google.android.material.textview.MaterialTextView
 import com.telen.easylineup.R
-import java.lang.StringBuilder
 
-class MLBStyledTextView : MaterialTextView {
+class MlbStyledTextView : MaterialTextView {
+    init {
+        setTextColor(ContextCompat.getColor(context, R.color.lineup_name))
+    }
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -18,10 +23,6 @@ class MLBStyledTextView : MaterialTextView {
         attrs,
         defStyleAttr
     )
-
-    init {
-        setTextColor(ContextCompat.getColor(context, R.color.lineup_name))
-    }
 
     override fun setTypeface(tf: Typeface?, style: Int) {
         super.setTypeface(Typeface.createFromAsset(context.assets, "MLBTUSCA.TTF"))

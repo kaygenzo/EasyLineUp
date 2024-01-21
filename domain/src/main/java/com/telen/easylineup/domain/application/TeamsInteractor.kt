@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.application
 
 import androidx.lifecycle.LiveData
@@ -12,7 +16,8 @@ interface TeamsInteractor {
     fun getAllTeams(): Single<List<Team>>
     fun getTeamsCount(): Single<Int>
 
-    /** @deprecated **/
+    /** @deprecated
+     * @return **/
     fun insertTeam(team: Team): Single<Long>
     fun updateCurrentTeam(currentTeam: Team): Completable
     fun saveTeam(team: Team): Completable

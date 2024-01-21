@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -29,9 +33,9 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 const val ICON_SIZE_SCALE = 0.12f
+const val INDICATOR_RADIUS_FACTOR = 6f
 
 abstract class DefenseView : ConstraintLayout {
-
     private var containerSize: Float? = 0f
     protected val positionMarkers: MutableMap<FieldPosition, MultipleStateDefenseIconButton> =
         mutableMapOf()
@@ -55,13 +59,11 @@ abstract class DefenseView : ConstraintLayout {
     }
 
     fun initField(strategy: TeamStrategy) {
-
         this.strategy = strategy
         positionMarkers.clear()
         cleanPlayerIcons()
 
         getContainerSize {
-
             Bitmap.createBitmap(it.toInt(), it.toInt(), Bitmap.Config.ARGB_8888).let { bitmap ->
                 getFieldCanvas().setImageBitmap(bitmap)
                 canvas = Canvas(bitmap).apply { drawColor(Color.TRANSPARENT) }
@@ -72,7 +74,7 @@ abstract class DefenseView : ConstraintLayout {
                 val view = MultipleStateDefenseIconButton(context).apply {
                     layoutParams = LayoutParams(iconSize, iconSize)
                     setState(StateDefense.LOADING)
-                    setOnClickListener { view ->
+                    setOnClickListener { _ ->
                         onFieldPositionClicked(position)
                     }
                 }
@@ -83,13 +85,13 @@ abstract class DefenseView : ConstraintLayout {
 
             getFieldImage().ready {
                 val image = when (strategy) {
-                    TeamStrategy.B5_DEFAULT -> {
-                        VectorDrawableCompat.create(resources, R.drawable.baseball5_field, null)
-                    }
+                    TeamStrategy.B5_DEFAULT -> VectorDrawableCompat.create(
+                        resources,
+                        R.drawable.baseball5_field,
+                        null
+                    )
 
-                    else -> {
-                        VectorDrawableCompat.create(resources, R.drawable.baseball_field, null)
-                    }
+                    else -> VectorDrawableCompat.create(resources, R.drawable.baseball_field, null)
                 }
                 getFieldImage().setImageDrawable(image)
             }
@@ -97,7 +99,7 @@ abstract class DefenseView : ConstraintLayout {
     }
 
     fun clear() {
-        //cleanPlayerIcons()
+        // cleanPlayerIcons()
     }
 
     protected fun addPlayerOnFieldWithPercentage(
@@ -111,9 +113,9 @@ abstract class DefenseView : ConstraintLayout {
     }
 
     private fun percentageToCoordinates(containerSize: Float, point: PointF): PointF {
-        val positionX = ((point.x * containerSize) / 100f)
-        val positionY = ((point.y * containerSize) / 100f)
-        return PointF(positionX, positionY)
+        val horizontalPosition = ((point.x * containerSize) / 100f)
+        val verticalPosition = ((point.y * containerSize) / 100f)
+        return PointF(horizontalPosition, verticalPosition)
     }
 
     private fun addPlayerOnFieldWithCoordinate(
@@ -140,14 +142,13 @@ abstract class DefenseView : ConstraintLayout {
                 y,
                 imageWidth,
                 imageHeight
-            ) { correctedX: Float, correctedY: Float ->
-                val positionX = correctedX - imageWidth / 2
-                val positionY = correctedY - imageHeight / 2
-                //Timber.d("containerSize=$parentWidth x=$x y=$y correctedX=$correctedX correctedY=$correctedY positionX=$positionX positionY=$positionY")
+            ) { horizontalCorrectedPos: Float, verticalCorrectedPos: Float ->
+                val horizontalPosition = horizontalCorrectedPos - imageWidth / 2
+                val verticalPosition = verticalCorrectedPos - imageHeight / 2
 
                 val layoutParamCustom = FrameLayout.LayoutParams(iconSize, iconSize).run {
-                    leftMargin = positionX.toInt()
-                    topMargin = positionY.toInt()
+                    leftMargin = horizontalPosition.toInt()
+                    topMargin = verticalPosition.toInt()
                     this
                 }
 
@@ -168,7 +169,7 @@ abstract class DefenseView : ConstraintLayout {
         getContainerView().addView(view)
     }
 
-    protected fun cleanPlayerIcons() {
+    private fun cleanPlayerIcons() {
         if (getContainerView().childCount > 1) {
             for (i in getContainerView().childCount - 1 downTo 0) {
                 val view = getContainerView().getChildAt(i)
@@ -192,21 +193,24 @@ abstract class DefenseView : ConstraintLayout {
         imageHeight: Float,
         callback: (x: Float, y: Float) -> Unit
     ) {
+        var axisHorizontalPosition: Float = x
+        var axisVerticalPosition: Float = y
 
-        var positionX: Float = x
-        var positionY: Float = y
+        if (axisHorizontalPosition + imageWidth / 2 > containerSize) {
+            axisHorizontalPosition = containerSize - imageWidth / 2
+        }
+        if (axisHorizontalPosition - imageWidth / 2 < 0) {
+            axisHorizontalPosition = imageWidth / 2
+        }
 
-        if (positionX + imageWidth / 2 > containerSize)
-            positionX = containerSize - imageWidth / 2
-        if (positionX - imageWidth / 2 < 0)
-            positionX = imageWidth / 2
+        if (axisVerticalPosition - imageHeight / 2 < 0) {
+            axisVerticalPosition = imageHeight / 2
+        }
+        if (axisVerticalPosition + imageHeight / 2 > containerSize) {
+            axisVerticalPosition = containerSize - imageHeight / 2
+        }
 
-        if (positionY - imageHeight / 2 < 0)
-            positionY = imageHeight / 2
-        if (positionY + imageHeight / 2 > containerSize)
-            positionY = containerSize - imageHeight / 2
-
-        callback(positionX, positionY)
+        callback(axisHorizontalPosition, axisVerticalPosition)
     }
 
     protected fun getContainerSize(result: (Float) -> Unit) {
@@ -224,9 +228,7 @@ abstract class DefenseView : ConstraintLayout {
 
     protected fun setSexIndicator(player: Player, position: FieldPosition) {
         when (val sex = Sex.getById(player.sex)) {
-            Sex.MALE, Sex.FEMALE -> {
-                drawIndicatorOnPositions(position, sex.getColor(context))
-            }
+            Sex.MALE, Sex.FEMALE -> drawIndicatorOnPositions(position, sex.getColor(context))
 
             else -> {
                 // set a color for unknown sex
@@ -241,7 +243,7 @@ abstract class DefenseView : ConstraintLayout {
     private fun drawIndicatorOnPositions(position: FieldPosition, color: Int) {
         getContainerSize {
             val iconSize = (it * ICON_SIZE_SCALE).roundToInt()
-            val indicatorRadius = iconSize / 6f
+            val indicatorRadius = iconSize / INDICATOR_RADIUS_FACTOR
             val percentage = position.getPositionPercentage(strategy)
             val pos = percentageToCoordinates(it, percentage)
             val size = iconSize.toFloat()

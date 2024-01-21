@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -10,7 +14,6 @@ import androidx.core.content.ContextCompat
 import com.telen.easylineup.databinding.ViewPlayerPositionFilterBinding
 
 class PlayerPositionFilterView : ConstraintLayout {
-
     private val binding =
         ViewPlayerPositionFilterBinding.inflate(LayoutInflater.from(context), this, true)
 

@@ -1,10 +1,13 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.application
 
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 internal class ApplicationInteractorImpl : ApplicationInteractor, KoinComponent {
-
     private val dataInteractor: DataInteractor by inject()
     private val lineupsInteractor: LineupsInteractor by inject()
     private val teamsInteractor: TeamsInteractor by inject()

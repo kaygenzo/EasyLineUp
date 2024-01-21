@@ -1,6 +1,19 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.MODE_DISABLED
+import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.isDpDhOrFlex
+import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithLineupMode
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
@@ -12,13 +25,12 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class UpdatePlayersWithLineupModeTests {
-
-    lateinit var updatePlayersWithLineupMode: UpdatePlayersWithLineupMode
-    lateinit var players: MutableList<PlayerWithPosition>
-    var observer = TestObserver<UpdatePlayersWithLineupMode.ResponseValue>()
+    var observer: TestObserver<UpdatePlayersWithLineupMode.ResponseValue> = TestObserver()
     private val extraHitters = 0
     private val strategy = TeamStrategy.STANDARD
     private val lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitters)
+    lateinit var updatePlayersWithLineupMode: UpdatePlayersWithLineupMode
+    lateinit var players: MutableList<PlayerWithPosition>
 
     @Before
     fun init() {
@@ -82,7 +94,7 @@ internal class UpdatePlayersWithLineupModeTests {
             UpdatePlayersWithLineupMode.RequestValues(
                 players,
                 lineup,
-                teamType?.id ?: 1000
+                teamType?.id ?: 1_000
             )
         ).subscribe(observer)
         observer.await()
@@ -104,14 +116,14 @@ internal class UpdatePlayersWithLineupModeTests {
     }
 
     @Test
-    fun shouldDoNothingIfListEmptyAndDPEnabled() {
+    fun shouldDoNothingIfListEmptyAndDpEnabled() {
         val playersCopy = players.map { it.copy() }
         startUseCase(players = mutableListOf(), lineupMode = true, teamType = TeamType.BASEBALL)
         Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
     }
 
     @Test
-    fun shouldDoNothingIfListEmptyAndDPDisabled() {
+    fun shouldDoNothingIfListEmptyAndDpDisabled() {
         val playersCopy = players.map { it.copy() }
         startUseCase(players = mutableListOf(), lineupMode = false, teamType = TeamType.BASEBALL)
         Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
@@ -125,21 +137,21 @@ internal class UpdatePlayersWithLineupModeTests {
     }
 
     @Test
-    fun shouldDoNothingIfDPEnabledAndNoPitcherAssigned() {
+    fun shouldDoNothingIfDpEnabledAndNoPitcherAssigned() {
         val playersCopy = players.map { it.copy() }
         startUseCase(teamType = TeamType.BASEBALL, lineupMode = true)
         Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
     }
 
     @Test
-    fun shouldDoNothingIfDPDisabledAndNoPitcherOrDPAssigned() {
+    fun shouldDoNothingIfDpDisabledAndNoPitcherOrDpassigned() {
         val playersCopy = players.map { it.copy() }
         startUseCase(teamType = TeamType.BASEBALL, lineupMode = false)
         Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
     }
 
     @Test
-    fun shouldUpdatePitcherOrderTo_10_ifAssignedAndDPEnabled() {
+    fun shouldUpdatePitcherOrderTo10IfAssignedAndDpEnabled() {
         players.first().position = FieldPosition.PITCHER.id
         startUseCase(TeamType.BASEBALL, lineupMode = true)
         val pitcher = players.first { it.isPitcher() }
@@ -149,7 +161,7 @@ internal class UpdatePlayersWithLineupModeTests {
     }
 
     @Test
-    fun shouldDeletePitcherAndDPifAssignedAndDPDisabled() {
+    fun shouldDeletePitcherAndDpifAssignedAndDpDisabled() {
         players.first().apply {
             position = FieldPosition.PITCHER.id
             flags = PlayerFieldPosition.FLAG_FLEX

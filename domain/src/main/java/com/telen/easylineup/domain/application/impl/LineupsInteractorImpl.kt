@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.application.impl
 
 import android.content.Context
@@ -20,7 +24,7 @@ import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.CreateLineup
 import com.telen.easylineup.domain.usecases.DeleteLineup
 import com.telen.easylineup.domain.usecases.GetBattersState
-import com.telen.easylineup.domain.usecases.GetDPAndFlexFromPlayersInField
+import com.telen.easylineup.domain.usecases.GetDpAndFlexFromPlayersInField
 import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
 import com.telen.easylineup.domain.usecases.GetOnlyPlayersInField
 import com.telen.easylineup.domain.usecases.GetRoster
@@ -43,8 +47,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 internal class LineupsInteractorImpl(private val context: Context) : LineupsInteractor,
-    KoinComponent {
-
+KoinComponent {
     private val playersRepo: PlayerRepository by inject()
     private val lineupsRepo: LineupRepository by inject()
     private val getTeam: GetTeam by inject()
@@ -55,14 +58,13 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
     private val updatePlayersWithLineupMode: UpdatePlayersWithLineupMode by inject()
     private val getRoster: GetRoster by inject()
     private val saveBattingOrderAndPosition: SaveBattingOrderAndPositions by inject()
-    private val getDpAndFlexFromPlayersInField: GetDPAndFlexFromPlayersInField by inject()
+    private val getDpAndFlexFromPlayersInField: GetDpAndFlexFromPlayersInField by inject()
     private val saveDpAndFlex: SaveDpAndFlex by inject()
     private val getBatterState: GetBattersState by inject()
     private val getListAvailablePlayersForLineup: GetListAvailablePlayersForSelection by inject()
     private val getPlayersInField: GetOnlyPlayersInField by inject()
     private val updateLineup: UpdateLineup by inject()
     private val updatePlayersWithBatters: UpdatePlayersWithBatters by inject()
-
     private val errors: PublishSubject<DomainErrors.Lineups> = PublishSubject.create()
 
     override fun insertLineups(lineups: List<Lineup>): Completable {
@@ -78,16 +80,16 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
             .map { it.summary }
     }
 
-    override fun getRoster(lineupID: Long): Single<TeamRosterSummary> {
+    override fun getRoster(lineupId: Long): Single<TeamRosterSummary> {
         return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
-            .flatMap { UseCaseHandler.execute(getRoster, GetRoster.RequestValues(it.id, lineupID)) }
+            .flatMap { UseCaseHandler.execute(getRoster, GetRoster.RequestValues(it.id, lineupId)) }
             .map { it.summary }
     }
 
-    override fun updateRoster(lineupID: Long, roster: List<RosterPlayerStatus>): Completable {
+    override fun updateRoster(lineupId: Long, roster: List<RosterPlayerStatus>): Completable {
         return UseCaseHandler
-            .execute(updateLineupRoster, UpdateLineupRoster.RequestValues(lineupID, roster))
+            .execute(updateLineupRoster, UpdateLineupRoster.RequestValues(lineupId, roster))
             .ignoreElement()
     }
 
@@ -107,8 +109,8 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
             }
     }
 
-    override fun deleteLineup(lineupID: Long?): Completable {
-        val requestValues = DeleteLineup.RequestValues(lineupID)
+    override fun deleteLineup(lineupId: Long?): Completable {
+        val requestValues = DeleteLineup.RequestValues(lineupId)
         return UseCaseHandler.execute(deleteLineup, requestValues).ignoreElement()
     }
 
@@ -132,7 +134,7 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
         }
     }
 
-    override fun updateLineup(lineup: Lineup, players: List<PlayerWithPosition>): Completable {
+    override fun updateLineupAndPlayers(lineup: Lineup, players: List<PlayerWithPosition>): Completable {
         val requestValues = SaveBattingOrderAndPositions.RequestValues(lineup, players)
         return UseCaseHandler.execute(saveBattingOrderAndPosition, requestValues).ignoreElement()
     }
@@ -162,7 +164,7 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
         return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
             .flatMap {
-                val request = GetDPAndFlexFromPlayersInField.RequestValues(list, it.type)
+                val request = GetDpAndFlexFromPlayersInField.RequestValues(list, it.type)
                 UseCaseHandler.execute(getDpAndFlexFromPlayersInField, request)
             }
             .map { it.configResult }
@@ -238,7 +240,7 @@ internal class LineupsInteractorImpl(private val context: Context) : LineupsInte
     }
 
     override fun getPlayersInFieldFromList(list: List<PlayerWithPosition>)
-            : Single<List<PlayerWithPosition>> {
+    : Single<List<PlayerWithPosition>> {
         return UseCaseHandler.execute(getPlayersInField, GetOnlyPlayersInField.RequestValues(list))
             .map { it.playersInField }
     }

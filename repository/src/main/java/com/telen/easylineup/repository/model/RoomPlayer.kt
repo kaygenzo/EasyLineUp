@@ -1,9 +1,32 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.repository.model
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.telen.easylineup.domain.model.Player
-import java.util.*
+import java.util.UUID
 
+/**
+ * @property id
+ * @property teamId
+ * @property name
+ * @property shirtNumber
+ * @property licenseNumber
+ * @property image
+ * @property positions
+ * @property pitching
+ * @property batting
+ * @property email
+ * @property phone
+ * @property sex
+ * @property hash
+ */
 @Entity(
     tableName = "players",
     indices = [Index(value = ["name", "licenseNumber", "teamID"])],
@@ -30,24 +53,54 @@ internal data class RoomPlayer(
     @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
 ) {
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (this === other) {
+            return true
+        }
+        if (javaClass != other?.javaClass) {
+            return false
+        }
 
         other as RoomPlayer
 
-        if (id != other.id) return false
-        if (teamId != other.teamId) return false
-        if (name != other.name) return false
-        if (shirtNumber != other.shirtNumber) return false
-        if (licenseNumber != other.licenseNumber) return false
-        if (image != other.image) return false
-        if (positions != other.positions) return false
-        if (pitching != other.pitching) return false
-        if (batting != other.batting) return false
-        if (email != other.email) return false
-        if (phone != other.phone) return false
-        if (sex != other.sex) return false
-        if (hash != other.hash) return false
+        if (id != other.id) {
+            return false
+        }
+        if (teamId != other.teamId) {
+            return false
+        }
+        if (name != other.name) {
+            return false
+        }
+        if (shirtNumber != other.shirtNumber) {
+            return false
+        }
+        if (licenseNumber != other.licenseNumber) {
+            return false
+        }
+        if (image != other.image) {
+            return false
+        }
+        if (positions != other.positions) {
+            return false
+        }
+        if (pitching != other.pitching) {
+            return false
+        }
+        if (batting != other.batting) {
+            return false
+        }
+        if (email != other.email) {
+            return false
+        }
+        if (phone != other.phone) {
+            return false
+        }
+        if (sex != other.sex) {
+            return false
+        }
+        if (hash != other.hash) {
+            return false
+        }
 
         return true
     }

@@ -1,6 +1,19 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.isCatcher
+import com.telen.easylineup.domain.model.isDpDh
+import com.telen.easylineup.domain.model.isFlex
+import com.telen.easylineup.domain.model.toPlayer
 import com.telen.easylineup.domain.usecases.SaveDpAndFlex
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import io.reactivex.rxjava3.observers.TestObserver
@@ -13,18 +26,17 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveDpAndFlexTests : BaseUseCaseTests() {
-
-    private lateinit var useCase: SaveDpAndFlex
-    lateinit var players: MutableList<PlayerWithPosition>
     private val strategy = TeamStrategy.STANDARD
     private val extraHitters = 0
     private val lineup = Lineup(strategy = strategy.id, extraHitters = extraHitters)
-    private val observer = TestObserver<SaveDpAndFlex.ResponseValue>()
+    private val observer: TestObserver<SaveDpAndFlex.ResponseValue> = TestObserver()
+    private lateinit var useCase: SaveDpAndFlex
+    lateinit var players: MutableList<PlayerWithPosition>
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        val teamID = 1L
+        val teamId = 1L
 
         useCase = SaveDpAndFlex()
 
@@ -97,42 +109,42 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
         val flex = players[1]
         startUseCase(dp = dp.toPlayer(), flex = flex.toPlayer(), players = players)
 
-        //flex
+        // flex
         Assert.assertEquals(1, players.count { it.isFlex() })
-        Assert.assertEquals(flex.playerID, players.firstOrNull { it.isFlex() }?.playerID)
+        Assert.assertEquals(flex.playerId, players.firstOrNull { it.isFlex() }?.playerId)
         Assert.assertEquals(
             TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters),
             flex.order
         )
 
-        //others
+        // others
         Assert.assertEquals(4, players.count { !it.isFlex() })
         Assert.assertArrayEquals(
             longArrayOf(1L, 3L, 4L, 5L),
-            players.filter { !it.isFlex() }.map { it.playerID }.sorted().toLongArray()
+            players.filter { !it.isFlex() }.map { it.playerId }.sorted().toLongArray()
         )
     }
 
     @Test
-    fun shouldAssignDPToExistingPosition() {
+    fun shouldAssignDpToExistingPosition() {
         val dp = players[3]
         val flex = players[1]
         startUseCase(dp = dp.toPlayer(), flex = flex.toPlayer(), players = players)
 
         Assert.assertEquals(1, players.count { it.isDpDh() })
-        Assert.assertEquals(dp.playerID, players.firstOrNull { it.isDpDh() }?.playerID)
+        Assert.assertEquals(dp.playerId, players.firstOrNull { it.isDpDh() }?.playerId)
         Assert.assertEquals(2, players.firstOrNull { it.isDpDh() }?.order)
     }
 
     @Test
-    fun shouldAssignDPToNotExistingPosition() {
+    fun shouldAssignDpToNotExistingPosition() {
         players.removeIf { it.isDpDh() }
         val dp = players[3]
         val flex = players[1]
         startUseCase(dp = dp.toPlayer(), flex = flex.toPlayer(), players = players)
 
         Assert.assertEquals(1, players.count { it.isDpDh() })
-        Assert.assertEquals(dp.playerID, players.firstOrNull { it.isDpDh() }?.playerID)
+        Assert.assertEquals(dp.playerId, players.firstOrNull { it.isDpDh() }?.playerId)
         Assert.assertEquals(2, players.firstOrNull { it.isDpDh() }?.order)
     }
 
@@ -150,7 +162,7 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
             strategy.getDesignatedPlayerOrder(lineup.extraHitters),
             players.first { it.isFlex() }.order
         )
-        Assert.assertEquals(newFlex.id, players.first { it.isFlex() }.playerID)
+        Assert.assertEquals(newFlex.id, players.first { it.isFlex() }.playerId)
         Assert.assertEquals(PlayerFieldPosition.FLAG_NONE, oldFlex.flags)
         Assert.assertEquals(oldCatcherOrder, oldFlex.order)
     }

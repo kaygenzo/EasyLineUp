@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.UseCase
@@ -7,9 +11,11 @@ import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournament
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import io.reactivex.rxjava3.core.Single
 
+/**
+ * @property repository
+ */
 internal class SaveTournament(val repository: TournamentRepository) :
     UseCase<SaveTournament.RequestValues, SaveTournament.ResponseValue>() {
-
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.defer {
             with(requestValues.tournament) {
@@ -32,5 +38,8 @@ internal class SaveTournament(val repository: TournamentRepository) :
     }
 
     class ResponseValue : UseCase.ResponseValue
+    /**
+     * @property tournament
+     */
     class RequestValues(val tournament: Tournament) : UseCase.RequestValues
 }

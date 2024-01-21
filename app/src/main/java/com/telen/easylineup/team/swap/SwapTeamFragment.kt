@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.team.swap
 
 import android.app.Dialog
@@ -23,17 +27,15 @@ interface SwapTeamActions {
 data class ActivityNullException(override val message: String) : Exception(message)
 
 class SwapTeamFragment : DialogFragment() {
-
-    private var mAdapter: SwapTeamsListAdapter? = null
-    private var mSwapTeamActions: SwapTeamActions? = null
+    private var listAdapter: SwapTeamsListAdapter? = null
+    private var swapTeamActions: SwapTeamActions? = null
     private var binding: TeamsListViewBinding? = null
 
     fun setSwapTeamActionsListener(swapTeamActions: SwapTeamActions) {
-        mSwapTeamActions = swapTeamActions
+        this.swapTeamActions = swapTeamActions
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         activity?.let { activity ->
             val binding = TeamsListViewBinding.inflate(activity.layoutInflater, null, false).apply {
                 this@SwapTeamFragment.binding = this
@@ -52,14 +54,14 @@ class SwapTeamFragment : DialogFragment() {
                 }
             }
 
-            mAdapter =
-                SwapTeamsListAdapter(teams, object : SwapTeamsListAdapter.SwapTeamsAdapterListener {
-                    override fun onTeamClicked(team: Team) {
-                        FirebaseAnalyticsUtils.onClick(activity, "click_team_swap_selection")
-                        mSwapTeamActions?.onTeamClick(team)
-                        dismiss()
-                    }
-                })
+            listAdapter =
+                    SwapTeamsListAdapter(teams, object : SwapTeamsListAdapter.SwapTeamsAdapterListener {
+                        override fun onTeamClicked(team: Team) {
+                            FirebaseAnalyticsUtils.onClick(activity, "click_team_swap_selection")
+                            swapTeamActions?.onTeamClick(team)
+                            dismiss()
+                        }
+                    })
 
             binding.list.apply {
                 layoutManager = object : LinearLayoutManager(activity) {
@@ -71,7 +73,7 @@ class SwapTeamFragment : DialogFragment() {
                     }
                 }
                 setHasFixedSize(true)
-                adapter = mAdapter
+                adapter = listAdapter
             }
 
             val dialogBuilder = MaterialAlertDialogBuilder(activity)
@@ -81,13 +83,12 @@ class SwapTeamFragment : DialogFragment() {
 
             dialogBuilder.setPositiveButton(R.string.team_list_dialog_create) { dialog, which ->
                 FirebaseAnalyticsUtils.onClick(activity, "click_team_swap_create")
-                mSwapTeamActions?.onCreateTeamClick()
+                swapTeamActions?.onCreateTeamClick()
                 dismiss()
             }
 
             return dialogBuilder.setNegativeButton(android.R.string.cancel, null)
                 .create()
-
         } ?: throw ActivityNullException("Activity is null, it's not allowed at this step")
     }
 

@@ -1,19 +1,31 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.model
 
 import com.telen.easylineup.domain.model.export.PlayerExport
 import com.telen.easylineup.domain.model.export.TeamExport
 import com.telen.easylineup.domain.model.export.TournamentExport
 import java.io.Serializable
-import java.util.*
+import java.util.UUID
 
+/**
+ * @property id
+ * @property name
+ * @property image
+ * @property type
+ * @property main
+ * @property hash
+ */
 data class Team(
-        var id: Long = 0,
-        var name: String = "",
-        var image: String? = null,
-        var type: Int = 0,
-        var main: Boolean = false,
-        var hash: String? = UUID.randomUUID().toString()): Serializable {
-
+    var id: Long = 0,
+    var name: String = "",
+    var image: String? = null,
+    var type: Int = 0,
+    var main: Boolean = false,
+    var hash: String? = UUID.randomUUID().toString()
+) : Serializable {
     override fun toString(): String {
         val builder = StringBuffer().apply {
             append("Team {")
@@ -29,16 +41,30 @@ data class Team(
     }
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (this === other) {
+            return true
+        }
+        if (javaClass != other?.javaClass) {
+            return false
+        }
 
         other as Team
 
-        if (id != other.id) return false
-        if (name != other.name) return false
-        if (image != other.image) return false
-        if (type != other.type) return false
-        if (main != other.main) return false
+        if (id != other.id) {
+            return false
+        }
+        if (name != other.name) {
+            return false
+        }
+        if (image != other.image) {
+            return false
+        }
+        if (type != other.type) {
+            return false
+        }
+        if (main != other.main) {
+            return false
+        }
 
         return true
     }
@@ -53,6 +79,17 @@ data class Team(
     }
 }
 
-fun Team.toTeamExport(players: List<PlayerExport>, tournaments: List<TournamentExport>) : TeamExport {
-    return TeamExport(hash ?: UUID.randomUUID().toString(), name, image, type, main, players, tournaments)
+fun Team.toTeamExport(
+    players: List<PlayerExport>,
+    tournaments: List<TournamentExport>
+): TeamExport {
+    return TeamExport(
+        hash ?: UUID.randomUUID().toString(),
+        name,
+        image,
+        type,
+        main,
+        players,
+        tournaments
+    )
 }

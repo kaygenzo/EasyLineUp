@@ -1,3 +1,5 @@
+import java.nio.charset.StandardCharsets
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
@@ -111,6 +113,7 @@ task cleanAll(type: Delete) {
 }
 
 spotless {
+    encoding = StandardCharsets.UTF_8
     java {
         target("**/*.java")
         targetExclude("**/build/**")
@@ -118,5 +121,14 @@ spotless {
         removeUnusedImports()
         googleJavaFormat().aosp()
         formatAnnotations()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    kotlin {
+        target("**/*.kt")
+        targetExclude("**/build/**")
+        diktat().configFile("$rootDir/Formatting.yml")
+        trimTrailingWhitespace()
+        endWithNewline()
     }
 }

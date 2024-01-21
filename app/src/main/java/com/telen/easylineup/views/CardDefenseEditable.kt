@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -10,9 +14,14 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 
 class CardDefenseEditable : MaterialCardView {
-
     private val binding =
         CardDefenseEditableBinding.inflate(LayoutInflater.from(context), this, true)
+
+    init {
+        context?.let {
+            setBackgroundColor(ContextCompat.getColor(it, android.R.color.transparent))
+        }
+    }
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -21,12 +30,6 @@ class CardDefenseEditable : MaterialCardView {
         attrs,
         defStyleAttr
     )
-
-    init {
-        context?.let {
-            setBackgroundColor(ContextCompat.getColor(it, android.R.color.transparent))
-        }
-    }
 
     fun init(strategy: TeamStrategy) {
         binding.fieldAndPlayersRootView.initField(strategy)

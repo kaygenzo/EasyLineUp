@@ -1,15 +1,24 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.repository.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
-import com.telen.easylineup.repository.model.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
+import com.telen.easylineup.repository.model.RoomLineup
+import com.telen.easylineup.repository.model.RoomPlayerInLineup
+import com.telen.easylineup.repository.model.RoomTournamentWithLineup
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 
 @Dao
 internal interface LineupDao {
-
     @Query("DELETE FROM lineups")
     fun deleteAll(): Completable
 
@@ -46,24 +55,29 @@ internal interface LineupDao {
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
     fun getLineupByIdSingle(lineupId: Long): Single<RoomLineup>
 
-    @Query("""
+    @Query(
+        """
         SELECT lineups.* FROM lineups
         INNER JOIN tournaments ON lineups.tournamentID = tournaments.id
         INNER JOIN teams ON lineups.teamID = teams.id
-        WHERE lineups.tournamentID = :tournamentId AND lineups.teamID = :teamID
-    """)
-    fun getLineupsForTournament(tournamentId: Long, teamID: Long): LiveData<List<RoomLineup>>
+        WHERE lineups.tournamentID = :tournamentId AND lineups.teamID = :teamId
+    """
+    )
+    fun getLineupsForTournament(tournamentId: Long, teamId: Long): LiveData<List<RoomLineup>>
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM lineups
-        WHERE lineups.tournamentID = :tournamentId AND lineups.teamID = :teamID
-    """)
-    fun getLineupsForTournamentRx(tournamentId: Long, teamID: Long): Single<List<RoomLineup>>
+        WHERE lineups.tournamentID = :tournamentId AND lineups.teamID = :teamId
+    """
+    )
+    fun getLineupsForTournamentRx(tournamentId: Long, teamId: Long): Single<List<RoomLineup>>
 
-    @Query("SELECT * FROM lineups WHERE teamID = :teamID ORDER BY editedAt DESC LIMIT 1")
-    fun getLastLineup(teamID: Long): Maybe<RoomLineup>
+    @Query("SELECT * FROM lineups WHERE teamID = :teamId ORDER BY editedAt DESC LIMIT 1")
+    fun getLastLineup(teamId: Long): Maybe<RoomLineup>
 
-    @Query("""
+    @Query(
+        """
         SELECT tournaments.id as tournamentID,
         tournaments.name as tournamentName,
         tournaments.createdAt as tournamentCreatedAt,
@@ -84,12 +98,14 @@ internal interface LineupDao {
         FROM tournaments
         LEFT JOIN lineups ON tournaments.id = lineups.tournamentID
         LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = lineups.id
-        WHERE teamID = :teamID AND (tournamentName LIKE '%' || :filter || '%' OR lineupName LIKE '%' || :filter || '%')
+        WHERE teamID = :teamId AND (tournamentName LIKE '%' || :filter || '%' OR lineupName LIKE '%' || :filter || '%')
         ORDER BY tournaments.createdAt DESC
-    """)
-    fun getAllTournamentsWithLineups(filter: String, teamID: Long): Single<List<RoomTournamentWithLineup>>
+    """
+    )
+    fun getAllTournamentsWithLineups(filter: String, teamId: Long): Single<List<RoomTournamentWithLineup>>
 
-    @Query("""
+    @Query(
+        """
         SELECT
         lineups.name as lineupName,
         lineups.id as lineupID,
@@ -99,7 +115,8 @@ internal interface LineupDao {
         FROM lineups
         LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = lineups.id
         LEFT JOIN players ON playerFieldPosition.playerID = players.id
-        WHERE lineups.teamID = :teamID AND lineups.tournamentID = :tournamentId
-    """)
-    fun getAllPlayerPositionsForTournament(tournamentId: Long, teamID: Long): Single<List<RoomPlayerInLineup>>
+        WHERE lineups.teamID = :teamId AND lineups.tournamentID = :tournamentId
+    """
+    )
+    fun getAllPlayerPositionsForTournament(tournamentId: Long, teamId: Long): Single<List<RoomPlayerInLineup>>
 }

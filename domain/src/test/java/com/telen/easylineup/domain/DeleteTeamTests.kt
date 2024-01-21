@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
@@ -20,45 +24,42 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
-
 @RunWith(MockitoJUnitRunner::class)
 internal class DeleteTeamTests {
-
+    val observer: TestObserver<DeleteTeam.ResponseValue> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
-    lateinit var mDeleteTeam: DeleteTeam
-    lateinit var mTeam: Team
-    lateinit var mTeam2: Team
-    lateinit var mTeam3: Team
+    lateinit var deleteTeam: DeleteTeam
+    lateinit var team: Team
+    lateinit var team2: Team
+    lateinit var team3: Team
     lateinit var teams: List<Team>
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        mDeleteTeam = DeleteTeam(teamDao)
-        mTeam = Team(id = 1L, name = "toto", type = TeamType.BASEBALL.id, main = true)
-        mTeam2 = Team(id = 2L, name = "tata", type = TeamType.SOFTBALL.id, main = false)
-        mTeam3 = Team(id = 3L, name = "titi", type = TeamType.SOFTBALL.id, main = false)
-        teams = mutableListOf(mTeam2, mTeam3)
-        Mockito.`when`(teamDao.deleteTeam(mTeam)).thenReturn(Completable.complete())
+        deleteTeam = DeleteTeam(teamDao)
+        team = Team(id = 1L, name = "toto", type = TeamType.BASEBALL.id, main = true)
+        team2 = Team(id = 2L, name = "tata", type = TeamType.SOFTBALL.id, main = false)
+        team3 = Team(id = 3L, name = "titi", type = TeamType.SOFTBALL.id, main = false)
+        teams = mutableListOf(team2, team3)
+        Mockito.`when`(teamDao.deleteTeam(team)).thenReturn(Completable.complete())
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(teams))
-        Mockito.`when`(teamDao.updateTeam(mTeam2)).thenReturn(Completable.complete())
+        Mockito.`when`(teamDao.updateTeam(team2)).thenReturn(Completable.complete())
     }
 
     @Test
     fun shouldTriggerAnExceptionIfItWasTheOnlyTeamInDatabase() {
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(mutableListOf()))
-        val observer = TestObserver<DeleteTeam.ResponseValue>()
-        mDeleteTeam.executeUseCase(DeleteTeam.RequestValues(mTeam))
-                .subscribe(observer)
+        deleteTeam.executeUseCase(DeleteTeam.RequestValues(team))
+            .subscribe(observer)
         observer.await()
         observer.assertError(NoSuchElementException::class.java)
     }
 
     @Test
     fun shouldReassignMainTeamToTheFirstElement() {
-        val observer = TestObserver<DeleteTeam.ResponseValue>()
-        mDeleteTeam.executeUseCase(DeleteTeam.RequestValues(mTeam))
-                .subscribe(observer)
+        deleteTeam.executeUseCase(DeleteTeam.RequestValues(team))
+            .subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(teamDao).updateTeam(com.nhaarman.mockitokotlin2.check {
@@ -70,11 +71,10 @@ internal class DeleteTeamTests {
 
     @Test
     fun shouldNotReassignMainTeam() {
-        mTeam.main = false
-        mTeam3.main = true
-        val observer = TestObserver<DeleteTeam.ResponseValue>()
-        mDeleteTeam.executeUseCase(DeleteTeam.RequestValues(mTeam))
-                .subscribe(observer)
+        team.main = false
+        team3.main = true
+        deleteTeam.executeUseCase(DeleteTeam.RequestValues(team))
+            .subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(teamDao, never()).updateTeam(any())
@@ -82,9 +82,8 @@ internal class DeleteTeamTests {
 
     @Test
     fun shouldDeleteSuccessfully() {
-        val observer = TestObserver<DeleteTeam.ResponseValue>()
-        mDeleteTeam.executeUseCase(DeleteTeam.RequestValues(mTeam))
-                .subscribe(observer)
+        deleteTeam.executeUseCase(DeleteTeam.RequestValues(team))
+            .subscribe(observer)
         observer.await()
         observer.assertComplete()
     }

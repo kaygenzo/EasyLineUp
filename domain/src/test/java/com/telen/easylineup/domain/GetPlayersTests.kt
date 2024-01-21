@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.Player
@@ -14,32 +18,31 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
-
 @RunWith(MockitoJUnitRunner::class)
 internal class GetPlayersTests {
-
+    val observer: TestObserver<GetPlayers.ResponseValue> = TestObserver()
     @Mock lateinit var playerDao: PlayerRepository
-    lateinit var mGetPlayers: GetPlayers
-
+    lateinit var getPlayers: GetPlayers
     lateinit var players: MutableList<Player>
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        mGetPlayers = GetPlayers(playerDao)
+        getPlayers = GetPlayers(playerDao)
 
-        val player1 = Player(id = 1L, teamId = 1L, name = "toto", shirtNumber =  1, licenseNumber = 1, image = null, positions = 1)
-        val player2 = Player(id = 2L, teamId = 1L, name = "tata", shirtNumber =  2, licenseNumber = 2, image = null, positions = 1)
+        val player1 = Player(id = 1L, teamId = 1L, name = "toto", shirtNumber = 1, licenseNumber = 1, image = null,
+            positions = 1)
+        val player2 = Player(id = 2L, teamId = 1L, name = "tata", shirtNumber = 2, licenseNumber = 2, image = null,
+            positions = 1)
 
         players = arrayListOf(player1, player2)
 
-        Mockito.`when`(playerDao.getPlayers(1L)).thenReturn(Single.just(players))
+        Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(Single.just(players))
     }
 
     @Test
     fun shouldGetPlayersTeam() {
-        val observer = TestObserver<GetPlayers.ResponseValue>()
-        mGetPlayers.executeUseCase(GetPlayers.RequestValues(1L)).subscribe(observer)
+        getPlayers.executeUseCase(GetPlayers.RequestValues(1L)).subscribe(observer)
         observer.await()
         observer.assertComplete()
         Assert.assertEquals(players[0], observer.values().first().players[0])

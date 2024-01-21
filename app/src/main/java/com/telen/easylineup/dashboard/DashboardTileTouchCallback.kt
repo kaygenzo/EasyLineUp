@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.dashboard
 
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -5,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 
 class DashboardTileTouchCallback(private val adapter: DashboardTileAdapter) :
     ItemTouchHelper.Callback() {
-
     override fun getMovementFlags(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder

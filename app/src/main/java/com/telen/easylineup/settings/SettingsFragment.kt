@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.settings
 
 import android.app.Activity
@@ -29,16 +33,15 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import timber.log.Timber
 
-class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
-
+class SettingsFragment : PreferenceFragmentCompat(),
+SharedPreferences.OnSharedPreferenceChangeListener {
     private val viewModel by viewModels<SettingsViewModel>()
     private val loginViewModel by viewModels<LoginViewModel>()
-
     private val disposables = CompositeDisposable()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
-        val about = findPreference<Preference>(getString(R.string.key_app_version))
+        val about: Preference? = findPreference(getString(R.string.key_app_version))
         about?.summary = BuildConfig.VERSION_NAME
     }
 
@@ -52,35 +55,45 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         preferenceManager.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val v = super.onCreateView(inflater, container, savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val view = super.onCreateView(inflater, container, savedInstanceState)
 
         val eventsDisposable = viewModel.observeEvent().subscribe({
-            when(it) {
+            when (it) {
                 DeleteAllDataEventSuccess -> {
                     FirebaseAnalyticsUtils.deleteData(activity)
-                    val intent = Intent(activity, LoginActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    val intent = Intent(activity, LoginActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
                     startActivity(intent)
                 }
+
                 is ExportDataEventSuccess -> {
                     activity?.run {
                         FirebaseAnalyticsUtils.exportData(this)
                         DialogFactory.getSuccessDialog(
-                                context = this,
-                                title = R.string.settings_export_success_title,
-                                message = R.string.settings_export_success_message,
-                                messageArgs = arrayOf(it.pathDirectory)
+                            context = this,
+                            title = R.string.settings_export_success_title,
+                            message = R.string.settings_export_success_message,
+                            messageArgs = arrayOf(it.pathDirectory)
                         ).show()
                     }
 
                     Timber.d("Successfully exported data!")
                 }
-                ExportDataEventFailure -> {
-                    activity?.run {
-                        DialogFactory.getErrorDialog(this, title = R.string.settings_export_error_title, message = R.string.settings_export_error_message).show()
-                    }
+
+                ExportDataEventFailure -> activity?.run {
+                    DialogFactory.getErrorDialog(
+                        this,
+                        title = R.string.settings_export_error_title,
+                        message = R.string.settings_export_error_message
+                    ).show()
                 }
+
                 else -> {}
             }
         }, {
@@ -91,17 +104,22 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
         val errorsDisposable = loginViewModel.observeEvents().subscribe({
             activity?.run {
-                when(it) {
+                when (it) {
                     ImportSuccessfulEvent -> {
                         FirebaseAnalyticsUtils.importData(this)
-                        DialogFactory.getSuccessDialog(context = this,
-                                title = R.string.settings_import_success_title,
-                                message = R.string.settings_import_success_message
+                        DialogFactory.getSuccessDialog(
+                            context = this,
+                            title = R.string.settings_import_success_title,
+                            message = R.string.settings_import_success_message
                         ).show()
                     }
-                    ImportFailure -> {
-                        DialogFactory.getErrorDialog(this, title = R.string.settings_import_error_title, message = R.string.settings_import_error_message).show()
-                    }
+
+                    ImportFailure -> DialogFactory.getErrorDialog(
+                        this,
+                        title = R.string.settings_import_error_title,
+                        message = R.string.settings_import_error_message
+                    ).show()
+
                     else -> {}
                 }
             }
@@ -111,7 +129,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
         disposables.add(errorsDisposable)
 
-        return v
+        return view
     }
 
     override fun onDestroyView() {
@@ -121,50 +139,58 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
-        when(preference.key) {
+        when (preference.key) {
             getString(R.string.key_play_store) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_play_store")
                 try {
-                    val intent = Intent(Intent.ACTION_VIEW)
-                    intent.data = Uri.parse("market://details?id=${activity?.packageName}")
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        data = Uri.parse("market://details?id=${activity?.packageName}")
+                    }
                     startActivity(intent)
-                }
-                catch (e: ActivityNotFoundException) {
+                } catch (e: ActivityNotFoundException) {
                     Timber.e(e)
-                    val intent = Intent(Intent.ACTION_VIEW)
-                    intent.data = Uri.parse("http://play.google.com/store/apps/details?id=${activity?.packageName}")
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        val link =
+                            "http://play.google.com/store/apps/details?id=${activity?.packageName}"
+                        data = Uri.parse(link)
+                    }
                     startActivity(intent)
                 }
                 return true
             }
+
             getString(R.string.key_delete_data) -> {
                 activity?.let {
                     DialogFactory.getWarningTaskDialog(context = it,
-                            message = R.string.dialog_delete_cannot_undo_message,
-                            task = Completable.create { emitter ->
-                                FirebaseAnalyticsUtils.onClick(activity, "click_settings_delete_data")
-                                viewModel.deleteAllData()
-                                emitter.onComplete()
-                            }
+                        message = R.string.dialog_delete_cannot_undo_message,
+                        task = Completable.create { emitter ->
+                            FirebaseAnalyticsUtils.onClick(activity, "click_settings_delete_data")
+                            viewModel.deleteAllData()
+                            emitter.onComplete()
+                        }
                     ).show()
                 }
                 return true
             }
+
             getString(R.string.key_export_data) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_export_data")
                 exportData()
                 return true
             }
+
             getString(R.string.key_import_data) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_import_data")
                 importData()
                 return true
             }
+
             getString(R.string.key_app_licenses) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_licenses")
                 activity?.let { LicensesManager.getDialog(it).show() }
                 return true
             }
+
             else -> return super.onPreferenceTreeClick(preference)
         }
     }
@@ -178,14 +204,17 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        when(key) {
-            getString(R.string.key_lineup_style) -> {
-                FirebaseAnalyticsUtils.onClick(activity, "click_settings_lineup_style")
-            }
+        when (key) {
+            getString(R.string.key_lineup_style) -> FirebaseAnalyticsUtils.onClick(
+                activity,
+                "click_settings_lineup_style"
+            )
+
             getString(R.string.key_bug_report_trigger) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_bug_report_trigger")
                 viewModel.onReportMethodsChosen(requireActivity())
             }
+
             getString(R.string.key_day_night_theme) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_theme")
                 SharedPreferencesUtils.getStringSetting(
@@ -194,25 +223,33 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                     getString(R.string.lineup_theme_default_value)
                 ).let {
                     val styleValue = it.toInt()
-                    AppCompatDelegate.setDefaultNightMode(when(styleValue) {
-                        1 -> { AppCompatDelegate.MODE_NIGHT_NO }
-                        2 -> { AppCompatDelegate.MODE_NIGHT_YES }
-                        else -> { AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM }
-                    })
+                    AppCompatDelegate.setDefaultNightMode(
+                        when (styleValue) {
+                            1 -> AppCompatDelegate.MODE_NIGHT_NO
+                            2 -> AppCompatDelegate.MODE_NIGHT_YES
+                            else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                        }
+                    )
                 }
+            }
+
+            else -> {
+                // this is a generated else block
             }
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 StorageUtils.REQUEST_CODE_OPEN_DOCUMENT -> {
                     val uri = data?.data ?: return
-                    val updateIfExists = findPreference<CheckBoxPreference>(getString(R.string.key_import_data_update_object))?.isChecked ?: false
+                    val key = getString(R.string.key_import_data_update_object)
+                    val updateIfExists = findPreference<CheckBoxPreference>(key)?.isChecked ?: false
                     loginViewModel.importData(uri, updateIfExists)
                 }
+
                 StorageUtils.REQUEST_CODE_CHOOSE_DIRECTORY -> {
                     val dirUri = data?.data ?: return
                     viewModel.exportData(dirUri)

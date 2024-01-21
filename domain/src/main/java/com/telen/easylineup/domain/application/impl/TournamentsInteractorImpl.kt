@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.application.impl
 
 import androidx.lifecycle.LiveData
@@ -7,7 +11,7 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MapInfo
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
-import com.telen.easylineup.domain.model.TournamentStatsUIConfig
+import com.telen.easylineup.domain.model.TournamentStatsUiConfig
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
 import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineupsUseCase
@@ -22,7 +26,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent {
-
     private val tournamentsRepo: TournamentRepository by inject()
     private val getTeam: GetTeam by inject()
     private val deleteTournamentUseCase: DeleteTournamentLineups by inject()
@@ -58,7 +61,7 @@ internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent 
     }
 
     override fun getCategorizedLineups(filter: String):
-            Single<List<Pair<Tournament, List<Lineup>>>> {
+    Single<List<Pair<Tournament, List<Lineup>>>> {
         return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .flatMap {
                 UseCaseHandler.execute(
@@ -72,7 +75,7 @@ internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent 
     override fun getPlayersPositionForTournament(
         tournament: Tournament,
         strategy: TeamStrategy
-    ): Single<TournamentStatsUIConfig> {
+    ): Single<TournamentStatsUiConfig> {
         return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .flatMap {
                 val request =

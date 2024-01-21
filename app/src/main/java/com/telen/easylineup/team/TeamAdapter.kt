@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.team
 
 import android.view.ViewGroup
@@ -13,19 +17,14 @@ interface OnPlayerClickListener {
     fun onPlayerSelected(player: Player)
 }
 
+/**
+ * @property displayType
+ */
 class TeamAdapter(
     private val onPlayerClickListener: OnPlayerClickListener?,
     var displayType: TeamViewModel.DisplayType = TeamViewModel.DisplayType.GRID
 ) :
     ListAdapter<Player, TeamAdapter.PlayerViewHolder>(DiffCallback()) {
-
-    private class DiffCallback : DiffUtil.ItemCallback<Player>() {
-        override fun areItemsTheSame(oldItem: Player, newItem: Player) = oldItem.id == newItem.id
-        override fun areContentsTheSame(oldItem: Player, newItem: Player) = oldItem == newItem
-    }
-
-    class PlayerViewHolder(val card: PlayerCard) : RecyclerView.ViewHolder(card)
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {
         val viewItem = when (displayType) {
             TeamViewModel.DisplayType.LIST -> PlayerListCard(parent.context)
@@ -41,4 +40,14 @@ class TeamAdapter(
             card.setOnClickListener { onPlayerClickListener?.onPlayerSelected(player) }
         }
     }
+
+    private class DiffCallback : DiffUtil.ItemCallback<Player>() {
+        override fun areItemsTheSame(oldItem: Player, newItem: Player) = oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: Player, newItem: Player) = oldItem == newItem
+    }
+
+    /**
+     * @property card
+     */
+    class PlayerViewHolder(val card: PlayerCard) : RecyclerView.ViewHolder(card)
 }

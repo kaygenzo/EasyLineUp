@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -8,6 +12,10 @@ import com.google.android.material.textview.MaterialTextView
 import com.telen.easylineup.R
 
 class CollegedStyledTextView : MaterialTextView {
+    init {
+        setTextColor(ContextCompat.getColor(context, R.color.text_orange))
+        isAllCaps = true
+    }
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -16,11 +24,6 @@ class CollegedStyledTextView : MaterialTextView {
         attrs,
         defStyleAttr
     )
-
-    init {
-        setTextColor(ContextCompat.getColor(context, R.color.text_orange))
-        isAllCaps = true
-    }
 
     override fun setTypeface(tf: Typeface?, style: Int) {
         super.setTypeface(Typeface.createFromAsset(context.assets, "Chivo-Black.ttf"))

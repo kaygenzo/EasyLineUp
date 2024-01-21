@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.lineup.defense
 
 import android.app.Dialog
@@ -35,16 +39,11 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlayerButtonCallback {
-
-    lateinit var availablePlayersBottomSheet: ListAvailablePlayersBottomSheet
     private var binder: FragmentLineupDefenseEditableBinding? = null
     private val viewModel by viewModels<LineupViewModel>(
         ownerProducer = { requireParentFragment() }
     )
-
-    companion object {
-        const val PLAYERS_BOTTOM_SHEET_TAG = "available_players_bottom_sheet"
-    }
+    lateinit var availablePlayersBottomSheet: ListAvailablePlayersBottomSheet
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,7 +114,11 @@ class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlaye
         }, {
             // if we arrive here, it means no players have been found
             activity?.run {
-                DialogFactory.getSimpleDialog(this, R.string.players_list_empty).show()
+                DialogFactory.getSimpleDialog(
+                    context = this,
+                    title = R.string.players_list_empty,
+                    cancelText = 0
+                ).show()
             }
         })
     }
@@ -227,5 +230,9 @@ class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlaye
                 PLAYERS_BOTTOM_SHEET_TAG
             )
         }
+    }
+
+    companion object {
+        const val PLAYERS_BOTTOM_SHEET_TAG = "available_players_bottom_sheet"
     }
 }

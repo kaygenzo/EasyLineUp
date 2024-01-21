@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.Tournament
@@ -14,18 +18,17 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
-
 @RunWith(MockitoJUnitRunner::class)
 internal class GetTournamentTests {
-
+    val observer: TestObserver<GetTournaments.ResponseValue> = TestObserver()
     @Mock lateinit var tournamentDao: TournamentRepository
-    lateinit var mGetTournaments: GetTournaments
+    lateinit var getTournaments: GetTournaments
     lateinit var tournaments: MutableList<Tournament>
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        mGetTournaments = GetTournaments(tournamentDao)
+        getTournaments = GetTournaments(tournamentDao)
 
         tournaments = mutableListOf()
         tournaments.add(Tournament(1, "toto", 1L, 2L, 3L, null))
@@ -37,8 +40,7 @@ internal class GetTournamentTests {
 
     @Test
     fun shouldGetTournaments() {
-        val observer = TestObserver<GetTournaments.ResponseValue>()
-        mGetTournaments.executeUseCase(GetTournaments.RequestValues()).subscribe(observer)
+        getTournaments.executeUseCase(GetTournaments.RequestValues()).subscribe(observer)
         observer.await()
         observer.assertComplete()
         Assert.assertEquals(tournaments, observer.values().first().tournaments)

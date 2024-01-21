@@ -1,7 +1,17 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.team
 
 import android.net.Uri
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.Team
@@ -12,15 +22,6 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 class TeamViewModel : ViewModel(), KoinComponent {
-
-    enum class SortType {
-        ALPHA, NUMERIC
-    }
-
-    enum class DisplayType {
-        LIST, GRID
-    }
-
     private val domain: ApplicationInteractor by inject()
     private val _team: MutableLiveData<Team> by lazy {
         MutableLiveData<Team>().apply { getCurrentTeam() }
@@ -30,21 +31,20 @@ class TeamViewModel : ViewModel(), KoinComponent {
             domain.players().observePlayers(it.id)
         }
     }
-    private val _playersMediator = MediatorLiveData<List<Player>>()
-    private val _players = MutableLiveData<List<Player>>()
-    private val _displayType = MutableLiveData(DisplayType.GRID)
-
+    private val _playersMediator: MediatorLiveData<List<Player>> = MediatorLiveData()
+    private val _players: MutableLiveData<List<Player>> = MutableLiveData()
+    private val _displayType: MutableLiveData<DisplayType> = MutableLiveData(DisplayType.GRID)
     private val disposables = CompositeDisposable()
-    private var playerSelectedID = 0L
+    private var playerSelectedId = 0L
     var team: Team? = null
     var sortType: SortType = SortType.ALPHA
         private set
     var displayType: DisplayType = DisplayType.GRID
         private set
-    private var playerList = listOf<Player>()
+    private var playerList: List<Player> = listOf()
 
     init {
-        val observer = Observer<List<Player>> {
+        val observer: Observer<List<Player>> = Observer {
             playerList = it
             _playersMediator.postValue(playerList)
         }
@@ -83,11 +83,11 @@ class TeamViewModel : ViewModel(), KoinComponent {
     fun deleteTeam(team: Team) = domain.teams().deleteTeam(team)
 
     fun getPlayerId(): Long {
-        return playerSelectedID
+        return playerSelectedId
     }
 
     fun setPlayerId(id: Long) {
-        playerSelectedID = id
+        playerSelectedId = id
     }
 
     fun loadTeam() {
@@ -107,12 +107,8 @@ class TeamViewModel : ViewModel(), KoinComponent {
 
     fun switchDisplayType() {
         when (this.displayType) {
-            DisplayType.LIST -> {
-                this.displayType = DisplayType.GRID
-            }
-            DisplayType.GRID -> {
-                this.displayType = DisplayType.LIST
-            }
+            DisplayType.LIST -> this.displayType = DisplayType.GRID
+            DisplayType.GRID -> this.displayType = DisplayType.LIST
         }
         _displayType.postValue(this.displayType)
     }
@@ -124,12 +120,16 @@ class TeamViewModel : ViewModel(), KoinComponent {
 
     private fun sortPlayers(listPlayers: List<Player>): List<Player> {
         return when (sortType) {
-            SortType.ALPHA -> {
-                listPlayers.sortedBy { it.name }.toMutableList()
-            }
-            SortType.NUMERIC -> {
-                listPlayers.sortedBy { it.shirtNumber }.toMutableList()
-            }
+            SortType.ALPHA -> listPlayers.sortedBy { it.name }.toMutableList()
+            SortType.NUMERIC -> listPlayers.sortedBy { it.shirtNumber }.toMutableList()
         }
+    }
+
+    enum class SortType {
+        ALPHA, NUMERIC
+    }
+
+    enum class DisplayType {
+        LIST, GRID
     }
 }

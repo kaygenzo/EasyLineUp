@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -17,8 +21,14 @@ import com.telen.easylineup.domain.model.toPlayer
 import kotlin.math.roundToInt
 
 class DefenseFixedView : DefenseView {
-
     private val binding = BaseballFieldOnlyBinding.inflate(LayoutInflater.from(context), this, true)
+
+    init {
+        getContainerSize { containerSize ->
+            getContainerView().layoutParams.height = containerSize.toInt()
+            getContainerView().layoutParams.width = containerSize.toInt()
+        }
+    }
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -27,13 +37,6 @@ class DefenseFixedView : DefenseView {
         attrs,
         defStyleAttr
     )
-
-    init {
-        getContainerSize { containerSize ->
-            getContainerView().layoutParams.height = containerSize.toInt()
-            getContainerView().layoutParams.width = containerSize.toInt()
-        }
-    }
 
     override fun getFieldCanvas(): ImageView {
         return binding.baseballFieldView.binding.imageCanvas
@@ -48,10 +51,9 @@ class DefenseFixedView : DefenseView {
     }
 
     fun setListPlayerInField(players: List<PlayerWithPosition>, lineupMode: Int) {
-
         cleanSexIndicators()
 
-        val emptyPositions = mutableListOf<FieldPosition>()
+        val emptyPositions: MutableList<FieldPosition> = mutableListOf()
         positionMarkers.keys.forEach { emptyPositions.add(it) }
 
         getContainerSize { containerSize ->
@@ -93,7 +95,7 @@ class DefenseFixedView : DefenseView {
         emptyPositions: MutableList<FieldPosition>,
         lineupMode: Int
     ) {
-        //Special case for DP/DH
+        // Special case for DP/DH
         // if the lineup do not manage dp/dh mode, just remove the field position. Otherwise,
         // let's just take a look if the position has been set before
         emptyPositions.filter { it == FieldPosition.DP_DH }
@@ -107,7 +109,7 @@ class DefenseFixedView : DefenseView {
             }
         emptyPositions.remove(FieldPosition.DP_DH)
 
-        //now, there are still some empty positions, let's just hide it
+        // now, there are still some empty positions, let's just hide it
         emptyPositions.mapNotNull { positionMarkers[it] }
             .forEach { it.setState(StateDefense.EMPTY) }
     }

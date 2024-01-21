@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.annotation.SuppressLint
@@ -15,7 +19,7 @@ import com.telen.easylineup.tournaments.list.LineupsAdapter
 import com.telen.easylineup.tournaments.list.OnTournamentItemListener
 import com.telen.easylineup.utils.drawn
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 interface OnActionsClickListener {
     fun onDeleteClicked()
@@ -25,12 +29,10 @@ interface OnActionsClickListener {
 @SuppressLint("ViewConstructor")
 class TournamentItemView(context: Context, itemClickedListener: OnTournamentItemListener?) :
     ConstraintLayout(context) {
-
-    lateinit var lineupsAdapter: LineupsAdapter
-    private val lineups = mutableListOf<Lineup>()
+    private val lineups: MutableList<Lineup> = mutableListOf()
     private var listener: OnActionsClickListener? = null
-
     val binding = ItemAdapterTournamentsBinding.inflate(LayoutInflater.from(context), this, true)
+    lateinit var lineupsAdapter: LineupsAdapter
 
     init {
         lineupsAdapter = LineupsAdapter(lineups, itemClickedListener)
@@ -65,8 +67,9 @@ class TournamentItemView(context: Context, itemClickedListener: OnTournamentItem
 
     fun setTournamentDate(start: Long, end: Long) {
         val builder = StringBuilder(SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(start))
-        if (start != end)
+        if (start != end) {
             builder.append(" - ").append(SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(end))
+        }
         binding.tournamentDate.text = builder.toString()
     }
 

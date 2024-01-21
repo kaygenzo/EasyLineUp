@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.dashboard.tiles
 
 import android.content.Context
@@ -5,21 +9,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.constraintlayout.widget.ConstraintLayout
+
 import com.telen.easylineup.R
 import com.telen.easylineup.dashboard.TileClickListener
 import com.telen.easylineup.databinding.TileLastPlayerNumberBinding
 import com.telen.easylineup.domain.model.ShirtNumberEntry
-import com.telen.easylineup.domain.model.tiles.ITileData
 import com.telen.easylineup.domain.model.tiles.KEY_DATA_HISTORY
+import com.telen.easylineup.domain.model.tiles.TileData
 import timber.log.Timber
 
 class PlayerNumberSearchTile(context: Context) : ConstraintLayout(context) {
-
     private val binding =
         TileLastPlayerNumberBinding.inflate(LayoutInflater.from(context), this, true)
 
-    fun bind(data: ITileData, inEditMode: Boolean, listener: TileClickListener) {
-
+    fun bind(data: TileData, inEditMode: Boolean, listener: TileClickListener) {
         binding.progressBar.visibility = View.GONE
         binding.tilePlayerNumberResult.visibility = View.GONE
 

@@ -1,9 +1,18 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.mock
 
 import android.content.Context
 import com.google.gson.JsonParser
 import com.telen.easylineup.domain.application.ApplicationInteractor
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.model.PlayerNumberOverlay
+import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.Tournament
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -11,7 +20,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class DatabaseMockProvider : KoinComponent {
-
     private val domain: ApplicationInteractor by inject()
 
     fun createMockDatabase(context: Context): Completable {
@@ -49,7 +57,7 @@ class DatabaseMockProvider : KoinComponent {
                         main = teamJson.get("main").asBoolean
                     )
 
-                    val playersList = mutableListOf<Player>()
+                    val playersList: MutableList<Player> = mutableListOf()
                     for (i in 0 until playersJson.size()) {
                         val line = playersJson[i].asJsonObject
                         playersList.add(
@@ -66,7 +74,7 @@ class DatabaseMockProvider : KoinComponent {
                         )
                     }
 
-                    val tournamentsList = mutableListOf<Tournament>()
+                    val tournamentsList: MutableList<Tournament> = mutableListOf()
                     for (i in 0 until tournamentsJson.size()) {
                         val line = tournamentsJson[i].asJsonObject
                         tournamentsList.add(
@@ -76,12 +84,15 @@ class DatabaseMockProvider : KoinComponent {
                                 line["createdAt"].asLong,
                                 line["startTime"].asLong,
                                 line["endTime"].asLong,
-                                try { line["address"].asString } catch (e: Exception) { null }
+                                try {
+                                    line["address"].asString } catch (e: Exception) {
+                                    null
+                                }
                             )
                         )
                     }
 
-                    val lineupsList = mutableListOf<Lineup>()
+                    val lineupsList: MutableList<Lineup> = mutableListOf()
                     for (i in 0 until lineupsJson.size()) {
                         val line = lineupsJson[i].asJsonObject
                         lineupsList.add(
@@ -100,7 +111,7 @@ class DatabaseMockProvider : KoinComponent {
                         )
                     }
 
-                    val positionsList = mutableListOf<PlayerFieldPosition>()
+                    val positionsList: MutableList<PlayerFieldPosition> = mutableListOf()
                     for (i in 0 until positionsJson.size()) {
                         val line = positionsJson[i].asJsonObject
                         positionsList.add(
@@ -116,7 +127,7 @@ class DatabaseMockProvider : KoinComponent {
                         )
                     }
 
-                    val overlaysList = mutableListOf<PlayerNumberOverlay>()
+                    val overlaysList: MutableList<PlayerNumberOverlay> = mutableListOf()
                     for (i in 0 until overlaysJson.size()) {
                         val line = overlaysJson[i].asJsonObject
                         overlaysList.add(
@@ -132,7 +143,6 @@ class DatabaseMockProvider : KoinComponent {
                         .andThen(insertLineups(lineupsList))
                         .andThen(insertPlayerFieldPositions(positionsList))
                         .andThen(insertPlayerNumberOverlays(overlaysList))
-
                 } catch (e: Exception) {
                     Completable.error(e)
                 }

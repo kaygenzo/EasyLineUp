@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.settings
 
 import android.app.Activity
@@ -17,21 +21,18 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 sealed class Event
-object DeleteAllDataEventSuccess: Event()
-object DeleteAllDataEventFailure: Event()
-data class ExportDataEventSuccess(val pathDirectory: String): Event()
-object ExportDataEventFailure: Event()
+object DeleteAllDataEventSuccess : Event()
+object DeleteAllDataEventFailure : Event()
+/**
+ * @property pathDirectory
+ */
+data class ExportDataEventSuccess(val pathDirectory: String) : Event()
+object ExportDataEventFailure : Event()
 
-class SettingsViewModel: ViewModel(), KoinComponent {
-
-    companion object {
-        private const val REQUEST_CODE_PERMISSION_OVERLAY = 0
-    }
-
+class SettingsViewModel : ViewModel(), KoinComponent {
     private val domain: ApplicationInteractor by inject()
     private val bugReporter: BugReporter by inject()
-
-    private val _event = PublishSubject.create<Event>()
+    private val _event: Subject<Event> = PublishSubject.create()
     private val disposables = CompositeDisposable()
 
     fun clear() {
@@ -40,13 +41,13 @@ class SettingsViewModel: ViewModel(), KoinComponent {
 
     fun deleteAllData() {
         val disposable = domain.data().deleteAllData()
-                .andThen(Completable.timer(1000, TimeUnit.MILLISECONDS))
-                .subscribe({
-                    _event.onNext(DeleteAllDataEventSuccess)
-                }, {
-                    Timber.e(it)
-                    _event.onNext(DeleteAllDataEventFailure)
-                })
+            .andThen(Completable.timer(DELAY, TimeUnit.MILLISECONDS))
+            .subscribe({
+                _event.onNext(DeleteAllDataEventSuccess)
+            }, {
+                Timber.e(it)
+                _event.onNext(DeleteAllDataEventFailure)
+            })
         disposables.add(disposable)
     }
 
@@ -55,12 +56,12 @@ class SettingsViewModel: ViewModel(), KoinComponent {
      */
     fun exportData(dirUri: Uri) {
         val disposable = domain.data().exportData(dirUri)
-                .subscribe({
-                    _event.onNext(ExportDataEventSuccess(it))
-                }, {
-                    Timber.e(it)
-                    _event.onNext(ExportDataEventFailure)
-                })
+            .subscribe({
+                _event.onNext(ExportDataEventSuccess(it))
+            }, {
+                Timber.e(it)
+                _event.onNext(ExportDataEventFailure)
+            })
         disposables.add(disposable)
     }
 
@@ -76,5 +77,10 @@ class SettingsViewModel: ViewModel(), KoinComponent {
         if (methods.contains(ReportMethod.FLOATING_BUTTON) && !hasPermission) {
             bugReporter.askOverlayPermission(activity, REQUEST_CODE_PERMISSION_OVERLAY)
         }
+    }
+
+    companion object {
+        private const val REQUEST_CODE_PERMISSION_OVERLAY = 0
+        private const val DELAY = 1_000L
     }
 }

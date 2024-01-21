@@ -35,7 +35,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             android:background="#b4FFFFFF">
 
-            <com.telen.easylineup.views.MLBStyledTextView
+            <com.telen.easylineup.views.MlbStyledTextView
                 style="@style/LineupName"
                 android:id="@+id/lineup_name"
                 android:maxLines="1"

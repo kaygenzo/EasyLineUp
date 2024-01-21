@@ -1,0 +1,328 @@
+# Checks that on file level internal or public class or function has missing KDoc
+- name: MISSING_KDOC_TOP_LEVEL
+  enabled: false
+
+# Checks that accessible internal elements (protected, public, internal) in a class are documented
+- name: MISSING_KDOC_CLASS_ELEMENTS
+  enabled: false
+
+# Checks that functions have kdoc
+- name: MISSING_KDOC_ON_FUNCTION
+  enabled: false
+
+# Checks that file with zero or >1 classes has header KDoc
+- name: HEADER_MISSING_IN_NON_SINGLE_CLASS_FILE
+  enabled: false
+
+# Checks that accessible method parameters are documented in KDoc
+- name: KDOC_WITHOUT_PARAM_TAG
+  enabled: false
+
+# Checks that kdoc does not contain @author tag or date
+- name: KDOC_CONTAINS_DATE_OR_AUTHOR
+  enabled: false
+  configuration:
+    versionRegex: \d+\.\d+\.\d+[-.\w\d]*
+
+# Checks that KDoc is not empty
+- name: KDOC_EMPTY_KDOC
+  enabled: false
+
+# Checks that block of tags @param, @return, @throws is separated from previous part of KDoc by exactly one empty line
+- name: KDOC_NEWLINES_BEFORE_BASIC_TAGS
+  enabled: false
+
+# Checks that there is no @deprecated tag in kdoc
+- name: KDOC_NO_DEPRECATED_TAG
+  enabled: false
+
+# Checks that there is no empty content in kdoc tags
+- name: KDOC_NO_EMPTY_TAGS
+  enabled: false
+
+# Checks that there is no newline of empty KDoc line (with leading asterisk) between `@param`, `@return`, `@throws` tags
+- name: KDOC_NO_NEWLINES_BETWEEN_BASIC_TAGS
+  enabled: false
+
+# Checks that special tags `@apiNote`, `@implNote`, `@implSpec` have exactly one empty line after
+- name: KDOC_NO_NEWLINE_AFTER_SPECIAL_TAGS
+  enabled: false
+
+# Checks that there is only one space after kdoc tag
+- name: KDOC_WRONG_SPACES_AFTER_TAG
+  enabled: false
+
+# Checks tags order in kDoc. `@param`, `@return`, `@throws`
+- name: KDOC_WRONG_TAGS_ORDER
+  enabled: false
+
+# Inspection that checks if there is a blank line before kDoc and none after
+- name: WRONG_NEWLINES_AROUND_KDOC
+  enabled: false
+
+# Checks that copyright exists on top of file and is properly formatted (as a block comment)
+- name: HEADER_MISSING_OR_WRONG_COPYRIGHT
+  enabled: true
+  configuration:
+    isCopyrightMandatory: true
+    copyrightText: 'Copyright (c) Karim Yarboua. 2010-;@currYear;'
+
+# Checks that file does not contain commented out code
+- name: COMMENTED_OUT_CODE
+  enabled: false
+
+# Checks unused imports
+- name: UNUSED_IMPORT
+  enabled: true
+  configuration:
+    deleteUnusedImport: true
+
+# Checks that no custom getters and setters are used for properties. It is a more wide rule than TRIVIAL_ACCESSORS_ARE_NOT_RECOMMENDED
+# Kotlin compiler automatically generates `get` and `set` methods for properties and also lets the possibility to override it.
+# But in all cases it is very confusing when `get` and `set` are overridden for a developer who uses this particular class.
+# Developer expects to get the value of the property, but receives some unknown value and some extra side effect hidden by the custom getter/setter.
+# Use extra functions for it instead.
+- name: CUSTOM_GETTERS_SETTERS
+  enabled: false
+
+# Check that typealias name is in PascalCase
+- name: TYPEALIAS_NAME_INCORRECT_CASE
+  enabled: true
+
+# Checks that function/method name is in lowerCamelCase
+- name: FUNCTION_NAME_INCORRECT_CASE
+  enabled: true
+
+# Checks that CONSTANT (treated as const val from companion object or class level) is in non UPPER_SNAKE_CASE
+- name: CONSTANT_UPPERCASE
+  enabled: true
+
+# Checks that there is no wildcard imports. Exception: allowedWildcards
+- name: FILE_WILDCARD_IMPORTS
+  enabled: true
+  configuration:
+    # Allowed wildcards for imports (e.g. "import com.saveourtool.diktat.*, import org.jetbrains.kotlin.*")
+    allowedWildcards: "androidx.test.espresso.Espresso.*,androidx.test.espresso.matcher.ViewMatchers.*,com.adevinta.android.barista.interaction.*,org.hamcrest.Matchers.*,org.mockito.junit.*,org.mockito.*"
+    useRecommendedImportsOrder: true
+
+# Type aliases provide alternative names for existing types when type's reference text is longer 25 chars
+- name: TYPE_ALIAS
+  enabled: false
+  configuration:
+    typeReferenceLength: '25' # max length of type reference
+
+# Checks that function use default values, instead overloading
+- name: WRONG_OVERLOADING_FUNCTION_ARGUMENTS
+  enabled: true
+
+# Checks that the line length is < lineLength parameter
+- name: LONG_LINE
+  enabled: true
+  configuration:
+    lineLength: '120'
+
+# Checks that usage of horizontal spaces doesn't violate code style guide
+- name: WRONG_WHITESPACE
+  enabled: true
+
+# Checks that indentation is correct
+- name: WRONG_INDENTATION
+  enabled: true
+  configuration:
+    # Is newline at the end of a file needed
+    newlineAtEnd: true
+    # If true: in parameter list when parameters are split by newline they are indented with two indentations instead of one
+    extendedIndentOfParameters: false
+    # If true: if first parameter in parameter list is on the same line as opening parenthesis, then other parameters can be aligned with it
+    alignedParameters: true
+    # If true, expression bodies which begin on a separate line are indented
+    # using a continuation indent. The default is false.
+    #
+    # This flag is called CONTINUATION_INDENT_FOR_EXPRESSION_BODIES in IDEA and
+    # ij_kotlin_continuation_indent_for_expression_bodies in .editorconfig.
+    extendedIndentForExpressionBodies: false
+    # If true: if expression is split by newline after operator like +/-/`*`, then the next line is indented with two indentations instead of one
+    extendedIndentAfterOperators: true
+    # If true: when dot qualified expression starts on a new line, this line will be indented with two indentations instead of one
+    extendedIndentBeforeDot: false
+    # The indentation size for each file
+    indentationSize: 4
+
+# Check that lambda with inner lambda doesn't use implicit parameter
+- name: PARAMETER_NAME_IN_OUTER_LAMBDA
+  enabled: false
+
+# If file contains class, then it can't contain extension functions for the same class
+- name: EXTENSION_FUNCTION_WITH_CLASS
+  enabled: false
+
+# Checks that the name of variable is in lowerCamelCase and contains only ASCII letters
+- name: VARIABLE_NAME_INCORRECT_FORMAT
+  enabled: false
+
+# Checks that function length isn't too long
+- name: TOO_LONG_FUNCTION
+  enabled: false
+  configuration:
+    maxFunctionLength: '30' # max length of function
+    isIncludeHeader: 'false' # count function's header
+
+# Variables with `val` modifier - are immutable (read-only). Usage of such variables instead of `var` variables increases
+# robustness and readability of code, because `var` variables can be reassigned several times in the business logic.
+# This rule prohibits usage of `var`s as local variables - the only exception is accumulators and counters
+- name: SAY_NO_TO_VAR
+  enabled: false
+
+# Checks if class can be made as data class
+- name: USE_DATA_CLASS
+  enabled: true
+
+# In case of not using field keyword in property accessors,
+# there should be explicit backing property with the name of real property
+# Example: val table get() {if (_table == null) ...} -> table should have _table
+- name: NO_CORRESPONDING_PROPERTY
+  enabled: true
+
+# Checks that functions/methods which return boolean have special prefix like "is/should/e.t.c"
+- name: FUNCTION_BOOLEAN_PREFIX
+  enabled: true
+  configuration:
+    allowedPrefixes: "" # A list of functions that return boolean and are allowed to use. Input is in a form "foo, bar".
+
+# Checks magic number
+- name: MAGIC_NUMBER
+  enabled: false
+  configuration:
+    # Ignore numbers from test
+    ignoreTest: "true"
+    # Ignore numbers
+    ignoreNumbers: "-1, 1, 0, 0f, 2, 0U, 1U, 2U, -1L, 0L, 1L, 2L, 0UL, 1UL, 2UL, 100f"
+    # Is ignore override hashCode function
+    ignoreHashCodeFunction: "true"
+    # Is ignore property
+    ignorePropertyDeclaration: "false"
+    # Is ignore local variable
+    ignoreLocalVariableDeclaration: "false"
+    # Is ignore value parameter
+    ignoreValueParameter: "true"
+    # Is ignore constant
+    ignoreConstantDeclaration: "true"
+    # Is ignore property in companion object
+    ignoreCompanionObjectPropertyDeclaration: "true"
+    # Is ignore numbers in enum
+    ignoreEnums: "true"
+    # Is ignore number in ranges
+    ignoreRanges: "false"
+    # Is ignore number in extension function
+    ignoreExtensionFunctions: "false"
+    # Is ignore number in pairs created using to
+    ignorePairsCreatedUsingTo: "false"
+
+# Checks that there is no empty blocks in a file.
+# If allowEmptyBlocks is true, checks that it follows correct style (have a newline)
+- name: EMPTY_BLOCK_STRUCTURE_ERROR
+  enabled: true
+  configuration:
+    # Whether a newline after `{` is required in an empty block
+    styleEmptyBlockWithNewline: 'True'
+    allowEmptyBlocks: 'False'
+
+# Warns if there are nested functions
+- name: AVOID_NESTED_FUNCTIONS
+  enabled: false
+
+# Checks that variables of generic types have explicit type declaration
+- name: GENERIC_VARIABLE_WRONG_DECLARATION
+  enabled: true
+
+# Identifier length should be in range [2,64] except names that used in industry like {i, j} and 'e' for catching exceptions
+- name: IDENTIFIER_LENGTH
+  enabled: false
+
+# Checks that the long lambda has parameters
+- name: TOO_MANY_LINES_IN_LAMBDA
+  enabled: false
+  configuration:
+    maxLambdaLength: 10 # max length of lambda without parameters
+
+# Checks that the name of variable is in lowerCamelCase and contains only ASCII letters
+- name: VARIABLE_NAME_INCORRECT
+  enabled: true
+
+# Checks that line breaks follow code style guide: rule 3.6
+- name: WRONG_NEWLINES
+  enabled: false
+  configuration:
+    # If the number of parameters on one line is more than this threshold, all parameters will be placed on separate lines.
+    maxParametersInOneLine: 2
+    # 3 by default.
+    maxCallsInOneLine: 3
+
+# Checks that function doesn't contains too many parameters
+- name: TOO_MANY_PARAMETERS
+  enabled: false
+  configuration:
+    maxParameterListSize: '5' # max parameters size
+
+# Checks if there is class/object that can be replace with extension function
+- name: AVOID_USING_UTILITY_CLASS
+  enabled: false
+
+# Checks that file name has extension
+- name: FILE_NAME_INCORRECT
+  enabled: true
+
+# Checks that floating-point values are not used in arithmetic expressions
+- name: FLOAT_IN_ACCURATE_CALCULATIONS
+  enabled: false
+
+# Checks that function doesn't have too many nested blocks
+- name: NESTED_BLOCK
+  enabled: false
+  configuration:
+    maxNestedBlockQuantity: '4'
+
+# Checks that file name matches class name, if it is only one class in file
+- name: FILE_NAME_MATCH_CLASS
+  enabled: true
+
+# Inspection that checks if local variables are declared close to the first usage site
+- name: LOCAL_VARIABLE_EARLY_DECLARATION
+  enabled: false
+
+# Checks that using unnecessary, custom label
+- name: CUSTOM_LABEL
+  enabled: false
+
+# Inspection that checks if a long dot qualified expression is used in condition or as an argument
+- name: COMPLEX_EXPRESSION
+  enabled: false
+
+# Checks that file does not contain only comments, imports and package directive
+- name: FILE_CONTAINS_ONLY_COMMENTS
+  enabled: false
+
+# Checks trailing comma
+- name: TRAILING_COMMA
+  enabled: true
+  configuration:
+    # VALUE_ARGUMENT
+    valueArgument: false
+    # VALUE_PARAMETER
+    valueParameter: false
+    # REFERENCE_EXPRESSION
+    indices: false
+    # WHEN_CONDITION_WITH_EXPRESSION
+    whenConditions: false
+    # STRING_TEMPLATE
+    collectionLiteral: false
+    # TYPE_PROJECTION
+    typeArgument: false
+    # TYPE_PARAMETER
+    typeParameter: false
+    # DESTRUCTURING_DECLARATION_ENTRY
+    destructuringDeclaration: false
+
+# Checks that identifier has appropriate name (See table of rule 1.2 part 6)
+- name: CONFUSING_IDENTIFIER_NAMING
+  enabled: true

@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.application
 
 import android.content.Context
@@ -15,21 +19,21 @@ import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.utils.SharedPreferencesUtils
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
 
 open class App : MultiDexApplication() {
-
     override fun onCreate() {
         super.onCreate()
 
-//        StrictMode.setVmPolicy(VmPolicy.Builder()
-//                .detectAll()
-//                .penaltyLog()
-//                .penaltyDeath()
-//                .build())
+        // StrictMode.setVmPolicy(VmPolicy.Builder()
+        // .detectAll()
+        // .penaltyLog()
+        // .penaltyDeath()
+        // .build())
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
@@ -60,16 +64,20 @@ open class App : MultiDexApplication() {
             getString(R.string.lineup_theme_default_value)
         ).let {
             val styleValue = it.toInt()
-            AppCompatDelegate.setDefaultNightMode(when(styleValue) {
-                1 -> { AppCompatDelegate.MODE_NIGHT_NO }
-                2 -> { AppCompatDelegate.MODE_NIGHT_YES }
-                else -> { AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM }
+            AppCompatDelegate.setDefaultNightMode(when (styleValue) {
+                AppCompatDelegate.MODE_NIGHT_NO -> AppCompatDelegate.MODE_NIGHT_NO
+                AppCompatDelegate.MODE_NIGHT_YES -> AppCompatDelegate.MODE_NIGHT_YES
+                else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             })
         }
 
         val remoteConfig = Firebase.remoteConfig
         val configSettings = remoteConfigSettings {
-            minimumFetchIntervalInSeconds = if (BuildConfig.DEBUG) 600 else 3600
+            minimumFetchIntervalInSeconds = if (BuildConfig.DEBUG) {
+                Constants.MIN_FETCH_INTERVAL_REMOTE_CONFIG_DEBUG
+            } else {
+                Constants.MIN_FETCH_INTERVAL_REMOTE_CONFIG_RELEASE
+            }
         }
         remoteConfig.setConfigSettingsAsync(configSettings)
         remoteConfig.setDefaultsAsync(R.xml.remote_config_default)
@@ -91,20 +99,14 @@ open class App : MultiDexApplication() {
     }
 
     class ReleaseTree(private val context: Context) : Timber.DebugTree() {
-
-        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+        override fun log(priority: Int, tag: String?, message: String, throwable: Throwable?) {
             val crashlytics: FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
             crashlytics.setCustomKey("installer", getInstaller() ?: "unknown")
             when (priority) {
-                Log.ERROR -> {
-                    t?.let { crashlytics.recordException(t) }
-                }
-                Log.WARN -> {
-                    crashlytics.log("W/${tag ?: ""}: $message")
-                }
+                Log.ERROR -> throwable?.let { crashlytics.recordException(it) }
+                Log.WARN -> crashlytics.log("W/${tag ?: ""}: $message")
                 else -> {}
             }
-
         }
 
         private fun getInstaller(): String? {

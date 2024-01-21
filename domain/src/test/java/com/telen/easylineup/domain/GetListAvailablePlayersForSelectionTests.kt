@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.FieldPosition
@@ -14,11 +18,11 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
-
+    private val observer: TestObserver<GetListAvailablePlayersForSelection.ResponseValue> =
+        TestObserver()
     lateinit var getListAvailablePlayersForSelection: GetListAvailablePlayersForSelection
     lateinit var players: MutableList<PlayerWithPosition>
     lateinit var roster: MutableList<RosterPlayerStatus>
-    private val observer = TestObserver<GetListAvailablePlayersForSelection.ResponseValue>()
 
     @Before
     fun init() {
@@ -77,9 +81,9 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
         startUseCase(position = FieldPosition.PITCHER)
         observer.values().first().players.let {
             Assert.assertEquals(3, it.size)
-            Assert.assertEquals(1, it.filter { it.playerID == 2L }.size)
-            Assert.assertEquals(1, it.filter { it.playerID == 4L }.size)
-            Assert.assertEquals(1, it.filter { it.playerID == 5L }.size)
+            Assert.assertEquals(1, it.filter { it.playerId == 2L }.size)
+            Assert.assertEquals(1, it.filter { it.playerId == 4L }.size)
+            Assert.assertEquals(1, it.filter { it.playerId == 5L }.size)
         }
     }
 
@@ -87,8 +91,8 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     fun shouldSortPlayersByFieldPositionCatcher() {
         startUseCase(position = FieldPosition.CATCHER)
         observer.values().first().players.let {
-            Assert.assertEquals(2, it[0].playerID)
-            Assert.assertEquals(4, it[1].playerID)
+            Assert.assertEquals(2, it[0].playerId)
+            Assert.assertEquals(4, it[1].playerId)
         }
     }
 
@@ -96,8 +100,8 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     fun shouldSortPlayersByFieldPositionSecondBase() {
         startUseCase(position = FieldPosition.SECOND_BASE)
         observer.values().first().players.let {
-            Assert.assertEquals(4, it[0].playerID)
-            Assert.assertEquals(2, it[1].playerID)
+            Assert.assertEquals(4, it[0].playerId)
+            Assert.assertEquals(2, it[1].playerId)
         }
     }
 
@@ -110,7 +114,7 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldRTriggerAnExceptionWhenRosterIsEmpty() {
+    fun shouldRtriggerAnExceptionWhenRosterIsEmpty() {
         startUseCase(
             roster = mutableListOf(),
             position = FieldPosition.SECOND_BASE,
@@ -123,6 +127,6 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
         roster.removeIf { it.player.id == 4L || it.player.id == 5L }
         startUseCase(position = FieldPosition.SECOND_BASE)
         Assert.assertEquals(1, observer.values().first().players.size)
-        Assert.assertEquals(2L, observer.values().first().players.first().playerID)
+        Assert.assertEquals(2L, observer.values().first().players.first().playerId)
     }
 }

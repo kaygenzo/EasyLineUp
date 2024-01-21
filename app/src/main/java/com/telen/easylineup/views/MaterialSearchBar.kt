@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -16,20 +20,11 @@ interface OnSearchBarListener {
 }
 
 class MaterialSearchBar : ConstraintLayout {
-
     @DrawableRes
     private var endIcon: Int = 0
     var onSearchBarListener: OnSearchBarListener? = null
     private val binding =
         ViewMaterialSearchBarBinding.inflate(LayoutInflater.from(context), this, true)
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    )
 
     init {
         val clickListener = OnClickListener {
@@ -85,6 +80,14 @@ class MaterialSearchBar : ConstraintLayout {
             }
         }
     }
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     private fun onSearchConfirmed(text: String?) {
         onSearchBarListener?.onSearchConfirmed(text)

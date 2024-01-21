@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.team.swap
 
 import android.view.LayoutInflater
@@ -10,11 +14,6 @@ class SwapTeamsListAdapter(
     private val teams: List<Team>,
     private val listener: SwapTeamsAdapterListener
 ) : RecyclerView.Adapter<SwapTeamsListAdapter.TeamsListViewHolder>() {
-
-    interface SwapTeamsAdapterListener {
-        fun onTeamClicked(team: Team)
-    }
-
     override fun getItemCount(): Int {
         return teams.size
     }
@@ -32,5 +31,12 @@ class SwapTeamsListAdapter(
         return TeamsListViewHolder(itemView.root)
     }
 
+    interface SwapTeamsAdapterListener {
+        fun onTeamClicked(team: Team)
+    }
+
+    /**
+     * @property view
+     */
     inner class TeamsListViewHolder(val view: TeamItemView) : RecyclerView.ViewHolder(view)
 }

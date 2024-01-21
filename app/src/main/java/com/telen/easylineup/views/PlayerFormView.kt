@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -40,21 +44,11 @@ interface PlayerFormListener {
 }
 
 class PlayerFormView : ConstraintLayout {
-
     private val binding = ViewCreatePlayerBinding.inflate(LayoutInflater.from(context), this, true)
-
     private var listener: PlayerFormListener? = null
     private var imageUri: Uri? = null
     private var playerPositions = 0
     private val positionState: MutableMap<FieldPosition, Boolean> = mutableMapOf()
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    )
 
     init {
         binding.playerImage.setImageResource(R.drawable.unknown_player)
@@ -114,6 +108,14 @@ class PlayerFormView : ConstraintLayout {
             }
         }
     }
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     fun setListener(listener: PlayerFormListener) {
         this.listener = listener
@@ -215,7 +217,6 @@ class PlayerFormView : ConstraintLayout {
     }
 
     fun setPositionsFilter(positions: Int) {
-
         this.playerPositions = positions
         this.positionState.clear()
 
@@ -238,10 +239,8 @@ class PlayerFormView : ConstraintLayout {
                     positionState[position]?.let { oldState ->
                         val newState = !oldState
 
-                        if (newState) {
-                            if (positionState.filterValues { it == true }.size >= 3) {
-                                return@setOnClickListener
-                            }
+                        if (newState && positionState.filterValues { it == true }.size >= 3) {
+                            return@setOnClickListener
                         }
 
                         positionState[position] = newState
@@ -272,16 +271,16 @@ class PlayerFormView : ConstraintLayout {
         }
     }
 
-//    private fun getRoundedBitmap(bitmap: Bitmap): RoundedBitmapDrawable {
-//        val min = Math.min(bitmap.width, bitmap.height)
-//        val drawable = RoundedBitmapDrawableFactory.create(resources, Bitmap.createBitmap(bitmap, 0,0,min, min))
-//        drawable.isCircular = true
-//        return drawable
-//    }
+    // private fun getRoundedBitmap(bitmap: Bitmap): RoundedBitmapDrawable {
+    // val min = Math.min(bitmap.width, bitmap.height)
+    // val drawable = RoundedBitmapDrawableFactory.create(resources, Bitmap.createBitmap(bitmap, 0,0,min, min))
+    // drawable.isCircular = true
+    // return drawable
+    // }
 
     fun displayInvalidName() {
         binding.playerNameInputLayout.error =
-            resources.getString(R.string.player_creation_error_name_empty)
+                resources.getString(R.string.player_creation_error_name_empty)
         binding.playerEmailInputLayout.error = null
         binding.playerPhoneInputLayout.error = null
     }
@@ -289,7 +288,7 @@ class PlayerFormView : ConstraintLayout {
     fun displayInvalidEmail() {
         binding.playerNameInputLayout.error = null
         binding.playerEmailInputLayout.error =
-            resources.getString(R.string.player_creation_error_invalid_email_format)
+                resources.getString(R.string.player_creation_error_invalid_email_format)
         binding.playerPhoneInputLayout.error = null
     }
 
@@ -297,24 +296,28 @@ class PlayerFormView : ConstraintLayout {
         binding.playerNameInputLayout.error = null
         binding.playerEmailInputLayout.error = null
         binding.playerPhoneInputLayout.error =
-            resources.getString(R.string.player_creation_error_invalid_phone_format)
+                resources.getString(R.string.player_creation_error_invalid_phone_format)
     }
 
     fun getPitchingSide(): PlayerSide? {
         var pitching = 0
-        if (binding.pitchingSideLeft.isChecked)
+        if (binding.pitchingSideLeft.isChecked) {
             pitching = pitching or PlayerSide.LEFT.flag
-        if (binding.pitchingSideRight.isChecked)
+        }
+        if (binding.pitchingSideRight.isChecked) {
             pitching = pitching or PlayerSide.RIGHT.flag
+        }
         return PlayerSide.getSideByValue(pitching)
     }
 
     fun getBattingSide(): PlayerSide? {
         var batting = 0
-        if (binding.battingSideLeft.isChecked)
+        if (binding.battingSideLeft.isChecked) {
             batting = batting or PlayerSide.LEFT.flag
-        if (binding.battingSideRight.isChecked)
+        }
+        if (binding.battingSideRight.isChecked) {
             batting = batting or PlayerSide.RIGHT.flag
+        }
         return PlayerSide.getSideByValue(batting)
     }
 
@@ -348,6 +351,9 @@ class PlayerFormView : ConstraintLayout {
             null -> {
                 binding.pitchingSideLeft.isChecked = false
                 binding.pitchingSideRight.isChecked = false
+            }
+            else -> {
+                // this is a generated else block
             }
         }
     }
@@ -391,6 +397,9 @@ class PlayerFormView : ConstraintLayout {
             null -> {
                 binding.battingSideLeft.isChecked = false
                 binding.battingSideRight.isChecked = false
+            }
+            else -> {
+                // this is a generated else block
             }
         }
     }

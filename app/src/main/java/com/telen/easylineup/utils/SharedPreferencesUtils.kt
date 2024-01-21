@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.utils
 
 import android.content.Context
@@ -6,7 +10,6 @@ import androidx.annotation.StringRes
 import androidx.preference.PreferenceManager
 
 object SharedPreferencesUtils {
-
     private fun getSharedPreferences(context: Context): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(context)
     }

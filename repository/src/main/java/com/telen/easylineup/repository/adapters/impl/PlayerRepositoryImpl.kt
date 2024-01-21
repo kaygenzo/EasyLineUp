@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.repository.adapters.impl
 
 import androidx.lifecycle.LiveData
@@ -9,17 +13,21 @@ import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.repository.dao.PlayerDao
 import com.telen.easylineup.repository.dao.PlayerNumberOverlayDao
-import com.telen.easylineup.repository.model.*
 import com.telen.easylineup.repository.model.RoomPlayer
+import com.telen.easylineup.repository.model.RoomPlayerNumberOverlay
 import com.telen.easylineup.repository.model.init
 import com.telen.easylineup.repository.model.toPlayer
+import com.telen.easylineup.repository.model.toPlayerNumberOverlay
 import com.telen.easylineup.repository.model.toPlayerWithPosition
+import com.telen.easylineup.repository.model.toShirtNumberEntry
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
 
-internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private val numberOverlayDao: PlayerNumberOverlayDao): PlayerRepository {
-
+internal class PlayerRepositoryImpl(
+    private val playerDao: PlayerDao,
+    private val numberOverlayDao: PlayerNumberOverlayDao
+) : PlayerRepository {
     init {
         Timber.i("PlayerRepositoryImpl.init")
     }
@@ -48,65 +56,87 @@ internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private va
         return playerDao.getPlayerByHash(hash).map { it.toPlayer() }
     }
 
-    override fun getPlayerById(playerID: Long): LiveData<Player> {
-        return playerDao.getPlayerById(playerID).map {
+    override fun getPlayerById(playerId: Long): LiveData<Player> {
+        return playerDao.getPlayerById(playerId).map {
             // sometime the refresh it too quick and when the player is deleted, the player is null
             it?.toPlayer() ?: Player(teamId = 0, name = "", shirtNumber = 0, licenseNumber = 0)
         }
     }
 
-    override fun getPlayerByIdAsSingle(playerID: Long): Single<Player> {
-        return playerDao.getPlayerByIdAsSingle(playerID).map { it.toPlayer() }
+    override fun getPlayerByIdAsSingle(playerId: Long): Single<Player> {
+        return playerDao.getPlayerByIdAsSingle(playerId).map { it.toPlayer() }
     }
 
-    override fun getPlayers(teamID: Long): Single<List<Player>> {
-        return playerDao.getPlayers(teamID).map { it.map { it.toPlayer() } }
+    override fun getPlayersByTeamId(teamId: Long): Single<List<Player>> {
+        return playerDao.getPlayersByTeamId(teamId).map { it.map { it.toPlayer() } }
     }
 
     override fun getPlayers(): Single<List<Player>> {
         return playerDao.getPlayers().map { it.map { it.toPlayer() } }
     }
 
-    override fun observePlayers(teamID: Long): LiveData<List<Player>> {
-        return playerDao.getPlayersAsLiveData(teamID).map {
+    override fun observePlayers(teamId: Long): LiveData<List<Player>> {
+        return playerDao.getPlayersAsLiveData(teamId).map {
             it.map { it.toPlayer() }
         }
     }
 
-    override fun getTeamPlayersAndMaybePositions(lineupID: Long): LiveData<List<PlayerWithPosition>> {
-        return playerDao.getTeamPlayersAndMaybePositions(lineupID).map {
+    override fun getTeamPlayersAndMaybePositions(lineupId: Long):
+    LiveData<List<PlayerWithPosition>> {
+        return playerDao.getTeamPlayersAndMaybePositions(lineupId).map {
             it.map { it.toPlayerWithPosition() }
         }
     }
 
-    override fun getShirtNumberFromPlayers(teamID: Long, number: Int): Single<List<ShirtNumberEntry>> {
-        return playerDao.getShirtNumberHistoryFromPlayers(teamID, number).map { it.map { it.toShirtNumberEntry() } }
+    override fun getShirtNumberFromPlayers(
+        teamId: Long,
+        number: Int
+    ): Single<List<ShirtNumberEntry>> {
+        return playerDao.getShirtNumberHistoryFromPlayers(teamId, number)
+            .map { it.map { it.toShirtNumberEntry() } }
     }
 
-    override fun getShirtNumberFromNumberOverlays(teamID: Long, number: Int): Single<List<ShirtNumberEntry>> {
-        return playerDao.getShirtNumberHistoryFromOverlays(teamID, number).map { it.map { it.toShirtNumberEntry() } }
+    override fun getShirtNumberFromNumberOverlays(
+        teamId: Long,
+        number: Int
+    ): Single<List<ShirtNumberEntry>> {
+        return playerDao.getShirtNumberHistoryFromOverlays(teamId, number)
+            .map { it.map { it.toShirtNumberEntry() } }
     }
 
-    override fun getShirtNumberOverlay(playerID: Long, lineupID: Long): Single<PlayerNumberOverlay> {
-        return numberOverlayDao.getShirtNumberOverlay(playerID, lineupID).map { it.toPlayerNumberOverlay() }
+    override fun getShirtNumberOverlay(
+        playerId: Long,
+        lineupId: Long
+    ): Single<PlayerNumberOverlay> {
+        return numberOverlayDao.getShirtNumberOverlay(playerId, lineupId)
+            .map { it.toPlayerNumberOverlay() }
     }
 
-    override fun observePlayersNumberOverlay(lineupID: Long): LiveData<List<PlayerNumberOverlay>> {
-        return numberOverlayDao.observePlayerNumberOverlays(lineupID).map{
+    override fun observePlayersNumberOverlay(lineupId: Long): LiveData<List<PlayerNumberOverlay>> {
+        return numberOverlayDao.observePlayerNumberOverlays(lineupId).map {
             it.map { it.toPlayerNumberOverlay() }
         }
     }
 
-    override fun getPlayersNumberOverlay(lineupID: Long): Single<List<PlayerNumberOverlay>> {
-        return numberOverlayDao.getPlayerNumberOverlays(lineupID).map { it.map { it.toPlayerNumberOverlay() } }
+    override fun getPlayersNumberOverlay(lineupId: Long): Single<List<PlayerNumberOverlay>> {
+        return numberOverlayDao.getPlayerNumberOverlays(lineupId)
+            .map { it.map { it.toPlayerNumberOverlay() } }
     }
 
     override fun deletePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable {
-        return numberOverlayDao.deletePlayerNumberOverlays(overlays.map { RoomPlayerNumberOverlay().init(it) })
+        return numberOverlayDao.deletePlayerNumberOverlays(overlays.map {
+            RoomPlayerNumberOverlay().init(
+                it
+            )
+        })
     }
 
     override fun updatePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable {
-        return numberOverlayDao.updatePlayerNumberOverlays(overlays.map { RoomPlayerNumberOverlay().init(it) })
+        return numberOverlayDao.updatePlayerNumberOverlays(overlays.map {
+            RoomPlayerNumberOverlay().init(
+                it
+            )
+        })
     }
 
     override fun updatePlayerNumberOverlay(overlay: PlayerNumberOverlay): Completable {
@@ -114,14 +144,20 @@ internal class PlayerRepositoryImpl(private val playerDao: PlayerDao, private va
     }
 
     override fun createPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable {
-        return numberOverlayDao.insertPlayerNumberOverlays(overlays.map { RoomPlayerNumberOverlay().init(it) })
+        return numberOverlayDao.insertPlayerNumberOverlays(overlays.map {
+            RoomPlayerNumberOverlay().init(
+                it
+            )
+        })
     }
 
     override fun createPlayerNumberOverlay(overlay: PlayerNumberOverlay): Completable {
-        return numberOverlayDao.insertPlayerNumberOverlay(RoomPlayerNumberOverlay().init(overlay)).ignoreElement()
+        return numberOverlayDao.insertPlayerNumberOverlay(RoomPlayerNumberOverlay().init(overlay))
+            .ignoreElement()
     }
 
     override fun getPlayerNumberOverlayByHash(hash: String): Single<PlayerNumberOverlay> {
-        return numberOverlayDao.getPlayerNumberOverlayByHash(hash).map { it.toPlayerNumberOverlay() }
+        return numberOverlayDao.getPlayerNumberOverlayByHash(hash)
+            .map { it.toPlayerNumberOverlay() }
     }
 }

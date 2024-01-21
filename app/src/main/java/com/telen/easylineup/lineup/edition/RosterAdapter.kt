@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.lineup.edition
 
 import android.text.Editable
@@ -12,9 +16,6 @@ class RosterAdapter(
     private val items: List<RosterItem>,
     private val listener: RosterAdapterCallback
 ) : RecyclerView.Adapter<RosterAdapter.RosterViewHolder>() {
-
-    data class RosterViewHolder(val view: RosterEntryView) : RecyclerView.ViewHolder(view)
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RosterViewHolder {
         return RosterViewHolder(RosterEntryView(parent.context))
     }
@@ -33,18 +34,24 @@ class RosterAdapter(
             holder.view.setNumber(item.player.shirtNumber)
         }
         holder.view.setTextListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
+            override fun afterTextChanged(text: Editable?) {
                 try {
-                    listener.onNumberChanged(item.player, s.toString().toInt())
+                    listener.onNumberChanged(item.player, text.toString().toInt())
                 } catch (e: NumberFormatException) {
                     Timber.e(e.message)
                     listener.onNumberChanged(item.player, 0)
                 }
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun beforeTextChanged(
+                text: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+            }
 
+            override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {}
         })
         holder.view.setSelectedStateListener(null)
         holder.view.setSelectedState(item.selected)
@@ -52,4 +59,9 @@ class RosterAdapter(
             listener.onPlayerSelectedChanged(item.player, isChecked)
         }
     }
+
+    /**
+     * @property view
+     */
+    data class RosterViewHolder(val view: RosterEntryView) : RecyclerView.ViewHolder(view)
 }

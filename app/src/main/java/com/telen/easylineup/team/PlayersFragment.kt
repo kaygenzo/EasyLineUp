@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.team
 
 import android.os.Bundle
@@ -18,7 +22,6 @@ import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 
 class PlayersFragment : BaseFragment("TeamFragment"), OnPlayerClickListener {
-
     private val playersAdapter = TeamAdapter(this)
     private val viewModel: TeamViewModel by viewModels()
     private var binding: FragmentPlayerListBinding? = null
@@ -47,7 +50,7 @@ class PlayersFragment : BaseFragment("TeamFragment"), OnPlayerClickListener {
 
         viewModel.observeDisplayType().observe(viewLifecycleOwner) {
             playersAdapter.displayType = it
-            when(it) {
+            when (it) {
                 TeamViewModel.DisplayType.LIST -> {
                     binding.displayMode.apply {
                         setChipIconResource(R.drawable.ic_baseline_grid_view_24)

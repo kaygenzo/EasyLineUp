@@ -1,13 +1,32 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.model
 
 import com.telen.easylineup.domain.model.export.LineupExport
 import com.telen.easylineup.domain.model.export.PlayerNumberOverlayExport
 import com.telen.easylineup.domain.model.export.PlayerPositionExport
-import java.util.*
+import java.util.Calendar
+import java.util.UUID
 
 const val MODE_DISABLED = 0
 const val MODE_ENABLED = 1
 
+/**
+ * @property id
+ * @property name
+ * @property teamId
+ * @property tournamentId
+ * @property mode
+ * @property strategy
+ * @property extraHitters
+ * @property eventTimeInMillis
+ * @property createdTimeInMillis
+ * @property editedTimeInMillis
+ * @property roster
+ * @property hash
+ */
 data class Lineup(
     var id: Long = 0,
     var name: String = "",
@@ -22,22 +41,43 @@ data class Lineup(
     var roster: String? = null,
     var hash: String? = UUID.randomUUID().toString()
 ) {
-
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (this === other) {
+            return true
+        }
+        if (javaClass != other?.javaClass) {
+            return false
+        }
 
         other as Lineup
 
-        if (id != other.id) return false
-        if (name != other.name) return false
-        if (teamId != other.teamId) return false
-        if (tournamentId != other.tournamentId) return false
-        if (mode != other.mode) return false
-        if (strategy != other.strategy) return false
-        if (extraHitters != other.extraHitters) return false
-        if (eventTimeInMillis != other.eventTimeInMillis) return false
-        if (roster != other.roster) return false
+        if (id != other.id) {
+            return false
+        }
+        if (name != other.name) {
+            return false
+        }
+        if (teamId != other.teamId) {
+            return false
+        }
+        if (tournamentId != other.tournamentId) {
+            return false
+        }
+        if (mode != other.mode) {
+            return false
+        }
+        if (strategy != other.strategy) {
+            return false
+        }
+        if (extraHitters != other.extraHitters) {
+            return false
+        }
+        if (eventTimeInMillis != other.eventTimeInMillis) {
+            return false
+        }
+        if (roster != other.roster) {
+            return false
+        }
 
         return true
     }
@@ -62,7 +102,7 @@ data class Lineup(
 fun Lineup.toLineupExport(
     playerPositions: MutableList<PlayerPositionExport>,
     playerNumberOverlays: List<PlayerNumberOverlayExport>,
-    rosterUUID: List<String>?
+    rosterUuid: List<String>?
 ): LineupExport {
     return LineupExport(
         hash ?: UUID.randomUUID().toString(),
@@ -73,7 +113,7 @@ fun Lineup.toLineupExport(
         mode,
         strategy,
         extraHitters,
-        rosterUUID,
+        rosterUuid,
         playerPositions,
         playerNumberOverlays
     )

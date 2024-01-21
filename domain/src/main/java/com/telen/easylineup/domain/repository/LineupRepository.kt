@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.repository
 
 import androidx.lifecycle.LiveData
@@ -20,16 +24,16 @@ interface LineupRepository {
     fun getLineupById(lineupId: Long): LiveData<Lineup>
     fun getLineupByHash(hash: String): Single<Lineup>
     fun getLineupByIdSingle(lineupId: Long): Single<Lineup>
-    fun getLineupsForTournament(tournamentId: Long, teamID: Long): LiveData<List<Lineup>>
-    fun getLineupsForTournamentRx(tournamentId: Long, teamID: Long): Single<List<Lineup>>
-    fun getLastLineup(teamID: Long): Maybe<Lineup>
+    fun getLineupsForTournament(tournamentId: Long, teamId: Long): LiveData<List<Lineup>>
+    fun getLineupsForTournamentRx(tournamentId: Long, teamId: Long): Single<List<Lineup>>
+    fun getLastLineup(teamId: Long): Maybe<Lineup>
     fun getAllTournamentsWithLineups(
         filter: String,
-        teamID: Long
+        teamId: Long
     ): Single<List<TournamentWithLineup>>
 
     fun getAllPlayerPositionsForTournament(
         tournamentId: Long,
-        teamID: Long
+        teamId: Long
     ): Single<List<PlayerInLineup>>
 }

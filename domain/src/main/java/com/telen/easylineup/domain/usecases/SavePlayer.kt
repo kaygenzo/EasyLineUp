@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.usecases
 
 import android.net.Uri
@@ -10,9 +14,11 @@ import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.domain.utils.ValidatorUtils
 import io.reactivex.rxjava3.core.Single
 
+/**
+ * @property dao
+ */
 internal class SavePlayer(val dao: PlayerRepository) :
     UseCase<SavePlayer.RequestValues, SavePlayer.ResponseValue>() {
-
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return when {
             requestValues.name.isNullOrBlank() -> Single.error(NameEmptyException())
@@ -24,8 +30,8 @@ internal class SavePlayer(val dao: PlayerRepository) :
             )
             else -> {
                 val player = Player(
-                    id = requestValues.playerID,
-                    teamId = requestValues.teamID,
+                    id = requestValues.playerId,
+                    teamId = requestValues.teamId,
                     name = requestValues.name.trim(),
                     shirtNumber = requestValues.shirtNumber ?: 0,
                     licenseNumber = requestValues.licenseNumber ?: 0L,
@@ -52,10 +58,25 @@ internal class SavePlayer(val dao: PlayerRepository) :
         }
     }
 
+    /**
+     * @property validatorUtils
+     * @property playerId
+     * @property teamId
+     * @property name
+     * @property shirtNumber
+     * @property licenseNumber
+     * @property imageUri
+     * @property positions
+     * @property pitching
+     * @property batting
+     * @property email
+     * @property phone
+     * @property sex
+     */
     class RequestValues(
         val validatorUtils: ValidatorUtils,
-        val playerID: Long,
-        val teamID: Long,
+        val playerId: Long,
+        val teamId: Long,
         val name: String?,
         val shirtNumber: Int?,
         val licenseNumber: Long? = 0,

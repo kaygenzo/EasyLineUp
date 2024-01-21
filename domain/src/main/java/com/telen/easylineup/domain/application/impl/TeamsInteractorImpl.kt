@@ -1,15 +1,21 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.application.impl
 
 import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.application.TeamsInteractor
 import com.telen.easylineup.domain.model.DomainErrors
-import com.telen.easylineup.domain.model.StepConfiguration
 import com.telen.easylineup.domain.model.Team
-import com.telen.easylineup.domain.model.TeamCreationStep
 import com.telen.easylineup.domain.repository.TeamRepository
-import com.telen.easylineup.domain.usecases.*
-import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
+import com.telen.easylineup.domain.usecases.CheckTeam
+import com.telen.easylineup.domain.usecases.DeleteTeam
+import com.telen.easylineup.domain.usecases.GetAllTeams
+import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.SaveCurrentTeam
+import com.telen.easylineup.domain.usecases.SaveTeam
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -18,7 +24,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 internal class TeamsInteractorImpl : TeamsInteractor, KoinComponent {
-
     private val teamsRepo: TeamRepository by inject()
     private val getTeam: GetTeam by inject()
     private val getAllTeamsUseCase: GetAllTeams by inject()
@@ -26,7 +31,6 @@ internal class TeamsInteractorImpl : TeamsInteractor, KoinComponent {
     private val deleteTeamUseCase: DeleteTeam by inject()
     private val saveTeamUseCase: SaveTeam by inject()
     private val checkTeamUseCase: CheckTeam by inject()
-
     private val errors: PublishSubject<DomainErrors.Teams> = PublishSubject.create()
 
     override fun getTeam(): Single<Team> {

@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -8,7 +12,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.databinding.ViewItemTeamCardBinding
 
 class TeamCardItemView : ConstraintLayout {
-
     private val binding = ViewItemTeamCardBinding.inflate(LayoutInflater.from(context), this, true)
 
     constructor(context: Context) : super(context)

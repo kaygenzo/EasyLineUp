@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.repository.adapters.impl
 
 import androidx.lifecycle.LiveData
@@ -7,14 +11,17 @@ import com.telen.easylineup.domain.model.PlayerInLineup
 import com.telen.easylineup.domain.model.TournamentWithLineup
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.repository.dao.LineupDao
-import com.telen.easylineup.repository.model.*
+import com.telen.easylineup.repository.model.RoomLineup
+import com.telen.easylineup.repository.model.init
+import com.telen.easylineup.repository.model.toLineup
+import com.telen.easylineup.repository.model.toPlayerInLineup
+import com.telen.easylineup.repository.model.toTournamentWithLineup
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
 
-internal class LineupRepositoryImpl(private val lineupDao: LineupDao): LineupRepository {
-
+internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRepository {
     init {
         Timber.i("LineupRepositoryImpl.init")
     }
@@ -67,25 +74,37 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao): LineupRep
         return lineupDao.getLineupByIdSingle(lineupId).map { it.toLineup() }
     }
 
-    override fun getLineupsForTournament(tournamentId: Long, teamID: Long): LiveData<List<Lineup>> {
-        return lineupDao.getLineupsForTournament(tournamentId, teamID).map{
+    override fun getLineupsForTournament(tournamentId: Long, teamId: Long): LiveData<List<Lineup>> {
+        return lineupDao.getLineupsForTournament(tournamentId, teamId).map {
             it.map { it.toLineup() }
         }
     }
 
-    override fun getLineupsForTournamentRx(tournamentId: Long, teamID: Long): Single<List<Lineup>> {
-        return lineupDao.getLineupsForTournamentRx(tournamentId, teamID).map { it.map { it.toLineup() } }
+    override fun getLineupsForTournamentRx(tournamentId: Long, teamId: Long): Single<List<Lineup>> {
+        return lineupDao.getLineupsForTournamentRx(tournamentId, teamId)
+            .map { it.map { it.toLineup() } }
     }
 
-    override fun getLastLineup(teamID: Long): Maybe<Lineup> {
-        return lineupDao.getLastLineup(teamID).map { it.toLineup() }
+    override fun getLastLineup(teamId: Long): Maybe<Lineup> {
+        return lineupDao.getLastLineup(teamId).map { it.toLineup() }
     }
 
-    override fun getAllTournamentsWithLineups(filter: String, teamID: Long): Single<List<TournamentWithLineup>> {
-        return lineupDao.getAllTournamentsWithLineups(filter, teamID).map { it.map { it.toTournamentWithLineup() } }
+    override fun getAllTournamentsWithLineups(
+        filter: String,
+        teamId: Long
+    ): Single<List<TournamentWithLineup>> {
+        return lineupDao.getAllTournamentsWithLineups(filter, teamId)
+            .map { it.map { it.toTournamentWithLineup() } }
     }
 
-    override fun getAllPlayerPositionsForTournament(tournamentId: Long, teamID: Long): Single<List<PlayerInLineup>> {
-        return lineupDao.getAllPlayerPositionsForTournament(tournamentId, teamID).map { it.map { it.toPlayerInLineup() } }
+    override fun getAllPlayerPositionsForTournament(
+        tournamentId: Long,
+        teamId: Long
+    ): Single<List<PlayerInLineup>> {
+        return lineupDao.getAllPlayerPositionsForTournament(tournamentId, teamId).map {
+            it.map {
+                it.toPlayerInLineup()
+            }
+        }
     }
 }

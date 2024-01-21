@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -23,17 +27,21 @@ interface OnPlayerClickListener {
 }
 
 class PlayerListView : ConstraintLayout, OnPlayerClickListener {
-
     private val binding =
         ViewBottomSheetPlayerListBinding.inflate(LayoutInflater.from(context), this, true)
-
-    override fun onPlayerSelected(player: Player) {
-        listener?.onPlayerSelected(player)
-    }
-
-    private val listPlayers = mutableListOf<Player>()
-    private var mAdapter: PlayerListAdapter = PlayerListAdapter(listPlayers, this)
+    private val listPlayers: MutableList<Player> = mutableListOf()
+    private var playersListAdapter: PlayerListAdapter = PlayerListAdapter(listPlayers, this)
     private var listener: OnPlayerClickListener? = null
+
+    init {
+        val linearLayoutManager = LinearLayoutManager(context)
+        val dividerItemDecoration = DividerItemDecoration(context, linearLayoutManager.orientation)
+        binding.playerRecyclerView.apply {
+            layoutManager = linearLayoutManager
+            addItemDecoration(dividerItemDecoration)
+            adapter = playersListAdapter
+        }
+    }
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -43,21 +51,15 @@ class PlayerListView : ConstraintLayout, OnPlayerClickListener {
         defStyleAttr
     )
 
-    init {
-        val linearLayoutManager = LinearLayoutManager(context)
-        val dividerItemDecoration = DividerItemDecoration(context, linearLayoutManager.orientation)
-        binding.playerRecyclerView.apply {
-            layoutManager = linearLayoutManager
-            addItemDecoration(dividerItemDecoration)
-            adapter = mAdapter
-        }
+    override fun onPlayerSelected(player: Player) {
+        listener?.onPlayerSelected(player)
     }
 
     fun setPlayers(players: List<Player>, position: FieldPosition? = null) {
         listPlayers.clear()
         listPlayers.addAll(players)
-        mAdapter.setFilter(position)
-        mAdapter.notifyDataSetChanged()
+        playersListAdapter.setFilter(position)
+        playersListAdapter.notifyDataSetChanged()
     }
 
     fun setOnPlayerClickListener(listener: OnPlayerClickListener) {
@@ -65,11 +67,13 @@ class PlayerListView : ConstraintLayout, OnPlayerClickListener {
     }
 }
 
+/**
+ * @property list
+ */
 class PlayerListAdapter(
     val list: List<Player>,
     private val playerListener: OnPlayerClickListener?
 ) : RecyclerView.Adapter<PlayerListAdapter.PlayerViewHolder>() {
-
     private var filter: FieldPosition? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerViewHolder {
@@ -133,5 +137,8 @@ class PlayerListAdapter(
         this.filter = filter
     }
 
+    /**
+     * @property view
+     */
     class PlayerViewHolder(val view: ItemPlayerSimpleBinding) : RecyclerView.ViewHolder(view.root)
 }

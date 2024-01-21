@@ -10,7 +10,7 @@
     android:layout_marginBottom="10dp"
     android:layout_marginTop="10dp">
 
-    <com.telen.easylineup.views.MLBStyledTextView
+    <com.telen.easylineup.views.MlbStyledTextView
         style="@style/LineupName"
         android:id="@+id/lineupName"
         android:layout_width="0dp"

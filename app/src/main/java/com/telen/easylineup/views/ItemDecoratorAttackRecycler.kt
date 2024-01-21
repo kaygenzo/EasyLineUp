@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -13,12 +17,10 @@ class ItemDecoratorAttackRecycler(
     batterSize: Int,
     extraHitterSize: Int = 0
 ) : DividerItemDecoration(context, orientation) {
-
-    private val mExtraDividerHeight: Int = 15
-    private val mExtraDividerIndex = (batterSize + extraHitterSize) - 1
+    private val extraDividerHeight: Int = DIVIDER_HEIGHT
+    private val extraDividerIndex = (batterSize + extraHitterSize) - 1
 
     override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-
         if (parent.layoutManager == null || drawable == null) {
             return
         }
@@ -28,7 +30,7 @@ class ItemDecoratorAttackRecycler(
         canvas.save()
         val left: Int
         val right: Int
-        //noinspection AndroidLintNewApi - NewApi lint fails to handle overrides.
+        // noinspection AndroidLintNewApi - NewApi lint fails to handle overrides.
         if (parent.clipToPadding) {
             left = parent.paddingLeft
             right = parent.width - parent.paddingRight
@@ -40,7 +42,6 @@ class ItemDecoratorAttackRecycler(
 
         val childCount = parent.childCount
         for (i in 0 until childCount) {
-
             val child = parent.getChildAt(i)
             val adapterPosition = parent.getChildAdapterPosition(child)
 
@@ -48,7 +49,7 @@ class ItemDecoratorAttackRecycler(
             val bottom = bounds.bottom + Math.round(child.translationY)
             drawable?.let {
                 val top = when (adapterPosition) {
-                    mExtraDividerIndex -> bottom - it.intrinsicHeight - mExtraDividerHeight
+                    extraDividerIndex -> bottom - it.intrinsicHeight - extraDividerHeight
                     else -> bottom - it.intrinsicHeight
                 }
                 it.setBounds(left, top, right, bottom)
@@ -66,10 +67,15 @@ class ItemDecoratorAttackRecycler(
     ) {
         drawable?.let {
             val position = parent.getChildAdapterPosition(view)
-            if (position == mExtraDividerIndex)
-                outRect.set(0, 0, 0, it.intrinsicHeight + mExtraDividerHeight)
-            else
+            if (position == extraDividerIndex) {
+                outRect.set(0, 0, 0, it.intrinsicHeight + extraDividerHeight)
+            } else {
                 outRect.set(0, 0, 0, it.intrinsicHeight)
+            }
         } ?: outRect.set(0, 0, 0, 0)
+    }
+
+    companion object {
+        private const val DIVIDER_HEIGHT = 15
     }
 }

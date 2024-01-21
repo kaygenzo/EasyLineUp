@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.utils
 
 import android.app.Activity
@@ -7,7 +11,6 @@ import androidx.fragment.app.Fragment
 
 class StorageUtils {
     companion object {
-
         const val REQUEST_CODE_OPEN_DOCUMENT = 0
         const val REQUEST_CODE_CHOOSE_DIRECTORY = 1
 

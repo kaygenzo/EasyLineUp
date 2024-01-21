@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.tournaments.list
 
 import com.telen.easylineup.domain.model.GeoLocation

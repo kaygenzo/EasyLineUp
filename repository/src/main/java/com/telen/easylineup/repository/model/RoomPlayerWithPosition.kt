@@ -1,8 +1,29 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.repository.model
 
 import androidx.room.ColumnInfo
 import com.telen.easylineup.domain.model.PlayerWithPosition
 
+/**
+ * @property playerName
+ * @property playerSex
+ * @property shirtNumber
+ * @property licenseNumber
+ * @property teamId
+ * @property image
+ * @property position
+ * @property x
+ * @property y
+ * @property flags
+ * @property order
+ * @property fieldPositionId
+ * @property playerId
+ * @property lineupId
+ * @property playerPositions
+ */
 internal data class RoomPlayerWithPosition(
     @ColumnInfo(name = "playerName") val playerName: String,
     @ColumnInfo(name = "playerSex") val playerSex: Int,
@@ -15,8 +36,8 @@ internal data class RoomPlayerWithPosition(
     @ColumnInfo(name = "y") var y: Float = 0f,
     @ColumnInfo(name = "flags") var flags: Int = 0,
     @ColumnInfo(name = "order") var order: Int = 0,
-    @ColumnInfo(name = "fieldPositionID") var fieldPositionID: Long = 0,
-    @ColumnInfo(name = "playerID") val playerID: Long,
+    @ColumnInfo(name = "fieldPositionID") var fieldPositionId: Long = 0,
+    @ColumnInfo(name = "playerID") val playerId: Long,
     @ColumnInfo(name = "lineupID") val lineupId: Long,
     @ColumnInfo(name = "playerPositions") val playerPositions: Int
 )
@@ -34,8 +55,8 @@ internal fun RoomPlayerWithPosition.toPlayerWithPosition(): PlayerWithPosition {
         y,
         flags,
         order,
-        fieldPositionID,
-        playerID,
+        fieldPositionId,
+        playerId,
         lineupId,
         playerPositions
     )

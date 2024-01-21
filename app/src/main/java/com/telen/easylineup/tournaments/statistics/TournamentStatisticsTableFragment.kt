@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.tournaments.statistics
 
 import android.graphics.Typeface
@@ -20,8 +24,7 @@ import io.github.kaygenzo.androidtable.api.StyleConfiguration
 import io.github.kaygenzo.androidtable.api.TableConfiguration
 
 class TournamentStatisticsTableFragment : BaseFragment("TournamentStatisticsTableFragment"),
-    AdapterView.OnItemSelectedListener {
-
+AdapterView.OnItemSelectedListener {
     private val viewModel by viewModels<TournamentStatisticsViewModel>()
     private var binding: FragmentTournamentStatisticsTableBinding? = null
 
@@ -77,8 +80,6 @@ class TournamentStatisticsTableFragment : BaseFragment("TournamentStatisticsTabl
                 viewModel.columnHighlights.observe(viewLifecycleOwner, Observer {
                     setColumnHighlights(it)
                 })
-
-
                 activity?.let { context ->
                     viewModel.getStrategiesNames(context)?.let { strategies ->
                         val strategyAdapter = ArrayAdapter(context, R.layout.item_team_strategy, strategies)

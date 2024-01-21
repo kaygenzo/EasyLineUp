@@ -1,18 +1,26 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCase
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.isDpDhOrFlex
+import com.telen.easylineup.domain.model.isSubstitute
+import com.telen.easylineup.domain.model.reset
 import io.reactivex.rxjava3.core.Single
 
 internal class DeletePlayerFieldPosition :
     UseCase<DeletePlayerFieldPosition.RequestValues, DeletePlayerFieldPosition.ResponseValue>() {
-
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return try {
             val players = requestValues.players
-            //substitutes have the same position, let's use player to get the good one
-            val player = players.first { it.playerID == requestValues.playerToDelete.id }
+            // substitutes have the same position, let's use player to get the good one
+            val player = players.first { it.playerId == requestValues.playerToDelete.id }
 
             val playerIsSubstitute = player.isSubstitute()
             val playerOrder = player.order
@@ -29,7 +37,7 @@ internal class DeletePlayerFieldPosition :
                 var found = false
                 substitutes.forEachIndexed { index, playerWithPosition ->
                     if (!found && index < requestValues.extraHitterSize
-                        && playerWithPosition.order == Constants.SUBSTITUTE_ORDER_VALUE
+                            && playerWithPosition.order == Constants.SUBSTITUTE_ORDER_VALUE
                     ) {
                         playerWithPosition.order = playerOrder
                         found = true
@@ -42,6 +50,12 @@ internal class DeletePlayerFieldPosition :
         }
     }
 
+    /**
+     * @property players
+     * @property playerToDelete
+     * @property lineupMode
+     * @property extraHitterSize
+     */
     class RequestValues(
         val players: List<PlayerWithPosition>,
         val playerToDelete: Player,

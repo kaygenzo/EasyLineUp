@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.lineup.defense
 
 import android.os.Bundle
@@ -19,7 +23,6 @@ class DefenseFragmentFixed : BaseFragment("DefenseFragmentFixed") {
     private val viewModel by viewModels<LineupViewModel>(
         ownerProducer = { requireParentFragment() }
     )
-
     private var binder: FragmentLineupDefenseFixedBinding? = null
 
     override fun onCreateView(

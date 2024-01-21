@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.player
 
 import android.content.Context
@@ -17,26 +21,23 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 class PlayerViewModel : ViewModel(), KoinComponent {
-
     private val domain: ApplicationInteractor by inject()
-
     private val disposables = CompositeDisposable()
-    private val _teamTypeLiveData = MutableLiveData<Int>().apply { getTeamType() }
-    private val _strategyLiveData = MutableLiveData<TeamStrategy>()
-    private val _lineupsLiveData by lazy {
+    private val _teamTypeLiveData: MutableLiveData<Int> = MutableLiveData<Int>().apply {
+        getTeamType()
+    }
+    private val _strategyLiveData: MutableLiveData<TeamStrategy> = MutableLiveData()
+    private val _lineupsLiveData: MutableLiveData<Map<FieldPosition, Int>> by lazy {
         MutableLiveData<Map<FieldPosition, Int>>().apply { getLineups() }
     }
     private val _player by lazy {
-        playerID.takeIf { it > 0 }
+        playerId.takeIf { it > 0 }
             ?.let { domain.players().getPlayer(it) }
             ?: MutableLiveData()
-
     }
-
-    var playerID: Long = 0
+    var playerId: Long = 0
     var teamType: Int = 0
-    var strategies = mutableListOf<String>()
-
+    var strategies: MutableList<String> = mutableListOf()
     var savedName: String? = null
     var savedShirtNumber: Int? = null
     var savedLicenseNumber: Long? = null
@@ -139,7 +140,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
         sex: Int
     ): Completable {
         return domain.players().savePlayer(
-            playerID,
+            playerId,
             name,
             shirtNumber,
             licenseNumber,
@@ -154,7 +155,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
 
     fun deletePlayer(): Completable {
-        return domain.players().deletePlayer(playerID)
+        return domain.players().deletePlayer(playerId)
     }
 
     fun registerPlayerFormErrorResult() = domain.players().observeErrors()
@@ -165,7 +166,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getLineups() {
-        val disposable = domain.players().getPlayerPositionsSummary(playerID)
+        val disposable = domain.players().getPlayerPositionsSummary(playerId)
             .subscribe({
                 _lineupsLiveData.postValue(it)
             }, {

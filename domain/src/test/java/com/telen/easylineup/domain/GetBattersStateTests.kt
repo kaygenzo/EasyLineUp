@@ -1,8 +1,18 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import android.content.Context
 import android.content.res.Resources
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.BatterState
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.GetBattersState
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
@@ -14,9 +24,9 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////// EDITABLE ////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////// EDITABLE ///////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////////
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal abstract class GetBattersStateEditableTests(
@@ -25,13 +35,12 @@ internal abstract class GetBattersStateEditableTests(
     batterSize: Int,
     extraHittersSize: Int
 ) : GetBattersStateTests(teamType, strategy, batterSize, extraHittersSize, true) {
-
     @Test
-    fun dp_should_only_showIndex_and_showDescription_and_canMove_in_extra_hitter_when_lineup_editable() {
+    fun dpShouldOnlyShowIndexAndShowDescriptionAndCanMoveInExtraHitterWhenLineupEditable() {
         addPlayers()
         addExtraHitters(extraHittersSize)
         players[0].position = FieldPosition.DP_DH.id
-        //switch order to be sure dp will be at the end of the list because it's sorted by order
+        // switch order to be sure dp will be at the end of the list because it's sorted by order
         val old = players[0].order
         val new = players[players.size - 1].order
         players[0].order = new
@@ -65,7 +74,7 @@ internal abstract class GetBattersStateEditableTests(
     }
 
     @Test
-    fun flex_should_haveBackground_and_showPosition_in_extra_hitter_when_lineup_editable() {
+    fun flexShouldHaveBackgroundAndShowPositionInExtraHitterWhenLineupEditable() {
         addPlayers()
         addExtraHitters(extraHittersSize)
 
@@ -95,7 +104,9 @@ internal abstract class GetBattersStateEditableTests(
 
         Assert.assertEquals(
             1,
-            observer.values()[0].players.filter { it.playerFlag == PlayerFieldPosition.FLAG_FLEX }.size
+            observer.values()[0].players.filter {
+                it.playerFlag == PlayerFieldPosition.FLAG_FLEX
+            }.size
         )
         Assert.assertEquals(
             expected,
@@ -103,7 +114,7 @@ internal abstract class GetBattersStateEditableTests(
     }
 
     @Test
-    fun defense_player_should_only_showIndex_and_showPosition_and_canMove_when_lineup_editable() {
+    fun defensePlayerShouldOnlyShowIndexAndShowPositionAndCanMoveWhenLineupEditable() {
         addPlayers()
 
         applyUserCase()
@@ -111,13 +122,14 @@ internal abstract class GetBattersStateEditableTests(
         var i = 1
         observer.values()[0].players.forEach { batterState ->
             val value = batterSize - i + 1
-            // we don't test here the field position and desc, so let's use the same as the loop object
+            // we don't test here the field position and desc, so let's use the same as the loop
+            // object
             val expected = BatterState(
                 value.toLong(),
                 PlayerFieldPosition.FLAG_NONE,
                 i,
                 "t$value",
-                "$value",
+                value.toString(),
                 batterState.playerPosition,
                 playerPositionDesc = batterState.playerPositionDesc,
                 canShowPosition = true,
@@ -133,7 +145,7 @@ internal abstract class GetBattersStateEditableTests(
     }
 
     @Test
-    fun substitute_should_in_extra_hitters_bounds_to_bat_when_lineup_editable() {
+    fun substituteShouldInExtraHittersBoundsToBatWhenLineupEditable() {
         addPlayers()
         addExtraHitters(extraHittersSize)
         addSubstitutes()
@@ -143,14 +155,15 @@ internal abstract class GetBattersStateEditableTests(
         var i = batterSize + 1
         observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
-                // we don't test here the field position and desc, so let's use the same as the loop object
+                // we don't test here the field position and desc, so let's use the same as the loop
+                // object
                 val subAllowBatting = i <= batterSize + extraHittersSize
                 val expected = BatterState(
                     i.toLong(),
                     PlayerFieldPosition.FLAG_NONE,
                     i,
                     "t$i",
-                    "$i",
+                    i.toString(),
                     FieldPosition.SUBSTITUTE,
                     playerPositionDesc = "SUB",
                     canShowPosition = false,
@@ -166,7 +179,7 @@ internal abstract class GetBattersStateEditableTests(
     }
 
     @Test
-    fun substitute_should_not_bat_if_index_greater_than_extra_hitters_size_when_lineup_editable() {
+    fun substituteShouldNotBatIfIndexGreaterThanExtraHittersSizeWhenLineupEditable() {
         addExtraHitters(extraHittersSize)
         addSubstitutes()
 
@@ -175,14 +188,15 @@ internal abstract class GetBattersStateEditableTests(
         var i = 1
         observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
-                // we don't test here the field position and desc, so let's use the same as the loop object
+                // we don't test here the field position and desc, so let's use the same as the loop
+                // object
                 val subAllowBatting = i <= extraHittersSize
                 val expected = BatterState(
                     i.toLong(),
                     PlayerFieldPosition.FLAG_NONE,
                     i,
                     "t$i",
-                    "$i",
+                    i.toString(),
                     FieldPosition.SUBSTITUTE,
                     playerPositionDesc = "SUB",
                     canShowPosition = false,
@@ -198,7 +212,7 @@ internal abstract class GetBattersStateEditableTests(
     }
 
     @Test
-    fun shouldNotShowSubstitutesOrderIfCannotMove_when_lineup_editable() {
+    fun shouldNotShowSubstitutesOrderIfCannotMoveWhenLineupEditable() {
         addPlayers()
         addSubstitutes(Constants.SUBSTITUTE_ORDER_VALUE)
         for (i in batterSize until (batterSize + extraHittersSize)) {
@@ -210,14 +224,15 @@ internal abstract class GetBattersStateEditableTests(
         var i = batterSize + 1
         observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
-                // we don't test here the field position and desc, so let's use the same as the loop object
+                // we don't test here the field position and desc, so let's use the same as the loop
+                // object
                 val subAllowBatting = i <= batterSize + extraHittersSize
                 val expected = BatterState(
                     i.toLong(),
                     PlayerFieldPosition.FLAG_NONE,
                     if (subAllowBatting) i else Constants.SUBSTITUTE_ORDER_VALUE,
                     "t$i",
-                    "$i",
+                    i.toString(),
                     FieldPosition.SUBSTITUTE,
                     playerPositionDesc = "SUB",
                     canShowPosition = false,
@@ -301,9 +316,9 @@ internal class GetBattersStateSoftballCustom5ManEditableTests : GetBattersStateE
     TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3
 )
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////// NOT EDITABLE //////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////// NOT EDITABLE //////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////////
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal abstract class GetBattersStateNotEditableTests(
@@ -312,13 +327,12 @@ internal abstract class GetBattersStateNotEditableTests(
     batterSize: Int,
     extraHittersSize: Int
 ) : GetBattersStateTests(teamType, strategy, batterSize, extraHittersSize, false) {
-
     @Test
-    fun dp_should_only_showIndex_and_showDescription_when_lineup_not_editable() {
+    fun dpShouldOnlyShowIndexAndShowDescriptionWhenLineupNotEditable() {
         addPlayers()
         addExtraHitters(extraHittersSize)
         players[0].position = FieldPosition.DP_DH.id
-        //switch order to be sure dp will be at the end of the list because it's sorted by order
+        // switch order to be sure dp will be at the end of the list because it's sorted by order
         val old = players[0].order
         val new = players[players.size - 1].order
         players[0].order = new
@@ -352,7 +366,7 @@ internal abstract class GetBattersStateNotEditableTests(
     }
 
     @Test
-    fun flex_should_only_haveBackground_and_showPosition_showDescription_when_lineup_not_editable() {
+    fun flexShouldOnlyHaveBackgroundAndShowPositionShowDescriptionWhenLineupNotEditable() {
         addPlayers()
         addExtraHitters(extraHittersSize)
 
@@ -382,7 +396,9 @@ internal abstract class GetBattersStateNotEditableTests(
 
         Assert.assertEquals(
             1,
-            observer.values()[0].players.filter { it.playerFlag == PlayerFieldPosition.FLAG_FLEX }.size
+            observer.values()[0].players.filter {
+                it.playerFlag == PlayerFieldPosition.FLAG_FLEX
+            }.size
         )
         Assert.assertEquals(
             expected,
@@ -390,7 +406,7 @@ internal abstract class GetBattersStateNotEditableTests(
     }
 
     @Test
-    fun defense_player_should_only_showIndex_and_showPosition_showDescription_when_lineup_editable() {
+    fun defensePlayerShouldOnlyShowIndexAndShowPositionShowDescriptionWhenLineupEditable() {
         addPlayers()
 
         applyUserCase()
@@ -398,13 +414,14 @@ internal abstract class GetBattersStateNotEditableTests(
         var i = 1
         observer.values()[0].players.forEach { batterState ->
             val value = batterSize - i + 1
-            // we don't test here the field position and desc, so let's use the same as the loop object
+            // we don't test here the field position and desc, so let's use the same as the loop
+            // object
             val expected = BatterState(
                 value.toLong(),
                 PlayerFieldPosition.FLAG_NONE,
                 i,
                 "t$value",
-                "$value",
+                value.toString(),
                 batterState.playerPosition,
                 playerPositionDesc = batterState.playerPositionDesc,
                 canShowPosition = true,
@@ -420,7 +437,7 @@ internal abstract class GetBattersStateNotEditableTests(
     }
 
     @Test
-    fun substitute_should_in_extra_hitters_bounds_to_bat_when_lineup_editable() {
+    fun substituteShouldInExtraHittersBoundsToBatWhenLineupEditable() {
         addPlayers()
         addExtraHitters(extraHittersSize)
         addSubstitutes()
@@ -430,14 +447,15 @@ internal abstract class GetBattersStateNotEditableTests(
         var i = batterSize + 1
         observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
-                // we don't test here the field position and desc, so let's use the same as the loop object
+                // we don't test here the field position and desc, so let's use the same as the loop
+                // object
                 val subAllowBatting = i <= batterSize + extraHittersSize
                 val expected = BatterState(
                     i.toLong(),
                     PlayerFieldPosition.FLAG_NONE,
                     i,
                     "t$i",
-                    "$i",
+                    i.toString(),
                     FieldPosition.SUBSTITUTE,
                     playerPositionDesc = "SUB",
                     canShowPosition = false,
@@ -453,7 +471,7 @@ internal abstract class GetBattersStateNotEditableTests(
     }
 
     @Test
-    fun substitute_should_not_bat_if_index_greater_than_extra_hitters_size_when_lineup_editable() {
+    fun substituteShouldNotBatIfIndexGreaterThanExtraHittersSizeWhenLineupEditable() {
         addExtraHitters(extraHittersSize)
         addSubstitutes()
 
@@ -462,14 +480,15 @@ internal abstract class GetBattersStateNotEditableTests(
         var i = 1
         observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
-                // we don't test here the field position and desc, so let's use the same as the loop object
+                // we don't test here the field position and desc, so let's use the same as the loop
+                // object
                 val subAllowBatting = i <= extraHittersSize
                 val expected = BatterState(
                     i.toLong(),
                     PlayerFieldPosition.FLAG_NONE,
                     i,
                     "t$i",
-                    "$i",
+                    i.toString(),
                     FieldPosition.SUBSTITUTE,
                     playerPositionDesc = "SUB",
                     canShowPosition = false,
@@ -497,14 +516,15 @@ internal abstract class GetBattersStateNotEditableTests(
         var i = batterSize + 1
         observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
-                // we don't test here the field position and desc, so let's use the same as the loop object
+                // we don't test here the field position and desc, so let's use the same as the loop
+                // object
                 val subAllowBatting = i <= batterSize + extraHittersSize
                 val expected = BatterState(
                     i.toLong(),
                     PlayerFieldPosition.FLAG_NONE,
                     if (subAllowBatting) i else Constants.SUBSTITUTE_ORDER_VALUE,
                     "t$i",
-                    "$i",
+                    i.toString(),
                     FieldPosition.SUBSTITUTE,
                     playerPositionDesc = "SUB",
                     canShowPosition = false,
@@ -518,7 +538,6 @@ internal abstract class GetBattersStateNotEditableTests(
                 i++
             }
     }
-
 }
 
 ////////////// NOT EDITABLE NO HITTER SIZE //////////////
@@ -558,16 +577,16 @@ internal class GetBattersStateSoftball5ManNotEditableTests : GetBattersStateNotE
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateBaseballCustomStandardNotEditableTests :
     GetBattersStateNotEditableTests(
-        TeamType.BASEBALL, TeamStrategy.STANDARD,
-        TeamStrategy.STANDARD.batterSize, 3
-    )
+    TeamType.BASEBALL, TeamStrategy.STANDARD,
+    TeamStrategy.STANDARD.batterSize, 3
+)
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballCustomStandardNotEditableTests :
     GetBattersStateNotEditableTests(
-        TeamType.SOFTBALL, TeamStrategy.STANDARD,
-        TeamStrategy.STANDARD.batterSize, 3
-    )
+    TeamType.SOFTBALL, TeamStrategy.STANDARD,
+    TeamStrategy.STANDARD.batterSize, 3
+)
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateBaseballCustom5ManNotEditableTests : GetBattersStateNotEditableTests(
@@ -580,9 +599,9 @@ internal class GetBattersStateBaseballCustom5ManNotEditableTests : GetBattersSta
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballCustomSlowpitchNotEditableTests :
     GetBattersStateNotEditableTests(
-        TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
-        TeamStrategy.SLOWPITCH.batterSize, 3
-    )
+    TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
+    TeamStrategy.SLOWPITCH.batterSize, 3
+)
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballCustom5ManNotEditableTests : GetBattersStateNotEditableTests(
@@ -590,32 +609,38 @@ internal class GetBattersStateSoftballCustom5ManNotEditableTests : GetBattersSta
     TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3
 )
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////// BASE /////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////// BASE ////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @property teamType
+ * @property strategy
+ * @property batterSize
+ * @property extraHittersSize
+ * @property isEditable
+ */
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal abstract class GetBattersStateTests(
+internal open class GetBattersStateTests(
     protected val teamType: TeamType, protected val strategy: TeamStrategy,
     protected val batterSize: Int, protected val extraHittersSize: Int,
     protected val isEditable: Boolean
 ) {
+    protected val players: MutableList<PlayerWithPosition> = mutableListOf()
+    val lineupMode = MODE_ENABLED
+    val observer: TestObserver<GetBattersState.ResponseValue> = TestObserver()
 
     @Mock
     lateinit var context: Context
 
     @Mock
     lateinit var resources: Resources
-    lateinit var mGetBattersState: GetBattersState
-    protected val players = mutableListOf<PlayerWithPosition>()
-
-    val lineupMode = MODE_ENABLED
-    val observer = TestObserver<GetBattersState.ResponseValue>()
+    lateinit var getBattersState: GetBattersState
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        mGetBattersState = GetBattersState()
+        getBattersState = GetBattersState()
 
         Mockito.`when`(context.resources).thenReturn(resources)
         Mockito.`when`(resources.getStringArray(R.array.field_positions_baseball_list)).thenReturn(
@@ -668,7 +693,7 @@ internal abstract class GetBattersStateTests(
         teamType.getValidPositions(strategy).forEach {
             players.add(
                 PlayerWithPosition(
-                    playerName = "t${i}",
+                    playerName = "t$i",
                     playerSex = 0,
                     shirtNumber = i,
                     licenseNumber = i.toLong(),
@@ -678,8 +703,8 @@ internal abstract class GetBattersStateTests(
                     x = 0f, y = 0f,
                     flags = PlayerFieldPosition.FLAG_NONE,
                     order = batterSize - i + 1,
-                    fieldPositionID = i.toLong(),
-                    playerID = i.toLong(),
+                    fieldPositionId = i.toLong(),
+                    playerId = i.toLong(),
                     lineupId = 1,
                     playerPositions = 1
                 )
@@ -693,7 +718,7 @@ internal abstract class GetBattersStateTests(
         for (j in fromIndex..fromIndex + 9) {
             players.add(
                 PlayerWithPosition(
-                    playerName = "t${j}",
+                    playerName = "t$j",
                     playerSex = 0,
                     shirtNumber = j,
                     licenseNumber = j.toLong(),
@@ -703,8 +728,8 @@ internal abstract class GetBattersStateTests(
                     x = 0f, y = 0f,
                     flags = PlayerFieldPosition.FLAG_NONE,
                     order = order,
-                    fieldPositionID = j.toLong(),
-                    playerID = j.toLong(),
+                    fieldPositionId = j.toLong(),
+                    playerId = j.toLong(),
                     lineupId = 1,
                     playerPositions = 1
                 )
@@ -717,7 +742,7 @@ internal abstract class GetBattersStateTests(
         for (j in fromIndex until fromIndex + extraHitters) {
             players.add(
                 PlayerWithPosition(
-                    playerName = "t${j}",
+                    playerName = "t$j",
                     playerSex = 0,
                     shirtNumber = j,
                     licenseNumber = j.toLong(),
@@ -727,8 +752,8 @@ internal abstract class GetBattersStateTests(
                     x = 0f, y = 0f,
                     flags = PlayerFieldPosition.FLAG_NONE,
                     order = j,
-                    fieldPositionID = j.toLong(),
-                    playerID = j.toLong(),
+                    fieldPositionId = j.toLong(),
+                    playerId = j.toLong(),
                     lineupId = 1,
                     playerPositions = 1
                 )
@@ -737,7 +762,7 @@ internal abstract class GetBattersStateTests(
     }
 
     protected fun applyUserCase() {
-        mGetBattersState.executeUseCase(
+        getBattersState.executeUseCase(
             GetBattersState.RequestValues(
                 context,
                 players,

@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup
 
 import androidx.lifecycle.LiveData
@@ -15,22 +19,28 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 sealed class Event
+/**
+ * @property team
+ */
 data class GetTeamSuccess(val team: Team) : Event()
 object GetTeamFailure : Event()
+/**
+ * @property count
+ */
 data class GetTeamsCountSuccess(val count: Int) : Event()
 object GetTeamsCountFailure : Event()
 object UpdateCurrentTeamSuccess : Event()
 object UpdateCurrentTeamFailure : Event()
+/**
+ * @property teams
+ */
 data class SwapButtonSuccess(val teams: List<Team>) : Event()
 object SwapButtonFailure : Event()
 
 class HomeViewModel : ViewModel(), KoinComponent {
-
     private val domain: ApplicationInteractor by inject()
     private val prefsHelper by inject<SharedPreferencesHelper>()
-
-    private val _event = PublishSubject.create<Event>()
-
+    private val _event: Subject<Event> = PublishSubject.create()
     val disposables = CompositeDisposable()
 
     fun registerTeamUpdates(): LiveData<List<Team>> {
@@ -89,8 +99,7 @@ class HomeViewModel : ViewModel(), KoinComponent {
         disposables.add(disposable)
     }
 
-
-    //TODO use event
+    // TODO use event
     fun showNewSwapTeamFeature(): Single<Boolean> {
         val show = prefsHelper.isFeatureEnabled(Constants.PREF_FEATURE_SHOW_NEW_SWAP_TEAM)
         if (show) {
@@ -98,5 +107,4 @@ class HomeViewModel : ViewModel(), KoinComponent {
         }
         return Single.just(show)
     }
-
 }

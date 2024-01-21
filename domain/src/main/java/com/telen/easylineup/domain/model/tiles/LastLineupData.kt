@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.model.tiles
 
 import com.telen.easylineup.domain.Constants
@@ -9,15 +13,14 @@ const val KEY_LINEUP_STRATEGY = 3
 const val KEY_LINEUP_EXTRA_HITTERS = 4
 
 class LastLineupData(
-    private val lineupID: Long,
+    private val lineupId: Long,
     private val name: String,
     private val strategy: TeamStrategy,
     private val extraHitters: Int
-) : ITileData {
-
+) : TileData {
     override fun getData(): Map<Int, Any> {
-        val map = mutableMapOf<Int, Any>()
-        map[KEY_LINEUP_ID] = lineupID
+        val map: MutableMap<Int, Any> = mutableMapOf()
+        map[KEY_LINEUP_ID] = lineupId
         map[KEY_LINEUP_NAME] = name
         map[KEY_LINEUP_STRATEGY] = strategy
         map[KEY_LINEUP_EXTRA_HITTERS] = extraHitters

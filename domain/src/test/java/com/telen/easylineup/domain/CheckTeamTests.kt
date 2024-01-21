@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.Team
@@ -10,25 +14,22 @@ import org.junit.runner.RunWith
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
-
 @RunWith(MockitoJUnitRunner::class)
 internal class CheckTeamTests {
-
-    lateinit var mCheckTeam: CheckTeam
-
+    private val observer: TestObserver<CheckTeam.ResponseValue> = TestObserver()
     val team = Team(1L, "A", null, 0, true, null)
+    lateinit var checkTeam: CheckTeam
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        mCheckTeam = CheckTeam()
+        checkTeam = CheckTeam()
     }
 
     @Test
     fun shouldAcceptTeamWithNameNotEmpty() {
-        val observer = TestObserver<CheckTeam.ResponseValue>()
-        mCheckTeam.executeUseCase(CheckTeam.RequestValues(team))
-                .subscribe(observer)
+        checkTeam.executeUseCase(CheckTeam.RequestValues(team))
+            .subscribe(observer)
         observer.await()
         observer.assertComplete()
     }
@@ -36,9 +37,8 @@ internal class CheckTeamTests {
     @Test
     fun shouldRejectTeamWithNameEmpty() {
         team.name = ""
-        val observer = TestObserver<CheckTeam.ResponseValue>()
-        mCheckTeam.executeUseCase(CheckTeam.RequestValues(team))
-                .subscribe(observer)
+        checkTeam.executeUseCase(CheckTeam.RequestValues(team))
+            .subscribe(observer)
         observer.await()
         observer.assertError(NameEmptyException::class.java)
     }
@@ -46,9 +46,8 @@ internal class CheckTeamTests {
     @Test
     fun shouldRejectTeamWithNameOnlyWhitespaces() {
         team.name = "    "
-        val observer = TestObserver<CheckTeam.ResponseValue>()
-        mCheckTeam.executeUseCase(CheckTeam.RequestValues(team))
-                .subscribe(observer)
+        checkTeam.executeUseCase(CheckTeam.RequestValues(team))
+            .subscribe(observer)
         observer.await()
         observer.assertError(NameEmptyException::class.java)
     }

@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.application.impl
 
 import android.content.Context
@@ -14,7 +18,15 @@ import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.export.ExportBase
-import com.telen.easylineup.domain.usecases.*
+import com.telen.easylineup.domain.usecases.CheckHashData
+import com.telen.easylineup.domain.usecases.CreateDashboardTiles
+import com.telen.easylineup.domain.usecases.DeleteAllData
+import com.telen.easylineup.domain.usecases.ExportData
+import com.telen.easylineup.domain.usecases.GetDashboardTiles
+import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.ImportData
+import com.telen.easylineup.domain.usecases.SaveDashboardTiles
+import com.telen.easylineup.domain.usecases.ValidationCallback
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -23,25 +35,24 @@ import io.reactivex.rxjava3.subjects.Subject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 internal class DataInteractorImpl(private val context: Context) : DataInteractor,
-    ValidationCallback, KoinComponent {
-
+ValidationCallback, KoinComponent {
     private val getTeam: GetTeam by inject()
     private val getDashboardTiles: GetDashboardTiles by inject()
     private val updateTiles: SaveDashboardTiles by inject()
     private val createTiles: CreateDashboardTiles by inject()
     private val deleteAllData: DeleteAllData by inject()
     private val checkHash: CheckHashData by inject()
-    private val mImporter: ImportData by inject()
+    private val importer: ImportData by inject()
     private val exportData: ExportData by inject()
-
     private val errors: PublishSubject<DomainErrors.Configuration> = PublishSubject.create()
     private val disposables = CompositeDisposable()
 
     override fun getDashboardConfigurations(): LiveData<List<DashboardTile>> {
-        val resultLiveData = MutableLiveData<List<DashboardTile>>()
+        val resultLiveData: MutableLiveData<List<DashboardTile>> = MutableLiveData()
         val disposable = UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
             .flatMap { team ->
@@ -68,7 +79,7 @@ internal class DataInteractorImpl(private val context: Context) : DataInteractor
     }
 
     override fun importData(root: ExportBase, updateIfExists: Boolean): Completable {
-        return UseCaseHandler.execute(mImporter, ImportData.RequestValues(root, updateIfExists))
+        return UseCaseHandler.execute(importer, ImportData.RequestValues(root, updateIfExists))
             .ignoreElement()
     }
 
@@ -82,7 +93,7 @@ internal class DataInteractorImpl(private val context: Context) : DataInteractor
             .ignoreElement()
             .andThen(UseCaseHandler.execute(exportData, ExportData.RequestValues(this)))
             .flatMap {
-                //TODO move into a dedicated class
+                // TODO move into a dedicated class
                 val now = Calendar.getInstance().time
                 val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ROOT)
                 val dateTime = formatter.format(now)

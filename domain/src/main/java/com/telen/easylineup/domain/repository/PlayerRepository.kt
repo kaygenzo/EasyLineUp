@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.repository
 
 import androidx.lifecycle.LiveData
@@ -15,22 +19,22 @@ interface PlayerRepository {
     fun updatePlayer(player: Player): Completable
     fun updatePlayersWithRowCount(players: List<Player>): Single<Int>
     fun getPlayerByHash(hash: String): Single<Player>
-    fun getPlayerById(playerID: Long): LiveData<Player>
-    fun getPlayerByIdAsSingle(playerID: Long): Single<Player>
-    fun getPlayers(teamID: Long): Single<List<Player>>
+    fun getPlayerById(playerId: Long): LiveData<Player>
+    fun getPlayerByIdAsSingle(playerId: Long): Single<Player>
+    fun getPlayersByTeamId(teamId: Long): Single<List<Player>>
     fun getPlayers(): Single<List<Player>>
-    fun observePlayers(teamID: Long): LiveData<List<Player>>
-    fun getTeamPlayersAndMaybePositions(lineupID: Long): LiveData<List<PlayerWithPosition>>
+    fun observePlayers(teamId: Long): LiveData<List<Player>>
+    fun getTeamPlayersAndMaybePositions(lineupId: Long): LiveData<List<PlayerWithPosition>>
 
-    fun observePlayersNumberOverlay(lineupID: Long): LiveData<List<PlayerNumberOverlay>>
-    fun getPlayersNumberOverlay(lineupID: Long): Single<List<PlayerNumberOverlay>>
+    fun observePlayersNumberOverlay(lineupId: Long): LiveData<List<PlayerNumberOverlay>>
+    fun getPlayersNumberOverlay(lineupId: Long): Single<List<PlayerNumberOverlay>>
     fun deletePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
     fun updatePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
     fun updatePlayerNumberOverlay(overlay: PlayerNumberOverlay): Completable
     fun createPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
     fun createPlayerNumberOverlay(overlay: PlayerNumberOverlay): Completable
-    fun getShirtNumberFromPlayers(teamID: Long, number: Int): Single<List<ShirtNumberEntry>>
-    fun getShirtNumberFromNumberOverlays(teamID: Long, number: Int): Single<List<ShirtNumberEntry>>
-    fun getShirtNumberOverlay(playerID: Long, lineupID: Long): Single<PlayerNumberOverlay>
+    fun getShirtNumberFromPlayers(teamId: Long, number: Int): Single<List<ShirtNumberEntry>>
+    fun getShirtNumberFromNumberOverlays(teamId: Long, number: Int): Single<List<ShirtNumberEntry>>
+    fun getShirtNumberOverlay(playerId: Long, lineupId: Long): Single<PlayerNumberOverlay>
     fun getPlayerNumberOverlayByHash(hash: String): Single<PlayerNumberOverlay>
 }

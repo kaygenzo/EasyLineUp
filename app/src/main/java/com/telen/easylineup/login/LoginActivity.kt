@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.login
 
 import android.app.Activity
@@ -8,7 +12,6 @@ import com.telen.easylineup.databinding.ActivityLoginBinding
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 
 class LoginActivity : BaseImportActivity() {
-
     private var binding: ActivityLoginBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

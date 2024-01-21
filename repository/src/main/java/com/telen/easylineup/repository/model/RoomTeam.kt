@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.repository.model
 
 import androidx.room.ColumnInfo
@@ -6,20 +10,27 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.telen.easylineup.domain.model.Team
 import java.io.Serializable
-import java.util.*
+import java.util.UUID
 
+/**
+ * @property id
+ * @property name
+ * @property image
+ * @property type
+ * @property main
+ * @property hash
+ */
 @Entity(
-        tableName = "teams",
-        indices = [Index(value = ["name"])]
+    tableName = "teams",
+    indices = [Index(value = ["name"])]
 )
 internal data class RoomTeam(
-        @PrimaryKey(autoGenerate = true) var id: Long = 0,
-        @ColumnInfo(name = "name") var name: String = "",
-        @ColumnInfo(name = "image") var image: String? = null,
-        @ColumnInfo(name = "type") var type: Int = 0,
-        @ColumnInfo(name = "main") var main: Boolean = false,
-        @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()): Serializable {
-
+    @PrimaryKey(autoGenerate = true) var id: Long = 0,
+    @ColumnInfo(name = "name") var name: String = "",
+    @ColumnInfo(name = "image") var image: String? = null,
+    @ColumnInfo(name = "type") var type: Int = 0,
+    @ColumnInfo(name = "main") var main: Boolean = false,
+    @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()) : Serializable {
     override fun toString(): String {
         val builder = StringBuffer().apply {
             append("Team {")
@@ -35,16 +46,30 @@ internal data class RoomTeam(
     }
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (this === other) {
+            return true
+        }
+        if (javaClass != other?.javaClass) {
+            return false
+        }
 
         other as RoomTeam
 
-        if (id != other.id) return false
-        if (name != other.name) return false
-        if (image != other.image) return false
-        if (type != other.type) return false
-        if (main != other.main) return false
+        if (id != other.id) {
+            return false
+        }
+        if (name != other.name) {
+            return false
+        }
+        if (image != other.image) {
+            return false
+        }
+        if (type != other.type) {
+            return false
+        }
+        if (main != other.main) {
+            return false
+        }
 
         return true
     }

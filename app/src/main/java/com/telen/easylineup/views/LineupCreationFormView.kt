@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -36,29 +40,15 @@ interface OnActionButtonListener {
 }
 
 class LineupCreationFormView : ConstraintLayout {
-
     private val tournaments: MutableList<Tournament> = mutableListOf()
     private val tournamentsNames: MutableList<String> = mutableListOf()
     private val tournamentAdapter: ArrayAdapter<String>
-
     private var actionClickListener: OnActionButtonListener? = null
-
     val binding: DialogCreateLineupBinding =
         DialogCreateLineupBinding.inflate(LayoutInflater.from(context), this, true)
-
     private var fragmentManager: FragmentManager? = null
     private var lineupStartTime: Long = System.currentTimeMillis()
     private var selectedTournament: Tournament? = null
-
-    constructor(context: Context) : super(context)
-
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    )
 
     init {
         with(binding) {
@@ -70,17 +60,17 @@ class LineupCreationFormView : ConstraintLayout {
             }
 
             tournamentAdapter =
-                ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
+                    ArrayAdapter(context, R.layout.item_auto_completion, tournamentsNames)
             tournamentChoiceAutoComplete.setAdapter(tournamentAdapter)
             tournamentChoiceAutoComplete.onItemClickListener =
-                AdapterView.OnItemClickListener { _, _, position, _ ->
-                    tournaments[position].let {
-                        selectedTournament = it
-                        actionClickListener?.onTournamentSelected(it)
-                        setTournamentNameError("")
+                    AdapterView.OnItemClickListener { _, _, position, _ ->
+                        tournaments[position].let {
+                            selectedTournament = it
+                            actionClickListener?.onTournamentSelected(it)
+                            setTournamentNameError("")
+                        }
+                        updateLineupTime()
                     }
-                    updateLineupTime()
-                }
 
             dateSummary.setOnClickListener {
                 selectedTournament?.let {
@@ -108,24 +98,35 @@ class LineupCreationFormView : ConstraintLayout {
 
             lineupExtraHittersSpinner.setSelection(0)
             lineupExtraHittersSpinner.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onNothingSelected(p0: AdapterView<*>?) {}
+                    object : AdapterView.OnItemSelectedListener {
+                        override fun onNothingSelected(adapter: AdapterView<*>?) {}
 
-                    override fun onItemSelected(
-                        p0: AdapterView<*>?,
-                        p1: View?,
-                        position: Int,
-                        id: Long
-                    ) {
-                        val value = resources.getIntArray(R.array.extra_hitters_values)[position]
-                        actionClickListener?.onExtraHittersChanged(value)
+                        override fun onItemSelected(
+                            adapter: AdapterView<*>?,
+                            view: View?,
+                            position: Int,
+                            id: Long
+                        ) {
+                            val value =
+                                resources.getIntArray(R.array.extra_hitters_values)[position]
+                            actionClickListener?.onExtraHittersChanged(value)
+                        }
                     }
-                }
             createTournament.setOnClickListener {
                 actionClickListener?.onCreateTournamentClicked()
             }
         }
     }
+
+    constructor(context: Context) : super(context)
+
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     private fun updateLineupTime() {
         selectedTournament?.let {
@@ -189,7 +190,7 @@ class LineupCreationFormView : ConstraintLayout {
         binding.lineupStrategySpinner.apply {
             adapter = strategyAdapter
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(p0: AdapterView<*>?) {}
+                override fun onNothingSelected(adapter: AdapterView<*>?) {}
 
                 override fun onItemSelected(
                     parent: AdapterView<*>?,

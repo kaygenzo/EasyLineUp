@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.verify
@@ -18,16 +22,16 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveCurrentTeamTests {
-
+    private var teams: MutableList<Team> = mutableListOf()
+    val observer: TestObserver<SaveCurrentTeam.ResponseValue> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
-    lateinit var mSaveCurrentTeam: SaveCurrentTeam
+    lateinit var saveCurrentTeam: SaveCurrentTeam
     lateinit var newTeam: Team
-    private var teams = mutableListOf<Team>()
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        mSaveCurrentTeam = SaveCurrentTeam(teamDao)
+        saveCurrentTeam = SaveCurrentTeam(teamDao)
 
         newTeam = Team(1, "toto", null, 0, true)
         teams.add(newTeam)
@@ -40,8 +44,7 @@ internal class SaveCurrentTeamTests {
 
     @Test
     fun shouldChangeOfMainTeam() {
-        val observer = TestObserver<SaveCurrentTeam.ResponseValue>()
-        mSaveCurrentTeam.executeUseCase(SaveCurrentTeam.RequestValues(newTeam)).subscribe(observer)
+        saveCurrentTeam.executeUseCase(SaveCurrentTeam.RequestValues(newTeam)).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(teamDao).updateTeams(com.nhaarman.mockitokotlin2.check {

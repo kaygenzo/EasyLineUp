@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.tournaments.list
 
 import android.view.LayoutInflater
@@ -6,21 +10,21 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.ItemAdapterLineupBinding
+import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+/**
+ * @property teamType
+ */
 class LineupsAdapter(
     private val lineups: List<Lineup>,
     private val itemClickedListener: OnTournamentItemListener?,
     var teamType: TeamType = TeamType.BASEBALL
 ) : RecyclerView.Adapter<LineupsAdapter.LineupsViewHolder>() {
-
-    data class LineupsViewHolder(val view: ItemAdapterLineupBinding) :
-        RecyclerView.ViewHolder(view.root)
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LineupsViewHolder {
         val binding =
             ItemAdapterLineupBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -58,16 +62,13 @@ class LineupsAdapter(
                 lineup.extraHitters.takeIf { it > 0 }?.let {
                     visibility = View.VISIBLE
                     text = when (it) {
-                        in 0..4 -> {
+                        in 0..Constants.MAX_EXTRA_HITTERS_BEFORE_UNLIMITED ->
                             context.getString(R.string.lineup_list_extra_hitters, it.toString())
-                        }
 
-                        else -> {
-                            context.getString(
-                                R.string.lineup_list_extra_hitters,
-                                context.getString(R.string.generic_infinite)
-                            )
-                        }
+                        else -> context.getString(
+                            R.string.lineup_list_extra_hitters,
+                            context.getString(R.string.generic_infinite)
+                        )
                     }
                 } ?: run {
                     visibility = View.GONE
@@ -80,4 +81,9 @@ class LineupsAdapter(
             }
         }
     }
+    /**
+     * @property view
+     */
+    data class LineupsViewHolder(val view: ItemAdapterLineupBinding) :
+        RecyclerView.ViewHolder(view.root)
 }

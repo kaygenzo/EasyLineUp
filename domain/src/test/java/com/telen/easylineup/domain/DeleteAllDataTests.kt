@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.Team
@@ -17,21 +21,19 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
-
 @RunWith(MockitoJUnitRunner::class)
 internal class DeleteAllDataTests {
-
+    private val tournaments: MutableList<Tournament> = mutableListOf()
+    private val teams: MutableList<Team> = mutableListOf()
+    private val observer: TestObserver<DeleteAllData.ResponseValue> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     @Mock lateinit var tournamentDao: TournamentRepository
-    lateinit var mDeleteAllData: DeleteAllData
-
-    private val tournaments = mutableListOf<Tournament>()
-    private val teams = mutableListOf<Team>()
+    lateinit var deleteAllData: DeleteAllData
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        mDeleteAllData = DeleteAllData(teamDao, tournamentDao)
+        deleteAllData = DeleteAllData(teamDao, tournamentDao)
 
         tournaments.add(Tournament(1, "t1", 1L, 2L, 3L, null))
         tournaments.add(Tournament(2, "t2", 2L, 3L, 4L, null))
@@ -49,8 +51,7 @@ internal class DeleteAllDataTests {
     @Test
     fun shouldTriggerAnExceptionIfCannotGetTournaments() {
         Mockito.`when`(tournamentDao.getTournaments()).thenReturn(Single.error(Exception()))
-        val observer = TestObserver<DeleteAllData.ResponseValue>()
-        mDeleteAllData.executeUseCase(DeleteAllData.RequestValues()).subscribe(observer)
+        deleteAllData.executeUseCase(DeleteAllData.RequestValues()).subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
     }
@@ -58,8 +59,7 @@ internal class DeleteAllDataTests {
     @Test
     fun shouldTriggerAnExceptionIfCannotDeleteTournaments() {
         Mockito.`when`(tournamentDao.deleteTournaments(tournaments)).thenReturn(Completable.error(Exception()))
-        val observer = TestObserver<DeleteAllData.ResponseValue>()
-        mDeleteAllData.executeUseCase(DeleteAllData.RequestValues()).subscribe(observer)
+        deleteAllData.executeUseCase(DeleteAllData.RequestValues()).subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
     }
@@ -67,8 +67,7 @@ internal class DeleteAllDataTests {
     @Test
     fun shouldTriggerAnExceptionIfCannotGetTeams() {
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.error(Exception()))
-        val observer = TestObserver<DeleteAllData.ResponseValue>()
-        mDeleteAllData.executeUseCase(DeleteAllData.RequestValues()).subscribe(observer)
+        deleteAllData.executeUseCase(DeleteAllData.RequestValues()).subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
     }
@@ -76,16 +75,14 @@ internal class DeleteAllDataTests {
     @Test
     fun shouldTriggerAnExceptionIfCannotDeleteTeams() {
         Mockito.`when`(teamDao.deleteTeams(teams)).thenReturn(Completable.error(Exception()))
-        val observer = TestObserver<DeleteAllData.ResponseValue>()
-        mDeleteAllData.executeUseCase(DeleteAllData.RequestValues()).subscribe(observer)
+        deleteAllData.executeUseCase(DeleteAllData.RequestValues()).subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
     }
 
     @Test
     fun shouldSuccessfullyDeleteAllData() {
-        val observer = TestObserver<DeleteAllData.ResponseValue>()
-        mDeleteAllData.executeUseCase(DeleteAllData.RequestValues()).subscribe(observer)
+        deleteAllData.executeUseCase(DeleteAllData.RequestValues()).subscribe(observer)
         observer.await()
         observer.assertComplete()
     }

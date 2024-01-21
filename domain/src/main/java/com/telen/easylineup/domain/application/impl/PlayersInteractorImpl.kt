@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.application.impl
 
 import android.net.Uri
@@ -5,9 +9,21 @@ import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.application.PlayersInteractor
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.DomainErrors
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerNumberOverlay
+import com.telen.easylineup.domain.model.RosterItem
+import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.repository.PlayerRepository
-import com.telen.easylineup.domain.usecases.*
+import com.telen.easylineup.domain.usecases.DeletePlayer
+import com.telen.easylineup.domain.usecases.GetPlayer
+import com.telen.easylineup.domain.usecases.GetPlayers
+import com.telen.easylineup.domain.usecases.GetPositionsSummaryForPlayer
+import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
+import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.SavePlayer
+import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
 import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
@@ -20,7 +36,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
-
     private val playersRepo: PlayerRepository by inject()
     private val getPlayer: GetPlayer by inject()
     private val deletePlayer: DeletePlayer by inject()
@@ -31,25 +46,24 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
     private val savePlayerNumberOverlay: SavePlayerNumberOverlay by inject()
     private val getShirtNumberHistory: GetShirtNumberHistory by inject()
     private val validatorUtils: ValidatorUtils by inject()
-
     private val errors: PublishSubject<DomainErrors.Players> = PublishSubject.create()
 
     override fun insertPlayers(players: List<Player>): Completable {
         return playersRepo.insertPlayers(players)
     }
 
-    override fun getPlayer(playerID: Long): LiveData<Player> {
-        return playersRepo.getPlayerById(playerID)
+    override fun getPlayer(playerId: Long): LiveData<Player> {
+        return playersRepo.getPlayerById(playerId)
     }
 
-    override fun getPlayerPositionsSummary(playerID: Long?): Single<Map<FieldPosition, Int>> {
-        val request = GetPositionsSummaryForPlayer.RequestValues(playerID)
+    override fun getPlayerPositionsSummary(playerId: Long?): Single<Map<FieldPosition, Int>> {
+        val request = GetPositionsSummaryForPlayer.RequestValues(playerId)
         return UseCaseHandler.execute(getPlayerPositionsSummary, request)
             .map { it.summary }
     }
 
     override fun savePlayer(
-        playerID: Long?,
+        playerId: Long?,
         name: String?,
         shirtNumber: Int?,
         licenseNumber: Long?,
@@ -66,7 +80,7 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
             .flatMapCompletable {
                 val req = SavePlayer.RequestValues(
                     validatorUtils,
-                    playerID ?: 0,
+                    playerId ?: 0,
                     it.id,
                     name,
                     shirtNumber,
@@ -93,8 +107,8 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
             }
     }
 
-    override fun deletePlayer(playerID: Long?): Completable {
-        return UseCaseHandler.execute(getPlayer, GetPlayer.RequestValues(playerID))
+    override fun deletePlayer(playerId: Long?): Completable {
+        return UseCaseHandler.execute(getPlayer, GetPlayer.RequestValues(playerId))
             .map { it.player }
             .flatMap { player ->
                 UseCaseHandler.execute(deletePlayer, DeletePlayer.RequestValues(player))
@@ -111,8 +125,8 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
             .map { it.players }
     }
 
-    override fun observePlayers(teamID: Long): LiveData<List<Player>> {
-        return playersRepo.observePlayers(teamID)
+    override fun observePlayers(teamId: Long): LiveData<List<Player>> {
+        return playersRepo.observePlayers(teamId)
     }
 
     override fun saveOrUpdatePlayerNumberOverlays(overlays: List<RosterItem>): Completable {
@@ -151,8 +165,8 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
         }
     }
 
-    override fun observePlayerNumberOverlays(lineupID: Long): LiveData<List<PlayerNumberOverlay>> {
-        return playersRepo.observePlayersNumberOverlay(lineupID)
+    override fun observePlayerNumberOverlays(lineupId: Long): LiveData<List<PlayerNumberOverlay>> {
+        return playersRepo.observePlayersNumberOverlay(lineupId)
     }
 
     override fun observeErrors(): Subject<DomainErrors.Players> {

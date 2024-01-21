@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -10,9 +14,13 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.databinding.ItemRosterEntryBinding
 
 class RosterEntryView : ConstraintLayout, TextWatcher {
-
     private var watcherListener: TextWatcher? = null
     private val binding = ItemRosterEntryBinding.inflate(LayoutInflater.from(context), this, true)
+
+    init {
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        binding.rosterShirtNumberTextField.addTextChangedListener(this)
+    }
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -21,11 +29,6 @@ class RosterEntryView : ConstraintLayout, TextWatcher {
         attrs,
         defStyleAttr
     )
-
-    init {
-        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-        binding.rosterShirtNumberTextField.addTextChangedListener(this)
-    }
 
     fun setPlayerName(name: String) {
         binding.rosterPlayerName.text = name
@@ -39,16 +42,16 @@ class RosterEntryView : ConstraintLayout, TextWatcher {
         watcherListener = watcher
     }
 
-    override fun afterTextChanged(p0: Editable?) {
-        watcherListener?.afterTextChanged(p0)
+    override fun afterTextChanged(text: Editable?) {
+        watcherListener?.afterTextChanged(text)
     }
 
-    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-        watcherListener?.beforeTextChanged(p0, p1, p2, p3)
+    override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {
+        watcherListener?.beforeTextChanged(text, start, count, after)
     }
 
-    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-        watcherListener?.onTextChanged(p0, p1, p2, p3)
+    override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {
+        watcherListener?.onTextChanged(text, start, before, count)
     }
 
     fun setSelectedStateListener(listener: CompoundButton.OnCheckedChangeListener?) {

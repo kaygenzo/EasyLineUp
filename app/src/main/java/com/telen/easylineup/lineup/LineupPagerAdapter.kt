@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.lineup
 
 import android.os.Bundle
@@ -15,16 +19,14 @@ const val FRAGMENT_ATTACK_INDEX = 1
 
 class LineupPagerAdapter(fragment: Fragment, private val editable: Boolean) :
     FragmentStateAdapter(fragment) {
-
     val map: MutableMap<Int, View> = mutableMapOf()
 
     override fun createFragment(position: Int): Fragment {
         val result = when (position) {
-            FRAGMENT_DEFENSE_INDEX -> {
-                if (editable)
-                    DefenseFragmentEditable()
-                else
-                    DefenseFragmentFixed()
+            FRAGMENT_DEFENSE_INDEX -> if (editable) {
+                DefenseFragmentEditable()
+            } else {
+                DefenseFragmentFixed()
             }
 
             FRAGMENT_ATTACK_INDEX -> {

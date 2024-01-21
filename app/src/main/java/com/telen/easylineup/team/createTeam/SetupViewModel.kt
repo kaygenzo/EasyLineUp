@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.team.createTeam
 
 import android.net.Uri
@@ -18,14 +22,8 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 class SetupViewModel : ViewModel(), KoinComponent {
-
-    enum class StepError {
-        NAME_EMPTY,
-    }
-
     private val domain: ApplicationInteractor by inject()
-    private val _team = MutableLiveData<Team>()
-
+    private val _team: MutableLiveData<Team> = MutableLiveData()
     private var currentTeam = Team(0, "", null, TeamType.UNKNOWN.id, true)
     var errors: Subject<StepError> = PublishSubject.create()
 
@@ -71,29 +69,27 @@ class SetupViewModel : ViewModel(), KoinComponent {
     fun getTeamTypeCardItems(): List<TeamTypeCardItem> {
         return TeamType.values().mapNotNull { type ->
             when (type) {
-                TeamType.BASEBALL -> {
-                    TeamTypeCardItem(
-                        type.id, type.title, R.drawable.image_baseball_ball_with_stroke,
-                        R.drawable.image_baseball_ball, type.sportResId
-                    )
-                }
-                TeamType.SOFTBALL -> {
-                    TeamTypeCardItem(
-                        type.id, type.title, R.drawable.image_softball_ball_with_stroke,
-                        R.drawable.image_softball_ball, type.sportResId
-                    )
-                }
-                TeamType.BASEBALL_5 -> {
-                    TeamTypeCardItem(
-                        type.id, type.title, R.drawable.image_baseball_ball_with_stroke,
-                        R.drawable.image_baseball_ball, type.sportResId
-                    )
-                }
+                TeamType.BASEBALL -> TeamTypeCardItem(
+                    type.id, type.title, R.drawable.image_baseball_ball_with_stroke,
+                    R.drawable.image_baseball_ball, type.sportResId
+                )
+                TeamType.SOFTBALL -> TeamTypeCardItem(
+                    type.id, type.title, R.drawable.image_softball_ball_with_stroke,
+                    R.drawable.image_softball_ball, type.sportResId
+                )
+                TeamType.BASEBALL_5 -> TeamTypeCardItem(
+                    type.id, type.title, R.drawable.image_baseball_ball_with_stroke,
+                    R.drawable.image_baseball_ball, type.sportResId
+                )
                 else -> {
                     Timber.e("Unknown team type $type")
                     null
                 }
             }
         }
+    }
+
+    enum class StepError {
+        NAME_EMPTY,
     }
 }

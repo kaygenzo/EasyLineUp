@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.dashboard
 
 import androidx.appcompat.view.ActionMode
@@ -12,10 +16,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class DashboardViewModel : ViewModel(), KoinComponent {
-
     private val domain: ApplicationInteractor by inject()
     private val prefsHelper: SharedPreferencesHelper by inject()
-
     var actionMode: ActionMode? = null
 
     fun registerTilesLiveData() = domain.teams().observeTeams().switchMap {

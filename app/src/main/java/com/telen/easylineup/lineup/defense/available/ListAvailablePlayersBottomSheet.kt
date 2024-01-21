@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.lineup.defense.available
 
 import android.os.Bundle
@@ -13,10 +17,8 @@ import com.telen.easylineup.views.OnPlayerClickListener
 class ListAvailablePlayersBottomSheet(
     private var playerClickListener: OnPlayerClickListener? = null
 ) : BottomSheetDialogFragment() {
-
     private var binder: FragmentDefenseAvailablePlayersBinding? = null
-
-    private val players = mutableListOf<Player>()
+    private val players: MutableList<Player> = mutableListOf()
     private var position: FieldPosition? = null
 
     override fun onCreateView(

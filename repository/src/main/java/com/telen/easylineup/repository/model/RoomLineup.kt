@@ -1,9 +1,32 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.repository.model
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.telen.easylineup.domain.model.Lineup
-import java.util.*
+import java.util.Calendar
+import java.util.UUID
 
+/**
+ * @property id
+ * @property name
+ * @property teamId
+ * @property tournamentId
+ * @property mode
+ * @property strategy
+ * @property extraHitters
+ * @property eventTimeInMillis
+ * @property createdTimeInMillis
+ * @property editedTimeInMillis
+ * @property roster
+ * @property hash
+ */
 @Entity(
     tableName = "lineups",
     indices = [Index(value = ["name", "teamID", "tournamentID"])],

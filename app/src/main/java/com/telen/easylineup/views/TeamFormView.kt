@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.annotation.SuppressLint
@@ -34,6 +38,13 @@ interface TeamFormListener {
     fun onImagePickerRequested()
 }
 
+/**
+ * @property type
+ * @property title
+ * @property ballResourceId
+ * @property compatBallResourceId
+ * @property representationId
+ */
 data class TeamTypeCardItem(
     val type: Int,
     @StringRes val title: Int,
@@ -43,25 +54,12 @@ data class TeamTypeCardItem(
 )
 
 class TeamFormView : ConstraintLayout, TextWatcher {
-
     private var listener: TeamFormListener? = null
     private var imageUri: Uri? = null
-
     val binding: ViewCreateTeamBinding =
         ViewCreateTeamBinding.inflate(LayoutInflater.from(context), this, true)
-
-    private val teamTypeList = mutableListOf<TeamTypeCardItem>()
+    private val teamTypeList: MutableList<TeamTypeCardItem> = mutableListOf()
     private val teamTypeAdapter = CardPagerAdapter(teamTypeList)
-
-    constructor(context: Context) : super(context)
-
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    )
 
     init {
         Picasso.get().load(R.drawable.ic_unknown_team)
@@ -102,6 +100,16 @@ class TeamFormView : ConstraintLayout, TextWatcher {
             setPageTransformer(TeamTypePageTransformer())
         }
     }
+
+    constructor(context: Context) : super(context)
+
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     @SuppressLint("NotifyDataSetChanged")
     fun setTeamTypes(types: List<TeamTypeCardItem>) {
@@ -159,10 +167,9 @@ class TeamFormView : ConstraintLayout, TextWatcher {
                             Timber.e("Successfully loaded image")
                         }
 
-                        override fun onError(e: Exception?) {
-                            Timber.e(e)
+                        override fun onError(ex: Exception?) {
+                            Timber.e(ex)
                         }
-
                     })
             } catch (e: IllegalArgumentException) {
                 Timber.e(e)
@@ -190,50 +197,17 @@ class TeamFormView : ConstraintLayout, TextWatcher {
             .into(binding.teamImage)
     }
 
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+    override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {}
 
-    override fun afterTextChanged(s: Editable?) {}
+    override fun afterTextChanged(text: Editable?) {}
 
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        listener?.onNameChanged(s.toString())
+    override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {
+        listener?.onNameChanged(text.toString())
     }
 }
 
-private class CardPagerAdapter(private val mData: MutableList<TeamTypeCardItem>) :
+private class CardPagerAdapter(private val data: MutableList<TeamTypeCardItem>) :
     RecyclerView.Adapter<CardPagerAdapter.CardViewHolder>() {
-
-    data class CardViewHolder(private val view: TeamTypeCarouselItemBinding) :
-        RecyclerView.ViewHolder(view.root) {
-        fun bind(item: TeamTypeCardItem) {
-            view.teamTypeRepresentation.drawn {
-                view.teamTypeRepresentation.apply {
-                    when (item.type) {
-                        TeamType.BASEBALL.id -> {
-                            Picasso.get().load(TeamType.BASEBALL.sportResId)
-                                .resize(width, height)
-                                .centerCrop()
-                                .into(view.teamTypeRepresentation)
-                        }
-
-                        TeamType.SOFTBALL.id -> {
-                            Picasso.get().load(TeamType.SOFTBALL.sportResId)
-                                .resize(width, height)
-                                .centerCrop()
-                                .into(view.teamTypeRepresentation)
-                        }
-
-                        TeamType.BASEBALL_5.id -> {
-                            Picasso.get().load(TeamType.BASEBALL_5.sportResId)
-                                .resize(width, height)
-                                .centerCrop()
-                                .into(view.teamTypeRepresentation)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
             TeamTypeCarouselItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -241,16 +215,41 @@ private class CardPagerAdapter(private val mData: MutableList<TeamTypeCardItem>)
     }
 
     override fun getItemCount(): Int {
-        return mData.size
+        return data.size
     }
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
-        holder.bind(mData[position])
+        holder.bind(data[position])
+    }
+
+    data class CardViewHolder(private val view: TeamTypeCarouselItemBinding) :
+        RecyclerView.ViewHolder(view.root) {
+        fun bind(item: TeamTypeCardItem) {
+            view.teamTypeRepresentation.drawn {
+                view.teamTypeRepresentation.apply {
+                    when (item.type) {
+                        TeamType.BASEBALL.id -> Picasso.get().load(TeamType.BASEBALL.sportResId)
+                            .resize(width, height)
+                            .centerCrop()
+                            .into(view.teamTypeRepresentation)
+
+                        TeamType.SOFTBALL.id -> Picasso.get().load(TeamType.SOFTBALL.sportResId)
+                            .resize(width, height)
+                            .centerCrop()
+                            .into(view.teamTypeRepresentation)
+
+                        TeamType.BASEBALL_5.id -> Picasso.get().load(TeamType.BASEBALL_5.sportResId)
+                            .resize(width, height)
+                            .centerCrop()
+                            .into(view.teamTypeRepresentation)
+                    }
+                }
+            }
+        }
     }
 }
 
 private class TeamTypePageTransformer : ViewPager2.PageTransformer {
-
     override fun transformPage(view: View, position: Float) {
         view.translationX = 0f
         view.scaleY = 1 - (0.25f * abs(position))

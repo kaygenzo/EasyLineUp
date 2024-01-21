@@ -1,9 +1,14 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.tournaments.list
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
+
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.telen.easylineup.domain.Constants
@@ -22,36 +27,37 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.Subject
-import kotlinx.coroutines.flow.MutableSharedFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 
+import kotlinx.coroutines.flow.MutableSharedFlow
+
 sealed class SaveResult
+
+/**
+ * @property lineup
+ */
 data class SaveSuccess(val lineup: Lineup) : SaveResult()
 
 class LineupViewModel : ViewModel(), KoinComponent {
-
     private val domain: ApplicationInteractor by inject()
     private val prefsHelper by inject<SharedPreferencesHelper>()
-
-    private val _categorizedLineupsLiveData = MutableLiveData<List<TournamentItem>>()
-    private val tournamentItems = mutableListOf<TournamentItem>()
-
+    private val _categorizedLineupsLiveData: MutableLiveData<List<TournamentItem>> =
+        MutableLiveData()
+    private val tournamentItems: MutableList<TournamentItem> = mutableListOf()
     private val filterLiveData: MutableLiveData<String> by lazy {
         MutableLiveData("")
     }
     private var chosenRoster: TeamRosterSummary =
         TeamRosterSummary(Constants.STATUS_ALL, mutableListOf())
-
-    private val saveResult = MutableLiveData<SaveResult>()
-
+    private val saveResult: MutableLiveData<SaveResult> = MutableLiveData()
     private val disposables = CompositeDisposable()
     private var tournament: Tournament? = null
     private val lineup = Lineup()
-
     private val remoteConfig = Firebase.remoteConfig
-    val mapsFlow = MutableSharedFlow<Pair<Tournament, MapInfo>>(extraBufferCapacity = 1, replay = 1)
+    val mapsFlow: MutableSharedFlow<Pair<Tournament, MapInfo>> =
+        MutableSharedFlow(extraBufferCapacity = 1, replay = 1)
 
     fun setFilter(filter: String) {
         filterLiveData.value = filter
@@ -90,7 +96,12 @@ class LineupViewModel : ViewModel(), KoinComponent {
         val items = tournamentItems.filter { it.tournament.address != null }
         val disposable = Observable.fromIterable(items)
             .flatMapSingle { item ->
-                domain.tournaments().getTournamentMapInfo(item.tournament, apiKey, 500, 500)
+                domain.tournaments().getTournamentMapInfo(
+                    item.tournament,
+                    apiKey,
+                    Constants.MAP_PIXEL_SIZE,
+                    Constants.MAP_PIXEL_SIZE
+                )
                     .map { Pair(item.tournament, it) }
                     .onErrorResumeNext { Single.just(Pair(item.tournament, MapInfo())) }
             }

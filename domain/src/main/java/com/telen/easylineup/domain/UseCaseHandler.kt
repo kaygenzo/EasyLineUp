@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import io.reactivex.rxjava3.core.Scheduler
@@ -7,7 +11,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 internal object UseCaseHandler : KoinComponent {
-
     private val mainThreadScheduler: Scheduler by inject()
 
     fun <T : UseCase.RequestValues, R : UseCase.ResponseValue> execute(

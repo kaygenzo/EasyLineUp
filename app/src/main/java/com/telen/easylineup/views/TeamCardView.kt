@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -22,11 +26,8 @@ import com.telen.easylineup.utils.drawn
 import timber.log.Timber
 
 class TeamCardView : ConstraintLayout {
-
     private var behavior: BottomSheetBehavior<ConstraintLayout>? = null
-
     private val binding = ItemCardTeamTypeBinding.inflate(LayoutInflater.from(context), this, true)
-
     private val blockedBottomSheetBehaviour = object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onSlide(bottomSheet: View, slideOffset: Float) {}
 
@@ -36,14 +37,6 @@ class TeamCardView : ConstraintLayout {
             }
         }
     }
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    )
 
     init {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -60,10 +53,18 @@ class TeamCardView : ConstraintLayout {
             val textSize = binding.teamTypeTitle.height
             val margin = resources.getDimensionPixelSize(R.dimen.default_margin)
             val peekHeight = imageRadius + textSize + margin
-            Timber.d("peekHeight=${peekHeight}")
+            Timber.d("peekHeight=$peekHeight")
             behavior?.peekHeight = peekHeight
         }
     }
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     fun setDragEnabled(enabled: Boolean) {
         if (!enabled) {
@@ -149,13 +150,12 @@ class TeamCardView : ConstraintLayout {
                             Timber.d("Successfully loaded image")
                         }
 
-                        override fun onError(e: Exception?) {
-                            Timber.e(e)
+                        override fun onError(ex: Exception?) {
+                            Timber.e(ex)
                         }
-
                     })
-            } catch (e: IllegalArgumentException) {
-                Timber.e(e)
+            } catch (ex: IllegalArgumentException) {
+                Timber.e(ex)
             }
         }
     }

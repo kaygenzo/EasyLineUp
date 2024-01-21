@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.lineup.attack
 
 import android.annotation.SuppressLint
@@ -13,7 +17,7 @@ import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.views.LineupTypeface
 import timber.log.Timber
-import java.util.*
+import java.util.Collections
 
 interface OnItemTouchedListener {
     fun onMoved(fromPosition: Int, toPosition: Int)
@@ -26,6 +30,12 @@ interface BatterListener {
     fun onBattersChanged(batters: List<BatterState>)
 }
 
+/**
+ * @property players
+ * @property lineupTypeface
+ * @property lineupMode
+ * @property itemTouchHelper
+ */
 class BattingOrderAdapter(
     val players: MutableList<BatterState>,
     private val batterListener: BatterListener,
@@ -33,7 +43,6 @@ class BattingOrderAdapter(
     var lineupMode: Int = MODE_DISABLED,
     var itemTouchHelper: ItemTouchHelper? = null
 ) : RecyclerView.Adapter<BattingOrderAdapter.BatterViewHolder>(), OnItemTouchedListener {
-
     override fun onDragStart() {}
     override fun onSwiped(position: Int) {}
     override fun onIdle() {}
@@ -47,8 +56,7 @@ class BattingOrderAdapter(
 
         Timber.d("Adapter: canMove from=${fromBatter.canMove} canMoveTo=${toBatter.canMove}")
         if (fromBatter.canMove && toBatter.canMove) {
-
-            //we simply just swap orders
+            // we simply just swap orders
 
             val fromOrder = fromBatter.playerOrder
             val toOrder = toBatter.playerOrder
@@ -76,9 +84,6 @@ class BattingOrderAdapter(
         }
     }
 
-    class BatterViewHolder(val binding: ItemPlayerAttackBinding) :
-        RecyclerView.ViewHolder(binding.root)
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BatterViewHolder {
         val binding =
             ItemPlayerAttackBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -90,7 +95,7 @@ class BattingOrderAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return players[position].playerID
+        return players[position].playerId
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -156,4 +161,10 @@ class BattingOrderAdapter(
             }
         }
     }
+
+    /**
+     * @property binding
+     */
+    class BatterViewHolder(val binding: ItemPlayerAttackBinding) :
+        RecyclerView.ViewHolder(binding.root)
 }

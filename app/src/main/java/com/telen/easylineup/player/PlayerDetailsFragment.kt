@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.player
 
 import android.os.Bundle
@@ -22,8 +26,7 @@ import timber.log.Timber
 const val EMPTY_MARKER = "-"
 
 class PlayerDetailsFragment : BaseFragment("PlayerDetailsFragment"),
-    AdapterView.OnItemSelectedListener {
-
+AdapterView.OnItemSelectedListener {
     private val viewModel by viewModels<PlayerViewModel>()
     private var binding: FragmentPlayerDetailsBinding? = null
 
@@ -34,8 +37,8 @@ class PlayerDetailsFragment : BaseFragment("PlayerDetailsFragment"),
     ): View {
         return FragmentPlayerDetailsBinding.inflate(inflater, container, false).apply {
             binding = this
-            val playerID = arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
-            viewModel.playerID = playerID
+            val playerId = arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
+            viewModel.playerId = playerId
 
             viewModel.observePlayerName().observe(viewLifecycleOwner) {
                 playerName.text = it.trim()
@@ -119,7 +122,8 @@ class PlayerDetailsFragment : BaseFragment("PlayerDetailsFragment"),
                 when (sex) {
                     Sex.MALE -> sexSymbol.setImageResource(R.drawable.ic_male_black)
                     Sex.FEMALE -> sexSymbol.setImageResource(R.drawable.ic_female_black)
-                    else -> { /* sex is not defined for this player */
+                    else -> {
+                        /* sex is not defined for this player */
                     }
                 }
             }
@@ -132,8 +136,8 @@ class PlayerDetailsFragment : BaseFragment("PlayerDetailsFragment"),
         binding = null
     }
 
-    override fun onNothingSelected(p0: AdapterView<*>?) {}
-    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
+    override fun onNothingSelected(adapter: AdapterView<*>?) {}
+    override fun onItemSelected(adapter: AdapterView<*>?, view: View?, position: Int, row: Long) {
         FirebaseAnalyticsUtils.onClick(activity, "click_player_details_strategy_selected")
         viewModel.onStrategySelected(position)
     }

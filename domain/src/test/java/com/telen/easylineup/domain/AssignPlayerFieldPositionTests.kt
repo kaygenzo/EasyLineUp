@@ -1,6 +1,21 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.MODE_DISABLED
+import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.isPitcher
+import com.telen.easylineup.domain.model.isShortStop
+import com.telen.easylineup.domain.model.reset
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
@@ -60,13 +75,11 @@ internal abstract class AssignPlayerFieldPositionTests(
     private val strategy: TeamStrategy,
     private val extraHitterSize: Int
 ) : BaseUseCaseTests() {
-
+    private var observer: TestObserver<AssignPlayerFieldPosition.ResponseValue> = TestObserver()
+    private val newPlayer = Player(2_000, 1, "k2000", 2_000, 2_000, null, 0x07)
+    private val lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitterSize)
     private lateinit var savePlayerFieldPosition: AssignPlayerFieldPosition
     private lateinit var players: MutableList<PlayerWithPosition>
-    private var observer = TestObserver<AssignPlayerFieldPosition.ResponseValue>()
-
-    private val newPlayer = Player(2000, 1, "k2000", 2000, 2000, null, 0x07)
-    private val lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitterSize)
 
     @Before
     fun init() {
@@ -93,7 +106,7 @@ internal abstract class AssignPlayerFieldPositionTests(
                 newPlayer.licenseNumber,
                 newPlayer.teamId,
                 newPlayer.image,
-                playerID = newPlayer.id,
+                playerId = newPlayer.id,
                 playerPositions = newPlayer.positions,
                 lineupId = lineup.id
             )
@@ -127,7 +140,7 @@ internal abstract class AssignPlayerFieldPositionTests(
                 Assert.assertEquals(
                     "Only one instance of new player is expected",
                     1,
-                    filter { it.playerID == newPlayer.id }.size
+                    filter { it.playerId == newPlayer.id }.size
                 )
                 // substitute is not unique, that is not true for other positions
                 if (position != FieldPosition.SUBSTITUTE) {
@@ -139,13 +152,13 @@ internal abstract class AssignPlayerFieldPositionTests(
                     Assert.assertEquals(
                         "The player at position is the new player",
                         newPlayer.id,
-                        first { it.position == position.id }.playerID
+                        first { it.position == position.id }.playerId
                     )
                 } else {
                     Assert.assertEquals(
                         "The new player is set as substitute",
                         FieldPosition.SUBSTITUTE.id,
-                        first { it.playerID == newPlayer.id }.position
+                        first { it.playerId == newPlayer.id }.position
                     )
                 }
             }
@@ -166,7 +179,7 @@ internal abstract class AssignPlayerFieldPositionTests(
         players.first { it.isShortStop() }.reset()
         startUseCase(FieldPosition.SUBSTITUTE, MODE_DISABLED)
 
-        players.first { newPlayer.id == it.playerID }.let {
+        players.first { newPlayer.id == it.playerId }.let {
             if (extraHitterSize < 1) {
                 Assert.assertEquals(200, it.order)
             } else {
@@ -181,7 +194,7 @@ internal abstract class AssignPlayerFieldPositionTests(
         for (i in (strategy.batterSize + 1)..(strategy.batterSize + extraHitterSize + 1)) {
             players.add(
                 PlayerWithPosition(
-                    "t${i}", 0, i, i.toLong(), 1L, null,
+                    "t$i", 0, i, i.toLong(), 1L, null,
                     FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, i,
                     i.toLong(), i.toLong(), 1L, i
                 )
@@ -189,13 +202,13 @@ internal abstract class AssignPlayerFieldPositionTests(
         }
 
         startUseCase(FieldPosition.SUBSTITUTE, MODE_DISABLED)
-        Assert.assertEquals(200, players.first { it.playerID == newPlayer.id }.order)
+        Assert.assertEquals(200, players.first { it.playerId == newPlayer.id }.order)
     }
 
     @Test
     fun shouldInsertInBattingOrderIfBattersCompleteAndExtraHitterAvailable() {
         startUseCase(FieldPosition.SUBSTITUTE, MODE_DISABLED)
-        players.first { newPlayer.id == it.playerID }.let {
+        players.first { newPlayer.id == it.playerId }.let {
             if (extraHitterSize < 1) {
                 Assert.assertEquals(200, it.order)
             } else {

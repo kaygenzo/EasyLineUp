@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -8,6 +12,9 @@ import com.google.android.material.textview.MaterialTextView
 import com.telen.easylineup.R
 
 class NumberedStyledTextView : MaterialTextView {
+    init {
+        setTextColor(ContextCompat.getColor(context, R.color.lineup_name))
+    }
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -16,10 +23,6 @@ class NumberedStyledTextView : MaterialTextView {
         attrs,
         defStyleAttr
     )
-
-    init {
-        setTextColor(ContextCompat.getColor(context, R.color.lineup_name))
-    }
 
     override fun setTypeface(tf: Typeface?, style: Int) {
         super.setTypeface(Typeface.createFromAsset(context.assets, "All Star Resort.ttf"))

@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup
 
 import android.app.Activity
@@ -16,14 +20,7 @@ import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.StorageUtils
 import timber.log.Timber
 
-
 abstract class BaseImportActivity : BaseActivity() {
-
-    companion object {
-
-        const val REQUEST_CREATE_TEAM = 2
-    }
-
     private val viewModel by viewModels<LoginViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,18 +35,16 @@ abstract class BaseImportActivity : BaseActivity() {
                         message = R.string.settings_import_success_message
                     )
                     dialog.setOnDismissListener {
-                        //check teams
+                        // check teams
                         viewModel.getMainTeam()
                     }
                     dialog.show()
                 }
 
-                ImportFailure -> {
-                    displayImportFailure()
-                }
+                ImportFailure -> displayImportFailure()
 
                 is GetTeamSuccess -> {
-                    //the file contains at least one main team
+                    // the file contains at least one main team
                     launchHome()
                 }
 
@@ -101,8 +96,9 @@ abstract class BaseImportActivity : BaseActivity() {
     }
 
     protected fun launchHome() {
-        val intent = Intent(this, HomeActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        val intent = Intent(this, HomeActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
         startActivity(intent)
         finish()
     }
@@ -113,5 +109,9 @@ abstract class BaseImportActivity : BaseActivity() {
             title = R.string.settings_import_error_title,
             message = R.string.settings_import_error_message
         ).show()
+    }
+
+    companion object {
+        const val REQUEST_CREATE_TEAM = 2
     }
 }

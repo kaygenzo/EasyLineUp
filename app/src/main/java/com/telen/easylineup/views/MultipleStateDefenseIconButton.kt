@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -7,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import androidx.annotation.ColorInt
-import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Callback
@@ -22,10 +25,8 @@ enum class StateDefense {
 }
 
 class MultipleStateDefenseIconButton : ConstraintLayout {
-
     private val binding =
         ViewMultipleStateDefenseIconBinding.inflate(LayoutInflater.from(context), this, true)
-
     private var state = StateDefense.LOADING
 
     constructor(context: Context) : super(context)
@@ -36,9 +37,9 @@ class MultipleStateDefenseIconButton : ConstraintLayout {
         defStyleAttr
     )
 
-    override fun setOnClickListener(l: OnClickListener?) {
-        super.setOnClickListener(l)
-        binding.fab.setOnClickListener(l)
+    override fun setOnClickListener(listener: OnClickListener?) {
+        super.setOnClickListener(listener)
+        binding.fab.setOnClickListener(listener)
     }
 
     fun getState() = state
@@ -102,10 +103,6 @@ class MultipleStateDefenseIconButton : ConstraintLayout {
         binding.designatedPlayerLabel.text = label
     }
 
-    fun setPlayerImage(url: String?, fallbackName: String, size: Int) {
-        setPlayerImage(url, fallbackName, size, Color.BLACK, 2f)
-    }
-
     fun setBorderColor(@ColorInt borderColor: Int) {
         if (borderColor == Color.RED) {
             binding.playerNameFallback.setBackgroundResource(R.drawable.circle_shape_letters_border_red)
@@ -114,19 +111,12 @@ class MultipleStateDefenseIconButton : ConstraintLayout {
         }
     }
 
-    fun setPlayerImage(@DrawableRes resId: Int, scaleType: ImageView.ScaleType) {
-        binding.playerImage.apply {
-            setImageResource(resId)
-            setScaleType(scaleType)
-        }
-    }
-
     fun setPlayerImage(
         url: String?,
         fallbackName: String,
         size: Int,
-        @ColorInt borderColor: Int,
-        borderWidth: Float
+        @ColorInt borderColor: Int = Color.BLACK,
+        borderWidth: Float = 2f
     ) {
         val nameFallback = fallbackName.toLetters()
         binding.playerNameFallback.text = nameFallback
@@ -150,17 +140,15 @@ class MultipleStateDefenseIconButton : ConstraintLayout {
                                 .build()
                         )
                         .into(binding.playerImage, object : Callback {
-
                             override fun onSuccess() {
                                 binding.playerImage.visibility = View.VISIBLE
                                 binding.playerNameFallback.visibility = View.INVISIBLE
                             }
 
-                            override fun onError(e: Exception?) {
+                            override fun onError(ex: Exception?) {
                                 binding.playerImage.visibility = View.INVISIBLE
                                 binding.playerNameFallback.visibility = View.VISIBLE
                             }
-
                         })
                 } catch (e: Exception) {
                     Timber.e(e)

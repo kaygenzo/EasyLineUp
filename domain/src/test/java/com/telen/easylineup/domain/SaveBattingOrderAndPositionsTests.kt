@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
@@ -23,21 +27,21 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
+    private val observer: TestObserver<SaveBattingOrderAndPositions.ResponseValue> = TestObserver()
+    private val lineup = Lineup(id = 1L, mode = MODE_DISABLED)
 
     @Mock
     private lateinit var playerFieldPositionRepository: PlayerFieldPositionRepository
 
     @Mock
     private lateinit var lineupRepository: LineupRepository
-    private lateinit var mSaveBattingOrder: SaveBattingOrderAndPositions
+    private lateinit var saveBattingOrder: SaveBattingOrderAndPositions
     private lateinit var players: MutableList<PlayerWithPosition>
-    private val observer = TestObserver<SaveBattingOrderAndPositions.ResponseValue>()
-    private val lineup = Lineup(id = 1L, mode = MODE_DISABLED)
 
     @Before
     fun init() {
-        mSaveBattingOrder =
-            SaveBattingOrderAndPositions(lineupRepository, playerFieldPositionRepository)
+        saveBattingOrder =
+                SaveBattingOrderAndPositions(lineupRepository, playerFieldPositionRepository)
         Mockito.`when`(lineupRepository.updateLineup(lineup)).thenReturn(Completable.complete())
         Mockito.`when`(playerFieldPositionRepository.updatePlayerFieldPosition(any()))
             .thenReturn(Completable.complete())
@@ -50,7 +54,7 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
             generate(1L, FieldPosition.FIRST_BASE, 0, 1),
             /* new position freshly assigned */
             generate(2L, FieldPosition.SECOND_BASE, 0, 1)
-                .apply { fieldPositionID = 0L },
+                .apply { fieldPositionId = 0L },
             generate(3L, FieldPosition.SUBSTITUTE, 0, 1),
             generate(4L, FieldPosition.OLD_SUBSTITUTE, 0, 1),
             /* old position released */
@@ -59,7 +63,7 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
     }
 
     fun startUseCase(exception: Class<out Throwable>? = null) {
-        mSaveBattingOrder.executeUseCase(
+        saveBattingOrder.executeUseCase(
             SaveBattingOrderAndPositions.RequestValues(
                 lineup,
                 players
@@ -123,7 +127,7 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldUpdateOnlyPlayersAssignedAndFieldIDGreaterThanZero() {
+    fun shouldUpdateOnlyPlayersAssignedAndFieldIdGreaterThanZero() {
         startUseCase()
         verify(playerFieldPositionRepository, times(3))
             .updatePlayerFieldPosition(com.nhaarman.mockitokotlin2.check {

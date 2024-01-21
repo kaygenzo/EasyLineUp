@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.usecases
 
 import android.location.Geocoder
@@ -13,7 +17,6 @@ import java.io.IOException
 
 internal class GetTournamentMapLink(private val geocoder: Geocoder) :
     UseCase<GetTournamentMapLink.RequestValues, GetTournamentMapLink.ResponseValue>() {
-
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.fromCallable {
             with(requestValues) {
@@ -28,22 +31,12 @@ internal class GetTournamentMapLink(private val geocoder: Geocoder) :
                 val basUrl = "https://tile.thunderforest.com/static"
                 val imageWidth = width
                 val imageHeight = height
-                val link = "$basUrl/$style/$long,$lat,$zoom/${imageWidth}x${imageHeight}.png" +
+                val link = "$basUrl/$style/$long,$lat,$zoom/${imageWidth}x$imageHeight.png" +
                         "?apikey=$apiKey"
                 ResponseValue(MapInfo(link, GeoLocation(lat, long)))
             }
         }
     }
-
-    data class ResponseValue(val mapInfo: MapInfo) : UseCase.ResponseValue
-    data class RequestValues(
-        val tournament: Tournament,
-        val apiKey: String?,
-        val width: Int,
-        val height: Int
-    ) : UseCase.RequestValues
-
-    data class AddressLocation(val latitude: Double, val longitude: Double)
 
     private fun getLocationFromAddress(strAddress: String): AddressLocation? {
         return try {
@@ -51,9 +44,34 @@ internal class GetTournamentMapLink(private val geocoder: Geocoder) :
             if (address.isNotEmpty()) {
                 val location = address[0]
                 AddressLocation(location.latitude, location.longitude)
-            } else null
+            } else {
+                null
+            }
         } catch (e: IOException) {
             null
         }
     }
+
+    /**
+     * @property mapInfo
+     */
+    data class ResponseValue(val mapInfo: MapInfo) : UseCase.ResponseValue
+    /**
+     * @property tournament
+     * @property apiKey
+     * @property width
+     * @property height
+     */
+    data class RequestValues(
+        val tournament: Tournament,
+        val apiKey: String?,
+        val width: Int,
+        val height: Int
+    ) : UseCase.RequestValues
+
+    /**
+     * @property latitude
+     * @property longitude
+     */
+    data class AddressLocation(val latitude: Double, val longitude: Double)
 }

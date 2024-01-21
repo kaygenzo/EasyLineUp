@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.repository.model
 
 import androidx.room.ColumnInfo
@@ -5,8 +9,17 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.telen.easylineup.domain.model.Tournament
 import java.io.Serializable
-import java.util.*
+import java.util.UUID
 
+/**
+ * @property id
+ * @property name
+ * @property createdAt
+ * @property startTime
+ * @property endTime
+ * @property address
+ * @property hash
+ */
 @Entity(
     tableName = "tournaments"
 )
@@ -20,17 +33,33 @@ internal data class RoomTournament(
     @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
 ) : Serializable {
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (this === other) {
+            return true
+        }
+        if (javaClass != other?.javaClass) {
+            return false
+        }
 
         other as RoomTournament
 
-        if (id != other.id) return false
-        if (name != other.name) return false
-        if (createdAt != other.createdAt) return false
-        if (startTime != other.startTime) return false
-        if (endTime != other.endTime) return false
-        if (address != other.address) return false
+        if (id != other.id) {
+            return false
+        }
+        if (name != other.name) {
+            return false
+        }
+        if (createdAt != other.createdAt) {
+            return false
+        }
+        if (startTime != other.startTime) {
+            return false
+        }
+        if (endTime != other.endTime) {
+            return false
+        }
+        if (address != other.address) {
+            return false
+        }
 
         return true
     }

@@ -1,18 +1,28 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.usecases
 
 import android.content.Context
 import com.telen.easylineup.domain.UseCase
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.BatterState
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.isDefensePlayer
+import com.telen.easylineup.domain.model.isDpDh
+import com.telen.easylineup.domain.model.isFlex
+import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.utils.getPositionShortNames
 import io.reactivex.rxjava3.core.Single
 
 internal class GetBattersState :
     UseCase<GetBattersState.RequestValues, GetBattersState.ResponseValue>() {
-
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         val positionDescriptions =
             getPositionShortNames(requestValues.context, requestValues.teamType)
-        val result = mutableListOf<BatterState>()
+        val result: MutableList<BatterState> = mutableListOf()
         val maxBatterSize = requestValues.batterSize + requestValues.extraHitterSize
 
         var position = 0
@@ -22,7 +32,7 @@ internal class GetBattersState :
             .sortedBy { it.order }
             .forEach { player ->
                 val playerFlag = player.flags
-                val playerID = player.playerID
+                val playerId = player.playerId
                 val isSubstitute = player.isSubstitute()
                 val isDefensePlayer = player.isDefensePlayer()
 
@@ -37,7 +47,7 @@ internal class GetBattersState :
                 var playerPositionDesc = ""
                 val shirtNumber = player.shirtNumber.toString()
 
-                var isDP = false
+                var isDp = false
                 var isFlex = false
 
                 when {
@@ -48,15 +58,16 @@ internal class GetBattersState :
                         }
                     }
                     player.isDpDh() -> {
-                        isDP = true
+                        isDp = true
                         canShowIndex = true
                     }
                     else -> {
                         isFlex = player.isFlex()
                         if (isFlex) {
                             applyBackground = true
-                        } else
+                        } else {
                             canShowIndex = true
+                        }
                     }
                 }
 
@@ -68,13 +79,13 @@ internal class GetBattersState :
                     playerPositionDesc = positionDescriptions[player.position]
                 }
 
-
                 if (!requestValues.isEditable) {
                     canShowDescription = true
                 } else if (position < maxBatterSize) {
-                    if (!isFlex)
+                    if (!isFlex) {
                         canMove = true
-                    if (isDP) {
+                    }
+                    if (isDp) {
                         canShowDescription = true
                     }
                     // In case of substitutes are added before defense ones, let's prevent non
@@ -91,7 +102,7 @@ internal class GetBattersState :
                     canShowDescription = true
                 }
 
-                //do not show field position value for baseball 5
+                // do not show field position value for baseball 5
                 if (requestValues.teamType == TeamType.BASEBALL_5.id) {
                     canShowPosition = false
                 }
@@ -100,7 +111,7 @@ internal class GetBattersState :
 
                 result.add(
                     BatterState(
-                        playerID,
+                        playerId,
                         playerFlag,
                         order,
                         playerName,
@@ -121,7 +132,19 @@ internal class GetBattersState :
         return Single.just(ResponseValue(result))
     }
 
+    /**
+     * @property players
+     */
     class ResponseValue(val players: List<BatterState>) : UseCase.ResponseValue
+    /**
+     * @property context
+     * @property players
+     * @property teamType
+     * @property batterSize
+     * @property extraHitterSize
+     * @property isDebug
+     * @property isEditable
+     */
     class RequestValues(
         val context: Context, val players: List<PlayerWithPosition>, val teamType: Int,
         val batterSize: Int, val extraHitterSize: Int,

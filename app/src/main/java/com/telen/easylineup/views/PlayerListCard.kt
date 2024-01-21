@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -11,7 +15,6 @@ import com.telen.easylineup.databinding.ItemPlayersListBinding
 import com.telen.easylineup.domain.model.Player
 
 class PlayerListCard(context: Context) : PlayerCard(context) {
-
     private val binding = ItemPlayersListBinding.inflate(LayoutInflater.from(context), this, true)
 
     init {

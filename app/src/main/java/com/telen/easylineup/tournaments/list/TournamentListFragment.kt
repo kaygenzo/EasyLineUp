@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.tournaments.list
 
 import android.content.Intent
@@ -46,11 +50,10 @@ class LineupsScrollListener(private val view: FloatingActionButton) :
 }
 
 class TournamentListFragment : BaseFragment("TournamentListFragment"), OnTournamentItemListener,
-    OnSearchBarListener {
-
-    private lateinit var tournamentsAdapter: TournamentsAdapter
+OnSearchBarListener {
     private val viewModel by viewModels<LineupViewModel>()
     private var binding: FragmentListTournamentsBinding? = null
+    private lateinit var tournamentsAdapter: TournamentsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +76,7 @@ class TournamentListFragment : BaseFragment("TournamentListFragment"), OnTournam
                 layoutManager = GridLayoutManager(context, 1)
                 adapter = tournamentsAdapter
 
-                //display or hide the fab when scrolling
+                // display or hide the fab when scrolling
                 addOnScrollListener(LineupsScrollListener(fab))
             }
 

@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.FieldPosition
@@ -15,19 +19,19 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
-
 @RunWith(MockitoJUnitRunner::class)
 internal class GetPositionsSummaryForPlayerTests {
+    val observer: TestObserver<GetPositionsSummaryForPlayer.ResponseValue> = TestObserver()
 
-    @Mock lateinit var playerFieldPositionsDao: PlayerFieldPositionRepository
-    lateinit var mGetPositionsSummaryForPlayer: GetPositionsSummaryForPlayer
-
-    lateinit var mPositions: List<PositionWithLineup>
+    @Mock
+    lateinit var playerFieldPositionsDao: PlayerFieldPositionRepository
+    lateinit var getPositionsSummaryForPlayer: GetPositionsSummaryForPlayer
+    lateinit var positions: List<PositionWithLineup>
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        mGetPositionsSummaryForPlayer = GetPositionsSummaryForPlayer(playerFieldPositionsDao)
+        getPositionsSummaryForPlayer = GetPositionsSummaryForPlayer(playerFieldPositionsDao)
 
         val position1 = PositionWithLineup(position = FieldPosition.CATCHER.id)
         val position2 = PositionWithLineup(position = FieldPosition.DP_DH.id)
@@ -40,23 +44,35 @@ internal class GetPositionsSummaryForPlayerTests {
         val position9 = PositionWithLineup(position = FieldPosition.CATCHER.id)
         val position10 = PositionWithLineup(position = FieldPosition.SUBSTITUTE.id)
 
-        mPositions = mutableListOf(position1, position2, position3, position4, position5, position6, position7, position8, position9, position10)
+        positions = mutableListOf(
+            position1,
+            position2,
+            position3,
+            position4,
+            position5,
+            position6,
+            position7,
+            position8,
+            position9,
+            position10
+        )
 
-        Mockito.`when`(playerFieldPositionsDao.getAllPositionsForPlayer(1L)).thenReturn(Single.just(mPositions))
+        Mockito.`when`(playerFieldPositionsDao.getAllPositionsForPlayer(1L))
+            .thenReturn(Single.just(positions))
     }
 
     @Test
     fun shouldTriggerAnExceptionIfPlayerIdIsNull() {
-        val observer = TestObserver<GetPositionsSummaryForPlayer.ResponseValue>()
-        mGetPositionsSummaryForPlayer.executeUseCase(GetPositionsSummaryForPlayer.RequestValues(null)).subscribe(observer)
+        getPositionsSummaryForPlayer.executeUseCase(GetPositionsSummaryForPlayer.RequestValues(null))
+            .subscribe(observer)
         observer.await()
         observer.assertError(IllegalArgumentException::class.java)
     }
 
     @Test
     fun shouldReturnMapOfAllPositions() {
-        val observer = TestObserver<GetPositionsSummaryForPlayer.ResponseValue>()
-        mGetPositionsSummaryForPlayer.executeUseCase(GetPositionsSummaryForPlayer.RequestValues(1L)).subscribe(observer)
+        getPositionsSummaryForPlayer.executeUseCase(GetPositionsSummaryForPlayer.RequestValues(1L))
+            .subscribe(observer)
         observer.await()
         observer.assertComplete()
         Assert.assertEquals(5, observer.values().first().summary.count())

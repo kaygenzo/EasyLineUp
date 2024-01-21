@@ -1,10 +1,19 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.dashboard
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +23,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
+
 import com.getkeepsafe.taptargetview.TapTargetView
 import com.github.kaygenzo.bugreporter.api.BugReporter
 import com.telen.easylineup.BaseFragment
@@ -22,20 +32,24 @@ import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentDashboardBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.ShirtNumberEntry
-import com.telen.easylineup.domain.model.tiles.ITileData
 import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_ID
 import com.telen.easylineup.domain.model.tiles.LastPlayerNumberResearchData
+import com.telen.easylineup.domain.model.tiles.TileData
 import com.telen.easylineup.launch
 import com.telen.easylineup.lineup.LineupFragment
-import com.telen.easylineup.utils.*
+import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.utils.FeatureViewFactory
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import com.telen.easylineup.utils.NavigationUtils
+import com.telen.easylineup.utils.hideSoftKeyboard
 import org.koin.android.ext.android.inject
 import timber.log.Timber
+
 import java.text.DateFormat
-import java.util.*
+import java.util.Date
 
 class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
-    ActionMode.Callback {
-
+ActionMode.Callback {
     private val viewModel by viewModels<DashboardViewModel>()
     private val tileAdapter = DashboardTileAdapter(this)
     private val itemTouchedCallback = DashboardTileTouchCallback(tileAdapter)
@@ -74,7 +88,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
         binding = null
     }
 
-    override fun onTileClicked(type: Int, data: ITileData) {
+    override fun onTileClicked(type: Int, data: TileData) {
         when (type) {
             Constants.TYPE_TEAM_SIZE -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_team_size")
@@ -87,8 +101,8 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
 
             Constants.TYPE_LAST_LINEUP -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_last_lineup")
-                val lineupID = data.getData()[KEY_LINEUP_ID] as? Long ?: 0L
-                val extras = LineupFragment.getArguments(lineupID).apply {
+                val lineupId = data.getData()[KEY_LINEUP_ID] as? Long ?: 0L
+                val extras = LineupFragment.getArguments(lineupId).apply {
                     putBoolean(Constants.EXTRA_IS_FROM_SHORTCUT, true)
                 }
                 findNavController().navigate(
@@ -98,9 +112,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                 )
             }
 
-            else -> {
-                Timber.d("Click on that tile is not supported, skip")
-            }
+            else -> Timber.d("Click on that tile is not supported, skip")
         }
     }
 
@@ -130,8 +142,9 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
     }
 
     override fun onTileSearchNumberHistoryClicked(history: List<ShirtNumberEntry>) {
-        if (history.isEmpty())
+        if (history.isEmpty()) {
             return
+        }
 
         FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_number_history")
 
@@ -149,7 +162,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
 
     override fun onTileTeamSizeSendButtonClicked() {
         activity?.let { activity ->
-            val list = mutableListOf<CharSequence>()
+            val list: MutableList<CharSequence> = mutableListOf()
             list.addAll(activity.resources.getStringArray(R.array.tile_team_size_send_list_labels))
             DialogFactory.getListDialog(activity, list.toTypedArray()) { dialogInterface, i ->
                 when (i) {
@@ -169,7 +182,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                                     Intent.ACTION_SENDTO,
                                     Uri.parse(contactsBuilder.toString())
                                 )
-                                if (smsIntent.resolveActivity(activity.packageManager) != null) {
+                                smsIntent.resolveActivity(activity.packageManager)?.let {
                                     startActivity(smsIntent)
                                 }
                             }
@@ -192,7 +205,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                                     data = Uri.parse("mailto:")
                                     putExtra(Intent.EXTRA_EMAIL, it.toTypedArray())
                                 }
-                                if (intent.resolveActivity(activity.packageManager) != null) {
+                                intent.resolveActivity(activity.packageManager)?.let {
                                     startActivity(intent)
                                 }
                             }
@@ -204,7 +217,7 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
                         val intent = Intent(Intent.ACTION_SEND).apply {
                             type = "text/plain"
                         }
-                        if (intent.resolveActivity(activity.packageManager) != null) {
+                        intent.resolveActivity(activity.packageManager)?.let {
                             startActivity(intent)
                         }
                     }
@@ -233,8 +246,9 @@ class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
         itemTouchedHelper.attachToRecyclerView(null)
         launch(viewModel.saveTiles(tileAdapter.currentList), {
             activity?.run {
-                if (BuildConfig.DEBUG)
+                if (BuildConfig.DEBUG) {
                     Toast.makeText(this, "Save dashboard success", Toast.LENGTH_SHORT).show()
+                }
             }
         })
     }

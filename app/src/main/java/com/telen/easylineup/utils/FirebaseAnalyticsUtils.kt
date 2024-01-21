@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.utils
 
 import android.annotation.SuppressLint
@@ -7,20 +11,15 @@ import com.google.firebase.analytics.FirebaseAnalytics
 
 @SuppressLint("MissingPermission")
 object FirebaseAnalyticsUtils {
-
     const val EVENT_NAME_EXCEPTION = "elu_exception"
     const val KEY_EMPTY_FIELD = "empty_field"
     const val KEY_INVALID_FORMAT = "invalid_format"
-
     const val EVENT_MISSING_PITCHER = "elu_exception_missing_pitcher"
     const val EVENT_MISSING_DP_FLEX = "elu_exception_missing_dp_flex"
-
     const val EVENT_IMPORT_DATA = "elu_import_data"
     const val EVENT_EXPORT_DATA = "elu_export_data"
     const val EVENT_DELETE_DATA = "elu_delete_data"
-
     const val KEY_FIRST_TEAM = "first_team"
-
     const val EVENT_CLICK = "elu_click"
     const val CLICK_NAME = "click_name"
 
@@ -62,7 +61,7 @@ object FirebaseAnalyticsUtils {
         logEvent(context, KEY_INVALID_FORMAT, "player_phone_number", EVENT_NAME_EXCEPTION)
     }
 
-    fun emptyPlayerID(context: Context?) {
+    fun emptyPlayerId(context: Context?) {
         logEvent(context, KEY_EMPTY_FIELD, "player_id", EVENT_NAME_EXCEPTION)
     }
 

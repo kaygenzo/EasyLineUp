@@ -1,9 +1,16 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.lineup.attack
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import timber.log.Timber
 
+/**
+ * @property adapter
+ */
 class AttackItemTouchCallback(val adapter: BattingOrderAdapter) : ItemTouchHelper.Callback() {
     override fun getMovementFlags(
         recyclerView: RecyclerView,

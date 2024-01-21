@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
@@ -8,7 +12,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.telen.easylineup.databinding.ViewTrashFieldButtonBinding
 
 class TrashFieldButton : ConstraintLayout {
-
     private val binding: ViewTrashFieldButtonBinding =
         ViewTrashFieldButtonBinding.inflate(LayoutInflater.from(context), this, true)
 
@@ -24,7 +27,7 @@ class TrashFieldButton : ConstraintLayout {
         binding.fab.scaleType = scaleType
     }
 
-    override fun setOnClickListener(l: OnClickListener?) {
-        binding.fab.setOnClickListener(l)
+    override fun setOnClickListener(listener: OnClickListener?) {
+        binding.fab.setOnClickListener(listener)
     }
 }

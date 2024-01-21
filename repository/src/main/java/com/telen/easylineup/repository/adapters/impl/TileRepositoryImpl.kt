@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.repository.adapters.impl
 
 import com.telen.easylineup.domain.model.DashboardTile
@@ -9,7 +13,7 @@ import com.telen.easylineup.repository.model.toDashboardTile
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 
-internal class TileRepositoryImpl(private val tilesDao: TilesDao): TilesRepository {
+internal class TileRepositoryImpl(private val tilesDao: TilesDao) : TilesRepository {
     override fun getTiles(): Single<List<DashboardTile>> {
         return tilesDao.getTiles().map { it.map { it.toDashboardTile() } }
     }

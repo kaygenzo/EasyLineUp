@@ -1,15 +1,16 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.views
 
 import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import com.google.android.material.textview.MaterialTextView
 import com.telen.easylineup.R
 
 class NormalUppercaseStyledTextView : MaterialTextView {
-
     constructor(context: Context) : super(context) {
         initView(context, null, 0)
     }
@@ -28,17 +29,17 @@ class NormalUppercaseStyledTextView : MaterialTextView {
 
     private fun initView(context: Context, attrs: AttributeSet?, defStyle: Int) {
         isAllCaps = attrs?.let {
-            val a = context.obtainStyledAttributes(
+            val attributes = context.obtainStyledAttributes(
                 attrs,
                 R.styleable.NormalUppercaseStyledTextView,
                 defStyle,
                 0
             )
-            val textAllCaps = a.getBoolean(
+            val textAllCaps = attributes.getBoolean(
                 R.styleable.NormalUppercaseStyledTextView_normalUppercaseStyledTextAllCaps,
                 true
             )
-            a.recycle()
+            attributes.recycle()
             textAllCaps
         } ?: true
     }

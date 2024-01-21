@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.utils
 
 import android.Manifest
@@ -20,7 +24,6 @@ import com.telen.easylineup.R
 class ImagePickerUtils {
     companion object {
         fun launchPicker(context: Context, view: View?, callback: ActivityResultLauncher<Intent>) {
-
             val snackBarPermissionListener: PermissionListener =
                 SnackbarOnDeniedPermissionListener.Builder
                     .with(view, R.string.permission_request_read_external_storage)
@@ -30,7 +33,7 @@ class ImagePickerUtils {
                     .build()
 
             val permissionListener = object : BasePermissionListener() {
-                override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
+                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
                     val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).applyImageTypes(arrayOf())
                     intent.addCategory(Intent.CATEGORY_OPENABLE)
                     intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
@@ -38,7 +41,8 @@ class ImagePickerUtils {
                     try {
                         callback.launch(intent)
                     } catch (e: ActivityNotFoundException) {
-                        Toast.makeText(context, context.getString(R.string.file_explorer_not_found), Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, context.getString(R.string.file_explorer_not_found), Toast.LENGTH_LONG)
+                            .show()
                     }
                 }
             }

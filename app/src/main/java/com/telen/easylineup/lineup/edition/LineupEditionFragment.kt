@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.lineup.edition
 
 import android.os.Bundle
@@ -21,22 +25,14 @@ import com.telen.easylineup.domain.model.RosterItem
 import com.telen.easylineup.launch
 
 class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapterCallback {
-
-    private lateinit var rosterAdapter: RosterAdapter
-
     private val viewModel: LineupEditionViewModel by viewModels()
     private var binding: FragmentLineupEditionBinding? = null
-    private val rosterItems = mutableListOf<RosterItem>()
-
-    companion object {
-        fun getBundle(lineupID: Long): Bundle {
-            return Bundle().apply { putLong(Constants.LINEUP_ID, lineupID) }
-        }
-    }
+    private val rosterItems: MutableList<RosterItem> = mutableListOf()
+    private lateinit var rosterAdapter: RosterAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.lineupID = arguments?.getLong(Constants.LINEUP_ID) ?: 0
+        viewModel.lineupId = arguments?.getLong(Constants.LINEUP_ID) ?: 0
         rosterAdapter = RosterAdapter(rosterItems, this)
     }
 
@@ -103,6 +99,12 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
 
     override fun onPlayerSelectedChanged(player: Player, selected: Boolean) {
         viewModel.playerSelectStatusChanged(player, selected)
+    }
+
+    companion object {
+        fun getBundle(lineupId: Long): Bundle {
+            return Bundle().apply { putLong(Constants.LINEUP_ID, lineupId) }
+        }
     }
 
     private class TournamentSelectionListener(private val onSelect: (Int) -> Unit) :

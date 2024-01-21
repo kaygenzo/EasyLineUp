@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.player
 
 import android.app.Activity
@@ -28,10 +32,8 @@ import com.telen.easylineup.views.PlayerFormListener
 import timber.log.Timber
 
 class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListener {
-
     private val viewModel by viewModels<PlayerViewModel>()
     private var binding: FragmentPlayerEditBinding? = null
-
     private val pickImage =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
@@ -58,7 +60,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
                 onCancelForm()
             }
         })
-        viewModel.playerID = arguments?.getLong(Constants.PLAYER_ID) ?: 0L
+        viewModel.playerId = arguments?.getLong(Constants.PLAYER_ID) ?: 0L
 
         launch(viewModel.registerPlayerFormErrorResult(), { error ->
             when (error) {
@@ -68,7 +70,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
                 }
                 DomainErrors.Players.INVALID_PLAYER_ID -> {
                     // case of a player creation
-                    FirebaseAnalyticsUtils.emptyPlayerID(activity)
+                    FirebaseAnalyticsUtils.emptyPlayerId(activity)
                 }
                 DomainErrors.Players.INVALID_EMAIL_FORMAT -> {
                     binding?.editPlayerForm?.displayInvalidEmail()
@@ -78,9 +80,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
                     binding?.editPlayerForm?.displayInvalidPhoneNumber()
                     FirebaseAnalyticsUtils.invalidPlayerPhoneNumber(activity)
                 }
-                else -> {
-                    Timber.e("Unknown error: $error")
-                }
+                else -> Timber.e("Unknown error: $error")
             }
         })
     }

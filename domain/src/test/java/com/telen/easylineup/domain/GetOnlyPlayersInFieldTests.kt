@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.FieldPosition
@@ -13,10 +17,9 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetOnlyPlayersInFieldTests : BaseUseCaseTests() {
-
+    private val observer: TestObserver<GetOnlyPlayersInField.ResponseValue> = TestObserver()
     lateinit var useCase: GetOnlyPlayersInField
     lateinit var players: MutableList<PlayerWithPosition>
-    private val observer = TestObserver<GetOnlyPlayersInField.ResponseValue>()
 
     @Before
     fun init() {
@@ -30,9 +33,9 @@ internal class GetOnlyPlayersInFieldTests : BaseUseCaseTests() {
         players.add(generate(5L, FieldPosition.SUBSTITUTE, Constants.SUBSTITUTE_ORDER_VALUE))
     }
 
-    private fun generate(playerID: Long, position: FieldPosition, order: Int): PlayerWithPosition {
+    private fun generate(playerId: Long, position: FieldPosition, order: Int): PlayerWithPosition {
         val flag = PlayerFieldPosition.FLAG_NONE
-        return generate(playerID, position, flag, order)
+        return generate(playerId, position, flag, order)
     }
 
     private fun startUseCase(players: List<PlayerWithPosition> = this.players) {

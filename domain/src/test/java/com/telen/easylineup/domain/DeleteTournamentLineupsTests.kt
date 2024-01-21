@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
@@ -19,41 +23,44 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
-import java.util.*
-
 
 @RunWith(MockitoJUnitRunner::class)
 internal class DeleteTournamentLineupsTests {
-
+    private val lineups: MutableList<Lineup> = mutableListOf()
+    val observer: TestObserver<DeleteTournamentLineups.ResponseValue> = TestObserver()
     @Mock lateinit var lineupsDao: LineupRepository
-    lateinit var mDeleteTournament: DeleteTournamentLineups
+    lateinit var deleteTournament: DeleteTournamentLineups
     lateinit var tournament: Tournament
     lateinit var team: Team
-    private val lineups = mutableListOf<Lineup>()
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        mDeleteTournament = DeleteTournamentLineups(lineupsDao)
+        deleteTournament = DeleteTournamentLineups(lineupsDao)
 
         tournament = Tournament(id = 1L, name = "toto", createdAt = 1L, 2L, 3L, null)
         team = Team(id = 1L, name = "toto", main = true)
         lineups.addAll(listOf(
-                Lineup(id = 1L,teamId = team.id, tournamentId = tournament.id, eventTimeInMillis = 1L, strategy = TeamStrategy.STANDARD.id, extraHitters = 0),
-                Lineup(id = 2L,teamId = team.id, tournamentId = tournament.id, eventTimeInMillis = 1L, strategy = TeamStrategy.STANDARD.id, extraHitters = 0),
-                Lineup(id = 3L,teamId = 2L, tournamentId = tournament.id, eventTimeInMillis = 1L, strategy = TeamStrategy.STANDARD.id, extraHitters = 0),
-                Lineup(id = 4L,teamId = team.id, tournamentId = 2L, eventTimeInMillis = 1L, strategy = TeamStrategy.STANDARD.id, extraHitters = 0)
+            Lineup(id = 1L, teamId = team.id, tournamentId = tournament.id, eventTimeInMillis = 1L,
+                strategy = TeamStrategy.STANDARD.id, extraHitters = 0),
+            Lineup(id = 2L, teamId = team.id, tournamentId = tournament.id, eventTimeInMillis = 1L,
+                strategy = TeamStrategy.STANDARD.id, extraHitters = 0),
+            Lineup(id = 3L, teamId = 2L, tournamentId = tournament.id, eventTimeInMillis = 1L,
+                strategy = TeamStrategy.STANDARD.id, extraHitters = 0),
+            Lineup(id = 4L, teamId = team.id, tournamentId = 2L, eventTimeInMillis = 1L,
+                strategy = TeamStrategy.STANDARD.id, extraHitters = 0)
         ))
 
-        Mockito.`when`(lineupsDao.getLineupsForTournamentRx(tournament.id, team.id)).thenReturn(Single.just(listOf(lineups[0], lineups[1])))
+        Mockito.`when`(lineupsDao.getLineupsForTournamentRx(tournament.id, team.id)).thenReturn(Single.just(listOf(
+            lineups[0], lineups[1]
+        )))
         Mockito.`when`(lineupsDao.deleteLineups(any())).thenReturn(Completable.complete())
     }
 
     @Test
     fun shouldDeleteOnlyLineupOfSpecificTournamentAndTeam() {
-        val observer = TestObserver<DeleteTournamentLineups.ResponseValue>()
-        mDeleteTournament.executeUseCase(DeleteTournamentLineups.RequestValues(tournament, team))
-                .subscribe(observer)
+        deleteTournament.executeUseCase(DeleteTournamentLineups.RequestValues(tournament, team))
+            .subscribe(observer)
         observer.await()
         observer.assertComplete()
 

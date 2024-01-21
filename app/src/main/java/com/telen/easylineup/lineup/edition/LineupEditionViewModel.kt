@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.lineup.edition
 
 import androidx.lifecycle.LiveData
@@ -21,20 +25,19 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 class LineupEditionViewModel : ViewModel(), KoinComponent {
-
     private val domain: ApplicationInteractor by inject()
-    var lineupID: Long = 0
+    var lineupId: Long = 0
         set(value) {
             field = value
             loadData()
         }
-    private val rosterItems = mutableListOf<RosterItem>()
-    private val _rosterItemsLiveData = MutableLiveData<List<RosterItem>>()
-    private val _lineupLiveData = MutableLiveData<Lineup>()
+    private val rosterItems: MutableList<RosterItem> = mutableListOf()
+    private val _rosterItemsLiveData: MutableLiveData<List<RosterItem>> = MutableLiveData()
+    private val _lineupLiveData: MutableLiveData<Lineup> = MutableLiveData()
     private var lineup: Lineup? = null
 
     private fun loadData() {
-        domain.lineups().getLineupById(lineupID)
+        domain.lineups().getLineupById(lineupId)
             .flatMap {
                 this.lineup = it
                 _lineupLiveData.postValue(it)
@@ -63,14 +66,14 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getRoster(): Single<List<RosterPlayerStatus>> {
-        return domain.lineups().getRoster(lineupID).map { it.players }
+        return domain.lineups().getRoster(lineupId).map { it.players }
     }
 
     fun saveClicked(): Completable {
         return Completable.defer {
             lineup?.let {
                 domain.lineups().updateLineup(it)
-                    .andThen(domain.lineups().updateRoster(lineupID, rosterItems.map {
+                    .andThen(domain.lineups().updateRoster(lineupId, rosterItems.map {
                         it.toRosterPlayerStatus()
                     }))
                     .andThen(domain.players().saveOrUpdatePlayerNumberOverlays(rosterItems))
@@ -85,8 +88,8 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
                     it.number = number
                 } ?: let {
                     rosterItem.playerNumberOverlay = PlayerNumberOverlay(
-                        lineupID = lineupID,
-                        playerID = rosterItem.player.id,
+                        lineupId = lineupId,
+                        playerId = rosterItem.player.id,
                         number = number
                     )
                 }

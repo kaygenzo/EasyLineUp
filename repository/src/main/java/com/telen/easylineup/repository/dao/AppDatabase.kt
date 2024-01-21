@@ -1,8 +1,18 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.repository.dao
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.telen.easylineup.repository.model.*
+import com.telen.easylineup.repository.model.RoomLineup
+import com.telen.easylineup.repository.model.RoomPlayer
+import com.telen.easylineup.repository.model.RoomPlayerFieldPosition
+import com.telen.easylineup.repository.model.RoomPlayerNumberOverlay
+import com.telen.easylineup.repository.model.RoomTeam
+import com.telen.easylineup.repository.model.RoomTile
+import com.telen.easylineup.repository.model.RoomTournament
 
 const val DATABASE_NAME = "easylineup_database"
 

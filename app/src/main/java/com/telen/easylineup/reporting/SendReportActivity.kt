@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.reporting
 
 import android.content.Intent
@@ -23,10 +27,6 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class SendReportActivity : BaseActivity() {
-    companion object {
-        const val TIMEOUT_CLOSE_REPORT_SCREEN = 1500L
-    }
-
     private val _disposables = CompositeDisposable()
     private var binding: ActivityMessageLoadingBinding? = null
 
@@ -37,7 +37,7 @@ class SendReportActivity : BaseActivity() {
             loadingMessage.setText(R.string.report_sending_message)
 
             val jsonStringData = intent.getStringExtra(Intent.EXTRA_TEXT)
-            val imageUri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+            val imageUri: Uri? = intent.getParcelableExtra(Intent.EXTRA_STREAM)
             val jsonData = JsonParser.parseString(jsonStringData).asJsonObject
 
             _disposables.add(
@@ -158,7 +158,7 @@ class SendReportActivity : BaseActivity() {
     private fun storeFireStore(json: JsonObject): Completable {
         return Completable.create { emitter ->
             val db = Firebase.firestore
-            val mapData = hashMapOf<String, String>()
+            val mapData: HashMap<String, String> = hashMapOf()
             json.entrySet().forEach {
                 mapData[it.key] = it.value.asString
             }
@@ -172,5 +172,8 @@ class SendReportActivity : BaseActivity() {
                     emitter.onError(it)
                 }
         }
+    }
+    companion object {
+        const val TIMEOUT_CLOSE_REPORT_SCREEN = 1_500L
     }
 }

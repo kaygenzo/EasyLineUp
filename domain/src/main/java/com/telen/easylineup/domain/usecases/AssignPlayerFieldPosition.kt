@@ -1,13 +1,27 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCase
-import com.telen.easylineup.domain.model.*
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.getNextAvailableOrder
+import com.telen.easylineup.domain.model.getPositionPercentage
+import com.telen.easylineup.domain.model.isSubstitute
+import com.telen.easylineup.domain.model.reset
 import io.reactivex.rxjava3.core.Single
 
 internal class AssignPlayerFieldPosition :
     UseCase<AssignPlayerFieldPosition.RequestValues, AssignPlayerFieldPosition.ResponseValue>() {
-
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.defer {
             val players = requestValues.players
@@ -25,7 +39,7 @@ internal class AssignPlayerFieldPosition :
                 it.position == position.id && !it.isSubstitute()
             }
             val playerPosition = players.firstOrNull {
-                it.playerID == player.id
+                it.playerId == player.id
             }
 
             // reassign values to the new player
@@ -44,11 +58,12 @@ internal class AssignPlayerFieldPosition :
                         // players. We authorize only maximum extraBatterSize substitutes to be
                         // batter
                         if (nextAvailableOrder > batterSize + extraHittersSize
-                            || substitutesBatterSize >= extraHittersSize
+                                || substitutesBatterSize >= extraHittersSize
                         ) {
                             this.order = Constants.SUBSTITUTE_ORDER_VALUE
                         }
                     }
+
                     FieldPosition.PITCHER -> {
                         // if the new position is a pitcher for a baseball team with dh enabled, the
                         // batting order is automatically equals to 10
@@ -57,6 +72,7 @@ internal class AssignPlayerFieldPosition :
                             this.flags = PlayerFieldPosition.FLAG_FLEX
                         }
                     }
+
                     else -> {}
                 }
 
@@ -77,6 +93,13 @@ internal class AssignPlayerFieldPosition :
         }
     }
 
+    /**
+     * @property player
+     * @property position
+     * @property lineup
+     * @property players
+     * @property teamType
+     */
     class RequestValues(
         val player: Player,
         val position: FieldPosition,

@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup
 
 import android.app.Activity
@@ -30,20 +34,18 @@ import timber.log.Timber
 import java.io.Serializable
 
 class HomeActivity : BaseActivity(), SwapTeamActions {
-
     private val viewModel by viewModels<HomeViewModel>()
     private val drawerLayout by lazy { findViewById<DrawerLayout>(R.id.drawer_layout) }
     private val navController by lazy { findNavController(R.id.nav_host_fragment) }
     private val navigationView by lazy { findViewById<NavigationView>(R.id.nav_view) }
-    private lateinit var drawerHeader: DrawerHeader
     private var binding: ActivityHomeBinding? = null
-
     private val createTeam =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
                 navController.popBackStack(R.id.navigation_home, false)
             }
         }
+    private lateinit var drawerHeader: DrawerHeader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,10 +112,10 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
                     is SwapButtonSuccess -> {
                         val argument = Bundle()
                         argument.putSerializable(Constants.EXTRA_TEAMS, it.teams as Serializable)
-                        val dialog = SwapTeamFragment()
-                        dialog.arguments = argument
-                        dialog.setSwapTeamActionsListener(this@HomeActivity)
-                        dialog.show(supportFragmentManager, "SwapTeamFragment")
+                        SwapTeamFragment().apply {
+                            arguments = argument
+                            setSwapTeamActionsListener(this@HomeActivity)
+                        }.show(supportFragmentManager, "SwapTeamFragment")
                     }
 
                     else -> {}

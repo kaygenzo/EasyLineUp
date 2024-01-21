@@ -1,3 +1,7 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.team.createTeam.teamMain
 
 import android.app.Activity
@@ -19,10 +23,8 @@ import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.TeamFormListener
 
 class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
-
     private val viewModel by activityViewModels<SetupViewModel>()
     private var binding: FragmentTeamEditBinding? = null
-
     private val pickImage =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
@@ -57,7 +59,7 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
                 SetupViewModel.StepError.NAME_EMPTY -> {
                     binding?.run {
                         editTeamForm.binding.teamNameInputLayout.error =
-                            getString(R.string.team_creation_error_name_empty)
+                                getString(R.string.team_creation_error_name_empty)
                     }
                     FirebaseAnalyticsUtils.emptyTeamName(activity)
                 }

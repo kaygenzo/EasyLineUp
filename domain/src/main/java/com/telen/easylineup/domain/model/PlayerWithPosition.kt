@@ -1,5 +1,26 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
 package com.telen.easylineup.domain.model
 
+/**
+ * @property playerName
+ * @property playerSex
+ * @property shirtNumber
+ * @property licenseNumber
+ * @property teamId
+ * @property image
+ * @property position
+ * @property x
+ * @property y
+ * @property flags
+ * @property order
+ * @property fieldPositionId
+ * @property playerId
+ * @property lineupId
+ * @property playerPositions
+ */
 data class PlayerWithPosition(
     val playerName: String,
     val playerSex: Int,
@@ -12,15 +33,15 @@ data class PlayerWithPosition(
     var y: Float = 0f,
     var flags: Int = 0,
     var order: Int = 0,
-    var fieldPositionID: Long = 0,
-    var playerID: Long = 0,
+    var fieldPositionId: Long = 0,
+    var playerId: Long = 0,
     val lineupId: Long,
     val playerPositions: Int
 )
 
 fun PlayerWithPosition.toPlayer(): Player {
     return Player(
-        id = playerID,
+        id = playerId,
         teamId = teamId,
         name = playerName,
         shirtNumber = shirtNumber,
@@ -33,18 +54,18 @@ fun PlayerWithPosition.toPlayer(): Player {
 
 fun PlayerWithPosition.toPlayerFieldPosition(): PlayerFieldPosition {
     return PlayerFieldPosition(
-        id = fieldPositionID, playerId = playerID, position = position, x = x, y = y,
+        id = fieldPositionId, playerId = playerId, position = position, x = x, y = y,
         order = order, lineupId = lineupId, flags = flags
     )
 }
 
 fun PlayerWithPosition.isSubstitute(): Boolean {
     return position == FieldPosition.SUBSTITUTE.id ||
-            (position == FieldPosition.OLD_SUBSTITUTE.id && fieldPositionID > 0)
+            (position == FieldPosition.OLD_SUBSTITUTE.id && fieldPositionId > 0)
 }
 
 fun PlayerWithPosition.isAssigned(): Boolean {
-    return position > 0 || (position == FieldPosition.OLD_SUBSTITUTE.id && fieldPositionID > 0)
+    return position > 0 || (position == FieldPosition.OLD_SUBSTITUTE.id && fieldPositionId > 0)
 }
 
 fun PlayerWithPosition.isBatter(): Boolean {
@@ -101,10 +122,11 @@ fun List<PlayerWithPosition>.getNextAvailableOrder(excludedOrders: List<Int>? = 
     this.filter { it.isBatter() && !(excludedOrders?.contains(it.order) ?: false) }
         .sortedBy { it.order }
         .forEach {
-            if (it.order == availableOrder)
+            if (it.order == availableOrder) {
                 availableOrder++
-            else
+            } else {
                 return availableOrder
+            }
         }
     return availableOrder
 }
