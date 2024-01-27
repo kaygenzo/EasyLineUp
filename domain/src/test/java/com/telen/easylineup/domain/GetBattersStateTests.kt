@@ -29,12 +29,13 @@ import org.mockito.junit.MockitoJUnitRunner
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal abstract class GetBattersStateEditableTests(
-    teamType: TeamType,
-    strategy: TeamStrategy,
-    batterSize: Int,
-    extraHittersSize: Int
-) : GetBattersStateTests(teamType, strategy, batterSize, extraHittersSize, true) {
+internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
+
+    override fun init() {
+        isEditable = true
+        super.init()
+    }
+
     @Test
     fun dpShouldOnlyShowIndexAndShowDescriptionAndCanMoveInExtraHitterWhenLineupEditable() {
         addPlayers()
@@ -251,82 +252,110 @@ internal abstract class GetBattersStateEditableTests(
 ////////////// EDITABLE NO HITTER SIZE //////////////
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateBaseballStandardEditableTests : GetBattersStateEditableTests(
-    TeamType.BASEBALL, TeamStrategy.STANDARD,
-    TeamStrategy.STANDARD.batterSize, 0
-)
+internal class GetBattersStateBaseballStandardEditableTests : GetBattersStateEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.BASEBALL
+        strategy = TeamStrategy.STANDARD
+        extraHittersSize = 0
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateSoftballStandardEditableTests : GetBattersStateEditableTests(
-    TeamType.SOFTBALL, TeamStrategy.STANDARD,
-    TeamStrategy.STANDARD.batterSize, 0
-)
+internal class GetBattersStateSoftballStandardEditableTests : GetBattersStateEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.SOFTBALL
+        strategy = TeamStrategy.STANDARD
+        extraHittersSize = 0
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateBaseball5ManEditableTests : GetBattersStateEditableTests(
-    TeamType.BASEBALL,
-    TeamStrategy.FIVE_MAN_STANDARD,
-    TeamStrategy.FIVE_MAN_STANDARD.batterSize,
-    0
-)
+internal class GetBattersStateBaseball5ManEditableTests : GetBattersStateEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.BASEBALL
+        strategy = TeamStrategy.FIVE_MAN_STANDARD
+        extraHittersSize = 0
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateSoftballSlowpitchEditableTests : GetBattersStateEditableTests(
-    TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
-    TeamStrategy.SLOWPITCH.batterSize, 0
-)
+internal class GetBattersStateSoftballSlowpitchEditableTests : GetBattersStateEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.SOFTBALL
+        strategy = TeamStrategy.SLOWPITCH
+        extraHittersSize = 0
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateSoftball5ManEditableTests : GetBattersStateEditableTests(
-    TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
-    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0
-)
+internal class GetBattersStateSoftball5ManEditableTests : GetBattersStateEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.SOFTBALL
+        strategy = TeamStrategy.FIVE_MAN_STANDARD
+        extraHittersSize = 0
+    }
+}
 
 ////////////// EDITABLE CUSTOM HITTER SIZE //////////////
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateBaseballCustomStandardEditableTests : GetBattersStateEditableTests(
-    TeamType.BASEBALL, TeamStrategy.STANDARD,
-    TeamStrategy.STANDARD.batterSize, 3
-)
+internal class GetBattersStateBaseballCustomStandardEditableTests : GetBattersStateEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.BASEBALL
+        strategy = TeamStrategy.STANDARD
+        extraHittersSize = 3
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateSoftballCustomStandardEditableTests : GetBattersStateEditableTests(
-    TeamType.SOFTBALL, TeamStrategy.STANDARD,
-    TeamStrategy.STANDARD.batterSize, 3
-)
+internal class GetBattersStateSoftballCustomStandardEditableTests : GetBattersStateEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.SOFTBALL
+        strategy = TeamStrategy.STANDARD
+        extraHittersSize = 3
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateBaseballCustom5ManEditableTests : GetBattersStateEditableTests(
-    TeamType.BASEBALL,
-    TeamStrategy.FIVE_MAN_STANDARD,
-    TeamStrategy.FIVE_MAN_STANDARD.batterSize,
-    3
-)
+internal class GetBattersStateBaseballCustom5ManEditableTests : GetBattersStateEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.BASEBALL
+        strategy = TeamStrategy.FIVE_MAN_STANDARD
+        extraHittersSize = 3
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateSoftballCustomSlowpitchEditableTests : GetBattersStateEditableTests(
-    TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
-    TeamStrategy.SLOWPITCH.batterSize, 3
-)
+internal class GetBattersStateSoftballCustomSlowpitchEditableTests :
+    GetBattersStateEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.SOFTBALL
+        strategy = TeamStrategy.SLOWPITCH
+        extraHittersSize = 3
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateSoftballCustom5ManEditableTests : GetBattersStateEditableTests(
-    TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
-    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3
-)
+internal class GetBattersStateSoftballCustom5ManEditableTests : GetBattersStateEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.SOFTBALL
+        strategy = TeamStrategy.FIVE_MAN_STANDARD
+        extraHittersSize = 3
+    }
+}
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////// NOT EDITABLE //////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal abstract class GetBattersStateNotEditableTests(
-    teamType: TeamType,
-    strategy: TeamStrategy,
-    batterSize: Int,
-    extraHittersSize: Int
-) : GetBattersStateTests(teamType, strategy, batterSize, extraHittersSize, false) {
+internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests() {
+
+    override fun init() {
+        isEditable = false
+        super.init()
+    }
+
     @Test
     fun dpShouldOnlyShowIndexAndShowDescriptionWhenLineupNotEditable() {
         addPlayers()
@@ -543,71 +572,102 @@ internal abstract class GetBattersStateNotEditableTests(
 ////////////// NOT EDITABLE NO HITTER SIZE //////////////
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateBaseballStandardNotEditableTests : GetBattersStateNotEditableTests(
-    TeamType.BASEBALL, TeamStrategy.STANDARD,
-    TeamStrategy.STANDARD.batterSize, 0
-)
+internal class GetBattersStateBaseballStandardNotEditableTests : GetBattersStateNotEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.BASEBALL
+        strategy = TeamStrategy.STANDARD
+        extraHittersSize = 0
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateSoftballStandardNotEditableTests : GetBattersStateNotEditableTests(
-    TeamType.SOFTBALL, TeamStrategy.STANDARD,
-    TeamStrategy.STANDARD.batterSize, 0
-)
+internal class GetBattersStateSoftballStandardNotEditableTests : GetBattersStateNotEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.SOFTBALL
+        strategy = TeamStrategy.STANDARD
+        extraHittersSize = 0
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateBaseball5ManNotEditableTests : GetBattersStateNotEditableTests(
-    TeamType.BASEBALL, TeamStrategy.FIVE_MAN_STANDARD,
-    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0
-)
+internal class GetBattersStateBaseball5ManNotEditableTests : GetBattersStateNotEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.BASEBALL
+        strategy = TeamStrategy.FIVE_MAN_STANDARD
+        extraHittersSize = 0
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateSoftballSlowpitchNotEditableTests : GetBattersStateNotEditableTests(
-    TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
-    TeamStrategy.SLOWPITCH.batterSize, 0
-)
+internal class GetBattersStateSoftballSlowpitchNotEditableTests :
+    GetBattersStateNotEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.SOFTBALL
+        strategy = TeamStrategy.SLOWPITCH
+        extraHittersSize = 0
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateSoftball5ManNotEditableTests : GetBattersStateNotEditableTests(
-    TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
-    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 0
-)
+internal class GetBattersStateSoftball5ManNotEditableTests : GetBattersStateNotEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.SOFTBALL
+        strategy = TeamStrategy.FIVE_MAN_STANDARD
+        extraHittersSize = 0
+    }
+}
 
 ////////////// NOT EDITABLE CUSTOM HITTER SIZE //////////////
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateBaseballCustomStandardNotEditableTests :
-    GetBattersStateNotEditableTests(
-    TeamType.BASEBALL, TeamStrategy.STANDARD,
-    TeamStrategy.STANDARD.batterSize, 3
-)
+    GetBattersStateNotEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.BASEBALL
+        strategy = TeamStrategy.STANDARD
+        extraHittersSize = 3
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballCustomStandardNotEditableTests :
-    GetBattersStateNotEditableTests(
-    TeamType.SOFTBALL, TeamStrategy.STANDARD,
-    TeamStrategy.STANDARD.batterSize, 3
-)
+    GetBattersStateNotEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.SOFTBALL
+        strategy = TeamStrategy.STANDARD
+        extraHittersSize = 3
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateBaseballCustom5ManNotEditableTests : GetBattersStateNotEditableTests(
-    TeamType.BASEBALL,
-    TeamStrategy.FIVE_MAN_STANDARD,
-    TeamStrategy.FIVE_MAN_STANDARD.batterSize,
-    3
-)
+internal class GetBattersStateBaseballCustom5ManNotEditableTests :
+    GetBattersStateNotEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.BASEBALL
+        strategy = TeamStrategy.FIVE_MAN_STANDARD
+        extraHittersSize = 3
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal class GetBattersStateSoftballCustomSlowpitchNotEditableTests :
-    GetBattersStateNotEditableTests(
-    TeamType.SOFTBALL, TeamStrategy.SLOWPITCH,
-    TeamStrategy.SLOWPITCH.batterSize, 3
-)
+    GetBattersStateNotEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.SOFTBALL
+        strategy = TeamStrategy.SLOWPITCH
+        extraHittersSize = 3
+    }
+}
 
 @RunWith(MockitoJUnitRunner.Silent::class)
-internal class GetBattersStateSoftballCustom5ManNotEditableTests : GetBattersStateNotEditableTests(
-    TeamType.SOFTBALL, TeamStrategy.FIVE_MAN_STANDARD,
-    TeamStrategy.FIVE_MAN_STANDARD.batterSize, 3
-)
+internal class GetBattersStateSoftballCustom5ManNotEditableTests :
+    GetBattersStateNotEditableTests() {
+    override fun initParameters() {
+        teamType = TeamType.SOFTBALL
+        strategy = TeamStrategy.FIVE_MAN_STANDARD
+        extraHittersSize = 3
+    }
+}
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// BASE ////////////////////////////////////////////////
@@ -620,12 +680,14 @@ internal class GetBattersStateSoftballCustom5ManNotEditableTests : GetBattersSta
  * @property extraHittersSize
  * @property isEditable
  */
-@RunWith(MockitoJUnitRunner.Silent::class)
-internal open class GetBattersStateTests(
-    protected val teamType: TeamType, protected val strategy: TeamStrategy,
-    protected val batterSize: Int, protected val extraHittersSize: Int,
-    protected val isEditable: Boolean
-) {
+internal abstract class GetBattersStateTests {
+
+    protected lateinit var teamType: TeamType
+    protected lateinit var strategy: TeamStrategy
+    protected var batterSize: Int = 0
+    protected var extraHittersSize: Int = 0
+    protected var isEditable: Boolean = false
+
     protected val players: MutableList<PlayerWithPosition> = mutableListOf()
     val lineupMode = MODE_ENABLED
     val observer: TestObserver<GetBattersState.ResponseValue> = TestObserver()
@@ -637,10 +699,14 @@ internal open class GetBattersStateTests(
     lateinit var resources: Resources
     lateinit var getBattersState: GetBattersState
 
+    protected abstract fun initParameters()
+
     @Before
-    fun init() {
+    open fun init() {
+        initParameters()
         MockitoAnnotations.initMocks(this)
         getBattersState = GetBattersState()
+        batterSize = strategy.batterSize
 
         Mockito.`when`(context.resources).thenReturn(resources)
         Mockito.`when`(resources.getStringArray(R.array.field_positions_baseball_list)).thenReturn(
