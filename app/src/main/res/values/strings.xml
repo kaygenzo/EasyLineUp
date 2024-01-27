@@ -271,4 +271,6 @@
     <string name="form_tournament_creation_address">Address (optional)</string>
     <string name="form_tournament_creation_name">Name</string>
     <string name="form_tournament_creation_title">Tournament creation...</string>
+    <string name="discard_change_title">You are about to cancel your changes</string>
+    <string name="discard_change_message">Changes would be discarded, are you really sure ?</string>
 </resources>

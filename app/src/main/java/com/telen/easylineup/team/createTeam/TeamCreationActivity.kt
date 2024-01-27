@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import com.telen.easylineup.BaseActivity
-import com.telen.easylineup.R
 import com.telen.easylineup.databinding.ActivityTeamCreationBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
@@ -39,23 +38,17 @@ class TeamCreationActivity : BaseActivity() {
             }
 
             teamCreationActionButtons.cancelClickListener = View.OnClickListener {
-                cancel()
+                showDiscardDialog("cancel")
             }
         }
     }
 
     override fun onBackPressed() {
-        FirebaseAnalyticsUtils.onClick(this, "click_team_creation_back_clicked")
-        cancel()
+        showDiscardDialog("back_pressed")
     }
 
-    private fun cancel() {
-        DialogFactory.getWarningDialog(
-            context = this@TeamCreationActivity,
-            title = R.string.discard_title,
-            message = R.string.discard_message,
-            confirmClick = { _, _ -> finish() },
-            confirmText = R.string.generic_discard
-        ).show()
+    private fun showDiscardDialog(trigger: String) {
+        FirebaseAnalyticsUtils.onClick(this, "click_create_team_cancel_$trigger")
+        DialogFactory.getDiscardDialog(this) { _, _ -> finish() }.show()
     }
 }

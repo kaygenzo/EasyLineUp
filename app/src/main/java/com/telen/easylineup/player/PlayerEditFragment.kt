@@ -8,14 +8,18 @@ import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.BaseFragment
-import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentPlayerEditBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DomainErrors
@@ -31,7 +35,7 @@ import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.PlayerFormListener
 import timber.log.Timber
 
-class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListener {
+class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListener, MenuProvider {
     private val viewModel by viewModels<PlayerViewModel>()
     private var binding: FragmentPlayerEditBinding? = null
     private val pickImage =
@@ -45,7 +49,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
         }
 
     override fun onCancel() {
-        onCancelForm()
+        showDiscardDialog("cancel")
     }
 
     override fun onImagePickerRequested() {
@@ -55,11 +59,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                onCancelForm()
-            }
-        })
+
         viewModel.playerId = arguments?.getLong(Constants.PLAYER_ID) ?: 0L
 
         launch(viewModel.registerPlayerFormErrorResult(), { error ->
@@ -92,6 +92,16 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
     ): View {
         val binding = FragmentPlayerEditBinding.inflate(inflater, container, false)
         this.binding = binding
+
+        activity?.onBackPressedDispatcher?.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    showDiscardDialog("back_pressed")
+                }
+            })
+
+        activity?.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         binding.editPlayerForm.setListener(this)
 
@@ -195,19 +205,19 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
         })
     }
 
-    fun onCancelForm() {
-        FirebaseAnalyticsUtils.onClick(activity, "click_player_edit_cancel")
-        activity?.run {
-            DialogFactory.getWarningDialog(
-                context = this,
-                title = R.string.discard_title,
-                message = R.string.discard_message,
-                confirmText = R.string.generic_discard,
-                confirmClick = { dialog, _ ->
-                    findNavController().navigateUp()
-                    dialog.dismiss()
-                }
-            ).show()
-        }
+    private fun showDiscardDialog(trigger: String) {
+        FirebaseAnalyticsUtils.onClick(activity, "click_player_edit_cancel_$trigger")
+        DialogFactory.getDiscardDialog(requireContext()) { _, _ ->
+            findNavController().navigateUp()
+        }.show()
+    }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        showDiscardDialog("navigation_up")
+        return true
     }
 }

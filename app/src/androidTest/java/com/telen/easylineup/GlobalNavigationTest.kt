@@ -181,6 +181,17 @@ class GlobalNavigationTest {
         // check name is albert
         BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
 
+        BaristaMenuClickInteractions.clickMenu(R.id.action_edit)
+
+        // 4. Check navigate up come back on details
+        clickNavigateUp()
+
+        // confirm discard changes with dialog ok button
+        BaristaDialogInteractions.clickDialogPositiveButton()
+
+        // check name is albert
+        BaristaVisibilityAssertions.assertDisplayed(R.id.playerName, "ALBERT")
+
         // click on delete action button
         BaristaMenuClickInteractions.clickMenu(R.id.action_delete)
 
@@ -202,6 +213,9 @@ class GlobalNavigationTest {
 
         // go back to bernard details
         clickNavigateUp()
+
+        // confirm delete with dialog ok button
+        BaristaDialogInteractions.clickDialogPositiveButton()
 
         // slide in pager to estelle
         BaristaViewPagerInteractions.swipeViewPagerForward()
@@ -401,6 +415,9 @@ class GlobalNavigationTest {
         // go back to the lineup fixed
         clickNavigateUp()
 
+        // confirm discard changes with dialog ok button
+        BaristaDialogInteractions.clickDialogPositiveButton()
+
         // click on edit button
         BaristaMenuClickInteractions.clickMenu(R.id.action_delete)
 
@@ -433,6 +450,9 @@ class GlobalNavigationTest {
 
         // go to the list of lineups
         pressBack()
+
+        // confirm discard changes with dialog ok button
+        BaristaDialogInteractions.clickDialogPositiveButton()
 
         // edit lineup
         onView(

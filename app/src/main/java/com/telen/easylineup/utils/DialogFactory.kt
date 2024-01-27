@@ -24,6 +24,18 @@ class DialogFactory {
     companion object {
         private val defaultClickListener = DialogInterface.OnClickListener { dialog, which -> }
 
+        fun getDiscardDialog(
+            context: Context,
+            confirmClick: DialogInterface.OnClickListener?
+        ): Dialog {
+            return getWarningDialog(
+                context,
+                title = R.string.discard_change_title,
+                message = R.string.discard_change_message,
+                confirmClick = confirmClick
+            )
+        }
+
         fun getWarningDialog(
             context: Context,
             @StringRes title: Int, titleArgs: Array<Any> = arrayOf(),

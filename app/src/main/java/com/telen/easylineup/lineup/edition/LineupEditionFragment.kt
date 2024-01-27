@@ -6,14 +6,18 @@ package com.telen.easylineup.lineup.edition
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
-import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import androidx.activity.OnBackPressedCallback
+import androidx.core.view.MenuProvider
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.BaseFragment
@@ -23,8 +27,11 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.RosterItem
 import com.telen.easylineup.launch
+import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 
-class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapterCallback {
+class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapterCallback,
+    MenuProvider {
     private val viewModel: LineupEditionViewModel by viewModels()
     private var binding: FragmentLineupEditionBinding? = null
     private val rosterItems: MutableList<RosterItem> = mutableListOf()
@@ -44,6 +51,16 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
         return FragmentLineupEditionBinding.inflate(inflater, container, false).apply {
             this@LineupEditionFragment.binding = this
 
+            activity?.addMenuProvider(this@LineupEditionFragment, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+            activity?.onBackPressedDispatcher?.addCallback(
+                viewLifecycleOwner,
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        showDiscardDialog("back_pressed")
+                    }
+                })
+
             rosterListItems.apply {
                 adapter = rosterAdapter
                 layoutManager = LinearLayoutManager(context)
@@ -56,7 +73,7 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
             }
 
             containerActions.cancelClickListener = View.OnClickListener {
-                findNavController().popBackStack()
+                showDiscardDialog("cancel")
             }
 
             viewModel.observeRosterItems().observe(viewLifecycleOwner) {
@@ -107,12 +124,19 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
         }
     }
 
-    private class TournamentSelectionListener(private val onSelect: (Int) -> Unit) :
-        OnItemSelectedListener {
-        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-            onSelect(position)
-        }
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
 
-        override fun onNothingSelected(parent: AdapterView<*>?) {}
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        showDiscardDialog("navigation_up")
+        return true
+    }
+
+    private fun showDiscardDialog(trigger: String) {
+        FirebaseAnalyticsUtils.onClick(activity, "click_lineup_edit_cancel_$trigger")
+        DialogFactory.getDiscardDialog(requireContext()) { _, _ ->
+            findNavController().popBackStack()
+        }.show()
     }
 }

@@ -13,6 +13,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.IdRes
 import androidx.annotation.MenuRes
 import androidx.appcompat.app.AppCompatActivity
@@ -75,6 +76,12 @@ abstract class LineupFragment(
         val binder = FragmentLineupBinding.inflate(inflater)
         this.binder = binder
 
+        activity?.onBackPressedDispatcher?.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(isEditable) {
+                override fun handleOnBackPressed() { showDiscardDialog("back_pressed") }
+            })
+
         if (isEditable) {
             binder.substitutesIndication?.visibility = View.GONE
             binder.bottomChoice?.apply {
@@ -85,7 +92,7 @@ abstract class LineupFragment(
                         goBack()
                     })
                 }
-                cancelClickListener = View.OnClickListener { goBack() }
+                cancelClickListener = View.OnClickListener { showDiscardDialog("cancel") }
             }
         } else {
             binder.substitutesIndication?.visibility = View.VISIBLE
@@ -214,7 +221,14 @@ abstract class LineupFragment(
                 true
             }
 
-            else -> false
+            else -> {
+                if (isEditable) {
+                    showDiscardDialog("navigation_up")
+                    true
+                } else {
+                    false
+                }
+            }
         }
     }
 
@@ -268,6 +282,11 @@ abstract class LineupFragment(
                     .commit()
             }
         }
+    }
+
+    private fun showDiscardDialog(trigger: String) {
+        FirebaseAnalyticsUtils.onClick(activity, "click_lineup_edit_cancel_$trigger")
+        DialogFactory.getDiscardDialog(requireContext()) { _, _ -> goBack() }.show()
     }
 
     private fun goBack(showFixedView: Boolean = true) {

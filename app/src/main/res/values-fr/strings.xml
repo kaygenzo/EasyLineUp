@@ -233,4 +233,7 @@
     <string name="form_tournament_creation_address">Adresse (optionnel)</string>
     <string name="form_tournament_creation_name">Nom</string>
     <string name="form_tournament_creation_title">Création de tournoi...</string>
+
+    <string name="discard_change_title">Vous êtes sur le point de perdre vos modifications</string>
+    <string name="discard_change_message">Vous perdrez vos changements, êtes-vous vraiment sûr ?</string>
 </resources>
