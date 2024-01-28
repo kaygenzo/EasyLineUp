@@ -18,7 +18,7 @@ internal class SaveBattingOrderAndPositions(
     private val lineupRepository: LineupRepository,
     private val pfpRepository: PlayerFieldPositionRepository
 ) : UseCase<SaveBattingOrderAndPositions.RequestValues,
-SaveBattingOrderAndPositions.ResponseValue>() {
+        SaveBattingOrderAndPositions.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.defer {
             if (requestValues.lineup.id <= 0) {
@@ -30,16 +30,17 @@ SaveBattingOrderAndPositions.ResponseValue>() {
                     if (!it.isAssigned() && it.fieldPositionId > 0) {
                         // it is an old position that can be safely removed
                         playersOperations.add(pfpRepository.deletePosition(playerPosition))
-                    } else if (playerPosition.id == 0L) {
-                        playersOperations.add(
-                            pfpRepository
-                                .insertPlayerFieldPosition(playerPosition).ignoreElement()
-                        )
-                    } else {
-                        playersOperations.add(
-                            pfpRepository
-                                .updatePlayerFieldPosition(playerPosition)
-                        )
+                    } else if (it.isAssigned()) {
+                        if (playerPosition.id == 0L) {
+                            playersOperations.add(
+                                pfpRepository.insertPlayerFieldPosition(playerPosition)
+                                    .ignoreElement()
+                            )
+                        } else {
+                            playersOperations.add(
+                                pfpRepository.updatePlayerFieldPosition(playerPosition)
+                            )
+                        }
                     }
                 }
                 lineupRepository.updateLineup(requestValues.lineup)

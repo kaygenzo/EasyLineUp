@@ -5,6 +5,8 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argThat
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.FieldPosition
@@ -105,7 +107,7 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
 
     @Test
     fun shouldTriggerAnErrorIfCannotDeleteAtLeastOnePlayer() {
-        Mockito.`when`(playerFieldPositionRepository.updatePlayerFieldPosition(any()))
+        Mockito.`when`(playerFieldPositionRepository.deletePosition(any()))
             .thenReturn(Completable.error(IllegalStateException()))
         startUseCase(IllegalStateException::class.java)
     }
@@ -118,12 +120,15 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldInsertOnlyPlayersWithFieldIdZero() {
+    fun shouldInsertOnlyPlayersWithFieldIdZeroAndAssigned() {
+        players.add(generate(0L, FieldPosition.OLD_SUBSTITUTE, 0, 0).apply {
+            position = 0
+            playerId = 100L
+        })
         startUseCase()
-        verify(playerFieldPositionRepository)
-            .insertPlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
-                Assert.assertEquals(2L, it.playerId)
-            })
+        verify(playerFieldPositionRepository).insertPlayerFieldPosition(argThat { playerId == 2L })
+        verify(playerFieldPositionRepository, never())
+            .insertPlayerFieldPosition(argThat { playerId == 100L })
     }
 
     @Test
