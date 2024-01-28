@@ -65,7 +65,7 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintLeft_toRightOf="@+id/tile_separator"
                 android:src="@drawable/ic_baseline_send_24"
-                app:tint="?attr/colorPrimary"/>
+                app:tint="?attr/colorTertiary"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -33,6 +33,7 @@
 
                 <com.telen.easylineup.views.NormalUppercaseStyledTextView
                     style="@style/Field.Green.Lighter.Small.Auto"
+                    android:textColor="@color/lineup_name"
                     android:id="@+id/tile_player_most_used_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
