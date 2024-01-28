@@ -89,7 +89,8 @@ class PlayerListAdapter(
     override fun onBindViewHolder(holder: PlayerViewHolder, position: Int) {
         val player = list[position]
         with(holder.view) {
-            playerName.text = player.name.trim()
+            val playerNameValue = player.name.trim()
+            playerName.text = playerNameValue
 
             filter?.let {
                 val isMatchingPosition = player.positions and it.mask > 0
@@ -104,27 +105,10 @@ class PlayerListAdapter(
                 }
             }
 
-            playerImage.post {
-                // I put this test here because untilReady is too long to complete so the adapter
-                // inflate too late the image.
-                // this cause the images to be at the wrong place in the recycler
-                if (playerImage.width > 0 && playerImage.height > 0) {
-                    try {
-                        Picasso.get().load(player.image)
-                            .resize(playerImage.width, playerImage.height)
-                            .centerCrop()
-                            .placeholder(R.drawable.ic_unknown_field_player)
-                            .error(R.drawable.ic_unknown_field_player)
-                            .into(playerImage)
-                    } catch (e: IllegalArgumentException) {
-                        Timber.e(e)
-                    }
-                } else {
-                    Picasso.get().load(R.drawable.ic_unknown_field_player)
-                        .error(R.drawable.ic_unknown_field_player)
-                        .placeholder(R.drawable.ic_unknown_field_player)
-                        .into(playerImage)
-                }
+            holder.view.playerImage.apply {
+                val size = resources.getDimensionPixelSize(R.dimen.teams_list_icon_size)
+                setState(StateDefense.PLAYER)
+                setPlayerImage(player.image, playerNameValue, size)
             }
 
             rootView.setOnClickListener {

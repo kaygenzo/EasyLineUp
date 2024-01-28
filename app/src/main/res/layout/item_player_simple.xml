@@ -9,12 +9,11 @@
     android:layout_height="40dp"
     android:layout_margin="4dp">
 
-    <ImageView
+    <com.telen.easylineup.views.MultipleStateDefenseIconButton
         android:id="@+id/playerImage"
         android:layout_width="40dp"
         android:layout_height="match_parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        tools:src="@drawable/unknown_player"/>
+        app:layout_constraintLeft_toLeftOf="parent"/>
 
     <com.telen.easylineup.views.NormalUppercaseStyledTextView
         android:id="@+id/playerName"
