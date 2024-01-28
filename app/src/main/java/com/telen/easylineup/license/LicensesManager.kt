@@ -23,8 +23,27 @@ object LicensesManager {
         Library("Dexter", "https://github.com/Karumi/Dexter", License.APACHE2),
         Library("Licenser", "https://github.com/marcoscgdev/Licenser", License.MIT),
         Library("LeakCanary", "https://github.com/square/leakcanary", License.APACHE2),
-        Library("ColorPickerPreference", "https://github.com/skydoves/ColorPickerPreference", License.APACHE2),
+        Library(
+            "ColorPickerPreference",
+            "https://github.com/skydoves/ColorPickerPreference",
+            License.APACHE2
+        ),
         // AndroidX
+        Library(
+            "Activity",
+            "https://developer.android.com/jetpack/androidx/releases/activity",
+            License.APACHE2
+        ),
+        Library(
+            "Fragment",
+            "https://developer.android.com/jetpack/androidx/releases/fragment",
+            License.APACHE2
+        ),
+        Library(
+            "Core",
+            "https://developer.android.com/jetpack/androidx/releases/core",
+            License.APACHE2
+        ),
         Library(
             "RecyclerView",
             "https://github.com/androidx-releases/Recyclerview",
