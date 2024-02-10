@@ -132,11 +132,26 @@ abstract class LineupFragment(
             })
         }
 
-        replaceFragmentIfNeeded(binder.fragmentDefenseEdition, R.id.fragment_defense_edition) {
-            DefenseFragmentEditable()
+        if (isEditable) {
+            replaceFragmentIfNeeded<DefenseFragmentEditable>(
+                binder.fragmentDefenseEdition,
+                R.id.fragment_defense_edition
+            ) {
+                DefenseFragmentEditable()
+            }
+        } else {
+            replaceFragmentIfNeeded<DefenseFragmentFixed>(
+                binder.fragmentDefenseEdition,
+                R.id.fragment_defense_edition
+            ) {
+                DefenseFragmentFixed()
+            }
         }
 
-        replaceFragmentIfNeeded(binder.fragmentAttackEdition, R.id.fragment_attack_edition) {
+        replaceFragmentIfNeeded<AttackFragment>(
+            binder.fragmentAttackEdition,
+            R.id.fragment_attack_edition
+        ) {
             AttackFragment()
         }
 

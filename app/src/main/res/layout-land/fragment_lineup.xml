@@ -9,7 +9,6 @@
         android:id="@+id/fragment_defense_edition"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:name="com.telen.easylineup.lineup.defense.DefenseFragmentEditable"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/separator"
         app:layout_constraintBottom_toBottomOf="parent"
