@@ -10,9 +10,12 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.RequiresApi
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.single.BasePermissionListener
@@ -24,6 +27,26 @@ import com.telen.easylineup.R
 class ImagePickerUtils {
     companion object {
         fun launchPicker(context: Context, view: View?, callback: ActivityResultLauncher<Intent>) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                launchPickerNew(callback)
+            } else {
+                launchPickerLegacy(context, view, callback)
+            }
+        }
+
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        private fun launchPickerNew(callback: ActivityResultLauncher<Intent>) {
+            val intent = Intent(MediaStore.ACTION_PICK_IMAGES).apply {
+                type = "image/*"
+            }
+            callback.launch(intent)
+        }
+
+        private fun launchPickerLegacy(
+            context: Context,
+            view: View?,
+            callback: ActivityResultLauncher<Intent>
+        ) {
             val snackBarPermissionListener: PermissionListener =
                 SnackbarOnDeniedPermissionListener.Builder
                     .with(view, R.string.permission_request_read_external_storage)
@@ -41,8 +64,11 @@ class ImagePickerUtils {
                     try {
                         callback.launch(intent)
                     } catch (e: ActivityNotFoundException) {
-                        Toast.makeText(context, context.getString(R.string.file_explorer_not_found), Toast.LENGTH_LONG)
-                            .show()
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.file_explorer_not_found),
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
             }
