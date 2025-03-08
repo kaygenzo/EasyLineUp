@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.player
 
-import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -38,15 +37,12 @@ import timber.log.Timber
 class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListener, MenuProvider {
     private val viewModel by viewModels<PlayerViewModel>()
     private var binding: FragmentPlayerEditBinding? = null
-    private val pickImage =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                it.data?.data?.let { imageUri ->
-                    context?.contentResolver?.let { ImagePickerUtils.persistImage(it, imageUri) }
-                    binding?.editPlayerForm?.onImageUriReceived(imageUri)
-                }
-            }
+    private val pickImage = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
+        it?.let { uri ->
+            context?.contentResolver?.let { ImagePickerUtils.persistImage(it, uri) }
+            binding?.editPlayerForm?.onImageUriReceived(uri)
         }
+    }
 
     override fun onCancel() {
         showDiscardDialog("cancel")
@@ -54,7 +50,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
 
     override fun onImagePickerRequested() {
         FirebaseAnalyticsUtils.onClick(activity, "click_player_edit_image_pick")
-        activity?.let { ImagePickerUtils.launchPicker(it, view, pickImage) }
+        activity?.let { ImagePickerUtils.launchPicker(pickImage) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

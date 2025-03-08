@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.team.createTeam.teamMain
 
-import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -25,19 +24,16 @@ import com.telen.easylineup.views.TeamFormListener
 class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
     private val viewModel by activityViewModels<SetupViewModel>()
     private var binding: FragmentTeamEditBinding? = null
-    private val pickImage =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                it.data?.data?.let { imageUri ->
-                    context?.contentResolver?.let { ImagePickerUtils.persistImage(it, imageUri) }
-                    binding?.editTeamForm?.onImageUriReceived(imageUri)
-                }
-            }
+    private val pickImage = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
+        it?.let { uri ->
+            context?.contentResolver?.let { ImagePickerUtils.persistImage(it, uri) }
+            binding?.editTeamForm?.onImageUriReceived(uri)
         }
+    }
 
     override fun onImagePickerRequested() {
         FirebaseAnalyticsUtils.onClick(activity, "click_team_edit_image_pick")
-        activity?.let { ImagePickerUtils.launchPicker(it, view, pickImage) }
+        activity?.let { ImagePickerUtils.launchPicker(pickImage) }
     }
 
     override fun onNameChanged(name: String) {
