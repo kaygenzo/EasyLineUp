@@ -210,11 +210,6 @@ SharedPreferences.OnSharedPreferenceChangeListener {
                 "click_settings_lineup_style"
             )
 
-            getString(R.string.key_bug_report_trigger) -> {
-                FirebaseAnalyticsUtils.onClick(activity, "click_settings_bug_report_trigger")
-                viewModel.onReportMethodsChosen(requireActivity())
-            }
-
             getString(R.string.key_day_night_theme) -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_settings_theme")
                 SharedPreferencesUtils.getStringSetting(

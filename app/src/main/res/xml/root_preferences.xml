@@ -74,16 +74,6 @@
             app:key="@string/key_delete_data"/>
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/settings_category_support">
-        <ListPreference
-            android:defaultValue="0"
-            android:entries="@array/bug_report_trigger"
-            android:entryValues="@array/bug_report_trigger_values"
-            android:key="@string/key_bug_report_trigger"
-            android:title="@string/setting_bug_report_trigger_description"
-            app:useSimpleSummaryProvider="true" />
-    </PreferenceCategory>
-
     <PreferenceCategory app:title="@string/setting_category_about_title">
 
         <Preference

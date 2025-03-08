@@ -10,7 +10,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -18,14 +17,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 
-import com.getkeepsafe.taptargetview.TapTargetView
-import com.github.kaygenzo.bugreporter.api.BugReporter
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
@@ -38,11 +34,9 @@ import com.telen.easylineup.domain.model.tiles.TileData
 import com.telen.easylineup.launch
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.utils.DialogFactory
-import com.telen.easylineup.utils.FeatureViewFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.utils.hideSoftKeyboard
-import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 import java.text.DateFormat
@@ -55,7 +49,6 @@ ActionMode.Callback {
     private val itemTouchedCallback = DashboardTileTouchCallback(tileAdapter)
     private val itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
     private var binding: FragmentDashboardBinding? = null
-    private val bugReporter by inject<BugReporter>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -251,46 +244,6 @@ ActionMode.Callback {
                 }
             }
         })
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.dashboard_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-
-        activity?.let { activity ->
-            launch(viewModel.showNewReportIssueButtonFeature(), { show ->
-                if (show) {
-                    (activity.findViewById<Toolbar>(R.id.toolbar))?.let { toolbar ->
-                        FeatureViewFactory.apply(toolbar, R.id.action_report_issue,
-                            activity as AppCompatActivity,
-                            getString(R.string.shake_beta_title),
-                            getString(R.string.shake_beta_description),
-                            object : TapTargetView.Listener() {
-                                override fun onTargetClick(view: TapTargetView?) {
-                                    bugReporter.startReport(activity)
-                                    view?.dismiss(true)
-                                }
-
-                                override fun onOuterCircleClick(view: TapTargetView?) {
-                                    view?.dismiss(false)
-                                }
-                            })
-                    }
-                }
-            })
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_report_issue -> {
-                FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_report_issue")
-                activity?.run { bugReporter.startReport(this) }
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 
     override fun onPause() {

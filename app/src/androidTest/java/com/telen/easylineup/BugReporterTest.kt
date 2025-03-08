@@ -50,32 +50,6 @@ class BugReporterTest {
         stopMonitorCurrentActivity()
     }
 
-    @Test
-    fun testReportSending() {
-        // click on report issue action button
-        onView(withId(R.id.action_report_issue))
-            .perform(click())
-
-        Thread.sleep(2_000)
-
-        // add description Test
-        BaristaEditTextInteractions.writeTo(R.id.bugReporterDescription, "Test")
-        // close keyboard
-        BaristaKeyboardInteractions.closeKeyboard()
-
-        // enter edit screenshot view
-        onView(withId(R.id.bugReporterScreenshotPreview))
-            .perform(click())
-
-        // click okay action
-        onView(withId(R.id.paintActionCheck))
-            .perform(click())
-
-        // send report
-        onView(withId(R.id.action_send_report))
-            .perform(click())
-    }
-
     private fun monitorCurrentActivity() {
         ActivityLifecycleMonitorRegistry.getInstance().addLifecycleCallback(lifecycleCallback)
     }

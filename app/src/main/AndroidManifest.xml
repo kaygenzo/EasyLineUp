@@ -84,11 +84,6 @@
             android:exported="false"/>
 
         <activity
-            android:name=".reporting.SendReportActivity"
-            android:theme="@style/AppTheme.NoActionBar.Transparent"
-            android:exported="false"/>
-
-        <activity
             android:name=".splashscreen.ImportDataActivity"
             android:theme="@style/AppTheme.NoActionBar.FullScreen"
             android:exported="false"/>

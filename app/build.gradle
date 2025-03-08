@@ -204,7 +204,6 @@ dependencies {
     implementation project(path: ':repository')
     implementation project(path: ':domain')
     implementation "io.github.kaygenzo:androidtable:$tablemultiscrollVersion"
-    implementation "com.github.kaygenzo:bugreporter:$bugreportingVersion"
 
     ////////// OTHERS //////////
 

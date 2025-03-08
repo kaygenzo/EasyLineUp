@@ -129,7 +129,6 @@
     <string name="setting_import_data_update_object_description">Update data if already exists ?</string>
     <string name="setting_export_data_description">Export data to file</string>
     <string name="setting_delete_data_description">Delete all data</string>
-    <string name="setting_bug_report_trigger_description">Bug report trigger</string>
     <string name="setting_version_title">Version</string>
     <string name="setting_licenses_title">Licenses</string>
     <string name="setting_play_store_title">Google Play Store official page</string>
@@ -146,7 +145,6 @@
     <string name="key_app_version" translatable="false">key_app_version</string>
     <string name="key_app_licenses" translatable="false">key_app_licenses</string>
     <string name="key_play_store" translatable="false">key_play_store</string>
-    <string name="key_bug_report_trigger" translatable="false">key_bug_report_trigger</string>
 
     <string name="login_create">Create your first team</string>
     <string name="login_import">Import an existing team</string>

@@ -9,7 +9,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDexApplication
-import com.github.kaygenzo.bugreporter.api.BugReporter
 import com.google.firebase.appcheck.ktx.appCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -53,9 +52,6 @@ open class App : MultiDexApplication() {
         val koinApp = startKoin {
             androidContext(this@App)
             modules(ModuleProvider.modules)
-        }.apply {
-            val hasPermission = koin.get<BugReporter>().hasPermissionOverlay(this@App)
-            Timber.d("has permission to display window overlay: $hasPermission")
         }
 
         SharedPreferencesUtils.getStringSetting(
