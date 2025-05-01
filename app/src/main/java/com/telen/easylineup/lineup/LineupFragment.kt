@@ -119,7 +119,7 @@ abstract class LineupFragment(
                 TabLayoutMediator(it, pager) { tab, position ->
                     tab.text = when (position) {
                         FRAGMENT_DEFENSE_INDEX -> getString(R.string.new_lineup_tab_field_defense)
-                        FRAGMENT_ATTACK_INDEX -> getString(R.string.new_lineup_tab_field_attack)
+                        FRAGMENT_ATTACK_INDEX -> getString(R.string.new_lineup_tab_field_offense)
                         else -> ""
                     }
                 }.attach()

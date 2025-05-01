@@ -9,7 +9,7 @@
     <string name="action_report_issue">Report an issue</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>
-    <string name="new_lineup_tab_field_attack">Attack</string>
+    <string name="new_lineup_tab_field_offense">Offense</string>
     <string name="new_lineup_substitute_label">Substitutes</string>
     <string name="save_button">Save</string>
     <string name="cancel_button">Cancel</string>
