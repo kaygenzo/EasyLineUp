@@ -474,10 +474,10 @@ class PlayerDragShadowBuilder(view: View) : View.DragShadowBuilder(view) {
         outShadowTouchPoint?.set(width / 2, height / 2)
     }
 
-    override fun onDrawShadow(canvas: Canvas?) {
+    override fun onDrawShadow(canvas: Canvas) {
         // Draws the ColorDrawable in the Canvas passed in from the system.
         scaleFactor?.let {
-            canvas?.scale(it.x / view.width.toFloat(), it.y / view.height.toFloat())
+            canvas.scale(it.x / view.width.toFloat(), it.y / view.height.toFloat())
             view.draw(canvas)
         } ?: super.onDrawShadow(canvas)
     }

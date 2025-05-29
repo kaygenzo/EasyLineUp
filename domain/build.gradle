@@ -24,12 +24,13 @@ android {
     }
 
     buildTypes {
-        debug {
-            testCoverageEnabled true
-        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            enableUnitTestCoverage true
+            enableAndroidTestCoverage true
         }
     }
 
@@ -47,8 +48,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     testOptions {
@@ -59,8 +60,12 @@ android {
             }
         }
     }
-    lintOptions {
+    namespace 'com.telen.easylineup.domain'
+    lint {
         abortOnError false
+    }
+    buildFeatures {
+        buildConfig true
     }
 }
 
