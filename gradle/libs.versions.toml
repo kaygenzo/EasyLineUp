@@ -119,3 +119,4 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektPluginVersio
 appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "appDistributionPluginVersion" }
 crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsPluginVersion" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotlessPluginVersion" }
+room = { id = "androidx.room", version.ref = "roomVersion" }
