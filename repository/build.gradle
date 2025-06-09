@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 android {
@@ -12,12 +12,7 @@ android {
         targetSdkVersion targetVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
-
-        kapt {
-            arguments {
-                arg("room.schemaLocation", "$projectDir/schemas".toString())
-            }
-        }
+        ksp { arg(new RoomSchemaArgProvider(new File(projectDir, "schemas"))) }
     }
 
     flavorDimensions 'version'
@@ -57,7 +52,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation libs.room.ktx
-    kapt libs.room.compiler
+    ksp libs.room.compiler
     implementation libs.room.rxjava3
     implementation libs.livedata
     implementation libs.rx.java
@@ -65,4 +60,22 @@ dependencies {
     implementation libs.timber
 
     implementation project(path: ':domain')
+}
+
+class RoomSchemaArgProvider implements CommandLineArgumentProvider {
+
+    @InputDirectory
+    @PathSensitive(PathSensitivity.RELATIVE)
+    File schemaDir
+
+    RoomSchemaArgProvider(File schemaDir) {
+        this.schemaDir = schemaDir
+    }
+
+    @Override
+    Iterable<String> asArguments() {
+        // Note: If you're using KAPT and javac, change the line below to
+        // return ["-Aroom.schemaLocation=${schemaDir.path}".toString()].
+        return ["room.schemaLocation=${schemaDir.path}".toString()]
+    }
 }

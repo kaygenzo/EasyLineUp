@@ -1,6 +1,7 @@
 [versions]
 # Main
 kotlinVersion = '1.8.22'
+kspVersion = "1.8.22-1.0.11"
 androidGradlePluginVersion = "8.10.0"
 # Jetpack
 splashscreenVersion = "1.0.1"
@@ -109,7 +110,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 android-application = { id = "com.android.application", version.ref = "androidGradlePluginVersion" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePluginVersion" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlinVersion" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "googleServicesPluginVersion" }
 navigation = { id = "androidx.navigation.safeargs", version.ref = "navigationPluginVersion" }
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqubePluginVersion" }

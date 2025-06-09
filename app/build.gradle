@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin)
-    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.navigation)
     alias(libs.plugins.googleServices)
     alias(libs.plugins.appdistribution)
