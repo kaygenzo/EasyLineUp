@@ -7,8 +7,8 @@ buildscript {
         appVersionName = "2.0.0"
         appVersionCode = 2_00_00_04
         minVersion = 21
-        targetVersion = 33
-        compileVersion = 33
+        targetVersion = 35
+        compileVersion = 35
     }
 }
 
