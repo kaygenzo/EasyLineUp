@@ -1,7 +1,7 @@
 [versions]
 # Main
-kotlinVersion = '1.8.22'
-kspVersion = "1.8.22-1.0.11"
+kotlinVersion = '2.1.20'
+kspVersion = "2.1.20-2.0.1"
 androidGradlePluginVersion = "8.10.0"
 # Jetpack
 splashscreenVersion = "1.0.1"

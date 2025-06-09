@@ -10,7 +10,7 @@ import java.util.regex.Pattern
 fun String.toLetters(): String {
     val parts: List<String> = trim().split(Pattern.compile("[\\s-]+"), 2).map {
         if (it.isNotBlank()) {
-            it[0].toString().toUpperCase(Locale.ROOT)
+            it[0].toString().uppercase(Locale.ROOT)
         } else {
             "?"
         }
