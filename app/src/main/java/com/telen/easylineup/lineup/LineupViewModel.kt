@@ -420,7 +420,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 }
 
-fun <T> Maybe<T>.processError(): Maybe<T> {
+fun <T: Any> Maybe<T>.processError(): Maybe<T> {
     return this.onErrorResumeNext {
         when (it) {
             is NeedAssignPitcherFirstException,
