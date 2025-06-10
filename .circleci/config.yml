@@ -3,7 +3,7 @@ version: 2.1
 executors:
   easylineup-executor:
     docker:
-      - image: kaygenzo/android-fastlane:30
+      - image: kaygenzo/android-fastlane:35
     resource_class: large
     working_directory: ~/easylineup
 
