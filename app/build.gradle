@@ -145,7 +145,7 @@ dependencies {
     androidTestImplementation(libs.tests.espresso) {
         exclude group: "com.google.protobuf"
     }
-    androidTestImplementation (name:'cloudtestingscreenshotter_lib', ext:'aar')
+    androidTestImplementation files('libs/cloudtestingscreenshotter_lib.aar')
     androidTestImplementation libs.tests.rxIdler
     androidTestImplementation libs.tests.uiAutomator
     androidTestImplementation libs.tests.screengrab
