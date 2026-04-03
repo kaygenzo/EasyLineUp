@@ -388,7 +388,7 @@ class GlobalNavigationTest {
         takeScreenshot("lineup_defense_fixed", homeTestRule.activity)
 
         // click on attack
-        BaristaClickInteractions.clickOn("Attack")
+        BaristaClickInteractions.clickOn("Offense")
 
         takeScreenshot("lineup_attack_fixed", homeTestRule.activity)
 
@@ -403,7 +403,7 @@ class GlobalNavigationTest {
         takeScreenshot("lineup_defense_editable", homeTestRule.activity)
 
         // click on attack
-        BaristaClickInteractions.clickOn("Attack")
+        BaristaClickInteractions.clickOn("Offense")
 
         takeScreenshot("lineup_attack_editable", homeTestRule.activity)
 
