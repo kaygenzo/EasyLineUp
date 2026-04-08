@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.room)
 }
@@ -10,7 +9,6 @@ android {
 
     defaultConfig {
         minSdkVersion minVersion
-        targetSdkVersion targetVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
     }
@@ -42,12 +40,16 @@ android {
     namespace 'com.telen.easylineup.repository'
     lint {
         abortOnError false
+        targetSdk targetVersion
     }
     buildFeatures {
         buildConfig true
     }
     room {
         schemaDirectory("$projectDir/schemas")
+    }
+    testOptions {
+        targetSdk { version = release(targetVersion) }
     }
 }
 

@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin)
 }
 
 repositories {
@@ -18,7 +17,6 @@ android {
 
     defaultConfig {
         minSdkVersion minVersion
-        targetSdkVersion targetVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
     }
@@ -59,10 +57,12 @@ android {
                 excludes = ['jdk.internal.*']
             }
         }
+        targetSdk { version = release(targetVersion) }
     }
     namespace 'com.telen.easylineup.domain'
     lint {
         abortOnError false
+        targetSdk targetVersion
     }
     buildFeatures {
         buildConfig true
