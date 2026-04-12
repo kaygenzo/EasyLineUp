@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets
 buildscript {
     ext {
         appVersionName = "2.1.0"
-        appVersionCode = 2_01_00_01
+        appVersionCode = 2_01_00_02
         minVersion = 21
         targetVersion = 36
         compileVersion = 36
