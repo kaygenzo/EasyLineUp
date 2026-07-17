@@ -8,7 +8,6 @@ import android.content.Context
 import com.telen.easylineup.domain.application.LineupsInteractor
 import com.telen.easylineup.domain.application.PlayerFieldPositionsInteractor
 import com.telen.easylineup.domain.application.PlayersInteractor
-import com.telen.easylineup.domain.application.TeamsInteractor
 import com.telen.easylineup.domain.application.TournamentsInteractor
 import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.model.DashboardTile
@@ -28,6 +27,7 @@ import com.telen.easylineup.domain.usecases.ExportData
 import com.telen.easylineup.domain.usecases.GetDashboardTiles
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ImportData
+import com.telen.easylineup.domain.usecases.InsertTeam
 import com.telen.easylineup.domain.usecases.SaveDashboardTiles
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
@@ -84,7 +84,7 @@ internal class DataInteractorImplTest {
 
         // Not exercised by the tests below - just need a valid graph to construct the interactor.
         val databaseMockProvider = DatabaseMockProvider(
-            teamsInteractor = Mockito.mock(TeamsInteractor::class.java),
+            insertTeamUseCase = InsertTeam(teamRepository),
             playersInteractor = Mockito.mock(PlayersInteractor::class.java),
             lineupsInteractor = Mockito.mock(LineupsInteractor::class.java),
             playerFieldPositionsInteractor = Mockito.mock(PlayerFieldPositionsInteractor::class.java),

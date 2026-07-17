@@ -7,7 +7,6 @@ package com.telen.easylineup.domain.application
 internal class ApplicationInteractorImpl(
     private val dataInteractor: DataInteractor,
     private val lineupsInteractor: LineupsInteractor,
-    private val teamsInteractor: TeamsInteractor,
     private val tournamentsInteractor: TournamentsInteractor,
     private val playerFieldPositionsInteractor: PlayerFieldPositionsInteractor,
     private val playerInteractor: PlayersInteractor,
@@ -15,7 +14,6 @@ internal class ApplicationInteractorImpl(
 
     override fun data() = dataInteractor
     override fun lineups() = lineupsInteractor
-    override fun teams() = teamsInteractor
     override fun tournaments() = tournamentsInteractor
     override fun playerFieldPositions() = playerFieldPositionsInteractor
     override fun players() = playerInteractor

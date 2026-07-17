@@ -12,10 +12,11 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.application.DataInteractor
 import com.telen.easylineup.domain.application.PlayersInteractor
-import com.telen.easylineup.domain.application.TeamsInteractor
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
@@ -51,7 +52,7 @@ internal class DashboardViewModelTest {
     lateinit var applicationInteractor: ApplicationInteractor
 
     @Mock
-    lateinit var teamsInteractor: TeamsInteractor
+    lateinit var teamRepository: TeamRepository
 
     @Mock
     lateinit var dataInteractor: DataInteractor
@@ -71,8 +72,7 @@ internal class DashboardViewModelTest {
     fun setup() {
         MockitoAnnotations.initMocks(this)
 
-        // lenient: each test only exercises one of these three sub-ports
-        Mockito.lenient().`when`(applicationInteractor.teams()).thenReturn(teamsInteractor)
+        // lenient: each test only exercises one of these sub-ports
         Mockito.lenient().`when`(applicationInteractor.data()).thenReturn(dataInteractor)
         Mockito.lenient().`when`(applicationInteractor.players()).thenReturn(playersInteractor)
 
@@ -80,6 +80,7 @@ internal class DashboardViewModelTest {
             modules(
                 module {
                     single { applicationInteractor }
+                    single { ObserveTeams(teamRepository) }
                     single { SharedPreferencesHelper(context) }
                 }
             )
@@ -97,7 +98,7 @@ internal class DashboardViewModelTest {
     fun shouldRegisterTilesLiveDataAndSwitchToDashboardConfigurationsWhenTeamsChange() {
         val teamsLiveData = MutableLiveData<List<Team>>()
         val tilesLiveData = MutableLiveData<List<DashboardTile>>()
-        Mockito.`when`(teamsInteractor.observeTeams()).thenReturn(teamsLiveData)
+        Mockito.`when`(teamRepository.getTeams()).thenReturn(teamsLiveData)
         Mockito.`when`(dataInteractor.getDashboardConfigurations()).thenReturn(tilesLiveData)
 
         val observedValues = mutableListOf<List<DashboardTile>>()

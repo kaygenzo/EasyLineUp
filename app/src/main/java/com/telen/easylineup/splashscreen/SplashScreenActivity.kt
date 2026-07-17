@@ -11,14 +11,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.telen.easylineup.BaseImportActivity
 import com.telen.easylineup.databinding.SplashscreenBinding
-import com.telen.easylineup.domain.application.ApplicationInteractor
+import com.telen.easylineup.domain.UseCaseHandler
+import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.login.LoginActivity
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class SplashScreenActivity : BaseImportActivity(), KoinComponent {
-    private val domain: ApplicationInteractor by inject()
+    private val useCaseHandler: UseCaseHandler by inject()
+    private val getTeam: GetTeam by inject()
     private var binding: SplashscreenBinding? = null
     private val activityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -34,7 +36,8 @@ class SplashScreenActivity : BaseImportActivity(), KoinComponent {
         data?.let {
             launchImportActivity(it)
         } ?: run {
-            val disposable = domain.teams().getTeam()
+            val disposable = useCaseHandler.execute(getTeam, GetTeam.RequestValues())
+                .map { it.team }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     launchHome()

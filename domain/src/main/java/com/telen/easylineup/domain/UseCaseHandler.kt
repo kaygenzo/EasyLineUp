@@ -8,7 +8,7 @@ import com.telen.easylineup.domain.usecases.SchedulersProvider
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
 
-internal open class UseCaseHandler(
+open class UseCaseHandler(
     private val schedulersProvider: SchedulersProvider
 ) {
     open fun <T : UseCase.RequestValues, R : UseCase.ResponseValue> execute(

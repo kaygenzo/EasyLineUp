@@ -9,7 +9,6 @@ import com.google.gson.JsonParser
 import com.telen.easylineup.domain.application.LineupsInteractor
 import com.telen.easylineup.domain.application.PlayerFieldPositionsInteractor
 import com.telen.easylineup.domain.application.PlayersInteractor
-import com.telen.easylineup.domain.application.TeamsInteractor
 import com.telen.easylineup.domain.application.TournamentsInteractor
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
@@ -17,12 +16,13 @@ import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.usecases.InsertTeam
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 class DatabaseMockProvider(
-    private val teamsInteractor: TeamsInteractor,
+    private val insertTeamUseCase: InsertTeam,
     private val playersInteractor: PlayersInteractor,
     private val lineupsInteractor: LineupsInteractor,
     private val playerFieldPositionsInteractor: PlayerFieldPositionsInteractor,
@@ -157,7 +157,7 @@ class DatabaseMockProvider(
     }
 
     private fun insertTeam(team: Team): Completable {
-        return teamsInteractor.insertTeam(team).ignoreElement()
+        return insertTeamUseCase.executeUseCase(InsertTeam.RequestValues(team)).ignoreElement()
             .subscribeOn(Schedulers.io())
     }
 

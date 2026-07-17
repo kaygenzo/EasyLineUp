@@ -11,13 +11,19 @@ import com.telen.easylineup.domain.repository.TeamRepository
 import io.reactivex.rxjava3.core.Single
 
 /**
+ * Validates the team name, inserts or updates it, then marks it as the current team.
+ *
  * @property dao
  */
-internal class SaveTeam(val dao: TeamRepository) :
-    UseCase<SaveTeam.RequestValues, SaveTeam.ResponseValue>() {
+class SaveTeam(
+    val dao: TeamRepository,
+    private val checkTeam: CheckTeam,
+    private val saveCurrentTeam: SaveCurrentTeam
+) : UseCase<SaveTeam.RequestValues, SaveTeam.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return Single.just(requestValues.team)
-            .flatMap { team ->
+        return checkTeam.executeUseCase(CheckTeam.RequestValues(requestValues.team))
+            .flatMap {
+                val team = requestValues.team
                 if (team.type == TeamType.UNKNOWN.id) {
                     team.type = TeamType.BASEBALL.id
                 }
@@ -30,8 +36,9 @@ internal class SaveTeam(val dao: TeamRepository) :
                     dao.updateTeam(team).andThen(Single.just(team))
                 }
             }
-            .flatMap {
-                Single.just(ResponseValue(it))
+            .flatMap { team ->
+                saveCurrentTeam.executeUseCase(SaveCurrentTeam.RequestValues(team))
+                    .map { ResponseValue(team) }
             }
     }
 

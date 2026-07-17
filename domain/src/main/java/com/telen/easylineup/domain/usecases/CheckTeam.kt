@@ -9,7 +9,7 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import io.reactivex.rxjava3.core.Single
 
-internal class CheckTeam : UseCase<CheckTeam.RequestValues, CheckTeam.ResponseValue>() {
+class CheckTeam : UseCase<CheckTeam.RequestValues, CheckTeam.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.just(requestValues.team)
             .flatMap { team ->

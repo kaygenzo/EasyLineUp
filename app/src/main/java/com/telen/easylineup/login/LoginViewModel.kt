@@ -8,9 +8,11 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
+import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.export.ExportBase
+import com.telen.easylineup.domain.usecases.GetTeam
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -30,6 +32,8 @@ object GetTeamFailed : LoginEvent()
 
 class LoginViewModel : ViewModel(), KoinComponent {
     private val domain: ApplicationInteractor by inject()
+    private val useCaseHandler: UseCaseHandler by inject()
+    private val getTeamUseCase: GetTeam by inject()
     private val context: Context by inject()
     private val _loginEvent: Subject<LoginEvent> = PublishSubject.create()
     val disposables = CompositeDisposable()
@@ -71,7 +75,8 @@ class LoginViewModel : ViewModel(), KoinComponent {
     }
 
     fun getMainTeam() {
-        val disposable = domain.teams().getTeam()
+        val disposable = useCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
+            .map { it.team }
             .subscribe({
                 _loginEvent.onNext(GetTeamSuccess(it))
             }, {

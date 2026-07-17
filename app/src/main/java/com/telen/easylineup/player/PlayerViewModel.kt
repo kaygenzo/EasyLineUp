@@ -10,10 +10,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.usecases.GetTeam
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.koin.core.component.KoinComponent
@@ -22,6 +24,8 @@ import timber.log.Timber
 
 class PlayerViewModel : ViewModel(), KoinComponent {
     private val domain: ApplicationInteractor by inject()
+    private val useCaseHandler: UseCaseHandler by inject()
+    private val getTeamUseCase: GetTeam by inject()
     private val disposables = CompositeDisposable()
     private val _teamTypeLiveData: MutableLiveData<Int> = MutableLiveData<Int>().apply {
         getTeamType()
@@ -110,12 +114,14 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getTeamType() {
-        val disposable = domain.teams().getTeamType().subscribe({
-            this.teamType = it
-            _teamTypeLiveData.postValue(it)
-        }, {
-            Timber.e(it)
-        })
+        val disposable = useCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
+            .map { it.team.type }
+            .subscribe({
+                this.teamType = it
+                _teamTypeLiveData.postValue(it)
+            }, {
+                Timber.e(it)
+            })
         disposables.add(disposable)
     }
 

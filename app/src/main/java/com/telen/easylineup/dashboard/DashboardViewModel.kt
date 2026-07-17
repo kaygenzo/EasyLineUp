@@ -10,6 +10,7 @@ import androidx.lifecycle.switchMap
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.DashboardTile
+import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import io.reactivex.rxjava3.core.Single
 import org.koin.core.component.KoinComponent
@@ -17,10 +18,11 @@ import org.koin.core.component.inject
 
 class DashboardViewModel : ViewModel(), KoinComponent {
     private val domain: ApplicationInteractor by inject()
+    private val observeTeams: ObserveTeams by inject()
     private val prefsHelper: SharedPreferencesHelper by inject()
     var actionMode: ActionMode? = null
 
-    fun registerTilesLiveData() = domain.teams().observeTeams().switchMap {
+    fun registerTilesLiveData() = observeTeams.execute().switchMap {
         domain.data().getDashboardConfigurations()
     }
 

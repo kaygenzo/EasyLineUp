@@ -20,6 +20,7 @@ import androidx.preference.PreferenceManager
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
@@ -29,6 +30,7 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import com.telen.easylineup.views.LineupTypeface
@@ -74,6 +76,8 @@ data class ListAvailablePlayers(
 class LineupViewModel : ViewModel(), KoinComponent {
     private val prefsHelper by inject<SharedPreferencesHelper>()
     private val domain: ApplicationInteractor by inject()
+    private val useCaseHandler: UseCaseHandler by inject()
+    private val getTeamUseCase: GetTeam by inject()
 
     // private val _designatedPlayerTitle = MutableLiveData<String>()
     private val _helpEvent: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -177,7 +181,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun getTeamType(): Single<Int> {
-        return domain.teams().getTeamType()
+        return useCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team.type }
     }
 
     fun onLineupModeChanged(isEnabled: Boolean) {
@@ -318,17 +322,20 @@ class LineupViewModel : ViewModel(), KoinComponent {
                 val batterSize = TeamStrategy.getStrategyById(lineup.strategy).batterSize
                 val extraHitters = lineup.extraHitters
                 val lineupMode = lineup.mode
-                val disposable = domain.teams().getTeamType().flatMap {
-                    domain.lineups().getBatterStates(
-                        players = players,
-                        teamType = it,
-                        batterSize = batterSize,
-                        extraHitterSize = extraHitters,
-                        lineupMode = lineupMode,
-                        isDebug = BuildConfig.DEBUG,
-                        isEditable = editable
-                    )
-                }.subscribe({
+                val disposable = useCaseHandler
+                    .execute(getTeamUseCase, GetTeam.RequestValues())
+                    .map { it.team.type }
+                    .flatMap {
+                        domain.lineups().getBatterStates(
+                            players = players,
+                            teamType = it,
+                            batterSize = batterSize,
+                            extraHitterSize = extraHitters,
+                            lineupMode = lineupMode,
+                            isDebug = BuildConfig.DEBUG,
+                            isEditable = editable
+                        )
+                    }.subscribe({
                     _batters.postValue(it)
                 }, {
                     Timber.e(it)

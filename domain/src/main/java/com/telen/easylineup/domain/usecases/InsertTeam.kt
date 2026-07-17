@@ -9,18 +9,12 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
 import io.reactivex.rxjava3.core.Single
 
-/**
- * @property dao
- */
-class GetAllTeams(val dao: TeamRepository) :
-    UseCase<GetAllTeams.RequestValues, GetAllTeams.ResponseValue>() {
+class InsertTeam(private val dao: TeamRepository) :
+    UseCase<InsertTeam.RequestValues, InsertTeam.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return dao.getTeamsRx().map { ResponseValue(it) }
+        return dao.insertTeam(requestValues.team).map { ResponseValue(it) }
     }
 
-    /**
-     * @property teams
-     */
-    class ResponseValue(val teams: List<Team>) : UseCase.ResponseValue
-    class RequestValues : UseCase.RequestValues
+    class RequestValues(val team: Team) : UseCase.RequestValues
+    class ResponseValue(val id: Long) : UseCase.ResponseValue
 }

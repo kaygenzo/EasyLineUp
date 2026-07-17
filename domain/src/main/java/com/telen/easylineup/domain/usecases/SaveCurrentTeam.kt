@@ -14,7 +14,7 @@ import io.reactivex.rxjava3.core.Single
 /**
  * @property dao
  */
-internal class SaveCurrentTeam(val dao: TeamRepository) :
+class SaveCurrentTeam(val dao: TeamRepository) :
     UseCase<SaveCurrentTeam.RequestValues, SaveCurrentTeam.ResponseValue>() {
     @SuppressLint("ApplySharedPref")
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {

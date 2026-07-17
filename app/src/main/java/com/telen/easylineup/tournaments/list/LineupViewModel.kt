@@ -12,6 +12,7 @@ import androidx.lifecycle.switchMap
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.Lineup
@@ -19,6 +20,7 @@ import com.telen.easylineup.domain.model.MapInfo
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import com.telen.easylineup.utils.SharedPreferencesHelper
@@ -42,6 +44,8 @@ data class SaveSuccess(val lineup: Lineup) : SaveResult()
 
 class LineupViewModel : ViewModel(), KoinComponent {
     private val domain: ApplicationInteractor by inject()
+    private val useCaseHandler: UseCaseHandler by inject()
+    private val getTeamUseCase: GetTeam by inject()
     private val prefsHelper by inject<SharedPreferencesHelper>()
     private val _categorizedLineupsLiveData: MutableLiveData<List<TournamentItem>> =
         MutableLiveData()
@@ -167,7 +171,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun getTeamType(): Single<Int> {
-        return domain.teams().getTeamType()
+        return useCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team.type }
     }
 
     fun saveTournament(tournament: Tournament): Completable {

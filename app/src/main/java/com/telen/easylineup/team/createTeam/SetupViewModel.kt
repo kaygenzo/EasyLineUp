@@ -10,9 +10,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.application.ApplicationInteractor
+import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.usecases.SaveTeam
 import com.telen.easylineup.views.TeamTypeCardItem
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -22,7 +23,8 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 class SetupViewModel : ViewModel(), KoinComponent {
-    private val domain: ApplicationInteractor by inject()
+    private val useCaseHandler: UseCaseHandler by inject()
+    private val saveTeamUseCase: SaveTeam by inject()
     private val _team: MutableLiveData<Team> = MutableLiveData()
     private var currentTeam = Team(0, "", null, TeamType.UNKNOWN.id, true)
     var errors: Subject<StepError> = PublishSubject.create()
@@ -56,7 +58,9 @@ class SetupViewModel : ViewModel(), KoinComponent {
     }
 
     fun onSaveClicked(): Completable {
-        return domain.teams().saveTeam(currentTeam)
+        return useCaseHandler
+            .execute(saveTeamUseCase, SaveTeam.RequestValues(currentTeam))
+            .ignoreElement()
     }
 
     fun setTeam(team: Team?) {

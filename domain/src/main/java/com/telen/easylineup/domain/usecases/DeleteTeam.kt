@@ -10,7 +10,7 @@ import com.telen.easylineup.domain.repository.TeamRepository
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 
-internal class DeleteTeam(private val dao: TeamRepository) :
+class DeleteTeam(private val dao: TeamRepository) :
     UseCase<DeleteTeam.RequestValues, DeleteTeam.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.just(requestValues.team)

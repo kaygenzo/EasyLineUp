@@ -11,13 +11,11 @@ import com.telen.easylineup.domain.application.DataInteractor
 import com.telen.easylineup.domain.application.LineupsInteractor
 import com.telen.easylineup.domain.application.PlayerFieldPositionsInteractor
 import com.telen.easylineup.domain.application.PlayersInteractor
-import com.telen.easylineup.domain.application.TeamsInteractor
 import com.telen.easylineup.domain.application.TournamentsInteractor
 import com.telen.easylineup.domain.application.impl.DataInteractorImpl
 import com.telen.easylineup.domain.application.impl.LineupsInteractorImpl
 import com.telen.easylineup.domain.application.impl.PlayerFieldPositionsInteractorImpl
 import com.telen.easylineup.domain.application.impl.PlayersInteractorImpl
-import com.telen.easylineup.domain.application.impl.TeamsInteractorImpl
 import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.application.impl.TournamentsInteractorImpl
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
@@ -49,6 +47,8 @@ import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.GetTournamentStatsForPositionTable
 import com.telen.easylineup.domain.usecases.GetTournaments
 import com.telen.easylineup.domain.usecases.ImportData
+import com.telen.easylineup.domain.usecases.InsertTeam
+import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
 import com.telen.easylineup.domain.usecases.SaveDashboardTiles
@@ -73,7 +73,6 @@ object DomainModule {
             ApplicationInteractorImpl(
                 dataInteractor = get(),
                 lineupsInteractor = get(),
-                teamsInteractor = get(),
                 tournamentsInteractor = get(),
                 playerFieldPositionsInteractor = get(),
                 playerInteractor = get()
@@ -91,18 +90,6 @@ object DomainModule {
                 savePlayerNumberOverlay = get(),
                 getShirtNumberHistory = get(),
                 validatorUtils = get(),
-                useCaseHandler = get()
-            )
-        }
-        single<TeamsInteractor> {
-            TeamsInteractorImpl(
-                teamsRepo = get(),
-                getTeam = get(),
-                getAllTeamsUseCase = get(),
-                saveCurrentTeam = get(),
-                deleteTeamUseCase = get(),
-                saveTeamUseCase = get(),
-                checkTeamUseCase = get(),
                 useCaseHandler = get()
             )
         }
@@ -154,7 +141,7 @@ object DomainModule {
         }
         single {
             DatabaseMockProvider(
-                teamsInteractor = get(),
+                insertTeamUseCase = get(),
                 playersInteractor = get(),
                 lineupsInteractor = get(),
                 playerFieldPositionsInteractor = get(),
@@ -192,8 +179,10 @@ object DomainModule {
         single { SavePlayer(get()) }
         single { GetPositionsSummaryForPlayer(get()) }
         single { GetPlayers(get()) }
-        single { SaveTeam(get()) }
+        single { SaveTeam(get(), get(), get()) }
         single { CheckTeam() }
+        single { ObserveTeams(get()) }
+        single { InsertTeam(get()) }
         single { AssignPlayerFieldPosition() }
         single { DeletePlayerFieldPosition() }
         single { GetListAvailablePlayersForSelection() }

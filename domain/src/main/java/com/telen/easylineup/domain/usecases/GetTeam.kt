@@ -12,7 +12,7 @@ import io.reactivex.rxjava3.core.Single
 /**
  * @property dao
  */
-internal class GetTeam(val dao: TeamRepository) :
+class GetTeam(val dao: TeamRepository) :
     UseCase<GetTeam.RequestValues, GetTeam.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return dao.getTeamsRx().map { teams -> teams.first { team -> team.main } }

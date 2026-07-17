@@ -10,7 +10,10 @@ import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.usecases.CheckTeam
+import com.telen.easylineup.domain.usecases.SaveCurrentTeam
 import com.telen.easylineup.domain.usecases.SaveTeam
+import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
@@ -23,6 +26,10 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
+/**
+ * `SaveTeam` also validates the name and marks the team as current - it absorbed that
+ * orchestration from `TeamsInteractorImpl.saveTeam()` when the Interactor layer was removed.
+ */
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveTeamTests {
     val observer: TestObserver<SaveTeam.ResponseValue> = TestObserver()
@@ -33,31 +40,33 @@ internal class SaveTeamTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        saveTeam = SaveTeam(teamDao)
+        saveTeam = SaveTeam(teamDao, CheckTeam(), SaveCurrentTeam(teamDao))
         team = Team(id = 1L, name = "test", type = TeamType.BASEBALL.id, main = true)
         Mockito.`when`(teamDao.insertTeam(any())).thenReturn(Single.just(2L))
         Mockito.`when`(teamDao.updateTeam(any())).thenReturn(Completable.complete())
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
+        Mockito.`when`(teamDao.updateTeams(any())).thenReturn(Completable.complete())
     }
 
-    // @Test
-    // fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() {
-    // mTeam.name = ""
-    // val request = SaveTeam.RequestValues(mTeam)
-    // val observer = TestObserver<SaveTeam.ResponseValue>()
-    // saveTeam.executeUseCase(request).subscribe(observer)
-    // observer.await()
-    // observer.assertError(NameEmptyException::class.java)
-    // }
+    @Test
+    fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() {
+        team.name = ""
+        val request = SaveTeam.RequestValues(team)
+        saveTeam.executeUseCase(request).subscribe(observer)
+        observer.await()
+        observer.assertError(NameEmptyException::class.java)
+        verify(teamDao, never()).insertTeam(any())
+        verify(teamDao, never()).updateTeam(any())
+    }
 
-    // @Test
-    // fun shouldTriggerNameEmptyExceptionIfNameIsOnlyWhitespaces() {
-    // mTeam.name = "\n\t\r       "
-    // val request = SaveTeam.RequestValues(mTeam)
-    // val observer = TestObserver<SaveTeam.ResponseValue>()
-    // saveTeam.executeUseCase(request).subscribe(observer)
-    // observer.await()
-    // observer.assertError(NameEmptyException::class.java)
-    // }
+    @Test
+    fun shouldTriggerNameEmptyExceptionIfNameIsOnlyWhitespaces() {
+        team.name = "\n\t\r       "
+        val request = SaveTeam.RequestValues(team)
+        saveTeam.executeUseCase(request).subscribe(observer)
+        observer.await()
+        observer.assertError(NameEmptyException::class.java)
+    }
 
     @Test
     fun shouldUpdateTeamIfIdGreaterThatZero() {
@@ -90,5 +99,14 @@ internal class SaveTeamTests {
         observer.await()
         observer.assertComplete()
         Assert.assertEquals(TeamType.BASEBALL.id, observer.values().first().team.type)
+    }
+
+    @Test
+    fun shouldSetTeamAsCurrentAfterSaving() {
+        val request = SaveTeam.RequestValues(team)
+        saveTeam.executeUseCase(request).subscribe(observer)
+        observer.await()
+        observer.assertComplete()
+        verify(teamDao).updateTeams(any())
     }
 }
