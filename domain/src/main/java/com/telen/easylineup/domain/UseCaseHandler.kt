@@ -4,19 +4,17 @@
 
 package com.telen.easylineup.domain
 
+import com.telen.easylineup.domain.usecases.SchedulersProvider
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.schedulers.Schedulers
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-internal object UseCaseHandler : KoinComponent {
-    private val mainThreadScheduler: Scheduler by inject()
-
-    fun <T : UseCase.RequestValues, R : UseCase.ResponseValue> execute(
+internal open class UseCaseHandler(
+    private val schedulersProvider: SchedulersProvider
+) {
+    open fun <T : UseCase.RequestValues, R : UseCase.ResponseValue> execute(
         useCase: UseCase<T, R>, values: T,
-        subscribeOn: Scheduler = Schedulers.io(),
-        observeOn: Scheduler = mainThreadScheduler
+        subscribeOn: Scheduler = schedulersProvider.io(),
+        observeOn: Scheduler = schedulersProvider.main()
     ): Single<R> {
         return useCase.executeUseCase(values).subscribeOn(subscribeOn).observeOn(observeOn)
     }

@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.domain.application.impl
 
+import com.telen.easylineup.domain.testUseCaseHandler
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.CheckTeam
@@ -22,8 +23,6 @@ import org.junit.Assert.assertSame
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
@@ -36,7 +35,7 @@ import org.mockito.junit.MockitoJUnitRunner
  * way [com.telen.easylineup.domain.DomainModule] wires them in production.
  */
 @RunWith(MockitoJUnitRunner::class)
-internal class TeamsInteractorImplTest : BaseInteractorTest() {
+internal class TeamsInteractorImplTest {
 
     @Mock
     lateinit var teamRepository: TeamRepository
@@ -50,19 +49,16 @@ internal class TeamsInteractorImplTest : BaseInteractorTest() {
     fun setup() {
         MockitoAnnotations.initMocks(this)
 
-        loadKoinModules(
-            module {
-                single { teamRepository }
-                single { GetTeam(teamRepository) }
-                single { GetAllTeams(teamRepository) }
-                single { SaveCurrentTeam(teamRepository) }
-                single { DeleteTeam(teamRepository) }
-                single { SaveTeam(teamRepository) }
-                single { CheckTeam() }
-            }
+        interactor = TeamsInteractorImpl(
+            teamsRepo = teamRepository,
+            getTeam = GetTeam(teamRepository),
+            getAllTeamsUseCase = GetAllTeams(teamRepository),
+            saveCurrentTeam = SaveCurrentTeam(teamRepository),
+            deleteTeamUseCase = DeleteTeam(teamRepository),
+            saveTeamUseCase = SaveTeam(teamRepository),
+            checkTeamUseCase = CheckTeam(),
+            useCaseHandler = testUseCaseHandler()
         )
-
-        interactor = TeamsInteractorImpl()
     }
 
     @Test

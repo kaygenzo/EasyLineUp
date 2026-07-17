@@ -6,7 +6,11 @@ package com.telen.easylineup.domain.mock
 
 import android.content.Context
 import com.google.gson.JsonParser
-import com.telen.easylineup.domain.application.ApplicationInteractor
+import com.telen.easylineup.domain.application.LineupsInteractor
+import com.telen.easylineup.domain.application.PlayerFieldPositionsInteractor
+import com.telen.easylineup.domain.application.PlayersInteractor
+import com.telen.easylineup.domain.application.TeamsInteractor
+import com.telen.easylineup.domain.application.TournamentsInteractor
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerFieldPosition
@@ -16,11 +20,14 @@ import com.telen.easylineup.domain.model.Tournament
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-class DatabaseMockProvider : KoinComponent {
-    private val domain: ApplicationInteractor by inject()
+class DatabaseMockProvider(
+    private val teamsInteractor: TeamsInteractor,
+    private val playersInteractor: PlayersInteractor,
+    private val lineupsInteractor: LineupsInteractor,
+    private val playerFieldPositionsInteractor: PlayerFieldPositionsInteractor,
+    private val tournamentsInteractor: TournamentsInteractor
+) {
 
     fun createMockDatabase(context: Context): Completable {
         return Single.create<String> { emitter ->
@@ -150,32 +157,32 @@ class DatabaseMockProvider : KoinComponent {
     }
 
     private fun insertTeam(team: Team): Completable {
-        return domain.teams().insertTeam(team).ignoreElement()
+        return teamsInteractor.insertTeam(team).ignoreElement()
             .subscribeOn(Schedulers.io())
     }
 
     private fun insertPlayers(list: List<Player>): Completable {
-        return domain.players().insertPlayers(list)
+        return playersInteractor.insertPlayers(list)
             .subscribeOn(Schedulers.io())
     }
 
     private fun insertLineups(list: List<Lineup>): Completable {
-        return domain.lineups().insertLineups(list)
+        return lineupsInteractor.insertLineups(list)
             .subscribeOn(Schedulers.io())
     }
 
     private fun insertPlayerFieldPositions(list: List<PlayerFieldPosition>): Completable {
-        return domain.playerFieldPositions().insertPlayerFieldPositions(list)
+        return playerFieldPositionsInteractor.insertPlayerFieldPositions(list)
             .subscribeOn(Schedulers.io())
     }
 
     private fun insertPlayerNumberOverlays(list: List<PlayerNumberOverlay>): Completable {
-        return domain.players().insertPlayerNumberOverlays(list)
+        return playersInteractor.insertPlayerNumberOverlays(list)
             .subscribeOn(Schedulers.io())
     }
 
     private fun insertTournaments(list: List<Tournament>): Completable {
-        return domain.tournaments().insertTournaments(list)
+        return tournamentsInteractor.insertTournaments(list)
             .subscribeOn(Schedulers.io())
     }
 }

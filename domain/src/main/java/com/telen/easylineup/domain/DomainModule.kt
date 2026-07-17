@@ -18,6 +18,7 @@ import com.telen.easylineup.domain.application.impl.LineupsInteractorImpl
 import com.telen.easylineup.domain.application.impl.PlayerFieldPositionsInteractorImpl
 import com.telen.easylineup.domain.application.impl.PlayersInteractorImpl
 import com.telen.easylineup.domain.application.impl.TeamsInteractorImpl
+import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.application.impl.TournamentsInteractorImpl
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.CheckHashData
@@ -67,13 +68,114 @@ import org.koin.dsl.module
 
 object DomainModule {
     val domainModules = module {
-        single<ApplicationInteractor> { ApplicationInteractorImpl() }
-        single<PlayersInteractor> { PlayersInteractorImpl() }
-        single<TeamsInteractor> { TeamsInteractorImpl() }
-        single<LineupsInteractor> { LineupsInteractorImpl(get()) }
-        single<TournamentsInteractor> { TournamentsInteractorImpl() }
-        single<PlayerFieldPositionsInteractor> { PlayerFieldPositionsInteractorImpl() }
-        single<DataInteractor> { DataInteractorImpl(get()) }
+        single { UseCaseHandler(get()) }
+        single<ApplicationInteractor> {
+            ApplicationInteractorImpl(
+                dataInteractor = get(),
+                lineupsInteractor = get(),
+                teamsInteractor = get(),
+                tournamentsInteractor = get(),
+                playerFieldPositionsInteractor = get(),
+                playerInteractor = get()
+            )
+        }
+        single<PlayersInteractor> {
+            PlayersInteractorImpl(
+                playersRepo = get(),
+                getPlayer = get(),
+                deletePlayer = get(),
+                savePlayer = get(),
+                getPlayerPositionsSummary = get(),
+                getPlayers = get(),
+                getTeam = get(),
+                savePlayerNumberOverlay = get(),
+                getShirtNumberHistory = get(),
+                validatorUtils = get(),
+                useCaseHandler = get()
+            )
+        }
+        single<TeamsInteractor> {
+            TeamsInteractorImpl(
+                teamsRepo = get(),
+                getTeam = get(),
+                getAllTeamsUseCase = get(),
+                saveCurrentTeam = get(),
+                deleteTeamUseCase = get(),
+                saveTeamUseCase = get(),
+                checkTeamUseCase = get(),
+                useCaseHandler = get()
+            )
+        }
+        single<LineupsInteractor> {
+            LineupsInteractorImpl(
+                context = get(),
+                playersRepo = get(),
+                lineupsRepo = get(),
+                getTeam = get(),
+                createLineup = get(),
+                updateLineupRoster = get(),
+                deleteLineup = get(),
+                setLineupMode = get(),
+                updatePlayersWithLineupMode = get(),
+                getRoster = get(),
+                saveBattingOrderAndPosition = get(),
+                getDpAndFlexFromPlayersInField = get(),
+                saveDpAndFlex = get(),
+                getBatterState = get(),
+                getListAvailablePlayersForLineup = get(),
+                getPlayersInField = get(),
+                updateLineup = get(),
+                updatePlayersWithBatters = get(),
+                useCaseHandler = get()
+            )
+        }
+        single<TournamentsInteractor> {
+            TournamentsInteractorImpl(
+                tournamentsRepo = get(),
+                getTeam = get(),
+                deleteTournamentUseCase = get(),
+                getAllTournamentsWithLineupsUseCase = get(),
+                getTournamentsUseCase = get(),
+                tableDataUseCase = get(),
+                saveTournament = get(),
+                getTournamentMapLink = get(),
+                useCaseHandler = get()
+            )
+        }
+        single<PlayerFieldPositionsInteractor> {
+            PlayerFieldPositionsInteractorImpl(
+                playerFieldPositionRepo = get(),
+                getTeam = get(),
+                savePlayerFieldPosition = get(),
+                deletePlayerFieldPosition = get(),
+                switchPlayersPosition = get(),
+                useCaseHandler = get()
+            )
+        }
+        single {
+            DatabaseMockProvider(
+                teamsInteractor = get(),
+                playersInteractor = get(),
+                lineupsInteractor = get(),
+                playerFieldPositionsInteractor = get(),
+                tournamentsInteractor = get()
+            )
+        }
+        single<DataInteractor> {
+            DataInteractorImpl(
+                context = get(),
+                getTeam = get(),
+                getDashboardTiles = get(),
+                updateTiles = get(),
+                createTiles = get(),
+                deleteAllData = get(),
+                checkHash = get(),
+                importer = get(),
+                exportData = get(),
+                databaseMockProvider = get(),
+                useCaseHandler = get()
+            )
+        }
 
         single { GetTeam(get()) }
         single { GetAllTeams(get()) }

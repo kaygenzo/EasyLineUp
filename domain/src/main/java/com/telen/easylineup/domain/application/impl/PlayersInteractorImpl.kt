@@ -32,20 +32,21 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
-    private val playersRepo: PlayerRepository by inject()
-    private val getPlayer: GetPlayer by inject()
-    private val deletePlayer: DeletePlayer by inject()
-    private val savePlayer: SavePlayer by inject()
-    private val getPlayerPositionsSummary: GetPositionsSummaryForPlayer by inject()
-    private val getPlayers: GetPlayers by inject()
-    private val getTeam: GetTeam by inject()
-    private val savePlayerNumberOverlay: SavePlayerNumberOverlay by inject()
-    private val getShirtNumberHistory: GetShirtNumberHistory by inject()
-    private val validatorUtils: ValidatorUtils by inject()
+internal class PlayersInteractorImpl(
+    private val playersRepo: PlayerRepository,
+    private val getPlayer: GetPlayer,
+    private val deletePlayer: DeletePlayer,
+    private val savePlayer: SavePlayer,
+    private val getPlayerPositionsSummary: GetPositionsSummaryForPlayer,
+    private val getPlayers: GetPlayers,
+    private val getTeam: GetTeam,
+    private val savePlayerNumberOverlay: SavePlayerNumberOverlay,
+    private val getShirtNumberHistory: GetShirtNumberHistory,
+    private val validatorUtils: ValidatorUtils,
+    private val useCaseHandler: UseCaseHandler
+) : PlayersInteractor {
+
     private val errors: PublishSubject<DomainErrors.Players> = PublishSubject.create()
 
     override fun insertPlayers(players: List<Player>): Completable {
@@ -58,7 +59,7 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
 
     override fun getPlayerPositionsSummary(playerId: Long?): Single<Map<FieldPosition, Int>> {
         val request = GetPositionsSummaryForPlayer.RequestValues(playerId)
-        return UseCaseHandler.execute(getPlayerPositionsSummary, request)
+        return useCaseHandler.execute(getPlayerPositionsSummary, request)
             .map { it.summary }
     }
 
@@ -75,7 +76,7 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
         phone: String?,
         sex: Int
     ): Completable {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
             .flatMapCompletable {
                 val req = SavePlayer.RequestValues(
@@ -93,7 +94,7 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
                     phone,
                     sex
                 )
-                UseCaseHandler.execute(savePlayer, req).ignoreElement()
+                useCaseHandler.execute(savePlayer, req).ignoreElement()
             }
             .doOnError {
                 when (it) {
@@ -108,19 +109,19 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
     }
 
     override fun deletePlayer(playerId: Long?): Completable {
-        return UseCaseHandler.execute(getPlayer, GetPlayer.RequestValues(playerId))
+        return useCaseHandler.execute(getPlayer, GetPlayer.RequestValues(playerId))
             .map { it.player }
             .flatMap { player ->
-                UseCaseHandler.execute(deletePlayer, DeletePlayer.RequestValues(player))
+                useCaseHandler.execute(deletePlayer, DeletePlayer.RequestValues(player))
             }
             .ignoreElement()
     }
 
     override fun getPlayers(): Single<List<Player>> {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
             .flatMap { team ->
-                UseCaseHandler.execute(getPlayers, GetPlayers.RequestValues(team.id))
+                useCaseHandler.execute(getPlayers, GetPlayers.RequestValues(team.id))
             }
             .map { it.players }
     }
@@ -130,17 +131,17 @@ internal class PlayersInteractorImpl : PlayersInteractor, KoinComponent {
     }
 
     override fun saveOrUpdatePlayerNumberOverlays(overlays: List<RosterItem>): Completable {
-        return UseCaseHandler
+        return useCaseHandler
             .execute(savePlayerNumberOverlay, SavePlayerNumberOverlay.RequestValues(overlays))
             .ignoreElement()
     }
 
     override fun getShirtNumberHistory(number: Int): Single<List<ShirtNumberEntry>> {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
             .flatMap {
                 val request = GetShirtNumberHistory.RequestValues(it.id, number)
-                UseCaseHandler.execute(getShirtNumberHistory, request)
+                useCaseHandler.execute(getShirtNumberHistory, request)
             }
             .map { it.history }
     }

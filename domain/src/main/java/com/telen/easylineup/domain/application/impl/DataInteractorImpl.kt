@@ -32,35 +32,37 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-internal class DataInteractorImpl(private val context: Context) : DataInteractor,
-ValidationCallback, KoinComponent {
-    private val getTeam: GetTeam by inject()
-    private val getDashboardTiles: GetDashboardTiles by inject()
-    private val updateTiles: SaveDashboardTiles by inject()
-    private val createTiles: CreateDashboardTiles by inject()
-    private val deleteAllData: DeleteAllData by inject()
-    private val checkHash: CheckHashData by inject()
-    private val importer: ImportData by inject()
-    private val exportData: ExportData by inject()
+internal class DataInteractorImpl(
+    private val context: Context,
+    private val getTeam: GetTeam,
+    private val getDashboardTiles: GetDashboardTiles,
+    private val updateTiles: SaveDashboardTiles,
+    private val createTiles: CreateDashboardTiles,
+    private val deleteAllData: DeleteAllData,
+    private val checkHash: CheckHashData,
+    private val importer: ImportData,
+    private val exportData: ExportData,
+    private val databaseMockProvider: DatabaseMockProvider,
+    private val useCaseHandler: UseCaseHandler
+) : DataInteractor, ValidationCallback {
+
     private val errors: PublishSubject<DomainErrors.Configuration> = PublishSubject.create()
     private val disposables = CompositeDisposable()
 
     override fun getDashboardConfigurations(): LiveData<List<DashboardTile>> {
         val resultLiveData: MutableLiveData<List<DashboardTile>> = MutableLiveData()
-        val disposable = UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        val disposable = useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
             .flatMap { team ->
                 val getDashboardUseCase =
-                    UseCaseHandler.execute(getDashboardTiles, GetDashboardTiles.RequestValues(team))
+                    useCaseHandler.execute(getDashboardTiles, GetDashboardTiles.RequestValues(team))
                 getDashboardUseCase.onErrorResumeNext {
                     if (it is NoSuchElementException) {
-                        UseCaseHandler.execute(createTiles, CreateDashboardTiles.RequestValues())
+                        useCaseHandler.execute(createTiles, CreateDashboardTiles.RequestValues())
                             .ignoreElement()
                             .andThen(getDashboardUseCase)
                     } else {
@@ -79,19 +81,19 @@ ValidationCallback, KoinComponent {
     }
 
     override fun importData(root: ExportBase, updateIfExists: Boolean): Completable {
-        return UseCaseHandler.execute(importer, ImportData.RequestValues(root, updateIfExists))
+        return useCaseHandler.execute(importer, ImportData.RequestValues(root, updateIfExists))
             .ignoreElement()
     }
 
     override fun deleteAllData(): Completable {
-        return UseCaseHandler.execute(deleteAllData, DeleteAllData.RequestValues())
+        return useCaseHandler.execute(deleteAllData, DeleteAllData.RequestValues())
             .ignoreElement()
     }
 
     override fun exportData(dirUri: Uri): Single<String> {
-        return UseCaseHandler.execute(checkHash, CheckHashData.RequestValues())
+        return useCaseHandler.execute(checkHash, CheckHashData.RequestValues())
             .ignoreElement()
-            .andThen(UseCaseHandler.execute(exportData, ExportData.RequestValues(this)))
+            .andThen(useCaseHandler.execute(exportData, ExportData.RequestValues(this)))
             .flatMap {
                 // TODO move into a dedicated class
                 val now = Calendar.getInstance().time
@@ -124,11 +126,11 @@ ValidationCallback, KoinComponent {
     }
 
     override fun generateMockedData(): Completable {
-        return DatabaseMockProvider().createMockDatabase(context)
+        return databaseMockProvider.createMockDatabase(context)
     }
 
     override fun updateDashboardConfiguration(tiles: List<DashboardTile>): Completable {
-        return UseCaseHandler.execute(updateTiles, SaveDashboardTiles.RequestValues(tiles))
+        return useCaseHandler.execute(updateTiles, SaveDashboardTiles.RequestValues(tiles))
             .ignoreElement()
     }
 

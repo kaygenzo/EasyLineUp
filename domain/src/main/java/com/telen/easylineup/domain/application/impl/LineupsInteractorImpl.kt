@@ -43,28 +43,29 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-internal class LineupsInteractorImpl(private val context: Context) : LineupsInteractor,
-KoinComponent {
-    private val playersRepo: PlayerRepository by inject()
-    private val lineupsRepo: LineupRepository by inject()
-    private val getTeam: GetTeam by inject()
-    private val createLineup: CreateLineup by inject()
-    private val updateLineupRoster: UpdateLineupRoster by inject()
-    private val deleteLineup: DeleteLineup by inject()
-    private val setLineupMode: SetLineupMode by inject()
-    private val updatePlayersWithLineupMode: UpdatePlayersWithLineupMode by inject()
-    private val getRoster: GetRoster by inject()
-    private val saveBattingOrderAndPosition: SaveBattingOrderAndPositions by inject()
-    private val getDpAndFlexFromPlayersInField: GetDpAndFlexFromPlayersInField by inject()
-    private val saveDpAndFlex: SaveDpAndFlex by inject()
-    private val getBatterState: GetBattersState by inject()
-    private val getListAvailablePlayersForLineup: GetListAvailablePlayersForSelection by inject()
-    private val getPlayersInField: GetOnlyPlayersInField by inject()
-    private val updateLineup: UpdateLineup by inject()
-    private val updatePlayersWithBatters: UpdatePlayersWithBatters by inject()
+internal class LineupsInteractorImpl(
+    private val context: Context,
+    private val playersRepo: PlayerRepository,
+    private val lineupsRepo: LineupRepository,
+    private val getTeam: GetTeam,
+    private val createLineup: CreateLineup,
+    private val updateLineupRoster: UpdateLineupRoster,
+    private val deleteLineup: DeleteLineup,
+    private val setLineupMode: SetLineupMode,
+    private val updatePlayersWithLineupMode: UpdatePlayersWithLineupMode,
+    private val getRoster: GetRoster,
+    private val saveBattingOrderAndPosition: SaveBattingOrderAndPositions,
+    private val getDpAndFlexFromPlayersInField: GetDpAndFlexFromPlayersInField,
+    private val saveDpAndFlex: SaveDpAndFlex,
+    private val getBatterState: GetBattersState,
+    private val getListAvailablePlayersForLineup: GetListAvailablePlayersForSelection,
+    private val getPlayersInField: GetOnlyPlayersInField,
+    private val updateLineup: UpdateLineup,
+    private val updatePlayersWithBatters: UpdatePlayersWithBatters,
+    private val useCaseHandler: UseCaseHandler
+) : LineupsInteractor {
+
     private val errors: PublishSubject<DomainErrors.Lineups> = PublishSubject.create()
 
     override fun insertLineups(lineups: List<Lineup>): Completable {
@@ -72,32 +73,32 @@ KoinComponent {
     }
 
     override fun getCompleteRoster(): Single<TeamRosterSummary> {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
             .flatMap {
-                UseCaseHandler.execute(getRoster, GetRoster.RequestValues(it.id, null))
+                useCaseHandler.execute(getRoster, GetRoster.RequestValues(it.id, null))
             }
             .map { it.summary }
     }
 
     override fun getRoster(lineupId: Long): Single<TeamRosterSummary> {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
-            .flatMap { UseCaseHandler.execute(getRoster, GetRoster.RequestValues(it.id, lineupId)) }
+            .flatMap { useCaseHandler.execute(getRoster, GetRoster.RequestValues(it.id, lineupId)) }
             .map { it.summary }
     }
 
     override fun updateRoster(lineupId: Long, roster: List<RosterPlayerStatus>): Completable {
-        return UseCaseHandler
+        return useCaseHandler
             .execute(updateLineupRoster, UpdateLineupRoster.RequestValues(lineupId, roster))
             .ignoreElement()
     }
 
     override fun saveLineup(lineup: Lineup, rosterFilter: TeamRosterSummary): Single<Lineup> {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues()).map { it.team }
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues()).map { it.team }
             .flatMap { team ->
                 val request = CreateLineup.RequestValues(team.id, lineup, rosterFilter.players)
-                UseCaseHandler.execute(createLineup, request)
+                useCaseHandler.execute(createLineup, request)
             }
             .map { it.lineup }
             .doOnError {
@@ -111,7 +112,7 @@ KoinComponent {
 
     override fun deleteLineup(lineupId: Long?): Completable {
         val requestValues = DeleteLineup.RequestValues(lineupId)
-        return UseCaseHandler.execute(deleteLineup, requestValues).ignoreElement()
+        return useCaseHandler.execute(deleteLineup, requestValues).ignoreElement()
     }
 
     override fun updateLineupMode(
@@ -122,13 +123,13 @@ KoinComponent {
         return Completable.defer {
             val lineupMode = if (isEnabled) MODE_ENABLED else MODE_DISABLED
             val request = SetLineupMode.RequestValues(lineup, lineupMode)
-            UseCaseHandler.execute(setLineupMode, request)
+            useCaseHandler.execute(setLineupMode, request)
                 .ignoreElement()
-                .andThen(UseCaseHandler.execute(getTeam, GetTeam.RequestValues()))
+                .andThen(useCaseHandler.execute(getTeam, GetTeam.RequestValues()))
                 .map { it.team }
                 .flatMap {
                     val update = UpdatePlayersWithLineupMode.RequestValues(list, lineup, it.type)
-                    UseCaseHandler.execute(updatePlayersWithLineupMode, update)
+                    useCaseHandler.execute(updatePlayersWithLineupMode, update)
                 }
                 .ignoreElement()
         }
@@ -136,11 +137,11 @@ KoinComponent {
 
     override fun updateLineupAndPlayers(lineup: Lineup, players: List<PlayerWithPosition>): Completable {
         val requestValues = SaveBattingOrderAndPositions.RequestValues(lineup, players)
-        return UseCaseHandler.execute(saveBattingOrderAndPosition, requestValues).ignoreElement()
+        return useCaseHandler.execute(saveBattingOrderAndPosition, requestValues).ignoreElement()
     }
 
     override fun updateLineup(lineup: Lineup): Completable {
-        return UseCaseHandler.execute(updateLineup, UpdateLineup.RequestValues(lineup))
+        return useCaseHandler.execute(updateLineup, UpdateLineup.RequestValues(lineup))
             .ignoreElement()
     }
 
@@ -161,11 +162,11 @@ KoinComponent {
     }
 
     override fun getDpAndFlexFromPlayersInField(list: List<PlayerWithPosition>): Single<DpAndFlexConfiguration> {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
             .flatMap {
                 val request = GetDpAndFlexFromPlayersInField.RequestValues(list, it.type)
-                UseCaseHandler.execute(getDpAndFlexFromPlayersInField, request)
+                useCaseHandler.execute(getDpAndFlexFromPlayersInField, request)
             }
             .map { it.configResult }
     }
@@ -178,7 +179,7 @@ KoinComponent {
     ): Completable {
         val request =
             SaveDpAndFlex.RequestValues(lineup = lineup, dp = dp, flex = flex, players = list)
-        return UseCaseHandler.execute(saveDpAndFlex, request).ignoreElement()
+        return useCaseHandler.execute(saveDpAndFlex, request).ignoreElement()
     }
 
     override fun getBatterStates(
@@ -190,7 +191,7 @@ KoinComponent {
         isDebug: Boolean,
         isEditable: Boolean
     ): Single<List<BatterState>> {
-        return UseCaseHandler.execute(
+        return useCaseHandler.execute(
             getBatterState, GetBattersState.RequestValues(
                 context = context,
                 players = players,
@@ -207,7 +208,7 @@ KoinComponent {
         players: List<PlayerWithPosition>,
         batters: List<BatterState>
     ): Completable {
-        return UseCaseHandler.execute(
+        return useCaseHandler.execute(
             updatePlayersWithBatters, UpdatePlayersWithBatters.RequestValues(
                 players = players,
                 batters = batters
@@ -220,10 +221,10 @@ KoinComponent {
         lineup: Lineup,
         sortBy: FieldPosition?
     ): Single<List<PlayerWithPosition>> {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
             .flatMap {
-                UseCaseHandler.execute(
+                useCaseHandler.execute(
                     getRoster,
                     GetRoster.RequestValues(it.id, lineup.id)
                 )
@@ -234,14 +235,14 @@ KoinComponent {
                     sortBy,
                     it.summary.players
                 )
-                UseCaseHandler.execute(getListAvailablePlayersForLineup, requestValues)
+                useCaseHandler.execute(getListAvailablePlayersForLineup, requestValues)
             }
             .map { it.players }
     }
 
     override fun getPlayersInFieldFromList(list: List<PlayerWithPosition>)
     : Single<List<PlayerWithPosition>> {
-        return UseCaseHandler.execute(getPlayersInField, GetOnlyPlayersInField.RequestValues(list))
+        return useCaseHandler.execute(getPlayersInField, GetOnlyPlayersInField.RequestValues(list))
             .map { it.playersInField }
     }
 }

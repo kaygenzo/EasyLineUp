@@ -6,6 +6,7 @@ package com.telen.easylineup.domain.application.impl
 
 import android.content.Context
 import android.content.res.Resources
+import com.telen.easylineup.domain.testUseCaseHandler
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
@@ -46,8 +47,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
@@ -58,7 +57,7 @@ import org.mockito.junit.MockitoJUnitRunner
  * merging the Interactor layer into the UseCase layer.
  */
 @RunWith(MockitoJUnitRunner::class)
-internal class LineupsInteractorImplTest : BaseInteractorTest() {
+internal class LineupsInteractorImplTest {
 
     @Mock
     lateinit var playerRepository: PlayerRepository
@@ -117,31 +116,30 @@ internal class LineupsInteractorImplTest : BaseInteractorTest() {
         Mockito.`when`(resources.getStringArray(Mockito.anyInt()))
             .thenReturn(Array(20) { "position$it" })
 
-        loadKoinModules(
-            module {
-                single { playerRepository }
-                single { lineupRepository }
-                single { GetTeam(teamRepository) }
-                single { CreateLineup(lineupRepository) }
-                single { UpdateLineupRoster(lineupRepository) }
-                single { DeleteLineup(lineupRepository) }
-                single { SetLineupMode() }
-                single { UpdatePlayersWithLineupMode() }
-                single { GetRoster(playerRepository, lineupRepository) }
-                single { SaveBattingOrderAndPositions(lineupRepository, playerFieldPositionRepository) }
-                single { GetDpAndFlexFromPlayersInField() }
-                single { SaveDpAndFlex() }
-                single { GetBattersState() }
-                single { GetListAvailablePlayersForSelection() }
-                single { GetOnlyPlayersInField() }
-                single { UpdateLineup(lineupRepository) }
-                single { UpdatePlayersWithBatters() }
-            }
-        )
-
         Mockito.`when`(teamRepository.getTeamsRx()).thenReturn(Single.just(listOf(mainTeam)))
 
-        interactor = LineupsInteractorImpl(context)
+        interactor = LineupsInteractorImpl(
+            context = context,
+            playersRepo = playerRepository,
+            lineupsRepo = lineupRepository,
+            getTeam = GetTeam(teamRepository),
+            createLineup = CreateLineup(lineupRepository),
+            updateLineupRoster = UpdateLineupRoster(lineupRepository),
+            deleteLineup = DeleteLineup(lineupRepository),
+            setLineupMode = SetLineupMode(),
+            updatePlayersWithLineupMode = UpdatePlayersWithLineupMode(),
+            getRoster = GetRoster(playerRepository, lineupRepository),
+            saveBattingOrderAndPosition =
+                SaveBattingOrderAndPositions(lineupRepository, playerFieldPositionRepository),
+            getDpAndFlexFromPlayersInField = GetDpAndFlexFromPlayersInField(),
+            saveDpAndFlex = SaveDpAndFlex(),
+            getBatterState = GetBattersState(),
+            getListAvailablePlayersForLineup = GetListAvailablePlayersForSelection(),
+            getPlayersInField = GetOnlyPlayersInField(),
+            updateLineup = UpdateLineup(lineupRepository),
+            updatePlayersWithBatters = UpdatePlayersWithBatters(),
+            useCaseHandler = testUseCaseHandler()
+        )
     }
 
     @Test

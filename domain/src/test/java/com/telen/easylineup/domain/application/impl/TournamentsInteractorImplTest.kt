@@ -7,6 +7,7 @@ package com.telen.easylineup.domain.application.impl
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
+import com.telen.easylineup.domain.testUseCaseHandler
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
@@ -30,8 +31,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
@@ -42,7 +41,7 @@ import org.mockito.junit.MockitoJUnitRunner
  * merging the Interactor layer into the UseCase layer.
  */
 @RunWith(MockitoJUnitRunner::class)
-internal class TournamentsInteractorImplTest : BaseInteractorTest() {
+internal class TournamentsInteractorImplTest {
 
     @Mock
     lateinit var tournamentRepository: TournamentRepository
@@ -75,22 +74,19 @@ internal class TournamentsInteractorImplTest : BaseInteractorTest() {
     fun setup() {
         MockitoAnnotations.initMocks(this)
 
-        loadKoinModules(
-            module {
-                single { tournamentRepository }
-                single { GetTeam(teamRepository) }
-                single { DeleteTournamentLineups(lineupRepository) }
-                single { GetAllTournamentsWithLineupsUseCase(lineupRepository) }
-                single { GetTournaments(tournamentRepository) }
-                single { GetTournamentStatsForPositionTable(context, lineupRepository) }
-                single { SaveTournament(tournamentRepository) }
-                single { GetTournamentMapLink(geocoder) }
-            }
-        )
-
         Mockito.`when`(teamRepository.getTeamsRx()).thenReturn(Single.just(listOf(mainTeam)))
 
-        interactor = TournamentsInteractorImpl()
+        interactor = TournamentsInteractorImpl(
+            tournamentsRepo = tournamentRepository,
+            getTeam = GetTeam(teamRepository),
+            deleteTournamentUseCase = DeleteTournamentLineups(lineupRepository),
+            getAllTournamentsWithLineupsUseCase = GetAllTournamentsWithLineupsUseCase(lineupRepository),
+            getTournamentsUseCase = GetTournaments(tournamentRepository),
+            tableDataUseCase = GetTournamentStatsForPositionTable(context, lineupRepository),
+            saveTournament = SaveTournament(tournamentRepository),
+            getTournamentMapLink = GetTournamentMapLink(geocoder),
+            useCaseHandler = testUseCaseHandler()
+        )
     }
 
     @Test

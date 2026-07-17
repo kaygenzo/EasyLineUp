@@ -22,21 +22,21 @@ import com.telen.easylineup.domain.usecases.GetTournaments
 import com.telen.easylineup.domain.usecases.SaveTournament
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent {
-    private val tournamentsRepo: TournamentRepository by inject()
-    private val getTeam: GetTeam by inject()
-    private val deleteTournamentUseCase: DeleteTournamentLineups by inject()
-    private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineupsUseCase by inject()
-    private val getTournamentsUseCase: GetTournaments by inject()
-    private val tableDataUseCase: GetTournamentStatsForPositionTable by inject()
-    private val saveTournament: SaveTournament by inject()
-    private val getTournamentMapLink: GetTournamentMapLink by inject()
+internal class TournamentsInteractorImpl(
+    private val tournamentsRepo: TournamentRepository,
+    private val getTeam: GetTeam,
+    private val deleteTournamentUseCase: DeleteTournamentLineups,
+    private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineupsUseCase,
+    private val getTournamentsUseCase: GetTournaments,
+    private val tableDataUseCase: GetTournamentStatsForPositionTable,
+    private val saveTournament: SaveTournament,
+    private val getTournamentMapLink: GetTournamentMapLink,
+    private val useCaseHandler: UseCaseHandler
+) : TournamentsInteractor {
 
     override fun getTournaments(): Single<List<Tournament>> {
-        return UseCaseHandler.execute(getTournamentsUseCase, GetTournaments.RequestValues())
+        return useCaseHandler.execute(getTournamentsUseCase, GetTournaments.RequestValues())
             .map { it.tournaments }
     }
 
@@ -49,10 +49,10 @@ internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent 
     }
 
     override fun deleteTournament(tournament: Tournament): Completable {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
             .flatMap {
-                UseCaseHandler.execute(
+                useCaseHandler.execute(
                     deleteTournamentUseCase,
                     DeleteTournamentLineups.RequestValues(tournament, it)
                 )
@@ -62,9 +62,9 @@ internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent 
 
     override fun getCategorizedLineups(filter: String):
     Single<List<Pair<Tournament, List<Lineup>>>> {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .flatMap {
-                UseCaseHandler.execute(
+                useCaseHandler.execute(
                     getAllTournamentsWithLineupsUseCase,
                     GetAllTournamentsWithLineupsUseCase.RequestValues(filter, it.team.id)
                 )
@@ -76,17 +76,17 @@ internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent 
         tournament: Tournament,
         strategy: TeamStrategy
     ): Single<TournamentStatsUiConfig> {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .flatMap {
                 val request =
                     GetTournamentStatsForPositionTable.RequestValues(tournament, it.team, strategy)
-                UseCaseHandler.execute(tableDataUseCase, request)
+                useCaseHandler.execute(tableDataUseCase, request)
             }
             .map { it.uiConfig }
     }
 
     override fun saveTournament(tournament: Tournament): Completable {
-        return UseCaseHandler.execute(saveTournament, SaveTournament.RequestValues(tournament))
+        return useCaseHandler.execute(saveTournament, SaveTournament.RequestValues(tournament))
             .ignoreElement()
     }
 
@@ -96,7 +96,7 @@ internal class TournamentsInteractorImpl : TournamentsInteractor, KoinComponent 
         width: Int,
         height: Int
     ): Single<MapInfo> {
-        return UseCaseHandler.execute(
+        return useCaseHandler.execute(
             getTournamentMapLink,
             GetTournamentMapLink.RequestValues(tournament, apiKey, width, height)
         ).map { it.mapInfo }

@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.domain.application.impl
 
+import com.telen.easylineup.domain.testUseCaseHandler
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.RosterItem
@@ -33,8 +34,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
@@ -45,7 +44,7 @@ import org.mockito.junit.MockitoJUnitRunner
  * merging the Interactor layer into the UseCase layer.
  */
 @RunWith(MockitoJUnitRunner::class)
-internal class PlayersInteractorImplTest : BaseInteractorTest() {
+internal class PlayersInteractorImplTest {
 
     @Mock
     lateinit var playerRepository: PlayerRepository
@@ -73,24 +72,21 @@ internal class PlayersInteractorImplTest : BaseInteractorTest() {
     fun setup() {
         MockitoAnnotations.initMocks(this)
 
-        loadKoinModules(
-            module {
-                single { playerRepository }
-                single { GetTeam(teamRepository) }
-                single { GetPlayer(playerRepository) }
-                single { DeletePlayer(playerRepository) }
-                single { SavePlayer(playerRepository) }
-                single { GetPositionsSummaryForPlayer(playerFieldPositionRepository) }
-                single { GetPlayers(playerRepository) }
-                single { SavePlayerNumberOverlay(playerRepository) }
-                single { GetShirtNumberHistory(playerRepository) }
-                single { ValidatorUtils() }
-            }
-        )
-
         Mockito.`when`(teamRepository.getTeamsRx()).thenReturn(Single.just(listOf(mainTeam)))
 
-        interactor = PlayersInteractorImpl()
+        interactor = PlayersInteractorImpl(
+            playersRepo = playerRepository,
+            getPlayer = GetPlayer(playerRepository),
+            deletePlayer = DeletePlayer(playerRepository),
+            savePlayer = SavePlayer(playerRepository),
+            getPlayerPositionsSummary = GetPositionsSummaryForPlayer(playerFieldPositionRepository),
+            getPlayers = GetPlayers(playerRepository),
+            getTeam = GetTeam(teamRepository),
+            savePlayerNumberOverlay = SavePlayerNumberOverlay(playerRepository),
+            getShirtNumberHistory = GetShirtNumberHistory(playerRepository),
+            validatorUtils = ValidatorUtils(),
+            useCaseHandler = testUseCaseHandler()
+        )
     }
 
     @Test

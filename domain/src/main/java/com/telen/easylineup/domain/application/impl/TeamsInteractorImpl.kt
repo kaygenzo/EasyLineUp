@@ -20,27 +20,28 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-internal class TeamsInteractorImpl : TeamsInteractor, KoinComponent {
-    private val teamsRepo: TeamRepository by inject()
-    private val getTeam: GetTeam by inject()
-    private val getAllTeamsUseCase: GetAllTeams by inject()
-    private val saveCurrentTeam: SaveCurrentTeam by inject()
-    private val deleteTeamUseCase: DeleteTeam by inject()
-    private val saveTeamUseCase: SaveTeam by inject()
-    private val checkTeamUseCase: CheckTeam by inject()
+internal class TeamsInteractorImpl(
+    private val teamsRepo: TeamRepository,
+    private val getTeam: GetTeam,
+    private val getAllTeamsUseCase: GetAllTeams,
+    private val saveCurrentTeam: SaveCurrentTeam,
+    private val deleteTeamUseCase: DeleteTeam,
+    private val saveTeamUseCase: SaveTeam,
+    private val checkTeamUseCase: CheckTeam,
+    private val useCaseHandler: UseCaseHandler
+) : TeamsInteractor {
+
     private val errors: PublishSubject<DomainErrors.Teams> = PublishSubject.create()
 
     override fun getTeam(): Single<Team> {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
             .doOnError { errors.onNext(DomainErrors.Teams.GET_TEAM_FAILED) }
     }
 
     override fun getAllTeams(): Single<List<Team>> {
-        return UseCaseHandler.execute(getAllTeamsUseCase, GetAllTeams.RequestValues())
+        return useCaseHandler.execute(getAllTeamsUseCase, GetAllTeams.RequestValues())
             .map { it.teams }
     }
 
@@ -53,26 +54,26 @@ internal class TeamsInteractorImpl : TeamsInteractor, KoinComponent {
     }
 
     override fun updateCurrentTeam(currentTeam: Team): Completable {
-        return UseCaseHandler.execute(saveCurrentTeam, SaveCurrentTeam.RequestValues(currentTeam))
+        return useCaseHandler.execute(saveCurrentTeam, SaveCurrentTeam.RequestValues(currentTeam))
             .ignoreElement()
     }
 
     override fun saveTeam(team: Team): Completable {
-        return UseCaseHandler.execute(checkTeamUseCase, CheckTeam.RequestValues(team))
+        return useCaseHandler.execute(checkTeamUseCase, CheckTeam.RequestValues(team))
             .ignoreElement()
-            .andThen(UseCaseHandler.execute(saveTeamUseCase, SaveTeam.RequestValues(team)))
+            .andThen(useCaseHandler.execute(saveTeamUseCase, SaveTeam.RequestValues(team)))
             .map { it.team }
-            .flatMap { UseCaseHandler.execute(saveCurrentTeam, SaveCurrentTeam.RequestValues(it)) }
+            .flatMap { useCaseHandler.execute(saveCurrentTeam, SaveCurrentTeam.RequestValues(it)) }
             .ignoreElement()
     }
 
     override fun getTeamType(): Single<Int> {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team.type }
     }
 
     override fun deleteTeam(team: Team): Completable {
-        return UseCaseHandler.execute(deleteTeamUseCase, DeleteTeam.RequestValues(team))
+        return useCaseHandler.execute(deleteTeamUseCase, DeleteTeam.RequestValues(team))
             .ignoreElement()
     }
 

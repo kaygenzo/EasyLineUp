@@ -17,15 +17,15 @@ import com.telen.easylineup.domain.usecases.DeletePlayerFieldPosition
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import io.reactivex.rxjava3.core.Completable
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-internal class PlayerFieldPositionsInteractorImpl : PlayerFieldPositionsInteractor, KoinComponent {
-    private val playerFieldPositionRepo: PlayerFieldPositionRepository by inject()
-    private val getTeam: GetTeam by inject()
-    private val savePlayerFieldPosition: AssignPlayerFieldPosition by inject()
-    private val deletePlayerFieldPosition: DeletePlayerFieldPosition by inject()
-    private val switchPlayersPosition: SwitchPlayersPosition by inject()
+internal class PlayerFieldPositionsInteractorImpl(
+    private val playerFieldPositionRepo: PlayerFieldPositionRepository,
+    private val getTeam: GetTeam,
+    private val savePlayerFieldPosition: AssignPlayerFieldPosition,
+    private val deletePlayerFieldPosition: DeletePlayerFieldPosition,
+    private val switchPlayersPosition: SwitchPlayersPosition,
+    private val useCaseHandler: UseCaseHandler
+) : PlayerFieldPositionsInteractor {
 
     override fun insertPlayerFieldPositions(playerFieldPositions: List<PlayerFieldPosition>):
     Completable {
@@ -38,7 +38,7 @@ internal class PlayerFieldPositionsInteractorImpl : PlayerFieldPositionsInteract
         lineup: Lineup,
         list: List<PlayerWithPosition>
     ): Completable {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
             .flatMap {
                 val requestValues = AssignPlayerFieldPosition.RequestValues(
@@ -48,7 +48,7 @@ internal class PlayerFieldPositionsInteractorImpl : PlayerFieldPositionsInteract
                     players = list,
                     teamType = it.type
                 )
-                UseCaseHandler.execute(savePlayerFieldPosition, requestValues)
+                useCaseHandler.execute(savePlayerFieldPosition, requestValues)
             }
             .ignoreElement()
     }
@@ -65,7 +65,7 @@ internal class PlayerFieldPositionsInteractorImpl : PlayerFieldPositionsInteract
             lineupMode,
             extraHitterSize
         )
-        return UseCaseHandler.execute(deletePlayerFieldPosition, requestValues).ignoreElement()
+        return useCaseHandler.execute(deletePlayerFieldPosition, requestValues).ignoreElement()
     }
 
     override fun switchPlayersPosition(
@@ -74,7 +74,7 @@ internal class PlayerFieldPositionsInteractorImpl : PlayerFieldPositionsInteract
         list: List<PlayerWithPosition>,
         lineup: Lineup
     ): Completable {
-        return UseCaseHandler.execute(getTeam, GetTeam.RequestValues())
+        return useCaseHandler.execute(getTeam, GetTeam.RequestValues())
             .map { it.team }
             .flatMap {
                 val request = SwitchPlayersPosition.RequestValues(
@@ -84,7 +84,7 @@ internal class PlayerFieldPositionsInteractorImpl : PlayerFieldPositionsInteract
                     teamType = it.type,
                     lineup = lineup
                 )
-                UseCaseHandler.execute(switchPlayersPosition, request)
+                useCaseHandler.execute(switchPlayersPosition, request)
             }
             .ignoreElement()
     }

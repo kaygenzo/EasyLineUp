@@ -5,6 +5,12 @@
 package com.telen.easylineup.domain.application.impl
 
 import android.content.Context
+import com.telen.easylineup.domain.application.LineupsInteractor
+import com.telen.easylineup.domain.application.PlayerFieldPositionsInteractor
+import com.telen.easylineup.domain.application.PlayersInteractor
+import com.telen.easylineup.domain.application.TeamsInteractor
+import com.telen.easylineup.domain.application.TournamentsInteractor
+import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.export.ExportBase
@@ -14,7 +20,13 @@ import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.repository.TilesRepository
 import com.telen.easylineup.domain.repository.TournamentRepository
+import com.telen.easylineup.domain.testUseCaseHandler
+import com.telen.easylineup.domain.usecases.CheckHashData
+import com.telen.easylineup.domain.usecases.CreateDashboardTiles
 import com.telen.easylineup.domain.usecases.DeleteAllData
+import com.telen.easylineup.domain.usecases.ExportData
+import com.telen.easylineup.domain.usecases.GetDashboardTiles
+import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ImportData
 import com.telen.easylineup.domain.usecases.SaveDashboardTiles
 import io.reactivex.rxjava3.core.Completable
@@ -25,8 +37,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
@@ -43,7 +53,7 @@ import org.mockito.junit.MockitoJUnitRunner
  * review.
  */
 @RunWith(MockitoJUnitRunner::class)
-internal class DataInteractorImplTest : BaseInteractorTest() {
+internal class DataInteractorImplTest {
 
     @Mock
     lateinit var teamRepository: TeamRepository
@@ -72,23 +82,51 @@ internal class DataInteractorImplTest : BaseInteractorTest() {
     fun setup() {
         MockitoAnnotations.initMocks(this)
 
-        loadKoinModules(
-            module {
-                single { SaveDashboardTiles(tilesRepository) }
-                single { DeleteAllData(teamRepository, tournamentRepository) }
-                single {
-                    ImportData(
-                        teamRepository,
-                        playerRepository,
-                        tournamentRepository,
-                        lineupRepository,
-                        playerFieldPositionRepository
-                    )
-                }
-            }
+        // Not exercised by the tests below - just need a valid graph to construct the interactor.
+        val databaseMockProvider = DatabaseMockProvider(
+            teamsInteractor = Mockito.mock(TeamsInteractor::class.java),
+            playersInteractor = Mockito.mock(PlayersInteractor::class.java),
+            lineupsInteractor = Mockito.mock(LineupsInteractor::class.java),
+            playerFieldPositionsInteractor = Mockito.mock(PlayerFieldPositionsInteractor::class.java),
+            tournamentsInteractor = Mockito.mock(TournamentsInteractor::class.java)
         )
 
-        interactor = DataInteractorImpl(context)
+        interactor = DataInteractorImpl(
+            context = context,
+            getTeam = GetTeam(teamRepository),
+            getDashboardTiles = GetDashboardTiles(
+                playerRepository,
+                lineupRepository,
+                playerFieldPositionRepository,
+                tilesRepository
+            ),
+            updateTiles = SaveDashboardTiles(tilesRepository),
+            createTiles = CreateDashboardTiles(tilesRepository),
+            deleteAllData = DeleteAllData(teamRepository, tournamentRepository),
+            checkHash = CheckHashData(
+                teamRepository,
+                playerRepository,
+                tournamentRepository,
+                lineupRepository,
+                playerFieldPositionRepository
+            ),
+            importer = ImportData(
+                teamRepository,
+                playerRepository,
+                tournamentRepository,
+                lineupRepository,
+                playerFieldPositionRepository
+            ),
+            exportData = ExportData(
+                teamRepository,
+                playerRepository,
+                tournamentRepository,
+                lineupRepository,
+                playerFieldPositionRepository
+            ),
+            databaseMockProvider = databaseMockProvider,
+            useCaseHandler = testUseCaseHandler()
+        )
     }
 
     @Test
