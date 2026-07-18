@@ -13,6 +13,9 @@ import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentLineupDefenseEditableBinding
@@ -35,6 +38,8 @@ import com.telen.easylineup.views.OnPlayerButtonCallback
 import com.telen.easylineup.views.OnPlayerClickListener
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -63,14 +68,17 @@ class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlaye
                     init(it)
                     setPlayerStateListener(this@DefenseFragmentEditable)
                 }
-                viewModel.observeDefensePlayers().observe(viewLifecycleOwner) { players ->
-                    val lineupMode = viewModel.lineup?.mode ?: MODE_DISABLED
-                    launch(viewModel.getTeamType().flatMap {
-                        Completable.timer(100, TimeUnit.MILLISECONDS).andThen(Single.just(it))
-                    }, { teamType ->
-                        cardDefenseView.setListPlayer(players, lineupMode, teamType)
-                    })
-                }
+                viewModel.observeDefensePlayers()
+                    .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                    .onEach { players ->
+                        val lineupMode = viewModel.lineup?.mode ?: MODE_DISABLED
+                        launch(viewModel.getTeamType().flatMap {
+                            Completable.timer(100, TimeUnit.MILLISECONDS).andThen(Single.just(it))
+                        }, { teamType ->
+                            cardDefenseView.setListPlayer(players, lineupMode, teamType)
+                        })
+                    }
+                    .launchIn(viewLifecycleOwner.lifecycleScope)
             })
         }.root
     }

@@ -12,6 +12,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -69,6 +71,7 @@ OnSearchBarListener {
             binding = this
 
             viewModel.mapsFlow
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
                 .onEach { tournamentsAdapter.setMapToTournament(it.first, it.second) }
                 .launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -89,9 +92,10 @@ OnSearchBarListener {
                 )
             }
 
-            viewModel.observeCategorizedLineups().observe(viewLifecycleOwner) {
-                tournamentsAdapter.setList(it)
-            }
+            viewModel.observeCategorizedLineups()
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .onEach { tournamentsAdapter.setList(it) }
+                .launchIn(viewLifecycleOwner.lifecycleScope)
 
             launch(viewModel.getTeamType(), {
                 tournamentsAdapter.setTeamType(it)

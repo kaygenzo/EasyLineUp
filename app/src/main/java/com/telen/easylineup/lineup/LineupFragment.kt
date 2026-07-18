@@ -22,6 +22,8 @@ import androidx.core.view.drawToBitmap
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
@@ -41,6 +43,8 @@ import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 class LineupFragmentFixed : LineupFragment("LineupFragmentFixed", R.menu.menu_lineup_summary, false)
@@ -155,15 +159,19 @@ abstract class LineupFragment(
             AttackFragment()
         }
 
-        viewModel.observeLineupName().observe(viewLifecycleOwner) {
-            (activity as AppCompatActivity).supportActionBar?.title = it
-        }
+        viewModel.observeLineupName()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { (activity as AppCompatActivity).supportActionBar?.title = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.observeDefensePlayers().observe(viewLifecycleOwner) {
-            val size = it.filter { item -> item.isSubstitute() }.size
-            binder.substitutesIndication?.text =
-                    resources.getQuantityString(R.plurals.lineups_substitutes_size, size, size)
-        }
+        viewModel.observeDefensePlayers()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach {
+                val size = it.filter { item -> item.isSubstitute() }.size
+                binder.substitutesIndication?.text =
+                        resources.getQuantityString(R.plurals.lineups_substitutes_size, size, size)
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         return binder.root
     }

@@ -11,6 +11,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.getkeepsafe.taptargetview.TapTargetView
 import com.telen.easylineup.BaseFragment
@@ -33,6 +36,8 @@ import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.LineupCreationFormView
 import com.telen.easylineup.views.OnActionButtonListener
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 class LineupCreationFragment : BaseFragment("LineupCreationFragment"), OnActionButtonListener {
@@ -70,9 +75,10 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment"), OnActionB
     ): View {
         return FragmentLineupCreationBinding.inflate(inflater, container, false).apply {
             this@LineupCreationFragment.binding = this
-            lineupViewModel.getTournaments().observe(viewLifecycleOwner) {
-                lineupCreationForm.setList(it)
-            }
+            lineupViewModel.getTournaments()
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .onEach { lineupCreationForm.setList(it) }
+                .launchIn(viewLifecycleOwner.lifecycleScope)
 
             launch(lineupViewModel.getTeamType(), {
                 lineupCreationForm.setTeamType(TeamType.getTypeById(it))
@@ -85,22 +91,25 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment"), OnActionB
                 updateRosterSize(lineupCreationForm.binding.playerCount, it)
             })
 
-            lineupViewModel.registerSaveResults().observe(viewLifecycleOwner) {
-                when (it) {
-                    is SaveSuccess -> {
-                        Timber.d("successfully inserted new lineup, new id: ${it.lineup.id}")
-                        val extras = LineupFragment.getArguments(it.lineup.id)
-                        findNavController().navigate(
-                            R.id.lineupFragmentEditable,
-                            extras,
-                            NavigationUtils().getOptionsWithPopDestination(
-                                R.id.navigation_lineups,
-                                false
+            lineupViewModel.registerSaveResults()
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .onEach {
+                    when (it) {
+                        is SaveSuccess -> {
+                            Timber.d("successfully inserted new lineup, new id: ${it.lineup.id}")
+                            val extras = LineupFragment.getArguments(it.lineup.id)
+                            findNavController().navigate(
+                                R.id.lineupFragmentEditable,
+                                extras,
+                                NavigationUtils().getOptionsWithPopDestination(
+                                    R.id.navigation_lineups,
+                                    false
+                                )
                             )
-                        )
+                        }
                     }
                 }
-            }
+                .launchIn(viewLifecycleOwner.lifecycleScope)
         }.root
     }
 

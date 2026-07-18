@@ -4,8 +4,6 @@
 
 package com.telen.easylineup.lineup.edition
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
@@ -25,6 +23,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -42,15 +42,17 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
             loadData()
         }
     private val rosterItems: MutableList<RosterItem> = mutableListOf()
-    private val _rosterItemsLiveData: MutableLiveData<List<RosterItem>> = MutableLiveData()
-    private val _lineupLiveData: MutableLiveData<Lineup> = MutableLiveData()
+    private val _rosterItemsFlow: MutableSharedFlow<List<RosterItem>> =
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
+    private val _lineupFlow: MutableSharedFlow<Lineup> =
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
     private var lineup: Lineup? = null
 
     private fun loadData() {
         getLineupByIdUseCase(lineupId)
             .flatMap {
                 this.lineup = it
-                _lineupLiveData.postValue(it)
+                _lineupFlow.tryEmit(it)
                 getRoster()
             }
             .map { it.map { RosterItem(it.player, it.status, it.playerNumberOverlay) } }
@@ -61,18 +63,18 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
                     rosterItems.run {
                         clear()
                         addAll(it)
-                        _rosterItemsLiveData.postValue(this)
+                        _rosterItemsFlow.tryEmit(this)
                     }
                 }
             }, { Timber.e(it) })
     }
 
-    fun observeLineup(): LiveData<Lineup> {
-        return _lineupLiveData
+    fun observeLineup(): Flow<Lineup> {
+        return _lineupFlow
     }
 
-    fun observeRosterItems(): LiveData<List<RosterItem>> {
-        return _rosterItemsLiveData
+    fun observeRosterItems(): Flow<List<RosterItem>> {
+        return _rosterItemsFlow
     }
 
     private fun getRoster(): Single<List<RosterPlayerStatus>> {
@@ -114,7 +116,7 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
     fun playerSelectStatusChanged(player: Player, state: Boolean) {
         synchronized(rosterItems) {
             rosterItems.firstOrNull { it.player.id == player.id }?.selected = state
-            _rosterItemsLiveData.postValue(rosterItems)
+            _rosterItemsFlow.tryEmit(rosterItems)
         }
     }
 

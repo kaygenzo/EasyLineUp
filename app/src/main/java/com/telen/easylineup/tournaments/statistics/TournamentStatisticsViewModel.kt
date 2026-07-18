@@ -5,7 +5,6 @@
 package com.telen.easylineup.tournaments.statistics
 
 import android.content.Context
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.TeamStrategy
@@ -17,16 +16,21 @@ import io.github.kaygenzo.androidtable.api.Highlight
 import io.github.kaygenzo.androidtable.api.StyleConfiguration
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
+import kotlinx.coroutines.flow.MutableSharedFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 
 class TournamentStatisticsViewModel : ViewModel(), KoinComponent {
     var disposable: Disposable? = null
-    val topHeadersData: MutableLiveData<List<CellConfiguration>> = MutableLiveData()
-    val leftHeadersData: MutableLiveData<List<CellConfiguration>> = MutableLiveData()
-    val mainTableData: MutableLiveData<List<List<CellConfiguration>>> = MutableLiveData()
-    val columnHighlights: MutableLiveData<List<Highlight>> = MutableLiveData()
+    val topHeadersData: MutableSharedFlow<List<CellConfiguration>> =
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
+    val leftHeadersData: MutableSharedFlow<List<CellConfiguration>> =
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
+    val mainTableData: MutableSharedFlow<List<List<CellConfiguration>>> =
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
+    val columnHighlights: MutableSharedFlow<List<Highlight>> =
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
     private val getTournamentStatsForPositionTable: GetTournamentStatsForPositionTable by inject()
     var strategy = TeamStrategy.STANDARD
     var tournament: Tournament? = null
@@ -84,10 +88,10 @@ class TournamentStatisticsViewModel : ViewModel(), KoinComponent {
                     )
                 }
 
-                this.topHeadersData.value = topHeaderDataList
-                this.leftHeadersData.value = leftHeaderDataList
-                this.mainTableData.value = mainDataList
-                this.columnHighlights.value = columnHighlights
+                this.topHeadersData.tryEmit(topHeaderDataList)
+                this.leftHeadersData.tryEmit(leftHeaderDataList)
+                this.mainTableData.tryEmit(mainDataList)
+                this.columnHighlights.tryEmit(columnHighlights)
             }, {
                 Timber.e(it)
             })

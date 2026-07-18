@@ -30,6 +30,7 @@ archCoreTestingVersion = "2.2.0"
 timberVersion = "5.0.1"
 rxAndroidVersion = "3.0.2"
 rxJavaVersion = "3.1.12"
+kotlinxCoroutinesVersion = "1.9.0"
 roundedImageView = "2.3.0"
 dexterVersion = "6.2.3"
 colorPickerVersion = "2.0.6"
@@ -86,6 +87,7 @@ preference = { group = "androidx.preference", name = "preference-ktx", version.r
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintLayoutVersion" }
 viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleVersion" }
 livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleVersion" }
+lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleVersion" }
 multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidexVersion" }
 navigation-runtime = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationVersion" }
 navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationVersion" }
@@ -98,6 +100,10 @@ androidTable = { group = "io.github.kaygenzo", name = "androidtable", version.re
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timberVersion" }
 rx-android = { group = "io.reactivex.rxjava3", name = "rxandroid", version.ref = "rxAndroidVersion" }
 rx-java = { group = "io.reactivex.rxjava3", name = "rxjava", version.ref = "rxJavaVersion" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesVersion" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesVersion" }
+kotlinx-coroutines-rx3 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-rx3", version.ref = "kotlinxCoroutinesVersion" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesVersion" }
 mpAndroidChart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "androidchartVersion" }
 picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picassoVersion" }
 rounedImage = { group = "com.makeramen", name = "roundedimageview", version.ref = "roundedImageView" }

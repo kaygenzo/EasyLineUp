@@ -5,10 +5,7 @@
 package com.telen.easylineup.team.createTeam
 
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
@@ -17,25 +14,28 @@ import com.telen.easylineup.views.TeamTypeCardItem
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.map
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 
 class SetupViewModel : ViewModel(), KoinComponent {
     private val saveTeamUseCase: SaveTeam by inject()
-    private val _team: MutableLiveData<Team> = MutableLiveData()
+    private val _team: MutableSharedFlow<Team> = MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
     private var currentTeam = Team(0, "", null, TeamType.UNKNOWN.id, true)
     var errors: Subject<StepError> = PublishSubject.create()
 
-    fun observeTeamName(): LiveData<String> {
+    fun observeTeamName(): Flow<String> {
         return _team.map { it.name }
     }
 
-    fun observeTeamType(): LiveData<Int> {
+    fun observeTeamType(): Flow<Int> {
         return _team.map { it.type }
     }
 
-    fun observeTeamImage(): LiveData<Uri?> {
+    fun observeTeamImage(): Flow<Uri?> {
         return _team.map {
             it.takeIf { it.image != null }?.let { Uri.parse(it.image) }
         }
@@ -63,7 +63,7 @@ class SetupViewModel : ViewModel(), KoinComponent {
         team?.let {
             currentTeam = it
         }
-        _team.postValue(currentTeam)
+        _team.tryEmit(currentTeam)
     }
 
     fun getTeamTypeCardItems(): List<TeamTypeCardItem> {

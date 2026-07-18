@@ -6,7 +6,6 @@ package com.telen.easylineup.dashboard
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.Player
@@ -32,11 +31,14 @@ import com.telen.easylineup.utils.SharedPreferencesHelper
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
 import io.reactivex.rxjava3.processors.PublishProcessor
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.startKoin
@@ -56,9 +58,6 @@ import org.mockito.junit.MockitoJUnitRunner
  */
 @RunWith(MockitoJUnitRunner::class)
 internal class DashboardViewModelTest {
-
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Mock
     lateinit var teamRepository: TeamRepository
@@ -128,7 +127,7 @@ internal class DashboardViewModelTest {
     }
 
     @Test
-    fun shouldRegisterTilesLiveDataAndSwitchToDashboardConfigurationsWhenTeamsChange() {
+    fun shouldRegisterTilesFlowAndSwitchToDashboardConfigurationsWhenTeamsChange() = runTest {
         val teamsProcessor = PublishProcessor.create<List<Team>>()
         Mockito.`when`(teamRepository.getTeams()).thenReturn(teamsProcessor)
         val tile = DashboardTile(id = 1L, position = 0, type = TileType.TEAM_SIZE.type)
@@ -136,12 +135,15 @@ internal class DashboardViewModelTest {
         Mockito.`when`(playerRepository.getPlayersByTeamId(1L)).thenReturn(Single.just(emptyList()))
 
         val observedValues = mutableListOf<List<DashboardTile>>()
-        viewModel.registerTilesLiveData().observeForever { observedValues.add(it) }
+        val job = launch { viewModel.registerTilesFlow().toList(observedValues) }
+        advanceUntilIdle()
 
         teamsProcessor.onNext(emptyList())
+        advanceUntilIdle()
 
         assertEquals(1, observedValues.size)
         assertEquals(1, observedValues.first().size)
+        job.cancel()
     }
 
     @Test

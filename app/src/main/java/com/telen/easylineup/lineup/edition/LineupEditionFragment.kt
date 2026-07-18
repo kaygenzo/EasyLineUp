@@ -18,6 +18,8 @@ import androidx.core.view.MenuProvider
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.telen.easylineup.BaseFragment
@@ -29,6 +31,8 @@ import com.telen.easylineup.domain.model.RosterItem
 import com.telen.easylineup.launch
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapterCallback,
     MenuProvider {
@@ -76,32 +80,38 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
                 showDiscardDialog("cancel")
             }
 
-            viewModel.observeRosterItems().observe(viewLifecycleOwner) {
-                rosterItems.clear()
-                rosterItems.addAll(it)
-                rosterAdapter.notifyDataSetChanged()
-            }
-
-            viewModel.observeLineup().observe(viewLifecycleOwner) { lineup ->
-                lineupNameEditText.setText(lineup.name)
-                lineupNameEditText.addTextChangedListener {
-                    viewModel.onLineupNameChanged(it.toString())
+            viewModel.observeRosterItems()
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .onEach {
+                    rosterItems.clear()
+                    rosterItems.addAll(it)
+                    rosterAdapter.notifyDataSetChanged()
                 }
-                launch(viewModel.getTournaments(), { tournaments ->
-                    val index = tournaments.indexOfFirst { it.id == lineup.tournamentId }
-                    val adapter = ArrayAdapter(
-                        requireContext(),
-                        R.layout.item_auto_completion,
-                        tournaments.map { it.name })
-                    with(tournamentChoice) {
-                        setAdapter(adapter)
-                        setText(tournaments[index].name, false)
-                        onItemClickListener = OnItemClickListener { _, _, position, _ ->
-                            viewModel.onTournamentChanged(tournaments[position])
-                        }
+                .launchIn(viewLifecycleOwner.lifecycleScope)
+
+            viewModel.observeLineup()
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .onEach { lineup ->
+                    lineupNameEditText.setText(lineup.name)
+                    lineupNameEditText.addTextChangedListener {
+                        viewModel.onLineupNameChanged(it.toString())
                     }
-                })
-            }
+                    launch(viewModel.getTournaments(), { tournaments ->
+                        val index = tournaments.indexOfFirst { it.id == lineup.tournamentId }
+                        val adapter = ArrayAdapter(
+                            requireContext(),
+                            R.layout.item_auto_completion,
+                            tournaments.map { it.name })
+                        with(tournamentChoice) {
+                            setAdapter(adapter)
+                            setText(tournaments[index].name, false)
+                            onItemClickListener = OnItemClickListener { _, _, position, _ ->
+                                viewModel.onTournamentChanged(tournaments[position])
+                            }
+                        }
+                    })
+                }
+                .launchIn(viewLifecycleOwner.lifecycleScope)
         }.root
     }
 

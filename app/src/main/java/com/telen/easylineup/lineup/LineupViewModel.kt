@@ -2,6 +2,8 @@
     Copyright (c) Karim Yarboua. 2010-2024
 */
 
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.telen.easylineup.lineup
 
 import android.content.Context
@@ -10,12 +12,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.core.content.FileProvider
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
 import androidx.preference.PreferenceManager
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
@@ -47,13 +44,21 @@ import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.SharedPreferencesHelper
-import com.telen.easylineup.utils.toLiveData
+import com.telen.easylineup.utils.asSafeFlow
 import com.telen.easylineup.views.LineupTypeface
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -111,25 +116,32 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val saveDpAndFlexUseCase: SaveDpAndFlex by inject()
     private val updatePlayersWithBattersUseCase: UpdatePlayersWithBatters by inject()
 
-    // private val _designatedPlayerTitle = MutableLiveData<String>()
-    private val _helpEvent: MutableLiveData<Boolean> = MutableLiveData(false)
+    // private val _designatedPlayerTitle = MutableStateFlow<String>()
+    private val _helpEvent: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     // players
     private val _listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
-    private val _players: MediatorLiveData<List<PlayerWithPosition>> by lazy {
-        MediatorLiveData<List<PlayerWithPosition>>().apply {
-            addSource(getLineupAndPositions()) { this.postValue(it) }
-        }
+
+    // Direct pushes from refreshPlayers(), merged with the DB-observed source below -
+    // emulates the former MediatorLiveData.addSource() wiring (source + ad-hoc direct writes).
+    private val _directPlayersPush: MutableSharedFlow<List<PlayerWithPosition>> =
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
+    private val _players: Flow<List<PlayerWithPosition>> by lazy {
+        merge(getLineupAndPositions(), _directPlayersPush)
     }
-    private val _batters: MutableLiveData<List<BatterState>> = MutableLiveData()
+    private val _batters: MutableSharedFlow<List<BatterState>> =
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
 
     // lineup
     var lineup: Lineup? = null
         private set
-    private val _lineup: MediatorLiveData<Lineup> by lazy {
-        MediatorLiveData<Lineup>().apply {
-            addSource(getLineup()) { this.postValue(it) }
-        }
+
+    // Direct pushes from setLineup(), merged with the DB-observed source below - same pattern
+    // as _directPlayersPush/_players above.
+    private val _directLineupPush: MutableSharedFlow<Lineup> =
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
+    private val _lineup: Flow<Lineup> by lazy {
+        merge(getLineup(), _directLineupPush)
     }
     var lineupId: Long? = 0
     var editable = false
@@ -137,41 +149,41 @@ class LineupViewModel : ViewModel(), KoinComponent {
 
     private fun setLineup(lineup: Lineup) {
         this.lineup = lineup
-        _lineup.postValue(this.lineup)
+        _directLineupPush.tryEmit(lineup)
     }
 
     private fun refreshPlayers(players: List<PlayerWithPosition>) {
-        _players.postValue(players)
+        _directPlayersPush.tryEmit(players)
     }
 
     fun clearData() {
         disposables.clear()
     }
 
-    fun observeLineupName(): LiveData<String> {
+    fun observeLineupName(): Flow<String> {
         return _lineup.map { it.name }
     }
 
-    fun observeLineupStrategy(): LiveData<TeamStrategy> {
+    fun observeLineupStrategy(): Flow<TeamStrategy> {
         return _lineup.map { TeamStrategy.getStrategyById(it.strategy) }
     }
 
-    fun observeLineupMode(): LiveData<Int> {
+    fun observeLineupMode(): Flow<Int> {
         return _lineup.map { it.mode }
     }
 
-    fun observeLineup(): LiveData<Lineup> {
+    fun observeLineup(): Flow<Lineup> {
         return _lineup
     }
 
-    fun observeLineupTypeface(context: Context): LiveData<LineupTypeface> {
+    fun observeLineupTypeface(context: Context): Flow<LineupTypeface> {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)
         val lineupValue = preferences.getString(
             context.getString(R.string.key_lineup_style),
             context.getString(R.string.lineup_style_default_value)
         )
         val lineupTypeface = LineupTypeface.getByValue(lineupValue)
-        return MutableLiveData(lineupTypeface)
+        return flowOf(lineupTypeface)
     }
 
     fun onDeletePosition(player: Player) {
@@ -362,9 +374,9 @@ class LineupViewModel : ViewModel(), KoinComponent {
         }.processError()
     }
 
-    fun observeBatters(): LiveData<List<BatterState>> {
-        return _players.switchMap { players ->
-            _lineup.switchMap { lineup ->
+    fun observeBatters(): Flow<List<BatterState>> {
+        return _players.flatMapLatest { players ->
+            _lineup.flatMapLatest { lineup ->
                 val batterSize = TeamStrategy.getStrategyById(lineup.strategy).batterSize
                 val extraHitters = lineup.extraHitters
                 val disposable = getTeamUseCase()
@@ -380,7 +392,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
                             isEditable = editable
                         )
                     }.subscribe({
-                    _batters.postValue(it)
+                    _batters.tryEmit(it)
                 }, {
                     Timber.e(it)
                 })
@@ -390,23 +402,23 @@ class LineupViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun observeDefensePlayers(): LiveData<List<PlayerWithPosition>> {
+    fun observeDefensePlayers(): Flow<List<PlayerWithPosition>> {
         return _players
     }
 
-    private fun getLineupAndPositions(): LiveData<List<PlayerWithPosition>> {
+    private fun getLineupAndPositions(): Flow<List<PlayerWithPosition>> {
         return getLineup()
-            .switchMap {
-                observeTeamPlayersAndMaybePositionsForLineupUseCase(it.id).toLiveData()
+            .flatMapLatest {
+                observeTeamPlayersAndMaybePositionsForLineupUseCase(it.id).asSafeFlow()
             }
-            .switchMap { positions ->
+            .flatMapLatest { positions ->
                 _listPlayersWithPosition.clear()
                 _listPlayersWithPosition.addAll(positions)
                 val playerMap = mutableMapOf(
                     *positions.map { Pair(it.playerId, it) }.toTypedArray()
                 )
                 val currentLineupId = lineupId ?: 0
-                observePlayerNumberOverlays(currentLineupId).toLiveData()
+                observePlayerNumberOverlays(currentLineupId).asSafeFlow()
                     .map {
                         it.forEach { overlay ->
                             playerMap[overlay.playerId]?.shirtNumber = overlay.number
@@ -416,8 +428,8 @@ class LineupViewModel : ViewModel(), KoinComponent {
             }
     }
 
-    private fun getLineup(): LiveData<Lineup> {
-        return observeLineupByIdUseCase(lineupId ?: 0).toLiveData().map {
+    private fun getLineup(): Flow<Lineup> {
+        return observeLineupByIdUseCase(lineupId ?: 0).asSafeFlow().map {
             it.apply {
                 this@LineupViewModel.lineup = this
             }
@@ -428,13 +440,13 @@ class LineupViewModel : ViewModel(), KoinComponent {
         val show = prefsHelper.isFeatureEnabled(Constants.PREF_FEATURE_SHOW_REORDER_HELP)
         if (position == FRAGMENT_ATTACK_INDEX && editable && show) {
             prefsHelper.disableFeature(Constants.PREF_FEATURE_SHOW_REORDER_HELP)
-            _helpEvent.postValue(true)
+            _helpEvent.value = true
         } else {
-            _helpEvent.postValue(false)
+            _helpEvent.value = false
         }
     }
 
-    fun observeHelpEvent(): LiveData<Boolean> {
+    fun observeHelpEvent(): Flow<Boolean> {
         return _helpEvent
     }
 

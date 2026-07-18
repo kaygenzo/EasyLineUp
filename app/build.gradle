@@ -151,7 +151,7 @@ dependencies {
     testImplementation libs.tests.junit
     testImplementation libs.mockito.core
     testImplementation libs.mockito.kotlin
-    testImplementation libs.tests.archCore
+    testImplementation libs.kotlinx.coroutines.test
 
     ////////// ANDROID X //////////
 
@@ -161,9 +161,14 @@ dependencies {
     implementation libs.preference
     implementation libs.constraintlayout
 
-    // ViewModel and LiveData
+    // ViewModel
     implementation libs.viewmodel
-    implementation libs.livedata
+    implementation libs.lifecycle.runtime.ktx
+
+    // Coroutines
+    implementation libs.kotlinx.coroutines.core
+    implementation libs.kotlinx.coroutines.android
+    implementation libs.kotlinx.coroutines.rx3
 
     implementation libs.multidex
     implementation libs.navigation.runtime

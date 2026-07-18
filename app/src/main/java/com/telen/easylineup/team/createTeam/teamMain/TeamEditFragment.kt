@@ -11,6 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentTeamEditBinding
@@ -20,6 +23,8 @@ import com.telen.easylineup.team.createTeam.SetupViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.TeamFormListener
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
     private val viewModel by activityViewModels<SetupViewModel>()
@@ -74,18 +79,23 @@ class TeamEditFragment : BaseFragment("TeamEditFragment"), TeamFormListener {
             with(editTeamForm) {
                 setListener(this@TeamEditFragment)
 
-                viewModel.observeTeamName().observe(viewLifecycleOwner) {
-                    setName(it)
-                }
+                viewModel.observeTeamName()
+                    .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                    .onEach { setName(it) }
+                    .launchIn(viewLifecycleOwner.lifecycleScope)
 
-                viewModel.observeTeamImage().observe(viewLifecycleOwner) {
-                    it?.let { setImage(it) }
-                }
+                viewModel.observeTeamImage()
+                    .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                    .onEach { it?.let { setImage(it) } }
+                    .launchIn(viewLifecycleOwner.lifecycleScope)
 
-                viewModel.observeTeamType().observe(viewLifecycleOwner) {
-                    setTeamTypes(viewModel.getTeamTypeCardItems())
-                    setTeamType(TeamType.getTypeById(it))
-                }
+                viewModel.observeTeamType()
+                    .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                    .onEach {
+                        setTeamTypes(viewModel.getTeamTypeCardItems())
+                        setTeamType(TeamType.getTypeById(it))
+                    }
+                    .launchIn(viewLifecycleOwner.lifecycleScope)
             }
         }.root
     }

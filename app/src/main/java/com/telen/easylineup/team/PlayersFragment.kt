@@ -10,6 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,6 +23,8 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class PlayersFragment : BaseFragment("TeamFragment"), OnPlayerClickListener {
     private val playersAdapter = TeamAdapter(this)
@@ -44,29 +49,33 @@ class PlayersFragment : BaseFragment("TeamFragment"), OnPlayerClickListener {
             )
         }
 
-        viewModel.observePlayers().observe(viewLifecycleOwner) {
-            playersAdapter.submitList(it)
-        }
+        viewModel.observePlayers()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { playersAdapter.submitList(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.observeDisplayType().observe(viewLifecycleOwner) {
-            playersAdapter.displayType = it
-            when (it) {
-                TeamViewModel.DisplayType.LIST -> {
-                    binding.displayMode.apply {
-                        setChipIconResource(R.drawable.ic_baseline_grid_view_24)
-                        setText(R.string.display_grid)
+        viewModel.observeDisplayType()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach {
+                playersAdapter.displayType = it
+                when (it) {
+                    TeamViewModel.DisplayType.LIST -> {
+                        binding.displayMode.apply {
+                            setChipIconResource(R.drawable.ic_baseline_grid_view_24)
+                            setText(R.string.display_grid)
+                        }
+                        showList()
                     }
-                    showList()
-                }
-                TeamViewModel.DisplayType.GRID -> {
-                    binding.displayMode.apply {
-                        setChipIconResource(R.drawable.ic_baseline_view_list_24)
-                        setText(R.string.display_list)
+                    TeamViewModel.DisplayType.GRID -> {
+                        binding.displayMode.apply {
+                            setChipIconResource(R.drawable.ic_baseline_view_list_24)
+                            setText(R.string.display_list)
+                        }
+                        showGrid()
                     }
-                    showGrid()
                 }
             }
-        }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         binding.displayMode.setOnClickListener {
             viewModel.switchDisplayType()

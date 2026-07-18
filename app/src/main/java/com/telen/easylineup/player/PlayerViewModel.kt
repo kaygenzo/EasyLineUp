@@ -6,12 +6,10 @@ package com.telen.easylineup.player
 
 import android.content.Context
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.DeletePlayer
@@ -22,11 +20,14 @@ import com.telen.easylineup.domain.usecases.SavePlayer
 import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
-import com.telen.easylineup.utils.toLiveData
+import com.telen.easylineup.utils.asSafeFlow
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.map
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -39,17 +40,20 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     private val getPlayerPositionsSummaryUseCase: GetPositionsSummaryForPlayer by inject()
     private val errors: Subject<DomainErrors.Players> = PublishSubject.create()
     private val disposables = CompositeDisposable()
-    private val _teamTypeLiveData: MutableLiveData<Int> = MutableLiveData<Int>().apply {
-        getTeamType()
+    private val _teamTypeFlow: MutableSharedFlow<Int> =
+        MutableSharedFlow<Int>(replay = 1, extraBufferCapacity = 1).apply {
+            getTeamType()
+        }
+    private val _strategyFlow: MutableSharedFlow<TeamStrategy> =
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
+    private val _lineupsFlow: MutableSharedFlow<Map<FieldPosition, Int>> by lazy {
+        MutableSharedFlow<Map<FieldPosition, Int>>(replay = 1, extraBufferCapacity = 1)
+            .apply { getLineups() }
     }
-    private val _strategyLiveData: MutableLiveData<TeamStrategy> = MutableLiveData()
-    private val _lineupsLiveData: MutableLiveData<Map<FieldPosition, Int>> by lazy {
-        MutableLiveData<Map<FieldPosition, Int>>().apply { getLineups() }
-    }
-    private val _player by lazy {
+    private val _player: Flow<Player> by lazy {
         playerId.takeIf { it > 0 }
-            ?.let { observePlayer(it).toLiveData() }
-            ?: MutableLiveData()
+            ?.let { observePlayer(it).asSafeFlow() }
+            ?: MutableSharedFlow()
     }
     var playerId: Long = 0
     var teamType: Int = 0
@@ -65,64 +69,64 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     var savedPhoneNumber: String? = null
     var savedSex: Int? = null
 
-    fun observePlayerName(): LiveData<String> {
+    fun observePlayerName(): Flow<String> {
         return _player.map { savedName ?: it.name }
     }
 
-    fun observePlayerShirtNumber(): LiveData<Int> {
+    fun observePlayerShirtNumber(): Flow<Int> {
         return _player.map { savedShirtNumber ?: it.shirtNumber }
     }
 
-    fun observePlayerLicenseNumber(): LiveData<Long> {
+    fun observePlayerLicenseNumber(): Flow<Long> {
         return _player.map { savedLicenseNumber ?: it.licenseNumber }
     }
 
-    fun observePlayerImage(): LiveData<String?> {
+    fun observePlayerImage(): Flow<String?> {
         return _player.map { savedImage ?: it.image }
     }
 
-    fun observePlayerPosition(): LiveData<Int> {
+    fun observePlayerPosition(): Flow<Int> {
         return _player.map { savedPositions ?: it.positions }
     }
 
-    fun observePlayerPitchingSide(): LiveData<Int> {
+    fun observePlayerPitchingSide(): Flow<Int> {
         return _player.map { savedPitching ?: it.pitching }
     }
 
-    fun observePlayerBattingSide(): LiveData<Int> {
+    fun observePlayerBattingSide(): Flow<Int> {
         return _player.map { savedBatting ?: it.batting }
     }
 
-    fun observePlayerEmail(): LiveData<String> {
+    fun observePlayerEmail(): Flow<String> {
         return _player.map { savedEmail ?: it.email ?: "" }
     }
 
-    fun observePlayerPhoneNumber(): LiveData<String> {
+    fun observePlayerPhoneNumber(): Flow<String> {
         return _player.map { savedPhoneNumber ?: it.phone ?: "" }
     }
 
-    fun observePlayerSex(): LiveData<Int> {
+    fun observePlayerSex(): Flow<Int> {
         return _player.map { savedSex ?: it.sex }
     }
 
-    fun observeStrategy(): LiveData<TeamStrategy> {
-        return _strategyLiveData
+    fun observeStrategy(): Flow<TeamStrategy> {
+        return _strategyFlow
     }
 
-    fun observeStrategies(context: Context): LiveData<List<String>> {
+    fun observeStrategies(context: Context): Flow<List<String>> {
         return observeTeamType().map { teamType ->
             val teamType = TeamType.getTypeById(teamType)
             val names = teamType.getStrategiesDisplayName(context) ?: arrayOf()
             strategies.apply {
                 clear()
                 addAll(names)
-                _strategyLiveData.postValue(teamType.getStrategies()[0])
+                _strategyFlow.tryEmit(teamType.getStrategies()[0])
             }
         }
     }
 
-    fun observeTeamType(): LiveData<Int> {
-        return _teamTypeLiveData
+    fun observeTeamType(): Flow<Int> {
+        return _teamTypeFlow
     }
 
     private fun getTeamType() {
@@ -130,15 +134,15 @@ class PlayerViewModel : ViewModel(), KoinComponent {
             .map { it.type }
             .subscribe({
                 this.teamType = it
-                _teamTypeLiveData.postValue(it)
+                _teamTypeFlow.tryEmit(it)
             }, {
                 Timber.e(it)
             })
         disposables.add(disposable)
     }
 
-    fun observeLineups(): LiveData<Map<FieldPosition, Int>> {
-        return _lineupsLiveData
+    fun observeLineups(): Flow<Map<FieldPosition, Int>> {
+        return _lineupsFlow
     }
 
     fun clear() {
@@ -190,13 +194,13 @@ class PlayerViewModel : ViewModel(), KoinComponent {
 
     fun onStrategySelected(index: Int) {
         val teamType = TeamType.getTypeById(this.teamType)
-        _strategyLiveData.postValue(teamType.getStrategies()[index])
+        _strategyFlow.tryEmit(teamType.getStrategies()[index])
     }
 
     private fun getLineups() {
         val disposable = getPlayerPositionsSummaryUseCase(playerId)
             .subscribe({
-                _lineupsLiveData.postValue(it)
+                _lineupsFlow.tryEmit(it)
             }, {
                 Timber.e(it)
             })

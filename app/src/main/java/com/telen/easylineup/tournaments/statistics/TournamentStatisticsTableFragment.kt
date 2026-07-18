@@ -13,7 +13,9 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentTournamentStatisticsTableBinding
@@ -22,6 +24,8 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import io.github.kaygenzo.androidtable.api.StyleConfiguration
 import io.github.kaygenzo.androidtable.api.TableConfiguration
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class TournamentStatisticsTableFragment : BaseFragment("TournamentStatisticsTableFragment"),
 AdapterView.OnItemSelectedListener {
@@ -65,21 +69,25 @@ AdapterView.OnItemSelectedListener {
                     )
                 )
 
-                viewModel.leftHeadersData.observe(viewLifecycleOwner, Observer {
-                    setLeftHeaderData(it)
-                })
+                viewModel.leftHeadersData
+                    .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                    .onEach { setLeftHeaderData(it) }
+                    .launchIn(viewLifecycleOwner.lifecycleScope)
 
-                viewModel.topHeadersData.observe(viewLifecycleOwner, Observer {
-                    setTopHeaderData(it)
-                })
+                viewModel.topHeadersData
+                    .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                    .onEach { setTopHeaderData(it) }
+                    .launchIn(viewLifecycleOwner.lifecycleScope)
 
-                viewModel.mainTableData.observe(viewLifecycleOwner, Observer {
-                    setMainData(it)
-                })
+                viewModel.mainTableData
+                    .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                    .onEach { setMainData(it) }
+                    .launchIn(viewLifecycleOwner.lifecycleScope)
 
-                viewModel.columnHighlights.observe(viewLifecycleOwner, Observer {
-                    setColumnHighlights(it)
-                })
+                viewModel.columnHighlights
+                    .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                    .onEach { setColumnHighlights(it) }
+                    .launchIn(viewLifecycleOwner.lifecycleScope)
                 activity?.let { context ->
                     viewModel.getStrategiesNames(context)?.let { strategies ->
                         val strategyAdapter = ArrayAdapter(context, R.layout.item_team_strategy, strategies)

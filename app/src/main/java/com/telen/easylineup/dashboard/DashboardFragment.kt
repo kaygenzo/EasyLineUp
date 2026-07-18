@@ -18,6 +18,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -37,6 +40,8 @@ import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.utils.hideSoftKeyboard
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 import java.text.DateFormat
@@ -70,9 +75,10 @@ ActionMode.Callback {
                 adapter = tileAdapter
             }
 
-            viewModel.registerTilesLiveData().observe(viewLifecycleOwner) {
-                tileAdapter.submitList(it)
-            }
+            viewModel.registerTilesFlow()
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .onEach { tileAdapter.submitList(it) }
+                .launchIn(viewLifecycleOwner.lifecycleScope)
         }.root
     }
 

@@ -2,24 +2,28 @@
     Copyright (c) Karim Yarboua. 2010-2024
 */
 
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.telen.easylineup.team
 
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.DeleteTeam
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObservePlayers
-import com.telen.easylineup.utils.toLiveData
+import com.telen.easylineup.utils.asSafeFlow
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -28,17 +32,23 @@ class TeamViewModel : ViewModel(), KoinComponent {
     private val getTeamUseCase: GetTeam by inject()
     private val deleteTeamUseCase: DeleteTeam by inject()
     private val observePlayers: ObservePlayers by inject()
-    private val _team: MutableLiveData<Team> by lazy {
-        MutableLiveData<Team>().apply { getCurrentTeam() }
+    private val _team: MutableSharedFlow<Team> by lazy {
+        MutableSharedFlow<Team>(replay = 1, extraBufferCapacity = 1).apply { getCurrentTeam() }
     }
     private val _playersFromDao by lazy {
-        _team.switchMap {
-            observePlayers(it.id).toLiveData()
+        _team.flatMapLatest {
+            observePlayers(it.id).asSafeFlow()
         }
     }
-    private val _playersMediator: MediatorLiveData<List<Player>> = MediatorLiveData()
-    private val _players: MutableLiveData<List<Player>> = MutableLiveData()
-    private val _displayType: MutableLiveData<DisplayType> = MutableLiveData(DisplayType.GRID)
+    private val _players: MutableSharedFlow<List<Player>> =
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
+
+    // Emulates a MediatorLiveData with a shared Observer on 2 sources: passthrough merge,
+    // not a combine - whichever source emits wins, re-triggering the sort downstream.
+    private val _playersMerged: Flow<List<Player>> by lazy {
+        merge(_playersFromDao, _players).onEach { playerList = it }
+    }
+    private val _displayType: MutableStateFlow<DisplayType> = MutableStateFlow(DisplayType.GRID)
     private val disposables = CompositeDisposable()
     private var playerSelectedId = 0L
     var team: Team? = null
@@ -49,37 +59,34 @@ class TeamViewModel : ViewModel(), KoinComponent {
     private var playerList: List<Player> = listOf()
 
     init {
-        val observer: Observer<List<Player>> = Observer {
-            playerList = it
-            _playersMediator.postValue(playerList)
-        }
-        _playersMediator.addSource(_playersFromDao, observer)
-        _playersMediator.addSource(_players, observer)
+        // Force _team/_playersFromDao/_playersMerged lazy init eagerly, matching the
+        // former MediatorLiveData.addSource(...) wiring that ran unconditionally at construction.
+        _playersMerged
     }
 
-    fun observePlayers(): LiveData<List<Player>> = _playersMediator.map {
+    fun observePlayers(): Flow<List<Player>> = _playersMerged.map {
         sortPlayers(it)
     }
 
-    fun observeDisplayType(): LiveData<DisplayType> = _displayType
+    fun observeDisplayType(): Flow<DisplayType> = _displayType
 
     fun clear() {
         disposables.clear()
     }
 
-    fun observeCurrentTeamName(): LiveData<String> {
+    fun observeCurrentTeamName(): Flow<String> {
         return _team.map {
             it.name.trim()
         }
     }
 
-    fun observeCurrentTeamType(): LiveData<TeamType> {
+    fun observeCurrentTeamType(): Flow<TeamType> {
         return _team.map {
             TeamType.getTypeById(it.type)
         }
     }
 
-    fun observeCurrentTeamImage(): LiveData<Uri?> {
+    fun observeCurrentTeamImage(): Flow<Uri?> {
         return _team.map {
             it.image.takeIf { it != null }?.let { Uri.parse(it) }
         }
@@ -103,7 +110,7 @@ class TeamViewModel : ViewModel(), KoinComponent {
         val disposable = getTeamUseCase()
             .subscribe({
                 team = it
-                _team.postValue(it)
+                _team.tryEmit(it)
             }, {
                 Timber.e(it)
             })
@@ -115,12 +122,12 @@ class TeamViewModel : ViewModel(), KoinComponent {
             DisplayType.LIST -> this.displayType = DisplayType.GRID
             DisplayType.GRID -> this.displayType = DisplayType.LIST
         }
-        _displayType.postValue(this.displayType)
+        _displayType.value = this.displayType
     }
 
     fun setSortType(sortType: SortType) {
         this.sortType = sortType
-        _players.postValue(playerList)
+        _players.tryEmit(playerList)
     }
 
     private fun sortPlayers(listPlayers: List<Player>): List<Player> {

@@ -13,6 +13,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.telen.easylineup.BaseFragment
@@ -23,6 +26,8 @@ import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFragment") {
@@ -60,11 +65,14 @@ class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFra
             registerOnPageChangeCallback(pageChangeCallback)
         }
 
-        teamViewModel.observePlayers().observe(viewLifecycleOwner) { players ->
-            playersAdapter.setPlayerIds(players)
-            val playerIndex = playersAdapter.getPlayerIndex(teamViewModel.getPlayerId())
-            pager.setCurrentItem(playerIndex, false)
-        }
+        teamViewModel.observePlayers()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { players ->
+                playersAdapter.setPlayerIds(players)
+                val playerIndex = playersAdapter.getPlayerIndex(teamViewModel.getPlayerId())
+                pager.setCurrentItem(playerIndex, false)
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         return binding.root
     }

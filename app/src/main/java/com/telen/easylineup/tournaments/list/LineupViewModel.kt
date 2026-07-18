@@ -2,12 +2,11 @@
     Copyright (c) Karim Yarboua. 2010-2024
 */
 
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.telen.easylineup.tournaments.list
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.switchMap
 
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
@@ -29,7 +28,7 @@ import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import com.telen.easylineup.utils.SharedPreferencesHelper
-import com.telen.easylineup.utils.toLiveData
+import com.telen.easylineup.utils.asSafeFlow
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
@@ -40,7 +39,11 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 
 sealed class SaveResult
 
@@ -60,15 +63,16 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val createLineupUseCase: CreateLineup by inject()
     private val prefsHelper by inject<SharedPreferencesHelper>()
     private val errors: Subject<DomainErrors.Lineups> = PublishSubject.create()
-    private val _categorizedLineupsLiveData: MutableLiveData<List<TournamentItem>> =
-        MutableLiveData()
+    private val _categorizedLineupsFlow: MutableSharedFlow<List<TournamentItem>> =
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
     private val tournamentItems: MutableList<TournamentItem> = mutableListOf()
-    private val filterLiveData: MutableLiveData<String> by lazy {
-        MutableLiveData("")
+    private val filterFlow: MutableStateFlow<String> by lazy {
+        MutableStateFlow("")
     }
     private var chosenRoster: TeamRosterSummary =
         TeamRosterSummary(Constants.STATUS_ALL, mutableListOf())
-    private val saveResult: MutableLiveData<SaveResult> = MutableLiveData()
+    private val saveResult: MutableSharedFlow<SaveResult> =
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
     private val disposables = CompositeDisposable()
     private var tournament: Tournament? = null
     private val lineup = Lineup()
@@ -77,20 +81,20 @@ class LineupViewModel : ViewModel(), KoinComponent {
         MutableSharedFlow(extraBufferCapacity = 1, replay = 1)
 
     fun setFilter(filter: String) {
-        filterLiveData.value = filter
+        filterFlow.value = filter
     }
 
-    fun registerSaveResults(): LiveData<SaveResult> {
+    fun registerSaveResults(): Flow<SaveResult> {
         return saveResult
     }
 
-    fun getTournaments(): LiveData<List<Tournament>> {
-        return observeTournamentsUseCase().toLiveData()
+    fun getTournaments(): Flow<List<Tournament>> {
+        return observeTournamentsUseCase().asSafeFlow()
     }
 
-    fun observeCategorizedLineups(): LiveData<List<TournamentItem>> {
-        return filterLiveData.switchMap { filter ->
-            _categorizedLineupsLiveData.apply {
+    fun observeCategorizedLineups(): Flow<List<TournamentItem>> {
+        return filterFlow.flatMapLatest { filter ->
+            _categorizedLineupsFlow.apply {
                 val disposable = getAllTournamentsWithLineupsUseCase(filter)
                     .flatMapObservable { Observable.fromIterable(it) }
                     .flatMapSingle { Single.just(TournamentItem(it.first, it.second)) }
@@ -98,7 +102,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
                     .subscribe({
                         tournamentItems.clear()
                         tournamentItems.addAll(it)
-                        _categorizedLineupsLiveData.postValue(tournamentItems)
+                        _categorizedLineupsFlow.tryEmit(tournamentItems)
                         loadMaps(it)
                     }, {
                         Timber.e(it)
@@ -157,7 +161,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
                     errors.onNext(DomainErrors.Lineups.INVALID_TOURNAMENT_NAME)
                 }
             }
-            .subscribe({ saveResult.value = SaveSuccess(it) }, {
+            .subscribe({ saveResult.tryEmit(SaveSuccess(it)) }, {
                 when (it) {
                     is TournamentNameEmptyException,
                     is LineupNameEmptyException -> Timber.w(it.message)

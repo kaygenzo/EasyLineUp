@@ -17,6 +17,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.databinding.FragmentPlayerEditBinding
@@ -32,6 +34,8 @@ import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.PlayerFormListener
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListener, MenuProvider {
@@ -101,45 +105,57 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
 
         binding.editPlayerForm.setListener(this)
 
-        viewModel.observePlayerName().observe(viewLifecycleOwner) {
-            binding.editPlayerForm.setName(it)
-        }
+        viewModel.observePlayerName()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { binding.editPlayerForm.setName(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.observePlayerLicenseNumber().observe(viewLifecycleOwner) {
-            binding.editPlayerForm.setLicenseNumber(it)
-        }
+        viewModel.observePlayerLicenseNumber()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { binding.editPlayerForm.setLicenseNumber(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.observePlayerShirtNumber().observe(viewLifecycleOwner) {
-            binding.editPlayerForm.setShirtNumber(it)
-        }
+        viewModel.observePlayerShirtNumber()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { binding.editPlayerForm.setShirtNumber(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.observePlayerPosition().observe(viewLifecycleOwner) {
-            binding.editPlayerForm.setPositionsFilter(it)
-        }
+        viewModel.observePlayerPosition()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { binding.editPlayerForm.setPositionsFilter(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.observePlayerImage().observe(viewLifecycleOwner) {
-            it?.let { imageUriString -> binding.editPlayerForm.setImage(Uri.parse(imageUriString)) }
-        }
+        viewModel.observePlayerImage()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach {
+                it?.let { imageUriString -> binding.editPlayerForm.setImage(Uri.parse(imageUriString)) }
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.observePlayerPitchingSide().observe(viewLifecycleOwner) {
-            binding.editPlayerForm.setPitchingSide(PlayerSide.getSideByValue(it))
-        }
+        viewModel.observePlayerPitchingSide()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { binding.editPlayerForm.setPitchingSide(PlayerSide.getSideByValue(it)) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.observePlayerBattingSide().observe(viewLifecycleOwner) {
-            binding.editPlayerForm.setBattingSide(PlayerSide.getSideByValue(it))
-        }
+        viewModel.observePlayerBattingSide()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { binding.editPlayerForm.setBattingSide(PlayerSide.getSideByValue(it)) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.observePlayerEmail().observe(viewLifecycleOwner) {
-            binding.editPlayerForm.setEmail(it)
-        }
+        viewModel.observePlayerEmail()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { binding.editPlayerForm.setEmail(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.observePlayerPhoneNumber().observe(viewLifecycleOwner) {
-            binding.editPlayerForm.setPhone(it)
-        }
+        viewModel.observePlayerPhoneNumber()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { binding.editPlayerForm.setPhone(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.observePlayerSex().observe(viewLifecycleOwner) {
-            binding.editPlayerForm.setSex(Sex.getById(it))
-        }
+        viewModel.observePlayerSex()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { binding.editPlayerForm.setSex(Sex.getById(it)) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         return binding.root
     }

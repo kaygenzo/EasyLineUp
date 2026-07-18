@@ -13,6 +13,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -30,6 +33,8 @@ import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.DrawerHeader
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import java.io.Serializable
 
@@ -57,9 +62,10 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
             setupActionBarWithNavController(navController, drawerLayout)
             navigationView.setupWithNavController(navController)
 
-            viewModel.registerTeamUpdates().observe(this@HomeActivity) {
-                loadTeamData()
-            }
+            viewModel.registerTeamUpdates()
+                .flowWithLifecycle(this@HomeActivity.lifecycle, Lifecycle.State.STARTED)
+                .onEach { loadTeamData() }
+                .launchIn(this@HomeActivity.lifecycleScope)
 
             drawerHeader = DrawerHeader(this@HomeActivity)
 

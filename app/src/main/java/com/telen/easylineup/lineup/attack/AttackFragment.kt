@@ -11,6 +11,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.getkeepsafe.taptargetview.TapTargetView
@@ -26,6 +29,8 @@ import com.telen.easylineup.utils.SharedPreferencesUtils
 import com.telen.easylineup.views.ItemDecoratorAttackRecycler
 import com.telen.easylineup.views.LineupTypeface
 import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -76,50 +81,65 @@ class AttackFragment : BaseFragment("AttackFragment"), BatterListener {
             itemTouchedHelper.attachToRecyclerView(binder.recyclerView)
         }
 
-        viewModel.observeLineup().observe(viewLifecycleOwner) {
-            val batterSize = TeamStrategy.getStrategyById(it.strategy).batterSize
-            val extraHitters = it.extraHitters
-            val dividerItemDecoration = ItemDecoratorAttackRecycler(
-                context,
-                linearLayoutManager.orientation,
-                batterSize,
-                extraHitters
-            )
-            binder.recyclerView.addItemDecoration(dividerItemDecoration)
-            playerAdapter.notifyDataSetChanged()
-        }
-
-        viewModel.observeLineupMode().observe(viewLifecycleOwner) {
-            playerAdapter.lineupMode = it
-            playerAdapter.notifyDataSetChanged()
-        }
-
-        viewModel.observeLineupTypeface(requireContext()).observe(viewLifecycleOwner) {
-            playerAdapter.lineupTypeface = it
-            playerAdapter.notifyDataSetChanged()
-        }
-
-        viewModel.observeBatters().observe(viewLifecycleOwner) {
-            adapterDataList.clear()
-            adapterDataList.addAll(it)
-            playerAdapter.notifyDataSetChanged()
-        }
-
-        viewModel.observeHelpEvent().observe(viewLifecycleOwner) { show ->
-            if (show) {
-                launch(Completable.timer(200, TimeUnit.MILLISECONDS), {
-                    linearLayoutManager.findViewByPosition(0)?.let {
-                        FeatureViewFactory.apply(
-                            it.findViewById<ImageView>(R.id.reorderImage),
-                            activity as AppCompatActivity,
-                            getString(R.string.reorder_batter_title),
-                            getString(R.string.reorder_batter_description),
-                            object : TapTargetView.Listener() {}
-                        )
-                    }
-                })
+        viewModel.observeLineup()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach {
+                val batterSize = TeamStrategy.getStrategyById(it.strategy).batterSize
+                val extraHitters = it.extraHitters
+                val dividerItemDecoration = ItemDecoratorAttackRecycler(
+                    context,
+                    linearLayoutManager.orientation,
+                    batterSize,
+                    extraHitters
+                )
+                binder.recyclerView.addItemDecoration(dividerItemDecoration)
+                playerAdapter.notifyDataSetChanged()
             }
-        }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeLineupMode()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach {
+                playerAdapter.lineupMode = it
+                playerAdapter.notifyDataSetChanged()
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeLineupTypeface(requireContext())
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach {
+                playerAdapter.lineupTypeface = it
+                playerAdapter.notifyDataSetChanged()
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeBatters()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach {
+                adapterDataList.clear()
+                adapterDataList.addAll(it)
+                playerAdapter.notifyDataSetChanged()
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeHelpEvent()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { show ->
+                if (show) {
+                    launch(Completable.timer(200, TimeUnit.MILLISECONDS), {
+                        linearLayoutManager.findViewByPosition(0)?.let {
+                            FeatureViewFactory.apply(
+                                it.findViewById<ImageView>(R.id.reorderImage),
+                                activity as AppCompatActivity,
+                                getString(R.string.reorder_batter_title),
+                                getString(R.string.reorder_batter_description),
+                                object : TapTargetView.Listener() {}
+                            )
+                        }
+                    })
+                }
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         return binder.root
     }

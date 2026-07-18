@@ -14,6 +14,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.telen.easylineup.BaseFragment
@@ -27,6 +30,8 @@ import com.telen.easylineup.tournaments.list.LineupViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
     private val teamViewModel: TeamViewModel by viewModels()
@@ -50,58 +55,67 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
         val binding = FragmentTeamDetailsBinding.inflate(inflater, container, false)
         this.binding = binding
 
-        teamViewModel.observeCurrentTeamName().observe(viewLifecycleOwner) {
-            binding.teamTypeRootView.setTeamName(it)
-        }
+        teamViewModel.observeCurrentTeamName()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { binding.teamTypeRootView.setTeamName(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        teamViewModel.observeCurrentTeamType().observe(viewLifecycleOwner) {
-            binding.teamTypeRootView.setTeamType(it.id)
-        }
+        teamViewModel.observeCurrentTeamType()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { binding.teamTypeRootView.setTeamType(it.id) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        teamViewModel.observeCurrentTeamImage().observe(viewLifecycleOwner) {
-            binding.teamTypeRootView.setTeamImage(it)
-        }
+        teamViewModel.observeCurrentTeamImage()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { binding.teamTypeRootView.setTeamImage(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         binding.teamTypeRootView.apply {
             setDragEnabled(true)
             setDragState(BottomSheetBehavior.STATE_HALF_EXPANDED)
         }
 
-        teamViewModel.observePlayers().observe(viewLifecycleOwner) {
-            val description =
-                resources.getQuantityString(R.plurals.team_details_team_size, it.size, it.size)
-            binding.teamTypeRootView.setPlayersSize(R.drawable.ic_team, description)
+        teamViewModel.observePlayers()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach {
+                val description =
+                    resources.getQuantityString(R.plurals.team_details_team_size, it.size, it.size)
+                binding.teamTypeRootView.setPlayersSize(R.drawable.ic_team, description)
 
-            val womenCount = it.filter { it.sex == Sex.FEMALE.id }.size.let {
-                resources.getQuantityString(R.plurals.women_count, it, it)
+                val womenCount = it.filter { it.sex == Sex.FEMALE.id }.size.let {
+                    resources.getQuantityString(R.plurals.women_count, it, it)
+                }
+                val menCount = it.filter { it.sex == Sex.MALE.id }.size.let {
+                    resources.getQuantityString(R.plurals.men_count, it, it)
+                }
+                val sexUnsetCount = it.filter { it.sex == Sex.UNKNOWN.id }.size.let {
+                    resources.getQuantityString(R.plurals.unset_sex_count, it, it)
+                }
+                val sexRepartitionCountMessage = "$womenCount, $menCount, $sexUnsetCount"
+                binding.teamTypeRootView.setSexStats(
+                    R.drawable.ic_baseline_diversity_2_24,
+                    sexRepartitionCountMessage
+                )
             }
-            val menCount = it.filter { it.sex == Sex.MALE.id }.size.let {
-                resources.getQuantityString(R.plurals.men_count, it, it)
-            }
-            val sexUnsetCount = it.filter { it.sex == Sex.UNKNOWN.id }.size.let {
-                resources.getQuantityString(R.plurals.unset_sex_count, it, it)
-            }
-            val sexRepartitionCountMessage = "$womenCount, $menCount, $sexUnsetCount"
-            binding.teamTypeRootView.setSexStats(
-                R.drawable.ic_baseline_diversity_2_24,
-                sexRepartitionCountMessage
-            )
-        }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        lineupViewModel.observeCategorizedLineups().observe(viewLifecycleOwner) {
-            val tournamentsSize = it.size
-            val lineupsSize = it.sumOf { item -> item.lineups.count() }
-            val tournamentsQuantity = resources.getQuantityString(
-                R.plurals.tournaments_quantity,
-                tournamentsSize,
-                tournamentsSize
-            )
-            val lineupsQuantity =
-                resources.getQuantityString(R.plurals.lineups_quantity, lineupsSize, lineupsSize)
-            val headerText =
-                getString(R.string.tournaments_summary_header, tournamentsQuantity, lineupsQuantity)
-            binding.teamTypeRootView.setLineupsSize(R.drawable.ic_list_black_24dp, headerText)
-        }
+        lineupViewModel.observeCategorizedLineups()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach {
+                val tournamentsSize = it.size
+                val lineupsSize = it.sumOf { item -> item.lineups.count() }
+                val tournamentsQuantity = resources.getQuantityString(
+                    R.plurals.tournaments_quantity,
+                    tournamentsSize,
+                    tournamentsSize
+                )
+                val lineupsQuantity =
+                    resources.getQuantityString(R.plurals.lineups_quantity, lineupsSize, lineupsSize)
+                val headerText =
+                    getString(R.string.tournaments_summary_header, tournamentsQuantity, lineupsQuantity)
+                binding.teamTypeRootView.setLineupsSize(R.drawable.ic_list_black_24dp, headerText)
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         return binding.root
     }

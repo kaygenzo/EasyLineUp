@@ -4,7 +4,6 @@
 
 package com.telen.easylineup
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
@@ -13,11 +12,12 @@ import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
 import com.telen.easylineup.utils.SharedPreferencesHelper
-import com.telen.easylineup.utils.toLiveData
+import com.telen.easylineup.utils.asSafeFlow
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
+import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -50,8 +50,8 @@ class HomeViewModel : ViewModel(), KoinComponent {
     private val _event: Subject<Event> = PublishSubject.create()
     val disposables = CompositeDisposable()
 
-    fun registerTeamUpdates(): LiveData<List<Team>> {
-        return observeTeams().toLiveData()
+    fun registerTeamUpdates(): Flow<List<Team>> {
+        return observeTeams().asSafeFlow()
     }
 
     fun clear() {
