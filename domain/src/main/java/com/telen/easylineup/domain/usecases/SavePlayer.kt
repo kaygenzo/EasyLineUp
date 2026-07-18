@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import android.net.Uri
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
@@ -27,7 +26,7 @@ class SavePlayer(
         name: String?,
         shirtNumber: Int?,
         licenseNumber: Long? = 0,
-        imageUri: Uri?,
+        image: String?,
         positions: Int,
         pitching: Int,
         batting: Int,
@@ -46,7 +45,7 @@ class SavePlayer(
                     name = name.trim(),
                     shirtNumber = shirtNumber ?: 0,
                     licenseNumber = licenseNumber ?: 0L,
-                    image = imageUri?.toString(),
+                    image = image,
                     positions = positions,
                     pitching = pitching,
                     batting = batting,

@@ -5,7 +5,6 @@
 package com.telen.easylineup.player
 
 import android.content.Context
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.FieldPosition
@@ -154,7 +153,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
         name: String?,
         shirtNumber: Int?,
         licenseNumber: Long?,
-        imageUri: Uri?,
+        image: String?,
         positions: Int,
         pitching: Int,
         batting: Int,
@@ -167,7 +166,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
             name,
             shirtNumber,
             licenseNumber,
-            imageUri,
+            image,
             positions,
             pitching,
             batting,

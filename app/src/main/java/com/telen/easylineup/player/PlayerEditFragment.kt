@@ -198,7 +198,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
             name,
             shirtNumber,
             licenseNumber,
-            imageUri,
+            imageUri?.toString(),
             positions,
             pitching,
             batting,
