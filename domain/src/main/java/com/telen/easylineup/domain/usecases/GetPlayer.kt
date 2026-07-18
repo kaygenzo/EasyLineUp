@@ -4,34 +4,24 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.exceptions.NotExistingPlayerException
 import io.reactivex.rxjava3.core.Single
 
-/**
- * @property dao
- */
-class GetPlayer(val dao: PlayerRepository) :
-    UseCase<GetPlayer.RequestValues, GetPlayer.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return requestValues.playerId?.let { id ->
-            if (id == 0L) {
-                Single.error(NotExistingPlayerException())
-            } else {
-                dao.getPlayerByIdAsSingle(id).map { ResponseValue(it) }
-            }
-        } ?: Single.error(IllegalArgumentException())
+class GetPlayer(
+    private val dao: PlayerRepository,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(playerId: Long?): Single<Player> {
+        return (
+            playerId?.let { id ->
+                if (id == 0L) {
+                    Single.error(NotExistingPlayerException())
+                } else {
+                    dao.getPlayerByIdAsSingle(id)
+                }
+            } ?: Single.error(IllegalArgumentException())
+            ).subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property player
-     */
-    class ResponseValue(val player: Player) : UseCase.ResponseValue
-
-    /**
-     * @property playerId
-     */
-    class RequestValues(val playerId: Long?) : UseCase.RequestValues
 }

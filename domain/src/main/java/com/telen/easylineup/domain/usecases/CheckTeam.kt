@@ -4,26 +4,18 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
-import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.Completable
 
-class CheckTeam : UseCase<CheckTeam.RequestValues, CheckTeam.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return Single.just(requestValues.team)
-            .flatMap { team ->
-                if ("" == team.name.trim()) {
-                    Single.error(NameEmptyException())
-                } else {
-                    Single.just(ResponseValue())
-                }
+class CheckTeam(private val schedulersProvider: SchedulersProvider) {
+    operator fun invoke(team: Team): Completable {
+        return Completable.defer {
+            if ("" == team.name.trim()) {
+                Completable.error(NameEmptyException())
+            } else {
+                Completable.complete()
             }
+        }.subscribeOn(schedulersProvider.io())
     }
-
-    class ResponseValue : UseCase.ResponseValue
-    /**
-     * @property team
-     */
-    class RequestValues(val team: Team) : UseCase.RequestValues
 }

@@ -25,7 +25,7 @@ internal class InsertLineupsTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        insertLineups = InsertLineups(lineupDao)
+        insertLineups = InsertLineups(lineupDao, testSchedulersProvider())
     }
 
     @Test
@@ -33,8 +33,8 @@ internal class InsertLineupsTests {
         val lineups = listOf(Lineup(id = 1L, name = "toto", teamId = 1L, tournamentId = 1L))
         Mockito.`when`(lineupDao.insertLineups(lineups)).thenReturn(Completable.complete())
 
-        val observer = TestObserver<InsertLineups.ResponseValue>()
-        insertLineups.executeUseCase(InsertLineups.RequestValues(lineups)).subscribe(observer)
+        val observer = TestObserver<Void>()
+        insertLineups(lineups).subscribe(observer)
         observer.await()
 
         observer.assertComplete()

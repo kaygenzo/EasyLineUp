@@ -21,14 +21,14 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class GetTeamTests {
     private var teams: MutableList<Team> = mutableListOf()
-    val observer: TestObserver<GetTeam.ResponseValue> = TestObserver()
+    val observer: TestObserver<Team> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     lateinit var getTeam: GetTeam
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getTeam = GetTeam(teamDao)
+        getTeam = GetTeam(teamDao, testSchedulersProvider())
 
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(teams))
     }
@@ -39,11 +39,11 @@ internal class GetTeamTests {
         teams.add(Team(2, "tata", null, 0, false))
         teams.add(Team(3, "titi", null, 0, false))
 
-        getTeam.executeUseCase(GetTeam.RequestValues())
+        getTeam()
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(teams[0], observer.values().first().team)
+        Assert.assertEquals(teams[0], observer.values().first())
     }
 
     @Test
@@ -52,10 +52,10 @@ internal class GetTeamTests {
         teams.add(Team(2, "tata", null, 0, false))
         teams.add(Team(3, "titi", null, 0, true))
 
-        getTeam.executeUseCase(GetTeam.RequestValues())
+        getTeam()
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(teams[2], observer.values().first().team)
+        Assert.assertEquals(teams[2], observer.values().first())
     }
 }

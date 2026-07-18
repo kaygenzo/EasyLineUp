@@ -32,7 +32,7 @@ import org.mockito.junit.MockitoJUnitRunner
  */
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveTeamTests {
-    val observer: TestObserver<SaveTeam.ResponseValue> = TestObserver()
+    val observer: TestObserver<Team> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     lateinit var saveTeam: SaveTeam
     lateinit var team: Team
@@ -40,7 +40,12 @@ internal class SaveTeamTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        saveTeam = SaveTeam(teamDao, CheckTeam(), SaveCurrentTeam(teamDao))
+        saveTeam = SaveTeam(
+            teamDao,
+            CheckTeam(testSchedulersProvider()),
+            SaveCurrentTeam(teamDao, testSchedulersProvider()),
+            testSchedulersProvider()
+        )
         team = Team(id = 1L, name = "test", type = TeamType.BASEBALL.id, main = true)
         Mockito.`when`(teamDao.insertTeam(any())).thenReturn(Single.just(2L))
         Mockito.`when`(teamDao.updateTeam(any())).thenReturn(Completable.complete())
@@ -51,8 +56,7 @@ internal class SaveTeamTests {
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() {
         team.name = ""
-        val request = SaveTeam.RequestValues(team)
-        saveTeam.executeUseCase(request).subscribe(observer)
+        saveTeam(team).subscribe(observer)
         observer.await()
         observer.assertError(NameEmptyException::class.java)
         verify(teamDao, never()).insertTeam(any())
@@ -62,49 +66,44 @@ internal class SaveTeamTests {
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsOnlyWhitespaces() {
         team.name = "\n\t\r       "
-        val request = SaveTeam.RequestValues(team)
-        saveTeam.executeUseCase(request).subscribe(observer)
+        saveTeam(team).subscribe(observer)
         observer.await()
         observer.assertError(NameEmptyException::class.java)
     }
 
     @Test
     fun shouldUpdateTeamIfIdGreaterThatZero() {
-        val request = SaveTeam.RequestValues(team)
-        saveTeam.executeUseCase(request).subscribe(observer)
+        saveTeam(team).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(teamDao).updateTeam(any())
         verify(teamDao, never()).insertTeam(any())
-        Assert.assertEquals(1L, observer.values().first().team.id)
+        Assert.assertEquals(1L, observer.values().first().id)
     }
 
     @Test
     fun shouldInsertTeamIfIdEqualsToZero() {
         team.id = 0L
-        val request = SaveTeam.RequestValues(team)
-        saveTeam.executeUseCase(request).subscribe(observer)
+        saveTeam(team).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(teamDao).insertTeam(any())
         verify(teamDao, never()).updateTeam(any())
-        Assert.assertEquals(2L, observer.values().first().team.id)
+        Assert.assertEquals(2L, observer.values().first().id)
     }
 
     @Test
     fun shouldCorrectTeamTypeIfUnknown() {
         team.type = TeamType.UNKNOWN.id
-        val request = SaveTeam.RequestValues(team)
-        saveTeam.executeUseCase(request).subscribe(observer)
+        saveTeam(team).subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(TeamType.BASEBALL.id, observer.values().first().team.type)
+        Assert.assertEquals(TeamType.BASEBALL.id, observer.values().first().type)
     }
 
     @Test
     fun shouldSetTeamAsCurrentAfterSaving() {
-        val request = SaveTeam.RequestValues(team)
-        saveTeam.executeUseCase(request).subscribe(observer)
+        saveTeam(team).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(teamDao).updateTeams(any())

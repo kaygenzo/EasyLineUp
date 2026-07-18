@@ -33,6 +33,6 @@ internal class ObserveLineupByIdTests {
         val liveData = MutableLiveData<Lineup>()
         Mockito.`when`(lineupDao.getLineupById(1L)).thenReturn(liveData)
 
-        assertSame(liveData, observeLineupById.execute(1L))
+        assertSame(liveData, observeLineupById(1L))
     }
 }

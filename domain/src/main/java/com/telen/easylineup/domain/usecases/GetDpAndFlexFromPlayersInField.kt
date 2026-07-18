@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.DpAndFlexConfiguration
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamType
@@ -16,14 +15,15 @@ import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import io.reactivex.rxjava3.core.Single
 
-class GetDpAndFlexFromPlayersInField(private val getTeam: GetTeam) :
-    UseCase<GetDpAndFlexFromPlayersInField.RequestValues,
-GetDpAndFlexFromPlayersInField.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return getTeam.executeUseCase(GetTeam.RequestValues())
-            .map { it.team.type }
+class GetDpAndFlexFromPlayersInField(
+    private val getTeam: GetTeam,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(playersInLineup: List<PlayerWithPosition>): Single<DpAndFlexConfiguration> {
+        return getTeam()
+            .map { it.type }
             .flatMap { teamType ->
-                Single.just(requestValues.playersInLineup)
+                Single.just(playersInLineup)
                     .map { list ->
                         list.filter {
                             it.isAssigned() && !it.isSubstitute()
@@ -44,26 +44,15 @@ GetDpAndFlexFromPlayersInField.ResponseValue>() {
                         if (flex == null && teamType == TeamType.BASEBALL.id) {
                             throw NeedAssignPitcherFirstException()
                         }
-                        ResponseValue(
-                            DpAndFlexConfiguration(
-                                dp,
-                                flex,
-                                dpLocked,
-                                flexLocked,
-                                teamType
-                            )
+                        DpAndFlexConfiguration(
+                            dp,
+                            flex,
+                            dpLocked,
+                            flexLocked,
+                            teamType
                         )
                     }
             }
+            .subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property configResult
-     */
-    class ResponseValue(val configResult: DpAndFlexConfiguration) : UseCase.ResponseValue
-    /**
-     * @property playersInLineup
-     */
-    class RequestValues(val playersInLineup: List<PlayerWithPosition>) :
-        UseCase.RequestValues
 }

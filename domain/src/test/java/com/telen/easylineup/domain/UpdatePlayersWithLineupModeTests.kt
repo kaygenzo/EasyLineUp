@@ -25,7 +25,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class UpdatePlayersWithLineupModeTests {
-    var observer: TestObserver<UpdatePlayersWithLineupMode.ResponseValue> = TestObserver()
+    var observer: TestObserver<Void> = TestObserver()
     private val extraHitters = 0
     private val strategy = TeamStrategy.STANDARD
     private val lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitters)
@@ -35,7 +35,7 @@ internal class UpdatePlayersWithLineupModeTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        updatePlayersWithLineupMode = UpdatePlayersWithLineupMode()
+        updatePlayersWithLineupMode = UpdatePlayersWithLineupMode(testSchedulersProvider())
         players = mutableListOf()
         players.add(
             PlayerWithPosition(
@@ -90,12 +90,10 @@ internal class UpdatePlayersWithLineupModeTests {
     ) {
         lineup.mode = if (lineupMode) MODE_ENABLED else MODE_DISABLED
         val playersSize = players.size
-        updatePlayersWithLineupMode.executeUseCase(
-            UpdatePlayersWithLineupMode.RequestValues(
-                players,
-                lineup,
-                teamType?.id ?: 1_000
-            )
+        updatePlayersWithLineupMode(
+            players,
+            lineup,
+            teamType?.id ?: 1_000
         ).subscribe(observer)
         observer.await()
         exception?.let {

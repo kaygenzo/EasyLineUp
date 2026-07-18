@@ -9,6 +9,6 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.repository.PlayerRepository
 
 class ObserveTeamPlayersAndMaybePositionsForLineup(private val dao: PlayerRepository) {
-    fun execute(lineupId: Long): LiveData<List<PlayerWithPosition>> =
+    operator fun invoke(lineupId: Long): LiveData<List<PlayerWithPosition>> =
         dao.getTeamPlayersAndMaybePositions(lineupId)
 }

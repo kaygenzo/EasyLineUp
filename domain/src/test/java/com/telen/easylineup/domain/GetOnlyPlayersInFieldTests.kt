@@ -17,13 +17,13 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetOnlyPlayersInFieldTests : BaseUseCaseTests() {
-    private val observer: TestObserver<GetOnlyPlayersInField.ResponseValue> = TestObserver()
+    private val observer: TestObserver<List<PlayerWithPosition>> = TestObserver()
     lateinit var useCase: GetOnlyPlayersInField
     lateinit var players: MutableList<PlayerWithPosition>
 
     @Before
     fun init() {
-        useCase = GetOnlyPlayersInField()
+        useCase = GetOnlyPlayersInField(testSchedulersProvider())
 
         players = mutableListOf()
         players.add(generate(1L, FieldPosition.PITCHER, 1))
@@ -39,7 +39,7 @@ internal class GetOnlyPlayersInFieldTests : BaseUseCaseTests() {
     }
 
     private fun startUseCase(players: List<PlayerWithPosition> = this.players) {
-        useCase.executeUseCase(GetOnlyPlayersInField.RequestValues(players)).subscribe(observer)
+        useCase(players).subscribe(observer)
         observer.await()
         observer.assertComplete()
     }
@@ -47,13 +47,13 @@ internal class GetOnlyPlayersInFieldTests : BaseUseCaseTests() {
     @Test
     fun shouldReturnEmptyList() {
         startUseCase(mutableListOf())
-        Assert.assertTrue(observer.values().first().playersInField.isEmpty())
+        Assert.assertTrue(observer.values().first().isEmpty())
     }
 
     @Test
     fun shouldReturnListWithOnlyInfieldersAndOutfielders() {
         startUseCase(players)
-        observer.values().first().playersInField.let {
+        observer.values().first().let {
             Assert.assertEquals(3, it.count())
             Assert.assertNotNull(it.firstOrNull { it.playerName == "player1" })
             Assert.assertNotNull(it.firstOrNull { it.playerName == "player2" })

@@ -29,7 +29,7 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class DeleteTournamentLineupsTests {
     private val lineups: MutableList<Lineup> = mutableListOf()
-    val observer: TestObserver<DeleteTournamentLineups.ResponseValue> = TestObserver()
+    val observer: TestObserver<Void> = TestObserver()
     @Mock lateinit var lineupsDao: LineupRepository
     @Mock lateinit var teamDao: TeamRepository
     lateinit var deleteTournament: DeleteTournamentLineups
@@ -39,7 +39,11 @@ internal class DeleteTournamentLineupsTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        deleteTournament = DeleteTournamentLineups(lineupsDao, GetTeam(teamDao))
+        deleteTournament = DeleteTournamentLineups(
+            lineupsDao,
+            GetTeam(teamDao, testSchedulersProvider()),
+            testSchedulersProvider()
+        )
 
         tournament = Tournament(id = 1L, name = "toto", createdAt = 1L, 2L, 3L, null)
         team = Team(id = 1L, name = "toto", main = true)
@@ -63,7 +67,7 @@ internal class DeleteTournamentLineupsTests {
 
     @Test
     fun shouldDeleteOnlyLineupOfSpecificTournamentAndTeam() {
-        deleteTournament.executeUseCase(DeleteTournamentLineups.RequestValues(tournament))
+        deleteTournament(tournament)
             .subscribe(observer)
         observer.await()
         observer.assertComplete()

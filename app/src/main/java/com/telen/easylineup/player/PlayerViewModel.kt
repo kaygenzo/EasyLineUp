@@ -10,7 +10,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamStrategy
@@ -32,7 +31,6 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 class PlayerViewModel : ViewModel(), KoinComponent {
-    private val useCaseHandler: UseCaseHandler by inject()
     private val getTeamUseCase: GetTeam by inject()
     private val observePlayer: ObservePlayer by inject()
     private val savePlayerUseCase: SavePlayer by inject()
@@ -49,7 +47,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
     private val _player by lazy {
         playerId.takeIf { it > 0 }
-            ?.let { observePlayer.execute(it) }
+            ?.let { observePlayer(it) }
             ?: MutableLiveData()
     }
     var playerId: Long = 0
@@ -127,8 +125,8 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getTeamType() {
-        val disposable = useCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
-            .map { it.team.type }
+        val disposable = getTeamUseCase()
+            .map { it.type }
             .subscribe({
                 this.teamType = it
                 _teamTypeLiveData.postValue(it)
@@ -158,7 +156,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
         phone: String?,
         sex: Int
     ): Completable {
-        val request = SavePlayer.RequestValues(
+        return savePlayerUseCase(
             playerId,
             name,
             shirtNumber,
@@ -171,8 +169,6 @@ class PlayerViewModel : ViewModel(), KoinComponent {
             phone,
             sex
         )
-        return useCaseHandler.execute(savePlayerUseCase, request)
-            .ignoreElement()
             .doOnError {
                 when (it) {
                     is NameEmptyException ->
@@ -186,9 +182,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
 
     fun deletePlayer(): Completable {
-        return useCaseHandler
-            .execute(deletePlayerUseCase, DeletePlayer.RequestValues(playerId))
-            .ignoreElement()
+        return deletePlayerUseCase(playerId)
     }
 
     fun registerPlayerFormErrorResult(): Subject<DomainErrors.Players> = errors
@@ -199,11 +193,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getLineups() {
-        val disposable = useCaseHandler.execute(
-            getPlayerPositionsSummaryUseCase,
-            GetPositionsSummaryForPlayer.RequestValues(playerId)
-        )
-            .map { it.summary }
+        val disposable = getPlayerPositionsSummaryUseCase(playerId)
             .subscribe({
                 _lineupsLiveData.postValue(it)
             }, {

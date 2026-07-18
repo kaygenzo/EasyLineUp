@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
@@ -15,17 +14,17 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.isDpDhOrFlex
 import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.model.reset
-import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.Completable
 
-class UpdatePlayersWithLineupMode :
-    UseCase<UpdatePlayersWithLineupMode.RequestValues,
-UpdatePlayersWithLineupMode.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return Single.defer {
-            val players = requestValues.players
-            val lineup = requestValues.lineup
+class UpdatePlayersWithLineupMode(private val schedulersProvider: SchedulersProvider) {
+    operator fun invoke(
+        players: List<PlayerWithPosition>,
+        lineup: Lineup,
+        teamType: Int
+    ): Completable {
+        return Completable.defer {
             when (lineup.mode) {
-                MODE_ENABLED -> when (requestValues.teamType) {
+                MODE_ENABLED -> when (teamType) {
                     TeamType.SOFTBALL.id -> {
                         /* nothing to do */
                     }
@@ -39,24 +38,11 @@ UpdatePlayersWithLineupMode.ResponseValue>() {
                             it.flags = PlayerFieldPosition.FLAG_FLEX
                         }
                     }
-                    else -> return@defer Single.error(IllegalArgumentException())
+                    else -> return@defer Completable.error(IllegalArgumentException())
                 }
                 MODE_DISABLED -> players.filter { it.isDpDhOrFlex() }.forEach { it.reset() }
             }
-            Single.just(ResponseValue())
-        }
+            Completable.complete()
+        }.subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property players
-     * @property lineup
-     * @property teamType
-     */
-    class RequestValues(
-        val players: List<PlayerWithPosition>,
-        val lineup: Lineup,
-        val teamType: Int
-    ) : UseCase.RequestValues
-
-    class ResponseValue : UseCase.ResponseValue
 }

@@ -21,7 +21,7 @@ import org.mockito.junit.*
 @RunWith(MockitoJUnitRunner::class)
 internal class DeleteLineupTests {
     private val extraHitters = 0
-    private val observer: TestObserver<DeleteLineup.ResponseValue> = TestObserver()
+    private val observer: TestObserver<Void> = TestObserver()
 
     @Mock
     lateinit var dao: LineupRepository
@@ -31,7 +31,7 @@ internal class DeleteLineupTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        deleteLineup = DeleteLineup(dao)
+        deleteLineup = DeleteLineup(dao, testSchedulersProvider())
 
         lineup1 =
                 Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id, extraHitters, 3L)
@@ -42,7 +42,7 @@ internal class DeleteLineupTests {
 
     @Test
     fun shouldReturnAnExceptionIfLineupIdIsNull() {
-        deleteLineup.executeUseCase(DeleteLineup.RequestValues(null)).subscribe(observer)
+        deleteLineup(null).subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
     }
@@ -50,14 +50,14 @@ internal class DeleteLineupTests {
     @Test
     fun shouldDeleteLineupIfIdExists() {
         Mockito.`when`(dao.deleteLineup(lineup1)).thenReturn(Completable.complete())
-        deleteLineup.executeUseCase(DeleteLineup.RequestValues(1)).subscribe(observer)
+        deleteLineup(1).subscribe(observer)
         observer.await()
         observer.assertComplete()
     }
 
     @Test
     fun shouldDeleteLineupIfIdNotExists() {
-        deleteLineup.executeUseCase(DeleteLineup.RequestValues(2)).subscribe(observer)
+        deleteLineup(2).subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
     }
@@ -65,7 +65,7 @@ internal class DeleteLineupTests {
     @Test
     fun shouldReturnAnErrorIfLineupExistsButCannotBeDeleted() {
         Mockito.`when`(dao.deleteLineup(lineup1)).thenReturn(Completable.error(Exception()))
-        deleteLineup.executeUseCase(DeleteLineup.RequestValues(1)).subscribe(observer)
+        deleteLineup(1).subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
     }

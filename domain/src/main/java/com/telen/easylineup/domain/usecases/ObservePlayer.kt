@@ -9,5 +9,5 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 
 class ObservePlayer(private val dao: PlayerRepository) {
-    fun execute(playerId: Long): LiveData<Player> = dao.getPlayerById(playerId)
+    operator fun invoke(playerId: Long): LiveData<Player> = dao.getPlayerById(playerId)
 }

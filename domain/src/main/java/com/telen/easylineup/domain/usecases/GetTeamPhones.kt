@@ -4,21 +4,19 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import io.reactivex.rxjava3.core.Single
 
-class GetTeamPhones(private val getPlayers: GetPlayers) :
-    UseCase<GetTeamPhones.RequestValues, GetTeamPhones.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return getPlayers.executeUseCase(GetPlayers.RequestValues())
-            .map { response ->
-                response.players
+class GetTeamPhones(
+    private val getPlayers: GetPlayers,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(): Single<List<String>> {
+        return getPlayers()
+            .map { players ->
+                players
                     .filter { !it.phone.isNullOrEmpty() }
                     .map { it.phone ?: "" }
             }
-            .map { ResponseValue(it) }
+            .subscribeOn(schedulersProvider.io())
     }
-
-    class RequestValues : UseCase.RequestValues
-    class ResponseValue(val phones: List<String>) : UseCase.ResponseValue
 }

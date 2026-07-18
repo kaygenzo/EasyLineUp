@@ -93,7 +93,7 @@ internal class CreateLineupSoftballCustomSlowpitchTests : CreateLineupTests() {
 internal open class CreateLineupTests {
     var strategy: TeamStrategy = TeamStrategy.STANDARD
     var extraHitters: Int = 0
-    private val observer: TestObserver<CreateLineup.ResponseValue> = TestObserver()
+    private val observer: TestObserver<Lineup> = TestObserver()
     private lateinit var lineup: Lineup
 
     @Mock
@@ -106,7 +106,7 @@ internal open class CreateLineupTests {
     @Before
     open fun init() {
         MockitoAnnotations.initMocks(this)
-        createLineup = CreateLineup(lineupDao, GetTeam(teamDao))
+        createLineup = CreateLineup(lineupDao, GetTeam(teamDao, testSchedulersProvider()), testSchedulersProvider())
 
         Mockito.`when`(teamDao.getTeamsRx())
             .thenReturn(Single.just(listOf(Team(id = 1L, name = "toto", main = true))))
@@ -128,7 +128,7 @@ internal open class CreateLineupTests {
     }
 
     private fun startUseCase(roster: List<RosterPlayerStatus>) {
-        createLineup.executeUseCase(CreateLineup.RequestValues(lineup, roster))
+        createLineup(lineup, roster)
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -154,13 +154,13 @@ internal open class CreateLineupTests {
     @Test
     fun shouldSavedSuccessfullyTheNewLineup() {
         startUseCase(roster)
-        Assert.assertEquals(1L, observer.values().first().lineup.id)
+        Assert.assertEquals(1L, observer.values().first().id)
     }
 
     @Test
     fun shouldTriggerAnExceptionIfLineupNameEmpty() {
         lineup.name = "      "
-        createLineup.executeUseCase(CreateLineup.RequestValues(lineup, roster))
+        createLineup(lineup, roster)
             .subscribe(observer)
         observer.await()
         observer.assertError(LineupNameEmptyException::class.java)
@@ -169,7 +169,7 @@ internal open class CreateLineupTests {
     @Test
     fun shouldTriggerAnExceptionIfTournamentNameEmpty() {
         lineup.tournamentId = 0
-        createLineup.executeUseCase(CreateLineup.RequestValues(lineup, roster))
+        createLineup(lineup, roster)
             .subscribe(observer)
         observer.await()
         observer.assertError(TournamentNameEmptyException::class.java)

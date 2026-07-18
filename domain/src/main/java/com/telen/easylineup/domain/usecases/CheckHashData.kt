@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerFieldPosition
@@ -19,21 +18,15 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import java.util.UUID
 
-/**
- * @property teamDao
- * @property playerDao
- * @property tournamentDao
- * @property lineupDao
- * @property playerFieldPositionsDao
- */
 class CheckHashData(
-    val teamDao: TeamRepository,
-    val playerDao: PlayerRepository,
-    val tournamentDao: TournamentRepository,
-    val lineupDao: LineupRepository,
-    val playerFieldPositionsDao: PlayerFieldPositionRepository
-) : UseCase<CheckHashData.RequestValues, CheckHashData.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
+    private val teamDao: TeamRepository,
+    private val playerDao: PlayerRepository,
+    private val tournamentDao: TournamentRepository,
+    private val lineupDao: LineupRepository,
+    private val playerFieldPositionsDao: PlayerFieldPositionRepository,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(): Single<IntArray> {
         val result = intArrayOf(0, 0, 0, 0, 0)
         return updateTeams().flatMapCompletable {
             result[0] = it
@@ -55,7 +48,8 @@ class CheckHashData(
                 result[4] = it
                 Completable.complete()
             })
-            .andThen(Single.just(ResponseValue(result)))
+            .andThen(Single.just(result))
+            .subscribeOn(schedulersProvider.io())
     }
 
     private fun updateTeams(): Single<Int> {
@@ -127,10 +121,4 @@ class CheckHashData(
             playerFieldPositionsDao.updatePlayerFieldPositionsWithRowCount(toUpdate)
         }
     }
-
-    /**
-     * @property updateResult
-     */
-    class ResponseValue(val updateResult: IntArray) : UseCase.ResponseValue
-    class RequestValues : UseCase.RequestValues
 }

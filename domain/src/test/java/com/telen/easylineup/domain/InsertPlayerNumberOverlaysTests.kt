@@ -25,7 +25,7 @@ internal class InsertPlayerNumberOverlaysTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        insertPlayerNumberOverlays = InsertPlayerNumberOverlays(playerDao)
+        insertPlayerNumberOverlays = InsertPlayerNumberOverlays(playerDao, testSchedulersProvider())
     }
 
     @Test
@@ -33,10 +33,8 @@ internal class InsertPlayerNumberOverlaysTests {
         val overlays = listOf(PlayerNumberOverlay(id = 1L, lineupId = 10L, playerId = 1L, number = 8))
         Mockito.`when`(playerDao.createPlayerNumberOverlays(overlays)).thenReturn(Completable.complete())
 
-        val observer = TestObserver<InsertPlayerNumberOverlays.ResponseValue>()
-        insertPlayerNumberOverlays
-            .executeUseCase(InsertPlayerNumberOverlays.RequestValues(overlays))
-            .subscribe(observer)
+        val observer = TestObserver<Void>()
+        insertPlayerNumberOverlays(overlays).subscribe(observer)
         observer.await()
 
         observer.assertComplete()

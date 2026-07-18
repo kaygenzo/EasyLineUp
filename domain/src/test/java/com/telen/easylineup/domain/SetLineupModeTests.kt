@@ -28,7 +28,7 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class SetLineupModeTests {
     private val extraHitters = 0
-    private val observer: TestObserver<SetLineupMode.ResponseValue> = TestObserver()
+    private val observer: TestObserver<Void> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     lateinit var setLineupMode: SetLineupMode
     lateinit var lineup: Lineup
@@ -36,7 +36,11 @@ internal class SetLineupModeTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        setLineupMode = SetLineupMode(GetTeam(teamDao), UpdatePlayersWithLineupMode())
+        setLineupMode = SetLineupMode(
+            GetTeam(teamDao, testSchedulersProvider()),
+            UpdatePlayersWithLineupMode(testSchedulersProvider()),
+            testSchedulersProvider()
+        )
 
         val team = Team(id = 1L, name = "toto", type = TeamType.SOFTBALL.id, main = true)
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
@@ -47,7 +51,7 @@ internal class SetLineupModeTests {
     private fun startUseCase(mode: Boolean) {
         lineup.mode = if (mode) MODE_DISABLED else MODE_ENABLED
         val lineupMode = if (mode) MODE_ENABLED else MODE_DISABLED
-        setLineupMode.executeUseCase(SetLineupMode.RequestValues(mode, lineup, emptyList()))
+        setLineupMode(mode, lineup, emptyList())
             .subscribe(observer)
         observer.await()
         observer.assertComplete()

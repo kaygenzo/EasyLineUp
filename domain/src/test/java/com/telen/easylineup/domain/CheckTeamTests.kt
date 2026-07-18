@@ -16,19 +16,19 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class CheckTeamTests {
-    private val observer: TestObserver<CheckTeam.ResponseValue> = TestObserver()
+    private val observer: TestObserver<Void> = TestObserver()
     val team = Team(1L, "A", null, 0, true, null)
     lateinit var checkTeam: CheckTeam
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        checkTeam = CheckTeam()
+        checkTeam = CheckTeam(testSchedulersProvider())
     }
 
     @Test
     fun shouldAcceptTeamWithNameNotEmpty() {
-        checkTeam.executeUseCase(CheckTeam.RequestValues(team))
+        checkTeam(team)
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -37,7 +37,7 @@ internal class CheckTeamTests {
     @Test
     fun shouldRejectTeamWithNameEmpty() {
         team.name = ""
-        checkTeam.executeUseCase(CheckTeam.RequestValues(team))
+        checkTeam(team)
             .subscribe(observer)
         observer.await()
         observer.assertError(NameEmptyException::class.java)
@@ -46,7 +46,7 @@ internal class CheckTeamTests {
     @Test
     fun shouldRejectTeamWithNameOnlyWhitespaces() {
         team.name = "    "
-        checkTeam.executeUseCase(CheckTeam.RequestValues(team))
+        checkTeam(team)
             .subscribe(observer)
         observer.await()
         observer.assertError(NameEmptyException::class.java)

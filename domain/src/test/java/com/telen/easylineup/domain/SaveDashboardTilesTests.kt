@@ -23,7 +23,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveDashboardTilesTests {
-    val observer: TestObserver<SaveDashboardTiles.ResponseValue> =
+    val observer: TestObserver<Void> =
         TestObserver()
     @Mock lateinit var tilesRepo: TilesRepository
     lateinit var saveDashboardTiles: SaveDashboardTiles
@@ -31,7 +31,7 @@ internal class SaveDashboardTilesTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        saveDashboardTiles = SaveDashboardTiles(tilesRepo)
+        saveDashboardTiles = SaveDashboardTiles(tilesRepo, testSchedulersProvider())
 
         Mockito.`when`(tilesRepo.updateTiles(any())).thenReturn(Completable.complete())
     }
@@ -39,7 +39,7 @@ internal class SaveDashboardTilesTests {
     @Test
     fun shouldTriggerAnErrorIfSaveFails() {
         Mockito.`when`(tilesRepo.updateTiles(any())).thenReturn(Completable.error(IllegalStateException()))
-        saveDashboardTiles.executeUseCase(SaveDashboardTiles.RequestValues(listOf())).subscribe(observer)
+        saveDashboardTiles(listOf()).subscribe(observer)
         observer.await()
         observer.assertError(IllegalStateException::class.java)
     }
@@ -52,7 +52,7 @@ internal class SaveDashboardTilesTests {
             add(DashboardTile(3, 3, TileType.LAST_LINEUP.type, true))
             add(DashboardTile(4, 4, TileType.LAST_PLAYER_NUMBER.type, true))
         }
-        saveDashboardTiles.executeUseCase(SaveDashboardTiles.RequestValues(list)).subscribe(observer)
+        saveDashboardTiles(list).subscribe(observer)
         observer.await()
         observer.assertComplete()
 
@@ -72,7 +72,7 @@ internal class SaveDashboardTilesTests {
             add(DashboardTile(2, 2, TileType.MOST_USED_PLAYER.type, true))
             add(DashboardTile(1, 1, TileType.TEAM_SIZE.type, true))
         }
-        saveDashboardTiles.executeUseCase(SaveDashboardTiles.RequestValues(list)).subscribe(observer)
+        saveDashboardTiles(list).subscribe(observer)
         observer.await()
         observer.assertComplete()
 

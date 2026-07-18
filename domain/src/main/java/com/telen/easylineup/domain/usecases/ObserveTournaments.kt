@@ -9,5 +9,5 @@ import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.TournamentRepository
 
 class ObserveTournaments(private val dao: TournamentRepository) {
-    fun execute(): LiveData<List<Tournament>> = dao.observeTournaments()
+    operator fun invoke(): LiveData<List<Tournament>> = dao.observeTournaments()
 }

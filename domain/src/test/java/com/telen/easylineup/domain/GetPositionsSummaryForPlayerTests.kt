@@ -21,7 +21,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetPositionsSummaryForPlayerTests {
-    val observer: TestObserver<GetPositionsSummaryForPlayer.ResponseValue> = TestObserver()
+    val observer: TestObserver<Map<FieldPosition, Int>> = TestObserver()
 
     @Mock
     lateinit var playerFieldPositionsDao: PlayerFieldPositionRepository
@@ -31,7 +31,8 @@ internal class GetPositionsSummaryForPlayerTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getPositionsSummaryForPlayer = GetPositionsSummaryForPlayer(playerFieldPositionsDao)
+        getPositionsSummaryForPlayer =
+            GetPositionsSummaryForPlayer(playerFieldPositionsDao, testSchedulersProvider())
 
         val position1 = PositionWithLineup(position = FieldPosition.CATCHER.id)
         val position2 = PositionWithLineup(position = FieldPosition.DP_DH.id)
@@ -63,7 +64,7 @@ internal class GetPositionsSummaryForPlayerTests {
 
     @Test
     fun shouldTriggerAnExceptionIfPlayerIdIsNull() {
-        getPositionsSummaryForPlayer.executeUseCase(GetPositionsSummaryForPlayer.RequestValues(null))
+        getPositionsSummaryForPlayer(null)
             .subscribe(observer)
         observer.await()
         observer.assertError(IllegalArgumentException::class.java)
@@ -71,16 +72,16 @@ internal class GetPositionsSummaryForPlayerTests {
 
     @Test
     fun shouldReturnMapOfAllPositions() {
-        getPositionsSummaryForPlayer.executeUseCase(GetPositionsSummaryForPlayer.RequestValues(1L))
+        getPositionsSummaryForPlayer(1L)
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(5, observer.values().first().summary.count())
+        Assert.assertEquals(5, observer.values().first().count())
 
-        Assert.assertEquals(1, observer.values().first().summary[FieldPosition.SUBSTITUTE])
-        Assert.assertEquals(1, observer.values().first().summary[FieldPosition.DP_DH])
-        Assert.assertEquals(5, observer.values().first().summary[FieldPosition.CATCHER])
-        Assert.assertEquals(2, observer.values().first().summary[FieldPosition.PITCHER])
-        Assert.assertEquals(1, observer.values().first().summary[FieldPosition.RIGHT_FIELD])
+        Assert.assertEquals(1, observer.values().first()[FieldPosition.SUBSTITUTE])
+        Assert.assertEquals(1, observer.values().first()[FieldPosition.DP_DH])
+        Assert.assertEquals(5, observer.values().first()[FieldPosition.CATCHER])
+        Assert.assertEquals(2, observer.values().first()[FieldPosition.PITCHER])
+        Assert.assertEquals(1, observer.values().first()[FieldPosition.RIGHT_FIELD])
     }
 }

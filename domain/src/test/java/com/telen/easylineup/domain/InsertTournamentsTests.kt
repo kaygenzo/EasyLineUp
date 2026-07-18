@@ -25,7 +25,7 @@ internal class InsertTournamentsTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        insertTournaments = InsertTournaments(tournamentDao)
+        insertTournaments = InsertTournaments(tournamentDao, testSchedulersProvider())
     }
 
     @Test
@@ -34,8 +34,8 @@ internal class InsertTournamentsTests {
         Mockito.`when`(tournamentDao.insertTournaments(tournaments))
             .thenReturn(Completable.complete())
 
-        val observer = TestObserver<InsertTournaments.ResponseValue>()
-        insertTournaments.executeUseCase(InsertTournaments.RequestValues(tournaments)).subscribe(observer)
+        val observer = TestObserver<Void>()
+        insertTournaments(tournaments).subscribe(observer)
         observer.await()
 
         observer.assertComplete()

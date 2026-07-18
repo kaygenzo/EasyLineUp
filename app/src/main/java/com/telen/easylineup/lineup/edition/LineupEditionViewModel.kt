@@ -7,7 +7,6 @@ package com.telen.easylineup.lineup.edition
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
@@ -31,7 +30,6 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 class LineupEditionViewModel : ViewModel(), KoinComponent {
-    private val useCaseHandler: UseCaseHandler by inject()
     private val savePlayerNumberOverlayUseCase: SavePlayerNumberOverlay by inject()
     private val getTournamentsUseCase: GetTournaments by inject()
     private val getLineupByIdUseCase: GetLineupById by inject()
@@ -49,8 +47,7 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
     private var lineup: Lineup? = null
 
     private fun loadData() {
-        useCaseHandler.execute(getLineupByIdUseCase, GetLineupById.RequestValues(lineupId))
-            .map { it.lineup }
+        getLineupByIdUseCase(lineupId)
             .flatMap {
                 this.lineup = it
                 _lineupLiveData.postValue(it)
@@ -79,30 +76,21 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getRoster(): Single<List<RosterPlayerStatus>> {
-        return useCaseHandler.execute(getRosterUseCase, GetRoster.RequestValues(lineupId))
-            .map { it.summary.players }
+        return getRosterUseCase(lineupId)
+            .map { it.players }
     }
 
     fun saveClicked(): Completable {
         return Completable.defer {
             lineup?.let {
-                useCaseHandler.execute(updateLineupUseCase, UpdateLineup.RequestValues(it))
-                    .ignoreElement()
+                updateLineupUseCase(it)
                     .andThen(
-                        useCaseHandler.execute(
-                            updateLineupRosterUseCase,
-                            UpdateLineupRoster.RequestValues(
-                                lineupId,
-                                rosterItems.map { it.toRosterPlayerStatus() }
-                            )
-                        ).ignoreElement()
+                        updateLineupRosterUseCase(
+                            lineupId,
+                            rosterItems.map { it.toRosterPlayerStatus() }
+                        )
                     )
-                    .andThen(
-                        useCaseHandler.execute(
-                            savePlayerNumberOverlayUseCase,
-                            SavePlayerNumberOverlay.RequestValues(rosterItems)
-                        ).ignoreElement()
-                    )
+                    .andThen(savePlayerNumberOverlayUseCase(rosterItems))
             } ?: Completable.error(LineupNameEmptyException())
         }
     }
@@ -135,8 +123,7 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
     }
 
     fun getTournaments(): Single<List<Tournament>> {
-        return useCaseHandler.execute(getTournamentsUseCase, GetTournaments.RequestValues())
-            .map { it.tournaments }
+        return getTournamentsUseCase()
     }
 
     fun onTournamentChanged(tournament: Tournament) {

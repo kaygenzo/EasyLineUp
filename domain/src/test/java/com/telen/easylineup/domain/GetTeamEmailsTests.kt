@@ -31,7 +31,10 @@ internal class GetTeamEmailsTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getTeamEmails = GetTeamEmails(GetPlayers(playerDao, GetTeam(teamDao)))
+        getTeamEmails = GetTeamEmails(
+            GetPlayers(playerDao, GetTeam(teamDao, testSchedulersProvider()), testSchedulersProvider()),
+            testSchedulersProvider()
+        )
         Mockito.`when`(teamDao.getTeamsRx())
             .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
     }
@@ -43,11 +46,11 @@ internal class GetTeamEmailsTests {
         Mockito.`when`(playerDao.getPlayersByTeamId(1L))
             .thenReturn(Single.just(listOf(withEmail, withoutEmail)))
 
-        val observer = TestObserver<GetTeamEmails.ResponseValue>()
-        getTeamEmails.executeUseCase(GetTeamEmails.RequestValues()).subscribe(observer)
+        val observer = TestObserver<List<String>>()
+        getTeamEmails().subscribe(observer)
         observer.await()
 
         observer.assertComplete()
-        assertEquals(listOf("a@mail.com"), observer.values().first().emails)
+        assertEquals(listOf("a@mail.com"), observer.values().first())
     }
 }

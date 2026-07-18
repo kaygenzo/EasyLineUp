@@ -8,6 +8,7 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
@@ -37,7 +38,7 @@ internal class GetRosterTests {
         2, null, 1, 0, 0, "hash")
     private val player3 = Player(3L, 1L, "C", 3,
         3, null, 1, 0, 0, "hash")
-    val observer: TestObserver<GetRoster.ResponseValue> = TestObserver()
+    val observer: TestObserver<TeamRosterSummary> = TestObserver()
     @Mock lateinit var lineupDao: LineupRepository
     @Mock lateinit var playerDao: PlayerRepository
     @Mock lateinit var teamDao: TeamRepository
@@ -46,7 +47,7 @@ internal class GetRosterTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getRoster = GetRoster(playerDao, lineupDao, GetTeam(teamDao))
+        getRoster = GetRoster(playerDao, lineupDao, GetTeam(teamDao, testSchedulersProvider()), testSchedulersProvider())
 
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
         Mockito.`when`(lineupDao.getLineupByIdSingle(1L)).thenReturn(Single.just(lineup))
@@ -63,63 +64,63 @@ internal class GetRosterTests {
 
     @Test
     fun shouldReturnAllPlayersIfLineupIdIsNull() {
-        getRoster.executeUseCase(GetRoster.RequestValues(null)).subscribe(observer)
+        getRoster(null).subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(3, observer.values().first().summary.players.filter { it.status }.size)
-        Assert.assertEquals(Constants.STATUS_ALL, observer.values().first().summary.status)
+        Assert.assertEquals(3, observer.values().first().players.filter { it.status }.size)
+        Assert.assertEquals(Constants.STATUS_ALL, observer.values().first().status)
     }
 
     @Test
     fun shouldReturnAllPlayersIfLineupRosterIsNull() {
         lineup.roster = null
-        getRoster.executeUseCase(GetRoster.RequestValues(1L)).subscribe(observer)
+        getRoster(1L).subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(3, observer.values().first().summary.players.filter { it.status }.size)
-        Assert.assertEquals(Constants.STATUS_ALL, observer.values().first().summary.status)
+        Assert.assertEquals(3, observer.values().first().players.filter { it.status }.size)
+        Assert.assertEquals(Constants.STATUS_ALL, observer.values().first().status)
     }
 
     @Test
     fun shouldReturnNoPlayersIfLineupRosterIsEmpty() {
         lineup.roster = ""
-        getRoster.executeUseCase(GetRoster.RequestValues(1L)).subscribe(observer)
+        getRoster(1L).subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(0, observer.values().first().summary.players.filter { it.status }.size)
-        Assert.assertEquals(Constants.STATUS_PARTIAL, observer.values().first().summary.status)
+        Assert.assertEquals(0, observer.values().first().players.filter { it.status }.size)
+        Assert.assertEquals(Constants.STATUS_PARTIAL, observer.values().first().status)
     }
 
     @Test
     fun shouldReturnAllPlayersIfLineupRosterIsFull() {
         lineup.roster = "1;2;3"
-        getRoster.executeUseCase(GetRoster.RequestValues(1L)).subscribe(observer)
+        getRoster(1L).subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(3, observer.values().first().summary.players.filter { it.status }.size)
-        Assert.assertEquals(Constants.STATUS_ALL, observer.values().first().summary.status)
+        Assert.assertEquals(3, observer.values().first().players.filter { it.status }.size)
+        Assert.assertEquals(Constants.STATUS_ALL, observer.values().first().status)
     }
 
     @Test
     fun shouldReturn2PlayersInRosterSelection() {
         lineup.roster = "1;3"
-        getRoster.executeUseCase(GetRoster.RequestValues(1L)).subscribe(observer)
+        getRoster(1L).subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(2, observer.values().first().summary.players.filter { it.status }.size)
+        Assert.assertEquals(2, observer.values().first().players.filter { it.status }.size)
         Assert.assertEquals(false,
-            observer.values().first().summary.players.filter { it.player.id == 2L }.first().status)
-        Assert.assertEquals(Constants.STATUS_PARTIAL, observer.values().first().summary.status)
+            observer.values().first().players.filter { it.player.id == 2L }.first().status)
+        Assert.assertEquals(Constants.STATUS_PARTIAL, observer.values().first().status)
     }
 
     @Test
     fun shouldReturnOverlaysNumber() {
         lineup.roster = "1;2;3"
-        getRoster.executeUseCase(GetRoster.RequestValues(1L)).subscribe(observer)
+        getRoster(1L).subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(42, observer.values().first().summary.players[0].playerNumberOverlay?.number)
-        Assert.assertEquals(null, observer.values().first().summary.players[1].playerNumberOverlay?.number)
-        Assert.assertEquals(69, observer.values().first().summary.players[2].playerNumberOverlay?.number)
+        Assert.assertEquals(42, observer.values().first().players[0].playerNumberOverlay?.number)
+        Assert.assertEquals(null, observer.values().first().players[1].playerNumberOverlay?.number)
+        Assert.assertEquals(69, observer.values().first().players[2].playerNumberOverlay?.number)
     }
 }

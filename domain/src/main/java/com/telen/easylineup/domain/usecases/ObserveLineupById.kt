@@ -9,5 +9,5 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.repository.LineupRepository
 
 class ObserveLineupById(private val dao: LineupRepository) {
-    fun execute(lineupId: Long): LiveData<Lineup> = dao.getLineupById(lineupId)
+    operator fun invoke(lineupId: Long): LiveData<Lineup> = dao.getLineupById(lineupId)
 }

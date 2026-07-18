@@ -20,7 +20,6 @@ import com.telen.easylineup.domain.usecases.InsertTeam
 import com.telen.easylineup.domain.usecases.InsertTournaments
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.schedulers.Schedulers
 
 class DatabaseMockProvider(
     private val insertTeamUseCase: InsertTeam,
@@ -159,39 +158,26 @@ class DatabaseMockProvider(
     }
 
     private fun insertTeam(team: Team): Completable {
-        return insertTeamUseCase.executeUseCase(InsertTeam.RequestValues(team)).ignoreElement()
-            .subscribeOn(Schedulers.io())
+        return insertTeamUseCase(team).ignoreElement()
     }
 
     private fun insertPlayers(list: List<Player>): Completable {
-        return insertPlayersUseCase.executeUseCase(InsertPlayers.RequestValues(list)).ignoreElement()
-            .subscribeOn(Schedulers.io())
+        return insertPlayersUseCase(list)
     }
 
     private fun insertLineups(list: List<Lineup>): Completable {
-        return insertLineupsUseCase.executeUseCase(InsertLineups.RequestValues(list))
-            .ignoreElement()
-            .subscribeOn(Schedulers.io())
+        return insertLineupsUseCase(list)
     }
 
     private fun insertPlayerFieldPositions(list: List<PlayerFieldPosition>): Completable {
-        return insertPlayerFieldPositionsUseCase
-            .executeUseCase(InsertPlayerFieldPositions.RequestValues(list))
-            .ignoreElement()
-            .subscribeOn(Schedulers.io())
+        return insertPlayerFieldPositionsUseCase(list)
     }
 
     private fun insertPlayerNumberOverlays(list: List<PlayerNumberOverlay>): Completable {
-        return insertPlayerNumberOverlaysUseCase
-            .executeUseCase(InsertPlayerNumberOverlays.RequestValues(list))
-            .ignoreElement()
-            .subscribeOn(Schedulers.io())
+        return insertPlayerNumberOverlaysUseCase(list)
     }
 
     private fun insertTournaments(list: List<Tournament>): Completable {
-        return insertTournamentsUseCase
-            .executeUseCase(InsertTournaments.RequestValues(list))
-            .ignoreElement()
-            .subscribeOn(Schedulers.io())
+        return insertTournamentsUseCase(list)
     }
 }

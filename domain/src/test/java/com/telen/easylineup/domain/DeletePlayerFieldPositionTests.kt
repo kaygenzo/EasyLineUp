@@ -88,7 +88,7 @@ internal abstract class DeletePlayerFieldPositionTests(
     private val extraHitterSize: Int
 ) : BaseUseCaseTests() {
     private val lineupMode = MODE_ENABLED
-    val observer: TestObserver<DeletePlayerFieldPosition.ResponseValue> = TestObserver()
+    val observer: TestObserver<Void> = TestObserver()
     private lateinit var deletePlayerFieldPosition: DeletePlayerFieldPosition
     private lateinit var players: MutableList<PlayerWithPosition>
     private lateinit var substitute: PlayerWithPosition
@@ -97,7 +97,7 @@ internal abstract class DeletePlayerFieldPositionTests(
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        deletePlayerFieldPosition = DeletePlayerFieldPosition()
+        deletePlayerFieldPosition = DeletePlayerFieldPosition(testSchedulersProvider())
         players = mutableListOf()
         teamType.getValidPositions(strategy).forEachIndexed { index, pos ->
             val id = index + 1
@@ -113,10 +113,8 @@ internal abstract class DeletePlayerFieldPositionTests(
         player: Player,
         exception: Class<out Throwable>? = null
     ) {
-        val request =
-            DeletePlayerFieldPosition.RequestValues(players, player, lineupMode, extraHitterSize)
         val playersSize = players.size
-        deletePlayerFieldPosition.executeUseCase(request).subscribe(observer)
+        deletePlayerFieldPosition(players, player, lineupMode, extraHitterSize).subscribe(observer)
         observer.await()
         exception?.let {
             observer.assertError(exception)

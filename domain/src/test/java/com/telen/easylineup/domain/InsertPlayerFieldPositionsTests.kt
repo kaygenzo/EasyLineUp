@@ -25,7 +25,8 @@ internal class InsertPlayerFieldPositionsTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        insertPlayerFieldPositions = InsertPlayerFieldPositions(playerFieldPositionDao)
+        insertPlayerFieldPositions =
+            InsertPlayerFieldPositions(playerFieldPositionDao, testSchedulersProvider())
     }
 
     @Test
@@ -34,10 +35,8 @@ internal class InsertPlayerFieldPositionsTests {
         Mockito.`when`(playerFieldPositionDao.insertPlayerFieldPositions(positions))
             .thenReturn(Completable.complete())
 
-        val observer = TestObserver<InsertPlayerFieldPositions.ResponseValue>()
-        insertPlayerFieldPositions
-            .executeUseCase(InsertPlayerFieldPositions.RequestValues(positions))
-            .subscribe(observer)
+        val observer = TestObserver<Void>()
+        insertPlayerFieldPositions(positions).subscribe(observer)
         observer.await()
 
         observer.assertComplete()

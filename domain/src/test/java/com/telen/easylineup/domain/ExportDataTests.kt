@@ -40,7 +40,7 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class ExportDataTests {
     private val extraHitters = 0
-    val observer: TestObserver<ExportData.ResponseValue> = TestObserver()
+    val observer: TestObserver<ExportBase> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     @Mock lateinit var playerDao: PlayerRepository
     @Mock lateinit var tournamentDao: TournamentRepository
@@ -66,8 +66,14 @@ internal class ExportDataTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        val checkHashData = CheckHashData(teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao)
-        export = ExportData(checkHashData, teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao)
+        val checkHashData = CheckHashData(
+            teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao,
+            testSchedulersProvider()
+        )
+        export = ExportData(
+            checkHashData, teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao,
+            testSchedulersProvider()
+        )
 
         // team 1
         team1 = Team(1L, "A", null, 0, true, "I")
@@ -127,7 +133,7 @@ internal class ExportDataTests {
 
     @Test
     fun shouldExportAllData() {
-        export.executeUseCase(ExportData.RequestValues())
+        export()
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -167,7 +173,7 @@ internal class ExportDataTests {
             )
         ))
 
-        Assert.assertEquals(root, observer.values().first().exportBase)
+        Assert.assertEquals(root, observer.values().first())
     }
 
     @Test
@@ -175,7 +181,7 @@ internal class ExportDataTests {
         Mockito.`when`(lineupDao.getLineupsForTournamentRx(1L, 1L)).thenReturn(Single.just(listOf(lineup1)))
         Mockito.`when`(lineupDao.getLineupsForTournamentRx(2L, 2L)).thenReturn(Single.just(listOf()))
 
-        export.executeUseCase(ExportData.RequestValues())
+        export()
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -204,7 +210,7 @@ internal class ExportDataTests {
             )
         ))
 
-        Assert.assertEquals(root, observer.values().first().exportBase)
+        Assert.assertEquals(root, observer.values().first())
     }
 
     @Test
@@ -215,15 +221,15 @@ internal class ExportDataTests {
         player2.image = "https://test.com"
 
 
-        export.executeUseCase(ExportData.RequestValues())
+        export()
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
 
-        Assert.assertEquals(null, observer.values().first().exportBase.teams[0].image)
-        Assert.assertEquals(null, observer.values().first().exportBase.teams[1].image)
-        Assert.assertEquals(player1.image, observer.values().first().exportBase.teams[0].players[0].image)
-        Assert.assertEquals(player2.image, observer.values().first().exportBase.teams[1].players[0].image)
+        Assert.assertEquals(null, observer.values().first().teams[0].image)
+        Assert.assertEquals(null, observer.values().first().teams[1].image)
+        Assert.assertEquals(player1.image, observer.values().first().teams[0].players[0].image)
+        Assert.assertEquals(player2.image, observer.values().first().teams[1].players[0].image)
     }
 
     @Test
@@ -239,7 +245,7 @@ internal class ExportDataTests {
         Mockito.`when`(playerPositionsDao.getAllPlayerFieldPositionsForLineup(1L))
             .thenReturn(Single.just(listOf(playerPosition1, playerPosition3, playerPosition4)))
 
-        export.executeUseCase(ExportData.RequestValues())
+        export()
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -286,6 +292,6 @@ internal class ExportDataTests {
             )
         ))
 
-        Assert.assertEquals(root, observer.values().first().exportBase)
+        Assert.assertEquals(root, observer.values().first())
     }
 }

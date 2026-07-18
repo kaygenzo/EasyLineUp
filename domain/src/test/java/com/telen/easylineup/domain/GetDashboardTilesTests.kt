@@ -48,8 +48,9 @@ internal class GetDashboardTilesTests {
             lineupDao,
             playerFieldPositionDao,
             tilesRepo,
-            GetTeam(teamDao),
-            CreateDashboardTiles(tilesRepo)
+            GetTeam(teamDao, testSchedulersProvider()),
+            CreateDashboardTiles(tilesRepo, testSchedulersProvider()),
+            testSchedulersProvider()
         )
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
     }
@@ -61,12 +62,12 @@ internal class GetDashboardTilesTests {
         Mockito.`when`(playerDao.getPlayersByTeamId(team.id))
             .thenReturn(Single.just(listOf(Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L))))
 
-        val observer = TestObserver<GetDashboardTiles.ResponseValue>()
-        getDashboardTiles.executeUseCase(GetDashboardTiles.RequestValues()).subscribe(observer)
+        val observer = TestObserver<List<DashboardTile>>()
+        getDashboardTiles().subscribe(observer)
         observer.await()
 
         observer.assertComplete()
-        assertEquals(1, observer.values().first().tiles.size)
+        assertEquals(1, observer.values().first().size)
     }
 
     @Test
@@ -78,12 +79,12 @@ internal class GetDashboardTilesTests {
         Mockito.`when`(playerDao.getPlayersByTeamId(team.id))
             .thenReturn(Single.just(listOf(Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L))))
 
-        val observer = TestObserver<GetDashboardTiles.ResponseValue>()
-        getDashboardTiles.executeUseCase(GetDashboardTiles.RequestValues()).subscribe(observer)
+        val observer = TestObserver<List<DashboardTile>>()
+        getDashboardTiles().subscribe(observer)
         observer.await()
 
         observer.assertComplete()
         Mockito.verify(tilesRepo).createTiles(any())
-        assertEquals(1, observer.values().first().tiles.size)
+        assertEquals(1, observer.values().first().size)
     }
 }

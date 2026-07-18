@@ -37,7 +37,10 @@ internal class GetTournamentStatsForPositionTableTests {
         team = Team(id = 1L, name = "toto", type = 0, main = true)
         tournament = Tournament(id = 5L, name = "Summer cup", createdAt = 1000L, startTime = 2000L, endTime = 3000L)
         getTournamentStatsForPositionTable =
-            GetTournamentStatsForPositionTable(context, lineupDao, GetTeam(teamDao))
+            GetTournamentStatsForPositionTable(
+                context, lineupDao, GetTeam(teamDao, testSchedulersProvider()),
+                testSchedulersProvider()
+            )
 
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
     }
@@ -48,11 +51,8 @@ internal class GetTournamentStatsForPositionTableTests {
         Mockito.`when`(lineupDao.getAllPlayerPositionsForTournament(tournament.id, team.id))
             .thenReturn(Single.error(error))
 
-        val observer = TestObserver<GetTournamentStatsForPositionTable.ResponseValue>()
-        getTournamentStatsForPositionTable
-            .executeUseCase(
-                GetTournamentStatsForPositionTable.RequestValues(tournament, TeamStrategy.STANDARD)
-            )
+        val observer = TestObserver<com.telen.easylineup.domain.model.TournamentStatsUiConfig>()
+        getTournamentStatsForPositionTable(tournament, TeamStrategy.STANDARD)
             .subscribe(observer)
         observer.await()
 

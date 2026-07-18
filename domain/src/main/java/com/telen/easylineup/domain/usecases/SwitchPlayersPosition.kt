@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_ENABLED
@@ -17,32 +16,39 @@ import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isFlex
 import com.telen.easylineup.domain.usecases.exceptions.FirstPositionEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.SamePlayerException
-import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.Completable
 
-class SwitchPlayersPosition(private val getTeam: GetTeam) :
-    UseCase<SwitchPlayersPosition.RequestValues, SwitchPlayersPosition.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return getTeam.executeUseCase(GetTeam.RequestValues()).flatMap { teamResponse ->
-            val players = requestValues.players.toMutableList()
-            val extraHittersSize = requestValues.lineup.extraHitters
-            val lineupMode = requestValues.lineup.mode
-            val strategy = TeamStrategy.getStrategyById(requestValues.lineup.strategy)
-            val teamType = teamResponse.team.type
+class SwitchPlayersPosition(
+    private val getTeam: GetTeam,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(
+        players: List<PlayerWithPosition>,
+        position1: FieldPosition,
+        position2: FieldPosition,
+        lineup: Lineup
+    ): Completable {
+        return getTeam().flatMapCompletable { team ->
+            val mutablePlayers = players.toMutableList()
+            val extraHittersSize = lineup.extraHitters
+            val lineupMode = lineup.mode
+            val strategy = TeamStrategy.getStrategyById(lineup.strategy)
+            val teamType = team.type
 
             val player1 = try {
-                players.first { it.position == requestValues.position1.id }
+                mutablePlayers.first { it.position == position1.id }
             } catch (e: NoSuchElementException) {
-                return@flatMap Single.error<ResponseValue>(FirstPositionEmptyException())
+                return@flatMapCompletable Completable.error(FirstPositionEmptyException())
             }
 
-            val player2 = players.firstOrNull { it.position == requestValues.position2.id }
+            val player2 = mutablePlayers.firstOrNull { it.position == position2.id }
 
             if (player1 == player2) {
-                return@flatMap Single.error<ResponseValue>(SamePlayerException())
+                return@flatMapCompletable Completable.error(SamePlayerException())
             }
 
-            player1.position = requestValues.position2.id
-            player2?.position = requestValues.position1.id
+            player1.position = position2.id
+            player2?.position = position1.id
 
             val playerPositions = arrayListOf(player1)
             player2?.let {
@@ -75,7 +81,7 @@ class SwitchPlayersPosition(private val getTeam: GetTeam) :
                                 if (it.order == orderDesignatedPlayer) {
                                     // we were a pitcher but not anymore.
                                     it.order = tmpOrder
-                                        ?: players.getNextAvailableOrder(listOf(it.order))
+                                        ?: mutablePlayers.getNextAvailableOrder(listOf(it.order))
                                 }
                             }
                         }
@@ -97,7 +103,7 @@ class SwitchPlayersPosition(private val getTeam: GetTeam) :
                                 if (it.order == orderDesignatedPlayer) {
                                     // we were a pitcher but not anymore.
                                     it.order = tmpOrder
-                                        ?: players.getNextAvailableOrder(listOf(it.order))
+                                        ?: mutablePlayers.getNextAvailableOrder(listOf(it.order))
                                 }
                             } else {
                                 it.order = orderDesignatedPlayer
@@ -108,21 +114,7 @@ class SwitchPlayersPosition(private val getTeam: GetTeam) :
                 }
             }
 
-            Single.just(ResponseValue())
-        }
+            Completable.complete()
+        }.subscribeOn(schedulersProvider.io())
     }
-
-    class ResponseValue : UseCase.ResponseValue
-    /**
-     * @property players
-     * @property position1
-     * @property position2
-     * @property lineup
-     */
-    class RequestValues(
-        val players: List<PlayerWithPosition>,
-        val position1: FieldPosition,
-        val position2: FieldPosition,
-        val lineup: Lineup
-    ) : UseCase.RequestValues
 }

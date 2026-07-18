@@ -28,7 +28,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerTests {
-    val observer: TestObserver<SavePlayer.ResponseValue> = TestObserver()
+    val observer: TestObserver<Void> = TestObserver()
 
     @Mock
     lateinit var playerDao: PlayerRepository
@@ -40,7 +40,12 @@ internal class SavePlayerTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        savePlayer = SavePlayer(playerDao, GetTeam(teamDao), ValidatorUtilsMock())
+        savePlayer = SavePlayer(
+            playerDao,
+            GetTeam(teamDao, testSchedulersProvider()),
+            ValidatorUtilsMock(),
+            testSchedulersProvider()
+        )
         val player = Player(
             id = 1L,
             teamId = 1,
@@ -64,7 +69,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() {
-        val request = SavePlayer.RequestValues(
+        savePlayer(
             playerId = 1L,
             name = "",
             positions = 1,
@@ -76,15 +81,14 @@ internal class SavePlayerTests {
             email = "p1@test.com",
             phone = "001",
             sex = 0
-        )
-        savePlayer.executeUseCase(request).subscribe(observer)
+        ).subscribe(observer)
         observer.await()
         observer.assertError(NameEmptyException::class.java)
     }
 
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsWhitespaces() {
-        val request = SavePlayer.RequestValues(
+        savePlayer(
             playerId = 1L,
             name = "     ",
             positions = 1,
@@ -96,15 +100,14 @@ internal class SavePlayerTests {
             email = "p1@test.com",
             phone = "001",
             sex = 0
-        )
-        savePlayer.executeUseCase(request).subscribe(observer)
+        ).subscribe(observer)
         observer.await()
         observer.assertError(NameEmptyException::class.java)
     }
 
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsNull() {
-        val request = SavePlayer.RequestValues(
+        savePlayer(
             playerId = 1L,
             name = null,
             positions = 1,
@@ -116,15 +119,14 @@ internal class SavePlayerTests {
             email = "p1@test.com",
             phone = "001",
             sex = 0
-        )
-        savePlayer.executeUseCase(request).subscribe(observer)
+        ).subscribe(observer)
         observer.await()
         observer.assertError(NameEmptyException::class.java)
     }
 
     @Test
     fun shouldInsertEventIfShirtNumberIsNull() {
-        val request = SavePlayer.RequestValues(
+        savePlayer(
             playerId = 0L,
             name = "Test",
             positions = 1,
@@ -136,8 +138,7 @@ internal class SavePlayerTests {
             email = "p1@test.com",
             phone = "001",
             sex = 0
-        )
-        savePlayer.executeUseCase(request).subscribe(observer)
+        ).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(playerDao).insertPlayer(any())
@@ -145,7 +146,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldInsertIfNewPlayer() {
-        val request = SavePlayer.RequestValues(
+        savePlayer(
             playerId = 0L,
             name = "Test",
             positions = 1,
@@ -157,8 +158,7 @@ internal class SavePlayerTests {
             email = "p1@test.com",
             phone = "001",
             sex = 0
-        )
-        savePlayer.executeUseCase(request).subscribe(observer)
+        ).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(playerDao).insertPlayer(any())
@@ -167,7 +167,7 @@ internal class SavePlayerTests {
 
     @Test
     fun shouldUpdateIfKnownPlayer() {
-        val request = SavePlayer.RequestValues(
+        savePlayer(
             playerId = 1L,
             name = "Test",
             positions = 1,
@@ -179,8 +179,7 @@ internal class SavePlayerTests {
             email = "p1@test.com",
             phone = "001",
             sex = 0
-        )
-        savePlayer.executeUseCase(request).subscribe(observer)
+        ).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(playerDao).updatePlayer(any())

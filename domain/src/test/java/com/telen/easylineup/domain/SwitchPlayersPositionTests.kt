@@ -40,7 +40,7 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
     private val players: MutableList<PlayerWithPosition> = mutableListOf()
     private val strategy = TeamStrategy.STANDARD
     private val extraHitters = 0
-    private val observer: TestObserver<SwitchPlayersPosition.ResponseValue> = TestObserver()
+    private val observer: TestObserver<Void> = TestObserver()
     lateinit var switchPlayersPosition: SwitchPlayersPosition
     private lateinit var player2bis: PlayerWithPosition
     private lateinit var lineup: Lineup
@@ -48,7 +48,10 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        switchPlayersPosition = SwitchPlayersPosition(GetTeam(teamDao))
+        switchPlayersPosition = SwitchPlayersPosition(
+            GetTeam(teamDao, testSchedulersProvider()),
+            testSchedulersProvider()
+        )
 
         players.add(generate(1L, FieldPosition.PITCHER, PlayerFieldPosition.FLAG_FLEX, 10))
         players.add(generate(2L, FieldPosition.CATCHER, PlayerFieldPosition.FLAG_NONE, 2))
@@ -73,15 +76,9 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
         lineup.mode = if (lineupMode) MODE_ENABLED else MODE_DISABLED
         Mockito.`when`(teamDao.getTeamsRx())
             .thenReturn(Single.just(listOf(Team(id = 1L, type = teamType.id, main = true))))
-        val request = SwitchPlayersPosition.RequestValues(
-            players,
-            fromPosition,
-            toPosition,
-            lineup
-        )
         val playersSize = players.size
         val originalPlayers = players.map { it.copy() }
-        switchPlayersPosition.executeUseCase(request).subscribe(observer)
+        switchPlayersPosition(players, fromPosition, toPosition, lineup).subscribe(observer)
         observer.await()
         exception?.let {
             observer.assertError(exception)

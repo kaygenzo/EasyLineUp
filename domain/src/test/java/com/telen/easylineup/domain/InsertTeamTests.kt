@@ -26,7 +26,7 @@ internal class InsertTeamTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        insertTeam = InsertTeam(teamDao)
+        insertTeam = InsertTeam(teamDao, testSchedulersProvider())
     }
 
     @Test
@@ -34,11 +34,11 @@ internal class InsertTeamTests {
         val team = Team(id = 0L, name = "Panthers")
         Mockito.`when`(teamDao.insertTeam(team)).thenReturn(Single.just(5L))
 
-        val observer = TestObserver<InsertTeam.ResponseValue>()
-        insertTeam.executeUseCase(InsertTeam.RequestValues(team)).subscribe(observer)
+        val observer = TestObserver<Long>()
+        insertTeam(team).subscribe(observer)
         observer.await()
 
         observer.assertComplete()
-        assertEquals(5L, observer.values().first().id)
+        assertEquals(5L, observer.values().first())
     }
 }

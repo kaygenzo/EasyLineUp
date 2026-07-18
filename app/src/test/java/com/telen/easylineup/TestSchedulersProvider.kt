@@ -4,7 +4,6 @@
 
 package com.telen.easylineup
 
-import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.usecases.SchedulersProvider
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -15,5 +14,5 @@ private class TestSchedulersProvider : SchedulersProvider {
     override fun computation(): Scheduler = Schedulers.trampoline()
 }
 
-/** A [UseCaseHandler] that runs everything synchronously on the calling thread. */
-fun testUseCaseHandler(): UseCaseHandler = UseCaseHandler(TestSchedulersProvider())
+/** A [SchedulersProvider] that runs everything synchronously on the calling thread. */
+fun testSchedulersProvider(): SchedulersProvider = TestSchedulersProvider()

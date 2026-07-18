@@ -4,7 +4,9 @@
 
 package com.telen.easylineup.domain
 
+import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineupsUseCase
@@ -31,7 +33,11 @@ internal class GetAllTournamentsWithLineupsUseCaseTests {
     fun init() {
         MockitoAnnotations.initMocks(this)
         team = Team(id = 1L, name = "toto", main = true)
-        getAllTournamentsWithLineups = GetAllTournamentsWithLineupsUseCase(lineupDao, GetTeam(teamDao))
+        getAllTournamentsWithLineups = GetAllTournamentsWithLineupsUseCase(
+            lineupDao,
+            GetTeam(teamDao, testSchedulersProvider()),
+            testSchedulersProvider()
+        )
 
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
     }
@@ -41,14 +47,13 @@ internal class GetAllTournamentsWithLineupsUseCaseTests {
         Mockito.`when`(lineupDao.getAllTournamentsWithLineups("summer", team.id))
             .thenReturn(Single.just(emptyList()))
 
-        val observer = TestObserver<GetAllTournamentsWithLineupsUseCase.ResponseValue>()
-        getAllTournamentsWithLineups
-            .executeUseCase(GetAllTournamentsWithLineupsUseCase.RequestValues("summer"))
+        val observer = TestObserver<List<Pair<Tournament, List<Lineup>>>>()
+        getAllTournamentsWithLineups("summer")
             .subscribe(observer)
         observer.await()
 
         observer.assertComplete()
-        Assert.assertTrue(observer.values().first().result.isEmpty())
+        Assert.assertTrue(observer.values().first().isEmpty())
         Mockito.verify(lineupDao).getAllTournamentsWithLineups("summer", team.id)
     }
 }

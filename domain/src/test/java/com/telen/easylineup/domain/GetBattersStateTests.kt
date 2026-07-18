@@ -67,11 +67,11 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
 
         Assert.assertEquals(
             1,
-            observer.values()[0].players.filter { it.playerPosition == FieldPosition.DP_DH }.size
+            observer.values()[0].filter { it.playerPosition == FieldPosition.DP_DH }.size
         )
         Assert.assertEquals(
             expected,
-            observer.values()[0].players.first { it.playerPosition == FieldPosition.DP_DH })
+            observer.values()[0].first { it.playerPosition == FieldPosition.DP_DH })
     }
 
     @Test
@@ -105,13 +105,13 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
 
         Assert.assertEquals(
             1,
-            observer.values()[0].players.filter {
+            observer.values()[0].filter {
                 it.playerFlag == PlayerFieldPosition.FLAG_FLEX
             }.size
         )
         Assert.assertEquals(
             expected,
-            observer.values()[0].players.first { it.playerFlag == PlayerFieldPosition.FLAG_FLEX })
+            observer.values()[0].first { it.playerFlag == PlayerFieldPosition.FLAG_FLEX })
     }
 
     @Test
@@ -121,7 +121,7 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
         applyUserCase()
 
         var i = 1
-        observer.values()[0].players.forEach { batterState ->
+        observer.values()[0].forEach { batterState ->
             val value = batterSize - i + 1
             // we don't test here the field position and desc, so let's use the same as the loop
             // object
@@ -154,7 +154,7 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
         applyUserCase()
 
         var i = batterSize + 1
-        observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
+        observer.values()[0].filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
                 // we don't test here the field position and desc, so let's use the same as the loop
                 // object
@@ -187,7 +187,7 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
         applyUserCase()
 
         var i = 1
-        observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
+        observer.values()[0].filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
                 // we don't test here the field position and desc, so let's use the same as the loop
                 // object
@@ -223,7 +223,7 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
         applyUserCase()
 
         var i = batterSize + 1
-        observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
+        observer.values()[0].filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
                 // we don't test here the field position and desc, so let's use the same as the loop
                 // object
@@ -387,11 +387,11 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
 
         Assert.assertEquals(
             1,
-            observer.values()[0].players.filter { it.playerPosition == FieldPosition.DP_DH }.size
+            observer.values()[0].filter { it.playerPosition == FieldPosition.DP_DH }.size
         )
         Assert.assertEquals(
             expected,
-            observer.values()[0].players.first { it.playerPosition == FieldPosition.DP_DH })
+            observer.values()[0].first { it.playerPosition == FieldPosition.DP_DH })
     }
 
     @Test
@@ -425,13 +425,13 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
 
         Assert.assertEquals(
             1,
-            observer.values()[0].players.filter {
+            observer.values()[0].filter {
                 it.playerFlag == PlayerFieldPosition.FLAG_FLEX
             }.size
         )
         Assert.assertEquals(
             expected,
-            observer.values()[0].players.first { it.playerFlag == PlayerFieldPosition.FLAG_FLEX })
+            observer.values()[0].first { it.playerFlag == PlayerFieldPosition.FLAG_FLEX })
     }
 
     @Test
@@ -441,7 +441,7 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
         applyUserCase()
 
         var i = 1
-        observer.values()[0].players.forEach { batterState ->
+        observer.values()[0].forEach { batterState ->
             val value = batterSize - i + 1
             // we don't test here the field position and desc, so let's use the same as the loop
             // object
@@ -474,7 +474,7 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
         applyUserCase()
 
         var i = batterSize + 1
-        observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
+        observer.values()[0].filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
                 // we don't test here the field position and desc, so let's use the same as the loop
                 // object
@@ -507,7 +507,7 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
         applyUserCase()
 
         var i = 1
-        observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
+        observer.values()[0].filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
                 // we don't test here the field position and desc, so let's use the same as the loop
                 // object
@@ -543,7 +543,7 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
         applyUserCase()
 
         var i = batterSize + 1
-        observer.values()[0].players.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
+        observer.values()[0].filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
                 // we don't test here the field position and desc, so let's use the same as the loop
                 // object
@@ -690,7 +690,7 @@ internal abstract class GetBattersStateTests {
 
     protected val players: MutableList<PlayerWithPosition> = mutableListOf()
     val lineupMode = MODE_ENABLED
-    val observer: TestObserver<GetBattersState.ResponseValue> = TestObserver()
+    val observer: TestObserver<List<BatterState>> = TestObserver()
 
     @Mock
     lateinit var context: Context
@@ -705,7 +705,7 @@ internal abstract class GetBattersStateTests {
     open fun init() {
         initParameters()
         MockitoAnnotations.initMocks(this)
-        getBattersState = GetBattersState()
+        getBattersState = GetBattersState(testSchedulersProvider())
         batterSize = strategy.batterSize
 
         Mockito.`when`(context.resources).thenReturn(resources)
@@ -828,16 +828,14 @@ internal abstract class GetBattersStateTests {
     }
 
     protected fun applyUserCase() {
-        getBattersState.executeUseCase(
-            GetBattersState.RequestValues(
-                context,
-                players,
-                teamType.id,
-                batterSize,
-                extraHittersSize,
-                false,
-                isEditable
-            )
+        getBattersState(
+            context,
+            players,
+            teamType.id,
+            batterSize,
+            extraHittersSize,
+            false,
+            isEditable
         )
             .subscribe(observer)
         observer.await()
@@ -848,7 +846,7 @@ internal abstract class GetBattersStateTests {
         addPlayers()
         addSubstitutes()
         applyUserCase()
-        Assert.assertEquals(batterSize, observer.values()[0].players.count())
-        Assert.assertEquals(0, observer.values()[0].players.filter { it.playerOrder == 0 }.count())
+        Assert.assertEquals(batterSize, observer.values()[0].count())
+        Assert.assertEquals(0, observer.values()[0].filter { it.playerOrder == 0 }.count())
     }
 }

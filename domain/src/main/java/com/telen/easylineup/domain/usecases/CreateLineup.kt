@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.repository.LineupRepository
@@ -14,34 +13,33 @@ import io.reactivex.rxjava3.core.Single
 
 class CreateLineup(
     private val lineupsDao: LineupRepository,
-    private val getTeam: GetTeam
-) : UseCase<CreateLineup.RequestValues, CreateLineup.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
+    private val getTeam: GetTeam,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(lineup: Lineup, roster: List<RosterPlayerStatus>): Single<Lineup> {
         return Single.defer {
-            requestValues.lineup.let { lineup ->
-                when {
-                    "" == lineup.name.trim() -> return@let Single.error(LineupNameEmptyException())
+            when {
+                "" == lineup.name.trim() -> return@defer Single.error(LineupNameEmptyException())
 
-                    lineup.tournamentId <= 0 ->
-                        return@let Single.error(TournamentNameEmptyException())
-                }
-                val roster = if (requestValues.roster.none { !it.status }) {
-                    null
-                } else {
-                    rosterToString(requestValues.roster)
-                }
-                lineup.roster = roster
-
-                getTeam.executeUseCase(GetTeam.RequestValues())
-                    .flatMap { teamResponse ->
-                        lineup.teamId = teamResponse.team.id
-                        lineupsDao.insertLineup(lineup).map {
-                            lineup.id = it
-                            ResponseValue(lineup)
-                        }
-                    }
+                lineup.tournamentId <= 0 ->
+                    return@defer Single.error(TournamentNameEmptyException())
             }
-        }
+            val rosterString = if (roster.none { !it.status }) {
+                null
+            } else {
+                rosterToString(roster)
+            }
+            lineup.roster = rosterString
+
+            getTeam()
+                .flatMap { team ->
+                    lineup.teamId = team.id
+                    lineupsDao.insertLineup(lineup).map {
+                        lineup.id = it
+                        lineup
+                    }
+                }
+        }.subscribeOn(schedulersProvider.io())
     }
 
     private fun rosterToString(list: List<RosterPlayerStatus>): String {
@@ -56,18 +54,4 @@ class CreateLineup(
         }
         return builder.toString()
     }
-
-    /**
-     * @property lineup
-     */
-    class ResponseValue(val lineup: Lineup) : UseCase.ResponseValue
-
-    /**
-     * @property lineup
-     * @property roster
-     */
-    class RequestValues(
-        val lineup: Lineup,
-        val roster: List<RosterPlayerStatus>
-    ) : UseCase.RequestValues
 }

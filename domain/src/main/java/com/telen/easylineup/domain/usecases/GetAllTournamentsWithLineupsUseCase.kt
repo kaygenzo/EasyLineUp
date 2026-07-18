@@ -4,24 +4,20 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.LineupRepository
 import io.reactivex.rxjava3.core.Single
 
-/**
- * @property dao
- */
 class GetAllTournamentsWithLineupsUseCase(
-    val dao: LineupRepository,
-    private val getTeam: GetTeam
-) : UseCase<GetAllTournamentsWithLineupsUseCase.RequestValues,
-GetAllTournamentsWithLineupsUseCase.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return getTeam.executeUseCase(GetTeam.RequestValues())
-            .flatMap { teamResponse ->
-                dao.getAllTournamentsWithLineups(requestValues.filter, teamResponse.team.id)
+    private val dao: LineupRepository,
+    private val getTeam: GetTeam,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(filter: String): Single<List<Pair<Tournament, List<Lineup>>>> {
+        return getTeam()
+            .flatMap { team ->
+                dao.getAllTournamentsWithLineups(filter, team.id)
             }
             .map {
                 val result: MutableMap<Tournament, MutableList<Lineup>> = mutableMapOf()
@@ -51,16 +47,8 @@ GetAllTournamentsWithLineupsUseCase.ResponseValue>() {
                     }
                     list.add(Pair(tournament, lineups))
                 }
-                ResponseValue(list)
+                list as List<Pair<Tournament, List<Lineup>>>
             }
+            .subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property result
-     */
-    class ResponseValue(val result: List<Pair<Tournament, List<Lineup>>>) : UseCase.ResponseValue
-    /**
-     * @property filter
-     */
-    class RequestValues(val filter: String) : UseCase.RequestValues
 }

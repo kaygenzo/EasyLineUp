@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.PlayerWithPosition
@@ -13,14 +12,18 @@ import com.telen.easylineup.domain.model.isDefensePlayer
 import com.telen.easylineup.domain.model.isSubstitute
 import io.reactivex.rxjava3.core.Single
 
-class GetListAvailablePlayersForSelection(private val getRoster: GetRoster) :
-    UseCase<GetListAvailablePlayersForSelection.RequestValues,
-GetListAvailablePlayersForSelection.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return getRoster.executeUseCase(GetRoster.RequestValues(requestValues.lineup.id))
-            .map { it.summary.players }
+class GetListAvailablePlayersForSelection(
+    private val getRoster: GetRoster,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(
+        players: List<PlayerWithPosition>,
+        position: FieldPosition?,
+        lineup: Lineup
+    ): Single<List<PlayerWithPosition>> {
+        return getRoster(lineup.id)
+            .map { it.players }
             .map { rosterPlayers ->
-                val players = requestValues.players
                 val playersSelectedForLineup = rosterPlayers
                     .filter { it.status }
                     .map { it.player.id }
@@ -29,13 +32,13 @@ GetListAvailablePlayersForSelection.ResponseValue>() {
                     // get only player no placed on a position except the substitutes, but only
                     // if it is not to add in the container of substitutes
                     .filter {
-                        val setAsSubstitute = requestValues.position == FieldPosition.SUBSTITUTE
+                        val setAsSubstitute = position == FieldPosition.SUBSTITUTE
                         !it.isAssigned() || (it.isSubstitute() && !setAsSubstitute)
                     }
                     // no player excluded from the lineup roster
                     .filter { playersSelectedForLineup.contains(it.playerId) }
 
-                requestValues.position?.run {
+                position?.run {
                     if (isDefensePlayer()) {
                         listAvailablePlayers = listAvailablePlayers
                             .sortedWith(getPlayerComparator(this))
@@ -45,11 +48,12 @@ GetListAvailablePlayersForSelection.ResponseValue>() {
             }
             .flatMap { listAvailablePlayers ->
                 if (listAvailablePlayers.isNotEmpty()) {
-                    Single.just(ResponseValue(listAvailablePlayers))
+                    Single.just(listAvailablePlayers)
                 } else {
                     Single.error(NoSuchElementException())
                 }
             }
+            .subscribeOn(schedulersProvider.io())
     }
 
     private fun getPlayerComparator(position: FieldPosition): Comparator<PlayerWithPosition> {
@@ -65,20 +69,4 @@ GetListAvailablePlayersForSelection.ResponseValue>() {
             }
         }
     }
-
-    /**
-     * @property players
-     * @property position
-     * @property lineup
-     */
-    class RequestValues(
-        val players: List<PlayerWithPosition>,
-        val position: FieldPosition?,
-        val lineup: Lineup
-    ) : UseCase.RequestValues
-
-    /**
-     * @property players
-     */
-    class ResponseValue(val players: List<PlayerWithPosition>) : UseCase.ResponseValue
 }

@@ -9,7 +9,6 @@ import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.ShirtNumberEntry
@@ -29,7 +28,7 @@ import com.telen.easylineup.domain.usecases.GetTeamEmails
 import com.telen.easylineup.domain.usecases.GetTeamPhones
 import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.domain.usecases.SaveDashboardTiles
-import com.telen.easylineup.testUseCaseHandler
+import com.telen.easylineup.testSchedulersProvider
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
@@ -92,13 +91,13 @@ internal class DashboardViewModelTest {
         Mockito.lenient().`when`(teamRepository.getTeamsRx())
             .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
 
-        val getTeam = GetTeam(teamRepository)
-        val getPlayers = GetPlayers(playerRepository, getTeam)
+        val schedulersProvider = testSchedulersProvider()
+        val getTeam = GetTeam(teamRepository, schedulersProvider)
+        val getPlayers = GetPlayers(playerRepository, getTeam, schedulersProvider)
 
         startKoin {
             modules(
                 module {
-                    single<UseCaseHandler> { testUseCaseHandler() }
                     single { ObserveTeams(teamRepository) }
                     single {
                         GetDashboardTiles(
@@ -107,13 +106,14 @@ internal class DashboardViewModelTest {
                             playerFieldPositionRepository,
                             tilesRepository,
                             getTeam,
-                            CreateDashboardTiles(tilesRepository)
+                            CreateDashboardTiles(tilesRepository, schedulersProvider),
+                            schedulersProvider
                         )
                     }
-                    single { SaveDashboardTiles(tilesRepository) }
-                    single { GetShirtNumberHistory(playerRepository, getTeam) }
-                    single { GetTeamEmails(getPlayers) }
-                    single { GetTeamPhones(getPlayers) }
+                    single { SaveDashboardTiles(tilesRepository, schedulersProvider) }
+                    single { GetShirtNumberHistory(playerRepository, getTeam, schedulersProvider) }
+                    single { GetTeamEmails(getPlayers, schedulersProvider) }
+                    single { GetTeamPhones(getPlayers, schedulersProvider) }
                     single { SharedPreferencesHelper(context) }
                 }
             )

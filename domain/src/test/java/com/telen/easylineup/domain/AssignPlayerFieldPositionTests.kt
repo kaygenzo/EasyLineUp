@@ -83,7 +83,7 @@ internal abstract class AssignPlayerFieldPositionTests(
 ) : BaseUseCaseTests() {
     @Mock
     lateinit var teamDao: TeamRepository
-    private var observer: TestObserver<AssignPlayerFieldPosition.ResponseValue> = TestObserver()
+    private var observer: TestObserver<Void> = TestObserver()
     private val newPlayer = Player(2_000, 1, "k2000", 2_000, 2_000, null, 0x07)
     private val lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitterSize)
     private lateinit var savePlayerFieldPosition: AssignPlayerFieldPosition
@@ -92,7 +92,8 @@ internal abstract class AssignPlayerFieldPositionTests(
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        savePlayerFieldPosition = AssignPlayerFieldPosition(GetTeam(teamDao))
+        savePlayerFieldPosition =
+            AssignPlayerFieldPosition(GetTeam(teamDao, testSchedulersProvider()), testSchedulersProvider())
 
         players = mutableListOf()
         teamType.getValidPositions(strategy).forEachIndexed { i, pos ->
@@ -131,14 +132,8 @@ internal abstract class AssignPlayerFieldPositionTests(
         lineup.mode = mode
         Mockito.`when`(teamDao.getTeamsRx())
             .thenReturn(Single.just(listOf(Team(id = 1L, type = teamType.id, main = true))))
-        val request = AssignPlayerFieldPosition.RequestValues(
-            player = player,
-            position = position,
-            lineup = lineup,
-            players = players
-        )
         val playersSize = players.size
-        savePlayerFieldPosition.executeUseCase(request).subscribe(observer)
+        savePlayerFieldPosition(player, position, lineup, players).subscribe(observer)
         observer.await()
         exception?.let {
             observer.assertError(it)

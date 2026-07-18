@@ -70,7 +70,6 @@ import org.koin.dsl.module
 
 object DomainModule {
     val domainModules = module {
-        single { UseCaseHandler(get()) }
         single {
             DatabaseMockProvider(
                 insertTeamUseCase = get(),
@@ -81,65 +80,65 @@ object DomainModule {
                 insertTournamentsUseCase = get()
             )
         }
-        single { GetTeam(get()) }
-        single { GetAllTeams(get()) }
-        single { SaveCurrentTeam(get()) }
-        single { GetDashboardTiles(get(), get(), get(), get(), get(), get()) }
-        single { SaveDashboardTiles(get()) }
-        single { CreateDashboardTiles(get()) }
-        single { CreateLineup(get(), get()) }
-        single { GetTournaments(get()) }
-        single { GetAllTournamentsWithLineupsUseCase(get(), get()) }
-        single { DeleteTournamentLineups(get(), get()) }
-        single { GetPlayer(get()) }
-        single { DeletePlayer(get(), get()) }
-        single { SavePlayer(get(), get(), get()) }
-        single { GetPositionsSummaryForPlayer(get()) }
-        single { GetPlayers(get(), get()) }
-        single { GetTeamEmails(get()) }
-        single { GetTeamPhones(get()) }
+        single { GetTeam(get(), get()) }
+        single { GetAllTeams(get(), get()) }
+        single { SaveCurrentTeam(get(), get()) }
+        single { GetDashboardTiles(get(), get(), get(), get(), get(), get(), get()) }
+        single { SaveDashboardTiles(get(), get()) }
+        single { CreateDashboardTiles(get(), get()) }
+        single { CreateLineup(get(), get(), get()) }
+        single { GetTournaments(get(), get()) }
+        single { GetAllTournamentsWithLineupsUseCase(get(), get(), get()) }
+        single { DeleteTournamentLineups(get(), get(), get()) }
+        single { GetPlayer(get(), get()) }
+        single { DeletePlayer(get(), get(), get()) }
+        single { SavePlayer(get(), get(), get(), get()) }
+        single { GetPositionsSummaryForPlayer(get(), get()) }
+        single { GetPlayers(get(), get(), get()) }
+        single { GetTeamEmails(get(), get()) }
+        single { GetTeamPhones(get(), get()) }
         single { ObservePlayer(get()) }
         single { ObservePlayers(get()) }
         single { ObservePlayerNumberOverlays(get()) }
-        single { InsertPlayers(get()) }
-        single { InsertPlayerNumberOverlays(get()) }
-        single { SaveTeam(get(), get(), get()) }
-        single { CheckTeam() }
+        single { InsertPlayers(get(), get()) }
+        single { InsertPlayerNumberOverlays(get(), get()) }
+        single { SaveTeam(get(), get(), get(), get()) }
+        single { CheckTeam(get()) }
         single { ObserveTeams(get()) }
-        single { InsertTeam(get()) }
-        single { AssignPlayerFieldPosition(get()) }
-        single { DeletePlayerFieldPosition() }
-        single { InsertPlayerFieldPositions(get()) }
-        single { GetListAvailablePlayersForSelection(get()) }
-        single { SaveBattingOrderAndPositions(get(), get()) }
-        single { DeleteLineup(get()) }
-        single { SetLineupMode(get(), get()) }
-        single { UpdatePlayersWithLineupMode() }
-        single { GetRoster(get(), get(), get()) }
-        single { UpdateLineupRoster(get()) }
-        single { DeleteTeam(get()) }
-        single { SwitchPlayersPosition(get()) }
-        single { DeleteAllData(get(), get()) }
-        single { GetTournamentStatsForPositionTable(get(), get(), get()) }
-        single { CheckHashData(get(), get(), get(), get(), get()) }
-        single { ExportData(get(), get(), get(), get(), get(), get()) }
-        single { ImportData(get(), get(), get(), get(), get()) }
-        single { GetOnlyPlayersInField() }
-        single { GetDpAndFlexFromPlayersInField(get()) }
-        single { SaveDpAndFlex() }
-        single { SavePlayerNumberOverlay(get()) }
-        single { GetShirtNumberHistory(get(), get()) }
+        single { InsertTeam(get(), get()) }
+        single { AssignPlayerFieldPosition(get(), get()) }
+        single { DeletePlayerFieldPosition(get()) }
+        single { InsertPlayerFieldPositions(get(), get()) }
+        single { GetListAvailablePlayersForSelection(get(), get()) }
+        single { SaveBattingOrderAndPositions(get(), get(), get()) }
+        single { DeleteLineup(get(), get()) }
+        single { SetLineupMode(get(), get(), get()) }
+        single { UpdatePlayersWithLineupMode(get()) }
+        single { GetRoster(get(), get(), get(), get()) }
+        single { UpdateLineupRoster(get(), get()) }
+        single { DeleteTeam(get(), get()) }
+        single { SwitchPlayersPosition(get(), get()) }
+        single { DeleteAllData(get(), get(), get()) }
+        single { GetTournamentStatsForPositionTable(get(), get(), get(), get()) }
+        single { CheckHashData(get(), get(), get(), get(), get(), get()) }
+        single { ExportData(get(), get(), get(), get(), get(), get(), get()) }
+        single { ImportData(get(), get(), get(), get(), get(), get()) }
+        single { GetOnlyPlayersInField(get()) }
+        single { GetDpAndFlexFromPlayersInField(get(), get()) }
+        single { SaveDpAndFlex(get()) }
+        single { SavePlayerNumberOverlay(get(), get()) }
+        single { GetShirtNumberHistory(get(), get(), get()) }
         single { ValidatorUtils() }
-        single { GetBattersState() }
-        single { UpdateLineup(get()) }
-        single { UpdatePlayersWithBatters() }
-        single { SaveTournament(get()) }
-        single { GetTournamentMapLink(get()) }
+        single { GetBattersState(get()) }
+        single { UpdateLineup(get(), get()) }
+        single { UpdatePlayersWithBatters(get()) }
+        single { SaveTournament(get(), get()) }
+        single { GetTournamentMapLink(get(), get()) }
         single { ObserveTournaments(get()) }
-        single { InsertTournaments(get()) }
-        single { InsertLineups(get()) }
+        single { InsertTournaments(get(), get()) }
+        single { InsertLineups(get(), get()) }
         single { ObserveLineupById(get()) }
-        single { GetLineupById(get()) }
+        single { GetLineupById(get(), get()) }
         single { ObserveTeamPlayersAndMaybePositionsForLineup(get()) }
         factory { Geocoder(get()) }
     }

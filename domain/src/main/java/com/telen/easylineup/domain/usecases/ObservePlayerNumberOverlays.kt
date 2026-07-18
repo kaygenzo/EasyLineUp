@@ -9,6 +9,6 @@ import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.repository.PlayerRepository
 
 class ObservePlayerNumberOverlays(private val dao: PlayerRepository) {
-    fun execute(lineupId: Long): LiveData<List<PlayerNumberOverlay>> =
+    operator fun invoke(lineupId: Long): LiveData<List<PlayerNumberOverlay>> =
         dao.observePlayersNumberOverlay(lineupId)
 }

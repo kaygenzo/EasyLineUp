@@ -23,7 +23,7 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveCurrentTeamTests {
     private var teams: MutableList<Team> = mutableListOf()
-    val observer: TestObserver<SaveCurrentTeam.ResponseValue> = TestObserver()
+    val observer: TestObserver<Void> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     lateinit var saveCurrentTeam: SaveCurrentTeam
     lateinit var newTeam: Team
@@ -31,7 +31,7 @@ internal class SaveCurrentTeamTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        saveCurrentTeam = SaveCurrentTeam(teamDao)
+        saveCurrentTeam = SaveCurrentTeam(teamDao, testSchedulersProvider())
 
         newTeam = Team(1, "toto", null, 0, true)
         teams.add(newTeam)
@@ -44,7 +44,7 @@ internal class SaveCurrentTeamTests {
 
     @Test
     fun shouldChangeOfMainTeam() {
-        saveCurrentTeam.executeUseCase(SaveCurrentTeam.RequestValues(newTeam)).subscribe(observer)
+        saveCurrentTeam(newTeam).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(teamDao).updateTeams(com.nhaarman.mockitokotlin2.check {

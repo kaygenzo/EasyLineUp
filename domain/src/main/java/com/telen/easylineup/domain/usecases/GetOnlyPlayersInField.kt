@@ -4,26 +4,15 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isSubstitute
 import io.reactivex.rxjava3.core.Single
 
-class GetOnlyPlayersInField :
-    UseCase<GetOnlyPlayersInField.RequestValues, GetOnlyPlayersInField.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return Single.just(requestValues.playersInLineup)
+class GetOnlyPlayersInField(private val schedulersProvider: SchedulersProvider) {
+    operator fun invoke(playersInLineup: List<PlayerWithPosition>): Single<List<PlayerWithPosition>> {
+        return Single.just(playersInLineup)
             .map { list -> list.filter { it.position > 0 && !it.isSubstitute() && !it.isDpDh() } }
-            .map { ResponseValue(it) }
+            .subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property playersInField
-     */
-    class ResponseValue(val playersInField: List<PlayerWithPosition>) : UseCase.ResponseValue
-    /**
-     * @property playersInLineup
-     */
-    class RequestValues(val playersInLineup: List<PlayerWithPosition>) : UseCase.RequestValues
 }

@@ -14,5 +14,5 @@ private class TestSchedulersProvider : SchedulersProvider {
     override fun computation(): Scheduler = Schedulers.trampoline()
 }
 
-/** A [UseCaseHandler] that runs everything synchronously on the calling thread. */
-internal fun testUseCaseHandler(): UseCaseHandler = UseCaseHandler(TestSchedulersProvider())
+/** A [SchedulersProvider] that runs everything synchronously on the calling thread. */
+fun testSchedulersProvider(): SchedulersProvider = TestSchedulersProvider()

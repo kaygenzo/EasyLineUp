@@ -4,42 +4,34 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournamentException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
-import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.Completable
 
-/**
- * @property repository
- */
-class SaveTournament(val repository: TournamentRepository) :
-    UseCase<SaveTournament.RequestValues, SaveTournament.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return Single.defer {
-            with(requestValues.tournament) {
+class SaveTournament(
+    private val repository: TournamentRepository,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(tournament: Tournament): Completable {
+        return Completable.defer {
+            with(tournament) {
                 repository.getTournamentByName(name)
-                    .flatMap {
-                        Single.error<ResponseValue>(AlreadyExistingTournamentException())
+                    .flatMapCompletable {
+                        Completable.error(AlreadyExistingTournamentException())
                     }
                     .onErrorResumeNext {
                         if (name.isEmpty()) {
-                            Single.error(TournamentNameEmptyException())
+                            Completable.error(TournamentNameEmptyException())
                         } else {
-                            repository.insertTournament(this).map {
+                            repository.insertTournament(this).flatMapCompletable {
                                 this.id = it
-                                ResponseValue()
+                                Completable.complete()
                             }
                         }
                     }
             }
-        }
+        }.subscribeOn(schedulersProvider.io())
     }
-
-    class ResponseValue : UseCase.ResponseValue
-    /**
-     * @property tournament
-     */
-    class RequestValues(val tournament: Tournament) : UseCase.RequestValues
 }

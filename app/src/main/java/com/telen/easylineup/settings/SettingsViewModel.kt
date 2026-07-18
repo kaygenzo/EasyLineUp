@@ -9,7 +9,6 @@ import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
-import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.usecases.DeleteAllData
 import com.telen.easylineup.domain.usecases.ExportData
@@ -36,7 +35,6 @@ data class ExportDataEventSuccess(val pathDirectory: String) : Event()
 object ExportDataEventFailure : Event()
 
 class SettingsViewModel : ViewModel(), KoinComponent {
-    private val useCaseHandler: UseCaseHandler by inject()
     private val deleteAllDataUseCase: DeleteAllData by inject()
     private val exportDataUseCase: ExportData by inject()
     private val context: Context by inject()
@@ -48,9 +46,7 @@ class SettingsViewModel : ViewModel(), KoinComponent {
     }
 
     fun deleteAllData() {
-        val disposable = useCaseHandler
-            .execute(deleteAllDataUseCase, DeleteAllData.RequestValues())
-            .ignoreElement()
+        val disposable = deleteAllDataUseCase()
             .andThen(Completable.timer(DELAY, TimeUnit.MILLISECONDS))
             .subscribe({
                 _event.onNext(DeleteAllDataEventSuccess)
@@ -65,9 +61,7 @@ class SettingsViewModel : ViewModel(), KoinComponent {
      * @return The directory name where the file is exported
      */
     fun exportData(dirUri: Uri) {
-        val disposable = useCaseHandler
-            .execute(exportDataUseCase, ExportData.RequestValues())
-            .map { it.exportBase }
+        val disposable = exportDataUseCase()
             .flatMap { writeExportFile(it, dirUri) }
             .subscribe({
                 _event.onNext(ExportDataEventSuccess(it))

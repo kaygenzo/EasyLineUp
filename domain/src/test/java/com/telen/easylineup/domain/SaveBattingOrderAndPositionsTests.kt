@@ -29,7 +29,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
-    private val observer: TestObserver<SaveBattingOrderAndPositions.ResponseValue> = TestObserver()
+    private val observer: TestObserver<Void> = TestObserver()
     private val lineup = Lineup(id = 1L, mode = MODE_DISABLED)
 
     @Mock
@@ -42,8 +42,9 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
 
     @Before
     fun init() {
-        saveBattingOrder =
-                SaveBattingOrderAndPositions(lineupRepository, playerFieldPositionRepository)
+        saveBattingOrder = SaveBattingOrderAndPositions(
+            lineupRepository, playerFieldPositionRepository, testSchedulersProvider()
+        )
         Mockito.`when`(lineupRepository.updateLineup(lineup)).thenReturn(Completable.complete())
         Mockito.`when`(playerFieldPositionRepository.updatePlayerFieldPosition(any()))
             .thenReturn(Completable.complete())
@@ -65,12 +66,7 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
     }
 
     fun startUseCase(exception: Class<out Throwable>? = null) {
-        saveBattingOrder.executeUseCase(
-            SaveBattingOrderAndPositions.RequestValues(
-                lineup,
-                players
-            )
-        ).subscribe(observer)
+        saveBattingOrder(lineup, players).subscribe(observer)
         observer.await()
         exception?.let {
             observer.assertError(exception)

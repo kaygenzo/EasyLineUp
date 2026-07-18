@@ -33,6 +33,6 @@ internal class ObserveTeamsTests {
         val liveData = MutableLiveData<List<Team>>()
         Mockito.`when`(teamDao.getTeams()).thenReturn(liveData)
 
-        assertSame(liveData, observeTeams.execute())
+        assertSame(liveData, observeTeams())
     }
 }

@@ -33,6 +33,6 @@ internal class ObservePlayerNumberOverlaysTests {
         val liveData = MutableLiveData<List<PlayerNumberOverlay>>()
         Mockito.`when`(playerDao.observePlayersNumberOverlay(10L)).thenReturn(liveData)
 
-        assertSame(liveData, observePlayerNumberOverlays.execute(10L))
+        assertSame(liveData, observePlayerNumberOverlays(10L))
     }
 }

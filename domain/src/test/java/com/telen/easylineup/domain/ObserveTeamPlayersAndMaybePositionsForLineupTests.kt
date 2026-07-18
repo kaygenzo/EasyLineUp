@@ -35,6 +35,6 @@ internal class ObserveTeamPlayersAndMaybePositionsForLineupTests {
         val liveData = MutableLiveData<List<PlayerWithPosition>>()
         Mockito.`when`(playerDao.getTeamPlayersAndMaybePositions(1L)).thenReturn(liveData)
 
-        assertSame(liveData, observeTeamPlayersAndMaybePositionsForLineup.execute(1L))
+        assertSame(liveData, observeTeamPlayersAndMaybePositionsForLineup(1L))
     }
 }

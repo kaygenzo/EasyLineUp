@@ -23,7 +23,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetPlayersTests {
-    val observer: TestObserver<GetPlayers.ResponseValue> = TestObserver()
+    val observer: TestObserver<List<Player>> = TestObserver()
     @Mock lateinit var playerDao: PlayerRepository
     @Mock lateinit var teamDao: TeamRepository
     lateinit var getPlayers: GetPlayers
@@ -32,7 +32,7 @@ internal class GetPlayersTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getPlayers = GetPlayers(playerDao, GetTeam(teamDao))
+        getPlayers = GetPlayers(playerDao, GetTeam(teamDao, testSchedulersProvider()), testSchedulersProvider())
 
         val player1 = Player(id = 1L, teamId = 1L, name = "toto", shirtNumber = 1, licenseNumber = 1, image = null,
             positions = 1)
@@ -48,10 +48,10 @@ internal class GetPlayersTests {
 
     @Test
     fun shouldGetPlayersTeam() {
-        getPlayers.executeUseCase(GetPlayers.RequestValues()).subscribe(observer)
+        getPlayers().subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(players[0], observer.values().first().players[0])
-        Assert.assertEquals(players[1], observer.values().first().players[1])
+        Assert.assertEquals(players[0], observer.values().first()[0])
+        Assert.assertEquals(players[1], observer.values().first()[1])
     }
 }

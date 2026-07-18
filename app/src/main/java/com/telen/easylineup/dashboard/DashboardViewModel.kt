@@ -10,7 +10,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.usecases.GetDashboardTiles
 import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
@@ -26,7 +25,6 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 class DashboardViewModel : ViewModel(), KoinComponent {
-    private val useCaseHandler: UseCaseHandler by inject()
     private val observeTeams: ObserveTeams by inject()
     private val getDashboardTilesUseCase: GetDashboardTiles by inject()
     private val saveDashboardTilesUseCase: SaveDashboardTiles by inject()
@@ -37,15 +35,13 @@ class DashboardViewModel : ViewModel(), KoinComponent {
     private val disposables = CompositeDisposable()
     var actionMode: ActionMode? = null
 
-    fun registerTilesLiveData() = observeTeams.execute().switchMap {
+    fun registerTilesLiveData() = observeTeams().switchMap {
         getDashboardTilesLiveData()
     }
 
     private fun getDashboardTilesLiveData(): LiveData<List<DashboardTile>> {
         val resultLiveData: MutableLiveData<List<DashboardTile>> = MutableLiveData()
-        val disposable = useCaseHandler
-            .execute(getDashboardTilesUseCase, GetDashboardTiles.RequestValues())
-            .map { it.tiles }
+        val disposable = getDashboardTilesUseCase()
             .subscribe({
                 resultLiveData.postValue(it)
             }, {
@@ -67,19 +63,11 @@ class DashboardViewModel : ViewModel(), KoinComponent {
         return Single.just(show)
     }
 
-    fun saveTiles(tiles: List<DashboardTile>) = useCaseHandler
-        .execute(saveDashboardTilesUseCase, SaveDashboardTiles.RequestValues(tiles))
-        .ignoreElement()
+    fun saveTiles(tiles: List<DashboardTile>) = saveDashboardTilesUseCase(tiles)
 
-    fun getShirtNumberHistory(number: Int) = useCaseHandler
-        .execute(getShirtNumberHistoryUseCase, GetShirtNumberHistory.RequestValues(number))
-        .map { it.history }
+    fun getShirtNumberHistory(number: Int) = getShirtNumberHistoryUseCase(number)
 
-    fun getEmails() = useCaseHandler
-        .execute(getTeamEmailsUseCase, GetTeamEmails.RequestValues())
-        .map { it.emails }
+    fun getEmails() = getTeamEmailsUseCase()
 
-    fun getPhones() = useCaseHandler
-        .execute(getTeamPhonesUseCase, GetTeamPhones.RequestValues())
-        .map { it.phones }
+    fun getPhones() = getTeamPhonesUseCase()
 }

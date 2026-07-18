@@ -4,40 +4,30 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import io.reactivex.rxjava3.core.Single
 
-/**
- * @property dao
- */
-class GetPositionsSummaryForPlayer(val dao: PlayerFieldPositionRepository) :
-    UseCase<GetPositionsSummaryForPlayer.RequestValues,
-GetPositionsSummaryForPlayer.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return requestValues.playerId?.let { id ->
-            dao.getAllPositionsForPlayer(id)
-                .map { list ->
-                    val chartData: MutableMap<FieldPosition, Int> = mutableMapOf()
-                    list.forEach { position ->
-                        val fieldPosition = FieldPosition.getFieldPositionById(position.position)
-                        fieldPosition?.let { element ->
-                            chartData[element] = chartData[element]?.let { it + 1 } ?: 1
+class GetPositionsSummaryForPlayer(
+    private val dao: PlayerFieldPositionRepository,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(playerId: Long?): Single<Map<FieldPosition, Int>> {
+        return (
+            playerId?.let { id ->
+                dao.getAllPositionsForPlayer(id)
+                    .map { list ->
+                        val chartData: MutableMap<FieldPosition, Int> = mutableMapOf()
+                        list.forEach { position ->
+                            val fieldPosition =
+                                FieldPosition.getFieldPositionById(position.position)
+                            fieldPosition?.let { element ->
+                                chartData[element] = chartData[element]?.let { it + 1 } ?: 1
+                            }
                         }
+                        chartData as Map<FieldPosition, Int>
                     }
-                    ResponseValue(chartData)
-                }
-        } ?: Single.error(IllegalArgumentException())
+            } ?: Single.error(IllegalArgumentException())
+            ).subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property summary
-     */
-    class ResponseValue(val summary: Map<FieldPosition, Int>) : UseCase.ResponseValue
-
-    /**
-     * @property playerId
-     */
-    class RequestValues(val playerId: Long?) : UseCase.RequestValues
 }

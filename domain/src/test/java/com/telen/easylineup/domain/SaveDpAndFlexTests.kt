@@ -29,7 +29,7 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
     private val strategy = TeamStrategy.STANDARD
     private val extraHitters = 0
     private val lineup = Lineup(strategy = strategy.id, extraHitters = extraHitters)
-    private val observer: TestObserver<SaveDpAndFlex.ResponseValue> = TestObserver()
+    private val observer: TestObserver<Void> = TestObserver()
     private lateinit var useCase: SaveDpAndFlex
     lateinit var players: MutableList<PlayerWithPosition>
 
@@ -38,7 +38,7 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
         MockitoAnnotations.initMocks(this)
         val teamId = 1L
 
-        useCase = SaveDpAndFlex()
+        useCase = SaveDpAndFlex(testSchedulersProvider())
 
         val noFlag = PlayerFieldPosition.FLAG_NONE
         players = mutableListOf(
@@ -57,8 +57,7 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
         exception: Class<out Throwable>? = null
     ) {
         val playersSize = players.size
-        val request = SaveDpAndFlex.RequestValues(lineup, dp, flex, players)
-        useCase.executeUseCase(request).subscribe(observer)
+        useCase(lineup, dp, flex, players).subscribe(observer)
         observer.await()
         exception?.let {
             observer.assertError(exception)

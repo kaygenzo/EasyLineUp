@@ -22,7 +22,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class DeletePlayerTests {
-    val observer: TestObserver<DeletePlayer.ResponseValue> = TestObserver()
+    val observer: TestObserver<Void> = TestObserver()
 
     @Mock
     lateinit var playerDao: PlayerRepository
@@ -32,7 +32,11 @@ internal class DeletePlayerTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        deletePlayer = DeletePlayer(playerDao, GetPlayer(playerDao))
+        deletePlayer = DeletePlayer(
+            playerDao,
+            GetPlayer(playerDao, testSchedulersProvider()),
+            testSchedulersProvider()
+        )
 
         player = Player(
             id = 1L,
@@ -50,7 +54,7 @@ internal class DeletePlayerTests {
 
     @Test
     fun shouldDeletePlayer() {
-        deletePlayer.executeUseCase(DeletePlayer.RequestValues(1L)).subscribe(observer)
+        deletePlayer(1L).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(playerDao).deletePlayer(player)

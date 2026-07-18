@@ -31,7 +31,10 @@ internal class GetTeamPhonesTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getTeamPhones = GetTeamPhones(GetPlayers(playerDao, GetTeam(teamDao)))
+        getTeamPhones = GetTeamPhones(
+            GetPlayers(playerDao, GetTeam(teamDao, testSchedulersProvider()), testSchedulersProvider()),
+            testSchedulersProvider()
+        )
         Mockito.`when`(teamDao.getTeamsRx())
             .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
     }
@@ -43,11 +46,11 @@ internal class GetTeamPhonesTests {
         Mockito.`when`(playerDao.getPlayersByTeamId(1L))
             .thenReturn(Single.just(listOf(withPhone, withoutPhone)))
 
-        val observer = TestObserver<GetTeamPhones.ResponseValue>()
-        getTeamPhones.executeUseCase(GetTeamPhones.RequestValues()).subscribe(observer)
+        val observer = TestObserver<List<String>>()
+        getTeamPhones().subscribe(observer)
         observer.await()
 
         observer.assertComplete()
-        assertEquals(listOf("0102030405"), observer.values().first().phones)
+        assertEquals(listOf("0102030405"), observer.values().first())
     }
 }

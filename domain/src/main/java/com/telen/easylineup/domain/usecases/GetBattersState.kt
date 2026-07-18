@@ -5,7 +5,6 @@
 package com.telen.easylineup.domain.usecases
 
 import android.content.Context
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
@@ -17,137 +16,126 @@ import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.utils.getPositionShortNames
 import io.reactivex.rxjava3.core.Single
 
-class GetBattersState :
-    UseCase<GetBattersState.RequestValues, GetBattersState.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        val positionDescriptions =
-            getPositionShortNames(requestValues.context, requestValues.teamType)
-        val result: MutableList<BatterState> = mutableListOf()
-        val maxBatterSize = requestValues.batterSize + requestValues.extraHitterSize
+class GetBattersState(private val schedulersProvider: SchedulersProvider) {
+    operator fun invoke(
+        context: Context,
+        players: List<PlayerWithPosition>,
+        teamType: Int,
+        batterSize: Int,
+        extraHitterSize: Int,
+        isDebug: Boolean,
+        isEditable: Boolean
+    ): Single<List<BatterState>> {
+        return Single.fromCallable {
+            val positionDescriptions = getPositionShortNames(context, teamType)
+            val result: MutableList<BatterState> = mutableListOf()
+            val maxBatterSize = batterSize + extraHitterSize
 
-        var position = 0
-        var subsFoundNumber = 0
-        requestValues.players
-            .filter { it.order > 0 }
-            .sortedBy { it.order }
-            .forEach { player ->
-                val playerFlag = player.flags
-                val playerId = player.playerId
-                val isSubstitute = player.isSubstitute()
-                val isDefensePlayer = player.isDefensePlayer()
+            var position = 0
+            var subsFoundNumber = 0
+            players
+                .filter { it.order > 0 }
+                .sortedBy { it.order }
+                .forEach { player ->
+                    val playerFlag = player.flags
+                    val playerId = player.playerId
+                    val isSubstitute = player.isSubstitute()
+                    val isDefensePlayer = player.isDefensePlayer()
 
-                var canMove = false
-                var canShowDescription = false
-                var canShowIndex = false
-                var canShowPosition = isDefensePlayer
-                var applyBackground = false
+                    var canMove = false
+                    var canShowDescription = false
+                    var canShowIndex = false
+                    var canShowPosition = isDefensePlayer
+                    var applyBackground = false
 
-                val order = player.order
-                val playerName = player.playerName.trim()
-                var playerPositionDesc = ""
-                val shirtNumber = player.shirtNumber.toString()
+                    val order = player.order
+                    val playerName = player.playerName.trim()
+                    var playerPositionDesc = ""
+                    val shirtNumber = player.shirtNumber.toString()
 
-                var isDp = false
-                var isFlex = false
+                    var isDp = false
+                    var isFlex = false
 
-                when {
-                    player.isSubstitute() -> {
-                        subsFoundNumber++
-                        if (position < maxBatterSize) {
-                            canShowIndex = subsFoundNumber <= requestValues.extraHitterSize
+                    when {
+                        player.isSubstitute() -> {
+                            subsFoundNumber++
+                            if (position < maxBatterSize) {
+                                canShowIndex = subsFoundNumber <= extraHitterSize
+                            }
                         }
-                    }
-                    player.isDpDh() -> {
-                        isDp = true
-                        canShowIndex = true
-                    }
-                    else -> {
-                        isFlex = player.isFlex()
-                        if (isFlex) {
-                            applyBackground = true
-                        } else {
+                        player.isDpDh() -> {
+                            isDp = true
                             canShowIndex = true
                         }
+                        else -> {
+                            isFlex = player.isFlex()
+                            if (isFlex) {
+                                applyBackground = true
+                            } else {
+                                canShowIndex = true
+                            }
+                        }
                     }
-                }
 
-                if (requestValues.isDebug) {
-                    canShowIndex = true
-                }
-
-                if (player.position >= 0) {
-                    playerPositionDesc = positionDescriptions[player.position]
-                }
-
-                if (!requestValues.isEditable) {
-                    canShowDescription = true
-                } else if (position < maxBatterSize) {
-                    if (!isFlex) {
-                        canMove = true
+                    if (isDebug) {
+                        canShowIndex = true
                     }
-                    if (isDp) {
+
+                    if (player.position >= 0) {
+                        playerPositionDesc = positionDescriptions[player.position]
+                    }
+
+                    if (!isEditable) {
+                        canShowDescription = true
+                    } else if (position < maxBatterSize) {
+                        if (!isFlex) {
+                            canMove = true
+                        }
+                        if (isDp) {
+                            canShowDescription = true
+                        }
+                        // In case of substitutes are added before defense ones, let's prevent non
+                        // authorized ones to be moved
+                        if (subsFoundNumber > extraHitterSize) {
+                            canMove = false
+                        }
+                    } else {
                         canShowDescription = true
                     }
-                    // In case of substitutes are added before defense ones, let's prevent non
-                    // authorized ones to be moved
-                    if (subsFoundNumber > requestValues.extraHitterSize) {
-                        canMove = false
+
+                    if (isSubstitute) {
+                        canShowPosition = false
+                        canShowDescription = true
                     }
-                } else {
-                    canShowDescription = true
-                }
 
-                if (isSubstitute) {
-                    canShowPosition = false
-                    canShowDescription = true
-                }
+                    // do not show field position value for baseball 5
+                    if (teamType == TeamType.BASEBALL_5.id) {
+                        canShowPosition = false
+                    }
 
-                // do not show field position value for baseball 5
-                if (requestValues.teamType == TeamType.BASEBALL_5.id) {
-                    canShowPosition = false
-                }
+                    position++
 
-                position++
-
-                result.add(
-                    BatterState(
-                        playerId,
-                        playerFlag,
-                        order,
-                        playerName,
-                        shirtNumber,
-                        FieldPosition.getFieldPositionById(player.position)
-                            ?: FieldPosition.SUBSTITUTE,
-                        playerPositionDesc,
-                        canShowPosition,
-                        canMove,
-                        canShowDescription,
-                        canShowIndex,
-                        applyBackground,
-                        requestValues.isEditable
+                    result.add(
+                        BatterState(
+                            playerId,
+                            playerFlag,
+                            order,
+                            playerName,
+                            shirtNumber,
+                            FieldPosition.getFieldPositionById(player.position)
+                                ?: FieldPosition.SUBSTITUTE,
+                            playerPositionDesc,
+                            canShowPosition,
+                            canMove,
+                            canShowDescription,
+                            canShowIndex,
+                            applyBackground,
+                            isEditable
+                        )
                     )
-                )
-            }
+                }
 
-        return Single.just(ResponseValue(result))
+            result as List<BatterState>
+        }.subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property players
-     */
-    class ResponseValue(val players: List<BatterState>) : UseCase.ResponseValue
-    /**
-     * @property context
-     * @property players
-     * @property teamType
-     * @property batterSize
-     * @property extraHitterSize
-     * @property isDebug
-     * @property isEditable
-     */
-    class RequestValues(
-        val context: Context, val players: List<PlayerWithPosition>, val teamType: Int,
-        val batterSize: Int, val extraHitterSize: Int,
-        val isDebug: Boolean, val isEditable: Boolean
-    ) : UseCase.RequestValues
 }

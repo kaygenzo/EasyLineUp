@@ -4,24 +4,15 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.repository.LineupRepository
 import io.reactivex.rxjava3.core.Single
 
-class GetLineupById(private val dao: LineupRepository) :
-    UseCase<GetLineupById.RequestValues, GetLineupById.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return dao.getLineupByIdSingle(requestValues.lineupId).map { ResponseValue(it) }
+class GetLineupById(
+    private val dao: LineupRepository,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(lineupId: Long): Single<Lineup> {
+        return dao.getLineupByIdSingle(lineupId).subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property lineup
-     */
-    class ResponseValue(val lineup: Lineup) : UseCase.ResponseValue
-
-    /**
-     * @property lineupId
-     */
-    class RequestValues(val lineupId: Long) : UseCase.RequestValues
 }

@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.repository.PlayerRepository
 import io.reactivex.rxjava3.core.Observable
@@ -12,14 +11,15 @@ import io.reactivex.rxjava3.core.Single
 
 class GetShirtNumberHistory(
     private val playersRepo: PlayerRepository,
-    private val getTeam: GetTeam
-) : UseCase<GetShirtNumberHistory.RequestValues, GetShirtNumberHistory.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
+    private val getTeam: GetTeam,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(number: Int): Single<List<ShirtNumberEntry>> {
         val overlaysAdded: MutableList<ShirtNumberEntry> = mutableListOf()
-        return getTeam.executeUseCase(GetTeam.RequestValues())
-            .flatMap { teamResponse ->
-                val teamId = teamResponse.team.id
-                playersRepo.getShirtNumberFromPlayers(teamId, requestValues.number)
+        return getTeam()
+            .flatMap { team ->
+                val teamId = team.id
+                playersRepo.getShirtNumberFromPlayers(teamId, number)
                     .flatMapObservable { items ->
                         Observable.fromIterable(items)
                     }
@@ -40,7 +40,7 @@ class GetShirtNumberHistory(
                     }
                     .toList()
                     .flatMap { items ->
-                        playersRepo.getShirtNumberFromNumberOverlays(teamId, requestValues.number)
+                        playersRepo.getShirtNumberFromNumberOverlays(teamId, number)
                             .map { overlays ->
                                 overlays.forEach { overlay ->
                                     val first =
@@ -50,7 +50,7 @@ class GetShirtNumberHistory(
                                         }
                                     first ?: items.add(overlay)
                                 }
-                                items.filter { it.number == requestValues.number }
+                                items.filter { it.number == number }
                             }
                     }
             }
@@ -59,16 +59,6 @@ class GetShirtNumberHistory(
                     entry.eventTime.takeIf { it > 0 } ?: let { entry.createdAt }
                 }
             }
-            .map { ResponseValue(it) }
+            .subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property history
-     */
-    class ResponseValue(val history: List<ShirtNumberEntry>) : UseCase.ResponseValue
-
-    /**
-     * @property number
-     */
-    class RequestValues(val number: Int) : UseCase.RequestValues
 }

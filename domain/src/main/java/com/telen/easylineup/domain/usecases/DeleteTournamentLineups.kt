@@ -4,27 +4,21 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.LineupRepository
-import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.Completable
 
 class DeleteTournamentLineups(
     private val lineupDao: LineupRepository,
-    private val getTeam: GetTeam
-) : UseCase<DeleteTournamentLineups.RequestValues, DeleteTournamentLineups.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return getTeam.executeUseCase(GetTeam.RequestValues())
-            .flatMap { teamResponse ->
-                lineupDao.getLineupsForTournamentRx(requestValues.tournament.id, teamResponse.team.id)
+    private val getTeam: GetTeam,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(tournament: Tournament): Completable {
+        return getTeam()
+            .flatMapCompletable { team ->
+                lineupDao.getLineupsForTournamentRx(tournament.id, team.id)
                     .flatMapCompletable { lineupDao.deleteLineups(it) }
-                    .andThen(Single.just(ResponseValue()))
             }
+            .subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property tournament
-     */
-    class RequestValues(val tournament: Tournament) : UseCase.RequestValues
-    class ResponseValue : UseCase.ResponseValue
 }

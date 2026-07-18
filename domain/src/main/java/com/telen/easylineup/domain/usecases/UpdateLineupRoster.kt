@@ -4,22 +4,24 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.repository.LineupRepository
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 
-class UpdateLineupRoster(private val lineupRepository: LineupRepository) :
-    UseCase<UpdateLineupRoster.RequestValues, UpdateLineupRoster.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return Single.create {
-            val rosterString = rosterToString(requestValues.roster)
+class UpdateLineupRoster(
+    private val lineupRepository: LineupRepository,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(lineupId: Long, roster: List<RosterPlayerStatus>): Completable {
+        return Single.create<String> {
+            val rosterString = rosterToString(roster)
             it.onSuccess(rosterString)
         }.flatMapCompletable { rosterString ->
-            lineupRepository.getLineupByIdSingle(requestValues.lineupId)
-                .map { it.apply { roster = rosterString } }
+            lineupRepository.getLineupByIdSingle(lineupId)
+                .map { it.apply { this.roster = rosterString } }
                 .flatMapCompletable { lineupRepository.updateLineup(it) }
-        }.andThen(Single.just(ResponseValue()))
+        }.subscribeOn(schedulersProvider.io())
     }
 
     private fun rosterToString(list: List<RosterPlayerStatus>): String {
@@ -34,12 +36,4 @@ class UpdateLineupRoster(private val lineupRepository: LineupRepository) :
         }
         return builder.toString()
     }
-
-    class ResponseValue : UseCase.ResponseValue
-    /**
-     * @property lineupId
-     * @property roster
-     */
-    class RequestValues(val lineupId: Long, val roster: List<RosterPlayerStatus>) :
-        UseCase.RequestValues
 }

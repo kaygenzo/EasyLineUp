@@ -8,7 +8,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
-import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.usecases.GetTeam
@@ -31,7 +30,6 @@ data class GetTeamSuccess(val team: Team) : LoginEvent()
 object GetTeamFailed : LoginEvent()
 
 class LoginViewModel : ViewModel(), KoinComponent {
-    private val useCaseHandler: UseCaseHandler by inject()
     private val getTeamUseCase: GetTeam by inject()
     private val importDataUseCase: ImportData by inject()
     private val context: Context by inject()
@@ -49,12 +47,7 @@ class LoginViewModel : ViewModel(), KoinComponent {
                     it.use { stream ->
                         stream.bufferedReader().use { reader ->
                             val data = Gson().fromJson(reader, ExportBase::class.java)
-                            useCaseHandler
-                                .execute(
-                                    importDataUseCase,
-                                    ImportData.RequestValues(data, updateIfExists)
-                                )
-                                .ignoreElement()
+                            importDataUseCase(data, updateIfExists).ignoreElement()
                         }
                     }
                 }
@@ -80,8 +73,7 @@ class LoginViewModel : ViewModel(), KoinComponent {
     }
 
     fun getMainTeam() {
-        val disposable = useCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
-            .map { it.team }
+        val disposable = getTeamUseCase()
             .subscribe({
                 _loginEvent.onNext(GetTeamSuccess(it))
             }, {

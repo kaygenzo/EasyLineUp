@@ -29,7 +29,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
-    private val observer: TestObserver<GetListAvailablePlayersForSelection.ResponseValue> =
+    private val observer: TestObserver<List<PlayerWithPosition>> =
         TestObserver()
     @Mock lateinit var lineupDao: LineupRepository
     @Mock lateinit var playerDao: PlayerRepository
@@ -41,8 +41,8 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        val getRoster = GetRoster(playerDao, lineupDao, GetTeam(teamDao))
-        getListAvailablePlayersForSelection = GetListAvailablePlayersForSelection(getRoster)
+        val getRoster = GetRoster(playerDao, lineupDao, GetTeam(teamDao, testSchedulersProvider()), testSchedulersProvider())
+        getListAvailablePlayersForSelection = GetListAvailablePlayersForSelection(getRoster, testSchedulersProvider())
 
         val team = Team(id = 1L, name = "toto", main = true)
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
@@ -82,8 +82,7 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
         players: List<PlayerWithPosition> = this.players,
         exception: Class<out Throwable>? = null
     ) {
-        val request = GetListAvailablePlayersForSelection.RequestValues(players, position, lineup)
-        getListAvailablePlayersForSelection.executeUseCase(request).subscribe(observer)
+        getListAvailablePlayersForSelection(players, position, lineup).subscribe(observer)
         observer.await()
         exception?.let {
             observer.assertError(exception)
@@ -104,7 +103,7 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     @Test
     fun shouldOnlyReturnPlayersWithoutFieldPositionOrSubstitutes() {
         startUseCase(position = FieldPosition.PITCHER)
-        observer.values().first().players.let {
+        observer.values().first().let {
             Assert.assertEquals(3, it.size)
             Assert.assertEquals(1, it.filter { it.playerId == 2L }.size)
             Assert.assertEquals(1, it.filter { it.playerId == 4L }.size)
@@ -115,7 +114,7 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     @Test
     fun shouldSortPlayersByFieldPositionCatcher() {
         startUseCase(position = FieldPosition.CATCHER)
-        observer.values().first().players.let {
+        observer.values().first().let {
             Assert.assertEquals(2, it[0].playerId)
             Assert.assertEquals(4, it[1].playerId)
         }
@@ -124,7 +123,7 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     @Test
     fun shouldSortPlayersByFieldPositionSecondBase() {
         startUseCase(position = FieldPosition.SECOND_BASE)
-        observer.values().first().players.let {
+        observer.values().first().let {
             Assert.assertEquals(4, it[0].playerId)
             Assert.assertEquals(2, it[1].playerId)
         }
@@ -143,7 +142,7 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     fun shouldReturnSomePlayersWhenRosterIsNotFull() {
         lineup.roster = "1;2;3"
         startUseCase(position = FieldPosition.SECOND_BASE)
-        Assert.assertEquals(1, observer.values().first().players.size)
-        Assert.assertEquals(2L, observer.values().first().players.first().playerId)
+        Assert.assertEquals(1, observer.values().first().size)
+        Assert.assertEquals(2L, observer.values().first().first().playerId)
     }
 }

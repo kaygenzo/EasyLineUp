@@ -4,23 +4,15 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
 import io.reactivex.rxjava3.core.Single
 
-/**
- * @property dao
- */
-class GetAllTeams(val dao: TeamRepository) :
-    UseCase<GetAllTeams.RequestValues, GetAllTeams.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return dao.getTeamsRx().map { ResponseValue(it) }
+class GetAllTeams(
+    private val dao: TeamRepository,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(): Single<List<Team>> {
+        return dao.getTeamsRx().subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property teams
-     */
-    class ResponseValue(val teams: List<Team>) : UseCase.ResponseValue
-    class RequestValues : UseCase.RequestValues
 }

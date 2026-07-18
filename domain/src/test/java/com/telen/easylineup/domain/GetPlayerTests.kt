@@ -21,7 +21,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetPlayerTests {
-    val observer: TestObserver<GetPlayer.ResponseValue> = TestObserver()
+    val observer: TestObserver<Player> = TestObserver()
 
     @Mock
     lateinit var playerDao: PlayerRepository
@@ -31,7 +31,7 @@ internal class GetPlayerTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getPlayer = GetPlayer(playerDao)
+        getPlayer = GetPlayer(playerDao, testSchedulersProvider())
 
         player = Player(
             id = 1L,
@@ -49,29 +49,29 @@ internal class GetPlayerTests {
 
     @Test
     fun shouldGetPlayerIfValidId() {
-        getPlayer.executeUseCase(GetPlayer.RequestValues(1L)).subscribe(observer)
+        getPlayer(1L).subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(player, observer.values().first().player)
+        Assert.assertEquals(player, observer.values().first())
     }
 
     @Test
     fun shouldTriggerAnExceptionIfIdIsLessOrEqualsTo0() {
-        getPlayer.executeUseCase(GetPlayer.RequestValues(0L)).subscribe(observer)
+        getPlayer(0L).subscribe(observer)
         observer.await()
         observer.assertError(NotExistingPlayerException::class.java)
     }
 
     @Test
     fun shouldTriggerAnExceptionIfUnknownId() {
-        getPlayer.executeUseCase(GetPlayer.RequestValues(2L)).subscribe(observer)
+        getPlayer(2L).subscribe(observer)
         observer.await()
         observer.assertError(Exception::class.java)
     }
 
     @Test
     fun shouldTriggerAnExceptionIfIdIsNull() {
-        getPlayer.executeUseCase(GetPlayer.RequestValues(null)).subscribe(observer)
+        getPlayer(null).subscribe(observer)
         observer.await()
         observer.assertError(IllegalArgumentException::class.java)
     }

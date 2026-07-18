@@ -12,7 +12,6 @@ import androidx.lifecycle.switchMap
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MapInfo
@@ -50,7 +49,6 @@ sealed class SaveResult
 data class SaveSuccess(val lineup: Lineup) : SaveResult()
 
 class LineupViewModel : ViewModel(), KoinComponent {
-    private val useCaseHandler: UseCaseHandler by inject()
     private val getTeamUseCase: GetTeam by inject()
     private val observeTournamentsUseCase: ObserveTournaments by inject()
     private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineupsUseCase by inject()
@@ -86,17 +84,13 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun getTournaments(): LiveData<List<Tournament>> {
-        return observeTournamentsUseCase.execute()
+        return observeTournamentsUseCase()
     }
 
     fun observeCategorizedLineups(): LiveData<List<TournamentItem>> {
         return filterLiveData.switchMap { filter ->
             _categorizedLineupsLiveData.apply {
-                val disposable = useCaseHandler.execute(
-                    getAllTournamentsWithLineupsUseCase,
-                    GetAllTournamentsWithLineupsUseCase.RequestValues(filter)
-                )
-                    .map { it.result }
+                val disposable = getAllTournamentsWithLineupsUseCase(filter)
                     .flatMapObservable { Observable.fromIterable(it) }
                     .flatMapSingle { Single.just(TournamentItem(it.first, it.second)) }
                     .toList()
@@ -118,16 +112,13 @@ class LineupViewModel : ViewModel(), KoinComponent {
         val items = tournamentItems.filter { it.tournament.address != null }
         val disposable = Observable.fromIterable(items)
             .flatMapSingle { item ->
-                useCaseHandler.execute(
-                    getTournamentMapLink,
-                    GetTournamentMapLink.RequestValues(
-                        item.tournament,
-                        apiKey,
-                        Constants.MAP_PIXEL_SIZE,
-                        Constants.MAP_PIXEL_SIZE
-                    )
+                getTournamentMapLink(
+                    item.tournament,
+                    apiKey,
+                    Constants.MAP_PIXEL_SIZE,
+                    Constants.MAP_PIXEL_SIZE
                 )
-                    .map { Pair(item.tournament, it.mapInfo) }
+                    .map { Pair(item.tournament, it) }
                     .onErrorResumeNext { Single.just(Pair(item.tournament, MapInfo())) }
             }
             .filter { it.second.url?.isNotEmpty() ?: false }
@@ -144,14 +135,11 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun deleteTournament(tournament: Tournament): Completable {
-        return useCaseHandler
-            .execute(deleteTournamentLineups, DeleteTournamentLineups.RequestValues(tournament))
-            .ignoreElement()
+        return deleteTournamentLineups(tournament)
     }
 
     fun getCompleteRoster(): Single<TeamRosterSummary> {
-        return useCaseHandler.execute(getRosterUseCase, GetRoster.RequestValues())
-            .map { it.summary }
+        return getRosterUseCase()
             .doOnSuccess { chosenRoster = it }
     }
 
@@ -160,9 +148,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun saveLineup() {
-        val disposable = useCaseHandler
-            .execute(createLineupUseCase, CreateLineup.RequestValues(lineup, chosenRoster.players))
-            .map { it.lineup }
+        val disposable = createLineupUseCase(lineup, chosenRoster.players)
             .doOnError {
                 if (it is LineupNameEmptyException) {
                     errors.onNext(DomainErrors.Lineups.INVALID_LINEUP_NAME)
@@ -205,13 +191,11 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun getTeamType(): Single<Int> {
-        return useCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues()).map { it.team.type }
+        return getTeamUseCase().map { it.type }
     }
 
     fun saveTournament(tournament: Tournament): Completable {
-        return useCaseHandler
-            .execute(saveTournamentUseCase, SaveTournament.RequestValues(tournament))
-            .ignoreElement()
+        return saveTournamentUseCase(tournament)
     }
 
     fun onTournamentSelected(tournament: Tournament) {

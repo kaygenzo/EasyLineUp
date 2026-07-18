@@ -25,7 +25,7 @@ internal class InsertPlayersTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        insertPlayers = InsertPlayers(playerDao)
+        insertPlayers = InsertPlayers(playerDao, testSchedulersProvider())
     }
 
     @Test
@@ -35,8 +35,8 @@ internal class InsertPlayersTests {
         )
         Mockito.`when`(playerDao.insertPlayers(players)).thenReturn(Completable.complete())
 
-        val observer = TestObserver<InsertPlayers.ResponseValue>()
-        insertPlayers.executeUseCase(InsertPlayers.RequestValues(players)).subscribe(observer)
+        val observer = TestObserver<Void>()
+        insertPlayers(players).subscribe(observer)
         observer.await()
 
         observer.assertComplete()

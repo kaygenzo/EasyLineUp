@@ -26,7 +26,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class DeleteTeamTests {
-    val observer: TestObserver<DeleteTeam.ResponseValue> = TestObserver()
+    val observer: TestObserver<Void> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     lateinit var deleteTeam: DeleteTeam
     lateinit var team: Team
@@ -37,7 +37,7 @@ internal class DeleteTeamTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        deleteTeam = DeleteTeam(teamDao)
+        deleteTeam = DeleteTeam(teamDao, testSchedulersProvider())
         team = Team(id = 1L, name = "toto", type = TeamType.BASEBALL.id, main = true)
         team2 = Team(id = 2L, name = "tata", type = TeamType.SOFTBALL.id, main = false)
         team3 = Team(id = 3L, name = "titi", type = TeamType.SOFTBALL.id, main = false)
@@ -50,7 +50,7 @@ internal class DeleteTeamTests {
     @Test
     fun shouldTriggerAnExceptionIfItWasTheOnlyTeamInDatabase() {
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(mutableListOf()))
-        deleteTeam.executeUseCase(DeleteTeam.RequestValues(team))
+        deleteTeam(team)
             .subscribe(observer)
         observer.await()
         observer.assertError(NoSuchElementException::class.java)
@@ -58,7 +58,7 @@ internal class DeleteTeamTests {
 
     @Test
     fun shouldReassignMainTeamToTheFirstElement() {
-        deleteTeam.executeUseCase(DeleteTeam.RequestValues(team))
+        deleteTeam(team)
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -73,7 +73,7 @@ internal class DeleteTeamTests {
     fun shouldNotReassignMainTeam() {
         team.main = false
         team3.main = true
-        deleteTeam.executeUseCase(DeleteTeam.RequestValues(team))
+        deleteTeam(team)
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -82,7 +82,7 @@ internal class DeleteTeamTests {
 
     @Test
     fun shouldDeleteSuccessfully() {
-        deleteTeam.executeUseCase(DeleteTeam.RequestValues(team))
+        deleteTeam(team)
             .subscribe(observer)
         observer.await()
         observer.assertComplete()

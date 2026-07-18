@@ -12,7 +12,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
-import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
@@ -25,7 +24,6 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 class TeamViewModel : ViewModel(), KoinComponent {
-    private val useCaseHandler: UseCaseHandler by inject()
     private val getTeamUseCase: GetTeam by inject()
     private val deleteTeamUseCase: DeleteTeam by inject()
     private val observePlayers: ObservePlayers by inject()
@@ -34,7 +32,7 @@ class TeamViewModel : ViewModel(), KoinComponent {
     }
     private val _playersFromDao by lazy {
         _team.switchMap {
-            observePlayers.execute(it.id)
+            observePlayers(it.id)
         }
     }
     private val _playersMediator: MediatorLiveData<List<Player>> = MediatorLiveData()
@@ -86,9 +84,7 @@ class TeamViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun deleteTeam(team: Team) = useCaseHandler
-        .execute(deleteTeamUseCase, DeleteTeam.RequestValues(team))
-        .ignoreElement()
+    fun deleteTeam(team: Team) = deleteTeamUseCase(team)
 
     fun getPlayerId(): Long {
         return playerSelectedId
@@ -103,8 +99,7 @@ class TeamViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getCurrentTeam() {
-        val disposable = useCaseHandler.execute(getTeamUseCase, GetTeam.RequestValues())
-            .map { it.team }
+        val disposable = getTeamUseCase()
             .subscribe({
                 team = it
                 _team.postValue(it)

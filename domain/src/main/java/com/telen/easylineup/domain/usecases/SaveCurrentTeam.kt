@@ -5,34 +5,25 @@
 package com.telen.easylineup.domain.usecases
 
 import android.annotation.SuppressLint
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
 
-/**
- * @property dao
- */
-class SaveCurrentTeam(val dao: TeamRepository) :
-    UseCase<SaveCurrentTeam.RequestValues, SaveCurrentTeam.ResponseValue>() {
+class SaveCurrentTeam(
+    private val dao: TeamRepository,
+    private val schedulersProvider: SchedulersProvider
+) {
     @SuppressLint("ApplySharedPref")
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
+    operator fun invoke(team: Team): Completable {
         return dao.getTeamsRx()
             .flatMapObservable { Observable.fromIterable(it) }
             .map {
-                it.main = it.id == requestValues.team.id
+                it.main = it.id == team.id
                 it
             }
             .toList()
             .flatMapCompletable { dao.updateTeams(it) }
-            .andThen(Single.just(ResponseValue()))
+            .subscribeOn(schedulersProvider.io())
     }
-
-    class ResponseValue : UseCase.ResponseValue
-
-    /**
-     * @property team
-     */
-    class RequestValues(val team: Team) : UseCase.RequestValues
 }

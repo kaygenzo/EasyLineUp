@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.repository.TeamRepository
@@ -12,18 +11,16 @@ import io.reactivex.rxjava3.core.Single
 
 /**
  * Validates the team name, inserts or updates it, then marks it as the current team.
- *
- * @property dao
  */
 class SaveTeam(
-    val dao: TeamRepository,
+    private val dao: TeamRepository,
     private val checkTeam: CheckTeam,
-    private val saveCurrentTeam: SaveCurrentTeam
-) : UseCase<SaveTeam.RequestValues, SaveTeam.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return checkTeam.executeUseCase(CheckTeam.RequestValues(requestValues.team))
-            .flatMap {
-                val team = requestValues.team
+    private val saveCurrentTeam: SaveCurrentTeam,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(team: Team): Single<Team> {
+        return checkTeam(team)
+            .andThen(Single.defer {
                 if (team.type == TeamType.UNKNOWN.id) {
                     team.type = TeamType.BASEBALL.id
                 }
@@ -35,20 +32,10 @@ class SaveTeam(
                 } else {
                     dao.updateTeam(team).andThen(Single.just(team))
                 }
+            })
+            .flatMap { savedTeam ->
+                saveCurrentTeam(savedTeam).andThen(Single.just(savedTeam))
             }
-            .flatMap { team ->
-                saveCurrentTeam.executeUseCase(SaveCurrentTeam.RequestValues(team))
-                    .map { ResponseValue(team) }
-            }
+            .subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property team
-     */
-    class ResponseValue(val team: Team) : UseCase.ResponseValue
-
-    /**
-     * @property team
-     */
-    class RequestValues(val team: Team) : UseCase.RequestValues
 }

@@ -4,24 +4,17 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.repository.PlayerRepository
-import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.Completable
 
 class DeletePlayer(
     private val dao: PlayerRepository,
-    private val getPlayer: GetPlayer
-) : UseCase<DeletePlayer.RequestValues, DeletePlayer.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return getPlayer.executeUseCase(GetPlayer.RequestValues(requestValues.playerId))
-            .map { it.player }
+    private val getPlayer: GetPlayer,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(playerId: Long?): Completable {
+        return getPlayer(playerId)
             .flatMapCompletable { dao.deletePlayer(it) }
-            .andThen(Single.just(ResponseValue()))
+            .subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property playerId
-     */
-    class RequestValues(val playerId: Long?) : UseCase.RequestValues
-    class ResponseValue : UseCase.ResponseValue
 }

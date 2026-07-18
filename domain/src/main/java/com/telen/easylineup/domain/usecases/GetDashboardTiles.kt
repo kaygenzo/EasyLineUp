@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
@@ -31,28 +30,29 @@ class GetDashboardTiles(
     private val playerFieldPositionDao: PlayerFieldPositionRepository,
     private val tilesRepo: TilesRepository,
     private val getTeam: GetTeam,
-    private val createDashboardTiles: CreateDashboardTiles
-) : UseCase<GetDashboardTiles.RequestValues, GetDashboardTiles.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return getTeam.executeUseCase(GetTeam.RequestValues())
-            .flatMap { teamResponse ->
-                val team = teamResponse.team
+    private val createDashboardTiles: CreateDashboardTiles,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(): Single<List<DashboardTile>> {
+        return getTeam()
+            .flatMap { team ->
                 fetchTiles(team).onErrorResumeNext {
                     if (it is NoSuchElementException) {
-                        createDashboardTiles.executeUseCase(CreateDashboardTiles.RequestValues())
-                            .flatMap { fetchTiles(team) }
+                        createDashboardTiles()
+                            .andThen(fetchTiles(team))
                     } else {
                         Single.error(it)
                     }
                 }
             }
+            .subscribeOn(schedulersProvider.io())
     }
 
-    private fun fetchTiles(team: Team): Single<ResponseValue> {
+    private fun fetchTiles(team: Team): Single<List<DashboardTile>> {
         return tilesRepo.getTiles().flatMap { tiles ->
 
             if (tiles.isEmpty()) {
-                val resultError: Single<ResponseValue> = Single.error(NoSuchElementException())
+                val resultError: Single<List<DashboardTile>> = Single.error(NoSuchElementException())
                 return@flatMap resultError
             }
 
@@ -83,7 +83,6 @@ class GetDashboardTiles(
             }
             Maybe.concat(tilesObservables)
                 .toList()
-                .map { ResponseValue(it) }
         }
     }
 
@@ -126,11 +125,4 @@ class GetDashboardTiles(
     private fun getLastPlayerNumberResearch(): Maybe<TileData> {
         return Maybe.just(LastPlayerNumberResearchData())
     }
-
-    /**
-     * @property tiles
-     */
-    class ResponseValue(val tiles: List<DashboardTile>) : UseCase.ResponseValue
-
-    class RequestValues : UseCase.RequestValues
 }

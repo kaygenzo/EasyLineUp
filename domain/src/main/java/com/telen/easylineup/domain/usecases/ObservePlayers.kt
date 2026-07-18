@@ -9,5 +9,5 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 
 class ObservePlayers(private val dao: PlayerRepository) {
-    fun execute(teamId: Long): LiveData<List<Player>> = dao.observePlayers(teamId)
+    operator fun invoke(teamId: Long): LiveData<List<Player>> = dao.observePlayers(teamId)
 }

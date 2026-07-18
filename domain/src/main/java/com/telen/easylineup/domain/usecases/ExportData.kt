@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.model.export.LineupExport
 import com.telen.easylineup.domain.model.export.PlayerExport
@@ -31,24 +30,20 @@ import io.reactivex.rxjava3.core.Single
  * Refreshes hashes for any record missing one, then builds the export payload. Writing that
  * payload to a file is an Android/UI concern handled by the caller (`SettingsViewModel`), not
  * by this UseCase.
- *
- * @property teamDao
- * @property playerDao
- * @property tournamentDao
- * @property lineupDao
  */
 class ExportData(
     private val checkHashData: CheckHashData,
-    val teamDao: TeamRepository,
-    val playerDao: PlayerRepository,
-    val tournamentDao: TournamentRepository,
-    val lineupDao: LineupRepository,
-    private val playerFieldPositionsDao: PlayerFieldPositionRepository
-) : UseCase<ExportData.RequestValues, ExportData.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
+    private val teamDao: TeamRepository,
+    private val playerDao: PlayerRepository,
+    private val tournamentDao: TournamentRepository,
+    private val lineupDao: LineupRepository,
+    private val playerFieldPositionsDao: PlayerFieldPositionRepository,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(): Single<ExportBase> {
         val teams: MutableList<TeamExport> = mutableListOf()
         val root = ExportBase(teams)
-        return checkHashData.executeUseCase(CheckHashData.RequestValues())
+        return checkHashData()
             .ignoreElement()
             .andThen(
                 teamDao.getTeamsRx()
@@ -137,7 +132,8 @@ class ExportData(
                             }
                     }
             )
-            .andThen(Single.just(ResponseValue(root)))
+            .andThen(Single.just(root))
+            .subscribeOn(schedulersProvider.io())
     }
 
     private fun isNetworkUrl(url: String?): Boolean {
@@ -158,11 +154,4 @@ class ExportData(
                 .filter { it.isNotEmpty() }
         }
     }
-
-    /**
-     * @property exportBase
-     */
-    class ResponseValue(val exportBase: ExportBase) : UseCase.ResponseValue
-
-    class RequestValues : UseCase.RequestValues
 }

@@ -20,7 +20,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetAllTeamsTests {
-    val observer: TestObserver<GetAllTeams.ResponseValue> = TestObserver()
+    val observer: TestObserver<List<Team>> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     lateinit var getAllTeams: GetAllTeams
     lateinit var teams: MutableList<Team>
@@ -28,7 +28,7 @@ internal class GetAllTeamsTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getAllTeams = GetAllTeams(teamDao)
+        getAllTeams = GetAllTeams(teamDao, testSchedulersProvider())
 
         teams = mutableListOf()
         teams.add(Team(1, "toto", null, 0, true))
@@ -39,10 +39,10 @@ internal class GetAllTeamsTests {
 
     @Test
     fun shouldDeleteTournament() {
-        getAllTeams.executeUseCase(GetAllTeams.RequestValues())
+        getAllTeams()
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(teams, observer.values().first().teams)
+        Assert.assertEquals(teams, observer.values().first())
     }
 }

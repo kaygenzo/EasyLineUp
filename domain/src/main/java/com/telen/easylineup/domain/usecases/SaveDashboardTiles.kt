@@ -4,31 +4,18 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.repository.TilesRepository
-import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.Completable
 
-/**
- * @property dao
- */
-class SaveDashboardTiles(val dao: TilesRepository) :
-    UseCase<SaveDashboardTiles.RequestValues, SaveDashboardTiles.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return Single.just(requestValues.tiles)
-            .flatMapCompletable { tiles ->
-                for (i in tiles.indices) {
-                    tiles[i].position = i
-                }
-                dao.updateTiles(tiles)
-            }
-            .andThen(Single.just(ResponseValue()))
+class SaveDashboardTiles(
+    private val dao: TilesRepository,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(tiles: List<DashboardTile>): Completable {
+        for (i in tiles.indices) {
+            tiles[i].position = i
+        }
+        return dao.updateTiles(tiles).subscribeOn(schedulersProvider.io())
     }
-
-    class ResponseValue : UseCase.ResponseValue
-
-    /**
-     * @property tiles
-     */
-    class RequestValues(val tiles: List<DashboardTile>) : UseCase.RequestValues
 }

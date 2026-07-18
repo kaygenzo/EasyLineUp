@@ -24,7 +24,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetShirtNumberHistoryTests {
-    val observer: TestObserver<GetShirtNumberHistory.ResponseValue> = TestObserver()
+    val observer: TestObserver<List<ShirtNumberEntry>> = TestObserver()
     @Mock lateinit var playerRepo: PlayerRepository
     @Mock lateinit var teamRepo: TeamRepository
     lateinit var getShirtNumberEntry: GetShirtNumberHistory
@@ -41,7 +41,11 @@ internal class GetShirtNumberHistoryTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getShirtNumberEntry = GetShirtNumberHistory(playerRepo, GetTeam(teamRepo))
+        getShirtNumberEntry = GetShirtNumberHistory(
+            playerRepo,
+            GetTeam(teamRepo, testSchedulersProvider()),
+            testSchedulersProvider()
+        )
         Mockito.`when`(teamRepo.getTeamsRx())
             .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
 
@@ -70,11 +74,11 @@ internal class GetShirtNumberHistoryTests {
     fun shouldGetAllShirtNumberFromPositions() {
         Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 1)).thenReturn(Single.just(listOf(entry1, entry2,
             entry3, entry4)))
-        getShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(1))
+        getShirtNumberEntry(1)
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
-        Assert.assertEquals(listOf(entry3, entry2, entry4, entry1), observer.values().first().history)
+        Assert.assertEquals(listOf(entry3, entry2, entry4, entry1), observer.values().first())
     }
 
     @Test
@@ -86,12 +90,12 @@ internal class GetShirtNumberHistoryTests {
             shirtNumberOverlay1, shirtNumberOverlay2
         )))
 
-        getShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(1))
+        getShirtNumberEntry(1)
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
         val result = listOf(shirtNumberOverlay2, shirtNumberOverlay1, entry3, entry2, entry4, entry1)
-        Assert.assertEquals(result, observer.values().first().history)
+        Assert.assertEquals(result, observer.values().first())
     }
 
     @Test
@@ -100,11 +104,11 @@ internal class GetShirtNumberHistoryTests {
         Mockito.`when`(playerRepo.getShirtNumberOverlay(3L, 3L)).thenReturn(Single.just(overlay2))
         Mockito.`when`(playerRepo.getShirtNumberFromNumberOverlays(1L, 42)).thenReturn(Single.just(listOf()))
 
-        getShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(42))
+        getShirtNumberEntry(42)
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
         val result: List<ShirtNumberEntry> = listOf()
-        Assert.assertEquals(result, observer.values().first().history)
+        Assert.assertEquals(result, observer.values().first())
     }
 }

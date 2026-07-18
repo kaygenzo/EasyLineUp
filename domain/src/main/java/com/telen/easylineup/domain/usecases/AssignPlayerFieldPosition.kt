@@ -5,7 +5,6 @@
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_ENABLED
@@ -18,21 +17,24 @@ import com.telen.easylineup.domain.model.getNextAvailableOrder
 import com.telen.easylineup.domain.model.getPositionPercentage
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.model.reset
-import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.Completable
 
-class AssignPlayerFieldPosition(private val getTeam: GetTeam) :
-    UseCase<AssignPlayerFieldPosition.RequestValues, AssignPlayerFieldPosition.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return getTeam.executeUseCase(GetTeam.RequestValues()).flatMap { teamResponse ->
-            val players = requestValues.players
-            val lineup = requestValues.lineup
+class AssignPlayerFieldPosition(
+    private val getTeam: GetTeam,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(
+        player: Player,
+        position: FieldPosition,
+        lineup: Lineup,
+        players: List<PlayerWithPosition>
+    ): Completable {
+        return getTeam().flatMapCompletable { team ->
             val lineupMode = lineup.mode
             val strategy = TeamStrategy.getStrategyById(lineup.strategy)
             val batterSize = strategy.batterSize
             val extraHittersSize = lineup.extraHitters
-            val position = requestValues.position
-            val player = requestValues.player
-            val teamType = teamResponse.team.type
+            val teamType = team.type
 
             val otherPlayerPosition = players.firstOrNull {
                 // another player is already on the same position
@@ -89,22 +91,7 @@ class AssignPlayerFieldPosition(private val getTeam: GetTeam) :
             // remove values from the old player
             otherPlayerPosition?.reset()
 
-            Single.just(ResponseValue())
-        }
+            Completable.complete()
+        }.subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property player
-     * @property position
-     * @property lineup
-     * @property players
-     */
-    class RequestValues(
-        val player: Player,
-        val position: FieldPosition,
-        val lineup: Lineup,
-        val players: List<PlayerWithPosition>
-    ) : UseCase.RequestValues
-
-    class ResponseValue : UseCase.ResponseValue
 }

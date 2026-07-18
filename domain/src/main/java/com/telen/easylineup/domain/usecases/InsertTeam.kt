@@ -4,17 +4,15 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
 import io.reactivex.rxjava3.core.Single
 
-class InsertTeam(private val dao: TeamRepository) :
-    UseCase<InsertTeam.RequestValues, InsertTeam.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return dao.insertTeam(requestValues.team).map { ResponseValue(it) }
+class InsertTeam(
+    private val dao: TeamRepository,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(team: Team): Single<Long> {
+        return dao.insertTeam(team).subscribeOn(schedulersProvider.io())
     }
-
-    class RequestValues(val team: Team) : UseCase.RequestValues
-    class ResponseValue(val id: Long) : UseCase.ResponseValue
 }

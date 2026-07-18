@@ -26,7 +26,7 @@ internal class GetLineupByIdTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getLineupById = GetLineupById(lineupDao)
+        getLineupById = GetLineupById(lineupDao, testSchedulersProvider())
     }
 
     @Test
@@ -34,11 +34,11 @@ internal class GetLineupByIdTests {
         val lineup = Lineup(id = 1L, name = "toto", teamId = 1L, tournamentId = 1L)
         Mockito.`when`(lineupDao.getLineupByIdSingle(1L)).thenReturn(Single.just(lineup))
 
-        val observer = TestObserver<GetLineupById.ResponseValue>()
-        getLineupById.executeUseCase(GetLineupById.RequestValues(1L)).subscribe(observer)
+        val observer = TestObserver<Lineup>()
+        getLineupById(1L).subscribe(observer)
         observer.await()
 
         observer.assertComplete()
-        Assert.assertEquals(lineup, observer.values().first().lineup)
+        Assert.assertEquals(lineup, observer.values().first())
     }
 }

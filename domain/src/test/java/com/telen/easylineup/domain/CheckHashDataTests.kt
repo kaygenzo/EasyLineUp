@@ -32,7 +32,7 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class CheckHashDataTests {
     private val extraHitters = 0
-    val observer: TestObserver<CheckHashData.ResponseValue> = TestObserver()
+    val observer: TestObserver<IntArray> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     @Mock lateinit var playerDao: PlayerRepository
     @Mock lateinit var tournamentDao: TournamentRepository
@@ -43,7 +43,10 @@ internal class CheckHashDataTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        checkHash = CheckHashData(teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao)
+        checkHash = CheckHashData(
+            teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao,
+            testSchedulersProvider()
+        )
 
         val teams = mutableListOf(
             Team(1L, "A", null, 0, true, null),
@@ -88,7 +91,7 @@ internal class CheckHashDataTests {
 
     @Test
     fun shouldUpdateHashForAllEntries() {
-        checkHash.executeUseCase(CheckHashData.RequestValues())
+        checkHash()
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -112,6 +115,6 @@ internal class CheckHashDataTests {
             Assert.assertEquals(0, it.filter { it.hash == null }.size)
         })
 
-        Assert.assertArrayEquals(intArrayOf(2, 2, 2, 2, 2), observer.values().first().updateResult)
+        Assert.assertArrayEquals(intArrayOf(2, 2, 2, 2, 2), observer.values().first())
     }
 }

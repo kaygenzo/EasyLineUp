@@ -6,7 +6,6 @@ package com.telen.easylineup.domain.usecases
 
 import android.content.Context
 import com.telen.easylineup.domain.R
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerInLineup
 import com.telen.easylineup.domain.model.TeamStrategy
@@ -18,22 +17,21 @@ import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.utils.getPositionShortNames
 import io.reactivex.rxjava3.core.Single
 
-/**
- * @property dao
- */
 class GetTournamentStatsForPositionTable(
     private val context: Context,
-    val dao: LineupRepository,
-    private val getTeam: GetTeam
-) : UseCase<GetTournamentStatsForPositionTable.RequestValues,
-GetTournamentStatsForPositionTable.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return getTeam.executeUseCase(GetTeam.RequestValues())
-            .flatMap { teamResponse ->
-                val team = teamResponse.team
-                dao.getAllPlayerPositionsForTournament(requestValues.tournament.id, team.id)
+    private val dao: LineupRepository,
+    private val getTeam: GetTeam,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(
+        tournament: Tournament,
+        strategy: TeamStrategy
+    ): Single<TournamentStatsUiConfig> {
+        return getTeam()
+            .flatMap { team ->
+                dao.getAllPlayerPositionsForTournament(tournament.id, team.id)
                     .map { list ->
-                        val possiblePositions = requestValues.strategy.positions
+                        val possiblePositions = strategy.positions
 
                         val topHeaderData: MutableList<Pair<String, Int>> = mutableListOf()
                         val leftHeaderData: MutableList<Pair<String, Int>> = mutableListOf()
@@ -109,30 +107,15 @@ GetTournamentStatsForPositionTable.ResponseValue>() {
                                 topLeftCell = it.toList()
                             } ?: let { /* nothing to do, just use standard strategy */ }
 
-                        ResponseValue(
-                            TournamentStatsUiConfig(
-                                leftHeaderData,
-                                topHeaderData,
-                                mainData,
-                                mutableListOf(),
-                                topLeftCell
-                            )
+                        TournamentStatsUiConfig(
+                            leftHeaderData,
+                            topHeaderData,
+                            mainData,
+                            mutableListOf(),
+                            topLeftCell
                         )
                     }
             }
+            .subscribeOn(schedulersProvider.io())
     }
-
-    /**
-     * @property uiConfig
-     */
-    class ResponseValue(val uiConfig: TournamentStatsUiConfig) : UseCase.ResponseValue
-
-    /**
-     * @property tournament
-     * @property strategy
-     */
-    class RequestValues(
-        val tournament: Tournament,
-        val strategy: TeamStrategy
-    ) : UseCase.RequestValues
 }

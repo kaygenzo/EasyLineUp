@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerFieldPosition
@@ -30,18 +29,24 @@ import io.reactivex.rxjava3.core.Single
 import java.lang.Exception
 import java.util.UUID
 
+/**
+ * @property inserted
+ * @property updated
+ */
+class ImportResult(val inserted: IntArray, val updated: IntArray)
+
 class ImportData(
     private val teamDao: TeamRepository,
     private val playerDao: PlayerRepository,
     private val tournamentDao: TournamentRepository,
     private val lineupDao: LineupRepository,
-    private val playerFieldPositionsDao: PlayerFieldPositionRepository
-) : UseCase<ImportData.RequestValues, ImportData.ResponseValue>() {
-    override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
+    private val playerFieldPositionsDao: PlayerFieldPositionRepository,
+    private val schedulersProvider: SchedulersProvider
+) {
+    operator fun invoke(exportBase: ExportBase, updateIfExists: Boolean): Single<ImportResult> {
         val insertedArray = intArrayOf(0, 0, 0, 0, 0, 0)
         val updatedArray = intArrayOf(0, 0, 0, 0, 0, 0)
-        val updateIfExists = requestValues.updateIfExists
-        return Single.just(requestValues.exportBase)
+        return Single.just(exportBase)
             .flatMapObservable { Observable.fromIterable(it.teams) }
             .flatMapCompletable { teamExport ->
                 processTeam(teamExport, insertedArray, updatedArray, updateIfExists)
@@ -127,7 +132,8 @@ class ImportData(
                             }
                     }
             }
-            .andThen(Single.just(ResponseValue(insertedArray, updatedArray)))
+            .andThen(Single.just(ImportResult(insertedArray, updatedArray)))
+            .subscribeOn(schedulersProvider.io())
     }
 
     private fun processTeam(
@@ -335,19 +341,6 @@ class ImportData(
                 playerDao.createPlayerNumberOverlay(p)
             }
     }
-
-    /**
-     * @property inserted
-     * @property updated
-     */
-    class ResponseValue(val inserted: IntArray, val updated: IntArray) : UseCase.ResponseValue
-
-    /**
-     * @property exportBase
-     * @property updateIfExists
-     */
-    class RequestValues(val exportBase: ExportBase, val updateIfExists: Boolean) :
-        UseCase.RequestValues
 
     companion object {
         const val RESULT_TEAMS_INDEX = 0
