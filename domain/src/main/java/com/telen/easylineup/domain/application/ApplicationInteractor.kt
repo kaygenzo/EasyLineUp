@@ -8,5 +8,4 @@ interface ApplicationInteractor {
     fun lineups(): LineupsInteractor
     fun tournaments(): TournamentsInteractor
     fun playerFieldPositions(): PlayerFieldPositionsInteractor
-    fun data(): DataInteractor
 }

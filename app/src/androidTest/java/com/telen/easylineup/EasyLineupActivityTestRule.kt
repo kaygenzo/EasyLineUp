@@ -5,15 +5,21 @@
 package com.telen.easylineup
 
 import android.app.Activity
+import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.application.ApplicationInteractor
+import com.telen.easylineup.domain.UseCaseHandler
+import com.telen.easylineup.domain.mock.DatabaseMockProvider
+import com.telen.easylineup.domain.usecases.DeleteAllData
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class EasyLineupActivityTestRule<T : Activity?> : ActivityTestRule<T>, KoinComponent {
-    private val domain: ApplicationInteractor by inject()
+    private val useCaseHandler: UseCaseHandler by inject()
+    private val deleteAllDataUseCase: DeleteAllData by inject()
+    private val databaseMockProvider: DatabaseMockProvider by inject()
+    private val context: Context by inject()
 
     constructor(activityClass: Class<T>?) : super(activityClass)
     constructor(activityClass: Class<T>?, initialTouchMode: Boolean, launchActivity: Boolean) : super(activityClass,
@@ -23,8 +29,9 @@ class EasyLineupActivityTestRule<T : Activity?> : ActivityTestRule<T>, KoinCompo
         super.beforeActivityLaunched()
 
         // activity?.applicationContext?.run {
-        domain.data().deleteAllData()
-            .andThen(domain.data().generateMockedData())
+        useCaseHandler.execute(deleteAllDataUseCase, DeleteAllData.RequestValues())
+            .ignoreElement()
+            .andThen(databaseMockProvider.createMockDatabase(context))
             // .andThen(Completable.timer(3, TimeUnit.SECONDS))
             .blockingAwait()
         // }

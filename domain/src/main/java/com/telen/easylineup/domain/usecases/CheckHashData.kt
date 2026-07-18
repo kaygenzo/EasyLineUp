@@ -26,7 +26,7 @@ import java.util.UUID
  * @property lineupDao
  * @property playerFieldPositionsDao
  */
-internal class CheckHashData(
+class CheckHashData(
     val teamDao: TeamRepository,
     val playerDao: PlayerRepository,
     val tournamentDao: TournamentRepository,

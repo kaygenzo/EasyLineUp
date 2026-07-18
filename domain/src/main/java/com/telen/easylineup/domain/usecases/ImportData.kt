@@ -30,7 +30,7 @@ import io.reactivex.rxjava3.core.Single
 import java.lang.Exception
 import java.util.UUID
 
-internal class ImportData(
+class ImportData(
     private val teamDao: TeamRepository,
     private val playerDao: PlayerRepository,
     private val tournamentDao: TournamentRepository,

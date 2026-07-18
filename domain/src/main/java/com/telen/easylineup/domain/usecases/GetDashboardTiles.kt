@@ -21,13 +21,34 @@ import com.telen.easylineup.domain.repository.TilesRepository
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 
-internal class GetDashboardTiles(
+/**
+ * Resolves the current team's dashboard tiles, auto-provisioning the default set the first
+ * time a team has none.
+ */
+class GetDashboardTiles(
     private val playerDao: PlayerRepository,
     private val lineupDao: LineupRepository,
     private val playerFieldPositionDao: PlayerFieldPositionRepository,
-    private val tilesRepo: TilesRepository
+    private val tilesRepo: TilesRepository,
+    private val getTeam: GetTeam,
+    private val createDashboardTiles: CreateDashboardTiles
 ) : UseCase<GetDashboardTiles.RequestValues, GetDashboardTiles.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
+        return getTeam.executeUseCase(GetTeam.RequestValues())
+            .flatMap { teamResponse ->
+                val team = teamResponse.team
+                fetchTiles(team).onErrorResumeNext {
+                    if (it is NoSuchElementException) {
+                        createDashboardTiles.executeUseCase(CreateDashboardTiles.RequestValues())
+                            .flatMap { fetchTiles(team) }
+                    } else {
+                        Single.error(it)
+                    }
+                }
+            }
+    }
+
+    private fun fetchTiles(team: Team): Single<ResponseValue> {
         return tilesRepo.getTiles().flatMap { tiles ->
 
             if (tiles.isEmpty()) {
@@ -38,17 +59,17 @@ internal class GetDashboardTiles(
             val tilesObservables: MutableList<Maybe<DashboardTile>> = mutableListOf()
             tiles.forEach { tile ->
                 when (tile.type) {
-                    TileType.TEAM_SIZE.type -> tilesObservables.add(getTeamSize(requestValues.team).map {
+                    TileType.TEAM_SIZE.type -> tilesObservables.add(getTeamSize(team).map {
                         tile.apply {
                             data = it
                         }
                     })
-                    TileType.MOST_USED_PLAYER.type -> tilesObservables.add(getMostUsedPlayer(requestValues.team).map {
+                    TileType.MOST_USED_PLAYER.type -> tilesObservables.add(getMostUsedPlayer(team).map {
                         tile.apply {
                             data = it
                         }
                     })
-                    TileType.LAST_LINEUP.type -> tilesObservables.add(getLastLineup(requestValues.team).map {
+                    TileType.LAST_LINEUP.type -> tilesObservables.add(getLastLineup(team).map {
                         tile.apply {
                             data = it
                         }
@@ -110,8 +131,6 @@ internal class GetDashboardTiles(
      * @property tiles
      */
     class ResponseValue(val tiles: List<DashboardTile>) : UseCase.ResponseValue
-    /**
-     * @property team
-     */
-    class RequestValues(val team: Team) : UseCase.RequestValues
+
+    class RequestValues : UseCase.RequestValues
 }

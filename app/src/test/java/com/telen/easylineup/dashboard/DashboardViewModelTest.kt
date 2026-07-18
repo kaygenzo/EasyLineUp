@@ -10,20 +10,25 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCaseHandler
-import com.telen.easylineup.domain.application.ApplicationInteractor
-import com.telen.easylineup.domain.application.DataInteractor
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.tiles.TileType
+import com.telen.easylineup.domain.repository.LineupRepository
+import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.repository.TilesRepository
+import com.telen.easylineup.domain.usecases.CreateDashboardTiles
+import com.telen.easylineup.domain.usecases.GetDashboardTiles
 import com.telen.easylineup.domain.usecases.GetPlayers
 import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.GetTeamEmails
 import com.telen.easylineup.domain.usecases.GetTeamPhones
 import com.telen.easylineup.domain.usecases.ObserveTeams
+import com.telen.easylineup.domain.usecases.SaveDashboardTiles
 import com.telen.easylineup.testUseCaseHandler
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import io.reactivex.rxjava3.core.Single
@@ -57,16 +62,19 @@ internal class DashboardViewModelTest {
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Mock
-    lateinit var applicationInteractor: ApplicationInteractor
-
-    @Mock
     lateinit var teamRepository: TeamRepository
 
     @Mock
     lateinit var playerRepository: PlayerRepository
 
     @Mock
-    lateinit var dataInteractor: DataInteractor
+    lateinit var lineupRepository: LineupRepository
+
+    @Mock
+    lateinit var playerFieldPositionRepository: PlayerFieldPositionRepository
+
+    @Mock
+    lateinit var tilesRepository: TilesRepository
 
     @Mock
     lateinit var context: Context
@@ -81,7 +89,6 @@ internal class DashboardViewModelTest {
         MockitoAnnotations.initMocks(this)
 
         // lenient: each test only exercises one of these sub-ports
-        Mockito.lenient().`when`(applicationInteractor.data()).thenReturn(dataInteractor)
         Mockito.lenient().`when`(teamRepository.getTeamsRx())
             .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
 
@@ -91,9 +98,19 @@ internal class DashboardViewModelTest {
         startKoin {
             modules(
                 module {
-                    single { applicationInteractor }
                     single<UseCaseHandler> { testUseCaseHandler() }
                     single { ObserveTeams(teamRepository) }
+                    single {
+                        GetDashboardTiles(
+                            playerRepository,
+                            lineupRepository,
+                            playerFieldPositionRepository,
+                            tilesRepository,
+                            getTeam,
+                            CreateDashboardTiles(tilesRepository)
+                        )
+                    }
+                    single { SaveDashboardTiles(tilesRepository) }
                     single { GetShirtNumberHistory(playerRepository, getTeam) }
                     single { GetTeamEmails(getPlayers) }
                     single { GetTeamPhones(getPlayers) }
@@ -113,18 +130,18 @@ internal class DashboardViewModelTest {
     @Test
     fun shouldRegisterTilesLiveDataAndSwitchToDashboardConfigurationsWhenTeamsChange() {
         val teamsLiveData = MutableLiveData<List<Team>>()
-        val tilesLiveData = MutableLiveData<List<DashboardTile>>()
         Mockito.`when`(teamRepository.getTeams()).thenReturn(teamsLiveData)
-        Mockito.`when`(dataInteractor.getDashboardConfigurations()).thenReturn(tilesLiveData)
+        val tile = DashboardTile(id = 1L, position = 0, type = TileType.TEAM_SIZE.type)
+        Mockito.`when`(tilesRepository.getTiles()).thenReturn(Single.just(listOf(tile)))
+        Mockito.`when`(playerRepository.getPlayersByTeamId(1L)).thenReturn(Single.just(emptyList()))
 
         val observedValues = mutableListOf<List<DashboardTile>>()
         viewModel.registerTilesLiveData().observeForever { observedValues.add(it) }
 
         teamsLiveData.value = emptyList()
-        val tiles = listOf(DashboardTile(id = 1L, position = 0, type = 1))
-        tilesLiveData.value = tiles
 
-        assertEquals(listOf(tiles), observedValues)
+        assertEquals(1, observedValues.size)
+        assertEquals(1, observedValues.first().size)
     }
 
     @Test
@@ -154,9 +171,9 @@ internal class DashboardViewModelTest {
     }
 
     @Test
-    fun shouldSaveTilesDelegateToDataInteractor() {
+    fun shouldSaveTilesDelegateToUseCase() {
         val tiles = listOf(DashboardTile(id = 1L, position = 0, type = 1))
-        Mockito.`when`(dataInteractor.updateDashboardConfiguration(tiles))
+        Mockito.`when`(tilesRepository.updateTiles(tiles))
             .thenReturn(io.reactivex.rxjava3.core.Completable.complete())
 
         val observer = TestObserver<Void>()
@@ -164,7 +181,7 @@ internal class DashboardViewModelTest {
         observer.await()
 
         observer.assertComplete()
-        Mockito.verify(dataInteractor).updateDashboardConfiguration(tiles)
+        Mockito.verify(tilesRepository).updateTiles(tiles)
     }
 
     @Test

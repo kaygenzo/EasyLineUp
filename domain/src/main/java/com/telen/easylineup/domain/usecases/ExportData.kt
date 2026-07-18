@@ -27,19 +27,18 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 
-internal interface ValidationCallback {
-    fun isNetworkUrl(url: String?): Boolean
-    fun isDigitsOnly(value: String): Boolean
-    fun isBlank(value: String): Boolean
-}
-
 /**
+ * Refreshes hashes for any record missing one, then builds the export payload. Writing that
+ * payload to a file is an Android/UI concern handled by the caller (`SettingsViewModel`), not
+ * by this UseCase.
+ *
  * @property teamDao
  * @property playerDao
  * @property tournamentDao
  * @property lineupDao
  */
-internal class ExportData(
+class ExportData(
+    private val checkHashData: CheckHashData,
     val teamDao: TeamRepository,
     val playerDao: PlayerRepository,
     val tournamentDao: TournamentRepository,
@@ -49,102 +48,109 @@ internal class ExportData(
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         val teams: MutableList<TeamExport> = mutableListOf()
         val root = ExportBase(teams)
-        return teamDao.getTeamsRx()
-            .flatMapObservable { Observable.fromIterable(it) }
-            .flatMapCompletable { team ->
-
-                val tournamentsExport: MutableList<TournamentExport> = mutableListOf()
-                val playersExport: MutableList<PlayerExport> = mutableListOf()
-                val teamExport = team.toTeamExport(playersExport, tournamentsExport)
-
-                if (!requestValues.validator.isNetworkUrl(teamExport.image)) {
-                    teamExport.image = null
-                }
-
-                teams.add(teamExport)
-
-                val playersUuidMap: MutableMap<Long, String?> = mutableMapOf()
-
-                playerDao.getPlayersByTeamId(team.id)
+        return checkHashData.executeUseCase(CheckHashData.RequestValues())
+            .ignoreElement()
+            .andThen(
+                teamDao.getTeamsRx()
                     .flatMapObservable { Observable.fromIterable(it) }
-                    .flatMapCompletable { player ->
+                    .flatMapCompletable { team ->
 
-                        val playerExport = player.toPlayerExport()
+                        val tournamentsExport: MutableList<TournamentExport> = mutableListOf()
+                        val playersExport: MutableList<PlayerExport> = mutableListOf()
+                        val teamExport = team.toTeamExport(playersExport, tournamentsExport)
 
-                        if (!requestValues.validator.isNetworkUrl(playerExport.image)) {
-                            playerExport.image = null
+                        if (!isNetworkUrl(teamExport.image)) {
+                            teamExport.image = null
                         }
 
-                        playersExport.add(playerExport)
+                        teams.add(teamExport)
 
-                        playersUuidMap[player.id] = player.hash
-                        Completable.complete()
-                    }
-                    .andThen(tournamentDao.getTournaments())
-                    .flatMapObservable { Observable.fromIterable(it) }
-                    .flatMapCompletable { tournament ->
+                        val playersUuidMap: MutableMap<Long, String?> = mutableMapOf()
 
-                        val lineupsExport: MutableList<LineupExport> = mutableListOf()
-                        val tournamentExport = tournament.toTournamentExport(lineupsExport)
+                        playerDao.getPlayersByTeamId(team.id)
+                            .flatMapObservable { Observable.fromIterable(it) }
+                            .flatMapCompletable { player ->
 
-                        lineupDao.getLineupsForTournamentRx(tournament.id, team.id)
-                            .flatMapObservable {
-                                if (it.isNotEmpty()) {
-                                    tournamentsExport.add(tournamentExport)
+                                val playerExport = player.toPlayerExport()
+
+                                if (!isNetworkUrl(playerExport.image)) {
+                                    playerExport.image = null
                                 }
-                                Observable.fromIterable(it)
+
+                                playersExport.add(playerExport)
+
+                                playersUuidMap[player.id] = player.hash
+                                Completable.complete()
                             }
-                            .flatMapCompletable { lineup ->
+                            .andThen(tournamentDao.getTournaments())
+                            .flatMapObservable { Observable.fromIterable(it) }
+                            .flatMapCompletable { tournament ->
 
-                                val positionsExport: MutableList<PlayerPositionExport> =
-                                    mutableListOf()
-                                val playerNumberOverlays: MutableList<PlayerNumberOverlayExport> =
-                                    mutableListOf()
-                                val roster = rosterToUuid(
-                                    playersUuidMap,
-                                    lineup.roster,
-                                    requestValues.validator
-                                )
-                                val lineupExport = lineup.toLineupExport(
-                                    positionsExport,
-                                    playerNumberOverlays,
-                                    roster
-                                )
-                                lineupsExport.add(lineupExport)
+                                val lineupsExport: MutableList<LineupExport> = mutableListOf()
+                                val tournamentExport = tournament.toTournamentExport(lineupsExport)
 
-                                playerFieldPositionsDao.getAllPlayerFieldPositionsForLineup(
-                                    lineup.id
-                                )
-                                    .flatMapObservable { Observable.fromIterable(it) }
-                                    .flatMapCompletable {
-                                        val positionExport = it.toPlayerFieldPositionsExport(
-                                            playersUuidMap[it.playerId]
-                                        )
-                                        positionsExport.add(positionExport)
-                                        Completable.complete()
+                                lineupDao.getLineupsForTournamentRx(tournament.id, team.id)
+                                    .flatMapObservable {
+                                        if (it.isNotEmpty()) {
+                                            tournamentsExport.add(tournamentExport)
+                                        }
+                                        Observable.fromIterable(it)
                                     }
-                                    .andThen(playerDao.getPlayersNumberOverlay(lineup.id))
-                                    .flatMapObservable { Observable.fromIterable(it) }
-                                    .flatMapCompletable {
-                                        val playerNumberExport = it.toPlayerNumberOverlayExport(
-                                            playersUuidMap[it.playerId]
+                                    .flatMapCompletable { lineup ->
+
+                                        val positionsExport: MutableList<PlayerPositionExport> =
+                                            mutableListOf()
+                                        val playerNumberOverlays:
+                                            MutableList<PlayerNumberOverlayExport> =
+                                            mutableListOf()
+                                        val roster = rosterToUuid(playersUuidMap, lineup.roster)
+                                        val lineupExport = lineup.toLineupExport(
+                                            positionsExport,
+                                            playerNumberOverlays,
+                                            roster
                                         )
-                                        playerNumberOverlays.add(playerNumberExport)
-                                        Completable.complete()
+                                        lineupsExport.add(lineupExport)
+
+                                        playerFieldPositionsDao.getAllPlayerFieldPositionsForLineup(
+                                            lineup.id
+                                        )
+                                            .flatMapObservable { Observable.fromIterable(it) }
+                                            .flatMapCompletable {
+                                                val positionExport =
+                                                    it.toPlayerFieldPositionsExport(
+                                                        playersUuidMap[it.playerId]
+                                                    )
+                                                positionsExport.add(positionExport)
+                                                Completable.complete()
+                                            }
+                                            .andThen(playerDao.getPlayersNumberOverlay(lineup.id))
+                                            .flatMapObservable { Observable.fromIterable(it) }
+                                            .flatMapCompletable {
+                                                val playerNumberExport =
+                                                    it.toPlayerNumberOverlayExport(
+                                                        playersUuidMap[it.playerId]
+                                                    )
+                                                playerNumberOverlays.add(playerNumberExport)
+                                                Completable.complete()
+                                            }
                                     }
                             }
                     }
-            }.andThen(Single.just(ResponseValue(root)))
+            )
+            .andThen(Single.just(ResponseValue(root)))
+    }
+
+    private fun isNetworkUrl(url: String?): Boolean {
+        return url != null && (url.startsWith("http://") || url.startsWith("https://"))
     }
 
     private fun rosterToUuid(
         players: Map<Long, String?>,
-        roaster: String?,
-        validator: ValidationCallback
+        roaster: String?
     ): List<String>? {
         return roaster?.run {
             this.split(";")
-                .filter { validator.isDigitsOnly(it) && !validator.isBlank(it) }
+                .filter { it.isNotBlank() && it.all { c -> c.isDigit() } }
                 .map {
                     it.toLong()
                 }
@@ -158,8 +164,5 @@ internal class ExportData(
      */
     class ResponseValue(val exportBase: ExportBase) : UseCase.ResponseValue
 
-    /**
-     * @property validator
-     */
-    class RequestValues(val validator: ValidationCallback) : UseCase.RequestValues
+    class RequestValues : UseCase.RequestValues
 }

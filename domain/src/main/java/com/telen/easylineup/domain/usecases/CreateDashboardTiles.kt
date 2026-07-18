@@ -13,7 +13,7 @@ import io.reactivex.rxjava3.core.Single
 /**
  * @property dao
  */
-internal class CreateDashboardTiles(val dao: TilesRepository) :
+class CreateDashboardTiles(val dao: TilesRepository) :
     UseCase<CreateDashboardTiles.RequestValues, CreateDashboardTiles.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         val tiles: MutableList<DashboardTile> = mutableListOf()

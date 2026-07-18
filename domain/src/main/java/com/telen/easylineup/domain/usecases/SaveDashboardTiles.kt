@@ -12,7 +12,7 @@ import io.reactivex.rxjava3.core.Single
 /**
  * @property dao
  */
-internal class SaveDashboardTiles(val dao: TilesRepository) :
+class SaveDashboardTiles(val dao: TilesRepository) :
     UseCase<SaveDashboardTiles.RequestValues, SaveDashboardTiles.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.just(requestValues.tiles)

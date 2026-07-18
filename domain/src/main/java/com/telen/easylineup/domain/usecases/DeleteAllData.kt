@@ -9,7 +9,7 @@ import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.repository.TournamentRepository
 import io.reactivex.rxjava3.core.Single
 
-internal class DeleteAllData(
+class DeleteAllData(
     private val teamDao: TeamRepository,
     private val tournamentDao: TournamentRepository
 ) : UseCase<DeleteAllData.RequestValues, DeleteAllData.ResponseValue>() {

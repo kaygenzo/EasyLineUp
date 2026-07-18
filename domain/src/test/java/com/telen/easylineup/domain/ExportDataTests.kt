@@ -24,8 +24,8 @@ import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.repository.TournamentRepository
+import com.telen.easylineup.domain.usecases.CheckHashData
 import com.telen.easylineup.domain.usecases.ExportData
-import com.telen.easylineup.domain.usecases.ValidationCallback
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
@@ -46,7 +46,6 @@ internal class ExportDataTests {
     @Mock lateinit var tournamentDao: TournamentRepository
     @Mock lateinit var lineupDao: LineupRepository
     @Mock lateinit var playerPositionsDao: PlayerFieldPositionRepository
-    @Mock lateinit var validator: ValidationCallback
     private lateinit var export: ExportData
 
     // team 1
@@ -67,7 +66,8 @@ internal class ExportDataTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        export = ExportData(teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao)
+        val checkHashData = CheckHashData(teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao)
+        export = ExportData(checkHashData, teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao)
 
         // team 1
         team1 = Team(1L, "A", null, 0, true, "I")
@@ -111,13 +111,23 @@ internal class ExportDataTests {
         Mockito.`when`(playerDao.getPlayersNumberOverlay(2L))
             .thenReturn(Single.just(listOf()))
 
-        Mockito.`when`(validator.isDigitsOnly(any())).thenReturn(true)
-        Mockito.`when`(validator.isBlank(any())).thenReturn(false)
+        // CheckHashData runs first - every fixture already has a non-blank hash, so it finds
+        // nothing to update; these repository calls just need a value to not NPE.
+        Mockito.`when`(playerDao.getPlayers()).thenReturn(Single.just(listOf(player1, player2)))
+        Mockito.`when`(playerDao.updatePlayersWithRowCount(any())).thenReturn(Single.just(0))
+        Mockito.`when`(teamDao.updateTeamsWithRowCount(any())).thenReturn(Single.just(0))
+        Mockito.`when`(tournamentDao.updateTournamentsWithRowCount(any())).thenReturn(Single.just(0))
+        Mockito.`when`(lineupDao.getLineups()).thenReturn(Single.just(listOf(lineup1, lineup2)))
+        Mockito.`when`(lineupDao.updateLineupsWithRowCount(any())).thenReturn(Single.just(0))
+        Mockito.`when`(playerPositionsDao.getPlayerFieldPositions())
+            .thenReturn(Single.just(listOf(playerPosition1, playerPosition2)))
+        Mockito.`when`(playerPositionsDao.updatePlayerFieldPositionsWithRowCount(any()))
+            .thenReturn(Single.just(0))
     }
 
     @Test
     fun shouldExportAllData() {
-        export.executeUseCase(ExportData.RequestValues(validator))
+        export.executeUseCase(ExportData.RequestValues())
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -165,7 +175,7 @@ internal class ExportDataTests {
         Mockito.`when`(lineupDao.getLineupsForTournamentRx(1L, 1L)).thenReturn(Single.just(listOf(lineup1)))
         Mockito.`when`(lineupDao.getLineupsForTournamentRx(2L, 2L)).thenReturn(Single.just(listOf()))
 
-        export.executeUseCase(ExportData.RequestValues(validator))
+        export.executeUseCase(ExportData.RequestValues())
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -204,12 +214,8 @@ internal class ExportDataTests {
         player1.image = "http://test.com"
         player2.image = "https://test.com"
 
-        Mockito.`when`(validator.isNetworkUrl(team1.image)).thenReturn(false)
-        Mockito.`when`(validator.isNetworkUrl(team2.image)).thenReturn(false)
-        Mockito.`when`(validator.isNetworkUrl(player1.image)).thenReturn(true)
-        Mockito.`when`(validator.isNetworkUrl(player2.image)).thenReturn(true)
 
-        export.executeUseCase(ExportData.RequestValues(validator))
+        export.executeUseCase(ExportData.RequestValues())
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -233,7 +239,7 @@ internal class ExportDataTests {
         Mockito.`when`(playerPositionsDao.getAllPlayerFieldPositionsForLineup(1L))
             .thenReturn(Single.just(listOf(playerPosition1, playerPosition3, playerPosition4)))
 
-        export.executeUseCase(ExportData.RequestValues(validator))
+        export.executeUseCase(ExportData.RequestValues())
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
