@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.repository.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -46,9 +45,6 @@ internal interface PlayerFieldPositionsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPlayerFieldPosition(fieldPositions: RoomPlayerFieldPosition): Single<Long>
 
-    @Query("SELECT * from playerFieldPosition")
-    fun getAllPlayerFieldPositions(): LiveData<List<RoomPlayerFieldPosition>>
-
     @Query("SELECT * from playerFieldPosition where hash = :hash")
     fun getPlayerFieldPositionByHash(hash: String): Single<RoomPlayerFieldPosition>
 
@@ -65,28 +61,6 @@ internal interface PlayerFieldPositionsDao {
     """
     )
     fun getAllPlayerFieldPositionsForLineup(lineupId: Long): Single<List<RoomPlayerFieldPosition>>
-
-    @Query(
-        """
-        SELECT players.name as playerName,
-        players.sex as playerSex,
-        players.shirtNumber, players.licenseNumber,
-        playerFieldPosition.position,
-        playerFieldPosition.x, playerFieldPosition.y,
-        playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID,
-        playerFieldPosition.lineupID,
-        playerFieldPosition.flags,
-        players.id as playerID,
-        players.teamID, players.image,
-        players.positions as playerPositions
-        FROM playerFieldPosition
-        INNER JOIN players ON playerFieldPosition.playerID = players.id
-        INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
-        WHERE playerFieldPosition.lineupID = :lineupId
-        ORDER BY playerFieldPosition.`order` ASC
-    """
-    )
-    fun getAllPlayersWithPositionsForLineup(lineupId: Long): LiveData<List<RoomPlayerWithPosition>>
 
     @Query(
         """

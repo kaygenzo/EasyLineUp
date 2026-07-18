@@ -29,6 +29,7 @@ import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import com.telen.easylineup.utils.SharedPreferencesHelper
+import com.telen.easylineup.utils.toLiveData
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
@@ -84,7 +85,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun getTournaments(): LiveData<List<Tournament>> {
-        return observeTournamentsUseCase()
+        return observeTournamentsUseCase().toLiveData()
     }
 
     fun observeCategorizedLineups(): LiveData<List<TournamentItem>> {

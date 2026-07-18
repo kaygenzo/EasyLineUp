@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.repository.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -14,6 +13,7 @@ import com.telen.easylineup.repository.model.RoomLineup
 import com.telen.easylineup.repository.model.RoomPlayerInLineup
 import com.telen.easylineup.repository.model.RoomTournamentWithLineup
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 
@@ -40,30 +40,17 @@ internal interface LineupDao {
     @Delete
     fun deleteLineups(lineups: List<RoomLineup>): Completable
 
-    @Query("SELECT * FROM lineups ORDER BY id ASC")
-    fun getAllLineup(): LiveData<List<RoomLineup>>
-
     @Query("SELECT * FROM lineups")
     fun getLineups(): Single<List<RoomLineup>>
 
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
-    fun getLineupById(lineupId: Long): LiveData<RoomLineup?>
+    fun getLineupById(lineupId: Long): Flowable<List<RoomLineup>>
 
     @Query("SELECT * FROM lineups WHERE hash = :hash")
     fun getLineupByHash(hash: String): Single<RoomLineup>
 
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
     fun getLineupByIdSingle(lineupId: Long): Single<RoomLineup>
-
-    @Query(
-        """
-        SELECT lineups.* FROM lineups
-        INNER JOIN tournaments ON lineups.tournamentID = tournaments.id
-        INNER JOIN teams ON lineups.teamID = teams.id
-        WHERE lineups.tournamentID = :tournamentId AND lineups.teamID = :teamId
-    """
-    )
-    fun getLineupsForTournament(tournamentId: Long, teamId: Long): LiveData<List<RoomLineup>>
 
     @Query(
         """

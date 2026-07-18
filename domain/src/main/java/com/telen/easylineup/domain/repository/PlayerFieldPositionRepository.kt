@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.repository
 
-import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerGamesCount
 import com.telen.easylineup.domain.model.PlayerWithPosition
@@ -22,12 +21,10 @@ interface PlayerFieldPositionRepository {
     fun deletePositions(position: List<PlayerFieldPosition>): Completable
     fun updatePlayerFieldPosition(fieldPosition: PlayerFieldPosition): Completable
     fun insertPlayerFieldPosition(fieldPosition: PlayerFieldPosition): Single<Long>
-    fun getAllPlayerFieldPositions(): LiveData<List<PlayerFieldPosition>>
     fun getPlayerFieldPositionByHash(hash: String): Single<PlayerFieldPosition>
     fun getPlayerFieldPositions(): Single<List<PlayerFieldPosition>>
     fun getPlayerFieldPosition(positionId: Long): Single<PlayerFieldPosition>
     fun getAllPlayerFieldPositionsForLineup(lineupId: Long): Single<List<PlayerFieldPosition>>
-    fun getAllPlayersWithPositionsForLineup(lineupId: Long): LiveData<List<PlayerWithPosition>>
     fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): Single<List<PlayerWithPosition>>
     fun getPlayerPositionFor(lineupId: Long, playerId: Long): Maybe<PlayerFieldPosition>
     fun getAllPositionsForPlayer(playerId: Long): Single<List<PositionWithLineup>>

@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.repository.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -13,6 +12,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.telen.easylineup.repository.model.RoomTournament
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 
 @Dao
@@ -24,7 +24,7 @@ internal interface TournamentDao {
     fun getTournaments(): Single<List<RoomTournament>>
 
     @Query("SELECT * from tournaments ORDER BY createdAt DESC")
-    fun observeTournaments(): LiveData<List<RoomTournament>>
+    fun observeTournaments(): Flowable<List<RoomTournament>>
 
     @Query("SELECT * from tournaments where hash = :hash")
     fun getTournamentByHash(hash: String): Single<RoomTournament>

@@ -4,8 +4,6 @@
 
 package com.telen.easylineup.repository.adapters.impl
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerGamesCount
 import com.telen.easylineup.domain.model.PlayerWithPosition
@@ -81,12 +79,6 @@ internal class PlayerFieldPositionRepositoryImpl(private val playerFieldPosition
         )
     }
 
-    override fun getAllPlayerFieldPositions(): LiveData<List<PlayerFieldPosition>> {
-        return playerFieldPositionsDao.getAllPlayerFieldPositions().map {
-            it.map { it.toPlayerFieldPosition() }
-        }
-    }
-
     override fun getPlayerFieldPositionByHash(hash: String): Single<PlayerFieldPosition> {
         return playerFieldPositionsDao.getPlayerFieldPositionByHash(hash)
             .map { it.toPlayerFieldPosition() }
@@ -105,12 +97,6 @@ internal class PlayerFieldPositionRepositoryImpl(private val playerFieldPosition
     override fun getAllPlayerFieldPositionsForLineup(lineupId: Long): Single<List<PlayerFieldPosition>> {
         return playerFieldPositionsDao.getAllPlayerFieldPositionsForLineup(lineupId)
             .map { it.map { it.toPlayerFieldPosition() } }
-    }
-
-    override fun getAllPlayersWithPositionsForLineup(lineupId: Long): LiveData<List<PlayerWithPosition>> {
-        return playerFieldPositionsDao.getAllPlayersWithPositionsForLineup(lineupId).map {
-            it.map { it.toPlayerWithPosition() }
-        }
     }
 
     override fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): Single<List<PlayerWithPosition>> {

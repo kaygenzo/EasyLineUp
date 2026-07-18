@@ -4,12 +4,12 @@
 
 package com.telen.easylineup.domain.repository
 
-import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 
 interface PlayerRepository {
@@ -19,14 +19,14 @@ interface PlayerRepository {
     fun updatePlayer(player: Player): Completable
     fun updatePlayersWithRowCount(players: List<Player>): Single<Int>
     fun getPlayerByHash(hash: String): Single<Player>
-    fun getPlayerById(playerId: Long): LiveData<Player>
+    fun getPlayerById(playerId: Long): Flowable<Player>
     fun getPlayerByIdAsSingle(playerId: Long): Single<Player>
     fun getPlayersByTeamId(teamId: Long): Single<List<Player>>
     fun getPlayers(): Single<List<Player>>
-    fun observePlayers(teamId: Long): LiveData<List<Player>>
-    fun getTeamPlayersAndMaybePositions(lineupId: Long): LiveData<List<PlayerWithPosition>>
+    fun observePlayers(teamId: Long): Flowable<List<Player>>
+    fun getTeamPlayersAndMaybePositions(lineupId: Long): Flowable<List<PlayerWithPosition>>
 
-    fun observePlayersNumberOverlay(lineupId: Long): LiveData<List<PlayerNumberOverlay>>
+    fun observePlayersNumberOverlay(lineupId: Long): Flowable<List<PlayerNumberOverlay>>
     fun getPlayersNumberOverlay(lineupId: Long): Single<List<PlayerNumberOverlay>>
     fun deletePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
     fun updatePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable

@@ -22,6 +22,7 @@ import com.telen.easylineup.domain.usecases.SavePlayer
 import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
+import com.telen.easylineup.utils.toLiveData
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -47,7 +48,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
     private val _player by lazy {
         playerId.takeIf { it > 0 }
-            ?.let { observePlayer(it) }
+            ?.let { observePlayer(it).toLiveData() }
             ?: MutableLiveData()
     }
     var playerId: Long = 0

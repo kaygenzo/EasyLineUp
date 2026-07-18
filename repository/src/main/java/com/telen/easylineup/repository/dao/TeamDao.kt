@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.repository.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -13,6 +12,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.telen.easylineup.repository.model.RoomTeam
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 
 @Dao
@@ -45,7 +45,7 @@ internal interface TeamDao {
     fun getTeamByHash(hash: String): Single<RoomTeam>
 
     @Query("SELECT * FROM teams")
-    fun getTeams(): LiveData<List<RoomTeam>>
+    fun getTeams(): Flowable<List<RoomTeam>>
 
     @Query("SELECT * FROM teams")
     fun getTeamsRx(): Single<List<RoomTeam>>

@@ -4,9 +4,9 @@
 
 package com.telen.easylineup.domain.repository
 
-import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.Team
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 
 interface TeamRepository {
@@ -18,6 +18,6 @@ interface TeamRepository {
     fun updateTeamsWithRowCount(teams: List<Team>): Single<Int>
     fun getTeamById(teamId: Long): Single<Team>
     fun getTeamByHash(hash: String): Single<Team>
-    fun getTeams(): LiveData<List<Team>>
+    fun getTeams(): Flowable<List<Team>>
     fun getTeamsRx(): Single<List<Team>>
 }

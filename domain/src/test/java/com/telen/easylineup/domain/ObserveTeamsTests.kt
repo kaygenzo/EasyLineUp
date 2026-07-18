@@ -4,10 +4,10 @@
 
 package com.telen.easylineup.domain
 
-import androidx.lifecycle.MutableLiveData
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.ObserveTeams
+import io.reactivex.rxjava3.core.Flowable
 import org.junit.Assert.assertSame
 import org.junit.Before
 import org.junit.Test
@@ -30,9 +30,9 @@ internal class ObserveTeamsTests {
 
     @Test
     fun shouldDelegateToRepository() {
-        val liveData = MutableLiveData<List<Team>>()
-        Mockito.`when`(teamDao.getTeams()).thenReturn(liveData)
+        val flowable = Flowable.just(listOf<Team>())
+        Mockito.`when`(teamDao.getTeams()).thenReturn(flowable)
 
-        assertSame(liveData, observeTeams())
+        assertSame(flowable, observeTeams())
     }
 }

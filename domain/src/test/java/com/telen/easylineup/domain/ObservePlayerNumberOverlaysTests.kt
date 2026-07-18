@@ -4,10 +4,10 @@
 
 package com.telen.easylineup.domain
 
-import androidx.lifecycle.MutableLiveData
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
+import io.reactivex.rxjava3.core.Flowable
 import org.junit.Assert.assertSame
 import org.junit.Before
 import org.junit.Test
@@ -30,9 +30,9 @@ internal class ObservePlayerNumberOverlaysTests {
 
     @Test
     fun shouldDelegateToRepository() {
-        val liveData = MutableLiveData<List<PlayerNumberOverlay>>()
-        Mockito.`when`(playerDao.observePlayersNumberOverlay(10L)).thenReturn(liveData)
+        val flowable = Flowable.just(listOf<PlayerNumberOverlay>())
+        Mockito.`when`(playerDao.observePlayersNumberOverlay(10L)).thenReturn(flowable)
 
-        assertSame(liveData, observePlayerNumberOverlays(10L))
+        assertSame(flowable, observePlayerNumberOverlays(10L))
     }
 }

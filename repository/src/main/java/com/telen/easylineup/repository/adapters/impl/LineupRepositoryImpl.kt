@@ -4,8 +4,6 @@
 
 package com.telen.easylineup.repository.adapters.impl
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.PlayerInLineup
 import com.telen.easylineup.domain.model.TournamentWithLineup
@@ -17,6 +15,7 @@ import com.telen.easylineup.repository.model.toLineup
 import com.telen.easylineup.repository.model.toPlayerInLineup
 import com.telen.easylineup.repository.model.toTournamentWithLineup
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
@@ -50,19 +49,13 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
         return lineupDao.deleteLineups(lineups.map { RoomLineup().init(it) })
     }
 
-    override fun getAllLineup(): LiveData<List<Lineup>> {
-        return lineupDao.getAllLineup().map {
-            it.map { it.toLineup() }
-        }
-    }
-
     override fun getLineups(): Single<List<Lineup>> {
         return lineupDao.getLineups().map { it.map { it.toLineup() } }
     }
 
-    override fun getLineupById(lineupId: Long): LiveData<Lineup> {
+    override fun getLineupById(lineupId: Long): Flowable<Lineup> {
         return lineupDao.getLineupById(lineupId).map {
-            it?.toLineup() ?: Lineup()
+            it.firstOrNull()?.toLineup() ?: Lineup()
         }
     }
 
@@ -72,12 +65,6 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
 
     override fun getLineupByIdSingle(lineupId: Long): Single<Lineup> {
         return lineupDao.getLineupByIdSingle(lineupId).map { it.toLineup() }
-    }
-
-    override fun getLineupsForTournament(tournamentId: Long, teamId: Long): LiveData<List<Lineup>> {
-        return lineupDao.getLineupsForTournament(tournamentId, teamId).map {
-            it.map { it.toLineup() }
-        }
     }
 
     override fun getLineupsForTournamentRx(tournamentId: Long, teamId: Long): Single<List<Lineup>> {

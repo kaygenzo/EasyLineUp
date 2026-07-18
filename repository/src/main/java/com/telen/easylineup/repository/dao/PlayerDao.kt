@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.repository.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -15,6 +14,7 @@ import com.telen.easylineup.repository.model.RoomPlayer
 import com.telen.easylineup.repository.model.RoomPlayerWithPosition
 import com.telen.easylineup.repository.model.RoomShirtNumberEntry
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 
 @Dao
@@ -41,7 +41,7 @@ internal interface PlayerDao {
     fun getPlayerByHash(hash: String): Single<RoomPlayer>
 
     @Query("SELECT * from players WHERE id = :playerId")
-    fun getPlayerById(playerId: Long): LiveData<RoomPlayer?>
+    fun getPlayerById(playerId: Long): Flowable<List<RoomPlayer>>
 
     @Query("SELECT * from players WHERE id = :playerId")
     fun getPlayerByIdAsSingle(playerId: Long): Single<RoomPlayer>
@@ -56,7 +56,7 @@ internal interface PlayerDao {
     fun getPlayers(): Single<List<RoomPlayer>>
 
     @Query("SELECT * FROM players WHERE players.teamID = :teamId")
-    fun getPlayersAsLiveData(teamId: Long): LiveData<List<RoomPlayer>>
+    fun getPlayersAsFlowable(teamId: Long): Flowable<List<RoomPlayer>>
 
     @Query(
         """
@@ -79,7 +79,7 @@ internal interface PlayerDao {
         ORDER BY result.playerID
     """
     )
-    fun getTeamPlayersAndMaybePositions(lineupId: Long): LiveData<List<RoomPlayerWithPosition>>
+    fun getTeamPlayersAndMaybePositions(lineupId: Long): Flowable<List<RoomPlayerWithPosition>>
 
     @Query(
         """

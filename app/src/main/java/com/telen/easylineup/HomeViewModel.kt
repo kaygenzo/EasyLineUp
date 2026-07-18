@@ -13,6 +13,7 @@ import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
 import com.telen.easylineup.utils.SharedPreferencesHelper
+import com.telen.easylineup.utils.toLiveData
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -50,7 +51,7 @@ class HomeViewModel : ViewModel(), KoinComponent {
     val disposables = CompositeDisposable()
 
     fun registerTeamUpdates(): LiveData<List<Team>> {
-        return observeTeams()
+        return observeTeams().toLiveData()
     }
 
     fun clear() {

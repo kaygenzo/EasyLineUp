@@ -18,6 +18,7 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.DeleteTeam
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObservePlayers
+import com.telen.easylineup.utils.toLiveData
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -32,7 +33,7 @@ class TeamViewModel : ViewModel(), KoinComponent {
     }
     private val _playersFromDao by lazy {
         _team.switchMap {
-            observePlayers(it.id)
+            observePlayers(it.id).toLiveData()
         }
     }
     private val _playersMediator: MediatorLiveData<List<Player>> = MediatorLiveData()

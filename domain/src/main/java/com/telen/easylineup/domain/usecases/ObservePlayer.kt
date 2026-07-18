@@ -4,10 +4,10 @@
 
 package com.telen.easylineup.domain.usecases
 
-import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
+import io.reactivex.rxjava3.core.Flowable
 
 class ObservePlayer(private val dao: PlayerRepository) {
-    operator fun invoke(playerId: Long): LiveData<Player> = dao.getPlayerById(playerId)
+    operator fun invoke(playerId: Long): Flowable<Player> = dao.getPlayerById(playerId)
 }

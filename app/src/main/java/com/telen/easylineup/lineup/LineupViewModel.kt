@@ -47,6 +47,7 @@ import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.SharedPreferencesHelper
+import com.telen.easylineup.utils.toLiveData
 import com.telen.easylineup.views.LineupTypeface
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
@@ -396,7 +397,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private fun getLineupAndPositions(): LiveData<List<PlayerWithPosition>> {
         return getLineup()
             .switchMap {
-                observeTeamPlayersAndMaybePositionsForLineupUseCase(it.id)
+                observeTeamPlayersAndMaybePositionsForLineupUseCase(it.id).toLiveData()
             }
             .switchMap { positions ->
                 _listPlayersWithPosition.clear()
@@ -405,7 +406,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
                     *positions.map { Pair(it.playerId, it) }.toTypedArray()
                 )
                 val currentLineupId = lineupId ?: 0
-                observePlayerNumberOverlays(currentLineupId)
+                observePlayerNumberOverlays(currentLineupId).toLiveData()
                     .map {
                         it.forEach { overlay ->
                             playerMap[overlay.playerId]?.shirtNumber = overlay.number
@@ -416,7 +417,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getLineup(): LiveData<Lineup> {
-        return observeLineupByIdUseCase(lineupId ?: 0).map {
+        return observeLineupByIdUseCase(lineupId ?: 0).toLiveData().map {
             it.apply {
                 this@LineupViewModel.lineup = this
             }

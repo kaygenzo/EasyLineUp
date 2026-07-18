@@ -4,10 +4,10 @@
 
 package com.telen.easylineup.domain.usecases
 
-import androidx.lifecycle.LiveData
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.TournamentRepository
+import io.reactivex.rxjava3.core.Flowable
 
 class ObserveTournaments(private val dao: TournamentRepository) {
-    operator fun invoke(): LiveData<List<Tournament>> = dao.observeTournaments()
+    operator fun invoke(): Flowable<List<Tournament>> = dao.observeTournaments()
 }

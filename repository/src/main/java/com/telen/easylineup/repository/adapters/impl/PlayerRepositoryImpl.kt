@@ -4,8 +4,6 @@
 
 package com.telen.easylineup.repository.adapters.impl
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
@@ -21,6 +19,7 @@ import com.telen.easylineup.repository.model.toPlayerNumberOverlay
 import com.telen.easylineup.repository.model.toPlayerWithPosition
 import com.telen.easylineup.repository.model.toShirtNumberEntry
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
 
@@ -56,10 +55,10 @@ internal class PlayerRepositoryImpl(
         return playerDao.getPlayerByHash(hash).map { it.toPlayer() }
     }
 
-    override fun getPlayerById(playerId: Long): LiveData<Player> {
+    override fun getPlayerById(playerId: Long): Flowable<Player> {
         return playerDao.getPlayerById(playerId).map {
             // sometime the refresh it too quick and when the player is deleted, the player is null
-            it?.toPlayer() ?: Player(teamId = 0, name = "", shirtNumber = 0, licenseNumber = 0)
+            it.firstOrNull()?.toPlayer() ?: Player(teamId = 0, name = "", shirtNumber = 0, licenseNumber = 0)
         }
     }
 
@@ -75,14 +74,14 @@ internal class PlayerRepositoryImpl(
         return playerDao.getPlayers().map { it.map { it.toPlayer() } }
     }
 
-    override fun observePlayers(teamId: Long): LiveData<List<Player>> {
-        return playerDao.getPlayersAsLiveData(teamId).map {
+    override fun observePlayers(teamId: Long): Flowable<List<Player>> {
+        return playerDao.getPlayersAsFlowable(teamId).map {
             it.map { it.toPlayer() }
         }
     }
 
     override fun getTeamPlayersAndMaybePositions(lineupId: Long):
-    LiveData<List<PlayerWithPosition>> {
+    Flowable<List<PlayerWithPosition>> {
         return playerDao.getTeamPlayersAndMaybePositions(lineupId).map {
             it.map { it.toPlayerWithPosition() }
         }
@@ -112,7 +111,7 @@ internal class PlayerRepositoryImpl(
             .map { it.toPlayerNumberOverlay() }
     }
 
-    override fun observePlayersNumberOverlay(lineupId: Long): LiveData<List<PlayerNumberOverlay>> {
+    override fun observePlayersNumberOverlay(lineupId: Long): Flowable<List<PlayerNumberOverlay>> {
         return numberOverlayDao.observePlayerNumberOverlays(lineupId).map {
             it.map { it.toPlayerNumberOverlay() }
         }

@@ -4,8 +4,6 @@
 
 package com.telen.easylineup.repository.adapters.impl
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.repository.dao.TeamDao
@@ -13,6 +11,7 @@ import com.telen.easylineup.repository.model.RoomTeam
 import com.telen.easylineup.repository.model.init
 import com.telen.easylineup.repository.model.toTeam
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
 
@@ -53,7 +52,7 @@ internal class TeamRepositoryImpl(private val teamDao: TeamDao) : TeamRepository
         return teamDao.getTeamByHash(hash).map { it.toTeam() }
     }
 
-    override fun getTeams(): LiveData<List<Team>> {
+    override fun getTeams(): Flowable<List<Team>> {
         return teamDao.getTeams().map {
             it.map { it.toTeam() }
         }

@@ -4,8 +4,6 @@
 
 package com.telen.easylineup.repository.adapters.impl
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.repository.dao.TournamentDao
@@ -13,6 +11,7 @@ import com.telen.easylineup.repository.model.RoomTournament
 import com.telen.easylineup.repository.model.init
 import com.telen.easylineup.repository.model.toTournament
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
 
@@ -25,7 +24,7 @@ internal class TournamentRepositoryImpl(private val tournamentDao: TournamentDao
         return tournamentDao.getTournaments().map { it.map { it.toTournament() } }
     }
 
-    override fun observeTournaments(): LiveData<List<Tournament>> {
+    override fun observeTournaments(): Flowable<List<Tournament>> {
         return tournamentDao.observeTournaments().map { it.map { it.toTournament() } }
     }
 

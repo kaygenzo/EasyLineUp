@@ -18,6 +18,7 @@ import com.telen.easylineup.domain.usecases.GetTeamPhones
 import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.domain.usecases.SaveDashboardTiles
 import com.telen.easylineup.utils.SharedPreferencesHelper
+import com.telen.easylineup.utils.toLiveData
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.koin.core.component.KoinComponent
@@ -35,7 +36,7 @@ class DashboardViewModel : ViewModel(), KoinComponent {
     private val disposables = CompositeDisposable()
     var actionMode: ActionMode? = null
 
-    fun registerTilesLiveData() = observeTeams().switchMap {
+    fun registerTilesLiveData() = observeTeams().toLiveData().switchMap {
         getDashboardTilesLiveData()
     }
 

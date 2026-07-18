@@ -7,7 +7,6 @@ package com.telen.easylineup.dashboard
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.MutableLiveData
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.Player
@@ -32,6 +31,7 @@ import com.telen.easylineup.testSchedulersProvider
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
+import io.reactivex.rxjava3.processors.PublishProcessor
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -129,8 +129,8 @@ internal class DashboardViewModelTest {
 
     @Test
     fun shouldRegisterTilesLiveDataAndSwitchToDashboardConfigurationsWhenTeamsChange() {
-        val teamsLiveData = MutableLiveData<List<Team>>()
-        Mockito.`when`(teamRepository.getTeams()).thenReturn(teamsLiveData)
+        val teamsProcessor = PublishProcessor.create<List<Team>>()
+        Mockito.`when`(teamRepository.getTeams()).thenReturn(teamsProcessor)
         val tile = DashboardTile(id = 1L, position = 0, type = TileType.TEAM_SIZE.type)
         Mockito.`when`(tilesRepository.getTiles()).thenReturn(Single.just(listOf(tile)))
         Mockito.`when`(playerRepository.getPlayersByTeamId(1L)).thenReturn(Single.just(emptyList()))
@@ -138,7 +138,7 @@ internal class DashboardViewModelTest {
         val observedValues = mutableListOf<List<DashboardTile>>()
         viewModel.registerTilesLiveData().observeForever { observedValues.add(it) }
 
-        teamsLiveData.value = emptyList()
+        teamsProcessor.onNext(emptyList())
 
         assertEquals(1, observedValues.size)
         assertEquals(1, observedValues.first().size)
