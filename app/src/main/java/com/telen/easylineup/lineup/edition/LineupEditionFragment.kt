@@ -117,6 +117,7 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModel.clear()
         binding = null
     }
 

@@ -19,10 +19,10 @@ import com.telen.easylineup.domain.usecases.SaveDashboardTiles
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import com.telen.easylineup.utils.asSafeFlow
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -36,28 +36,20 @@ class DashboardViewModel : ViewModel(), KoinComponent {
     private val getTeamEmailsUseCase: GetTeamEmails by inject()
     private val getTeamPhonesUseCase: GetTeamPhones by inject()
     private val prefsHelper: SharedPreferencesHelper by inject()
-    private val disposables = CompositeDisposable()
     var actionMode: ActionMode? = null
 
     fun registerTilesFlow(): Flow<List<DashboardTile>> = observeTeams().asSafeFlow().flatMapLatest {
         getDashboardTilesFlow()
     }
 
-    private fun getDashboardTilesFlow(): Flow<List<DashboardTile>> {
-        val resultFlow: MutableSharedFlow<List<DashboardTile>> =
-            MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
+    private fun getDashboardTilesFlow(): Flow<List<DashboardTile>> = callbackFlow {
         val disposable = getDashboardTilesUseCase()
             .subscribe({
-                resultFlow.tryEmit(it)
+                trySend(it)
             }, {
                 Timber.e(it)
             })
-        disposables.add(disposable)
-        return resultFlow
-    }
-
-    fun clear() {
-        disposables.clear()
+        awaitClose { disposable.dispose() }
     }
 
     fun showNewReportIssueButtonFeature(): Single<Boolean> {

@@ -52,9 +52,11 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -129,9 +131,6 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val _players: Flow<List<PlayerWithPosition>> by lazy {
         merge(getLineupAndPositions(), _directPlayersPush)
     }
-    private val _batters: MutableSharedFlow<List<BatterState>> =
-        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
-
     // lineup
     var lineup: Lineup? = null
         private set
@@ -379,25 +378,26 @@ class LineupViewModel : ViewModel(), KoinComponent {
             _lineup.flatMapLatest { lineup ->
                 val batterSize = TeamStrategy.getStrategyById(lineup.strategy).batterSize
                 val extraHitters = lineup.extraHitters
-                val disposable = getTeamUseCase()
-                    .map { it.type }
-                    .flatMap {
-                        getBattersStateUseCase(
-                            context = context,
-                            players = players,
-                            teamType = it,
-                            batterSize = batterSize,
-                            extraHitterSize = extraHitters,
-                            isDebug = BuildConfig.DEBUG,
-                            isEditable = editable
-                        )
-                    }.subscribe({
-                    _batters.tryEmit(it)
-                }, {
-                    Timber.e(it)
-                })
-                this.disposables.add(disposable)
-                _batters
+                callbackFlow {
+                    val disposable = getTeamUseCase()
+                        .map { it.type }
+                        .flatMap {
+                            getBattersStateUseCase(
+                                context = context,
+                                players = players,
+                                teamType = it,
+                                batterSize = batterSize,
+                                extraHitterSize = extraHitters,
+                                isDebug = BuildConfig.DEBUG,
+                                isEditable = editable
+                            )
+                        }.subscribe({
+                        trySend(it)
+                    }, {
+                        Timber.e(it)
+                    })
+                    awaitClose { disposable.dispose() }
+                }
             }
         }
     }

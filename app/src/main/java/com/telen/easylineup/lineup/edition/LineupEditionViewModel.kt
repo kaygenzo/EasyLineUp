@@ -22,6 +22,7 @@ import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -47,9 +48,10 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
     private val _lineupFlow: MutableSharedFlow<Lineup> =
         MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
     private var lineup: Lineup? = null
+    private val disposables = CompositeDisposable()
 
     private fun loadData() {
-        getLineupByIdUseCase(lineupId)
+        val disposable = getLineupByIdUseCase(lineupId)
             .flatMap {
                 this.lineup = it
                 _lineupFlow.tryEmit(it)
@@ -67,6 +69,11 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
                     }
                 }
             }, { Timber.e(it) })
+        disposables.add(disposable)
+    }
+
+    fun clear() {
+        disposables.clear()
     }
 
     fun observeLineup(): Flow<Lineup> {

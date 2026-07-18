@@ -27,6 +27,7 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -53,7 +54,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     private val _player: Flow<Player> by lazy {
         playerId.takeIf { it > 0 }
             ?.let { observePlayer(it).asSafeFlow() }
-            ?: MutableSharedFlow()
+            ?: flowOf(Player(teamId = 0, name = "", shirtNumber = 0, licenseNumber = 0))
     }
     var playerId: Long = 0
     var teamType: Int = 0

@@ -40,9 +40,11 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flatMapLatest
 
 sealed class SaveResult
@@ -63,8 +65,6 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val createLineupUseCase: CreateLineup by inject()
     private val prefsHelper by inject<SharedPreferencesHelper>()
     private val errors: Subject<DomainErrors.Lineups> = PublishSubject.create()
-    private val _categorizedLineupsFlow: MutableSharedFlow<List<TournamentItem>> =
-        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
     private val tournamentItems: MutableList<TournamentItem> = mutableListOf()
     private val filterFlow: MutableStateFlow<String> by lazy {
         MutableStateFlow("")
@@ -94,7 +94,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
 
     fun observeCategorizedLineups(): Flow<List<TournamentItem>> {
         return filterFlow.flatMapLatest { filter ->
-            _categorizedLineupsFlow.apply {
+            callbackFlow {
                 val disposable = getAllTournamentsWithLineupsUseCase(filter)
                     .flatMapObservable { Observable.fromIterable(it) }
                     .flatMapSingle { Single.just(TournamentItem(it.first, it.second)) }
@@ -102,12 +102,12 @@ class LineupViewModel : ViewModel(), KoinComponent {
                     .subscribe({
                         tournamentItems.clear()
                         tournamentItems.addAll(it)
-                        _categorizedLineupsFlow.tryEmit(tournamentItems)
+                        trySend(tournamentItems)
                         loadMaps(it)
                     }, {
                         Timber.e(it)
                     })
-                disposables.add(disposable)
+                awaitClose { disposable.dispose() }
             }
         }
     }
