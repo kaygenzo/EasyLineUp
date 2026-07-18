@@ -5,7 +5,6 @@
 package com.telen.easylineup.domain.application
 
 interface ApplicationInteractor {
-    fun players(): PlayersInteractor
     fun lineups(): LineupsInteractor
     fun tournaments(): TournamentsInteractor
     fun playerFieldPositions(): PlayerFieldPositionsInteractor

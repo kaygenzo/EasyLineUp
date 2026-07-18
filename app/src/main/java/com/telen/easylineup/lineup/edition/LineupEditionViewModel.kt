@@ -7,6 +7,7 @@ package com.telen.easylineup.lineup.edition
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
@@ -15,6 +16,7 @@ import com.telen.easylineup.domain.model.RosterItem
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.toRosterPlayerStatus
+import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -26,6 +28,8 @@ import timber.log.Timber
 
 class LineupEditionViewModel : ViewModel(), KoinComponent {
     private val domain: ApplicationInteractor by inject()
+    private val useCaseHandler: UseCaseHandler by inject()
+    private val savePlayerNumberOverlayUseCase: SavePlayerNumberOverlay by inject()
     var lineupId: Long = 0
         set(value) {
             field = value
@@ -76,7 +80,12 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
                     .andThen(domain.lineups().updateRoster(lineupId, rosterItems.map {
                         it.toRosterPlayerStatus()
                     }))
-                    .andThen(domain.players().saveOrUpdatePlayerNumberOverlays(rosterItems))
+                    .andThen(
+                        useCaseHandler.execute(
+                            savePlayerNumberOverlayUseCase,
+                            SavePlayerNumberOverlay.RequestValues(rosterItems)
+                        ).ignoreElement()
+                    )
             } ?: Completable.error(LineupNameEmptyException())
         }
     }

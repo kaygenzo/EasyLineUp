@@ -31,6 +31,7 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import com.telen.easylineup.views.LineupTypeface
@@ -78,6 +79,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val domain: ApplicationInteractor by inject()
     private val useCaseHandler: UseCaseHandler by inject()
     private val getTeamUseCase: GetTeam by inject()
+    private val observePlayerNumberOverlays: ObservePlayerNumberOverlays by inject()
 
     // private val _designatedPlayerTitle = MutableLiveData<String>()
     private val _helpEvent: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -360,7 +362,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
                     *positions.map { Pair(it.playerId, it) }.toTypedArray()
                 )
                 val currentLineupId = lineupId ?: 0
-                domain.players().observePlayerNumberOverlays(currentLineupId)
+                observePlayerNumberOverlays.execute(currentLineupId)
                     .map {
                         it.forEach { overlay ->
                             playerMap[overlay.playerId]?.shirtNumber = overlay.number

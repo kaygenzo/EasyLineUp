@@ -6,8 +6,11 @@ package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.ShirtNumberEntry
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.PlayerRepository
+import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
+import com.telen.easylineup.domain.usecases.GetTeam
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
@@ -23,6 +26,7 @@ import org.mockito.junit.MockitoJUnitRunner
 internal class GetShirtNumberHistoryTests {
     val observer: TestObserver<GetShirtNumberHistory.ResponseValue> = TestObserver()
     @Mock lateinit var playerRepo: PlayerRepository
+    @Mock lateinit var teamRepo: TeamRepository
     lateinit var getShirtNumberEntry: GetShirtNumberHistory
     lateinit var entry1: ShirtNumberEntry
     lateinit var entry2: ShirtNumberEntry
@@ -37,7 +41,9 @@ internal class GetShirtNumberHistoryTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getShirtNumberEntry = GetShirtNumberHistory(playerRepo)
+        getShirtNumberEntry = GetShirtNumberHistory(playerRepo, GetTeam(teamRepo))
+        Mockito.`when`(teamRepo.getTeamsRx())
+            .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
 
         entry1 = ShirtNumberEntry(1, "toto", 1L, 1L, 1L, 1L, "lineup1")
         entry4 = ShirtNumberEntry(1, "tutu", 2L, 2L, 1L, 1L, "lineup1")
@@ -64,7 +70,7 @@ internal class GetShirtNumberHistoryTests {
     fun shouldGetAllShirtNumberFromPositions() {
         Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 1)).thenReturn(Single.just(listOf(entry1, entry2,
             entry3, entry4)))
-        getShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(1L, 1))
+        getShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(1))
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -80,7 +86,7 @@ internal class GetShirtNumberHistoryTests {
             shirtNumberOverlay1, shirtNumberOverlay2
         )))
 
-        getShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(1L, 1))
+        getShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(1))
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -94,7 +100,7 @@ internal class GetShirtNumberHistoryTests {
         Mockito.`when`(playerRepo.getShirtNumberOverlay(3L, 3L)).thenReturn(Single.just(overlay2))
         Mockito.`when`(playerRepo.getShirtNumberFromNumberOverlays(1L, 42)).thenReturn(Single.just(listOf()))
 
-        getShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(1L, 42))
+        getShirtNumberEntry.executeUseCase(GetShirtNumberHistory.RequestValues(42))
             .subscribe(observer)
         observer.await()
         observer.assertComplete()

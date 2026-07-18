@@ -12,7 +12,7 @@ import io.reactivex.rxjava3.core.Single
 /**
  * @property dao
  */
-internal class GetPositionsSummaryForPlayer(val dao: PlayerFieldPositionRepository) :
+class GetPositionsSummaryForPlayer(val dao: PlayerFieldPositionRepository) :
     UseCase<GetPositionsSummaryForPlayer.RequestValues,
 GetPositionsSummaryForPlayer.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {

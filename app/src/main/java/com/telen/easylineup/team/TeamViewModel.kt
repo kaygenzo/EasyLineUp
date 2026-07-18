@@ -13,28 +13,28 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.telen.easylineup.domain.UseCaseHandler
-import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.DeleteTeam
 import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.ObservePlayers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 
 class TeamViewModel : ViewModel(), KoinComponent {
-    private val domain: ApplicationInteractor by inject()
     private val useCaseHandler: UseCaseHandler by inject()
     private val getTeamUseCase: GetTeam by inject()
     private val deleteTeamUseCase: DeleteTeam by inject()
+    private val observePlayers: ObservePlayers by inject()
     private val _team: MutableLiveData<Team> by lazy {
         MutableLiveData<Team>().apply { getCurrentTeam() }
     }
     private val _playersFromDao by lazy {
         _team.switchMap {
-            domain.players().observePlayers(it.id)
+            observePlayers.execute(it.id)
         }
     }
     private val _playersMediator: MediatorLiveData<List<Player>> = MediatorLiveData()

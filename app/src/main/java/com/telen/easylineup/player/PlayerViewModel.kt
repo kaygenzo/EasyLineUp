@@ -11,21 +11,34 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import com.telen.easylineup.domain.UseCaseHandler
-import com.telen.easylineup.domain.application.ApplicationInteractor
+import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.usecases.DeletePlayer
+import com.telen.easylineup.domain.usecases.GetPositionsSummaryForPlayer
 import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.ObservePlayer
+import com.telen.easylineup.domain.usecases.SavePlayer
+import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
+import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
+import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.subjects.PublishSubject
+import io.reactivex.rxjava3.subjects.Subject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 
 class PlayerViewModel : ViewModel(), KoinComponent {
-    private val domain: ApplicationInteractor by inject()
     private val useCaseHandler: UseCaseHandler by inject()
     private val getTeamUseCase: GetTeam by inject()
+    private val observePlayer: ObservePlayer by inject()
+    private val savePlayerUseCase: SavePlayer by inject()
+    private val deletePlayerUseCase: DeletePlayer by inject()
+    private val getPlayerPositionsSummaryUseCase: GetPositionsSummaryForPlayer by inject()
+    private val errors: Subject<DomainErrors.Players> = PublishSubject.create()
     private val disposables = CompositeDisposable()
     private val _teamTypeLiveData: MutableLiveData<Int> = MutableLiveData<Int>().apply {
         getTeamType()
@@ -36,7 +49,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
     private val _player by lazy {
         playerId.takeIf { it > 0 }
-            ?.let { domain.players().getPlayer(it) }
+            ?.let { observePlayer.execute(it) }
             ?: MutableLiveData()
     }
     var playerId: Long = 0
@@ -145,7 +158,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
         phone: String?,
         sex: Int
     ): Completable {
-        return domain.players().savePlayer(
+        val request = SavePlayer.RequestValues(
             playerId,
             name,
             shirtNumber,
@@ -158,13 +171,27 @@ class PlayerViewModel : ViewModel(), KoinComponent {
             phone,
             sex
         )
+        return useCaseHandler.execute(savePlayerUseCase, request)
+            .ignoreElement()
+            .doOnError {
+                when (it) {
+                    is NameEmptyException ->
+                        errors.onNext(DomainErrors.Players.INVALID_PLAYER_NAME)
+                    is InvalidEmailException ->
+                        errors.onNext(DomainErrors.Players.INVALID_EMAIL_FORMAT)
+                    is InvalidPhoneException ->
+                        errors.onNext(DomainErrors.Players.INVALID_PHONE_NUMBER_FORMAT)
+                }
+            }
     }
 
     fun deletePlayer(): Completable {
-        return domain.players().deletePlayer(playerId)
+        return useCaseHandler
+            .execute(deletePlayerUseCase, DeletePlayer.RequestValues(playerId))
+            .ignoreElement()
     }
 
-    fun registerPlayerFormErrorResult() = domain.players().observeErrors()
+    fun registerPlayerFormErrorResult(): Subject<DomainErrors.Players> = errors
 
     fun onStrategySelected(index: Int) {
         val teamType = TeamType.getTypeById(this.teamType)
@@ -172,7 +199,11 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getLineups() {
-        val disposable = domain.players().getPlayerPositionsSummary(playerId)
+        val disposable = useCaseHandler.execute(
+            getPlayerPositionsSummaryUseCase,
+            GetPositionsSummaryForPlayer.RequestValues(playerId)
+        )
+            .map { it.summary }
             .subscribe({
                 _lineupsLiveData.postValue(it)
             }, {

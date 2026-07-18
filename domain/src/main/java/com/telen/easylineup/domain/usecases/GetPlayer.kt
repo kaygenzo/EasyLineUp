@@ -13,7 +13,7 @@ import io.reactivex.rxjava3.core.Single
 /**
  * @property dao
  */
-internal class GetPlayer(val dao: PlayerRepository) :
+class GetPlayer(val dao: PlayerRepository) :
     UseCase<GetPlayer.RequestValues, GetPlayer.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return requestValues.playerId?.let { id ->

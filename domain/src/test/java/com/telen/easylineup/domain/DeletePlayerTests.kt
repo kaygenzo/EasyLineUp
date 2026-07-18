@@ -8,7 +8,9 @@ import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.DeletePlayer
+import com.telen.easylineup.domain.usecases.GetPlayer
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +32,7 @@ internal class DeletePlayerTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        deletePlayer = DeletePlayer(playerDao)
+        deletePlayer = DeletePlayer(playerDao, GetPlayer(playerDao))
 
         player = Player(
             id = 1L,
@@ -42,12 +44,13 @@ internal class DeletePlayerTests {
             positions = 1
         )
 
+        Mockito.`when`(playerDao.getPlayerByIdAsSingle(1L)).thenReturn(Single.just(player))
         Mockito.`when`(playerDao.deletePlayer(player)).thenReturn(Completable.complete())
     }
 
     @Test
     fun shouldDeletePlayer() {
-        deletePlayer.executeUseCase(DeletePlayer.RequestValues(player)).subscribe(observer)
+        deletePlayer.executeUseCase(DeletePlayer.RequestValues(1L)).subscribe(observer)
         observer.await()
         observer.assertComplete()
         verify(playerDao).deletePlayer(player)

@@ -15,23 +15,28 @@ import com.telen.easylineup.domain.utils.ValidatorUtils
 import io.reactivex.rxjava3.core.Single
 
 /**
+ * Validates the player, then inserts/updates it under the current team.
+ *
  * @property dao
  */
-internal class SavePlayer(val dao: PlayerRepository) :
-    UseCase<SavePlayer.RequestValues, SavePlayer.ResponseValue>() {
+class SavePlayer(
+    val dao: PlayerRepository,
+    private val getTeam: GetTeam,
+    private val validatorUtils: ValidatorUtils
+) : UseCase<SavePlayer.RequestValues, SavePlayer.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return when {
             requestValues.name.isNullOrBlank() -> Single.error(NameEmptyException())
-            !requestValues.validatorUtils.isEmailValid(requestValues.email) -> Single.error(
+            !validatorUtils.isEmailValid(requestValues.email) -> Single.error(
                 InvalidEmailException()
             )
-            !requestValues.validatorUtils.isValidPhoneNumber(requestValues.phone) -> Single.error(
+            !validatorUtils.isValidPhoneNumber(requestValues.phone) -> Single.error(
                 InvalidPhoneException()
             )
-            else -> {
+            else -> getTeam.executeUseCase(GetTeam.RequestValues()).flatMap { teamResponse ->
                 val player = Player(
                     id = requestValues.playerId,
-                    teamId = requestValues.teamId,
+                    teamId = teamResponse.team.id,
                     name = requestValues.name.trim(),
                     shirtNumber = requestValues.shirtNumber ?: 0,
                     licenseNumber = requestValues.licenseNumber ?: 0L,
@@ -59,9 +64,7 @@ internal class SavePlayer(val dao: PlayerRepository) :
     }
 
     /**
-     * @property validatorUtils
      * @property playerId
-     * @property teamId
      * @property name
      * @property shirtNumber
      * @property licenseNumber
@@ -74,9 +77,7 @@ internal class SavePlayer(val dao: PlayerRepository) :
      * @property sex
      */
     class RequestValues(
-        val validatorUtils: ValidatorUtils,
         val playerId: Long,
-        val teamId: Long,
         val name: String?,
         val shirtNumber: Int?,
         val licenseNumber: Long? = 0,

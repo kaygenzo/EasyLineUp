@@ -12,10 +12,14 @@ import io.reactivex.rxjava3.core.Single
 /**
  * @property dao
  */
-internal class GetPlayers(val dao: PlayerRepository) :
-    UseCase<GetPlayers.RequestValues, GetPlayers.ResponseValue>() {
+class GetPlayers(
+    val dao: PlayerRepository,
+    private val getTeam: GetTeam
+) : UseCase<GetPlayers.RequestValues, GetPlayers.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return dao.getPlayersByTeamId(requestValues.teamId).map { ResponseValue(it) }
+        return getTeam.executeUseCase(GetTeam.RequestValues())
+            .flatMap { dao.getPlayersByTeamId(it.team.id) }
+            .map { ResponseValue(it) }
     }
 
     /**
@@ -23,8 +27,5 @@ internal class GetPlayers(val dao: PlayerRepository) :
      */
     class ResponseValue(val players: List<Player>) : UseCase.ResponseValue
 
-    /**
-     * @property teamId
-     */
-    class RequestValues(val teamId: Long) : UseCase.RequestValues
+    class RequestValues : UseCase.RequestValues
 }

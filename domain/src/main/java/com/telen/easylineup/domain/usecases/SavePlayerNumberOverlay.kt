@@ -10,7 +10,7 @@ import com.telen.easylineup.domain.model.RosterItem
 import com.telen.easylineup.domain.repository.PlayerRepository
 import io.reactivex.rxjava3.core.Single
 
-internal class SavePlayerNumberOverlay(private val playerRepository: PlayerRepository) :
+class SavePlayerNumberOverlay(private val playerRepository: PlayerRepository) :
     UseCase<SavePlayerNumberOverlay.RequestValues, SavePlayerNumberOverlay.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.just(requestValues.items)

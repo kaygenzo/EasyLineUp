@@ -10,44 +10,48 @@ import com.telen.easylineup.domain.repository.PlayerRepository
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 
-internal class GetShirtNumberHistory(private val playersRepo: PlayerRepository) :
-    UseCase<GetShirtNumberHistory.RequestValues, GetShirtNumberHistory.ResponseValue>() {
+class GetShirtNumberHistory(
+    private val playersRepo: PlayerRepository,
+    private val getTeam: GetTeam
+) : UseCase<GetShirtNumberHistory.RequestValues, GetShirtNumberHistory.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         val overlaysAdded: MutableList<ShirtNumberEntry> = mutableListOf()
-        return playersRepo.getShirtNumberFromPlayers(requestValues.teamId, requestValues.number)
-            .flatMapObservable { items ->
-                Observable.fromIterable(items)
-            }
-            .flatMapSingle { shirtNumber ->
-                playersRepo.getShirtNumberOverlay(shirtNumber.playerId, shirtNumber.lineupId)
-                    .map {
-                        val newItem = ShirtNumberEntry(
-                            it.number, shirtNumber.playerName, it.playerId, shirtNumber.eventTime,
-                            shirtNumber.createdAt, it.lineupId, shirtNumber.lineupName
-                        )
-                        overlaysAdded.add(newItem)
-                        newItem
+        return getTeam.executeUseCase(GetTeam.RequestValues())
+            .flatMap { teamResponse ->
+                val teamId = teamResponse.team.id
+                playersRepo.getShirtNumberFromPlayers(teamId, requestValues.number)
+                    .flatMapObservable { items ->
+                        Observable.fromIterable(items)
                     }
-                    .onErrorResumeNext {
-                        Single.just(shirtNumber)
+                    .flatMapSingle { shirtNumber ->
+                        playersRepo.getShirtNumberOverlay(shirtNumber.playerId, shirtNumber.lineupId)
+                            .map {
+                                val newItem = ShirtNumberEntry(
+                                    it.number, shirtNumber.playerName, it.playerId,
+                                    shirtNumber.eventTime, shirtNumber.createdAt, it.lineupId,
+                                    shirtNumber.lineupName
+                                )
+                                overlaysAdded.add(newItem)
+                                newItem
+                            }
+                            .onErrorResumeNext {
+                                Single.just(shirtNumber)
+                            }
                     }
-            }
-            .toList()
-            .flatMap { items ->
-                playersRepo.getShirtNumberFromNumberOverlays(
-                    requestValues.teamId,
-                    requestValues.number
-                )
-                    .map { overlays ->
-                        overlays.forEach { overlay ->
-                            val first =
-                                overlaysAdded.find {
-                                    it.playerId == overlay.playerId
-                                            && it.lineupId == overlay.lineupId
+                    .toList()
+                    .flatMap { items ->
+                        playersRepo.getShirtNumberFromNumberOverlays(teamId, requestValues.number)
+                            .map { overlays ->
+                                overlays.forEach { overlay ->
+                                    val first =
+                                        overlaysAdded.find {
+                                            it.playerId == overlay.playerId
+                                                    && it.lineupId == overlay.lineupId
+                                        }
+                                    first ?: items.add(overlay)
                                 }
-                            first ?: items.add(overlay)
-                        }
-                        items.filter { it.number == requestValues.number }
+                                items.filter { it.number == requestValues.number }
+                            }
                     }
             }
             .map {
@@ -64,8 +68,7 @@ internal class GetShirtNumberHistory(private val playersRepo: PlayerRepository) 
     class ResponseValue(val history: List<ShirtNumberEntry>) : UseCase.ResponseValue
 
     /**
-     * @property teamId
      * @property number
      */
-    class RequestValues(val teamId: Long, val number: Int) : UseCase.RequestValues
+    class RequestValues(val number: Int) : UseCase.RequestValues
 }

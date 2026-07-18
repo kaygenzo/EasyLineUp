@@ -8,7 +8,6 @@ import android.content.Context
 import com.google.gson.JsonParser
 import com.telen.easylineup.domain.application.LineupsInteractor
 import com.telen.easylineup.domain.application.PlayerFieldPositionsInteractor
-import com.telen.easylineup.domain.application.PlayersInteractor
 import com.telen.easylineup.domain.application.TournamentsInteractor
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
@@ -16,6 +15,8 @@ import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
+import com.telen.easylineup.domain.usecases.InsertPlayers
 import com.telen.easylineup.domain.usecases.InsertTeam
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
@@ -23,7 +24,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class DatabaseMockProvider(
     private val insertTeamUseCase: InsertTeam,
-    private val playersInteractor: PlayersInteractor,
+    private val insertPlayersUseCase: InsertPlayers,
+    private val insertPlayerNumberOverlaysUseCase: InsertPlayerNumberOverlays,
     private val lineupsInteractor: LineupsInteractor,
     private val playerFieldPositionsInteractor: PlayerFieldPositionsInteractor,
     private val tournamentsInteractor: TournamentsInteractor
@@ -162,7 +164,7 @@ class DatabaseMockProvider(
     }
 
     private fun insertPlayers(list: List<Player>): Completable {
-        return playersInteractor.insertPlayers(list)
+        return insertPlayersUseCase.executeUseCase(InsertPlayers.RequestValues(list)).ignoreElement()
             .subscribeOn(Schedulers.io())
     }
 
@@ -177,7 +179,9 @@ class DatabaseMockProvider(
     }
 
     private fun insertPlayerNumberOverlays(list: List<PlayerNumberOverlay>): Completable {
-        return playersInteractor.insertPlayerNumberOverlays(list)
+        return insertPlayerNumberOverlaysUseCase
+            .executeUseCase(InsertPlayerNumberOverlays.RequestValues(list))
+            .ignoreElement()
             .subscribeOn(Schedulers.io())
     }
 

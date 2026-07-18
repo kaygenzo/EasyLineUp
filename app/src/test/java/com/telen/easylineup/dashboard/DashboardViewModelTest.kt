@@ -9,14 +9,22 @@ import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.application.DataInteractor
-import com.telen.easylineup.domain.application.PlayersInteractor
 import com.telen.easylineup.domain.model.DashboardTile
+import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.usecases.GetPlayers
+import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
+import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.GetTeamEmails
+import com.telen.easylineup.domain.usecases.GetTeamPhones
 import com.telen.easylineup.domain.usecases.ObserveTeams
+import com.telen.easylineup.testUseCaseHandler
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
@@ -37,9 +45,9 @@ import org.mockito.junit.MockitoJUnitRunner
 
 /**
  * Characterization tests for [DashboardViewModel], demonstrating a pattern for testing the
- * `app` module ViewModels that resolve their [ApplicationInteractor] through Koin
- * (`by inject()`). The remaining ViewModels listed in the refactor plan can follow the same
- * shape: mock the interactor sub-ports, register them in a Koin test module, then exercise the
+ * `app` module ViewModels that resolve their UseCases through Koin (`by inject()`). The
+ * remaining ViewModels listed in the refactor plan can follow the same shape: construct real
+ * UseCases with mocked repositories, register them in a Koin test module, then exercise the
  * ViewModel's public API.
  */
 @RunWith(MockitoJUnitRunner::class)
@@ -55,10 +63,10 @@ internal class DashboardViewModelTest {
     lateinit var teamRepository: TeamRepository
 
     @Mock
-    lateinit var dataInteractor: DataInteractor
+    lateinit var playerRepository: PlayerRepository
 
     @Mock
-    lateinit var playersInteractor: PlayersInteractor
+    lateinit var dataInteractor: DataInteractor
 
     @Mock
     lateinit var context: Context
@@ -74,13 +82,21 @@ internal class DashboardViewModelTest {
 
         // lenient: each test only exercises one of these sub-ports
         Mockito.lenient().`when`(applicationInteractor.data()).thenReturn(dataInteractor)
-        Mockito.lenient().`when`(applicationInteractor.players()).thenReturn(playersInteractor)
+        Mockito.lenient().`when`(teamRepository.getTeamsRx())
+            .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
+
+        val getTeam = GetTeam(teamRepository)
+        val getPlayers = GetPlayers(playerRepository, getTeam)
 
         startKoin {
             modules(
                 module {
                     single { applicationInteractor }
+                    single<UseCaseHandler> { testUseCaseHandler() }
                     single { ObserveTeams(teamRepository) }
+                    single { GetShirtNumberHistory(playerRepository, getTeam) }
+                    single { GetTeamEmails(getPlayers) }
+                    single { GetTeamPhones(getPlayers) }
                     single { SharedPreferencesHelper(context) }
                 }
             )
@@ -152,31 +168,34 @@ internal class DashboardViewModelTest {
     }
 
     @Test
-    fun shouldGetShirtNumberHistoryDelegateToPlayersInteractor() {
-        val history = listOf(
-            ShirtNumberEntry(
-                number = 8,
-                playerName = "Toto",
-                playerId = 1L,
-                eventTime = 0L,
-                createdAt = 0L,
-                lineupId = 1L,
-                lineupName = "Game 1"
-            )
+    fun shouldGetShirtNumberHistoryDelegateToUseCase() {
+        val overlayEntry = ShirtNumberEntry(
+            number = 8,
+            playerName = "Toto",
+            playerId = 1L,
+            eventTime = 0L,
+            createdAt = 0L,
+            lineupId = 1L,
+            lineupName = "Game 1"
         )
-        Mockito.`when`(playersInteractor.getShirtNumberHistory(8)).thenReturn(Single.just(history))
+        Mockito.`when`(playerRepository.getShirtNumberFromPlayers(1L, 8))
+            .thenReturn(Single.just(emptyList()))
+        Mockito.`when`(playerRepository.getShirtNumberFromNumberOverlays(1L, 8))
+            .thenReturn(Single.just(listOf(overlayEntry)))
 
         val observer = TestObserver<List<ShirtNumberEntry>>()
         viewModel.getShirtNumberHistory(8).subscribe(observer)
         observer.await()
 
         observer.assertComplete()
-        assertEquals(history, observer.values().first())
+        assertEquals(listOf(overlayEntry), observer.values().first())
     }
 
     @Test
-    fun shouldGetEmailsDelegateToPlayersInteractor() {
-        Mockito.`when`(playersInteractor.getTeamEmails()).thenReturn(Single.just(listOf("a@mail.com")))
+    fun shouldGetEmailsDelegateToUseCase() {
+        val withEmail = Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L, email = "a@mail.com")
+        Mockito.`when`(playerRepository.getPlayersByTeamId(1L))
+            .thenReturn(Single.just(listOf(withEmail)))
 
         val observer = TestObserver<List<String>>()
         viewModel.getEmails().subscribe(observer)
@@ -187,8 +206,10 @@ internal class DashboardViewModelTest {
     }
 
     @Test
-    fun shouldGetPhonesDelegateToPlayersInteractor() {
-        Mockito.`when`(playersInteractor.getTeamPhones()).thenReturn(Single.just(listOf("0102030405")))
+    fun shouldGetPhonesDelegateToUseCase() {
+        val withPhone = Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L, phone = "0102030405")
+        Mockito.`when`(playerRepository.getPlayersByTeamId(1L))
+            .thenReturn(Single.just(listOf(withPhone)))
 
         val observer = TestObserver<List<String>>()
         viewModel.getPhones().subscribe(observer)

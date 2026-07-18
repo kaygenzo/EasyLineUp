@@ -8,7 +8,10 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.PlayerRepository
+import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.SavePlayer
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.domain.utils.ValidatorUtils
@@ -29,13 +32,15 @@ internal class SavePlayerTests {
 
     @Mock
     lateinit var playerDao: PlayerRepository
-    lateinit var validatorUtils: ValidatorUtils
+
+    @Mock
+    lateinit var teamDao: TeamRepository
     lateinit var savePlayer: SavePlayer
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        savePlayer = SavePlayer(playerDao)
+        savePlayer = SavePlayer(playerDao, GetTeam(teamDao), ValidatorUtilsMock())
         val player = Player(
             id = 1L,
             teamId = 1,
@@ -53,15 +58,14 @@ internal class SavePlayerTests {
         Mockito.`when`(playerDao.updatePlayer(any())).thenReturn(Completable.complete())
         Mockito.`when`(playerDao.insertPlayer(any())).thenReturn(Single.just(1))
         Mockito.`when`(playerDao.getPlayerByIdAsSingle(any())).thenReturn(Single.just(player))
-        validatorUtils = ValidatorUtilsMock()
+        Mockito.`when`(teamDao.getTeamsRx())
+            .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
     }
 
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() {
         val request = SavePlayer.RequestValues(
-            validatorUtils = validatorUtils,
             playerId = 1L,
-            teamId = 1,
             name = "",
             positions = 1,
             licenseNumber = 1,
@@ -81,9 +85,7 @@ internal class SavePlayerTests {
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsWhitespaces() {
         val request = SavePlayer.RequestValues(
-            validatorUtils = validatorUtils,
             playerId = 1L,
-            teamId = 1,
             name = "     ",
             positions = 1,
             licenseNumber = 1,
@@ -103,9 +105,7 @@ internal class SavePlayerTests {
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsNull() {
         val request = SavePlayer.RequestValues(
-            validatorUtils = validatorUtils,
             playerId = 1L,
-            teamId = 1,
             name = null,
             positions = 1,
             licenseNumber = 1,
@@ -125,9 +125,7 @@ internal class SavePlayerTests {
     @Test
     fun shouldInsertEventIfShirtNumberIsNull() {
         val request = SavePlayer.RequestValues(
-            validatorUtils = validatorUtils,
             playerId = 0L,
-            teamId = 1,
             name = "Test",
             positions = 1,
             licenseNumber = 1,
@@ -148,9 +146,7 @@ internal class SavePlayerTests {
     @Test
     fun shouldInsertIfNewPlayer() {
         val request = SavePlayer.RequestValues(
-            validatorUtils = validatorUtils,
             playerId = 0L,
-            teamId = 1,
             name = "Test",
             positions = 1,
             licenseNumber = 1,
@@ -172,9 +168,7 @@ internal class SavePlayerTests {
     @Test
     fun shouldUpdateIfKnownPlayer() {
         val request = SavePlayer.RequestValues(
-            validatorUtils = validatorUtils,
             playerId = 1L,
-            teamId = 1,
             name = "Test",
             positions = 1,
             licenseNumber = 1,
@@ -193,7 +187,7 @@ internal class SavePlayerTests {
         verify(playerDao, never()).insertPlayer(any())
     }
 
-    inner class ValidatorUtilsMock : ValidatorUtils() {
+    class ValidatorUtilsMock : ValidatorUtils() {
         override fun isEmailValid(email: String?): Boolean {
             return true
         }

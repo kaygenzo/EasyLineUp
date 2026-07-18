@@ -10,12 +10,10 @@ import com.telen.easylineup.domain.application.ApplicationInteractorImpl
 import com.telen.easylineup.domain.application.DataInteractor
 import com.telen.easylineup.domain.application.LineupsInteractor
 import com.telen.easylineup.domain.application.PlayerFieldPositionsInteractor
-import com.telen.easylineup.domain.application.PlayersInteractor
 import com.telen.easylineup.domain.application.TournamentsInteractor
 import com.telen.easylineup.domain.application.impl.DataInteractorImpl
 import com.telen.easylineup.domain.application.impl.LineupsInteractorImpl
 import com.telen.easylineup.domain.application.impl.PlayerFieldPositionsInteractorImpl
-import com.telen.easylineup.domain.application.impl.PlayersInteractorImpl
 import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.application.impl.TournamentsInteractorImpl
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
@@ -43,11 +41,18 @@ import com.telen.easylineup.domain.usecases.GetPositionsSummaryForPlayer
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
 import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.GetTeamEmails
+import com.telen.easylineup.domain.usecases.GetTeamPhones
 import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.GetTournamentStatsForPositionTable
 import com.telen.easylineup.domain.usecases.GetTournaments
 import com.telen.easylineup.domain.usecases.ImportData
+import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
+import com.telen.easylineup.domain.usecases.InsertPlayers
 import com.telen.easylineup.domain.usecases.InsertTeam
+import com.telen.easylineup.domain.usecases.ObservePlayer
+import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
+import com.telen.easylineup.domain.usecases.ObservePlayers
 import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
@@ -74,23 +79,7 @@ object DomainModule {
                 dataInteractor = get(),
                 lineupsInteractor = get(),
                 tournamentsInteractor = get(),
-                playerFieldPositionsInteractor = get(),
-                playerInteractor = get()
-            )
-        }
-        single<PlayersInteractor> {
-            PlayersInteractorImpl(
-                playersRepo = get(),
-                getPlayer = get(),
-                deletePlayer = get(),
-                savePlayer = get(),
-                getPlayerPositionsSummary = get(),
-                getPlayers = get(),
-                getTeam = get(),
-                savePlayerNumberOverlay = get(),
-                getShirtNumberHistory = get(),
-                validatorUtils = get(),
-                useCaseHandler = get()
+                playerFieldPositionsInteractor = get()
             )
         }
         single<LineupsInteractor> {
@@ -142,7 +131,8 @@ object DomainModule {
         single {
             DatabaseMockProvider(
                 insertTeamUseCase = get(),
-                playersInteractor = get(),
+                insertPlayersUseCase = get(),
+                insertPlayerNumberOverlaysUseCase = get(),
                 lineupsInteractor = get(),
                 playerFieldPositionsInteractor = get(),
                 tournamentsInteractor = get()
@@ -175,10 +165,17 @@ object DomainModule {
         single { GetAllTournamentsWithLineupsUseCase(get()) }
         single { DeleteTournamentLineups(get()) }
         single { GetPlayer(get()) }
-        single { DeletePlayer(get()) }
-        single { SavePlayer(get()) }
+        single { DeletePlayer(get(), get()) }
+        single { SavePlayer(get(), get(), get()) }
         single { GetPositionsSummaryForPlayer(get()) }
-        single { GetPlayers(get()) }
+        single { GetPlayers(get(), get()) }
+        single { GetTeamEmails(get()) }
+        single { GetTeamPhones(get()) }
+        single { ObservePlayer(get()) }
+        single { ObservePlayers(get()) }
+        single { ObservePlayerNumberOverlays(get()) }
+        single { InsertPlayers(get()) }
+        single { InsertPlayerNumberOverlays(get()) }
         single { SaveTeam(get(), get(), get()) }
         single { CheckTeam() }
         single { ObserveTeams(get()) }
@@ -203,7 +200,7 @@ object DomainModule {
         single { GetDpAndFlexFromPlayersInField() }
         single { SaveDpAndFlex() }
         single { SavePlayerNumberOverlay(get()) }
-        single { GetShirtNumberHistory(get()) }
+        single { GetShirtNumberHistory(get(), get()) }
         single { ValidatorUtils() }
         single { GetBattersState() }
         single { UpdateLineup(get()) }
