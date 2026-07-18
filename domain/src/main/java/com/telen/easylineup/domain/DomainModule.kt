@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain
 
-import android.location.Geocoder
 import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.CheckHashData
@@ -140,6 +139,5 @@ object DomainModule {
         single { ObserveLineupById(get()) }
         single { GetLineupById(get(), get()) }
         single { ObserveTeamPlayersAndMaybePositionsForLineup(get()) }
-        factory { Geocoder(get()) }
     }
 }
