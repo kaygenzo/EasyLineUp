@@ -14,7 +14,7 @@ import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.model.reset
 import io.reactivex.rxjava3.core.Single
 
-internal class DeletePlayerFieldPosition :
+class DeletePlayerFieldPosition :
     UseCase<DeletePlayerFieldPosition.RequestValues, DeletePlayerFieldPosition.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return try {

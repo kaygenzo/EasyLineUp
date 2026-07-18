@@ -20,10 +20,10 @@ import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.model.reset
 import io.reactivex.rxjava3.core.Single
 
-internal class AssignPlayerFieldPosition :
+class AssignPlayerFieldPosition(private val getTeam: GetTeam) :
     UseCase<AssignPlayerFieldPosition.RequestValues, AssignPlayerFieldPosition.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return Single.defer {
+        return getTeam.executeUseCase(GetTeam.RequestValues()).flatMap { teamResponse ->
             val players = requestValues.players
             val lineup = requestValues.lineup
             val lineupMode = lineup.mode
@@ -32,7 +32,7 @@ internal class AssignPlayerFieldPosition :
             val extraHittersSize = lineup.extraHitters
             val position = requestValues.position
             val player = requestValues.player
-            val teamType = requestValues.teamType
+            val teamType = teamResponse.team.type
 
             val otherPlayerPosition = players.firstOrNull {
                 // another player is already on the same position
@@ -98,15 +98,13 @@ internal class AssignPlayerFieldPosition :
      * @property position
      * @property lineup
      * @property players
-     * @property teamType
      */
     class RequestValues(
         val player: Player,
         val position: FieldPosition,
         val lineup: Lineup,
-        val players: List<PlayerWithPosition>,
-        val teamType: Int
+        val players: List<PlayerWithPosition>
     ) : UseCase.RequestValues
 
-    inner class ResponseValue : UseCase.ResponseValue
+    class ResponseValue : UseCase.ResponseValue
 }

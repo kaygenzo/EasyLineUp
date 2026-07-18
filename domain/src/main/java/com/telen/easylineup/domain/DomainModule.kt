@@ -8,10 +8,8 @@ import android.location.Geocoder
 import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.application.ApplicationInteractorImpl
 import com.telen.easylineup.domain.application.LineupsInteractor
-import com.telen.easylineup.domain.application.PlayerFieldPositionsInteractor
 import com.telen.easylineup.domain.application.TournamentsInteractor
 import com.telen.easylineup.domain.application.impl.LineupsInteractorImpl
-import com.telen.easylineup.domain.application.impl.PlayerFieldPositionsInteractorImpl
 import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.application.impl.TournamentsInteractorImpl
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
@@ -45,6 +43,7 @@ import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.GetTournamentStatsForPositionTable
 import com.telen.easylineup.domain.usecases.GetTournaments
 import com.telen.easylineup.domain.usecases.ImportData
+import com.telen.easylineup.domain.usecases.InsertPlayerFieldPositions
 import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
 import com.telen.easylineup.domain.usecases.InsertPlayers
 import com.telen.easylineup.domain.usecases.InsertTeam
@@ -75,8 +74,7 @@ object DomainModule {
         single<ApplicationInteractor> {
             ApplicationInteractorImpl(
                 lineupsInteractor = get(),
-                tournamentsInteractor = get(),
-                playerFieldPositionsInteractor = get()
+                tournamentsInteractor = get()
             )
         }
         single<LineupsInteractor> {
@@ -115,23 +113,13 @@ object DomainModule {
                 useCaseHandler = get()
             )
         }
-        single<PlayerFieldPositionsInteractor> {
-            PlayerFieldPositionsInteractorImpl(
-                playerFieldPositionRepo = get(),
-                getTeam = get(),
-                savePlayerFieldPosition = get(),
-                deletePlayerFieldPosition = get(),
-                switchPlayersPosition = get(),
-                useCaseHandler = get()
-            )
-        }
         single {
             DatabaseMockProvider(
                 insertTeamUseCase = get(),
                 insertPlayersUseCase = get(),
                 insertPlayerNumberOverlaysUseCase = get(),
                 lineupsInteractor = get(),
-                playerFieldPositionsInteractor = get(),
+                insertPlayerFieldPositionsUseCase = get(),
                 tournamentsInteractor = get()
             )
         }
@@ -161,8 +149,9 @@ object DomainModule {
         single { CheckTeam() }
         single { ObserveTeams(get()) }
         single { InsertTeam(get()) }
-        single { AssignPlayerFieldPosition() }
+        single { AssignPlayerFieldPosition(get()) }
         single { DeletePlayerFieldPosition() }
+        single { InsertPlayerFieldPositions(get()) }
         single { GetListAvailablePlayersForSelection() }
         single { SaveBattingOrderAndPositions(get(), get()) }
         single { DeleteLineup(get()) }
@@ -171,7 +160,7 @@ object DomainModule {
         single { GetRoster(get(), get()) }
         single { UpdateLineupRoster(get()) }
         single { DeleteTeam(get()) }
-        single { SwitchPlayersPosition() }
+        single { SwitchPlayersPosition(get()) }
         single { DeleteAllData(get(), get()) }
         single { GetTournamentStatsForPositionTable(get(), get()) }
         single { CheckHashData(get(), get(), get(), get(), get()) }

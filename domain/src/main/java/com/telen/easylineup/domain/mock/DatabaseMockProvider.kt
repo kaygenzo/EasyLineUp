@@ -7,7 +7,6 @@ package com.telen.easylineup.domain.mock
 import android.content.Context
 import com.google.gson.JsonParser
 import com.telen.easylineup.domain.application.LineupsInteractor
-import com.telen.easylineup.domain.application.PlayerFieldPositionsInteractor
 import com.telen.easylineup.domain.application.TournamentsInteractor
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
@@ -15,6 +14,7 @@ import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.usecases.InsertPlayerFieldPositions
 import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
 import com.telen.easylineup.domain.usecases.InsertPlayers
 import com.telen.easylineup.domain.usecases.InsertTeam
@@ -27,7 +27,7 @@ class DatabaseMockProvider(
     private val insertPlayersUseCase: InsertPlayers,
     private val insertPlayerNumberOverlaysUseCase: InsertPlayerNumberOverlays,
     private val lineupsInteractor: LineupsInteractor,
-    private val playerFieldPositionsInteractor: PlayerFieldPositionsInteractor,
+    private val insertPlayerFieldPositionsUseCase: InsertPlayerFieldPositions,
     private val tournamentsInteractor: TournamentsInteractor
 ) {
 
@@ -174,7 +174,9 @@ class DatabaseMockProvider(
     }
 
     private fun insertPlayerFieldPositions(list: List<PlayerFieldPosition>): Completable {
-        return playerFieldPositionsInteractor.insertPlayerFieldPositions(list)
+        return insertPlayerFieldPositionsUseCase
+            .executeUseCase(InsertPlayerFieldPositions.RequestValues(list))
+            .ignoreElement()
             .subscribeOn(Schedulers.io())
     }
 

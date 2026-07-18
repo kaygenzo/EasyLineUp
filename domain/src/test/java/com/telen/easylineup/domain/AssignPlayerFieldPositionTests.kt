@@ -11,17 +11,23 @@ import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.model.isShortStop
 import com.telen.easylineup.domain.model.reset
+import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
+import com.telen.easylineup.domain.usecases.GetTeam
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
@@ -75,6 +81,8 @@ internal abstract class AssignPlayerFieldPositionTests(
     private val strategy: TeamStrategy,
     private val extraHitterSize: Int
 ) : BaseUseCaseTests() {
+    @Mock
+    lateinit var teamDao: TeamRepository
     private var observer: TestObserver<AssignPlayerFieldPosition.ResponseValue> = TestObserver()
     private val newPlayer = Player(2_000, 1, "k2000", 2_000, 2_000, null, 0x07)
     private val lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitterSize)
@@ -84,7 +92,7 @@ internal abstract class AssignPlayerFieldPositionTests(
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        savePlayerFieldPosition = AssignPlayerFieldPosition()
+        savePlayerFieldPosition = AssignPlayerFieldPosition(GetTeam(teamDao))
 
         players = mutableListOf()
         teamType.getValidPositions(strategy).forEachIndexed { i, pos ->
@@ -121,12 +129,13 @@ internal abstract class AssignPlayerFieldPositionTests(
         exception: Class<out Throwable>? = null
     ) {
         lineup.mode = mode
+        Mockito.`when`(teamDao.getTeamsRx())
+            .thenReturn(Single.just(listOf(Team(id = 1L, type = teamType.id, main = true))))
         val request = AssignPlayerFieldPosition.RequestValues(
             player = player,
             position = position,
             lineup = lineup,
-            players = players,
-            teamType = teamType.id
+            players = players
         )
         val playersSize = players.size
         savePlayerFieldPosition.executeUseCase(request).subscribe(observer)

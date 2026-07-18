@@ -10,25 +10,33 @@ import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.isCatcher
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isFirstBase
 import com.telen.easylineup.domain.model.isPitcher
+import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.exceptions.FirstPositionEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.SamePlayerException
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
+    @Mock
+    lateinit var teamDao: TeamRepository
     private val players: MutableList<PlayerWithPosition> = mutableListOf()
     private val strategy = TeamStrategy.STANDARD
     private val extraHitters = 0
@@ -40,7 +48,7 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        switchPlayersPosition = SwitchPlayersPosition()
+        switchPlayersPosition = SwitchPlayersPosition(GetTeam(teamDao))
 
         players.add(generate(1L, FieldPosition.PITCHER, PlayerFieldPosition.FLAG_FLEX, 10))
         players.add(generate(2L, FieldPosition.CATCHER, PlayerFieldPosition.FLAG_NONE, 2))
@@ -63,11 +71,12 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
         exception: Class<out Throwable>? = null
     ) {
         lineup.mode = if (lineupMode) MODE_ENABLED else MODE_DISABLED
+        Mockito.`when`(teamDao.getTeamsRx())
+            .thenReturn(Single.just(listOf(Team(id = 1L, type = teamType.id, main = true))))
         val request = SwitchPlayersPosition.RequestValues(
             players,
             fromPosition,
             toPosition,
-            teamType.id,
             lineup
         )
         val playersSize = players.size

@@ -30,8 +30,11 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
+import com.telen.easylineup.domain.usecases.DeletePlayerFieldPosition
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
+import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import com.telen.easylineup.views.LineupTypeface
@@ -80,6 +83,9 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val useCaseHandler: UseCaseHandler by inject()
     private val getTeamUseCase: GetTeam by inject()
     private val observePlayerNumberOverlays: ObservePlayerNumberOverlays by inject()
+    private val deletePlayerFieldPositionUseCase: DeletePlayerFieldPosition by inject()
+    private val switchPlayersPositionUseCase: SwitchPlayersPosition by inject()
+    private val assignPlayerFieldPositionUseCase: AssignPlayerFieldPosition by inject()
 
     // private val _designatedPlayerTitle = MutableLiveData<String>()
     private val _helpEvent: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -147,9 +153,17 @@ class LineupViewModel : ViewModel(), KoinComponent {
     fun onDeletePosition(player: Player) {
         val lineupMode = lineup?.mode ?: MODE_DISABLED
         val hitters = lineup?.extraHitters ?: 0
-        val disposable = domain
-            .playerFieldPositions()
-            .deletePlayerPosition(player, _listPlayersWithPosition, lineupMode, hitters)
+        val disposable = useCaseHandler
+            .execute(
+                deletePlayerFieldPositionUseCase,
+                DeletePlayerFieldPosition.RequestValues(
+                    _listPlayersWithPosition,
+                    player,
+                    lineupMode,
+                    hitters
+                )
+            )
+            .ignoreElement()
             .subscribe({
                 refreshPlayers(_listPlayersWithPosition)
             }, {
@@ -270,8 +284,17 @@ class LineupViewModel : ViewModel(), KoinComponent {
     ): Completable {
         return Completable.defer {
             lineup?.let {
-                domain.playerFieldPositions()
-                    .switchPlayersPosition(position1, position2, _listPlayersWithPosition, it)
+                useCaseHandler
+                    .execute(
+                        switchPlayersPositionUseCase,
+                        SwitchPlayersPosition.RequestValues(
+                            _listPlayersWithPosition,
+                            position1,
+                            position2,
+                            it
+                        )
+                    )
+                    .ignoreElement()
                     .doOnComplete { refreshPlayers(_listPlayersWithPosition) }
             } ?: Completable.error(IllegalArgumentException("Lineup is not supposed to be null"))
         }
@@ -279,8 +302,17 @@ class LineupViewModel : ViewModel(), KoinComponent {
 
     fun onPlayerSelected(player: Player, position: FieldPosition) {
         lineup?.let {
-            val disposable = domain.playerFieldPositions()
-                .savePlayerFieldPosition(player, position, it, _listPlayersWithPosition)
+            val disposable = useCaseHandler
+                .execute(
+                    assignPlayerFieldPositionUseCase,
+                    AssignPlayerFieldPosition.RequestValues(
+                        player,
+                        position,
+                        it,
+                        _listPlayersWithPosition
+                    )
+                )
+                .ignoreElement()
                 .subscribe({
                     refreshPlayers(_listPlayersWithPosition)
                 }, {
