@@ -12,6 +12,7 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.PhoneNumberValidator
 import com.telen.easylineup.domain.usecases.SavePlayer
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.domain.utils.ValidatorUtils
@@ -186,7 +187,11 @@ internal class SavePlayerTests {
         verify(playerDao, never()).insertPlayer(any())
     }
 
-    class ValidatorUtilsMock : ValidatorUtils() {
+    class ValidatorUtilsMock : ValidatorUtils(
+        object : PhoneNumberValidator {
+            override fun isGlobalPhoneNumber(phone: String) = true
+        }
+    ) {
         override fun isEmailValid(email: String?): Boolean {
             return true
         }

@@ -127,7 +127,7 @@ object DomainModule {
         single { SaveDpAndFlex(get()) }
         single { SavePlayerNumberOverlay(get(), get()) }
         single { GetShirtNumberHistory(get(), get(), get()) }
-        single { ValidatorUtils() }
+        single { ValidatorUtils(get()) }
         single { GetBattersState(get(), get()) }
         single { UpdateLineup(get(), get()) }
         single { UpdatePlayersWithBatters(get()) }

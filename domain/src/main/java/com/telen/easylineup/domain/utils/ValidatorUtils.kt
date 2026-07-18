@@ -4,11 +4,11 @@
 
 package com.telen.easylineup.domain.utils
 
-import android.telephony.PhoneNumberUtils
+import com.telen.easylineup.domain.usecases.PhoneNumberValidator
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-open class ValidatorUtils {
+open class ValidatorUtils(private val phoneNumberValidator: PhoneNumberValidator) {
     /**
      * method is used for checking valid email id format.
      *
@@ -26,7 +26,7 @@ open class ValidatorUtils {
 
     open fun isValidPhoneNumber(phone: String?): Boolean {
         return phone.takeIf { !it.isNullOrEmpty() }?.let {
-            PhoneNumberUtils.isGlobalPhoneNumber(it)
+            phoneNumberValidator.isGlobalPhoneNumber(it)
         } ?: true
     }
 }
