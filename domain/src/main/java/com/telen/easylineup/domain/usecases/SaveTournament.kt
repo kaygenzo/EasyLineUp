@@ -14,7 +14,7 @@ import io.reactivex.rxjava3.core.Single
 /**
  * @property repository
  */
-internal class SaveTournament(val repository: TournamentRepository) :
+class SaveTournament(val repository: TournamentRepository) :
     UseCase<SaveTournament.RequestValues, SaveTournament.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.defer {

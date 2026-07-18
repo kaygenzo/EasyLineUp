@@ -13,11 +13,16 @@ import io.reactivex.rxjava3.core.Single
 /**
  * @property dao
  */
-internal class GetAllTournamentsWithLineupsUseCase(val dao: LineupRepository) :
-    UseCase<GetAllTournamentsWithLineupsUseCase.RequestValues,
+class GetAllTournamentsWithLineupsUseCase(
+    val dao: LineupRepository,
+    private val getTeam: GetTeam
+) : UseCase<GetAllTournamentsWithLineupsUseCase.RequestValues,
 GetAllTournamentsWithLineupsUseCase.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return dao.getAllTournamentsWithLineups(requestValues.filter, requestValues.teamId)
+        return getTeam.executeUseCase(GetTeam.RequestValues())
+            .flatMap { teamResponse ->
+                dao.getAllTournamentsWithLineups(requestValues.filter, teamResponse.team.id)
+            }
             .map {
                 val result: MutableMap<Tournament, MutableList<Lineup>> = mutableMapOf()
                 val lineups: MutableMap<Long, Lineup> = mutableMapOf()
@@ -56,7 +61,6 @@ GetAllTournamentsWithLineupsUseCase.ResponseValue>() {
     class ResponseValue(val result: List<Pair<Tournament, List<Lineup>>>) : UseCase.ResponseValue
     /**
      * @property filter
-     * @property teamId
      */
-    class RequestValues(val filter: String, val teamId: Long) : UseCase.RequestValues
+    class RequestValues(val filter: String) : UseCase.RequestValues
 }

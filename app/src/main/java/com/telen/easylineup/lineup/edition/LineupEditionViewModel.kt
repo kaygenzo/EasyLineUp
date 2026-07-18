@@ -16,6 +16,7 @@ import com.telen.easylineup.domain.model.RosterItem
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.toRosterPlayerStatus
+import com.telen.easylineup.domain.usecases.GetTournaments
 import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -30,6 +31,7 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
     private val domain: ApplicationInteractor by inject()
     private val useCaseHandler: UseCaseHandler by inject()
     private val savePlayerNumberOverlayUseCase: SavePlayerNumberOverlay by inject()
+    private val getTournamentsUseCase: GetTournaments by inject()
     var lineupId: Long = 0
         set(value) {
             field = value
@@ -118,7 +120,8 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
     }
 
     fun getTournaments(): Single<List<Tournament>> {
-        return domain.tournaments().getTournaments()
+        return useCaseHandler.execute(getTournamentsUseCase, GetTournaments.RequestValues())
+            .map { it.tournaments }
     }
 
     fun onTournamentChanged(tournament: Tournament) {

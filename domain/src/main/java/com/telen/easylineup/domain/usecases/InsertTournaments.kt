@@ -9,18 +9,13 @@ import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.TournamentRepository
 import io.reactivex.rxjava3.core.Single
 
-/**
- * @property dao
- */
-class GetTournaments(val dao: TournamentRepository) :
-    UseCase<GetTournaments.RequestValues, GetTournaments.ResponseValue>() {
+class InsertTournaments(private val dao: TournamentRepository) :
+    UseCase<InsertTournaments.RequestValues, InsertTournaments.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return dao.getTournaments().map { ResponseValue(it) }
+        return dao.insertTournaments(requestValues.tournaments)
+            .andThen(Single.just(ResponseValue()))
     }
 
-    /**
-     * @property tournaments
-     */
-    class ResponseValue(val tournaments: List<Tournament>) : UseCase.ResponseValue
-    class RequestValues : UseCase.RequestValues
+    class RequestValues(val tournaments: List<Tournament>) : UseCase.RequestValues
+    class ResponseValue : UseCase.ResponseValue
 }

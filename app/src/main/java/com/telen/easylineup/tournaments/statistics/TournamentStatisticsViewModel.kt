@@ -8,10 +8,11 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.application.ApplicationInteractor
+import com.telen.easylineup.domain.UseCaseHandler
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.usecases.GetTournamentStatsForPositionTable
 import io.github.kaygenzo.androidtable.api.CellConfiguration
 import io.github.kaygenzo.androidtable.api.Highlight
 import io.github.kaygenzo.androidtable.api.StyleConfiguration
@@ -27,7 +28,8 @@ class TournamentStatisticsViewModel : ViewModel(), KoinComponent {
     val leftHeadersData: MutableLiveData<List<CellConfiguration>> = MutableLiveData()
     val mainTableData: MutableLiveData<List<List<CellConfiguration>>> = MutableLiveData()
     val columnHighlights: MutableLiveData<List<Highlight>> = MutableLiveData()
-    private val domain: ApplicationInteractor by inject()
+    private val useCaseHandler: UseCaseHandler by inject()
+    private val getTournamentStatsForPositionTable: GetTournamentStatsForPositionTable by inject()
     var strategy = TeamStrategy.STANDARD
     var tournament: Tournament? = null
     var teamType: TeamType? = null
@@ -47,20 +49,25 @@ class TournamentStatisticsViewModel : ViewModel(), KoinComponent {
                 emitter.onError(IllegalArgumentException())
             }
         }
-            .flatMap { domain.tournaments().getPlayersPositionForTournament(it, strategy) }
+            .flatMap {
+                useCaseHandler.execute(
+                    getTournamentStatsForPositionTable,
+                    GetTournamentStatsForPositionTable.RequestValues(it, strategy)
+                )
+            }
             .subscribe({
                 val leftHeaderDataList: MutableList<CellConfiguration> = mutableListOf()
-                it.leftHeader.forEach {
+                it.uiConfig.leftHeader.forEach {
                     leftHeaderDataList.add(CellConfiguration(it.first))
                 }
 
                 val topHeaderDataList: MutableList<CellConfiguration> = mutableListOf()
-                it.topHeader.forEach {
+                it.uiConfig.topHeader.forEach {
                     topHeaderDataList.add(CellConfiguration(it.first, it.second))
                 }
 
                 val mainDataList: MutableList<List<CellConfiguration>> = mutableListOf()
-                it.mainTable.forEach {
+                it.uiConfig.mainTable.forEach {
                     val list: MutableList<CellConfiguration> = mutableListOf()
                     mainDataList.add(list)
                     it.forEach {
@@ -69,7 +76,7 @@ class TournamentStatisticsViewModel : ViewModel(), KoinComponent {
                 }
 
                 val columnHighlights: MutableList<Highlight> = mutableListOf()
-                it.columnToHighlight.forEach {
+                it.uiConfig.columnToHighlight.forEach {
                     columnHighlights.add(
                         it,
                         Highlight(

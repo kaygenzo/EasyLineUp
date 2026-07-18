@@ -7,7 +7,6 @@ package com.telen.easylineup.domain.mock
 import android.content.Context
 import com.google.gson.JsonParser
 import com.telen.easylineup.domain.application.LineupsInteractor
-import com.telen.easylineup.domain.application.TournamentsInteractor
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerFieldPosition
@@ -18,6 +17,7 @@ import com.telen.easylineup.domain.usecases.InsertPlayerFieldPositions
 import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
 import com.telen.easylineup.domain.usecases.InsertPlayers
 import com.telen.easylineup.domain.usecases.InsertTeam
+import com.telen.easylineup.domain.usecases.InsertTournaments
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -28,7 +28,7 @@ class DatabaseMockProvider(
     private val insertPlayerNumberOverlaysUseCase: InsertPlayerNumberOverlays,
     private val lineupsInteractor: LineupsInteractor,
     private val insertPlayerFieldPositionsUseCase: InsertPlayerFieldPositions,
-    private val tournamentsInteractor: TournamentsInteractor
+    private val insertTournamentsUseCase: InsertTournaments
 ) {
 
     fun createMockDatabase(context: Context): Completable {
@@ -188,7 +188,9 @@ class DatabaseMockProvider(
     }
 
     private fun insertTournaments(list: List<Tournament>): Completable {
-        return tournamentsInteractor.insertTournaments(list)
+        return insertTournamentsUseCase
+            .executeUseCase(InsertTournaments.RequestValues(list))
+            .ignoreElement()
             .subscribeOn(Schedulers.io())
     }
 }

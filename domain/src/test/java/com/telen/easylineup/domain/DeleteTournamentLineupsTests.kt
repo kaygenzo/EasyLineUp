@@ -11,7 +11,9 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.LineupRepository
+import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
+import com.telen.easylineup.domain.usecases.GetTeam
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
@@ -29,6 +31,7 @@ internal class DeleteTournamentLineupsTests {
     private val lineups: MutableList<Lineup> = mutableListOf()
     val observer: TestObserver<DeleteTournamentLineups.ResponseValue> = TestObserver()
     @Mock lateinit var lineupsDao: LineupRepository
+    @Mock lateinit var teamDao: TeamRepository
     lateinit var deleteTournament: DeleteTournamentLineups
     lateinit var tournament: Tournament
     lateinit var team: Team
@@ -36,7 +39,7 @@ internal class DeleteTournamentLineupsTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        deleteTournament = DeleteTournamentLineups(lineupsDao)
+        deleteTournament = DeleteTournamentLineups(lineupsDao, GetTeam(teamDao))
 
         tournament = Tournament(id = 1L, name = "toto", createdAt = 1L, 2L, 3L, null)
         team = Team(id = 1L, name = "toto", main = true)
@@ -51,6 +54,7 @@ internal class DeleteTournamentLineupsTests {
                 strategy = TeamStrategy.STANDARD.id, extraHitters = 0)
         ))
 
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
         Mockito.`when`(lineupsDao.getLineupsForTournamentRx(tournament.id, team.id)).thenReturn(Single.just(listOf(
             lineups[0], lineups[1]
         )))
@@ -59,7 +63,7 @@ internal class DeleteTournamentLineupsTests {
 
     @Test
     fun shouldDeleteOnlyLineupOfSpecificTournamentAndTeam() {
-        deleteTournament.executeUseCase(DeleteTournamentLineups.RequestValues(tournament, team))
+        deleteTournament.executeUseCase(DeleteTournamentLineups.RequestValues(tournament))
             .subscribe(observer)
         observer.await()
         observer.assertComplete()

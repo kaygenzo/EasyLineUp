@@ -20,7 +20,12 @@ import com.telen.easylineup.domain.model.MapInfo
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
+import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineupsUseCase
 import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.GetTournamentMapLink
+import com.telen.easylineup.domain.usecases.ObserveTournaments
+import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import com.telen.easylineup.utils.SharedPreferencesHelper
@@ -46,6 +51,11 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val domain: ApplicationInteractor by inject()
     private val useCaseHandler: UseCaseHandler by inject()
     private val getTeamUseCase: GetTeam by inject()
+    private val observeTournamentsUseCase: ObserveTournaments by inject()
+    private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineupsUseCase by inject()
+    private val getTournamentMapLink: GetTournamentMapLink by inject()
+    private val deleteTournamentLineups: DeleteTournamentLineups by inject()
+    private val saveTournamentUseCase: SaveTournament by inject()
     private val prefsHelper by inject<SharedPreferencesHelper>()
     private val _categorizedLineupsLiveData: MutableLiveData<List<TournamentItem>> =
         MutableLiveData()
@@ -72,13 +82,17 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun getTournaments(): LiveData<List<Tournament>> {
-        return domain.tournaments().observeTournaments()
+        return observeTournamentsUseCase.execute()
     }
 
     fun observeCategorizedLineups(): LiveData<List<TournamentItem>> {
         return filterLiveData.switchMap { filter ->
             _categorizedLineupsLiveData.apply {
-                val disposable = domain.tournaments().getCategorizedLineups(filter)
+                val disposable = useCaseHandler.execute(
+                    getAllTournamentsWithLineupsUseCase,
+                    GetAllTournamentsWithLineupsUseCase.RequestValues(filter)
+                )
+                    .map { it.result }
                     .flatMapObservable { Observable.fromIterable(it) }
                     .flatMapSingle { Single.just(TournamentItem(it.first, it.second)) }
                     .toList()
@@ -100,13 +114,16 @@ class LineupViewModel : ViewModel(), KoinComponent {
         val items = tournamentItems.filter { it.tournament.address != null }
         val disposable = Observable.fromIterable(items)
             .flatMapSingle { item ->
-                domain.tournaments().getTournamentMapInfo(
-                    item.tournament,
-                    apiKey,
-                    Constants.MAP_PIXEL_SIZE,
-                    Constants.MAP_PIXEL_SIZE
+                useCaseHandler.execute(
+                    getTournamentMapLink,
+                    GetTournamentMapLink.RequestValues(
+                        item.tournament,
+                        apiKey,
+                        Constants.MAP_PIXEL_SIZE,
+                        Constants.MAP_PIXEL_SIZE
+                    )
                 )
-                    .map { Pair(item.tournament, it) }
+                    .map { Pair(item.tournament, it.mapInfo) }
                     .onErrorResumeNext { Single.just(Pair(item.tournament, MapInfo())) }
             }
             .filter { it.second.url?.isNotEmpty() ?: false }
@@ -123,7 +140,9 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun deleteTournament(tournament: Tournament): Completable {
-        return domain.tournaments().deleteTournament(tournament)
+        return useCaseHandler
+            .execute(deleteTournamentLineups, DeleteTournamentLineups.RequestValues(tournament))
+            .ignoreElement()
     }
 
     fun getCompleteRoster(): Single<TeamRosterSummary> {
@@ -175,7 +194,9 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun saveTournament(tournament: Tournament): Completable {
-        return domain.tournaments().saveTournament(tournament)
+        return useCaseHandler
+            .execute(saveTournamentUseCase, SaveTournament.RequestValues(tournament))
+            .ignoreElement()
     }
 
     fun onTournamentSelected(tournament: Tournament) {

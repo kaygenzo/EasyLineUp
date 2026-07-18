@@ -15,7 +15,7 @@ import com.telen.easylineup.domain.usecases.exceptions.TournamentMapNotFoundExce
 import io.reactivex.rxjava3.core.Single
 import java.io.IOException
 
-internal class GetTournamentMapLink(private val geocoder: Geocoder) :
+class GetTournamentMapLink(private val geocoder: Geocoder) :
     UseCase<GetTournamentMapLink.RequestValues, GetTournamentMapLink.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.fromCallable {
