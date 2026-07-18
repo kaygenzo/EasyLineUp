@@ -9,9 +9,12 @@ import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.RosterPlayerStatus
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.repository.LineupRepository
+import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.CreateLineup
+import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import io.reactivex.rxjava3.core.Single
@@ -95,13 +98,18 @@ internal open class CreateLineupTests {
 
     @Mock
     private lateinit var lineupDao: LineupRepository
+    @Mock
+    private lateinit var teamDao: TeamRepository
     private lateinit var createLineup: CreateLineup
     private lateinit var roster: MutableList<RosterPlayerStatus>
 
     @Before
     open fun init() {
         MockitoAnnotations.initMocks(this)
-        createLineup = CreateLineup(lineupDao)
+        createLineup = CreateLineup(lineupDao, GetTeam(teamDao))
+
+        Mockito.`when`(teamDao.getTeamsRx())
+            .thenReturn(Single.just(listOf(Team(id = 1L, name = "toto", main = true))))
 
         lineup = Lineup(
             name = "title",
@@ -120,7 +128,7 @@ internal open class CreateLineupTests {
     }
 
     private fun startUseCase(roster: List<RosterPlayerStatus>) {
-        createLineup.executeUseCase(CreateLineup.RequestValues(1L, lineup, roster))
+        createLineup.executeUseCase(CreateLineup.RequestValues(lineup, roster))
             .subscribe(observer)
         observer.await()
         observer.assertComplete()
@@ -152,7 +160,7 @@ internal open class CreateLineupTests {
     @Test
     fun shouldTriggerAnExceptionIfLineupNameEmpty() {
         lineup.name = "      "
-        createLineup.executeUseCase(CreateLineup.RequestValues(1L, lineup, roster))
+        createLineup.executeUseCase(CreateLineup.RequestValues(lineup, roster))
             .subscribe(observer)
         observer.await()
         observer.assertError(LineupNameEmptyException::class.java)
@@ -161,7 +169,7 @@ internal open class CreateLineupTests {
     @Test
     fun shouldTriggerAnExceptionIfTournamentNameEmpty() {
         lineup.tournamentId = 0
-        createLineup.executeUseCase(CreateLineup.RequestValues(1L, lineup, roster))
+        createLineup.executeUseCase(CreateLineup.RequestValues(lineup, roster))
             .subscribe(observer)
         observer.await()
         observer.assertError(TournamentNameEmptyException::class.java)

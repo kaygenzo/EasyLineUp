@@ -18,7 +18,7 @@ import com.telen.easylineup.domain.model.reset
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import io.reactivex.rxjava3.core.Single
 
-internal class SaveDpAndFlex : UseCase<SaveDpAndFlex.RequestValues, SaveDpAndFlex.ResponseValue>() {
+class SaveDpAndFlex : UseCase<SaveDpAndFlex.RequestValues, SaveDpAndFlex.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         val players = requestValues.players
         val lineup = requestValues.lineup

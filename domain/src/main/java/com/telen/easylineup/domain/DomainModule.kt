@@ -5,10 +5,6 @@
 package com.telen.easylineup.domain
 
 import android.location.Geocoder
-import com.telen.easylineup.domain.application.ApplicationInteractor
-import com.telen.easylineup.domain.application.ApplicationInteractorImpl
-import com.telen.easylineup.domain.application.LineupsInteractor
-import com.telen.easylineup.domain.application.impl.LineupsInteractorImpl
 import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.CheckHashData
@@ -28,6 +24,7 @@ import com.telen.easylineup.domain.usecases.GetBattersState
 import com.telen.easylineup.domain.usecases.GetDashboardTiles
 import com.telen.easylineup.domain.usecases.GetDpAndFlexFromPlayersInField
 import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
+import com.telen.easylineup.domain.usecases.GetLineupById
 import com.telen.easylineup.domain.usecases.GetOnlyPlayersInField
 import com.telen.easylineup.domain.usecases.GetPlayer
 import com.telen.easylineup.domain.usecases.GetPlayers
@@ -41,14 +38,17 @@ import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.GetTournamentStatsForPositionTable
 import com.telen.easylineup.domain.usecases.GetTournaments
 import com.telen.easylineup.domain.usecases.ImportData
+import com.telen.easylineup.domain.usecases.InsertLineups
 import com.telen.easylineup.domain.usecases.InsertPlayerFieldPositions
 import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
 import com.telen.easylineup.domain.usecases.InsertPlayers
 import com.telen.easylineup.domain.usecases.InsertTeam
 import com.telen.easylineup.domain.usecases.InsertTournaments
+import com.telen.easylineup.domain.usecases.ObserveLineupById
 import com.telen.easylineup.domain.usecases.ObservePlayer
 import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
 import com.telen.easylineup.domain.usecases.ObservePlayers
+import com.telen.easylineup.domain.usecases.ObserveTeamPlayersAndMaybePositionsForLineup
 import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.domain.usecases.ObserveTournaments
 import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
@@ -71,40 +71,12 @@ import org.koin.dsl.module
 object DomainModule {
     val domainModules = module {
         single { UseCaseHandler(get()) }
-        single<ApplicationInteractor> {
-            ApplicationInteractorImpl(
-                lineupsInteractor = get()
-            )
-        }
-        single<LineupsInteractor> {
-            LineupsInteractorImpl(
-                context = get(),
-                playersRepo = get(),
-                lineupsRepo = get(),
-                getTeam = get(),
-                createLineup = get(),
-                updateLineupRoster = get(),
-                deleteLineup = get(),
-                setLineupMode = get(),
-                updatePlayersWithLineupMode = get(),
-                getRoster = get(),
-                saveBattingOrderAndPosition = get(),
-                getDpAndFlexFromPlayersInField = get(),
-                saveDpAndFlex = get(),
-                getBatterState = get(),
-                getListAvailablePlayersForLineup = get(),
-                getPlayersInField = get(),
-                updateLineup = get(),
-                updatePlayersWithBatters = get(),
-                useCaseHandler = get()
-            )
-        }
         single {
             DatabaseMockProvider(
                 insertTeamUseCase = get(),
                 insertPlayersUseCase = get(),
                 insertPlayerNumberOverlaysUseCase = get(),
-                lineupsInteractor = get(),
+                insertLineupsUseCase = get(),
                 insertPlayerFieldPositionsUseCase = get(),
                 insertTournamentsUseCase = get()
             )
@@ -115,7 +87,7 @@ object DomainModule {
         single { GetDashboardTiles(get(), get(), get(), get(), get(), get()) }
         single { SaveDashboardTiles(get()) }
         single { CreateDashboardTiles(get()) }
-        single { CreateLineup(get()) }
+        single { CreateLineup(get(), get()) }
         single { GetTournaments(get()) }
         single { GetAllTournamentsWithLineupsUseCase(get(), get()) }
         single { DeleteTournamentLineups(get(), get()) }
@@ -138,12 +110,12 @@ object DomainModule {
         single { AssignPlayerFieldPosition(get()) }
         single { DeletePlayerFieldPosition() }
         single { InsertPlayerFieldPositions(get()) }
-        single { GetListAvailablePlayersForSelection() }
+        single { GetListAvailablePlayersForSelection(get()) }
         single { SaveBattingOrderAndPositions(get(), get()) }
         single { DeleteLineup(get()) }
-        single { SetLineupMode() }
+        single { SetLineupMode(get(), get()) }
         single { UpdatePlayersWithLineupMode() }
-        single { GetRoster(get(), get()) }
+        single { GetRoster(get(), get(), get()) }
         single { UpdateLineupRoster(get()) }
         single { DeleteTeam(get()) }
         single { SwitchPlayersPosition(get()) }
@@ -153,7 +125,7 @@ object DomainModule {
         single { ExportData(get(), get(), get(), get(), get(), get()) }
         single { ImportData(get(), get(), get(), get(), get()) }
         single { GetOnlyPlayersInField() }
-        single { GetDpAndFlexFromPlayersInField() }
+        single { GetDpAndFlexFromPlayersInField(get()) }
         single { SaveDpAndFlex() }
         single { SavePlayerNumberOverlay(get()) }
         single { GetShirtNumberHistory(get(), get()) }
@@ -165,6 +137,10 @@ object DomainModule {
         single { GetTournamentMapLink(get()) }
         single { ObserveTournaments(get()) }
         single { InsertTournaments(get()) }
+        single { InsertLineups(get()) }
+        single { ObserveLineupById(get()) }
+        single { GetLineupById(get()) }
+        single { ObserveTeamPlayersAndMaybePositionsForLineup(get()) }
         factory { Geocoder(get()) }
     }
 }

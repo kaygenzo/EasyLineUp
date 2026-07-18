@@ -17,7 +17,7 @@ import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.utils.getPositionShortNames
 import io.reactivex.rxjava3.core.Single
 
-internal class GetBattersState :
+class GetBattersState :
     UseCase<GetBattersState.RequestValues, GetBattersState.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         val positionDescriptions =

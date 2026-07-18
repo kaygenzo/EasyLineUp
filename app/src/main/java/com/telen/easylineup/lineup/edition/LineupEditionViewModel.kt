@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.UseCaseHandler
-import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
@@ -16,8 +15,12 @@ import com.telen.easylineup.domain.model.RosterItem
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.toRosterPlayerStatus
+import com.telen.easylineup.domain.usecases.GetLineupById
+import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetTournaments
 import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
+import com.telen.easylineup.domain.usecases.UpdateLineup
+import com.telen.easylineup.domain.usecases.UpdateLineupRoster
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -28,10 +31,13 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 class LineupEditionViewModel : ViewModel(), KoinComponent {
-    private val domain: ApplicationInteractor by inject()
     private val useCaseHandler: UseCaseHandler by inject()
     private val savePlayerNumberOverlayUseCase: SavePlayerNumberOverlay by inject()
     private val getTournamentsUseCase: GetTournaments by inject()
+    private val getLineupByIdUseCase: GetLineupById by inject()
+    private val getRosterUseCase: GetRoster by inject()
+    private val updateLineupUseCase: UpdateLineup by inject()
+    private val updateLineupRosterUseCase: UpdateLineupRoster by inject()
     var lineupId: Long = 0
         set(value) {
             field = value
@@ -43,7 +49,8 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
     private var lineup: Lineup? = null
 
     private fun loadData() {
-        domain.lineups().getLineupById(lineupId)
+        useCaseHandler.execute(getLineupByIdUseCase, GetLineupById.RequestValues(lineupId))
+            .map { it.lineup }
             .flatMap {
                 this.lineup = it
                 _lineupLiveData.postValue(it)
@@ -72,16 +79,24 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getRoster(): Single<List<RosterPlayerStatus>> {
-        return domain.lineups().getRoster(lineupId).map { it.players }
+        return useCaseHandler.execute(getRosterUseCase, GetRoster.RequestValues(lineupId))
+            .map { it.summary.players }
     }
 
     fun saveClicked(): Completable {
         return Completable.defer {
             lineup?.let {
-                domain.lineups().updateLineup(it)
-                    .andThen(domain.lineups().updateRoster(lineupId, rosterItems.map {
-                        it.toRosterPlayerStatus()
-                    }))
+                useCaseHandler.execute(updateLineupUseCase, UpdateLineup.RequestValues(it))
+                    .ignoreElement()
+                    .andThen(
+                        useCaseHandler.execute(
+                            updateLineupRosterUseCase,
+                            UpdateLineupRoster.RequestValues(
+                                lineupId,
+                                rosterItems.map { it.toRosterPlayerStatus() }
+                            )
+                        ).ignoreElement()
+                    )
                     .andThen(
                         useCaseHandler.execute(
                             savePlayerNumberOverlayUseCase,

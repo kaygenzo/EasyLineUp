@@ -13,15 +13,16 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCaseHandler
-import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MapInfo
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.usecases.CreateLineup
 import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
 import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineupsUseCase
+import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.ObserveTournaments
@@ -33,6 +34,7 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -48,7 +50,6 @@ sealed class SaveResult
 data class SaveSuccess(val lineup: Lineup) : SaveResult()
 
 class LineupViewModel : ViewModel(), KoinComponent {
-    private val domain: ApplicationInteractor by inject()
     private val useCaseHandler: UseCaseHandler by inject()
     private val getTeamUseCase: GetTeam by inject()
     private val observeTournamentsUseCase: ObserveTournaments by inject()
@@ -56,7 +57,10 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val getTournamentMapLink: GetTournamentMapLink by inject()
     private val deleteTournamentLineups: DeleteTournamentLineups by inject()
     private val saveTournamentUseCase: SaveTournament by inject()
+    private val getRosterUseCase: GetRoster by inject()
+    private val createLineupUseCase: CreateLineup by inject()
     private val prefsHelper by inject<SharedPreferencesHelper>()
+    private val errors: Subject<DomainErrors.Lineups> = PublishSubject.create()
     private val _categorizedLineupsLiveData: MutableLiveData<List<TournamentItem>> =
         MutableLiveData()
     private val tournamentItems: MutableList<TournamentItem> = mutableListOf()
@@ -146,7 +150,9 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun getCompleteRoster(): Single<TeamRosterSummary> {
-        return domain.lineups().getCompleteRoster().doOnSuccess { chosenRoster = it }
+        return useCaseHandler.execute(getRosterUseCase, GetRoster.RequestValues())
+            .map { it.summary }
+            .doOnSuccess { chosenRoster = it }
     }
 
     fun getChosenRoster(): Single<TeamRosterSummary> {
@@ -154,7 +160,16 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun saveLineup() {
-        val disposable = domain.lineups().saveLineup(lineup, chosenRoster)
+        val disposable = useCaseHandler
+            .execute(createLineupUseCase, CreateLineup.RequestValues(lineup, chosenRoster.players))
+            .map { it.lineup }
+            .doOnError {
+                if (it is LineupNameEmptyException) {
+                    errors.onNext(DomainErrors.Lineups.INVALID_LINEUP_NAME)
+                } else if (it is TournamentNameEmptyException) {
+                    errors.onNext(DomainErrors.Lineups.INVALID_TOURNAMENT_NAME)
+                }
+            }
             .subscribe({ saveResult.value = SaveSuccess(it) }, {
                 when (it) {
                     is TournamentNameEmptyException,
@@ -186,7 +201,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun observeErrors(): Subject<DomainErrors.Lineups> {
-        return domain.lineups().observeErrors()
+        return errors
     }
 
     fun getTeamType(): Single<Int> {

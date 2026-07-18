@@ -5,28 +5,49 @@
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
-import com.telen.easylineup.domain.model.RosterPlayerStatus
+import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.repository.LineupRepository
+import com.telen.easylineup.domain.repository.PlayerRepository
+import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
+import com.telen.easylineup.domain.usecases.GetRoster
+import com.telen.easylineup.domain.usecases.GetTeam
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     private val observer: TestObserver<GetListAvailablePlayersForSelection.ResponseValue> =
         TestObserver()
+    @Mock lateinit var lineupDao: LineupRepository
+    @Mock lateinit var playerDao: PlayerRepository
+    @Mock lateinit var teamDao: TeamRepository
     lateinit var getListAvailablePlayersForSelection: GetListAvailablePlayersForSelection
     lateinit var players: MutableList<PlayerWithPosition>
-    lateinit var roster: MutableList<RosterPlayerStatus>
+    lateinit var lineup: Lineup
 
     @Before
     fun init() {
-        getListAvailablePlayersForSelection = GetListAvailablePlayersForSelection()
+        MockitoAnnotations.initMocks(this)
+        val getRoster = GetRoster(playerDao, lineupDao, GetTeam(teamDao))
+        getListAvailablePlayersForSelection = GetListAvailablePlayersForSelection(getRoster)
+
+        val team = Team(id = 1L, name = "toto", main = true)
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
+
+        lineup = Lineup(id = 10L, teamId = team.id, roster = "1;2;3;4;5")
 
         players = mutableListOf(
             generate(1L, FieldPosition.PITCHER, PlayerFieldPosition.FLAG_NONE, 0, 1),
@@ -42,22 +63,26 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
             )
         )
 
-        roster = mutableListOf(
-            generateRosterPlayerStatus(1L, 1, true),
-            generateRosterPlayerStatus(2L, 2, true),
-            generateRosterPlayerStatus(3L, 4, true),
-            generateRosterPlayerStatus(4L, 8, true),
-            generateRosterPlayerStatus(5L, 16, true)
+        val teamPlayers = mutableListOf(
+            Player(id = 1L, teamId = team.id, name = "p1", shirtNumber = 1, licenseNumber = 1L),
+            Player(id = 2L, teamId = team.id, name = "p2", shirtNumber = 2, licenseNumber = 2L),
+            Player(id = 3L, teamId = team.id, name = "p3", shirtNumber = 3, licenseNumber = 3L),
+            Player(id = 4L, teamId = team.id, name = "p4", shirtNumber = 4, licenseNumber = 4L),
+            Player(id = 5L, teamId = team.id, name = "p5", shirtNumber = 5, licenseNumber = 5L)
         )
+
+        Mockito.`when`(lineupDao.getLineupByIdSingle(lineup.id)).thenReturn(Single.just(lineup))
+        Mockito.`when`(playerDao.getPlayersByTeamId(team.id)).thenReturn(Single.just(teamPlayers))
+        Mockito.`when`(playerDao.getPlayersNumberOverlay(lineup.id))
+            .thenReturn(Single.just(emptyList()))
     }
 
     private fun startUseCase(
         position: FieldPosition?,
         players: List<PlayerWithPosition> = this.players,
-        roster: List<RosterPlayerStatus>? = this.roster,
         exception: Class<out Throwable>? = null
     ) {
-        val request = GetListAvailablePlayersForSelection.RequestValues(players, position, roster)
+        val request = GetListAvailablePlayersForSelection.RequestValues(players, position, lineup)
         getListAvailablePlayersForSelection.executeUseCase(request).subscribe(observer)
         observer.await()
         exception?.let {
@@ -106,25 +131,17 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldReturnAllPlayersWhenRosterIsNull() {
-        startUseCase(position = FieldPosition.SECOND_BASE, roster = null)
-        observer.values().first().players.let {
-            Assert.assertEquals(3, it.size)
-        }
-    }
-
-    @Test
     fun shouldRtriggerAnExceptionWhenRosterIsEmpty() {
+        lineup.roster = ""
         startUseCase(
-            roster = mutableListOf(),
             position = FieldPosition.SECOND_BASE,
             exception = NoSuchElementException::class.java
         )
     }
 
     @Test
-    fun shouldReturnSomePlayersWhenRosterIsNotNullAndNotEmpty() {
-        roster.removeIf { it.player.id == 4L || it.player.id == 5L }
+    fun shouldReturnSomePlayersWhenRosterIsNotFull() {
+        lineup.roster = "1;2;3"
         startUseCase(position = FieldPosition.SECOND_BASE)
         Assert.assertEquals(1, observer.values().first().players.size)
         Assert.assertEquals(2L, observer.values().first().players.first().playerId)

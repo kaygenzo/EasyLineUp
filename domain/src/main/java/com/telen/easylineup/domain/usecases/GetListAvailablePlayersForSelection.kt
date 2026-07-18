@@ -6,44 +6,50 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.UseCase
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.PlayerWithPosition
-import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.isAssigned
 import com.telen.easylineup.domain.model.isDefensePlayer
 import com.telen.easylineup.domain.model.isSubstitute
 import io.reactivex.rxjava3.core.Single
 
-internal class GetListAvailablePlayersForSelection :
+class GetListAvailablePlayersForSelection(private val getRoster: GetRoster) :
     UseCase<GetListAvailablePlayersForSelection.RequestValues,
 GetListAvailablePlayersForSelection.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        val players = requestValues.players
-        val playersSelectedForLineup = requestValues.rosterPlayers
-            ?.filter { it.status }
-            ?.map { it.player.id }
+        return getRoster.executeUseCase(GetRoster.RequestValues(requestValues.lineup.id))
+            .map { it.summary.players }
+            .map { rosterPlayers ->
+                val players = requestValues.players
+                val playersSelectedForLineup = rosterPlayers
+                    .filter { it.status }
+                    .map { it.player.id }
 
-        var listAvailablePlayers = players
-            // get only player no placed on a position except the substitutes, but only if it is
-            // not to add in the container of substitutes
-            .filter {
-                val setAsSubstitute = requestValues.position == FieldPosition.SUBSTITUTE
-                !it.isAssigned() || (it.isSubstitute() && !setAsSubstitute)
+                var listAvailablePlayers = players
+                    // get only player no placed on a position except the substitutes, but only
+                    // if it is not to add in the container of substitutes
+                    .filter {
+                        val setAsSubstitute = requestValues.position == FieldPosition.SUBSTITUTE
+                        !it.isAssigned() || (it.isSubstitute() && !setAsSubstitute)
+                    }
+                    // no player excluded from the lineup roster
+                    .filter { playersSelectedForLineup.contains(it.playerId) }
+
+                requestValues.position?.run {
+                    if (isDefensePlayer()) {
+                        listAvailablePlayers = listAvailablePlayers
+                            .sortedWith(getPlayerComparator(this))
+                    }
+                }
+                listAvailablePlayers
             }
-            // no player excluded from the lineup roster
-            .filter { playersSelectedForLineup?.contains(it.playerId) ?: true }
-
-        requestValues.position?.run {
-            if (isDefensePlayer()) {
-                listAvailablePlayers = listAvailablePlayers
-                    .sortedWith(getPlayerComparator(this))
+            .flatMap { listAvailablePlayers ->
+                if (listAvailablePlayers.isNotEmpty()) {
+                    Single.just(ResponseValue(listAvailablePlayers))
+                } else {
+                    Single.error(NoSuchElementException())
+                }
             }
-        }
-
-        return if (listAvailablePlayers.isNotEmpty()) {
-            Single.just(ResponseValue(listAvailablePlayers))
-        } else {
-            Single.error(NoSuchElementException())
-        }
     }
 
     private fun getPlayerComparator(position: FieldPosition): Comparator<PlayerWithPosition> {
@@ -63,12 +69,12 @@ GetListAvailablePlayersForSelection.ResponseValue>() {
     /**
      * @property players
      * @property position
-     * @property rosterPlayers
+     * @property lineup
      */
     class RequestValues(
         val players: List<PlayerWithPosition>,
         val position: FieldPosition?,
-        val rosterPlayers: List<RosterPlayerStatus>?
+        val lineup: Lineup
     ) : UseCase.RequestValues
 
     /**

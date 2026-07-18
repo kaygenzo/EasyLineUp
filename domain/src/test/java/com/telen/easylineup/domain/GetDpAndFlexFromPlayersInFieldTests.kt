@@ -7,29 +7,38 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.model.isRightField
+import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetDpAndFlexFromPlayersInField
+import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
     private val observer: TestObserver<GetDpAndFlexFromPlayersInField.ResponseValue> =
         TestObserver()
+    @Mock lateinit var teamDao: TeamRepository
     lateinit var useCase: GetDpAndFlexFromPlayersInField
     lateinit var players: MutableList<PlayerWithPosition>
 
     @Before
     fun init() {
-        useCase = GetDpAndFlexFromPlayersInField()
+        MockitoAnnotations.initMocks(this)
+        useCase = GetDpAndFlexFromPlayersInField(GetTeam(teamDao))
         val noFlag = PlayerFieldPosition.FLAG_NONE
         players = mutableListOf(
             generate(1L, FieldPosition.PITCHER, noFlag, 1),
@@ -45,7 +54,9 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
         teamType: TeamType,
         exception: Class<out Throwable>? = null
     ) {
-        val request = GetDpAndFlexFromPlayersInField.RequestValues(players, teamType.id)
+        Mockito.`when`(teamDao.getTeamsRx())
+            .thenReturn(Single.just(listOf(Team(id = 1L, name = "toto", type = teamType.id, main = true))))
+        val request = GetDpAndFlexFromPlayersInField.RequestValues(players)
         val playersSize = players.size
         useCase.executeUseCase(request).subscribe(observer)
         observer.await()

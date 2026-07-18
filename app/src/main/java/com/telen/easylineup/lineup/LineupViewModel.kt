@@ -21,7 +21,6 @@ import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.UseCaseHandler
-import com.telen.easylineup.domain.application.ApplicationInteractor
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
@@ -31,10 +30,22 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
+import com.telen.easylineup.domain.usecases.DeleteLineup
 import com.telen.easylineup.domain.usecases.DeletePlayerFieldPosition
+import com.telen.easylineup.domain.usecases.GetBattersState
+import com.telen.easylineup.domain.usecases.GetDpAndFlexFromPlayersInField
+import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
+import com.telen.easylineup.domain.usecases.GetLineupById
+import com.telen.easylineup.domain.usecases.GetOnlyPlayersInField
 import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.ObserveLineupById
 import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
+import com.telen.easylineup.domain.usecases.ObserveTeamPlayersAndMaybePositionsForLineup
+import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
+import com.telen.easylineup.domain.usecases.SaveDpAndFlex
+import com.telen.easylineup.domain.usecases.SetLineupMode
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
+import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import com.telen.easylineup.views.LineupTypeface
@@ -79,13 +90,27 @@ data class ListAvailablePlayers(
 
 class LineupViewModel : ViewModel(), KoinComponent {
     private val prefsHelper by inject<SharedPreferencesHelper>()
-    private val domain: ApplicationInteractor by inject()
+    private val context: Context by inject()
     private val useCaseHandler: UseCaseHandler by inject()
     private val getTeamUseCase: GetTeam by inject()
     private val observePlayerNumberOverlays: ObservePlayerNumberOverlays by inject()
     private val deletePlayerFieldPositionUseCase: DeletePlayerFieldPosition by inject()
     private val switchPlayersPositionUseCase: SwitchPlayersPosition by inject()
     private val assignPlayerFieldPositionUseCase: AssignPlayerFieldPosition by inject()
+    private val getLineupByIdUseCase: GetLineupById by inject()
+    private val getListAvailablePlayersForSelectionUseCase: GetListAvailablePlayersForSelection
+    by inject()
+    private val saveBattingOrderAndPositionsUseCase: SaveBattingOrderAndPositions by inject()
+    private val deleteLineupUseCase: DeleteLineup by inject()
+    private val setLineupModeUseCase: SetLineupMode by inject()
+    private val getDpAndFlexFromPlayersInFieldUseCase: GetDpAndFlexFromPlayersInField by inject()
+    private val getBattersStateUseCase: GetBattersState by inject()
+    private val observeTeamPlayersAndMaybePositionsForLineupUseCase:
+    ObserveTeamPlayersAndMaybePositionsForLineup by inject()
+    private val observeLineupByIdUseCase: ObserveLineupById by inject()
+    private val getOnlyPlayersInFieldUseCase: GetOnlyPlayersInField by inject()
+    private val saveDpAndFlexUseCase: SaveDpAndFlex by inject()
+    private val updatePlayersWithBattersUseCase: UpdatePlayersWithBatters by inject()
 
     // private val _designatedPlayerTitle = MutableLiveData<String>()
     private val _helpEvent: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -173,27 +198,39 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun getTeamStrategy(): Single<TeamStrategy> {
-        return domain.lineups().getLineupById(lineupId ?: 0)
-            .map { TeamStrategy.getStrategyById(it.strategy) }
+        return useCaseHandler.execute(getLineupByIdUseCase, GetLineupById.RequestValues(lineupId ?: 0))
+            .map { TeamStrategy.getStrategyById(it.lineup.strategy) }
             .subscribeOn(Schedulers.io())
     }
 
     private fun getNotSelectedPlayers(sortBy: FieldPosition?): Single<List<PlayerWithPosition>> {
         return Single.defer {
             lineup?.let {
-                domain.lineups().getNotSelectedPlayersFromList(_listPlayersWithPosition, it, sortBy)
+                useCaseHandler.execute(
+                    getListAvailablePlayersForSelectionUseCase,
+                    GetListAvailablePlayersForSelection.RequestValues(
+                        _listPlayersWithPosition,
+                        sortBy,
+                        it
+                    )
+                ).map { it.players }
             } ?: Single.error(IllegalArgumentException("Lineup is not expected to be null"))
         }
     }
 
     fun save(): Completable {
         return lineup?.let {
-            domain.lineups().updateLineupAndPlayers(it, _listPlayersWithPosition)
+            useCaseHandler.execute(
+                saveBattingOrderAndPositionsUseCase,
+                SaveBattingOrderAndPositions.RequestValues(it, _listPlayersWithPosition)
+            ).ignoreElement()
         } ?: Completable.error(IllegalArgumentException("Lineup is not supposed to be null"))
     }
 
     fun deleteLineup(): Completable {
-        return domain.lineups().deleteLineup(lineupId)
+        return useCaseHandler
+            .execute(deleteLineupUseCase, DeleteLineup.RequestValues(lineupId))
+            .ignoreElement()
     }
 
     fun getTeamType(): Single<Int> {
@@ -202,14 +239,17 @@ class LineupViewModel : ViewModel(), KoinComponent {
 
     fun onLineupModeChanged(isEnabled: Boolean) {
         lineup?.let { lineup ->
-            val disposable =
-                domain.lineups().updateLineupMode(isEnabled, lineup, _listPlayersWithPosition)
-                    .subscribe({
-                        setLineup(lineup)
-                        refreshPlayers(_listPlayersWithPosition)
-                    }, {
-                        Timber.e(it)
-                    })
+            val disposable = useCaseHandler.execute(
+                setLineupModeUseCase,
+                SetLineupMode.RequestValues(isEnabled, lineup, _listPlayersWithPosition)
+            )
+                .ignoreElement()
+                .subscribe({
+                    setLineup(lineup)
+                    refreshPlayers(_listPlayersWithPosition)
+                }, {
+                    Timber.e(it)
+                })
             disposables.add(disposable)
         }
     }
@@ -329,7 +369,11 @@ class LineupViewModel : ViewModel(), KoinComponent {
                     Maybe.just(ListAvailablePlayers(it, position))
                 }
             } else {
-                domain.lineups().getDpAndFlexFromPlayersInField(_listPlayersWithPosition)
+                useCaseHandler.execute(
+                    getDpAndFlexFromPlayersInFieldUseCase,
+                    GetDpAndFlexFromPlayersInField.RequestValues(_listPlayersWithPosition)
+                )
+                    .map { it.configResult }
                     .flatMapMaybe {
                         val title = if (it.teamType == TeamType.SOFTBALL.id) {
                             R.string.link_dp_and_flex_dialog_title
@@ -355,20 +399,22 @@ class LineupViewModel : ViewModel(), KoinComponent {
             _lineup.switchMap { lineup ->
                 val batterSize = TeamStrategy.getStrategyById(lineup.strategy).batterSize
                 val extraHitters = lineup.extraHitters
-                val lineupMode = lineup.mode
                 val disposable = useCaseHandler
                     .execute(getTeamUseCase, GetTeam.RequestValues())
                     .map { it.team.type }
                     .flatMap {
-                        domain.lineups().getBatterStates(
-                            players = players,
-                            teamType = it,
-                            batterSize = batterSize,
-                            extraHitterSize = extraHitters,
-                            lineupMode = lineupMode,
-                            isDebug = BuildConfig.DEBUG,
-                            isEditable = editable
-                        )
+                        useCaseHandler.execute(
+                            getBattersStateUseCase,
+                            GetBattersState.RequestValues(
+                                context = context,
+                                players = players,
+                                teamType = it,
+                                batterSize = batterSize,
+                                extraHitterSize = extraHitters,
+                                isDebug = BuildConfig.DEBUG,
+                                isEditable = editable
+                            )
+                        ).map { it.players }
                     }.subscribe({
                     _batters.postValue(it)
                 }, {
@@ -386,7 +432,9 @@ class LineupViewModel : ViewModel(), KoinComponent {
 
     private fun getLineupAndPositions(): LiveData<List<PlayerWithPosition>> {
         return getLineup()
-            .switchMap { domain.lineups().observeTeamPlayersAndMaybePositionsForLineup(it.id) }
+            .switchMap {
+                observeTeamPlayersAndMaybePositionsForLineupUseCase.execute(it.id)
+            }
             .switchMap { positions ->
                 _listPlayersWithPosition.clear()
                 _listPlayersWithPosition.addAll(positions)
@@ -405,7 +453,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getLineup(): LiveData<Lineup> {
-        return domain.lineups().observeLineupById(lineupId ?: 0).map {
+        return observeLineupByIdUseCase.execute(lineupId ?: 0).map {
             it.apply {
                 this@LineupViewModel.lineup = this
             }
@@ -435,7 +483,11 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun getPlayerSelectionForFlex(): Single<List<PlayerWithPosition>> {
-        return domain.lineups().getPlayersInFieldFromList(_listPlayersWithPosition)
+        return useCaseHandler.execute(
+            getOnlyPlayersInFieldUseCase,
+            GetOnlyPlayersInField.RequestValues(_listPlayersWithPosition)
+        )
+            .map { it.playersInField }
             .onErrorResumeNext {
                 if (it is NoSuchElementException) {
                     Timber.e(it.message.toString())
@@ -449,15 +501,21 @@ class LineupViewModel : ViewModel(), KoinComponent {
     fun linkDpAndFlex(dp: Player?, flex: Player?): Completable {
         return Completable.defer {
             lineup?.let {
-                domain.lineups().linkDpAndFlex(dp, flex, it, _listPlayersWithPosition)
+                useCaseHandler.execute(
+                    saveDpAndFlexUseCase,
+                    SaveDpAndFlex.RequestValues(it, dp, flex, _listPlayersWithPosition)
+                )
+                    .ignoreElement()
                     .doOnComplete { refreshPlayers(_listPlayersWithPosition) }
             } ?: Completable.error(IllegalStateException("Lineup cannot be null"))
         }
     }
 
     fun onBattersChanged(batters: List<BatterState>): Completable {
-        return domain.lineups()
-            .updatePlayersWithBatters(_listPlayersWithPosition, batters)
+        return useCaseHandler.execute(
+            updatePlayersWithBattersUseCase,
+            UpdatePlayersWithBatters.RequestValues(_listPlayersWithPosition, batters)
+        ).ignoreElement()
     }
 }
 

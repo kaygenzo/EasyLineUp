@@ -17,7 +17,7 @@ import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.model.reset
 import io.reactivex.rxjava3.core.Single
 
-internal class UpdatePlayersWithLineupMode :
+class UpdatePlayersWithLineupMode :
     UseCase<UpdatePlayersWithLineupMode.RequestValues,
 UpdatePlayersWithLineupMode.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {

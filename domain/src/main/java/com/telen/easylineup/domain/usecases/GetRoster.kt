@@ -13,47 +13,52 @@ import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
 import io.reactivex.rxjava3.core.Single
 
-internal class GetRoster(
+class GetRoster(
     private val dao: PlayerRepository,
-    private val lineupDao: LineupRepository
+    private val lineupDao: LineupRepository,
+    private val getTeam: GetTeam
 ) : UseCase<GetRoster.RequestValues, GetRoster.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return requestValues.lineupId?.let { lineupId ->
-            val overlays: MutableMap<Long, PlayerNumberOverlay> = mutableMapOf()
-            dao.getPlayersNumberOverlay(lineupId)
-                .flatMap {
-                    it.forEach {
-                        overlays[it.playerId] = it
-                    }
-                    lineupDao.getLineupByIdSingle(lineupId)
-                }
-                .flatMap { lineup ->
-                    val rosterIds = stringToRoster(lineup.roster)
-                    dao.getPlayersByTeamId(requestValues.teamId).map { players ->
-                        // if rosterIds is null, it means that all players are selected
-                        val status = rosterIds?.let {
-                            if (it.size == players.size) {
-                                Constants.STATUS_ALL
-                            } else {
-                                Constants.STATUS_PARTIAL
+        return getTeam.executeUseCase(GetTeam.RequestValues())
+            .map { it.team.id }
+            .flatMap { teamId ->
+                requestValues.lineupId?.let { lineupId ->
+                    val overlays: MutableMap<Long, PlayerNumberOverlay> = mutableMapOf()
+                    dao.getPlayersNumberOverlay(lineupId)
+                        .flatMap {
+                            it.forEach {
+                                overlays[it.playerId] = it
                             }
-                        } ?: Constants.STATUS_ALL
-                        ResponseValue(TeamRosterSummary(status, players.map {
-                            RosterPlayerStatus(
-                                it,
-                                rosterIds?.contains(it.id) ?: true,
-                                overlays[it.id]
-                            )
-                        }))
-                    }
+                            lineupDao.getLineupByIdSingle(lineupId)
+                        }
+                        .flatMap { lineup ->
+                            val rosterIds = stringToRoster(lineup.roster)
+                            dao.getPlayersByTeamId(teamId).map { players ->
+                                // if rosterIds is null, it means that all players are selected
+                                val status = rosterIds?.let {
+                                    if (it.size == players.size) {
+                                        Constants.STATUS_ALL
+                                    } else {
+                                        Constants.STATUS_PARTIAL
+                                    }
+                                } ?: Constants.STATUS_ALL
+                                ResponseValue(TeamRosterSummary(status, players.map {
+                                    RosterPlayerStatus(
+                                        it,
+                                        rosterIds?.contains(it.id) ?: true,
+                                        overlays[it.id]
+                                    )
+                                }))
+                            }
+                        }
+                } ?: dao.getPlayersByTeamId(teamId).map {
+                    ResponseValue(
+                        TeamRosterSummary(
+                            Constants.STATUS_ALL,
+                            it.map { RosterPlayerStatus(it, true, null) })
+                    )
                 }
-        } ?: dao.getPlayersByTeamId(requestValues.teamId).map {
-            ResponseValue(
-                TeamRosterSummary(
-                    Constants.STATUS_ALL,
-                    it.map { RosterPlayerStatus(it, true, null) })
-            )
-        }
+            }
     }
 
     private fun stringToRoster(rosterString: String?): List<Long>? {
@@ -75,8 +80,7 @@ internal class GetRoster(
     class ResponseValue(val summary: TeamRosterSummary) : UseCase.ResponseValue
 
     /**
-     * @property teamId
      * @property lineupId
      */
-    class RequestValues(val teamId: Long, val lineupId: Long?) : UseCase.RequestValues
+    class RequestValues(val lineupId: Long? = null) : UseCase.RequestValues
 }

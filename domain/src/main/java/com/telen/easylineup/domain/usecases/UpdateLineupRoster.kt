@@ -9,7 +9,7 @@ import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.repository.LineupRepository
 import io.reactivex.rxjava3.core.Single
 
-internal class UpdateLineupRoster(private val lineupRepository: LineupRepository) :
+class UpdateLineupRoster(private val lineupRepository: LineupRepository) :
     UseCase<UpdateLineupRoster.RequestValues, UpdateLineupRoster.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.create {

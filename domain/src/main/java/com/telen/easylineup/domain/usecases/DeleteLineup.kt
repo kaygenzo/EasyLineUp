@@ -9,7 +9,7 @@ import com.telen.easylineup.domain.repository.LineupRepository
 import io.reactivex.rxjava3.core.Single
 import java.lang.Exception
 
-internal class DeleteLineup(private val lineupDao: LineupRepository) :
+class DeleteLineup(private val lineupDao: LineupRepository) :
     UseCase<DeleteLineup.RequestValues, DeleteLineup.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return requestValues.lineupId?.let { id ->

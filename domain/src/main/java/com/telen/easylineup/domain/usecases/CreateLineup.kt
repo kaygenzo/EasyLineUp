@@ -12,8 +12,10 @@ import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import io.reactivex.rxjava3.core.Single
 
-internal class CreateLineup(private val lineupsDao: LineupRepository) :
-    UseCase<CreateLineup.RequestValues, CreateLineup.ResponseValue>() {
+class CreateLineup(
+    private val lineupsDao: LineupRepository,
+    private val getTeam: GetTeam
+) : UseCase<CreateLineup.RequestValues, CreateLineup.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.defer {
             requestValues.lineup.let { lineup ->
@@ -28,13 +30,16 @@ internal class CreateLineup(private val lineupsDao: LineupRepository) :
                 } else {
                     rosterToString(requestValues.roster)
                 }
-                lineup.teamId = requestValues.teamId
                 lineup.roster = roster
 
-                lineupsDao.insertLineup(lineup).map {
-                    lineup.id = it
-                    ResponseValue(lineup)
-                }
+                getTeam.executeUseCase(GetTeam.RequestValues())
+                    .flatMap { teamResponse ->
+                        lineup.teamId = teamResponse.team.id
+                        lineupsDao.insertLineup(lineup).map {
+                            lineup.id = it
+                            ResponseValue(lineup)
+                        }
+                    }
             }
         }
     }
@@ -58,12 +63,10 @@ internal class CreateLineup(private val lineupsDao: LineupRepository) :
     class ResponseValue(val lineup: Lineup) : UseCase.ResponseValue
 
     /**
-     * @property teamId
      * @property lineup
      * @property roster
      */
     class RequestValues(
-        val teamId: Long,
         val lineup: Lineup,
         val roster: List<RosterPlayerStatus>
     ) : UseCase.RequestValues

@@ -10,7 +10,7 @@ import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isSubstitute
 import io.reactivex.rxjava3.core.Single
 
-internal class GetOnlyPlayersInField :
+class GetOnlyPlayersInField :
     UseCase<GetOnlyPlayersInField.RequestValues, GetOnlyPlayersInField.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
         return Single.just(requestValues.playersInLineup)

@@ -6,13 +6,13 @@ package com.telen.easylineup.domain.mock
 
 import android.content.Context
 import com.google.gson.JsonParser
-import com.telen.easylineup.domain.application.LineupsInteractor
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.usecases.InsertLineups
 import com.telen.easylineup.domain.usecases.InsertPlayerFieldPositions
 import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
 import com.telen.easylineup.domain.usecases.InsertPlayers
@@ -26,7 +26,7 @@ class DatabaseMockProvider(
     private val insertTeamUseCase: InsertTeam,
     private val insertPlayersUseCase: InsertPlayers,
     private val insertPlayerNumberOverlaysUseCase: InsertPlayerNumberOverlays,
-    private val lineupsInteractor: LineupsInteractor,
+    private val insertLineupsUseCase: InsertLineups,
     private val insertPlayerFieldPositionsUseCase: InsertPlayerFieldPositions,
     private val insertTournamentsUseCase: InsertTournaments
 ) {
@@ -169,7 +169,8 @@ class DatabaseMockProvider(
     }
 
     private fun insertLineups(list: List<Lineup>): Completable {
-        return lineupsInteractor.insertLineups(list)
+        return insertLineupsUseCase.executeUseCase(InsertLineups.RequestValues(list))
+            .ignoreElement()
             .subscribeOn(Schedulers.io())
     }
 

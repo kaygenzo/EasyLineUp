@@ -14,7 +14,7 @@ import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 
-internal class SaveBattingOrderAndPositions(
+class SaveBattingOrderAndPositions(
     private val lineupRepository: LineupRepository,
     private val pfpRepository: PlayerFieldPositionRepository
 ) : UseCase<SaveBattingOrderAndPositions.RequestValues,

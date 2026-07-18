@@ -9,7 +9,7 @@ import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import io.reactivex.rxjava3.core.Single
 
-internal class UpdatePlayersWithBatters :
+class UpdatePlayersWithBatters :
     UseCase<UpdatePlayersWithBatters.RequestValues, UpdatePlayersWithBatters.ResponseValue>() {
     object ResponseValue : UseCase.ResponseValue
 

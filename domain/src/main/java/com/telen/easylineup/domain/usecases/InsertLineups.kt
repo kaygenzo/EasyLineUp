@@ -9,18 +9,13 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.repository.LineupRepository
 import io.reactivex.rxjava3.core.Single
 
-class UpdateLineup(private val lineupRepo: LineupRepository) :
-    UseCase<UpdateLineup.RequestValues, UpdateLineup.ResponseValue>() {
+class InsertLineups(private val dao: LineupRepository) :
+    UseCase<InsertLineups.RequestValues, InsertLineups.ResponseValue>() {
     override fun executeUseCase(requestValues: RequestValues): Single<ResponseValue> {
-        return requestValues.lineup.let { lineup ->
-            lineupRepo.updateLineup(lineup)
-                .andThen(Single.just(ResponseValue()))
-        }
+        return dao.insertLineups(requestValues.lineups)
+            .andThen(Single.just(ResponseValue()))
     }
 
-    /**
-     * @property lineup
-     */
-    class RequestValues(val lineup: Lineup) : UseCase.RequestValues
+    class RequestValues(val lineups: List<Lineup>) : UseCase.RequestValues
     class ResponseValue : UseCase.ResponseValue
 }
