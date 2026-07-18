@@ -235,4 +235,7 @@
 
     <string name="discard_change_title">Vous êtes sur le point de perdre vos modifications</string>
     <string name="discard_change_message">Vous perdrez vos changements, êtes-vous vraiment sûr ?</string>
+
+    <string name="tournament_stats_unknown_player_name">Inconnu</string>
+    <string name="tournament_stats_label_games_played">Total</string>
 </resources>

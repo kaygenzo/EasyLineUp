@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain
 
-import android.content.Context
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
@@ -12,6 +11,7 @@ import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.GetTournamentStatsForPositionTable
+import com.telen.easylineup.domain.usecases.StringResourcesProvider
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Before
@@ -26,7 +26,7 @@ import org.mockito.junit.MockitoJUnitRunner
 internal class GetTournamentStatsForPositionTableTests {
     @Mock lateinit var lineupDao: LineupRepository
     @Mock lateinit var teamDao: TeamRepository
-    @Mock lateinit var context: Context
+    @Mock lateinit var stringResourcesProvider: StringResourcesProvider
     lateinit var getTournamentStatsForPositionTable: GetTournamentStatsForPositionTable
     lateinit var team: Team
     lateinit var tournament: Tournament
@@ -38,7 +38,7 @@ internal class GetTournamentStatsForPositionTableTests {
         tournament = Tournament(id = 5L, name = "Summer cup", createdAt = 1000L, startTime = 2000L, endTime = 3000L)
         getTournamentStatsForPositionTable =
             GetTournamentStatsForPositionTable(
-                context, lineupDao, GetTeam(teamDao, testSchedulersProvider()),
+                stringResourcesProvider, lineupDao, GetTeam(teamDao, testSchedulersProvider()),
                 testSchedulersProvider()
             )
 

@@ -24,7 +24,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.databinding.ViewBarChartBinding
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamStrategy
-import com.telen.easylineup.domain.utils.getPositionShortNames
+import com.telen.easylineup.utils.StringResourcesProviderImpl
 
 class PositionsBarChart : ConstraintLayout {
     val binding = ViewBarChartBinding.inflate(LayoutInflater.from(context), this, true)
@@ -101,7 +101,7 @@ class PositionsBarChart : ConstraintLayout {
     private fun refreshHorizontalaxis() {
         teamType?.let {
             val horizontalAxis = binding.playerPositionsChart.xAxis
-            positions = getPositionShortNames(context, it)
+            positions = StringResourcesProviderImpl(context).positionShortNames(it)
             horizontalAxis.valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
                     val index = value.toInt()

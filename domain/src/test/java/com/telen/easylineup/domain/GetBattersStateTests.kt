@@ -4,8 +4,6 @@
 
 package com.telen.easylineup.domain
 
-import android.content.Context
-import android.content.res.Resources
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.MODE_ENABLED
@@ -14,6 +12,7 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.GetBattersState
+import com.telen.easylineup.domain.usecases.StringResourcesProvider
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
@@ -693,10 +692,7 @@ internal abstract class GetBattersStateTests {
     val observer: TestObserver<List<BatterState>> = TestObserver()
 
     @Mock
-    lateinit var context: Context
-
-    @Mock
-    lateinit var resources: Resources
+    lateinit var stringResourcesProvider: StringResourcesProvider
     lateinit var getBattersState: GetBattersState
 
     protected abstract fun initParameters()
@@ -705,11 +701,10 @@ internal abstract class GetBattersStateTests {
     open fun init() {
         initParameters()
         MockitoAnnotations.initMocks(this)
-        getBattersState = GetBattersState(testSchedulersProvider())
+        getBattersState = GetBattersState(stringResourcesProvider, testSchedulersProvider())
         batterSize = strategy.batterSize
 
-        Mockito.`when`(context.resources).thenReturn(resources)
-        Mockito.`when`(resources.getStringArray(R.array.field_positions_baseball_list)).thenReturn(
+        Mockito.`when`(stringResourcesProvider.positionShortNames(TeamType.BASEBALL.id)).thenReturn(
             arrayOf(
                 "SUB",
                 "P",
@@ -731,7 +726,7 @@ internal abstract class GetBattersStateTests {
             )
         )
 
-        Mockito.`when`(resources.getStringArray(R.array.field_positions_softball_list)).thenReturn(
+        Mockito.`when`(stringResourcesProvider.positionShortNames(TeamType.SOFTBALL.id)).thenReturn(
             arrayOf(
                 "SUB",
                 "P",
@@ -829,7 +824,6 @@ internal abstract class GetBattersStateTests {
 
     protected fun applyUserCase() {
         getBattersState(
-            context,
             players,
             teamType.id,
             batterSize,

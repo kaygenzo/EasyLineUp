@@ -4,21 +4,17 @@
 
 package com.telen.easylineup.domain.usecases
 
-import android.content.Context
-import com.telen.easylineup.domain.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerInLineup
 import com.telen.easylineup.domain.model.TeamStrategy
-import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.TournamentStatsUiConfig
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.repository.LineupRepository
-import com.telen.easylineup.domain.utils.getPositionShortNames
 import io.reactivex.rxjava3.core.Single
 
 class GetTournamentStatsForPositionTable(
-    private val context: Context,
+    private val stringResourcesProvider: StringResourcesProvider,
     private val dao: LineupRepository,
     private val getTeam: GetTeam,
     private val schedulersProvider: SchedulersProvider
@@ -44,9 +40,7 @@ class GetTournamentStatsForPositionTable(
                         list.forEach { player ->
                             player.playerId?.let { playerId ->
                                 playersIdToPlayerName[playerId] = player.playerName
-                                    ?: context.getString(
-                                        R.string.tournament_stats_unknown_player_name
-                                    )
+                                    ?: stringResourcesProvider.unknownPlayerName()
 
                                 if (!playerIdToData.containsKey(playerId)) {
                                     playerIdToData[playerId] = mutableListOf()
@@ -56,14 +50,12 @@ class GetTournamentStatsForPositionTable(
                             }
                         }
 
-                        val positionsArray = getPositionShortNames(context, team.type)
+                        val positionsArray = stringResourcesProvider.positionShortNames(team.type)
 
                         topHeaderData
                             .add(
                                 Pair(
-                                    context.getString(
-                                        R.string.tournament_stats_label_games_played
-                                    ),
+                                    stringResourcesProvider.gamesPlayedLabel(),
                                     -1
                                 )
                             )
@@ -102,10 +94,9 @@ class GetTournamentStatsForPositionTable(
                         }
 
                         var topLeftCell: List<String>? = null
-                        TeamType.getTypeById(team.type)
-                            .getStrategiesDisplayName(context)?.let {
-                                topLeftCell = it.toList()
-                            } ?: let { /* nothing to do, just use standard strategy */ }
+                        stringResourcesProvider.strategyDisplayNames(team.type)?.let {
+                            topLeftCell = it.toList()
+                        } ?: let { /* nothing to do, just use standard strategy */ }
 
                         TournamentStatsUiConfig(
                             leftHeaderData,

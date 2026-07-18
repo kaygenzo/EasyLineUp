@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import android.content.Context
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
@@ -13,12 +12,13 @@ import com.telen.easylineup.domain.model.isDefensePlayer
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isFlex
 import com.telen.easylineup.domain.model.isSubstitute
-import com.telen.easylineup.domain.utils.getPositionShortNames
 import io.reactivex.rxjava3.core.Single
 
-class GetBattersState(private val schedulersProvider: SchedulersProvider) {
+class GetBattersState(
+    private val stringResourcesProvider: StringResourcesProvider,
+    private val schedulersProvider: SchedulersProvider
+) {
     operator fun invoke(
-        context: Context,
         players: List<PlayerWithPosition>,
         teamType: Int,
         batterSize: Int,
@@ -27,7 +27,7 @@ class GetBattersState(private val schedulersProvider: SchedulersProvider) {
         isEditable: Boolean
     ): Single<List<BatterState>> {
         return Single.fromCallable {
-            val positionDescriptions = getPositionShortNames(context, teamType)
+            val positionDescriptions = stringResourcesProvider.positionShortNames(teamType)
             val result: MutableList<BatterState> = mutableListOf()
             val maxBatterSize = batterSize + extraHitterSize
 

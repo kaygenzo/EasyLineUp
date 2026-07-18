@@ -19,7 +19,7 @@ import com.telen.easylineup.databinding.ItemPlayerSimpleBinding
 import com.telen.easylineup.databinding.ViewBottomSheetPlayerListBinding
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
-import com.telen.easylineup.domain.utils.getPositionShortNames
+import com.telen.easylineup.utils.StringResourcesProviderImpl
 import timber.log.Timber
 
 interface OnPlayerClickListener {
@@ -96,7 +96,8 @@ class PlayerListAdapter(
                 val isMatchingPosition = player.positions and it.mask > 0
                 if (isMatchingPosition) {
                     filterPosition.visibility = View.VISIBLE
-                    val positionShortDescription = getPositionShortNames(filterPosition.context, 0)
+                    val positionShortDescription =
+                        StringResourcesProviderImpl(filterPosition.context).positionShortNames(0)
                     filterPosition.setText(positionShortDescription[it.ordinal])
                     filterPosition.setBackground(R.drawable.position_selected_background)
                     filterPosition.setTextColor(R.color.white)

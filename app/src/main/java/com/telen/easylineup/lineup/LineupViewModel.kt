@@ -97,7 +97,6 @@ data class ListAvailablePlayers(
 
 class LineupViewModel : ViewModel(), KoinComponent {
     private val prefsHelper by inject<SharedPreferencesHelper>()
-    private val context: Context by inject()
     private val getTeamUseCase: GetTeam by inject()
     private val observePlayerNumberOverlays: ObservePlayerNumberOverlays by inject()
     private val deletePlayerFieldPositionUseCase: DeletePlayerFieldPosition by inject()
@@ -383,7 +382,6 @@ class LineupViewModel : ViewModel(), KoinComponent {
                         .map { it.type }
                         .flatMap {
                             getBattersStateUseCase(
-                                context = context,
                                 players = players,
                                 teamType = it,
                                 batterSize = batterSize,
