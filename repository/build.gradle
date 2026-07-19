@@ -65,3 +65,5 @@ dependencies {
 
     implementation project(path: ':domain')
 }
+
+apply from: '../detekt.gradle'

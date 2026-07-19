@@ -1,5 +1,6 @@
 plugins {
-    alias(libs.plugins.android.library)
+    id 'java-library'
+    alias(libs.plugins.kotlin.jvm)
 }
 
 repositories {
@@ -12,74 +13,21 @@ if (sonarPropertiesFile.exists()) {
     sonarProperties.load(new FileInputStream(sonarPropertiesFile))
 }
 
-android {
-    compileSdkVersion compileVersion
-
-    defaultConfig {
-        minSdkVersion minVersion
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles 'consumer-rules.pro'
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-        debug {
-            enableUnitTestCoverage true
-            enableAndroidTestCoverage true
-        }
-    }
-
-    flavorDimensions 'version'
-    productFlavors {
-        dev {
-            dimension 'version'
-        }
-        prod {
-            dimension 'version'
-        }
-        demo {
-            dimension 'version'
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    testOptions {
-        unitTests.all {
-            jacoco {
-                includeNoLocationClasses = true
-                excludes = ['jdk.internal.*']
-            }
-        }
-        targetSdk { version = release(targetVersion) }
-    }
-    namespace 'com.telen.easylineup.domain'
-    lint {
-        abortOnError false
-        targetSdk targetVersion
-    }
-    buildFeatures {
-        buildConfig true
-    }
+kotlin {
+    jvmToolchain(17)
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    testImplementation libs.tests.junit
+    testImplementation libs.junit4
     testImplementation libs.mockito.core
     testImplementation libs.mockito.kotlin
 
     implementation libs.rx.java
     implementation libs.gson
-    implementation libs.koin
-    implementation libs.android.core
+    implementation libs.koin.core
 }
 
-apply from: '../jacoco.gradle'
+apply plugin: 'jacoco'
+apply from: '../detekt.gradle'

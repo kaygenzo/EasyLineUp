@@ -26,6 +26,7 @@ rxIdlerVersion = "0.11.0"
 mockitoCoreVersion = "2.23.0"
 mockitoKotlinVersion = "2.2.0"
 archCoreTestingVersion = "2.2.0"
+junit4Version = "4.13.2"
 # Others
 timberVersion = "5.0.1"
 rxAndroidVersion = "3.0.2"
@@ -80,6 +81,7 @@ tests-uiAutomator = { group = "androidx.test.uiautomator", name = "uiautomator",
 tests-screengrab = { group = "tools.fastlane", name = "screengrab", version.ref = "fastlaneVersion" }
 tests-barista = { group = "com.adevinta.android", name = "barista", version.ref = "baristaVersion" }
 tests-junit = { group = "androidx.test.ext", name = "junit", version.ref = "extJUnitVersion" }
+junit4 = { group = "junit", name = "junit", version.ref = "junit4Version" }
 activity = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityVersion" }
 fragment = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentVersion" }
 recyclerView = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerViewVersion" }
@@ -108,6 +110,8 @@ mpAndroidChart = { group = "com.github.PhilJay", name = "MPAndroidChart", versio
 picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picassoVersion" }
 rounedImage = { group = "com.makeramen", name = "roundedimageview", version.ref = "roundedImageView" }
 koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koinVersion" }
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koinVersion" }
+detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detektPluginVersion" }
 taptaptarget = { group = "com.getkeepsafe.taptargetview", name = "taptargetview", version.ref = "taptargetviewVersion" }
 dexter = { group = "com.karumi", name = "dexter", version.ref = "dexterVersion" }
 licenser = { group = "com.github.marcoscgdev", name = "Licenser", version.ref = "licenserVersion" }
@@ -118,6 +122,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 android-application = { id = "com.android.application", version.ref = "androidGradlePluginVersion" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePluginVersion" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinVersion" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "googleServicesPluginVersion" }
 navigation = { id = "androidx.navigation.safeargs", version.ref = "navigationPluginVersion" }
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqubePluginVersion" }

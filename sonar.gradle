@@ -39,10 +39,8 @@ sonarqube {
 project.tasks["sonarqube"].dependsOn ':app:testProdDebugUnitTestCoverage'
 project.tasks["sonarqube"].dependsOn ':app:lintProdDebug'
 project.tasks["sonarqube"].dependsOn ':app:dependencyCheckAnalyze'
+project.tasks["sonarqube"].dependsOn ':app:detekt'
 
 //domain
-project.tasks["sonarqube"].dependsOn ':domain:testProdDebugUnitTestCoverage'
-project.tasks["sonarqube"].dependsOn ':domain:lintProdDebug'
-
-//project
-project.tasks["sonarqube"].dependsOn 'detekt'
+project.tasks["sonarqube"].dependsOn ':domain:test'
+project.tasks["sonarqube"].dependsOn ':domain:detekt'

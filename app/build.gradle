@@ -217,3 +217,4 @@ dependencies {
 
 apply from: '../jacoco.gradle'
 apply from: '../dependency-check.gradle'
+apply from: '../detekt.gradle'
