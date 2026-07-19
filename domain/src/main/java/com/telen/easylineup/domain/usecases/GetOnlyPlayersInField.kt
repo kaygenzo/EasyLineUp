@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.domain.usecases
 
+import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isSubstitute

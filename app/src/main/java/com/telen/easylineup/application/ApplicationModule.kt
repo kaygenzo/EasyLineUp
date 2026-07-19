@@ -4,10 +4,10 @@
 
 package com.telen.easylineup.application
 
-import com.telen.easylineup.domain.usecases.GeocodingPort
-import com.telen.easylineup.domain.usecases.PhoneNumberValidator
-import com.telen.easylineup.domain.usecases.SchedulersProvider
-import com.telen.easylineup.domain.usecases.StringResourcesProvider
+import com.telen.easylineup.domain.ports.GeocodingPort
+import com.telen.easylineup.domain.ports.PhoneNumberValidator
+import com.telen.easylineup.domain.ports.SchedulersProvider
+import com.telen.easylineup.domain.ports.StringResourcesProvider
 import com.telen.easylineup.utils.GeocodingPortImpl
 import com.telen.easylineup.utils.PhoneNumberValidatorImpl
 import com.telen.easylineup.utils.SchedulersProviderImpl

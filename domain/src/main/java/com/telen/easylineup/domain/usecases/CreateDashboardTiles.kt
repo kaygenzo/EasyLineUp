@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.domain.usecases
 
+import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.tiles.TileType
 import com.telen.easylineup.domain.repository.TilesRepository

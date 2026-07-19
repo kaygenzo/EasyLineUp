@@ -4,7 +4,7 @@
 
 package com.telen.easylineup.domain.utils
 
-import com.telen.easylineup.domain.usecases.PhoneNumberValidator
+import com.telen.easylineup.domain.ports.PhoneNumberValidator
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 

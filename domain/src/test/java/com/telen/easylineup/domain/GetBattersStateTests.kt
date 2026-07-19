@@ -12,7 +12,7 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.GetBattersState
-import com.telen.easylineup.domain.usecases.StringResourcesProvider
+import com.telen.easylineup.domain.ports.StringResourcesProvider
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before

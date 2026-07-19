@@ -3,7 +3,7 @@ package com.telen.easylineup.utils
 import android.content.Context
 import android.location.Geocoder
 import com.telen.easylineup.domain.model.GeoLocation
-import com.telen.easylineup.domain.usecases.GeocodingPort
+import com.telen.easylineup.domain.ports.GeocodingPort
 import java.io.IOException
 
 class GeocodingPortImpl(context: Context) : GeocodingPort {

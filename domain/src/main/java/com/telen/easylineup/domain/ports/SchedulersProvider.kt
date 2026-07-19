@@ -1,4 +1,4 @@
-package com.telen.easylineup.domain.usecases
+package com.telen.easylineup.domain.ports
 
 import io.reactivex.rxjava3.core.Scheduler
 

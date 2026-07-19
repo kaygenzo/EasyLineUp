@@ -4,7 +4,7 @@
 
 package com.telen.easylineup
 
-import com.telen.easylineup.domain.usecases.SchedulersProvider
+import com.telen.easylineup.domain.ports.SchedulersProvider
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.schedulers.Schedulers
 

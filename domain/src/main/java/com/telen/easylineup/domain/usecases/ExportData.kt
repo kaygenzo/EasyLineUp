@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.domain.usecases
 
+import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.model.export.LineupExport
 import com.telen.easylineup.domain.model.export.PlayerExport

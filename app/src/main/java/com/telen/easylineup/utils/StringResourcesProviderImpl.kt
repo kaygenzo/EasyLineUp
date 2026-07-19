@@ -3,7 +3,7 @@ package com.telen.easylineup.utils
 import android.content.Context
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.usecases.StringResourcesProvider
+import com.telen.easylineup.domain.ports.StringResourcesProvider
 
 class StringResourcesProviderImpl(private val context: Context) : StringResourcesProvider {
     override fun positionShortNames(teamType: Int): Array<String> {

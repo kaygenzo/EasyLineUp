@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.domain.usecases
 
+import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import io.reactivex.rxjava3.core.Completable

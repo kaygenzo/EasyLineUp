@@ -4,6 +4,8 @@
 
 package com.telen.easylineup.domain.usecases
 
+import com.telen.easylineup.domain.ports.GeocodingPort
+import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.GeoLocation
 import com.telen.easylineup.domain.model.MapInfo
 import com.telen.easylineup.domain.model.Tournament

@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.domain.usecases
 
+import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import io.reactivex.rxjava3.core.Completable

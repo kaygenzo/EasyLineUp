@@ -11,7 +11,7 @@ import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.GetTournamentStatsForPositionTable
-import com.telen.easylineup.domain.usecases.StringResourcesProvider
+import com.telen.easylineup.domain.ports.StringResourcesProvider
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
 import org.junit.Before

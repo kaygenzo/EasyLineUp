@@ -1,6 +1,6 @@
 package com.telen.easylineup.utils
 
-import com.telen.easylineup.domain.usecases.SchedulersProvider
+import com.telen.easylineup.domain.ports.SchedulersProvider
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.schedulers.Schedulers
