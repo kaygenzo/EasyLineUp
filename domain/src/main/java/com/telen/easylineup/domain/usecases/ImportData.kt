@@ -189,6 +189,8 @@ class ImportData(
             positions = playerExport.positions,
             pitching = playerExport.pitching,
             batting = playerExport.batting,
+            email = playerExport.email,
+            phone = playerExport.phone,
             sex = playerExport.sex,
             hash = playerExport.id
         )

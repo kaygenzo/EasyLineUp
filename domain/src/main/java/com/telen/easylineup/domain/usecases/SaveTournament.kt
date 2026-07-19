@@ -18,13 +18,16 @@ class SaveTournament(
     operator fun invoke(tournament: Tournament): Completable {
         return Completable.defer {
             with(tournament) {
+                if (name.isEmpty()) {
+                    return@defer Completable.error(TournamentNameEmptyException())
+                }
                 repository.getTournamentByName(name)
                     .flatMapCompletable {
                         Completable.error(AlreadyExistingTournamentException())
                     }
-                    .onErrorResumeNext {
-                        if (name.isEmpty()) {
-                            Completable.error(TournamentNameEmptyException())
+                    .onErrorResumeNext { error ->
+                        if (error is AlreadyExistingTournamentException) {
+                            Completable.error(error)
                         } else {
                             repository.insertTournament(this).flatMapCompletable {
                                 this.id = it
