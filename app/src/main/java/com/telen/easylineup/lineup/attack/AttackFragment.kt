@@ -47,6 +47,7 @@ class AttackFragment : BaseFragment("AttackFragment"), BatterListener {
     private val viewModel by viewModels<LineupViewModel>(
         ownerProducer = { requireParentFragment() }
     )
+    private var dividerItemDecoration: ItemDecoratorAttackRecycler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,13 +87,17 @@ class AttackFragment : BaseFragment("AttackFragment"), BatterListener {
             .onEach {
                 val batterSize = TeamStrategy.getStrategyById(it.strategy).batterSize
                 val extraHitters = it.extraHitters
-                val dividerItemDecoration = ItemDecoratorAttackRecycler(
+                dividerItemDecoration?.let { previous ->
+                    binder.recyclerView.removeItemDecoration(previous)
+                }
+                val newDecoration = ItemDecoratorAttackRecycler(
                     context,
                     linearLayoutManager.orientation,
                     batterSize,
                     extraHitters
                 )
-                binder.recyclerView.addItemDecoration(dividerItemDecoration)
+                dividerItemDecoration = newDecoration
+                binder.recyclerView.addItemDecoration(newDecoration)
                 playerAdapter.notifyDataSetChanged()
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
@@ -147,6 +152,7 @@ class AttackFragment : BaseFragment("AttackFragment"), BatterListener {
     override fun onDestroyView() {
         super.onDestroyView()
         binder = null
+        dividerItemDecoration = null
     }
 
     override fun onBattersChanged(batters: List<BatterState>) {
