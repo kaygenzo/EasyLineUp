@@ -73,10 +73,18 @@ class AssignPlayerFieldPosition(
                         if (lineupMode == MODE_ENABLED && teamType == TeamType.BASEBALL.id) {
                             this.order = strategy.getDesignatedPlayerOrder(extraHittersSize)
                             this.flags = PlayerFieldPosition.FLAG_FLEX
+                        } else {
+                            this.flags = PlayerFieldPosition.FLAG_NONE
                         }
                     }
 
-                    else -> {}
+                    else -> {
+                        // clear a leftover flex flag if this player was previously the DH/flex
+                        // and is now being placed on a regular position through this direct
+                        // assignment path (SwitchPlayersPosition already does this, this use
+                        // case did not).
+                        this.flags = PlayerFieldPosition.FLAG_NONE
+                    }
                 }
 
                 // we keep the order of the previous position, except if there wasn't
