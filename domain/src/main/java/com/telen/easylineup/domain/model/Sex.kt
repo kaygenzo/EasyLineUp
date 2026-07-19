@@ -4,17 +4,13 @@
 
 package com.telen.easylineup.domain.model
 
-import androidx.annotation.ColorRes
-import com.telen.easylineup.domain.R
-
 /**
  * @property id
- * @property defaultColorRes
  */
-enum class Sex(val id: Int, @ColorRes val defaultColorRes: Int) {
-    UNKNOWN(0, 0),
-    MALE(1, R.color.default_men_color),
-    FEMALE(2, R.color.default_women_color),
+enum class Sex(val id: Int) {
+    UNKNOWN(0),
+    MALE(1),
+    FEMALE(2),
     ;
 
     companion object {

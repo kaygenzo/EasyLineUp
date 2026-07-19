@@ -10,6 +10,8 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.SaveTeam
+import com.telen.easylineup.utils.sportDrawableRes
+import com.telen.easylineup.utils.titleRes
 import com.telen.easylineup.views.TeamTypeCardItem
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -70,16 +72,16 @@ class SetupViewModel : ViewModel(), KoinComponent {
         return TeamType.values().mapNotNull { type ->
             when (type) {
                 TeamType.BASEBALL -> TeamTypeCardItem(
-                    type.id, type.title, R.drawable.image_baseball_ball_with_stroke,
-                    R.drawable.image_baseball_ball, type.sportResId
+                    type.id, type.titleRes(), R.drawable.image_baseball_ball_with_stroke,
+                    R.drawable.image_baseball_ball, type.sportDrawableRes()
                 )
                 TeamType.SOFTBALL -> TeamTypeCardItem(
-                    type.id, type.title, R.drawable.image_softball_ball_with_stroke,
-                    R.drawable.image_softball_ball, type.sportResId
+                    type.id, type.titleRes(), R.drawable.image_softball_ball_with_stroke,
+                    R.drawable.image_softball_ball, type.sportDrawableRes()
                 )
                 TeamType.BASEBALL_5 -> TeamTypeCardItem(
-                    type.id, type.title, R.drawable.image_baseball_ball_with_stroke,
-                    R.drawable.image_baseball_ball, type.sportResId
+                    type.id, type.titleRes(), R.drawable.image_baseball_ball_with_stroke,
+                    R.drawable.image_baseball_ball, type.sportDrawableRes()
                 )
                 else -> {
                     Timber.e("Unknown team type $type")

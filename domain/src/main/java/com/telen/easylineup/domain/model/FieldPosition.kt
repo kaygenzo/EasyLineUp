@@ -4,10 +4,6 @@
 
 package com.telen.easylineup.domain.model
 
-import android.content.Context
-import android.graphics.PointF
-import com.telen.easylineup.domain.R
-
 /**
  * @property id
  * @property mask
@@ -54,60 +50,57 @@ fun FieldPosition.isDefensePlayer(): Boolean {
     return !isSubstitute() && id != FieldPosition.DP_DH.id
 }
 
-fun FieldPosition.getPositionShortName(context: Context, teamType: Int): String {
-    return when (teamType) {
-        TeamType.SOFTBALL.id ->
-            context.resources.getStringArray(R.array.field_positions_softball_list)[ordinal]
+/**
+ * @property x
+ * @property y
+ */
+data class FieldPositionCoordinate(val x: Float, val y: Float)
 
-        else -> context.resources.getStringArray(R.array.field_positions_baseball_list)[ordinal]
-    }
-}
-
-fun FieldPosition.getPositionPercentage(strategy: TeamStrategy): PointF {
+fun FieldPosition.getPositionPercentage(strategy: TeamStrategy): FieldPositionCoordinate {
     return when (strategy) {
         TeamStrategy.B5_DEFAULT -> when (this) {
-            FieldPosition.OLD_SUBSTITUTE, FieldPosition.SUBSTITUTE -> PointF(0f, 0f)
-            FieldPosition.FIRST_BASE -> PointF(73.8f, 11.9f)
-            FieldPosition.SECOND_BASE -> PointF(42.86f, 11.9f)
-            FieldPosition.THIRD_BASE -> PointF(11.9f, 73.8f)
-            FieldPosition.SHORT_STOP -> PointF(11.9f, 42.86f)
-            FieldPosition.MID_FIELDER -> PointF(11.9f, 11.9f)
+            FieldPosition.OLD_SUBSTITUTE, FieldPosition.SUBSTITUTE -> FieldPositionCoordinate(0f, 0f)
+            FieldPosition.FIRST_BASE -> FieldPositionCoordinate(73.8f, 11.9f)
+            FieldPosition.SECOND_BASE -> FieldPositionCoordinate(42.86f, 11.9f)
+            FieldPosition.THIRD_BASE -> FieldPositionCoordinate(11.9f, 73.8f)
+            FieldPosition.SHORT_STOP -> FieldPositionCoordinate(11.9f, 42.86f)
+            FieldPosition.MID_FIELDER -> FieldPositionCoordinate(11.9f, 11.9f)
             else -> throw Exception("Not a valid position for strategy $strategy")
         }
 
         else -> when (this) {
-            FieldPosition.OLD_SUBSTITUTE, FieldPosition.SUBSTITUTE -> PointF(0f, 0f)
-            FieldPosition.PITCHER -> PointF(50f, 59f)
-            FieldPosition.CATCHER -> PointF(50f, 87f)
-            FieldPosition.FIRST_BASE -> PointF(74f, 57f)
-            FieldPosition.SECOND_BASE -> PointF(63f, 44f)
-            FieldPosition.THIRD_BASE -> PointF(27f, 57f)
-            FieldPosition.SHORT_STOP -> PointF(37f, 44f)
-            FieldPosition.DP_DH -> PointF(0f, 100f)
+            FieldPosition.OLD_SUBSTITUTE, FieldPosition.SUBSTITUTE -> FieldPositionCoordinate(0f, 0f)
+            FieldPosition.PITCHER -> FieldPositionCoordinate(50f, 59f)
+            FieldPosition.CATCHER -> FieldPositionCoordinate(50f, 87f)
+            FieldPosition.FIRST_BASE -> FieldPositionCoordinate(74f, 57f)
+            FieldPosition.SECOND_BASE -> FieldPositionCoordinate(63f, 44f)
+            FieldPosition.THIRD_BASE -> FieldPositionCoordinate(27f, 57f)
+            FieldPosition.SHORT_STOP -> FieldPositionCoordinate(37f, 44f)
+            FieldPosition.DP_DH -> FieldPositionCoordinate(0f, 100f)
             else -> when (strategy) {
                 TeamStrategy.STANDARD -> when (this) {
-                    FieldPosition.LEFT_FIELD -> PointF(15f, 15f)
-                    FieldPosition.CENTER_FIELD -> PointF(50f, 10f)
-                    FieldPosition.RIGHT_FIELD -> PointF(85f, 15f)
+                    FieldPosition.LEFT_FIELD -> FieldPositionCoordinate(15f, 15f)
+                    FieldPosition.CENTER_FIELD -> FieldPositionCoordinate(50f, 10f)
+                    FieldPosition.RIGHT_FIELD -> FieldPositionCoordinate(85f, 15f)
                     else -> throw Exception("Not a valid position $this for strategy $strategy")
                 }
 
                 TeamStrategy.SLOWPITCH -> when (this) {
-                    FieldPosition.SLOWPITCH_LF -> PointF(14f, 20f)
-                    FieldPosition.SLOWPITCH_LCF -> PointF(38f, 10f)
-                    FieldPosition.SLOWPITCH_RCF -> PointF(62f, 10f)
-                    FieldPosition.SLOWPITCH_RF -> PointF(86f, 20f)
+                    FieldPosition.SLOWPITCH_LF -> FieldPositionCoordinate(14f, 20f)
+                    FieldPosition.SLOWPITCH_LCF -> FieldPositionCoordinate(38f, 10f)
+                    FieldPosition.SLOWPITCH_RCF -> FieldPositionCoordinate(62f, 10f)
+                    FieldPosition.SLOWPITCH_RF -> FieldPositionCoordinate(86f, 20f)
                     else -> throw Exception("Not a valid position for strategy $strategy")
                 }
 
                 TeamStrategy.FIVE_MAN_STANDARD -> when (this) {
-                    FieldPosition.LEFT_FIELD -> PointF(30f, 15f)
-                    FieldPosition.RIGHT_FIELD -> PointF(70f, 15f)
-                    FieldPosition.MID_FIELDER -> PointF(50f, 35f)
+                    FieldPosition.LEFT_FIELD -> FieldPositionCoordinate(30f, 15f)
+                    FieldPosition.RIGHT_FIELD -> FieldPositionCoordinate(70f, 15f)
+                    FieldPosition.MID_FIELDER -> FieldPositionCoordinate(50f, 35f)
                     else -> throw Exception("Not a valid position for strategy $strategy")
                 }
 
-                else -> PointF(0f, 0f)
+                else -> FieldPositionCoordinate(0f, 0f)
             }
         }
     }

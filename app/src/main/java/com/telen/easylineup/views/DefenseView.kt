@@ -245,7 +245,7 @@ abstract class DefenseView : ConstraintLayout {
             val iconSize = (it * ICON_SIZE_SCALE).roundToInt()
             val indicatorRadius = iconSize / INDICATOR_RADIUS_FACTOR
             val percentage = position.getPositionPercentage(strategy)
-            val pos = percentageToCoordinates(it, percentage)
+            val pos = percentageToCoordinates(it, PointF(percentage.x, percentage.y))
             val size = iconSize.toFloat()
             checkBounds(it, pos.x, pos.y, size, size) { x: Float, y: Float ->
                 val cx = x + iconSize / 2

@@ -28,6 +28,7 @@ import com.telen.easylineup.databinding.ViewCreateTeamBinding
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.drawn
 import com.telen.easylineup.utils.ready
+import com.telen.easylineup.utils.sportDrawableRes
 import timber.log.Timber
 import kotlin.math.abs
 
@@ -228,17 +229,20 @@ private class CardPagerAdapter(private val data: MutableList<TeamTypeCardItem>) 
             view.teamTypeRepresentation.drawn {
                 view.teamTypeRepresentation.apply {
                     when (item.type) {
-                        TeamType.BASEBALL.id -> Picasso.get().load(TeamType.BASEBALL.sportResId)
+                        TeamType.BASEBALL.id -> Picasso.get()
+                            .load(TeamType.BASEBALL.sportDrawableRes())
                             .resize(width, height)
                             .centerCrop()
                             .into(view.teamTypeRepresentation)
 
-                        TeamType.SOFTBALL.id -> Picasso.get().load(TeamType.SOFTBALL.sportResId)
+                        TeamType.SOFTBALL.id -> Picasso.get()
+                            .load(TeamType.SOFTBALL.sportDrawableRes())
                             .resize(width, height)
                             .centerCrop()
                             .into(view.teamTypeRepresentation)
 
-                        TeamType.BASEBALL_5.id -> Picasso.get().load(TeamType.BASEBALL_5.sportResId)
+                        TeamType.BASEBALL_5.id -> Picasso.get()
+                            .load(TeamType.BASEBALL_5.sportDrawableRes())
                             .resize(width, height)
                             .centerCrop()
                             .into(view.teamTypeRepresentation)

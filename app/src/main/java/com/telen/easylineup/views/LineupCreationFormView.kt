@@ -25,6 +25,7 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.utils.getStrategiesDisplayName
 import java.text.DateFormat
 
 interface OnActionButtonListener {

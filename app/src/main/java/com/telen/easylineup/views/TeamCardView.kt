@@ -23,6 +23,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.databinding.ItemCardTeamTypeBinding
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.drawn
+import com.telen.easylineup.utils.sportDrawableRes
 import timber.log.Timber
 
 class TeamCardView : ConstraintLayout {
@@ -102,9 +103,9 @@ class TeamCardView : ConstraintLayout {
         with(binding.teamTypeRepresentation) {
             drawn {
                 when (teamType) {
-                    TeamType.BASEBALL.id -> TeamType.BASEBALL.sportResId
-                    TeamType.SOFTBALL.id -> TeamType.SOFTBALL.sportResId
-                    TeamType.BASEBALL_5.id -> TeamType.BASEBALL_5.sportResId
+                    TeamType.BASEBALL.id -> TeamType.BASEBALL.sportDrawableRes()
+                    TeamType.SOFTBALL.id -> TeamType.SOFTBALL.sportDrawableRes()
+                    TeamType.BASEBALL_5.id -> TeamType.BASEBALL_5.sportDrawableRes()
                     else -> null
                 }?.let {
                     Picasso.get().load(it)

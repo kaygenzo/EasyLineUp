@@ -14,6 +14,7 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.utils.getStrategiesDisplayName
 import java.text.SimpleDateFormat
 import java.util.Locale
 

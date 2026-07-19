@@ -15,13 +15,13 @@ fun Sex.getColor(context: Context): Int {
         Sex.MALE -> SharedPreferencesUtils.getIntSetting(
             context,
             R.string.key_men_style,
-            ContextCompat.getColor(context, defaultColorRes)
+            ContextCompat.getColor(context, R.color.default_men_color)
         )
 
         Sex.FEMALE -> SharedPreferencesUtils.getIntSetting(
             context,
             R.string.key_women_style,
-            ContextCompat.getColor(context, defaultColorRes)
+            ContextCompat.getColor(context, R.color.default_women_color)
         )
 
         else -> Color.TRANSPARENT

@@ -21,8 +21,8 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.model.getPositionShortName
 import com.telen.easylineup.domain.model.isDefensePlayer
+import com.telen.easylineup.utils.StringResourcesProviderImpl
 import timber.log.Timber
 
 interface PlayerFormListener {
@@ -231,7 +231,10 @@ class PlayerFormView : ConstraintLayout {
                 positionState[position] = isEnabled
 
                 val view = PlayerPositionFilterView(context)
-                view.setText(position.getPositionShortName(context, TeamType.UNKNOWN.id))
+                view.setText(
+                    StringResourcesProviderImpl(context)
+                        .positionShortNames(TeamType.UNKNOWN.id)[position.ordinal]
+                )
                 applyFilterOnView(view, isEnabled)
 
                 view.setOnClickListener { _ ->
