@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.CheckHashData
 import com.telen.easylineup.domain.usecases.CheckTeam
@@ -69,16 +68,6 @@ import org.koin.dsl.module
 
 object DomainModule {
     val domainModules = module {
-        single {
-            DatabaseMockProvider(
-                insertTeamUseCase = get(),
-                insertPlayersUseCase = get(),
-                insertPlayerNumberOverlaysUseCase = get(),
-                insertLineupsUseCase = get(),
-                insertPlayerFieldPositionsUseCase = get(),
-                insertTournamentsUseCase = get()
-            )
-        }
         single { GetTeam(get(), get()) }
         single { GetAllTeams(get(), get()) }
         single { SaveCurrentTeam(get(), get()) }

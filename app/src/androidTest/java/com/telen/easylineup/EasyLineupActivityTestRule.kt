@@ -9,14 +9,30 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.mock.DatabaseMockProvider
 import com.telen.easylineup.domain.usecases.DeleteAllData
+import com.telen.easylineup.domain.usecases.InsertLineups
+import com.telen.easylineup.domain.usecases.InsertPlayerFieldPositions
+import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
+import com.telen.easylineup.domain.usecases.InsertPlayers
+import com.telen.easylineup.domain.usecases.InsertTeam
+import com.telen.easylineup.domain.usecases.InsertTournaments
+import com.telen.easylineup.mock.DatabaseMockProvider
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.koin.core.component.inject
 
 class EasyLineupActivityTestRule<T : Activity?> : ActivityTestRule<T>, KoinComponent {
     private val deleteAllDataUseCase: DeleteAllData by inject()
-    private val databaseMockProvider: DatabaseMockProvider by inject()
+    private val databaseMockProvider: DatabaseMockProvider by lazy {
+        DatabaseMockProvider(
+            insertTeamUseCase = get<InsertTeam>(),
+            insertPlayersUseCase = get<InsertPlayers>(),
+            insertPlayerNumberOverlaysUseCase = get<InsertPlayerNumberOverlays>(),
+            insertLineupsUseCase = get<InsertLineups>(),
+            insertPlayerFieldPositionsUseCase = get<InsertPlayerFieldPositions>(),
+            insertTournamentsUseCase = get<InsertTournaments>()
+        )
+    }
     private val context: Context by inject()
 
     constructor(activityClass: Class<T>?) : super(activityClass)
