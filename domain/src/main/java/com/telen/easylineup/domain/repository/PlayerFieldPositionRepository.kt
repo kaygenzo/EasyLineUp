@@ -12,8 +12,10 @@ import com.telen.easylineup.domain.model.PositionWithLineup
 interface PlayerFieldPositionRepository {
     suspend fun insertPlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>)
     suspend fun updatePlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>)
-    suspend fun updatePlayerFieldPositionsWithRowCount(fieldPositions: List<PlayerFieldPosition>):
-    Int
+    suspend fun updatePlayerFieldPositionsWithRowCount(
+        fieldPositions: List<PlayerFieldPosition>
+    ): Int
+
     suspend fun deletePosition(position: PlayerFieldPosition)
     suspend fun deletePositions(position: List<PlayerFieldPosition>)
     suspend fun updatePlayerFieldPosition(fieldPosition: PlayerFieldPosition)

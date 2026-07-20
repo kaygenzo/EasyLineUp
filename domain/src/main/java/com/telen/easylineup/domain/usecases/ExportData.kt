@@ -93,7 +93,6 @@ class ExportData(
                         lineupsExport.add(lineupExport)
 
                         playerFieldPositionsDao.getAllPlayerFieldPositionsForLineup(lineup.id)
-                            
                             .forEach {
                                 val positionExport = it.toPlayerFieldPositionsExport(
                                     playersUuidMap[it.playerId]

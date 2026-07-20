@@ -29,6 +29,7 @@ class UpdatePlayersWithLineupMode(private val dispatcherProvider: DispatcherProv
                     TeamType.SOFTBALL.id -> {
                         /* nothing to do */
                     }
+
                     TeamType.BASEBALL.id -> {
                         // find the pitcher if exists and set him at position 10 in lineup
                         players.firstOrNull { it.isPitcher() }?.let {
@@ -39,8 +40,10 @@ class UpdatePlayersWithLineupMode(private val dispatcherProvider: DispatcherProv
                             it.flags = PlayerFieldPosition.FLAG_FLEX
                         }
                     }
+
                     else -> throw IllegalArgumentException()
                 }
+
                 MODE_DISABLED -> players.filter { it.isDpDhOrFlex() }.forEach { it.reset() }
             }
         }

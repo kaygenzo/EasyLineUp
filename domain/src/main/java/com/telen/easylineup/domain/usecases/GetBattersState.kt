@@ -65,10 +65,12 @@ class GetBattersState(
                                 canShowIndex = subsFoundNumber <= extraHitterSize
                             }
                         }
+
                         player.isDpDh() -> {
                             isDp = true
                             canShowIndex = true
                         }
+
                         else -> {
                             isFlex = player.isFlex()
                             if (isFlex) {

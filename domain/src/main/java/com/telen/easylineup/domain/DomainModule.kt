@@ -21,8 +21,8 @@ import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineupsUseCase
 import com.telen.easylineup.domain.usecases.GetBattersState
 import com.telen.easylineup.domain.usecases.GetDashboardTiles
 import com.telen.easylineup.domain.usecases.GetDpAndFlexFromPlayersInField
-import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
 import com.telen.easylineup.domain.usecases.GetLineupById
+import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
 import com.telen.easylineup.domain.usecases.GetOnlyPlayersInField
 import com.telen.easylineup.domain.usecases.GetPlayer
 import com.telen.easylineup.domain.usecases.GetPlayers

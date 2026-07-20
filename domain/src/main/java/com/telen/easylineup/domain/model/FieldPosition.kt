@@ -59,7 +59,10 @@ data class FieldPositionCoordinate(val x: Float, val y: Float)
 fun FieldPosition.getPositionPercentage(strategy: TeamStrategy): FieldPositionCoordinate {
     return when (strategy) {
         TeamStrategy.B5_DEFAULT -> when (this) {
-            FieldPosition.OLD_SUBSTITUTE, FieldPosition.SUBSTITUTE -> FieldPositionCoordinate(0f, 0f)
+            FieldPosition.OLD_SUBSTITUTE, FieldPosition.SUBSTITUTE -> {
+                FieldPositionCoordinate(0f, 0f)
+            }
+
             FieldPosition.FIRST_BASE -> FieldPositionCoordinate(73.8f, 11.9f)
             FieldPosition.SECOND_BASE -> FieldPositionCoordinate(42.86f, 11.9f)
             FieldPosition.THIRD_BASE -> FieldPositionCoordinate(11.9f, 73.8f)
@@ -69,7 +72,10 @@ fun FieldPosition.getPositionPercentage(strategy: TeamStrategy): FieldPositionCo
         }
 
         else -> when (this) {
-            FieldPosition.OLD_SUBSTITUTE, FieldPosition.SUBSTITUTE -> FieldPositionCoordinate(0f, 0f)
+            FieldPosition.OLD_SUBSTITUTE, FieldPosition.SUBSTITUTE -> {
+                FieldPositionCoordinate(0f, 0f)
+            }
+
             FieldPosition.PITCHER -> FieldPositionCoordinate(50f, 59f)
             FieldPosition.CATCHER -> FieldPositionCoordinate(50f, 87f)
             FieldPosition.FIRST_BASE -> FieldPositionCoordinate(74f, 57f)

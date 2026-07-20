@@ -57,7 +57,12 @@ internal class PlayerRepositoryImpl(
     override fun getPlayerById(playerId: Long): Flow<Player> {
         return playerDao.getPlayerById(playerId).map {
             // sometime the refresh it too quick and when the player is deleted, the player is null
-            it.firstOrNull()?.toPlayer() ?: Player(teamId = 0, name = "", shirtNumber = 0, licenseNumber = 0)
+            it.firstOrNull()?.toPlayer() ?: Player(
+                teamId = 0,
+                name = "",
+                shirtNumber = 0,
+                licenseNumber = 0
+            )
         }
     }
 

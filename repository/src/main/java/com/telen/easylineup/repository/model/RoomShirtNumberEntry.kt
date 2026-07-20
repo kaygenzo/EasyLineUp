@@ -27,5 +27,13 @@ internal data class RoomShirtNumberEntry(
 )
 
 internal fun RoomShirtNumberEntry.toShirtNumberEntry(): ShirtNumberEntry {
-    return ShirtNumberEntry(number, playerName, playerId, eventTime, createdAt, lineupId, lineupName)
+    return ShirtNumberEntry(
+        number = number,
+        playerName = playerName,
+        playerId = playerId,
+        eventTime = eventTime,
+        createdAt = createdAt,
+        lineupId = lineupId,
+        lineupName = lineupName
+    )
 }

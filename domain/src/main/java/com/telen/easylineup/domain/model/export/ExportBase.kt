@@ -43,11 +43,7 @@ data class ExportBase(
 
         other as ExportBase
 
-        if (teams != other.teams) {
-            return false
-        }
-
-        return true
+        return teams == other.teams
     }
 
     override fun hashCode(): Int {

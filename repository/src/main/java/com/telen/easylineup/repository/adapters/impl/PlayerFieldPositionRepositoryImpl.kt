@@ -105,7 +105,10 @@ internal class PlayerFieldPositionRepositoryImpl(private val playerFieldPosition
             .map { it.toPlayerWithPosition() }
     }
 
-    override suspend fun getPlayerPositionFor(lineupId: Long, playerId: Long): PlayerFieldPosition? {
+    override suspend fun getPlayerPositionFor(
+        lineupId: Long,
+        playerId: Long
+    ): PlayerFieldPosition? {
         return playerFieldPositionsDao.getPlayerPositionFor(lineupId, playerId)
             ?.toPlayerFieldPosition()
     }

@@ -62,7 +62,7 @@ class AssignPlayerFieldPosition(
                         // players. We authorize only maximum extraBatterSize substitutes to be
                         // batter
                         if (nextAvailableOrder > batterSize + extraHittersSize
-                                || substitutesBatterSize >= extraHittersSize
+                            || substitutesBatterSize >= extraHittersSize
                         ) {
                             this.order = Constants.SUBSTITUTE_ORDER_VALUE
                         }

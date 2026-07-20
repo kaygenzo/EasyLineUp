@@ -23,7 +23,8 @@ data class PlayerNumberOverlay(
     var hash: String? = UUID.randomUUID().toString()
 ) : Serializable
 
-fun PlayerNumberOverlay.toPlayerNumberOverlayExport(playerUuid: String?):
-PlayerNumberOverlayExport {
+fun PlayerNumberOverlay.toPlayerNumberOverlayExport(
+    playerUuid: String?
+): PlayerNumberOverlayExport {
     return PlayerNumberOverlayExport(hash ?: UUID.randomUUID().toString(), playerUuid, number)
 }

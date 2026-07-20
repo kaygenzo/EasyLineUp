@@ -76,6 +76,7 @@ class SwitchPlayersPosition(
                                 it.order = orderDesignatedPlayer
                                 it.flags = PlayerFieldPosition.FLAG_FLEX
                             }
+
                             else -> {
                                 it.flags = PlayerFieldPosition.FLAG_NONE
                                 // if possible, just keep order, but in case of a swap with a pitcher,

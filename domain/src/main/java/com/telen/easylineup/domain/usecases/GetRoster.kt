@@ -19,43 +19,44 @@ class GetRoster(
     private val getTeam: GetTeam,
     private val dispatcherProvider: DispatcherProvider
 ) {
-    suspend operator fun invoke(lineupId: Long? = null): Result<TeamRosterSummary> = runCatchingCancellable {
-        withContext(dispatcherProvider.io()) {
-            val team = getTeam().getOrThrow()
-            val teamId = team.id
+    suspend operator fun invoke(lineupId: Long? = null): Result<TeamRosterSummary> =
+        runCatchingCancellable {
+            withContext(dispatcherProvider.io()) {
+                val team = getTeam().getOrThrow()
+                val teamId = team.id
 
-            if (lineupId != null) {
-                val overlays: MutableMap<Long, PlayerNumberOverlay> = mutableMapOf()
-                dao.getPlayersNumberOverlay(lineupId).forEach {
-                    overlays[it.playerId] = it
-                }
-                val lineup = lineupDao.getLineupByIdSingle(lineupId)
-                val rosterIds = stringToRoster(lineup.roster)
-                val players = dao.getPlayersByTeamId(teamId)
-                // if rosterIds is null, it means that all players are selected
-                val status = rosterIds?.let {
-                    if (it.size == players.size) {
-                        Constants.STATUS_ALL
-                    } else {
-                        Constants.STATUS_PARTIAL
+                if (lineupId != null) {
+                    val overlays: MutableMap<Long, PlayerNumberOverlay> = mutableMapOf()
+                    dao.getPlayersNumberOverlay(lineupId).forEach {
+                        overlays[it.playerId] = it
                     }
-                } ?: Constants.STATUS_ALL
-                TeamRosterSummary(status, players.map {
-                    RosterPlayerStatus(
-                        it,
-                        rosterIds?.contains(it.id) ?: true,
-                        overlays[it.id]
+                    val lineup = lineupDao.getLineupByIdSingle(lineupId)
+                    val rosterIds = stringToRoster(lineup.roster)
+                    val players = dao.getPlayersByTeamId(teamId)
+                    // if rosterIds is null, it means that all players are selected
+                    val status = rosterIds?.let {
+                        if (it.size == players.size) {
+                            Constants.STATUS_ALL
+                        } else {
+                            Constants.STATUS_PARTIAL
+                        }
+                    } ?: Constants.STATUS_ALL
+                    TeamRosterSummary(status, players.map {
+                        RosterPlayerStatus(
+                            it,
+                            rosterIds?.contains(it.id) ?: true,
+                            overlays[it.id]
+                        )
+                    })
+                } else {
+                    val players = dao.getPlayersByTeamId(teamId)
+                    TeamRosterSummary(
+                        Constants.STATUS_ALL,
+                        players.map { RosterPlayerStatus(it, true, null) }
                     )
-                })
-            } else {
-                val players = dao.getPlayersByTeamId(teamId)
-                TeamRosterSummary(
-                    Constants.STATUS_ALL,
-                    players.map { RosterPlayerStatus(it, true, null) }
-                )
+                }
             }
         }
-    }
 
     private fun stringToRoster(rosterString: String?): List<Long>? {
         return rosterString?.let {

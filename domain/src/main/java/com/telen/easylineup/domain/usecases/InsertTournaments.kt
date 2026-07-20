@@ -13,9 +13,10 @@ class InsertTournaments(
     private val dao: TournamentRepository,
     private val dispatcherProvider: DispatcherProvider
 ) {
-    suspend operator fun invoke(tournaments: List<Tournament>): Result<Unit> = runCatchingCancellable {
-        withContext(dispatcherProvider.io()) {
-            dao.insertTournaments(tournaments)
+    suspend operator fun invoke(tournaments: List<Tournament>): Result<Unit> =
+        runCatchingCancellable {
+            withContext(dispatcherProvider.io()) {
+                dao.insertTournaments(tournaments)
+            }
         }
-    }
 }

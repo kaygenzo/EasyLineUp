@@ -24,10 +24,14 @@ import java.util.UUID
     tableName = "playerNumberOverlay",
     indices = [Index(value = ["number"])],
     foreignKeys = [
-        ForeignKey(entity = RoomPlayer::class, parentColumns = ["id"], childColumns = ["playerID"],
-            onDelete = ForeignKey.CASCADE),
-        ForeignKey(entity = RoomLineup::class, parentColumns = ["id"], childColumns = ["lineupID"],
-            onDelete = ForeignKey.CASCADE)
+        ForeignKey(
+            entity = RoomPlayer::class, parentColumns = ["id"], childColumns = ["playerID"],
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = RoomLineup::class, parentColumns = ["id"], childColumns = ["lineupID"],
+            onDelete = ForeignKey.CASCADE
+        )
     ]
 )
 internal data class RoomPlayerNumberOverlay(

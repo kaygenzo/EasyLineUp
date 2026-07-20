@@ -14,7 +14,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
-internal class TournamentRepositoryImpl(private val tournamentDao: TournamentDao) : TournamentRepository {
+internal class TournamentRepositoryImpl(
+    private val tournamentDao: TournamentDao
+) : TournamentRepository {
     init {
         Timber.i("TournamentRepositoryImpl.init")
     }
@@ -48,7 +50,11 @@ internal class TournamentRepositoryImpl(private val tournamentDao: TournamentDao
     }
 
     override suspend fun updateTournamentsWithRowCount(tournaments: List<Tournament>): Int {
-        return tournamentDao.updateTournamentsWithRowCount(tournaments.map { RoomTournament().init(it) })
+        return tournamentDao.updateTournamentsWithRowCount(
+            tournaments = tournaments.map {
+                RoomTournament().init(tournament = it)
+            }
+        )
     }
 
     override suspend fun deleteTournament(tournament: Tournament) {

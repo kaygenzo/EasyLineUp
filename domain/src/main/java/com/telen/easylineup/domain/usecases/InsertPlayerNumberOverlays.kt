@@ -13,9 +13,10 @@ class InsertPlayerNumberOverlays(
     private val dao: PlayerRepository,
     private val dispatcherProvider: DispatcherProvider
 ) {
-    suspend operator fun invoke(overlays: List<PlayerNumberOverlay>): Result<Unit> = runCatchingCancellable {
-        withContext(dispatcherProvider.io()) {
-            dao.createPlayerNumberOverlays(overlays)
+    suspend operator fun invoke(overlays: List<PlayerNumberOverlay>): Result<Unit> =
+        runCatchingCancellable {
+            withContext(dispatcherProvider.io()) {
+                dao.createPlayerNumberOverlays(overlays)
+            }
         }
-    }
 }

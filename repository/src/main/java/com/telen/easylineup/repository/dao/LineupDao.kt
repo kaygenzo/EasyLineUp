@@ -86,7 +86,10 @@ internal interface LineupDao {
         ORDER BY tournaments.createdAt DESC
     """
     )
-    suspend fun getAllTournamentsWithLineups(filter: String, teamId: Long): List<RoomTournamentWithLineup>
+    suspend fun getAllTournamentsWithLineups(
+        filter: String,
+        teamId: Long
+    ): List<RoomTournamentWithLineup>
 
     @Query(
         """
@@ -102,5 +105,8 @@ internal interface LineupDao {
         WHERE lineups.teamID = :teamId AND lineups.tournamentID = :tournamentId
     """
     )
-    suspend fun getAllPlayerPositionsForTournament(tournamentId: Long, teamId: Long): List<RoomPlayerInLineup>
+    suspend fun getAllPlayerPositionsForTournament(
+        tournamentId: Long,
+        teamId: Long
+    ): List<RoomPlayerInLineup>
 }

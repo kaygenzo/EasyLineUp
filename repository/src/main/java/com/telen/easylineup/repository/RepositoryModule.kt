@@ -212,7 +212,8 @@ object RepositoryModule {
                     "CREATE INDEX IF NOT EXISTS `index_tiles_position` ON tiles (`position`)"
                 )
                 database.execSQL(
-                    "INSERT INTO tiles (id, position, type) VALUES (1, 0, ${TileType.BETA.type})")
+                    "INSERT INTO tiles (id, position, type) VALUES (1, 0, ${TileType.BETA.type})"
+                )
                 database.execSQL(
                     "INSERT INTO tiles (id, position, type) " +
                             "VALUES (2, 1, ${TileType.TEAM_SIZE.type})"

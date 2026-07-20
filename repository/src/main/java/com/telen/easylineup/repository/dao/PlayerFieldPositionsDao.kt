@@ -27,8 +27,9 @@ internal interface PlayerFieldPositionsDao {
     suspend fun updatePlayerFieldPositions(fieldPositions: List<RoomPlayerFieldPosition>)
 
     @Update
-    suspend fun updatePlayerFieldPositionsWithRowCount(fieldPositions: List<RoomPlayerFieldPosition>):
-    Int
+    suspend fun updatePlayerFieldPositionsWithRowCount(
+        fieldPositions: List<RoomPlayerFieldPosition>
+    ): Int
 
     @Query("DELETE FROM playerFieldPosition where id=:id")
     suspend fun deletePositionById(id: Long)

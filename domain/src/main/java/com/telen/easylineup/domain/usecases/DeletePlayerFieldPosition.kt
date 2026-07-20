@@ -40,7 +40,7 @@ class DeletePlayerFieldPosition(private val dispatcherProvider: DispatcherProvid
                 var found = false
                 substitutes.forEachIndexed { index, playerWithPosition ->
                     if (!found && index < extraHitterSize
-                            && playerWithPosition.order == Constants.SUBSTITUTE_ORDER_VALUE
+                        && playerWithPosition.order == Constants.SUBSTITUTE_ORDER_VALUE
                     ) {
                         playerWithPosition.order = playerOrder
                         found = true
