@@ -33,6 +33,7 @@ import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapterCallback,
     MenuProvider {
@@ -96,20 +97,22 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
                     lineupNameEditText.addTextChangedListener {
                         viewModel.onLineupNameChanged(it.toString())
                     }
-                    launch(viewModel.getTournaments(), { tournaments ->
-                        val index = tournaments.indexOfFirst { it.id == lineup.tournamentId }
-                        val adapter = ArrayAdapter(
-                            requireContext(),
-                            R.layout.item_auto_completion,
-                            tournaments.map { it.name })
-                        with(tournamentChoice) {
-                            setAdapter(adapter)
-                            setText(tournaments[index].name, false)
-                            onItemClickListener = OnItemClickListener { _, _, position, _ ->
-                                viewModel.onTournamentChanged(tournaments[position])
+                    viewModel.getTournaments()
+                        .onSuccess { tournaments ->
+                            val index = tournaments.indexOfFirst { it.id == lineup.tournamentId }
+                            val adapter = ArrayAdapter(
+                                requireContext(),
+                                R.layout.item_auto_completion,
+                                tournaments.map { it.name })
+                            with(tournamentChoice) {
+                                setAdapter(adapter)
+                                setText(tournaments[index].name, false)
+                                onItemClickListener = OnItemClickListener { _, _, position, _ ->
+                                    viewModel.onTournamentChanged(tournaments[position])
+                                }
                             }
                         }
-                    })
+                        .onFailure { Timber.e(it) }
                 }
                 .launchIn(viewLifecycleOwner.lifecycleScope)
         }.root

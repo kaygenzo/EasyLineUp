@@ -4,38 +4,39 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournamentException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class SaveTournament(
     private val repository: TournamentRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(tournament: Tournament): Completable {
-        return Completable.defer {
-            with(tournament) {
-                if (name.isEmpty()) {
-                    return@defer Completable.error(TournamentNameEmptyException())
-                }
-                repository.getTournamentByName(name)
-                    .flatMapCompletable {
-                        Completable.error(AlreadyExistingTournamentException())
-                    }
-                    .onErrorResumeNext { error ->
-                        if (error is AlreadyExistingTournamentException) {
-                            Completable.error(error)
-                        } else {
-                            repository.insertTournament(this).flatMapCompletable {
-                                this.id = it
-                                Completable.complete()
-                            }
-                        }
-                    }
+    suspend operator fun invoke(tournament: Tournament): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            if (tournament.name.isEmpty()) {
+                throw TournamentNameEmptyException()
             }
-        }.subscribeOn(schedulersProvider.io())
+
+            val alreadyExists = try {
+                repository.getTournamentByName(tournament.name).await()
+                true
+            } catch (c: CancellationException) {
+                throw c
+            } catch (e: Exception) {
+                false
+            }
+
+            if (alreadyExists) {
+                throw AlreadyExistingTournamentException()
+            }
+
+            tournament.id = repository.insertTournament(tournament).await()
+        }
     }
 }

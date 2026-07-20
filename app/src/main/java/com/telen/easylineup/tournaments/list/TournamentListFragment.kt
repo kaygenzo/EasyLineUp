@@ -38,6 +38,7 @@ import com.telen.easylineup.views.OnSearchBarListener
 import io.reactivex.rxjava3.core.Completable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.rx3.rxCompletable
 
 class LineupsScrollListener(private val view: FloatingActionButton) :
     RecyclerView.OnScrollListener() {
@@ -122,7 +123,7 @@ OnSearchBarListener {
     override fun onDeleteTournamentClicked(tournament: Tournament) {
         activity?.let {
             FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_delete")
-            val task: Completable = viewModel.deleteTournament(tournament)
+            val task: Completable = rxCompletable { viewModel.deleteTournament(tournament).getOrThrow() }
                 .doOnError { throwable ->
                     Toast.makeText(
                         activity,

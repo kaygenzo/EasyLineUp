@@ -4,16 +4,19 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.TournamentRepository
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class GetTournaments(
     private val dao: TournamentRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(): Single<List<Tournament>> {
-        return dao.getTournaments().subscribeOn(schedulersProvider.io())
+    suspend operator fun invoke(): Result<List<Tournament>> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            dao.getTournaments().await()
+        }
     }
 }

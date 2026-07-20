@@ -6,8 +6,9 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.TournamentRepository
-import io.reactivex.rxjava3.core.Flowable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.reactive.asFlow
 
 class ObserveTournaments(private val dao: TournamentRepository) {
-    operator fun invoke(): Flowable<List<Tournament>> = dao.observeTournaments()
+    operator fun invoke(): Flow<List<Tournament>> = dao.observeTournaments().asFlow()
 }

@@ -7,6 +7,7 @@
 package com.telen.easylineup.tournaments.list
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
@@ -28,9 +29,6 @@ import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import com.telen.easylineup.utils.SharedPreferencesHelper
-import com.telen.easylineup.utils.asSafeFlow
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -40,12 +38,13 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 
 sealed class SaveResult
 
@@ -89,25 +88,21 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun getTournaments(): Flow<List<Tournament>> {
-        return observeTournamentsUseCase().asSafeFlow()
+        return observeTournamentsUseCase().catch { Timber.e(it) }
     }
 
     fun observeCategorizedLineups(): Flow<List<TournamentItem>> {
         return filterFlow.flatMapLatest { filter ->
-            callbackFlow {
-                val disposable = getAllTournamentsWithLineupsUseCase(filter)
-                    .flatMapObservable { Observable.fromIterable(it) }
-                    .flatMapSingle { Single.just(TournamentItem(it.first, it.second)) }
-                    .toList()
-                    .subscribe({
+            flow {
+                getAllTournamentsWithLineupsUseCase(filter)
+                    .onSuccess { pairs ->
+                        val items = pairs.map { TournamentItem(it.first, it.second) }
                         tournamentItems.clear()
-                        tournamentItems.addAll(it)
-                        trySend(tournamentItems)
-                        loadMaps(it)
-                    }, {
-                        Timber.e(it)
-                    })
-                awaitClose { disposable.dispose() }
+                        tournamentItems.addAll(items)
+                        emit(tournamentItems.toList())
+                        loadMaps(items)
+                    }
+                    .onFailure { Timber.e(it) }
             }
         }
     }
@@ -115,31 +110,26 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private fun loadMaps(tournamentItems: List<TournamentItem>) {
         val apiKey = remoteConfig.getString("maps_api_key")
         val items = tournamentItems.filter { it.tournament.address != null }
-        val disposable = Observable.fromIterable(items)
-            .flatMapSingle { item ->
-                getTournamentMapLink(
+        viewModelScope.launch {
+            items.forEach { item ->
+                val mapInfo = getTournamentMapLink(
                     item.tournament,
                     apiKey,
                     Constants.MAP_PIXEL_SIZE,
                     Constants.MAP_PIXEL_SIZE
-                )
-                    .map { Pair(item.tournament, it) }
-                    .onErrorResumeNext { Single.just(Pair(item.tournament, MapInfo())) }
+                ).getOrElse { MapInfo() }
+                if (mapInfo.url?.isNotEmpty() == true) {
+                    mapsFlow.tryEmit(Pair(item.tournament, mapInfo))
+                }
             }
-            .filter { it.second.url?.isNotEmpty() ?: false }
-            .subscribe({
-                mapsFlow.tryEmit(it)
-            }, {
-                Timber.e(it)
-            })
-        disposables.add(disposable)
+        }
     }
 
     fun clear() {
         disposables.clear()
     }
 
-    fun deleteTournament(tournament: Tournament): Completable {
+    suspend fun deleteTournament(tournament: Tournament): Result<Unit> {
         return deleteTournamentLineups(tournament)
     }
 
@@ -199,7 +189,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
         return getTeamUseCase().map { it.type }
     }
 
-    fun saveTournament(tournament: Tournament): Completable {
+    suspend fun saveTournament(tournament: Tournament): Result<Unit> {
         return saveTournamentUseCase(tournament)
     }
 

@@ -132,7 +132,7 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
         lineup?.name = name
     }
 
-    fun getTournaments(): Single<List<Tournament>> {
+    suspend fun getTournaments(): Result<List<Tournament>> {
         return getTournamentsUseCase()
     }
 

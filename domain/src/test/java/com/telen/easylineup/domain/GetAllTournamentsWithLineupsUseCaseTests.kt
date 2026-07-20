@@ -4,16 +4,15 @@
 
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Team
-import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineupsUseCase
 import com.telen.easylineup.domain.usecases.GetTeam
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,24 +35,21 @@ internal class GetAllTournamentsWithLineupsUseCaseTests {
         getAllTournamentsWithLineups = GetAllTournamentsWithLineupsUseCase(
             lineupDao,
             GetTeam(teamDao, testSchedulersProvider()),
-            testSchedulersProvider()
+            testDispatcherProvider()
         )
 
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
     }
 
     @Test
-    fun shouldReturnEmptyListWhenNoTournamentsForCurrentTeam() {
+    fun shouldReturnEmptyListWhenNoTournamentsForCurrentTeam() = runTest {
         Mockito.`when`(lineupDao.getAllTournamentsWithLineups("summer", team.id))
             .thenReturn(Single.just(emptyList()))
 
-        val observer = TestObserver<List<Pair<Tournament, List<Lineup>>>>()
-        getAllTournamentsWithLineups("summer")
-            .subscribe(observer)
-        observer.await()
+        val result = getAllTournamentsWithLineups("summer")
 
-        observer.assertComplete()
-        Assert.assertTrue(observer.values().first().isEmpty())
+        assertTrue(result.isSuccess)
+        Assert.assertTrue(result.getOrNull()?.isEmpty() ?: false)
         Mockito.verify(lineupDao).getAllTournamentsWithLineups("summer", team.id)
     }
 }

@@ -11,7 +11,7 @@ import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.exceptions.AddressNotFoundException
 import com.telen.easylineup.domain.usecases.exceptions.MapApiKeyNotFoundException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentMapNotFoundException
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -31,7 +31,7 @@ internal class GetTournamentMapLinkTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getTournamentMapLink = GetTournamentMapLink(geocodingPort, testSchedulersProvider())
+        getTournamentMapLink = GetTournamentMapLink(geocodingPort, testDispatcherProvider())
         tournament = Tournament(
             id = 1L, name = "champs", createdAt = 0L, startTime = 0L, endTime = 0L,
             address = "1 rue de Paris"
@@ -39,53 +39,43 @@ internal class GetTournamentMapLinkTests {
     }
 
     @Test
-    fun shouldTriggerMapApiKeyNotFoundExceptionWhenApiKeyIsNull() {
-        val observer = TestObserver<com.telen.easylineup.domain.model.MapInfo>()
-        getTournamentMapLink(tournament, null, 100, 100).subscribe(observer)
-        observer.await()
-        observer.assertError(MapApiKeyNotFoundException::class.java)
+    fun shouldTriggerMapApiKeyNotFoundExceptionWhenApiKeyIsNull() = runTest {
+        val result = getTournamentMapLink(tournament, null, 100, 100)
+        assertTrue(result.exceptionOrNull() is MapApiKeyNotFoundException)
     }
 
     @Test
-    fun shouldTriggerMapApiKeyNotFoundExceptionWhenApiKeyIsEmpty() {
-        val observer = TestObserver<com.telen.easylineup.domain.model.MapInfo>()
-        getTournamentMapLink(tournament, "", 100, 100).subscribe(observer)
-        observer.await()
-        observer.assertError(MapApiKeyNotFoundException::class.java)
+    fun shouldTriggerMapApiKeyNotFoundExceptionWhenApiKeyIsEmpty() = runTest {
+        val result = getTournamentMapLink(tournament, "", 100, 100)
+        assertTrue(result.exceptionOrNull() is MapApiKeyNotFoundException)
     }
 
     @Test
-    fun shouldTriggerAddressNotFoundExceptionWhenTournamentAddressIsNull() {
+    fun shouldTriggerAddressNotFoundExceptionWhenTournamentAddressIsNull() = runTest {
         tournament.address = null
-        val observer = TestObserver<com.telen.easylineup.domain.model.MapInfo>()
-        getTournamentMapLink(tournament, "apiKey", 100, 100).subscribe(observer)
-        observer.await()
-        observer.assertError(AddressNotFoundException::class.java)
+        val result = getTournamentMapLink(tournament, "apiKey", 100, 100)
+        assertTrue(result.exceptionOrNull() is AddressNotFoundException)
     }
 
     @Test
-    fun shouldTriggerTournamentMapNotFoundExceptionWhenGeocodingReturnsNull() {
+    fun shouldTriggerTournamentMapNotFoundExceptionWhenGeocodingReturnsNull() = runTest {
         Mockito.`when`(geocodingPort.getLocationFromAddress("1 rue de Paris")).thenReturn(null)
-        val observer = TestObserver<com.telen.easylineup.domain.model.MapInfo>()
-        getTournamentMapLink(tournament, "apiKey", 100, 100).subscribe(observer)
-        observer.await()
-        observer.assertError(TournamentMapNotFoundException::class.java)
+        val result = getTournamentMapLink(tournament, "apiKey", 100, 100)
+        assertTrue(result.exceptionOrNull() is TournamentMapNotFoundException)
     }
 
     @Test
-    fun shouldBuildMapInfoWhenGeocodingSucceeds() {
+    fun shouldBuildMapInfoWhenGeocodingSucceeds() = runTest {
         val location = GeoLocation(latitude = 48.85, longitude = 2.35)
         Mockito.`when`(geocodingPort.getLocationFromAddress("1 rue de Paris")).thenReturn(location)
 
-        val observer = TestObserver<com.telen.easylineup.domain.model.MapInfo>()
-        getTournamentMapLink(tournament, "apiKey", 300, 200).subscribe(observer)
-        observer.await()
+        val result = getTournamentMapLink(tournament, "apiKey", 300, 200)
 
-        observer.assertComplete()
-        val result = observer.values().first()
-        assertEquals(location, result.location)
-        assertTrue(result.url!!.contains("2.35,48.85"))
-        assertTrue(result.url!!.contains("300x200"))
-        assertTrue(result.url!!.contains("apikey=apiKey"))
+        assertTrue(result.isSuccess)
+        val mapInfo = result.getOrNull()
+        assertEquals(location, mapInfo?.location)
+        assertTrue(mapInfo?.url!!.contains("2.35,48.85"))
+        assertTrue(mapInfo.url!!.contains("300x200"))
+        assertTrue(mapInfo.url!!.contains("apikey=apiKey"))
     }
 }

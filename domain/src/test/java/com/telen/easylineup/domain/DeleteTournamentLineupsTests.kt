@@ -5,6 +5,7 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.check
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Team
@@ -16,8 +17,9 @@ import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
 import com.telen.easylineup.domain.usecases.GetTeam
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,7 +31,6 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class DeleteTournamentLineupsTests {
     private val lineups: MutableList<Lineup> = mutableListOf()
-    val observer: TestObserver<Void> = TestObserver()
     @Mock lateinit var lineupsDao: LineupRepository
     @Mock lateinit var teamDao: TeamRepository
     lateinit var deleteTournament: DeleteTournamentLineups
@@ -42,7 +43,7 @@ internal class DeleteTournamentLineupsTests {
         deleteTournament = DeleteTournamentLineups(
             lineupsDao,
             GetTeam(teamDao, testSchedulersProvider()),
-            testSchedulersProvider()
+            testDispatcherProvider()
         )
 
         tournament = Tournament(id = 1L, name = "toto", createdAt = 1L, 2L, 3L, null)
@@ -66,13 +67,11 @@ internal class DeleteTournamentLineupsTests {
     }
 
     @Test
-    fun shouldDeleteOnlyLineupOfSpecificTournamentAndTeam() {
-        deleteTournament(tournament)
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+    fun shouldDeleteOnlyLineupOfSpecificTournamentAndTeam() = runTest {
+        val result = deleteTournament(tournament)
 
-        verify(lineupsDao).deleteLineups(com.nhaarman.mockitokotlin2.check {
+        assertTrue(result.isSuccess)
+        verify(lineupsDao).deleteLineups(check {
             Assert.assertEquals(2, it.size)
             Assert.assertEquals(1L, it[0].id)
             Assert.assertEquals(2L, it[1].id)

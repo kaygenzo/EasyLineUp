@@ -8,8 +8,9 @@ import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.GetTournaments
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,7 +21,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetTournamentTests {
-    val observer: TestObserver<List<Tournament>> = TestObserver()
     @Mock lateinit var tournamentDao: TournamentRepository
     lateinit var getTournaments: GetTournaments
     lateinit var tournaments: MutableList<Tournament>
@@ -28,7 +28,7 @@ internal class GetTournamentTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getTournaments = GetTournaments(tournamentDao, testSchedulersProvider())
+        getTournaments = GetTournaments(tournamentDao, testDispatcherProvider())
 
         tournaments = mutableListOf()
         tournaments.add(Tournament(1, "toto", 1L, 2L, 3L, null))
@@ -39,10 +39,9 @@ internal class GetTournamentTests {
     }
 
     @Test
-    fun shouldGetTournaments() {
-        getTournaments().subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(tournaments, observer.values().first())
+    fun shouldGetTournaments() = runTest {
+        val result = getTournaments()
+        assertTrue(result.isSuccess)
+        Assert.assertEquals(tournaments, result.getOrNull())
     }
 }

@@ -8,7 +8,9 @@ import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.ObserveTournaments
 import io.reactivex.rxjava3.core.Flowable
-import org.junit.Assert.assertSame
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,10 +31,12 @@ internal class ObserveTournamentsTests {
     }
 
     @Test
-    fun shouldDelegateToRepository() {
-        val flowable = Flowable.just(listOf<Tournament>())
-        Mockito.`when`(tournamentDao.observeTournaments()).thenReturn(flowable)
+    fun shouldDelegateToRepository() = runTest {
+        val tournaments = listOf<Tournament>()
+        Mockito.`when`(tournamentDao.observeTournaments()).thenReturn(Flowable.just(tournaments))
 
-        assertSame(flowable, observeTournaments())
+        val result = observeTournaments().toList()
+
+        assertEquals(listOf(tournaments), result)
     }
 }

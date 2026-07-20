@@ -38,6 +38,7 @@ import com.telen.easylineup.views.LineupCreationFormView
 import com.telen.easylineup.views.OnActionButtonListener
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class LineupCreationFragment : BaseFragment("LineupCreationFragment"), OnActionButtonListener {
@@ -182,12 +183,16 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment"), OnActionB
     }
 
     override fun onCreateTournamentClicked() {
-        CreateTournamentDialog {
-            launch(lineupViewModel.saveTournament(it), {
-                Timber.d("Tournament saved")
-                binding?.lineupCreationForm?.selectTournament(it)
-                lineupViewModel.onTournamentSelected(it)
-            }, { Timber.e(it) })
+        CreateTournamentDialog { tournament ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                lineupViewModel.saveTournament(tournament)
+                    .onSuccess {
+                        Timber.d("Tournament saved")
+                        binding?.lineupCreationForm?.selectTournament(tournament)
+                        lineupViewModel.onTournamentSelected(tournament)
+                    }
+                    .onFailure { Timber.e(it) }
+            }
         }.show(childFragmentManager, "createTournamentFragment")
     }
 

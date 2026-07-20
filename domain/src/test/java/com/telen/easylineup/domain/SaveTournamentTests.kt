@@ -12,9 +12,9 @@ import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournamentException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,7 +25,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveTournamentTests {
-    val observer: TestObserver<Void> = TestObserver()
     @Mock lateinit var repository: TournamentRepository
     lateinit var saveTournament: SaveTournament
     lateinit var tournament: Tournament
@@ -33,57 +32,54 @@ internal class SaveTournamentTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        saveTournament = SaveTournament(repository, testSchedulersProvider())
+        saveTournament = SaveTournament(repository, testDispatcherProvider())
         tournament = Tournament(id = 0L, name = "champs", createdAt = 0L, startTime = 0L, endTime = 0L)
     }
 
     @Test
-    fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() {
+    fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() = runTest {
         tournament.name = ""
 
-        saveTournament(tournament).subscribe(observer)
-        observer.await()
+        val result = saveTournament(tournament)
 
-        observer.assertError(TournamentNameEmptyException::class.java)
+        assertTrue(result.exceptionOrNull() is TournamentNameEmptyException)
         verify(repository, never()).getTournamentByName(any())
         verify(repository, never()).insertTournament(any())
     }
 
     @Test
-    fun shouldInsertTournamentWhenNameDoesNotExist() {
+    fun shouldInsertTournamentWhenNameDoesNotExist() = runTest {
         Mockito.`when`(repository.getTournamentByName("champs"))
             .thenReturn(Single.error(NoSuchElementException()))
         Mockito.`when`(repository.insertTournament(any())).thenReturn(Single.just(42L))
 
-        saveTournament(tournament).subscribe(observer)
-        observer.await()
+        val result = saveTournament(tournament)
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         verify(repository).insertTournament(any())
     }
 
     @Test
-    fun shouldTriggerAlreadyExistingExceptionAndNotInsertWhenNameAlreadyExists() {
+    fun shouldTriggerAlreadyExistingExceptionAndNotInsertWhenNameAlreadyExists() = runTest {
         val existing = tournament.copy(id = 1L)
         Mockito.`when`(repository.getTournamentByName("champs")).thenReturn(Single.just(existing))
 
-        saveTournament(tournament).subscribe(observer)
-        observer.await()
+        val result = saveTournament(tournament)
 
-        observer.assertError(AlreadyExistingTournamentException::class.java)
+        assertTrue(result.exceptionOrNull() is AlreadyExistingTournamentException)
         verify(repository, never()).insertTournament(any())
     }
 
     @Test
-    fun shouldPropagateUnrelatedInsertErrors() {
+    fun shouldPropagateUnrelatedInsertErrors() = runTest {
         val exception = Exception("db error")
         Mockito.`when`(repository.getTournamentByName("champs"))
             .thenReturn(Single.error(NoSuchElementException()))
         Mockito.`when`(repository.insertTournament(any())).thenReturn(Single.error(exception))
 
-        saveTournament(tournament).subscribe(observer)
-        observer.await()
+        val result = saveTournament(tournament)
 
-        observer.assertError(exception)
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull()?.message == exception.message)
     }
 }
