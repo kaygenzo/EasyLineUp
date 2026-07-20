@@ -138,16 +138,18 @@ class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlaye
 
     override fun onPlayersSwitched(player1: PlayerWithPosition, player2: PlayerWithPosition) {
         Timber.d("Switch ${player1.playerName} with ${player2.playerName}")
-        launch(viewModel.switchPlayersPosition(player1, player2), {}, {
-            Timber.e("Cannot switch players: ${it.message}")
-        })
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.switchPlayersPosition(player1, player2)
+                .onFailure { Timber.e("Cannot switch players: ${it.message}") }
+        }
     }
 
     override fun onPlayerReassigned(player: PlayerWithPosition, newPosition: FieldPosition) {
         Timber.d("${player.playerName} reassigned to $newPosition")
-        launch(viewModel.switchPlayersPosition(player, newPosition), {}, {
-            Timber.e("Cannot change player position: ${it.message}")
-        })
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.switchPlayersPosition(player, newPosition)
+                .onFailure { Timber.e("Cannot change player position: ${it.message}") }
+        }
     }
 
     private fun getDialogLinkDpAndFlex(
@@ -169,9 +171,13 @@ class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlaye
         }
 
         dpFlexLinkView.setOnFlexClickListener(flexLocked) {
-            launch(viewModel.getPlayerSelectionForFlex(), {
-                dpFlexLinkView.setPlayerList(it.map { it.toPlayer() })
-            })
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.getPlayerSelectionForFlex()
+                    .onSuccess { players ->
+                        dpFlexLinkView.setPlayerList(players.map { it.toPlayer() })
+                    }
+                    .onFailure { Timber.e(it) }
+            }
         }
 
         val dialog = DialogFactory.getSimpleDialog(

@@ -18,8 +18,6 @@ import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
 import com.telen.easylineup.domain.usecases.InsertPlayers
 import com.telen.easylineup.domain.usecases.InsertTeam
 import com.telen.easylineup.domain.usecases.InsertTournaments
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
 
 class DatabaseMockProvider(
     private val insertTeamUseCase: InsertTeam,
@@ -30,24 +28,21 @@ class DatabaseMockProvider(
     private val insertTournamentsUseCase: InsertTournaments
 ) {
 
-    fun createMockDatabase(context: Context): Completable {
-        return Single.create<String> { emitter ->
-
-            var json: String?
-            try {
-                val input = context.assets.open("database.json")
-                val size = input.available()
-                val buffer = ByteArray(size)
-                input.read(buffer)
-                input.close()
-                json = String(buffer, Charsets.UTF_8)
-                emitter.onSuccess(json)
-            } catch (ex: Throwable) {
-                ex.printStackTrace()
-                emitter.onError(ex)
-            }
+    suspend fun createMockDatabase(context: Context) {
+        val json: String
+        try {
+            val input = context.assets.open("database.json")
+            val size = input.available()
+            val buffer = ByteArray(size)
+            input.read(buffer)
+            input.close()
+            json = String(buffer, Charsets.UTF_8)
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            throw ex
         }
-            .flatMapCompletable { json ->
+
+        run {
                 try {
                     val root = JsonParser().parse(json).asJsonObject
                     val teamJson = root.getAsJsonObject("team")
@@ -146,38 +141,39 @@ class DatabaseMockProvider(
                         )
                     }
 
-                    insertTeam(team).andThen(insertPlayers(playersList))
-                        .andThen(insertTournaments(tournamentsList))
-                        .andThen(insertLineups(lineupsList))
-                        .andThen(insertPlayerFieldPositions(positionsList))
-                        .andThen(insertPlayerNumberOverlays(overlaysList))
+                    insertTeam(team)
+                    insertPlayers(playersList)
+                    insertTournaments(tournamentsList)
+                    insertLineups(lineupsList)
+                    insertPlayerFieldPositions(positionsList)
+                    insertPlayerNumberOverlays(overlaysList)
                 } catch (e: Exception) {
-                    Completable.error(e)
+                    throw e
                 }
-            }
+        }
     }
 
-    private fun insertTeam(team: Team): Completable {
-        return insertTeamUseCase(team).ignoreElement()
+    private suspend fun insertTeam(team: Team) {
+        insertTeamUseCase(team).getOrThrow()
     }
 
-    private fun insertPlayers(list: List<Player>): Completable {
-        return insertPlayersUseCase(list)
+    private suspend fun insertPlayers(list: List<Player>) {
+        insertPlayersUseCase(list).getOrThrow()
     }
 
-    private fun insertLineups(list: List<Lineup>): Completable {
-        return insertLineupsUseCase(list)
+    private suspend fun insertLineups(list: List<Lineup>) {
+        insertLineupsUseCase(list).getOrThrow()
     }
 
-    private fun insertPlayerFieldPositions(list: List<PlayerFieldPosition>): Completable {
-        return insertPlayerFieldPositionsUseCase(list)
+    private suspend fun insertPlayerFieldPositions(list: List<PlayerFieldPosition>) {
+        insertPlayerFieldPositionsUseCase(list).getOrThrow()
     }
 
-    private fun insertPlayerNumberOverlays(list: List<PlayerNumberOverlay>): Completable {
-        return insertPlayerNumberOverlaysUseCase(list)
+    private suspend fun insertPlayerNumberOverlays(list: List<PlayerNumberOverlay>) {
+        insertPlayerNumberOverlaysUseCase(list).getOrThrow()
     }
 
-    private fun insertTournaments(list: List<Tournament>): Completable {
-        return insertTournamentsUseCase(list)
+    private suspend fun insertTournaments(list: List<Tournament>) {
+        insertTournamentsUseCase(list).getOrThrow()
     }
 }

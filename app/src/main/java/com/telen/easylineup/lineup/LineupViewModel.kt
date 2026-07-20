@@ -45,12 +45,10 @@ import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.SharedPreferencesHelper
-import com.telen.easylineup.utils.asSafeFlow
 import com.telen.easylineup.views.LineupTypeface
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -147,7 +145,6 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
     var lineupId: Long? = 0
     var editable = false
-    private val disposables = CompositeDisposable()
 
     private fun setLineup(lineup: Lineup) {
         this.lineup = lineup
@@ -159,7 +156,6 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun clearData() {
-        disposables.clear()
     }
 
     fun observeLineupName(): Flow<String> {
@@ -191,18 +187,11 @@ class LineupViewModel : ViewModel(), KoinComponent {
     fun onDeletePosition(player: Player) {
         val lineupMode = lineup?.mode ?: MODE_DISABLED
         val hitters = lineup?.extraHitters ?: 0
-        val disposable = deletePlayerFieldPositionUseCase(
-            _listPlayersWithPosition,
-            player,
-            lineupMode,
-            hitters
-        )
-            .subscribe({
-                refreshPlayers(_listPlayersWithPosition)
-            }, {
-                Timber.e(it)
-            })
-        disposables.add(disposable)
+        viewModelScope.launch {
+            deletePlayerFieldPositionUseCase(_listPlayersWithPosition, player, lineupMode, hitters)
+                .onSuccess { refreshPlayers(_listPlayersWithPosition) }
+                .onFailure { Timber.e(it) }
+        }
     }
 
     suspend fun getTeamStrategy(): Result<TeamStrategy> {
@@ -298,10 +287,10 @@ class LineupViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun switchPlayersPosition(
+    suspend fun switchPlayersPosition(
         player1: PlayerWithPosition,
         player2: PlayerWithPosition
-    ): Completable {
+    ): Result<Unit> {
         val position1 = FieldPosition.getFieldPositionById(player1.position)
             ?: FieldPosition.FIRST_BASE
         val position2 = FieldPosition.getFieldPositionById(player2.position)
@@ -309,43 +298,36 @@ class LineupViewModel : ViewModel(), KoinComponent {
         return switchPlayersPosition(position1, position2)
     }
 
-    fun switchPlayersPosition(player1: PlayerWithPosition, position2: FieldPosition): Completable {
+    suspend fun switchPlayersPosition(
+        player1: PlayerWithPosition,
+        position2: FieldPosition
+    ): Result<Unit> {
         val position1 = FieldPosition.getFieldPositionById(player1.position)
             ?: FieldPosition.FIRST_BASE
         return switchPlayersPosition(position1, position2)
     }
 
-    private fun switchPlayersPosition(
+    private suspend fun switchPlayersPosition(
         position1: FieldPosition,
         position2: FieldPosition
-    ): Completable {
-        return Completable.defer {
-            lineup?.let {
-                switchPlayersPositionUseCase(
-                    _listPlayersWithPosition,
-                    position1,
-                    position2,
-                    it
-                )
-                    .doOnComplete { refreshPlayers(_listPlayersWithPosition) }
-            } ?: Completable.error(IllegalArgumentException("Lineup is not supposed to be null"))
-        }
+    ): Result<Unit> {
+        val currentLineup = lineup
+            ?: return Result.failure(IllegalArgumentException("Lineup is not supposed to be null"))
+        return switchPlayersPositionUseCase(
+            _listPlayersWithPosition,
+            position1,
+            position2,
+            currentLineup
+        ).onSuccess { refreshPlayers(_listPlayersWithPosition) }
     }
 
     fun onPlayerSelected(player: Player, position: FieldPosition) {
         lineup?.let {
-            val disposable = assignPlayerFieldPositionUseCase(
-                player,
-                position,
-                it,
-                _listPlayersWithPosition
-            )
-                .subscribe({
-                    refreshPlayers(_listPlayersWithPosition)
-                }, {
-                    Timber.e(it)
-                })
-            disposables.add(disposable)
+            viewModelScope.launch {
+                assignPlayerFieldPositionUseCase(player, position, it, _listPlayersWithPosition)
+                    .onSuccess { refreshPlayers(_listPlayersWithPosition) }
+                    .onFailure { Timber.e(it) }
+            }
         }
     }
 
@@ -406,7 +388,8 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private fun getLineupAndPositions(): Flow<List<PlayerWithPosition>> {
         return getLineup()
             .flatMapLatest {
-                observeTeamPlayersAndMaybePositionsForLineupUseCase(it.id).asSafeFlow()
+                observeTeamPlayersAndMaybePositionsForLineupUseCase(it.id)
+                    .catch { e -> Timber.e(e) }
             }
             .flatMapLatest { positions ->
                 _listPlayersWithPosition.clear()
@@ -455,15 +438,15 @@ class LineupViewModel : ViewModel(), KoinComponent {
             }
     }
 
-    fun getPlayerSelectionForFlex(): Single<List<PlayerWithPosition>> {
+    suspend fun getPlayerSelectionForFlex(): Result<List<PlayerWithPosition>> {
         return getOnlyPlayersInFieldUseCase(_listPlayersWithPosition)
-            .onErrorResumeNext {
+            .recoverCatching {
                 if (it is NoSuchElementException) {
                     Timber.e(it.message.toString())
                 } else {
                     Timber.e(it)
                 }
-                Single.just(listOf())
+                listOf()
             }
     }
 

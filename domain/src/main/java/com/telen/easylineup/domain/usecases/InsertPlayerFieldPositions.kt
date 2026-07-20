@@ -4,16 +4,20 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.PlayerFieldPosition
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class InsertPlayerFieldPositions(
     private val dao: PlayerFieldPositionRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(positions: List<PlayerFieldPosition>): Completable {
-        return dao.insertPlayerFieldPositions(positions).subscribeOn(schedulersProvider.io())
-    }
+    suspend operator fun invoke(positions: List<PlayerFieldPosition>): Result<Unit> =
+        runCatchingCancellable {
+            withContext(dispatcherProvider.io()) {
+                dao.insertPlayerFieldPositions(positions).await()
+            }
+        }
 }

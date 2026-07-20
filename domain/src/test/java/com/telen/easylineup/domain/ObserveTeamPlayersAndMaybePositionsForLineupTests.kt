@@ -8,7 +8,9 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.ObserveTeamPlayersAndMaybePositionsForLineup
 import io.reactivex.rxjava3.core.Flowable
-import org.junit.Assert.assertSame
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,10 +33,11 @@ internal class ObserveTeamPlayersAndMaybePositionsForLineupTests {
     }
 
     @Test
-    fun shouldDelegateToRepository() {
-        val flowable = Flowable.just(listOf<PlayerWithPosition>())
-        Mockito.`when`(playerDao.getTeamPlayersAndMaybePositions(1L)).thenReturn(flowable)
+    fun shouldDelegateToRepository() = runTest {
+        val expected = listOf<PlayerWithPosition>()
+        Mockito.`when`(playerDao.getTeamPlayersAndMaybePositions(1L))
+            .thenReturn(Flowable.just(expected))
 
-        assertSame(flowable, observeTeamPlayersAndMaybePositionsForLineup(1L))
+        assertEquals(expected, observeTeamPlayersAndMaybePositionsForLineup(1L).first())
     }
 }

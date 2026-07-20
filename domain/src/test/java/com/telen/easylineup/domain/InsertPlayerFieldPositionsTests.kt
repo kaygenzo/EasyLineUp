@@ -8,7 +8,8 @@ import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.InsertPlayerFieldPositions
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,20 +27,18 @@ internal class InsertPlayerFieldPositionsTests {
     fun init() {
         MockitoAnnotations.initMocks(this)
         insertPlayerFieldPositions =
-            InsertPlayerFieldPositions(playerFieldPositionDao, testSchedulersProvider())
+            InsertPlayerFieldPositions(playerFieldPositionDao, testDispatcherProvider())
     }
 
     @Test
-    fun shouldDelegateToRepository() {
+    fun shouldDelegateToRepository() = runTest {
         val positions = listOf(PlayerFieldPosition(id = 1L, playerId = 1L, lineupId = 10L))
         Mockito.`when`(playerFieldPositionDao.insertPlayerFieldPositions(positions))
             .thenReturn(Completable.complete())
 
-        val observer = TestObserver<Void>()
-        insertPlayerFieldPositions(positions).subscribe(observer)
-        observer.await()
+        val result = insertPlayerFieldPositions(positions)
 
-        observer.assertComplete()
+        Assert.assertTrue(result.isSuccess)
         Mockito.verify(playerFieldPositionDao).insertPlayerFieldPositions(positions)
     }
 }

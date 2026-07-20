@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
@@ -18,19 +17,22 @@ import com.telen.easylineup.domain.model.getNextAvailableOrder
 import com.telen.easylineup.domain.model.getPositionPercentage
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.model.reset
-import io.reactivex.rxjava3.core.Completable
+import com.telen.easylineup.domain.ports.DispatcherProvider
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class AssignPlayerFieldPosition(
     private val getTeam: GetTeam,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         player: Player,
         position: FieldPosition,
         lineup: Lineup,
         players: List<PlayerWithPosition>
-    ): Completable {
-        return getTeam().flatMapCompletable { team ->
+    ): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            val team = getTeam().await()
             val lineupMode = lineup.mode
             val strategy = TeamStrategy.getStrategyById(lineup.strategy)
             val batterSize = strategy.batterSize
@@ -99,8 +101,6 @@ class AssignPlayerFieldPosition(
 
             // remove values from the old player
             otherPlayerPosition?.reset()
-
-            Completable.complete()
-        }.subscribeOn(schedulersProvider.io())
+        }
     }
 }

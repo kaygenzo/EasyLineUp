@@ -17,6 +17,8 @@ import com.telen.easylineup.domain.usecases.InsertPlayers
 import com.telen.easylineup.domain.usecases.InsertTeam
 import com.telen.easylineup.domain.usecases.InsertTournaments
 import com.telen.easylineup.mock.DatabaseMockProvider
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
@@ -43,10 +45,10 @@ class EasyLineupActivityTestRule<T : Activity?> : ActivityTestRule<T>, KoinCompo
         super.beforeActivityLaunched()
 
         // activity?.applicationContext?.run {
-        deleteAllDataUseCase()
-            .andThen(databaseMockProvider.createMockDatabase(context))
-            // .andThen(Completable.timer(3, TimeUnit.SECONDS))
-            .blockingAwait()
+        runBlocking {
+            deleteAllDataUseCase().await()
+            databaseMockProvider.createMockDatabase(context)
+        }
         // }
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext

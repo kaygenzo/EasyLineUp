@@ -21,7 +21,7 @@ import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.GetTeam
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -83,7 +83,6 @@ internal abstract class AssignPlayerFieldPositionTests(
 ) : BaseUseCaseTests() {
     @Mock
     lateinit var teamDao: TeamRepository
-    private var observer: TestObserver<Void> = TestObserver()
     private val newPlayer = Player(2_000, 1, "k2000", 2_000, 2_000, null, 0x07)
     private val lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitterSize)
     private lateinit var savePlayerFieldPosition: AssignPlayerFieldPosition
@@ -93,7 +92,7 @@ internal abstract class AssignPlayerFieldPositionTests(
     fun init() {
         MockitoAnnotations.initMocks(this)
         savePlayerFieldPosition =
-            AssignPlayerFieldPosition(GetTeam(teamDao, testSchedulersProvider()), testSchedulersProvider())
+            AssignPlayerFieldPosition(GetTeam(teamDao, testSchedulersProvider()), testDispatcherProvider())
 
         players = mutableListOf()
         teamType.getValidPositions(strategy).forEachIndexed { i, pos ->
@@ -122,7 +121,7 @@ internal abstract class AssignPlayerFieldPositionTests(
         )
     }
 
-    private fun startUseCase(
+    private suspend fun startUseCase(
         position: FieldPosition,
         mode: Int,
         player: Player = newPlayer,
@@ -133,12 +132,12 @@ internal abstract class AssignPlayerFieldPositionTests(
         Mockito.`when`(teamDao.getTeamsRx())
             .thenReturn(Single.just(listOf(Team(id = 1L, type = teamType.id, main = true))))
         val playersSize = players.size
-        savePlayerFieldPosition(player, position, lineup, players).subscribe(observer)
-        observer.await()
+        val result = savePlayerFieldPosition(player, position, lineup, players)
         exception?.let {
-            observer.assertError(it)
+            Assert.assertTrue(result.isFailure)
+            Assert.assertEquals(it, result.exceptionOrNull()?.javaClass)
         } ?: let {
-            observer.assertComplete()
+            Assert.assertTrue(result.isSuccess)
             players.apply {
                 Assert.assertEquals("Size of player list must not change", playersSize, size)
                 Assert.assertEquals(
@@ -170,7 +169,7 @@ internal abstract class AssignPlayerFieldPositionTests(
     }
 
     @Test
-    fun shouldInsertPlayerWithWhenOrderAvailable() {
+    fun shouldInsertPlayerWithWhenOrderAvailable() = runTest {
         val lastOrder = players.first { it.isShortStop() }.order
         players.first { it.isShortStop() }.reset()
         startUseCase(FieldPosition.SHORT_STOP, MODE_DISABLED)
@@ -178,7 +177,7 @@ internal abstract class AssignPlayerFieldPositionTests(
     }
 
     @Test
-    fun shouldInsertSubstituteWithOrderWhenOrderAvailable() {
+    fun shouldInsertSubstituteWithOrderWhenOrderAvailable() = runTest {
         val lastOrder = players.first { it.isShortStop() }.order
         players.first { it.isShortStop() }.reset()
         startUseCase(FieldPosition.SUBSTITUTE, MODE_DISABLED)
@@ -193,7 +192,7 @@ internal abstract class AssignPlayerFieldPositionTests(
     }
 
     @Test
-    fun shouldNotInsertInBattingOrderIfBattersAndExtraHitterAllComplete() {
+    fun shouldNotInsertInBattingOrderIfBattersAndExtraHitterAllComplete() = runTest {
         // fill in with fake players
         for (i in (strategy.batterSize + 1)..(strategy.batterSize + extraHitterSize + 1)) {
             players.add(
@@ -210,7 +209,7 @@ internal abstract class AssignPlayerFieldPositionTests(
     }
 
     @Test
-    fun shouldInsertInBattingOrderIfBattersCompleteAndExtraHitterAvailable() {
+    fun shouldInsertInBattingOrderIfBattersCompleteAndExtraHitterAvailable() = runTest {
         startUseCase(FieldPosition.SUBSTITUTE, MODE_DISABLED)
         players.first { newPlayer.id == it.playerId }.let {
             if (extraHitterSize < 1) {
@@ -222,7 +221,7 @@ internal abstract class AssignPlayerFieldPositionTests(
     }
 
     @Test
-    fun shouldInsertPitcherAsDesignatedPitcherOrderInBaseballLineup() {
+    fun shouldInsertPitcherAsDesignatedPitcherOrderInBaseballLineup() = runTest {
         players.first { it.isPitcher() }.reset()
 
         startUseCase(FieldPosition.PITCHER, MODE_ENABLED, teamType = TeamType.BASEBALL)
@@ -234,13 +233,13 @@ internal abstract class AssignPlayerFieldPositionTests(
     }
 
     @Test
-    fun shouldNewPlayerReplaceAnotherPlayerOnSamePosition() {
+    fun shouldNewPlayerReplaceAnotherPlayerOnSamePosition() = runTest {
         startUseCase(FieldPosition.SHORT_STOP, MODE_DISABLED)
         Assert.assertEquals(strategy.batterSize - 5, players.first { it.isShortStop() }.order)
     }
 
     @Test
-    fun shouldTriggerAnErrorIfNewPlayerNotPartOfPlayersList() {
+    fun shouldTriggerAnErrorIfNewPlayerNotPartOfPlayersList() = runTest {
         startUseCase(
             FieldPosition.SHORT_STOP,
             MODE_DISABLED,

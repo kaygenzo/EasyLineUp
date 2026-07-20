@@ -4,16 +4,18 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isSubstitute
-import io.reactivex.rxjava3.core.Single
+import com.telen.easylineup.domain.ports.DispatcherProvider
+import kotlinx.coroutines.withContext
 
-class GetOnlyPlayersInField(private val schedulersProvider: SchedulersProvider) {
-    operator fun invoke(playersInLineup: List<PlayerWithPosition>): Single<List<PlayerWithPosition>> {
-        return Single.just(playersInLineup)
-            .map { list -> list.filter { it.position > 0 && !it.isSubstitute() && !it.isDpDh() } }
-            .subscribeOn(schedulersProvider.io())
+class GetOnlyPlayersInField(private val dispatcherProvider: DispatcherProvider) {
+    suspend operator fun invoke(
+        playersInLineup: List<PlayerWithPosition>
+    ): Result<List<PlayerWithPosition>> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            playersInLineup.filter { it.position > 0 && !it.isSubstitute() && !it.isDpDh() }
+        }
     }
 }

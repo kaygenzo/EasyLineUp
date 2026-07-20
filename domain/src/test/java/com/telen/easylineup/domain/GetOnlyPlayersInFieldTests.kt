@@ -8,7 +8,7 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.usecases.GetOnlyPlayersInField
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -17,13 +17,12 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetOnlyPlayersInFieldTests : BaseUseCaseTests() {
-    private val observer: TestObserver<List<PlayerWithPosition>> = TestObserver()
     lateinit var useCase: GetOnlyPlayersInField
     lateinit var players: MutableList<PlayerWithPosition>
 
     @Before
     fun init() {
-        useCase = GetOnlyPlayersInField(testSchedulersProvider())
+        useCase = GetOnlyPlayersInField(testDispatcherProvider())
 
         players = mutableListOf()
         players.add(generate(1L, FieldPosition.PITCHER, 1))
@@ -38,22 +37,22 @@ internal class GetOnlyPlayersInFieldTests : BaseUseCaseTests() {
         return generate(playerId, position, flag, order)
     }
 
-    private fun startUseCase(players: List<PlayerWithPosition> = this.players) {
-        useCase(players).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+    private suspend fun startUseCase(
+        players: List<PlayerWithPosition> = this.players
+    ): List<PlayerWithPosition> {
+        val result = useCase(players)
+        Assert.assertTrue(result.isSuccess)
+        return result.getOrNull()!!
     }
 
     @Test
-    fun shouldReturnEmptyList() {
-        startUseCase(mutableListOf())
-        Assert.assertTrue(observer.values().first().isEmpty())
+    fun shouldReturnEmptyList() = runTest {
+        Assert.assertTrue(startUseCase(mutableListOf()).isEmpty())
     }
 
     @Test
-    fun shouldReturnListWithOnlyInfieldersAndOutfielders() {
-        startUseCase(players)
-        observer.values().first().let {
+    fun shouldReturnListWithOnlyInfieldersAndOutfielders() = runTest {
+        startUseCase(players).let {
             Assert.assertEquals(3, it.count())
             Assert.assertNotNull(it.firstOrNull { it.playerName == "player1" })
             Assert.assertNotNull(it.firstOrNull { it.playerName == "player2" })

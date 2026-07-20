@@ -16,7 +16,7 @@ import com.telen.easylineup.domain.model.isShortStop
 import com.telen.easylineup.domain.model.reset
 import com.telen.easylineup.domain.model.toPlayer
 import com.telen.easylineup.domain.usecases.DeletePlayerFieldPosition
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -88,7 +88,6 @@ internal abstract class DeletePlayerFieldPositionTests(
     private val extraHitterSize: Int
 ) : BaseUseCaseTests() {
     private val lineupMode = MODE_ENABLED
-    val observer: TestObserver<Void> = TestObserver()
     private lateinit var deletePlayerFieldPosition: DeletePlayerFieldPosition
     private lateinit var players: MutableList<PlayerWithPosition>
     private lateinit var substitute: PlayerWithPosition
@@ -97,7 +96,7 @@ internal abstract class DeletePlayerFieldPositionTests(
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        deletePlayerFieldPosition = DeletePlayerFieldPosition(testSchedulersProvider())
+        deletePlayerFieldPosition = DeletePlayerFieldPosition(testDispatcherProvider())
         players = mutableListOf()
         teamType.getValidPositions(strategy).forEachIndexed { index, pos ->
             val id = index + 1
@@ -108,18 +107,18 @@ internal abstract class DeletePlayerFieldPositionTests(
         players.add(substitute)
     }
 
-    private fun startUseCase(
+    private suspend fun startUseCase(
         players: List<PlayerWithPosition> = this.players,
         player: Player,
         exception: Class<out Throwable>? = null
     ) {
         val playersSize = players.size
-        deletePlayerFieldPosition(players, player, lineupMode, extraHitterSize).subscribe(observer)
-        observer.await()
+        val result = deletePlayerFieldPosition(players, player, lineupMode, extraHitterSize)
         exception?.let {
-            observer.assertError(exception)
+            Assert.assertTrue(result.isFailure)
+            Assert.assertEquals(it, result.exceptionOrNull()?.javaClass)
         } ?: let {
-            observer.assertComplete()
+            Assert.assertTrue(result.isSuccess)
             Assert.assertEquals("Size of player list must not change", playersSize, players.size)
             players.first { it.playerId == player.id }.let {
                 Assert.assertEquals("The player batting order is reset", 0, it.order)
@@ -155,12 +154,12 @@ internal abstract class DeletePlayerFieldPositionTests(
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfListIsEmpty() {
+    fun shouldTriggerAnExceptionIfListIsEmpty() = runTest {
         startUseCase(mutableListOf(), player, NoSuchElementException::class.java)
     }
 
     @Test
-    fun shouldDeletePlayerFieldPositionsDpAndFlexIfDeleteFlex() {
+    fun shouldDeletePlayerFieldPositionsDpAndFlexIfDeleteFlex() = runTest {
         setupDpAndFlex()
         startUseCase(players, player)
         assertPlayerDeleted(players.first { it.playerId == player.id })
@@ -168,7 +167,7 @@ internal abstract class DeletePlayerFieldPositionTests(
     }
 
     @Test
-    fun shouldDeletePlayerFieldPositionsDpAndFlexIfDeleteDp() {
+    fun shouldDeletePlayerFieldPositionsDpAndFlexIfDeleteDp() = runTest {
         setupDpAndFlex()
         startUseCase(players, substitute.toPlayer())
         assertPlayerDeleted(players.first { it.playerId == player.id })
@@ -176,7 +175,7 @@ internal abstract class DeletePlayerFieldPositionTests(
     }
 
     @Test
-    fun shouldDeletePlayerFieldPositionOnePositionIfNotDpNorFlex() {
+    fun shouldDeletePlayerFieldPositionOnePositionIfNotDpNorFlex() = runTest {
         setupDpAndFlex()
         startUseCase(players, players.first { it.isShortStop() }.toPlayer())
         assertPlayerNotDeleted(players.first { it.playerId == player.id })
@@ -184,7 +183,7 @@ internal abstract class DeletePlayerFieldPositionTests(
     }
 
     @Test
-    fun shouldDeletePlayerFieldPositionIfMultipleSubstitutesPlayerNotFirst() {
+    fun shouldDeletePlayerFieldPositionIfMultipleSubstitutesPlayerNotFirst() = runTest {
         for (i in (strategy.batterSize + 1)..(strategy.batterSize + extraHitterSize + 1)) {
             players.add(
                 generate(
@@ -204,7 +203,7 @@ internal abstract class DeletePlayerFieldPositionTests(
     }
 
     @Test
-    fun shouldReplaceOldSubstituteByAnewOne() {
+    fun shouldReplaceOldSubstituteByAnewOne() = runTest {
         // added 2 substitutes as batters
         for (i in (strategy.batterSize - 1)..strategy.batterSize) {
             players[i - 1].position = FieldPosition.SUBSTITUTE.id

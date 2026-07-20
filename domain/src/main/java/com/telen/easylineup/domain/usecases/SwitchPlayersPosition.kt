@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_ENABLED
@@ -15,21 +14,24 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.getNextAvailableOrder
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isFlex
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.exceptions.FirstPositionEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.SamePlayerException
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class SwitchPlayersPosition(
     private val getTeam: GetTeam,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         players: List<PlayerWithPosition>,
         position1: FieldPosition,
         position2: FieldPosition,
         lineup: Lineup
-    ): Completable {
-        return getTeam().flatMapCompletable { team ->
+    ): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            val team = getTeam().await()
             val mutablePlayers = players.toMutableList()
             val extraHittersSize = lineup.extraHitters
             val lineupMode = lineup.mode
@@ -39,13 +41,13 @@ class SwitchPlayersPosition(
             val player1 = try {
                 mutablePlayers.first { it.position == position1.id }
             } catch (e: NoSuchElementException) {
-                return@flatMapCompletable Completable.error(FirstPositionEmptyException())
+                throw FirstPositionEmptyException()
             }
 
             val player2 = mutablePlayers.firstOrNull { it.position == position2.id }
 
             if (player1 == player2) {
-                return@flatMapCompletable Completable.error(SamePlayerException())
+                throw SamePlayerException()
             }
 
             player1.position = position2.id
@@ -114,8 +116,6 @@ class SwitchPlayersPosition(
                     }
                 }
             }
-
-            Completable.complete()
-        }.subscribeOn(schedulersProvider.io())
+        }
     }
 }
