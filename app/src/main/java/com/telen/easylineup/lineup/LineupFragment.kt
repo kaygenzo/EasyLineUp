@@ -42,8 +42,8 @@ import com.telen.easylineup.lineup.defense.DefenseFragmentFixed
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.rx3.rxCompletable
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
@@ -261,8 +261,7 @@ abstract class LineupFragment(
                 .getWarningTaskDialog(context = ctx,
                     title = R.string.dialog_delete_lineup_title,
                     message = R.string.dialog_delete_cannot_undo_message,
-                    task = viewModel.deleteLineup()
-                        .observeOn(AndroidSchedulers.mainThread())
+                    task = rxCompletable { viewModel.deleteLineup().getOrThrow() }
                         .doOnComplete { goBack(showFixedView = false) }
                         .doOnError {
                             Toast.makeText(

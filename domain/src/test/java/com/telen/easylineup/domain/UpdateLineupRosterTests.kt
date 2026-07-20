@@ -14,8 +14,9 @@ import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.UpdateLineupRoster
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +27,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class UpdateLineupRosterTests {
-    val observer: TestObserver<Void> = TestObserver()
     @Mock lateinit var lineupRepository: LineupRepository
     lateinit var updateLineupRoster: UpdateLineupRoster
     lateinit var lineup: Lineup
@@ -36,52 +36,50 @@ internal class UpdateLineupRosterTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        updateLineupRoster = UpdateLineupRoster(lineupRepository, testSchedulersProvider())
+        updateLineupRoster = UpdateLineupRoster(lineupRepository, testDispatcherProvider())
         lineup = Lineup(id = 1L, name = "test", teamId = 1L, tournamentId = 1L)
         Mockito.`when`(lineupRepository.getLineupByIdSingle(1L)).thenReturn(Single.just(lineup))
         Mockito.`when`(lineupRepository.updateLineup(any())).thenReturn(Completable.complete())
     }
 
     @Test
-    fun shouldBuildRosterStringFromSelectedPlayersOnly() {
+    fun shouldBuildRosterStringFromSelectedPlayersOnly() = runTest {
         val roster = listOf(
             RosterPlayerStatus(player(1L), status = true, playerNumberOverlay = null),
             RosterPlayerStatus(player(2L), status = false, playerNumberOverlay = null),
             RosterPlayerStatus(player(3L), status = true, playerNumberOverlay = null)
         )
 
-        updateLineupRoster(1L, roster).subscribe(observer)
-        observer.await()
+        val result = updateLineupRoster(1L, roster)
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         val captor = argumentCaptor<Lineup>()
         Mockito.verify(lineupRepository).updateLineup(captor.capture())
         assertEquals("1;3", captor.firstValue.roster)
     }
 
     @Test
-    fun shouldBuildEmptyRosterStringWhenNoPlayerSelected() {
+    fun shouldBuildEmptyRosterStringWhenNoPlayerSelected() = runTest {
         val roster = listOf(
             RosterPlayerStatus(player(1L), status = false, playerNumberOverlay = null)
         )
 
-        updateLineupRoster(1L, roster).subscribe(observer)
-        observer.await()
+        val result = updateLineupRoster(1L, roster)
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         val captor = argumentCaptor<Lineup>()
         Mockito.verify(lineupRepository).updateLineup(captor.capture())
         assertEquals("", captor.firstValue.roster)
     }
 
     @Test
-    fun shouldPropagateErrorWhenLineupNotFound() {
+    fun shouldPropagateErrorWhenLineupNotFound() = runTest {
         val exception = Exception("not found")
         Mockito.`when`(lineupRepository.getLineupByIdSingle(eq(1L))).thenReturn(Single.error(exception))
 
-        updateLineupRoster(1L, emptyList()).subscribe(observer)
-        observer.await()
+        val result = updateLineupRoster(1L, emptyList())
 
-        observer.assertError(exception)
+        assertTrue(result.isFailure)
+        assertEquals(exception.message, result.exceptionOrNull()?.message)
     }
 }

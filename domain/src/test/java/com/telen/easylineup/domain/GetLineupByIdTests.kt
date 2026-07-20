@@ -8,8 +8,9 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.GetLineupById
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,19 +27,17 @@ internal class GetLineupByIdTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getLineupById = GetLineupById(lineupDao, testSchedulersProvider())
+        getLineupById = GetLineupById(lineupDao, testDispatcherProvider())
     }
 
     @Test
-    fun shouldDelegateToRepository() {
+    fun shouldDelegateToRepository() = runTest {
         val lineup = Lineup(id = 1L, name = "toto", teamId = 1L, tournamentId = 1L)
         Mockito.`when`(lineupDao.getLineupByIdSingle(1L)).thenReturn(Single.just(lineup))
 
-        val observer = TestObserver<Lineup>()
-        getLineupById(1L).subscribe(observer)
-        observer.await()
+        val result = getLineupById(1L)
 
-        observer.assertComplete()
-        Assert.assertEquals(lineup, observer.values().first())
+        assertTrue(result.isSuccess)
+        Assert.assertEquals(lineup, result.getOrNull())
     }
 }

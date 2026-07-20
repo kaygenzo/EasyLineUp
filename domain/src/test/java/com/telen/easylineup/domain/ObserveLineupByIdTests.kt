@@ -8,7 +8,9 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.ObserveLineupById
 import io.reactivex.rxjava3.core.Flowable
-import org.junit.Assert.assertSame
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,10 +31,12 @@ internal class ObserveLineupByIdTests {
     }
 
     @Test
-    fun shouldDelegateToRepository() {
-        val flowable = Flowable.just(Lineup())
-        Mockito.`when`(lineupDao.getLineupById(1L)).thenReturn(flowable)
+    fun shouldDelegateToRepository() = runTest {
+        val lineup = Lineup()
+        Mockito.`when`(lineupDao.getLineupById(1L)).thenReturn(Flowable.just(lineup))
 
-        assertSame(flowable, observeLineupById(1L))
+        val result = observeLineupById(1L).toList()
+
+        assertEquals(listOf(lineup), result)
     }
 }

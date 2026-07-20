@@ -4,29 +4,28 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.domain.model.PlayerWithPosition
-import io.reactivex.rxjava3.core.Completable
+import com.telen.easylineup.domain.ports.DispatcherProvider
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class SetLineupMode(
     private val getTeam: GetTeam,
     private val updatePlayersWithLineupMode: UpdatePlayersWithLineupMode,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         isEnabled: Boolean,
         lineup: Lineup,
         players: List<PlayerWithPosition>
-    ): Completable {
-        return Completable.defer {
+    ): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
             lineup.mode = if (isEnabled) MODE_ENABLED else MODE_DISABLED
-            getTeam()
-                .flatMapCompletable { team ->
-                    updatePlayersWithLineupMode(players, lineup, team.type)
-                }
-        }.subscribeOn(schedulersProvider.io())
+            val team = getTeam().await()
+            updatePlayersWithLineupMode(players, lineup, team.type).getOrThrow()
+        }
     }
 }

@@ -28,11 +28,11 @@ import com.telen.easylineup.databinding.FragmentLineupEditionBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.RosterItem
-import com.telen.easylineup.launch
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapterCallback,
@@ -72,9 +72,13 @@ class LineupEditionFragment : BaseFragment("LineupEditionFragment"), RosterAdapt
             }
 
             containerActions.saveClickListener = View.OnClickListener {
-                launch(viewModel.saveClicked(), {
-                    findNavController().popBackStack()
-                })
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.saveClicked()
+                        .onSuccess {
+                            findNavController().popBackStack()
+                        }
+                        .onFailure { Timber.e(it) }
+                }
             }
 
             containerActions.cancelClickListener = View.OnClickListener {

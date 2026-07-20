@@ -4,16 +4,19 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class InsertLineups(
     private val dao: LineupRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(lineups: List<Lineup>): Completable {
-        return dao.insertLineups(lineups).subscribeOn(schedulersProvider.io())
+    suspend operator fun invoke(lineups: List<Lineup>): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            dao.insertLineups(lineups).await()
+        }
     }
 }

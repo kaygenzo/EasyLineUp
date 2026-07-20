@@ -4,57 +4,53 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.isAssigned
 import com.telen.easylineup.domain.model.isDefensePlayer
 import com.telen.easylineup.domain.model.isSubstitute
-import io.reactivex.rxjava3.core.Single
+import com.telen.easylineup.domain.ports.DispatcherProvider
+import kotlinx.coroutines.withContext
 
 class GetListAvailablePlayersForSelection(
     private val getRoster: GetRoster,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         players: List<PlayerWithPosition>,
         position: FieldPosition?,
         lineup: Lineup
-    ): Single<List<PlayerWithPosition>> {
-        return getRoster(lineup.id)
-            .map { it.players }
-            .map { rosterPlayers ->
-                val playersSelectedForLineup = rosterPlayers
-                    .filter { it.status }
-                    .map { it.player.id }
+    ): Result<List<PlayerWithPosition>> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            val rosterPlayers = getRoster(lineup.id).getOrThrow().players
+            val playersSelectedForLineup = rosterPlayers
+                .filter { it.status }
+                .map { it.player.id }
 
-                var listAvailablePlayers = players
-                    // get only player no placed on a position except the substitutes, but only
-                    // if it is not to add in the container of substitutes
-                    .filter {
-                        val setAsSubstitute = position == FieldPosition.SUBSTITUTE
-                        !it.isAssigned() || (it.isSubstitute() && !setAsSubstitute)
-                    }
-                    // no player excluded from the lineup roster
-                    .filter { playersSelectedForLineup.contains(it.playerId) }
-
-                position?.run {
-                    if (isDefensePlayer()) {
-                        listAvailablePlayers = listAvailablePlayers
-                            .sortedWith(getPlayerComparator(this))
-                    }
+            var listAvailablePlayers = players
+                // get only player no placed on a position except the substitutes, but only
+                // if it is not to add in the container of substitutes
+                .filter {
+                    val setAsSubstitute = position == FieldPosition.SUBSTITUTE
+                    !it.isAssigned() || (it.isSubstitute() && !setAsSubstitute)
                 }
-                listAvailablePlayers
-            }
-            .flatMap { listAvailablePlayers ->
-                if (listAvailablePlayers.isNotEmpty()) {
-                    Single.just(listAvailablePlayers)
-                } else {
-                    Single.error(NoSuchElementException())
+                // no player excluded from the lineup roster
+                .filter { playersSelectedForLineup.contains(it.playerId) }
+
+            position?.run {
+                if (isDefensePlayer()) {
+                    listAvailablePlayers = listAvailablePlayers
+                        .sortedWith(getPlayerComparator(this))
                 }
             }
-            .subscribeOn(schedulersProvider.io())
+
+            if (listAvailablePlayers.isEmpty()) {
+                throw NoSuchElementException()
+            }
+
+            listAvailablePlayers
+        }
     }
 
     private fun getPlayerComparator(position: FieldPosition): Comparator<PlayerWithPosition> {

@@ -4,16 +4,19 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class GetLineupById(
     private val dao: LineupRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(lineupId: Long): Single<Lineup> {
-        return dao.getLineupByIdSingle(lineupId).subscribeOn(schedulersProvider.io())
+    suspend operator fun invoke(lineupId: Long): Result<Lineup> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            dao.getLineupByIdSingle(lineupId).await()
+        }
     }
 }

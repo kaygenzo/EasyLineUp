@@ -11,7 +11,8 @@ import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.DeleteLineup
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,7 +22,6 @@ import org.mockito.junit.*
 @RunWith(MockitoJUnitRunner::class)
 internal class DeleteLineupTests {
     private val extraHitters = 0
-    private val observer: TestObserver<Void> = TestObserver()
 
     @Mock
     lateinit var dao: LineupRepository
@@ -31,7 +31,7 @@ internal class DeleteLineupTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        deleteLineup = DeleteLineup(dao, testSchedulersProvider())
+        deleteLineup = DeleteLineup(dao, testDispatcherProvider())
 
         lineup1 =
                 Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id, extraHitters, 3L)
@@ -41,32 +41,28 @@ internal class DeleteLineupTests {
     }
 
     @Test
-    fun shouldReturnAnExceptionIfLineupIdIsNull() {
-        deleteLineup(null).subscribe(observer)
-        observer.await()
-        observer.assertError(Exception::class.java)
+    fun shouldReturnAnExceptionIfLineupIdIsNull() = runTest {
+        val result = deleteLineup(null)
+        assertTrue(result.isFailure)
     }
 
     @Test
-    fun shouldDeleteLineupIfIdExists() {
+    fun shouldDeleteLineupIfIdExists() = runTest {
         Mockito.`when`(dao.deleteLineup(lineup1)).thenReturn(Completable.complete())
-        deleteLineup(1).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+        val result = deleteLineup(1)
+        assertTrue(result.isSuccess)
     }
 
     @Test
-    fun shouldDeleteLineupIfIdNotExists() {
-        deleteLineup(2).subscribe(observer)
-        observer.await()
-        observer.assertError(Exception::class.java)
+    fun shouldDeleteLineupIfIdNotExists() = runTest {
+        val result = deleteLineup(2)
+        assertTrue(result.isFailure)
     }
 
     @Test
-    fun shouldReturnAnErrorIfLineupExistsButCannotBeDeleted() {
+    fun shouldReturnAnErrorIfLineupExistsButCannotBeDeleted() = runTest {
         Mockito.`when`(dao.deleteLineup(lineup1)).thenReturn(Completable.error(Exception()))
-        deleteLineup(1).subscribe(observer)
-        observer.await()
-        observer.assertError(Exception::class.java)
+        val result = deleteLineup(1)
+        assertTrue(result.isFailure)
     }
 }

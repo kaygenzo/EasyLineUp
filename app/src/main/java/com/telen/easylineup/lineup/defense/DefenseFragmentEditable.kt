@@ -40,6 +40,7 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -63,23 +64,27 @@ class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlaye
         return FragmentLineupDefenseEditableBinding.inflate(inflater, container, false).apply {
             this@DefenseFragmentEditable.binder = this
 
-            launch(viewModel.getTeamStrategy(), {
-                cardDefenseView.apply {
-                    init(it)
-                    setPlayerStateListener(this@DefenseFragmentEditable)
-                }
-                viewModel.observeDefensePlayers()
-                    .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                    .onEach { players ->
-                        val lineupMode = viewModel.lineup?.mode ?: MODE_DISABLED
-                        launch(viewModel.getTeamType().flatMap {
-                            Completable.timer(100, TimeUnit.MILLISECONDS).andThen(Single.just(it))
-                        }, { teamType ->
-                            cardDefenseView.setListPlayer(players, lineupMode, teamType)
-                        })
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.getTeamStrategy()
+                    .onSuccess {
+                        cardDefenseView.apply {
+                            init(it)
+                            setPlayerStateListener(this@DefenseFragmentEditable)
+                        }
+                        viewModel.observeDefensePlayers()
+                            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                            .onEach { players ->
+                                val lineupMode = viewModel.lineup?.mode ?: MODE_DISABLED
+                                launch(viewModel.getTeamType().flatMap {
+                                    Completable.timer(100, TimeUnit.MILLISECONDS).andThen(Single.just(it))
+                                }, { teamType ->
+                                    cardDefenseView.setListPlayer(players, lineupMode, teamType)
+                                })
+                            }
+                            .launchIn(viewLifecycleOwner.lifecycleScope)
                     }
-                    .launchIn(viewLifecycleOwner.lifecycleScope)
-            })
+                    .onFailure { Timber.e(it) }
+            }
         }.root
     }
 

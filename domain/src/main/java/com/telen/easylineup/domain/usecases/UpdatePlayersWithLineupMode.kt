@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
@@ -15,15 +14,16 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.isDpDhOrFlex
 import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.model.reset
-import io.reactivex.rxjava3.core.Completable
+import com.telen.easylineup.domain.ports.DispatcherProvider
+import kotlinx.coroutines.withContext
 
-class UpdatePlayersWithLineupMode(private val schedulersProvider: SchedulersProvider) {
-    operator fun invoke(
+class UpdatePlayersWithLineupMode(private val dispatcherProvider: DispatcherProvider) {
+    suspend operator fun invoke(
         players: List<PlayerWithPosition>,
         lineup: Lineup,
         teamType: Int
-    ): Completable {
-        return Completable.defer {
+    ): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
             when (lineup.mode) {
                 MODE_ENABLED -> when (teamType) {
                     TeamType.SOFTBALL.id -> {
@@ -39,11 +39,10 @@ class UpdatePlayersWithLineupMode(private val schedulersProvider: SchedulersProv
                             it.flags = PlayerFieldPosition.FLAG_FLEX
                         }
                     }
-                    else -> return@defer Completable.error(IllegalArgumentException())
+                    else -> throw IllegalArgumentException()
                 }
                 MODE_DISABLED -> players.filter { it.isDpDhOrFlex() }.forEach { it.reset() }
             }
-            Completable.complete()
-        }.subscribeOn(schedulersProvider.io())
+        }
     }
 }

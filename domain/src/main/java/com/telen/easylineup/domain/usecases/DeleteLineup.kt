@@ -4,20 +4,20 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class DeleteLineup(
     private val lineupDao: LineupRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(lineupId: Long?): Completable {
-        return (
-            lineupId?.let { id ->
-                lineupDao.getLineupByIdSingle(id)
-                    .flatMapCompletable { lineup -> lineupDao.deleteLineup(lineup) }
-            } ?: Completable.error(Exception("Lineup id is null"))
-            ).subscribeOn(schedulersProvider.io())
+    suspend operator fun invoke(lineupId: Long?): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            val id = lineupId ?: throw Exception("Lineup id is null")
+            val lineup = lineupDao.getLineupByIdSingle(id).await()
+            lineupDao.deleteLineup(lineup).await()
+        }
     }
 }

@@ -17,8 +17,9 @@ import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetTeam
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,8 +30,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
-    private val observer: TestObserver<List<PlayerWithPosition>> =
-        TestObserver()
     @Mock lateinit var lineupDao: LineupRepository
     @Mock lateinit var playerDao: PlayerRepository
     @Mock lateinit var teamDao: TeamRepository
@@ -41,8 +40,8 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        val getRoster = GetRoster(playerDao, lineupDao, GetTeam(teamDao, testSchedulersProvider()), testSchedulersProvider())
-        getListAvailablePlayersForSelection = GetListAvailablePlayersForSelection(getRoster, testSchedulersProvider())
+        val getRoster = GetRoster(playerDao, lineupDao, GetTeam(teamDao, testSchedulersProvider()), testDispatcherProvider())
+        getListAvailablePlayersForSelection = GetListAvailablePlayersForSelection(getRoster, testDispatcherProvider())
 
         val team = Team(id = 1L, name = "toto", main = true)
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
@@ -77,22 +76,22 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
             .thenReturn(Single.just(emptyList()))
     }
 
-    private fun startUseCase(
+    private suspend fun startUseCase(
         position: FieldPosition?,
         players: List<PlayerWithPosition> = this.players,
         exception: Class<out Throwable>? = null
-    ) {
-        getListAvailablePlayersForSelection(players, position, lineup).subscribe(observer)
-        observer.await()
+    ): Result<List<PlayerWithPosition>> {
+        val result = getListAvailablePlayersForSelection(players, position, lineup)
         exception?.let {
-            observer.assertError(exception)
+            assertTrue(exception.isInstance(result.exceptionOrNull()))
         } ?: let {
-            observer.assertComplete()
+            assertTrue(result.isSuccess)
         }
+        return result
     }
 
     @Test
-    fun shouldTriggerAnErrorIfListEmpty() {
+    fun shouldTriggerAnErrorIfListEmpty() = runTest {
         startUseCase(
             players = mutableListOf(),
             position = FieldPosition.PITCHER,
@@ -101,9 +100,9 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldOnlyReturnPlayersWithoutFieldPositionOrSubstitutes() {
-        startUseCase(position = FieldPosition.PITCHER)
-        observer.values().first().let {
+    fun shouldOnlyReturnPlayersWithoutFieldPositionOrSubstitutes() = runTest {
+        val result = startUseCase(position = FieldPosition.PITCHER)
+        result.getOrNull()!!.let {
             Assert.assertEquals(3, it.size)
             Assert.assertEquals(1, it.filter { it.playerId == 2L }.size)
             Assert.assertEquals(1, it.filter { it.playerId == 4L }.size)
@@ -112,25 +111,25 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldSortPlayersByFieldPositionCatcher() {
-        startUseCase(position = FieldPosition.CATCHER)
-        observer.values().first().let {
+    fun shouldSortPlayersByFieldPositionCatcher() = runTest {
+        val result = startUseCase(position = FieldPosition.CATCHER)
+        result.getOrNull()!!.let {
             Assert.assertEquals(2, it[0].playerId)
             Assert.assertEquals(4, it[1].playerId)
         }
     }
 
     @Test
-    fun shouldSortPlayersByFieldPositionSecondBase() {
-        startUseCase(position = FieldPosition.SECOND_BASE)
-        observer.values().first().let {
+    fun shouldSortPlayersByFieldPositionSecondBase() = runTest {
+        val result = startUseCase(position = FieldPosition.SECOND_BASE)
+        result.getOrNull()!!.let {
             Assert.assertEquals(4, it[0].playerId)
             Assert.assertEquals(2, it[1].playerId)
         }
     }
 
     @Test
-    fun shouldRtriggerAnExceptionWhenRosterIsEmpty() {
+    fun shouldRtriggerAnExceptionWhenRosterIsEmpty() = runTest {
         lineup.roster = ""
         startUseCase(
             position = FieldPosition.SECOND_BASE,
@@ -139,10 +138,10 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldReturnSomePlayersWhenRosterIsNotFull() {
+    fun shouldReturnSomePlayersWhenRosterIsNotFull() = runTest {
         lineup.roster = "1;2;3"
-        startUseCase(position = FieldPosition.SECOND_BASE)
-        Assert.assertEquals(1, observer.values().first().size)
-        Assert.assertEquals(2L, observer.values().first().first().playerId)
+        val result = startUseCase(position = FieldPosition.SECOND_BASE)
+        Assert.assertEquals(1, result.getOrNull()?.size)
+        Assert.assertEquals(2L, result.getOrNull()?.first()?.playerId)
     }
 }

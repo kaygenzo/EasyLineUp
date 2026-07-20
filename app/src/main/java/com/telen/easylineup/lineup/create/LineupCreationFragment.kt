@@ -88,9 +88,13 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment"), OnActionB
             lineupCreationForm.setFragmentManager(childFragmentManager)
             lineupCreationForm.setOnActionClickListener(this@LineupCreationFragment)
 
-            launch(lineupViewModel.getCompleteRoster(), {
-                updateRosterSize(lineupCreationForm.binding.playerCount, it)
-            })
+            viewLifecycleOwner.lifecycleScope.launch {
+                lineupViewModel.getCompleteRoster()
+                    .onSuccess {
+                        updateRosterSize(lineupCreationForm.binding.playerCount, it)
+                    }
+                    .onFailure { Timber.e(it) }
+            }
 
             lineupViewModel.registerSaveResults()
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
@@ -120,24 +124,23 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment"), OnActionB
     }
 
     private fun showRosterDialog(formView: LineupCreationFormView) {
-        launch(lineupViewModel.getChosenRoster(), { response ->
-            activity?.let { activity ->
-                val names: MutableList<CharSequence> = mutableListOf()
-                names.addAll(response.players.map { it.player.name })
-                val checked: MutableList<Boolean> = mutableListOf()
-                checked.addAll(response.players.map { it.status })
-                DialogFactory.getMultiChoiceDialog(
-                    context = activity,
-                    title = R.string.roster_list_player_dialog_title,
-                    items = names.toTypedArray(),
-                    checkedItems = checked.toBooleanArray(),
-                    listener = { _, which, isChecked ->
-                        lineupViewModel.rosterPlayerStatusChanged(which, isChecked)
-                        updateRosterSize(formView.binding.playerCount, response)
-                    }
-                ).show()
-            }
-        })
+        val response = lineupViewModel.getChosenRoster()
+        activity?.let { activity ->
+            val names: MutableList<CharSequence> = mutableListOf()
+            names.addAll(response.players.map { it.player.name })
+            val checked: MutableList<Boolean> = mutableListOf()
+            checked.addAll(response.players.map { it.status })
+            DialogFactory.getMultiChoiceDialog(
+                context = activity,
+                title = R.string.roster_list_player_dialog_title,
+                items = names.toTypedArray(),
+                checkedItems = checked.toBooleanArray(),
+                listener = { _, which, isChecked ->
+                    lineupViewModel.rosterPlayerStatusChanged(which, isChecked)
+                    updateRosterSize(formView.binding.playerCount, response)
+                }
+            ).show()
+        }
     }
 
     override fun onResume() {

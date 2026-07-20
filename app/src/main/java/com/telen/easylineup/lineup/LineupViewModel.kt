@@ -13,6 +13,7 @@ import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
@@ -62,6 +63,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.rxSingle
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -202,21 +205,20 @@ class LineupViewModel : ViewModel(), KoinComponent {
         disposables.add(disposable)
     }
 
-    fun getTeamStrategy(): Single<TeamStrategy> {
+    suspend fun getTeamStrategy(): Result<TeamStrategy> {
         return getLineupByIdUseCase(lineupId ?: 0)
-            .map { TeamStrategy.getStrategyById(it.strategy) }
-            .subscribeOn(Schedulers.io())
+            .mapCatching { TeamStrategy.getStrategyById(it.strategy) }
     }
 
     private fun getNotSelectedPlayers(sortBy: FieldPosition?): Single<List<PlayerWithPosition>> {
-        return Single.defer {
-            lineup?.let {
-                getListAvailablePlayersForSelectionUseCase(
-                    _listPlayersWithPosition,
-                    sortBy,
-                    it
-                )
-            } ?: Single.error(IllegalArgumentException("Lineup is not expected to be null"))
+        return rxSingle {
+            val currentLineup = lineup
+                ?: throw IllegalArgumentException("Lineup is not expected to be null")
+            getListAvailablePlayersForSelectionUseCase(
+                _listPlayersWithPosition,
+                sortBy,
+                currentLineup
+            ).getOrThrow()
         }
     }
 
@@ -226,7 +228,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
         } ?: Completable.error(IllegalArgumentException("Lineup is not supposed to be null"))
     }
 
-    fun deleteLineup(): Completable {
+    suspend fun deleteLineup(): Result<Unit> {
         return deleteLineupUseCase(lineupId)
     }
 
@@ -236,14 +238,16 @@ class LineupViewModel : ViewModel(), KoinComponent {
 
     fun onLineupModeChanged(isEnabled: Boolean) {
         lineup?.let { lineup ->
-            val disposable = setLineupModeUseCase(isEnabled, lineup, _listPlayersWithPosition)
-                .subscribe({
-                    setLineup(lineup)
-                    refreshPlayers(_listPlayersWithPosition)
-                }, {
-                    Timber.e(it)
-                })
-            disposables.add(disposable)
+            viewModelScope.launch {
+                setLineupModeUseCase(isEnabled, lineup, _listPlayersWithPosition)
+                    .onSuccess {
+                        setLineup(lineup)
+                        refreshPlayers(_listPlayersWithPosition)
+                    }
+                    .onFailure {
+                        Timber.e(it)
+                    }
+            }
         }
     }
 
@@ -428,7 +432,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getLineup(): Flow<Lineup> {
-        return observeLineupByIdUseCase(lineupId ?: 0).asSafeFlow().map {
+        return observeLineupByIdUseCase(lineupId ?: 0).catch { Timber.e(it) }.map {
             it.apply {
                 this@LineupViewModel.lineup = this
             }

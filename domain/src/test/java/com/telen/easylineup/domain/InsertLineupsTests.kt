@@ -8,7 +8,8 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.InsertLineups
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,19 +26,17 @@ internal class InsertLineupsTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        insertLineups = InsertLineups(lineupDao, testSchedulersProvider())
+        insertLineups = InsertLineups(lineupDao, testDispatcherProvider())
     }
 
     @Test
-    fun shouldDelegateToRepository() {
+    fun shouldDelegateToRepository() = runTest {
         val lineups = listOf(Lineup(id = 1L, name = "toto", teamId = 1L, tournamentId = 1L))
         Mockito.`when`(lineupDao.insertLineups(lineups)).thenReturn(Completable.complete())
 
-        val observer = TestObserver<Void>()
-        insertLineups(lineups).subscribe(observer)
-        observer.await()
+        val result = insertLineups(lineups)
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         Mockito.verify(lineupDao).insertLineups(lineups)
     }
 }

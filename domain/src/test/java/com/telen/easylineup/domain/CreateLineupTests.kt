@@ -5,6 +5,7 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.check
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
@@ -18,8 +19,9 @@ import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -93,7 +95,6 @@ internal class CreateLineupSoftballCustomSlowpitchTests : CreateLineupTests() {
 internal open class CreateLineupTests {
     var strategy: TeamStrategy = TeamStrategy.STANDARD
     var extraHitters: Int = 0
-    private val observer: TestObserver<Lineup> = TestObserver()
     private lateinit var lineup: Lineup
 
     @Mock
@@ -106,7 +107,7 @@ internal open class CreateLineupTests {
     @Before
     open fun init() {
         MockitoAnnotations.initMocks(this)
-        createLineup = CreateLineup(lineupDao, GetTeam(teamDao, testSchedulersProvider()), testSchedulersProvider())
+        createLineup = CreateLineup(lineupDao, GetTeam(teamDao, testSchedulersProvider()), testDispatcherProvider())
 
         Mockito.`when`(teamDao.getTeamsRx())
             .thenReturn(Single.just(listOf(Team(id = 1L, name = "toto", main = true))))
@@ -127,51 +128,46 @@ internal open class CreateLineupTests {
         Mockito.`when`(lineupDao.insertLineup(any())).thenReturn(Single.just(1L))
     }
 
-    private fun startUseCase(roster: List<RosterPlayerStatus>) {
-        createLineup(lineup, roster)
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+    private suspend fun startUseCase(roster: List<RosterPlayerStatus>): Result<Lineup> {
+        val result = createLineup(lineup, roster)
+        assertTrue(result.isSuccess)
+        return result
     }
 
     @Test
-    fun shouldLineupSavedWithRosterNullForAll() {
+    fun shouldLineupSavedWithRosterNullForAll() = runTest {
         startUseCase(roster)
-        verify(lineupDao).insertLineup(com.nhaarman.mockitokotlin2.check {
+        verify(lineupDao).insertLineup(check {
             Assert.assertNull(null, it.roster)
         })
     }
 
     @Test
-    fun shouldLineupSavedWithRosterNotNullForSelection() {
+    fun shouldLineupSavedWithRosterNotNullForSelection() = runTest {
         roster.add(RosterPlayerStatus(Player(4, 1, "tutu", 1, 1), false, null))
         startUseCase(roster)
-        verify(lineupDao).insertLineup(com.nhaarman.mockitokotlin2.check {
+        verify(lineupDao).insertLineup(check {
             Assert.assertEquals("1;2;3", it.roster)
         })
     }
 
     @Test
-    fun shouldSavedSuccessfullyTheNewLineup() {
-        startUseCase(roster)
-        Assert.assertEquals(1L, observer.values().first().id)
+    fun shouldSavedSuccessfullyTheNewLineup() = runTest {
+        val result = startUseCase(roster)
+        Assert.assertEquals(1L, result.getOrNull()?.id)
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfLineupNameEmpty() {
+    fun shouldTriggerAnExceptionIfLineupNameEmpty() = runTest {
         lineup.name = "      "
-        createLineup(lineup, roster)
-            .subscribe(observer)
-        observer.await()
-        observer.assertError(LineupNameEmptyException::class.java)
+        val result = createLineup(lineup, roster)
+        assertTrue(result.exceptionOrNull() is LineupNameEmptyException)
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfTournamentNameEmpty() {
+    fun shouldTriggerAnExceptionIfTournamentNameEmpty() = runTest {
         lineup.tournamentId = 0
-        createLineup(lineup, roster)
-            .subscribe(observer)
-        observer.await()
-        observer.assertError(TournamentNameEmptyException::class.java)
+        val result = createLineup(lineup, roster)
+        assertTrue(result.exceptionOrNull() is TournamentNameEmptyException)
     }
 }

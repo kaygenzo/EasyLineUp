@@ -4,26 +4,25 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.RosterPlayerStatus
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class UpdateLineupRoster(
     private val lineupRepository: LineupRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(lineupId: Long, roster: List<RosterPlayerStatus>): Completable {
-        return Single.create<String> {
-            val rosterString = rosterToString(roster)
-            it.onSuccess(rosterString)
-        }.flatMapCompletable { rosterString ->
-            lineupRepository.getLineupByIdSingle(lineupId)
-                .map { it.apply { this.roster = rosterString } }
-                .flatMapCompletable { lineupRepository.updateLineup(it) }
-        }.subscribeOn(schedulersProvider.io())
-    }
+    suspend operator fun invoke(lineupId: Long, roster: List<RosterPlayerStatus>): Result<Unit> =
+        runCatchingCancellable {
+            withContext(dispatcherProvider.io()) {
+                val rosterString = rosterToString(roster)
+                val lineup = lineupRepository.getLineupByIdSingle(lineupId).await()
+                lineup.roster = rosterString
+                lineupRepository.updateLineup(lineup).await()
+            }
+        }
 
     private fun rosterToString(list: List<RosterPlayerStatus>): String {
         val builder = StringBuilder()

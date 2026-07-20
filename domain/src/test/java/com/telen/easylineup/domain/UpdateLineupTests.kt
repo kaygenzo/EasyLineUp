@@ -10,7 +10,8 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.UpdateLineup
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,7 +22,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class UpdateLineupTests {
-    val observer: TestObserver<Void> = TestObserver()
     @Mock lateinit var lineupRepo: LineupRepository
     lateinit var updateLineup: UpdateLineup
     lateinit var lineup: Lineup
@@ -29,29 +29,28 @@ internal class UpdateLineupTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        updateLineup = UpdateLineup(lineupRepo, testSchedulersProvider())
+        updateLineup = UpdateLineup(lineupRepo, testDispatcherProvider())
         lineup = Lineup(id = 1L, name = "test", teamId = 1L, tournamentId = 1L)
     }
 
     @Test
-    fun shouldUpdateLineupThroughRepository() {
+    fun shouldUpdateLineupThroughRepository() = runTest {
         Mockito.`when`(lineupRepo.updateLineup(lineup)).thenReturn(Completable.complete())
 
-        updateLineup(lineup).subscribe(observer)
-        observer.await()
+        val result = updateLineup(lineup)
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         verify(lineupRepo).updateLineup(lineup)
     }
 
     @Test
-    fun shouldPropagateErrorFromRepository() {
+    fun shouldPropagateErrorFromRepository() = runTest {
         val exception = Exception("db error")
         Mockito.`when`(lineupRepo.updateLineup(lineup)).thenReturn(Completable.error(exception))
 
-        updateLineup(lineup).subscribe(observer)
-        observer.await()
+        val result = updateLineup(lineup)
 
-        observer.assertError(exception)
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull()?.message == exception.message)
     }
 }

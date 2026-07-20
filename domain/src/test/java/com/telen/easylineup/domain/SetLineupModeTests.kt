@@ -15,8 +15,9 @@ import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.SetLineupMode
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithLineupMode
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,7 +29,6 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class SetLineupModeTests {
     private val extraHitters = 0
-    private val observer: TestObserver<Void> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     lateinit var setLineupMode: SetLineupMode
     lateinit var lineup: Lineup
@@ -38,8 +38,8 @@ internal class SetLineupModeTests {
         MockitoAnnotations.initMocks(this)
         setLineupMode = SetLineupMode(
             GetTeam(teamDao, testSchedulersProvider()),
-            UpdatePlayersWithLineupMode(testSchedulersProvider()),
-            testSchedulersProvider()
+            UpdatePlayersWithLineupMode(testDispatcherProvider()),
+            testDispatcherProvider()
         )
 
         val team = Team(id = 1L, name = "toto", type = TeamType.SOFTBALL.id, main = true)
@@ -48,23 +48,21 @@ internal class SetLineupModeTests {
         lineup = Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id, extraHitters, 3L)
     }
 
-    private fun startUseCase(mode: Boolean) {
+    private suspend fun startUseCase(mode: Boolean) {
         lineup.mode = if (mode) MODE_DISABLED else MODE_ENABLED
         val lineupMode = if (mode) MODE_ENABLED else MODE_DISABLED
-        setLineupMode(mode, lineup, emptyList())
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+        val result = setLineupMode(mode, lineup, emptyList())
+        assertTrue(result.isSuccess)
         Assert.assertEquals(lineupMode, lineup.mode)
     }
 
     @Test
-    fun shouldSaveTheLineupModeNone() {
+    fun shouldSaveTheLineupModeNone() = runTest {
         startUseCase(false)
     }
 
     @Test
-    fun shouldSaveTheLineupModeDh() {
+    fun shouldSaveTheLineupModeDh() = runTest {
         startUseCase(true)
     }
 }

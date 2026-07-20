@@ -6,8 +6,9 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.repository.LineupRepository
-import io.reactivex.rxjava3.core.Flowable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.reactive.asFlow
 
 class ObserveLineupById(private val dao: LineupRepository) {
-    operator fun invoke(lineupId: Long): Flowable<Lineup> = dao.getLineupById(lineupId)
+    operator fun invoke(lineupId: Long): Flow<Lineup> = dao.getLineupById(lineupId).asFlow()
 }

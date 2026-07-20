@@ -15,8 +15,9 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.isDpDhOrFlex
 import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithLineupMode
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,7 +26,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class UpdatePlayersWithLineupModeTests {
-    var observer: TestObserver<Void> = TestObserver()
     private val extraHitters = 0
     private val strategy = TeamStrategy.STANDARD
     private val lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitters)
@@ -35,7 +35,7 @@ internal class UpdatePlayersWithLineupModeTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        updatePlayersWithLineupMode = UpdatePlayersWithLineupMode(testSchedulersProvider())
+        updatePlayersWithLineupMode = UpdatePlayersWithLineupMode(testDispatcherProvider())
         players = mutableListOf()
         players.add(
             PlayerWithPosition(
@@ -82,7 +82,7 @@ internal class UpdatePlayersWithLineupModeTests {
         )
     }
 
-    private fun startUseCase(
+    private suspend fun startUseCase(
         teamType: TeamType?,
         lineupMode: Boolean,
         players: List<PlayerWithPosition> = this.players,
@@ -90,22 +90,21 @@ internal class UpdatePlayersWithLineupModeTests {
     ) {
         lineup.mode = if (lineupMode) MODE_ENABLED else MODE_DISABLED
         val playersSize = players.size
-        updatePlayersWithLineupMode(
+        val result = updatePlayersWithLineupMode(
             players,
             lineup,
             teamType?.id ?: 1_000
-        ).subscribe(observer)
-        observer.await()
+        )
         exception?.let {
-            observer.assertError(exception)
+            assertTrue(exception.isInstance(result.exceptionOrNull()))
         } ?: let {
-            observer.assertComplete()
+            assertTrue(result.isSuccess)
             Assert.assertEquals(playersSize, players.size)
         }
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfTeamTypeIsUnknown() {
+    fun shouldTriggerAnExceptionIfTeamTypeIsUnknown() = runTest {
         startUseCase(
             teamType = null,
             lineupMode = true,
@@ -114,42 +113,42 @@ internal class UpdatePlayersWithLineupModeTests {
     }
 
     @Test
-    fun shouldDoNothingIfListEmptyAndDpEnabled() {
+    fun shouldDoNothingIfListEmptyAndDpEnabled() = runTest {
         val playersCopy = players.map { it.copy() }
         startUseCase(players = mutableListOf(), lineupMode = true, teamType = TeamType.BASEBALL)
         Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
     }
 
     @Test
-    fun shouldDoNothingIfListEmptyAndDpDisabled() {
+    fun shouldDoNothingIfListEmptyAndDpDisabled() = runTest {
         val playersCopy = players.map { it.copy() }
         startUseCase(players = mutableListOf(), lineupMode = false, teamType = TeamType.BASEBALL)
         Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
     }
 
     @Test
-    fun shouldDoNothingIfDesignatedPlayerEnabledAndSoftballTeam() {
+    fun shouldDoNothingIfDesignatedPlayerEnabledAndSoftballTeam() = runTest {
         val playersCopy = players.map { it.copy() }
         startUseCase(players = mutableListOf(), lineupMode = true, teamType = TeamType.SOFTBALL)
         Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
     }
 
     @Test
-    fun shouldDoNothingIfDpEnabledAndNoPitcherAssigned() {
+    fun shouldDoNothingIfDpEnabledAndNoPitcherAssigned() = runTest {
         val playersCopy = players.map { it.copy() }
         startUseCase(teamType = TeamType.BASEBALL, lineupMode = true)
         Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
     }
 
     @Test
-    fun shouldDoNothingIfDpDisabledAndNoPitcherOrDpassigned() {
+    fun shouldDoNothingIfDpDisabledAndNoPitcherOrDpassigned() = runTest {
         val playersCopy = players.map { it.copy() }
         startUseCase(teamType = TeamType.BASEBALL, lineupMode = false)
         Assert.assertArrayEquals(players.toTypedArray(), playersCopy.toTypedArray())
     }
 
     @Test
-    fun shouldUpdatePitcherOrderTo10IfAssignedAndDpEnabled() {
+    fun shouldUpdatePitcherOrderTo10IfAssignedAndDpEnabled() = runTest {
         players.first().position = FieldPosition.PITCHER.id
         startUseCase(TeamType.BASEBALL, lineupMode = true)
         val pitcher = players.first { it.isPitcher() }
@@ -159,7 +158,7 @@ internal class UpdatePlayersWithLineupModeTests {
     }
 
     @Test
-    fun shouldDeletePitcherAndDpifAssignedAndDpDisabled() {
+    fun shouldDeletePitcherAndDpifAssignedAndDpDisabled() = runTest {
         players.first().apply {
             position = FieldPosition.PITCHER.id
             flags = PlayerFieldPosition.FLAG_FLEX

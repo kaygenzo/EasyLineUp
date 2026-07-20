@@ -133,33 +133,33 @@ class LineupViewModel : ViewModel(), KoinComponent {
         return deleteTournamentLineups(tournament)
     }
 
-    fun getCompleteRoster(): Single<TeamRosterSummary> {
-        return getRosterUseCase()
-            .doOnSuccess { chosenRoster = it }
+    suspend fun getCompleteRoster(): Result<TeamRosterSummary> {
+        return getRosterUseCase().onSuccess { chosenRoster = it }
     }
 
-    fun getChosenRoster(): Single<TeamRosterSummary> {
-        return Single.just(chosenRoster)
+    fun getChosenRoster(): TeamRosterSummary {
+        return chosenRoster
     }
 
     fun saveLineup() {
-        val disposable = createLineupUseCase(lineup, chosenRoster.players)
-            .doOnError {
-                if (it is LineupNameEmptyException) {
-                    errors.onNext(DomainErrors.Lineups.INVALID_LINEUP_NAME)
-                } else if (it is TournamentNameEmptyException) {
-                    errors.onNext(DomainErrors.Lineups.INVALID_TOURNAMENT_NAME)
-                }
-            }
-            .subscribe({ saveResult.tryEmit(SaveSuccess(it)) }, {
-                when (it) {
-                    is TournamentNameEmptyException,
-                    is LineupNameEmptyException -> Timber.w(it.message)
+        viewModelScope.launch {
+            createLineupUseCase(lineup, chosenRoster.players)
+                .onSuccess { saveResult.tryEmit(SaveSuccess(it)) }
+                .onFailure {
+                    when (it) {
+                        is LineupNameEmptyException ->
+                            errors.onNext(DomainErrors.Lineups.INVALID_LINEUP_NAME)
+                        is TournamentNameEmptyException ->
+                            errors.onNext(DomainErrors.Lineups.INVALID_TOURNAMENT_NAME)
+                    }
+                    when (it) {
+                        is TournamentNameEmptyException,
+                        is LineupNameEmptyException -> Timber.w(it.message)
 
-                    else -> Timber.e(it)
+                        else -> Timber.e(it)
+                    }
                 }
-            })
-        disposables.add(disposable)
+        }
     }
 
     fun rosterPlayerStatusChanged(position: Int, status: Boolean) {
