@@ -13,7 +13,7 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.GetBattersState
 import com.telen.easylineup.domain.ports.StringResourcesProvider
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -36,7 +36,7 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
     }
 
     @Test
-    fun dpShouldOnlyShowIndexAndShowDescriptionAndCanMoveInExtraHitterWhenLineupEditable() {
+    fun dpShouldOnlyShowIndexAndShowDescriptionAndCanMoveInExtraHitterWhenLineupEditable() = runTest {
         addPlayers()
         addExtraHitters(extraHittersSize)
         players[0].position = FieldPosition.DP_DH.id
@@ -66,15 +66,15 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
 
         Assert.assertEquals(
             1,
-            observer.values()[0].filter { it.playerPosition == FieldPosition.DP_DH }.size
+            result.filter { it.playerPosition == FieldPosition.DP_DH }.size
         )
         Assert.assertEquals(
             expected,
-            observer.values()[0].first { it.playerPosition == FieldPosition.DP_DH })
+            result.first { it.playerPosition == FieldPosition.DP_DH })
     }
 
     @Test
-    fun flexShouldHaveBackgroundAndShowPositionInExtraHitterWhenLineupEditable() {
+    fun flexShouldHaveBackgroundAndShowPositionInExtraHitterWhenLineupEditable() = runTest {
         addPlayers()
         addExtraHitters(extraHittersSize)
 
@@ -104,23 +104,23 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
 
         Assert.assertEquals(
             1,
-            observer.values()[0].filter {
+            result.filter {
                 it.playerFlag == PlayerFieldPosition.FLAG_FLEX
             }.size
         )
         Assert.assertEquals(
             expected,
-            observer.values()[0].first { it.playerFlag == PlayerFieldPosition.FLAG_FLEX })
+            result.first { it.playerFlag == PlayerFieldPosition.FLAG_FLEX })
     }
 
     @Test
-    fun defensePlayerShouldOnlyShowIndexAndShowPositionAndCanMoveWhenLineupEditable() {
+    fun defensePlayerShouldOnlyShowIndexAndShowPositionAndCanMoveWhenLineupEditable() = runTest {
         addPlayers()
 
         applyUserCase()
 
         var i = 1
-        observer.values()[0].forEach { batterState ->
+        result.forEach { batterState ->
             val value = batterSize - i + 1
             // we don't test here the field position and desc, so let's use the same as the loop
             // object
@@ -145,7 +145,7 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
     }
 
     @Test
-    fun substituteShouldInExtraHittersBoundsToBatWhenLineupEditable() {
+    fun substituteShouldInExtraHittersBoundsToBatWhenLineupEditable() = runTest {
         addPlayers()
         addExtraHitters(extraHittersSize)
         addSubstitutes()
@@ -153,7 +153,7 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
         applyUserCase()
 
         var i = batterSize + 1
-        observer.values()[0].filter { it.playerPosition == FieldPosition.SUBSTITUTE }
+        result.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
                 // we don't test here the field position and desc, so let's use the same as the loop
                 // object
@@ -179,14 +179,14 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
     }
 
     @Test
-    fun substituteShouldNotBatIfIndexGreaterThanExtraHittersSizeWhenLineupEditable() {
+    fun substituteShouldNotBatIfIndexGreaterThanExtraHittersSizeWhenLineupEditable() = runTest {
         addExtraHitters(extraHittersSize)
         addSubstitutes()
 
         applyUserCase()
 
         var i = 1
-        observer.values()[0].filter { it.playerPosition == FieldPosition.SUBSTITUTE }
+        result.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
                 // we don't test here the field position and desc, so let's use the same as the loop
                 // object
@@ -212,7 +212,7 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
     }
 
     @Test
-    fun shouldNotShowSubstitutesOrderIfCannotMoveWhenLineupEditable() {
+    fun shouldNotShowSubstitutesOrderIfCannotMoveWhenLineupEditable() = runTest {
         addPlayers()
         addSubstitutes(Constants.SUBSTITUTE_ORDER_VALUE)
         for (i in batterSize until (batterSize + extraHittersSize)) {
@@ -222,7 +222,7 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
         applyUserCase()
 
         var i = batterSize + 1
-        observer.values()[0].filter { it.playerPosition == FieldPosition.SUBSTITUTE }
+        result.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
                 // we don't test here the field position and desc, so let's use the same as the loop
                 // object
@@ -356,7 +356,7 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
     }
 
     @Test
-    fun dpShouldOnlyShowIndexAndShowDescriptionWhenLineupNotEditable() {
+    fun dpShouldOnlyShowIndexAndShowDescriptionWhenLineupNotEditable() = runTest {
         addPlayers()
         addExtraHitters(extraHittersSize)
         players[0].position = FieldPosition.DP_DH.id
@@ -386,15 +386,15 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
 
         Assert.assertEquals(
             1,
-            observer.values()[0].filter { it.playerPosition == FieldPosition.DP_DH }.size
+            result.filter { it.playerPosition == FieldPosition.DP_DH }.size
         )
         Assert.assertEquals(
             expected,
-            observer.values()[0].first { it.playerPosition == FieldPosition.DP_DH })
+            result.first { it.playerPosition == FieldPosition.DP_DH })
     }
 
     @Test
-    fun flexShouldOnlyHaveBackgroundAndShowPositionShowDescriptionWhenLineupNotEditable() {
+    fun flexShouldOnlyHaveBackgroundAndShowPositionShowDescriptionWhenLineupNotEditable() = runTest {
         addPlayers()
         addExtraHitters(extraHittersSize)
 
@@ -424,23 +424,23 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
 
         Assert.assertEquals(
             1,
-            observer.values()[0].filter {
+            result.filter {
                 it.playerFlag == PlayerFieldPosition.FLAG_FLEX
             }.size
         )
         Assert.assertEquals(
             expected,
-            observer.values()[0].first { it.playerFlag == PlayerFieldPosition.FLAG_FLEX })
+            result.first { it.playerFlag == PlayerFieldPosition.FLAG_FLEX })
     }
 
     @Test
-    fun defensePlayerShouldOnlyShowIndexAndShowPositionShowDescriptionWhenLineupEditable() {
+    fun defensePlayerShouldOnlyShowIndexAndShowPositionShowDescriptionWhenLineupEditable() = runTest {
         addPlayers()
 
         applyUserCase()
 
         var i = 1
-        observer.values()[0].forEach { batterState ->
+        result.forEach { batterState ->
             val value = batterSize - i + 1
             // we don't test here the field position and desc, so let's use the same as the loop
             // object
@@ -465,7 +465,7 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
     }
 
     @Test
-    fun substituteShouldInExtraHittersBoundsToBatWhenLineupEditable() {
+    fun substituteShouldInExtraHittersBoundsToBatWhenLineupEditable() = runTest {
         addPlayers()
         addExtraHitters(extraHittersSize)
         addSubstitutes()
@@ -473,7 +473,7 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
         applyUserCase()
 
         var i = batterSize + 1
-        observer.values()[0].filter { it.playerPosition == FieldPosition.SUBSTITUTE }
+        result.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
                 // we don't test here the field position and desc, so let's use the same as the loop
                 // object
@@ -499,14 +499,14 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
     }
 
     @Test
-    fun substituteShouldNotBatIfIndexGreaterThanExtraHittersSizeWhenLineupEditable() {
+    fun substituteShouldNotBatIfIndexGreaterThanExtraHittersSizeWhenLineupEditable() = runTest {
         addExtraHitters(extraHittersSize)
         addSubstitutes()
 
         applyUserCase()
 
         var i = 1
-        observer.values()[0].filter { it.playerPosition == FieldPosition.SUBSTITUTE }
+        result.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
                 // we don't test here the field position and desc, so let's use the same as the loop
                 // object
@@ -532,7 +532,7 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
     }
 
     @Test
-    fun shouldNotShowSubstitutesOrderIfCannotMove() {
+    fun shouldNotShowSubstitutesOrderIfCannotMove() = runTest {
         addPlayers()
         addSubstitutes(Constants.SUBSTITUTE_ORDER_VALUE)
         for (i in batterSize until (batterSize + extraHittersSize)) {
@@ -542,7 +542,7 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
         applyUserCase()
 
         var i = batterSize + 1
-        observer.values()[0].filter { it.playerPosition == FieldPosition.SUBSTITUTE }
+        result.filter { it.playerPosition == FieldPosition.SUBSTITUTE }
             .forEach { batterState ->
                 // we don't test here the field position and desc, so let's use the same as the loop
                 // object
@@ -689,7 +689,7 @@ internal abstract class GetBattersStateTests {
 
     protected val players: MutableList<PlayerWithPosition> = mutableListOf()
     val lineupMode = MODE_ENABLED
-    val observer: TestObserver<List<BatterState>> = TestObserver()
+    lateinit var result: List<BatterState>
 
     @Mock
     lateinit var stringResourcesProvider: StringResourcesProvider
@@ -701,7 +701,7 @@ internal abstract class GetBattersStateTests {
     open fun init() {
         initParameters()
         MockitoAnnotations.initMocks(this)
-        getBattersState = GetBattersState(stringResourcesProvider, testSchedulersProvider())
+        getBattersState = GetBattersState(stringResourcesProvider, testDispatcherProvider())
         batterSize = strategy.batterSize
 
         Mockito.`when`(stringResourcesProvider.positionShortNames(TeamType.BASEBALL.id)).thenReturn(
@@ -822,25 +822,23 @@ internal abstract class GetBattersStateTests {
         }
     }
 
-    protected fun applyUserCase() {
-        getBattersState(
+    protected suspend fun applyUserCase() {
+        result = getBattersState(
             players,
             teamType.id,
             batterSize,
             extraHittersSize,
             false,
             isEditable
-        )
-            .subscribe(observer)
-        observer.await()
+        ).getOrThrow()
     }
 
     @Test
-    fun shouldFilterPlayersWithOrder0() {
+    fun shouldFilterPlayersWithOrder0() = runTest {
         addPlayers()
         addSubstitutes()
         applyUserCase()
-        Assert.assertEquals(batterSize, observer.values()[0].count())
-        Assert.assertEquals(0, observer.values()[0].filter { it.playerOrder == 0 }.count())
+        Assert.assertEquals(batterSize, result.count())
+        Assert.assertEquals(0, result.filter { it.playerOrder == 0 }.count())
     }
 }

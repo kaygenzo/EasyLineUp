@@ -16,8 +16,9 @@ import com.telen.easylineup.domain.model.isFlex
 import com.telen.easylineup.domain.model.toPlayer
 import com.telen.easylineup.domain.usecases.SaveDpAndFlex
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,16 +30,14 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
     private val strategy = TeamStrategy.STANDARD
     private val extraHitters = 0
     private val lineup = Lineup(strategy = strategy.id, extraHitters = extraHitters)
-    private val observer: TestObserver<Void> = TestObserver()
     private lateinit var useCase: SaveDpAndFlex
     lateinit var players: MutableList<PlayerWithPosition>
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        val teamId = 1L
 
-        useCase = SaveDpAndFlex(testSchedulersProvider())
+        useCase = SaveDpAndFlex(testDispatcherProvider())
 
         val noFlag = PlayerFieldPosition.FLAG_NONE
         players = mutableListOf(
@@ -50,25 +49,24 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
         )
     }
 
-    private fun startUseCase(
+    private suspend fun startUseCase(
         dp: Player?,
         flex: Player?,
         players: List<PlayerWithPosition> = this.players,
         exception: Class<out Throwable>? = null
     ) {
         val playersSize = players.size
-        useCase(lineup, dp, flex, players).subscribe(observer)
-        observer.await()
+        val result = useCase(lineup, dp, flex, players)
         exception?.let {
-            observer.assertError(exception)
+            assertTrue(exception.isInstance(result.exceptionOrNull()))
         } ?: let {
-            observer.assertComplete()
+            assertTrue(result.isSuccess)
             Assert.assertEquals("Size of player list must not change", playersSize, players.size)
         }
     }
 
     @Test
-    fun shouldTriggerAnErrorIfDpNotAssigned() {
+    fun shouldTriggerAnErrorIfDpNotAssigned() = runTest {
         startUseCase(
             dp = null,
             flex = players.first().toPlayer(),
@@ -78,7 +76,7 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldTriggerAnErrorIfFlexNotAssigned() {
+    fun shouldTriggerAnErrorIfFlexNotAssigned() = runTest {
         startUseCase(
             dp = players.first().toPlayer(),
             flex = null,
@@ -88,7 +86,7 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldChangeFlagAndOrderOfTheFlex() {
+    fun shouldChangeFlagAndOrderOfTheFlex() = runTest {
         val dp = players[3]
         val flex = players[1]
         startUseCase(dp = dp.toPlayer(), flex = flex.toPlayer(), players = players)
@@ -101,7 +99,7 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldChangeFlagAndOrderOfOldFlex() {
+    fun shouldChangeFlagAndOrderOfOldFlex() = runTest {
         players.forEach { it.flags = PlayerFieldPosition.FLAG_FLEX }
 
         val dp = players[3]
@@ -125,7 +123,7 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldAssignDpToExistingPosition() {
+    fun shouldAssignDpToExistingPosition() = runTest {
         val dp = players[3]
         val flex = players[1]
         startUseCase(dp = dp.toPlayer(), flex = flex.toPlayer(), players = players)
@@ -136,7 +134,7 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldAssignDpToNotExistingPosition() {
+    fun shouldAssignDpToNotExistingPosition() = runTest {
         players.removeIf { it.isDpDh() }
         val dp = players[3]
         val flex = players[1]
@@ -148,7 +146,7 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldReplaceBatterOrderWhenSwitchFlex() {
+    fun shouldReplaceBatterOrderWhenSwitchFlex() = runTest {
         players.clear()
         players.addAll(generateFullLineup(lineup, strategy, withDpDh = true))
         val dp = players.first { it.isDpDh() }.toPlayer()

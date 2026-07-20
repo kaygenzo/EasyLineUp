@@ -53,17 +53,17 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.rx3.rxSingle
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -222,10 +222,10 @@ class LineupViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun save(): Completable {
+    suspend fun save(): Result<Unit> {
         return lineup?.let {
             saveBattingOrderAndPositionsUseCase(it, _listPlayersWithPosition)
-        } ?: Completable.error(IllegalArgumentException("Lineup is not supposed to be null"))
+        } ?: Result.failure(IllegalArgumentException("Lineup is not supposed to be null"))
     }
 
     suspend fun deleteLineup(): Result<Unit> {
@@ -356,7 +356,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
                     Maybe.just(ListAvailablePlayers(it, position))
                 }
             } else {
-                getDpAndFlexFromPlayersInFieldUseCase(_listPlayersWithPosition)
+                rxSingle { getDpAndFlexFromPlayersInFieldUseCase(_listPlayersWithPosition).getOrThrow() }
                     .flatMapMaybe {
                         val title = if (it.teamType == TeamType.SOFTBALL.id) {
                             R.string.link_dp_and_flex_dialog_title
@@ -382,24 +382,18 @@ class LineupViewModel : ViewModel(), KoinComponent {
             _lineup.flatMapLatest { lineup ->
                 val batterSize = TeamStrategy.getStrategyById(lineup.strategy).batterSize
                 val extraHitters = lineup.extraHitters
-                callbackFlow {
-                    val disposable = getTeamUseCase()
-                        .map { it.type }
-                        .flatMap {
-                            getBattersStateUseCase(
-                                players = players,
-                                teamType = it,
-                                batterSize = batterSize,
-                                extraHitterSize = extraHitters,
-                                isDebug = BuildConfig.DEBUG,
-                                isEditable = editable
-                            )
-                        }.subscribe({
-                        trySend(it)
-                    }, {
-                        Timber.e(it)
-                    })
-                    awaitClose { disposable.dispose() }
+                flow {
+                    val teamType = getTeamUseCase().await().type
+                    getBattersStateUseCase(
+                        players = players,
+                        teamType = teamType,
+                        batterSize = batterSize,
+                        extraHitterSize = extraHitters,
+                        isDebug = BuildConfig.DEBUG,
+                        isEditable = editable
+                    )
+                        .onSuccess { emit(it) }
+                        .onFailure { Timber.e(it) }
                 }
             }
         }
@@ -473,16 +467,14 @@ class LineupViewModel : ViewModel(), KoinComponent {
             }
     }
 
-    fun linkDpAndFlex(dp: Player?, flex: Player?): Completable {
-        return Completable.defer {
-            lineup?.let {
-                saveDpAndFlexUseCase(it, dp, flex, _listPlayersWithPosition)
-                    .doOnComplete { refreshPlayers(_listPlayersWithPosition) }
-            } ?: Completable.error(IllegalStateException("Lineup cannot be null"))
-        }
+    suspend fun linkDpAndFlex(dp: Player?, flex: Player?): Result<Unit> {
+        val currentLineup = lineup
+            ?: return Result.failure(IllegalStateException("Lineup cannot be null"))
+        return saveDpAndFlexUseCase(currentLineup, dp, flex, _listPlayersWithPosition)
+            .onSuccess { refreshPlayers(_listPlayersWithPosition) }
     }
 
-    fun onBattersChanged(batters: List<BatterState>): Completable {
+    suspend fun onBattersChanged(batters: List<BatterState>): Result<Unit> {
         return updatePlayersWithBattersUseCase(_listPlayersWithPosition, batters)
     }
 }

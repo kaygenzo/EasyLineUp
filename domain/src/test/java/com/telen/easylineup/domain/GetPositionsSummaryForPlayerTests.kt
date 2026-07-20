@@ -9,8 +9,9 @@ import com.telen.easylineup.domain.model.PositionWithLineup
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.GetPositionsSummaryForPlayer
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,8 +22,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetPositionsSummaryForPlayerTests {
-    val observer: TestObserver<Map<FieldPosition, Int>> = TestObserver()
-
     @Mock
     lateinit var playerFieldPositionsDao: PlayerFieldPositionRepository
     lateinit var getPositionsSummaryForPlayer: GetPositionsSummaryForPlayer
@@ -32,7 +31,7 @@ internal class GetPositionsSummaryForPlayerTests {
     fun init() {
         MockitoAnnotations.initMocks(this)
         getPositionsSummaryForPlayer =
-            GetPositionsSummaryForPlayer(playerFieldPositionsDao, testSchedulersProvider())
+            GetPositionsSummaryForPlayer(playerFieldPositionsDao, testDispatcherProvider())
 
         val position1 = PositionWithLineup(position = FieldPosition.CATCHER.id)
         val position2 = PositionWithLineup(position = FieldPosition.DP_DH.id)
@@ -63,25 +62,22 @@ internal class GetPositionsSummaryForPlayerTests {
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfPlayerIdIsNull() {
-        getPositionsSummaryForPlayer(null)
-            .subscribe(observer)
-        observer.await()
-        observer.assertError(IllegalArgumentException::class.java)
+    fun shouldTriggerAnExceptionIfPlayerIdIsNull() = runTest {
+        val result = getPositionsSummaryForPlayer(null)
+        assertTrue(result.exceptionOrNull() is IllegalArgumentException)
     }
 
     @Test
-    fun shouldReturnMapOfAllPositions() {
-        getPositionsSummaryForPlayer(1L)
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(5, observer.values().first().count())
+    fun shouldReturnMapOfAllPositions() = runTest {
+        val result = getPositionsSummaryForPlayer(1L)
+        assertTrue(result.isSuccess)
+        val positionsSummary = result.getOrNull().orEmpty()
+        Assert.assertEquals(5, positionsSummary.count())
 
-        Assert.assertEquals(1, observer.values().first()[FieldPosition.SUBSTITUTE])
-        Assert.assertEquals(1, observer.values().first()[FieldPosition.DP_DH])
-        Assert.assertEquals(5, observer.values().first()[FieldPosition.CATCHER])
-        Assert.assertEquals(2, observer.values().first()[FieldPosition.PITCHER])
-        Assert.assertEquals(1, observer.values().first()[FieldPosition.RIGHT_FIELD])
+        Assert.assertEquals(1, positionsSummary[FieldPosition.SUBSTITUTE])
+        Assert.assertEquals(1, positionsSummary[FieldPosition.DP_DH])
+        Assert.assertEquals(5, positionsSummary[FieldPosition.CATCHER])
+        Assert.assertEquals(2, positionsSummary[FieldPosition.PITCHER])
+        Assert.assertEquals(1, positionsSummary[FieldPosition.RIGHT_FIELD])
     }
 }

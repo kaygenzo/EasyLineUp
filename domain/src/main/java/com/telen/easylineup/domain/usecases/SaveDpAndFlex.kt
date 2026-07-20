@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
@@ -15,19 +14,20 @@ import com.telen.easylineup.domain.model.getNextAvailableOrder
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isFlex
 import com.telen.easylineup.domain.model.reset
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.withContext
 
-class SaveDpAndFlex(private val schedulersProvider: SchedulersProvider) {
-    operator fun invoke(
+class SaveDpAndFlex(private val dispatcherProvider: DispatcherProvider) {
+    suspend operator fun invoke(
         lineup: Lineup,
         dp: Player?,
         flex: Player?,
         players: List<PlayerWithPosition>
-    ): Completable {
-        return Completable.defer {
-            val theDp = dp ?: return@defer Completable.error(NeedAssignBothPlayersException())
-            val theFlex = flex ?: return@defer Completable.error(NeedAssignBothPlayersException())
+    ): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            val theDp = dp ?: throw NeedAssignBothPlayersException()
+            val theFlex = flex ?: throw NeedAssignBothPlayersException()
             val strategy = TeamStrategy.getStrategyById(lineup.strategy)
 
             val oldFlex = players.filter { it.isFlex() }
@@ -51,8 +51,6 @@ class SaveDpAndFlex(private val schedulersProvider: SchedulersProvider) {
                 position = FieldPosition.DP_DH.id
                 order = players.getNextAvailableOrder(listOf(order))
             }
-
-            Completable.complete()
-        }.subscribeOn(schedulersProvider.io())
+        }
     }
 }

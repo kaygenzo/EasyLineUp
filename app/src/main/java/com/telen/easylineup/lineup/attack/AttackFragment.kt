@@ -31,6 +31,7 @@ import com.telen.easylineup.views.LineupTypeface
 import io.reactivex.rxjava3.core.Completable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -156,6 +157,9 @@ class AttackFragment : BaseFragment("AttackFragment"), BatterListener {
     }
 
     override fun onBattersChanged(batters: List<BatterState>) {
-        launch(viewModel.onBattersChanged(batters), { /* Nothing to do */ }, { Timber.e(it) })
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.onBattersChanged(batters)
+                .onFailure { Timber.e(it) }
+        }
     }
 }

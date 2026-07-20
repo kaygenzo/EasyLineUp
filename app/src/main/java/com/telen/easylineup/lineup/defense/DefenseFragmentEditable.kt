@@ -181,21 +181,25 @@ class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlaye
             confirmClick = { dialog, _ ->
                 val dp = dpFlexLinkView.getDp()
                 val flex = dpFlexLinkView.getFlex()
-                launch(viewModel.linkDpAndFlex(dp, flex), {
-                    dialog.dismiss()
-                }, {
-                    if (it is NeedAssignBothPlayersException) {
-                        Timber.w(it.message)
-                        FirebaseAnalyticsUtils.missingDpFlex(context)
-                        DialogFactory.getErrorDialog(
-                            context = context,
-                            title = R.string.error_need_assign_both_players_title,
-                            message = R.string.error_need_assign_both_players_message
-                        ).show()
-                    } else {
-                        Timber.e(it)
-                    }
-                })
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.linkDpAndFlex(dp, flex)
+                        .onSuccess {
+                            dialog.dismiss()
+                        }
+                        .onFailure {
+                            if (it is NeedAssignBothPlayersException) {
+                                Timber.w(it.message)
+                                FirebaseAnalyticsUtils.missingDpFlex(context)
+                                DialogFactory.getErrorDialog(
+                                    context = context,
+                                    title = R.string.error_need_assign_both_players_title,
+                                    message = R.string.error_need_assign_both_players_message
+                                ).show()
+                            } else {
+                                Timber.e(it)
+                            }
+                        }
+                }
             }
         )
         dialog.setCancelable(false)

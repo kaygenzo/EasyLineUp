@@ -8,8 +8,9 @@ import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,7 +19,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class UpdatePlayersWithBattersTests {
-    val observer: TestObserver<Void> = TestObserver()
     lateinit var updatePlayersWithBatters: UpdatePlayersWithBatters
 
     private fun player(playerId: Long, order: Int = 0) = PlayerWithPosition(
@@ -38,11 +38,11 @@ internal class UpdatePlayersWithBattersTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        updatePlayersWithBatters = UpdatePlayersWithBatters(testSchedulersProvider())
+        updatePlayersWithBatters = UpdatePlayersWithBatters(testDispatcherProvider())
     }
 
     @Test
-    fun shouldApplyBatterOrderToMatchingPlayers() {
+    fun shouldApplyBatterOrderToMatchingPlayers() = runTest {
         val player1 = player(playerId = 1L)
         val player2 = player(playerId = 2L)
         val batters = listOf(
@@ -62,16 +62,15 @@ internal class UpdatePlayersWithBattersTests {
             )
         )
 
-        updatePlayersWithBatters(listOf(player1, player2), batters).subscribe(observer)
-        observer.await()
+        val result = updatePlayersWithBatters(listOf(player1, player2), batters)
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         assertEquals(3, player1.order)
         assertEquals(1, player2.order)
     }
 
     @Test
-    fun shouldIgnoreBatterWithNoMatchingPlayer() {
+    fun shouldIgnoreBatterWithNoMatchingPlayer() = runTest {
         val player1 = player(playerId = 1L, order = 5)
         val batters = listOf(
             BatterState(
@@ -83,21 +82,19 @@ internal class UpdatePlayersWithBattersTests {
             )
         )
 
-        updatePlayersWithBatters(listOf(player1), batters).subscribe(observer)
-        observer.await()
+        val result = updatePlayersWithBatters(listOf(player1), batters)
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         assertEquals(5, player1.order)
     }
 
     @Test
-    fun shouldCompleteWhenBattersListIsEmpty() {
+    fun shouldCompleteWhenBattersListIsEmpty() = runTest {
         val player1 = player(playerId = 1L, order = 5)
 
-        updatePlayersWithBatters(listOf(player1), emptyList()).subscribe(observer)
-        observer.await()
+        val result = updatePlayersWithBatters(listOf(player1), emptyList())
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         assertEquals(5, player1.order)
     }
 }

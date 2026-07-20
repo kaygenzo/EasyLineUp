@@ -18,8 +18,9 @@ import com.telen.easylineup.domain.usecases.GetDpAndFlexFromPlayersInField
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,8 +31,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
-    private val observer: TestObserver<DpAndFlexConfiguration> =
-        TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     lateinit var useCase: GetDpAndFlexFromPlayersInField
     lateinit var players: MutableList<PlayerWithPosition>
@@ -41,7 +40,7 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
         MockitoAnnotations.initMocks(this)
         useCase = GetDpAndFlexFromPlayersInField(
             GetTeam(teamDao, testSchedulersProvider()),
-            testSchedulersProvider()
+            testDispatcherProvider()
         )
         val noFlag = PlayerFieldPosition.FLAG_NONE
         players = mutableListOf(
@@ -53,26 +52,26 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
         )
     }
 
-    private fun startUseCase(
+    private suspend fun startUseCase(
         players: List<PlayerWithPosition> = this.players,
         teamType: TeamType,
         exception: Class<out Throwable>? = null
-    ) {
+    ): Result<DpAndFlexConfiguration> {
         Mockito.`when`(teamDao.getTeamsRx())
             .thenReturn(Single.just(listOf(Team(id = 1L, name = "toto", type = teamType.id, main = true))))
         val playersSize = players.size
-        useCase(players).subscribe(observer)
-        observer.await()
+        val result = useCase(players)
         exception?.let {
-            observer.assertError(exception)
+            assertTrue(exception.isInstance(result.exceptionOrNull()))
         } ?: let {
-            observer.assertComplete()
+            assertTrue(result.isSuccess)
             Assert.assertEquals("Size of player list must not change", playersSize, players.size)
         }
+        return result
     }
 
     @Test
-    fun shouldTriggerNeedAssignPitcherFirstExceptionIfListEmpty() {
+    fun shouldTriggerNeedAssignPitcherFirstExceptionIfListEmpty() = runTest {
         startUseCase(
             players = mutableListOf(),
             teamType = TeamType.BASEBALL,
@@ -81,7 +80,7 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldTriggerNeedAssignPitcherFirstExceptionIfPitcherNotAssignedBaseball() {
+    fun shouldTriggerNeedAssignPitcherFirstExceptionIfPitcherNotAssignedBaseball() = runTest {
         players.removeIf { it.isPitcher() }
         startUseCase(
             teamType = TeamType.BASEBALL,
@@ -90,10 +89,10 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldReturnOnlyFlexPitcherBaseball() {
+    fun shouldReturnOnlyFlexPitcherBaseball() = runTest {
         players.removeIf { it.isDpDh() }
-        startUseCase(teamType = TeamType.BASEBALL)
-        observer.values().first().let {
+        val result = startUseCase(teamType = TeamType.BASEBALL)
+        result.getOrThrow().let {
             Assert.assertNull(it.dp)
             Assert.assertEquals(players.first { it.playerId == 1L }, it.flex)
             Assert.assertFalse(it.dpLocked)
@@ -102,9 +101,9 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldReturnDpandFlexPitcherBaseball() {
-        startUseCase(teamType = TeamType.BASEBALL)
-        observer.values().first().let {
+    fun shouldReturnDpandFlexPitcherBaseball() = runTest {
+        val result = startUseCase(teamType = TeamType.BASEBALL)
+        result.getOrThrow().let {
             Assert.assertEquals(players.first { it.playerId == 3L }, it.dp)
             Assert.assertEquals(players.first { it.playerId == 1L }, it.flex)
             Assert.assertFalse(it.dpLocked)
@@ -113,10 +112,10 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldReturnDpandFlexRightFieldSoftball() {
+    fun shouldReturnDpandFlexRightFieldSoftball() = runTest {
         players.first { it.isRightField() }.flags = PlayerFieldPosition.FLAG_FLEX
-        startUseCase(teamType = TeamType.SOFTBALL)
-        observer.values().first().let {
+        val result = startUseCase(teamType = TeamType.SOFTBALL)
+        result.getOrThrow().let {
             Assert.assertEquals(players.first { it.playerId == 3L }, it.dp)
             Assert.assertEquals(players.first { it.playerId == 2L }, it.flex)
             Assert.assertFalse(it.dpLocked)
@@ -125,11 +124,11 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldReturnOnlyFlexRightFieldSoftball() {
+    fun shouldReturnOnlyFlexRightFieldSoftball() = runTest {
         players.first { it.isRightField() }.flags = PlayerFieldPosition.FLAG_FLEX
         players.removeIf { it.isDpDh() }
-        startUseCase(teamType = TeamType.SOFTBALL)
-        observer.values().first().let {
+        val result = startUseCase(teamType = TeamType.SOFTBALL)
+        result.getOrThrow().let {
             Assert.assertNull(it.dp)
             Assert.assertEquals(players.first { it.playerId == 2L }, it.flex)
             Assert.assertFalse(it.dpLocked)
@@ -138,19 +137,19 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldReturnDpAndFlexWithSlowPitch() {
+    fun shouldReturnDpAndFlexWithSlowPitch() = runTest {
         players.add(generate(6L, FieldPosition.SLOWPITCH_RF, PlayerFieldPosition.FLAG_FLEX, 6))
-        startUseCase(teamType = TeamType.SOFTBALL)
-        observer.values().first().let {
+        val result = startUseCase(teamType = TeamType.SOFTBALL)
+        result.getOrThrow().let {
             Assert.assertEquals(players.first { it.playerId == 6L }, it.flex)
         }
     }
 
     @Test
-    fun shouldReturnDpAndFlexWithBaseball5() {
+    fun shouldReturnDpAndFlexWithBaseball5() = runTest {
         players.add(generate(6L, FieldPosition.MID_FIELDER, PlayerFieldPosition.FLAG_FLEX, 6))
-        startUseCase(teamType = TeamType.SOFTBALL)
-        observer.values().first().let {
+        val result = startUseCase(teamType = TeamType.SOFTBALL)
+        result.getOrThrow().let {
             Assert.assertEquals(players.first { it.playerId == 6L }, it.flex)
         }
     }

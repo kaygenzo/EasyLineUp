@@ -4,8 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
-import com.telen.easylineup.domain.ports.StringResourcesProvider
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
@@ -14,21 +12,23 @@ import com.telen.easylineup.domain.model.isDefensePlayer
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isFlex
 import com.telen.easylineup.domain.model.isSubstitute
-import io.reactivex.rxjava3.core.Single
+import com.telen.easylineup.domain.ports.DispatcherProvider
+import com.telen.easylineup.domain.ports.StringResourcesProvider
+import kotlinx.coroutines.withContext
 
 class GetBattersState(
     private val stringResourcesProvider: StringResourcesProvider,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         players: List<PlayerWithPosition>,
         teamType: Int,
         batterSize: Int,
         extraHitterSize: Int,
         isDebug: Boolean,
         isEditable: Boolean
-    ): Single<List<BatterState>> {
-        return Single.fromCallable {
+    ): Result<List<BatterState>> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
             val positionDescriptions = stringResourcesProvider.positionShortNames(teamType)
             val result: MutableList<BatterState> = mutableListOf()
             val maxBatterSize = batterSize + extraHitterSize
@@ -138,6 +138,6 @@ class GetBattersState(
                 }
 
             result as List<BatterState>
-        }.subscribeOn(schedulersProvider.io())
+        }
     }
 }

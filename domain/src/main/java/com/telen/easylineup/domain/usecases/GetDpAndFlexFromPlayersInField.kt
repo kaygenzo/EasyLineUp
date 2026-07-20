@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.DpAndFlexConfiguration
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamType
@@ -13,47 +12,44 @@ import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isFlex
 import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.model.isSubstitute
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class GetDpAndFlexFromPlayersInField(
     private val getTeam: GetTeam,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(playersInLineup: List<PlayerWithPosition>): Single<DpAndFlexConfiguration> {
-        return getTeam()
-            .map { it.type }
-            .flatMap { teamType ->
-                Single.just(playersInLineup)
-                    .map { list ->
-                        list.filter {
-                            it.isAssigned() && !it.isSubstitute()
-                        }
-                    }
-                    .map { players ->
-                        val dpLocked = false
-                        var flexLocked = false
-                        val dp = players.firstOrNull { it.isDpDh() }
+    suspend operator fun invoke(playersInLineup: List<PlayerWithPosition>): Result<DpAndFlexConfiguration> =
+        runCatchingCancellable {
+            withContext(dispatcherProvider.io()) {
+                val teamType = getTeam().await().type
+                val players = playersInLineup.filter {
+                    it.isAssigned() && !it.isSubstitute()
+                }
 
-                        val flex = when (teamType) {
-                            TeamType.SOFTBALL.id -> players.firstOrNull { it.isFlex() }
-                            else -> {
-                                flexLocked = true
-                                players.firstOrNull { it.isPitcher() }
-                            }
-                        }
-                        if (flex == null && teamType == TeamType.BASEBALL.id) {
-                            throw NeedAssignPitcherFirstException()
-                        }
-                        DpAndFlexConfiguration(
-                            dp,
-                            flex,
-                            dpLocked,
-                            flexLocked,
-                            teamType
-                        )
+                val dpLocked = false
+                var flexLocked = false
+                val dp = players.firstOrNull { it.isDpDh() }
+
+                val flex = when (teamType) {
+                    TeamType.SOFTBALL.id -> players.firstOrNull { it.isFlex() }
+                    else -> {
+                        flexLocked = true
+                        players.firstOrNull { it.isPitcher() }
                     }
+                }
+                if (flex == null && teamType == TeamType.BASEBALL.id) {
+                    throw NeedAssignPitcherFirstException()
+                }
+                DpAndFlexConfiguration(
+                    dp,
+                    flex,
+                    dpLocked,
+                    flexLocked,
+                    teamType
+                )
             }
-            .subscribeOn(schedulersProvider.io())
-    }
+        }
 }

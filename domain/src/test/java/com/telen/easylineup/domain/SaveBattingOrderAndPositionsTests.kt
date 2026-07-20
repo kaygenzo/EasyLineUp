@@ -6,6 +6,7 @@ package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argThat
+import com.nhaarman.mockitokotlin2.check
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
@@ -18,8 +19,9 @@ import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,7 +31,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
-    private val observer: TestObserver<Void> = TestObserver()
     private val lineup = Lineup(id = 1L, mode = MODE_DISABLED)
 
     @Mock
@@ -43,7 +44,7 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
     @Before
     fun init() {
         saveBattingOrder = SaveBattingOrderAndPositions(
-            lineupRepository, playerFieldPositionRepository, testSchedulersProvider()
+            lineupRepository, playerFieldPositionRepository, testDispatcherProvider()
         )
         Mockito.`when`(lineupRepository.updateLineup(lineup)).thenReturn(Completable.complete())
         Mockito.`when`(playerFieldPositionRepository.updatePlayerFieldPosition(any()))
@@ -65,58 +66,57 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
         )
     }
 
-    fun startUseCase(exception: Class<out Throwable>? = null) {
-        saveBattingOrder(lineup, players).subscribe(observer)
-        observer.await()
+    suspend fun startUseCase(exception: Class<out Throwable>? = null) {
+        val result = saveBattingOrder(lineup, players)
         exception?.let {
-            observer.assertError(exception)
+            assertTrue(exception.isInstance(result.exceptionOrNull()))
         } ?: let {
-            observer.assertComplete()
+            assertTrue(result.isSuccess)
         }
     }
 
     @Test
-    fun shouldTriggerAnErrorIfLineupIdEqualsZero() {
+    fun shouldTriggerAnErrorIfLineupIdEqualsZero() = runTest {
         lineup.id = 0L
         startUseCase(IllegalStateException::class.java)
     }
 
     @Test
-    fun shouldTriggerAnErrorIfLineupIdLessThanZero() {
+    fun shouldTriggerAnErrorIfLineupIdLessThanZero() = runTest {
         lineup.id = -1L
         startUseCase(IllegalStateException::class.java)
     }
 
     @Test
-    fun shouldTriggerAnErrorIfCannotSaveLineup() {
+    fun shouldTriggerAnErrorIfCannotSaveLineup() = runTest {
         Mockito.`when`(lineupRepository.updateLineup(any()))
             .thenReturn(Completable.error(IllegalStateException()))
         startUseCase(IllegalStateException::class.java)
     }
 
     @Test
-    fun shouldTriggerAnErrorIfCannotCreateAtLeastOnePlayer() {
+    fun shouldTriggerAnErrorIfCannotCreateAtLeastOnePlayer() = runTest {
         Mockito.`when`(playerFieldPositionRepository.insertPlayerFieldPosition(any()))
             .thenReturn(Single.error(IllegalStateException()))
         startUseCase(IllegalStateException::class.java)
     }
 
     @Test
-    fun shouldTriggerAnErrorIfCannotDeleteAtLeastOnePlayer() {
+    fun shouldTriggerAnErrorIfCannotDeleteAtLeastOnePlayer() = runTest {
         Mockito.`when`(playerFieldPositionRepository.deletePosition(any()))
             .thenReturn(Completable.error(IllegalStateException()))
         startUseCase(IllegalStateException::class.java)
     }
 
     @Test
-    fun shouldTriggerAnErrorIfCannotUpdateAtLeastOnePlayer() {
+    fun shouldTriggerAnErrorIfCannotUpdateAtLeastOnePlayer() = runTest {
         Mockito.`when`(playerFieldPositionRepository.updatePlayerFieldPosition(any()))
             .thenReturn(Completable.error(IllegalStateException()))
         startUseCase(IllegalStateException::class.java)
     }
 
     @Test
-    fun shouldInsertOnlyPlayersWithFieldIdZeroAndAssigned() {
+    fun shouldInsertOnlyPlayersWithFieldIdZeroAndAssigned() = runTest {
         players.add(generate(0L, FieldPosition.OLD_SUBSTITUTE, 0, 0).apply {
             position = 0
             playerId = 100L
@@ -128,18 +128,18 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldUpdateOnlyPlayersAssignedAndFieldIdGreaterThanZero() {
+    fun shouldUpdateOnlyPlayersAssignedAndFieldIdGreaterThanZero() = runTest {
         startUseCase()
         verify(playerFieldPositionRepository, times(3))
-            .updatePlayerFieldPosition(com.nhaarman.mockitokotlin2.check {
+            .updatePlayerFieldPosition(check {
                 Assert.assertTrue(it.id == 1L || it.id == 3L || it.id == 4L)
             })
     }
 
     @Test
-    fun shouldDeleteOnlyPlayersNotAssignedButWithFieldIdGreaterThanZero() {
+    fun shouldDeleteOnlyPlayersNotAssignedButWithFieldIdGreaterThanZero() = runTest {
         startUseCase()
-        verify(playerFieldPositionRepository).deletePosition(com.nhaarman.mockitokotlin2.check {
+        verify(playerFieldPositionRepository).deletePosition(check {
             Assert.assertTrue(it.id == 5L)
         })
     }

@@ -43,8 +43,9 @@ import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.rx3.rxCompletable
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.rxCompletable
 import timber.log.Timber
 
 class LineupFragmentFixed : LineupFragment("LineupFragmentFixed", R.menu.menu_lineup_summary, false)
@@ -91,10 +92,14 @@ abstract class LineupFragment(
             binder.bottomChoice?.apply {
                 visibility = View.VISIBLE
                 saveClickListener = View.OnClickListener {
-                    launch(viewModel.save(), {
-                        Timber.d("Successfully saved")
-                        goBack()
-                    })
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.save()
+                            .onSuccess {
+                                Timber.d("Successfully saved")
+                                goBack()
+                            }
+                            .onFailure { Timber.e(it) }
+                    }
                 }
                 cancelClickListener = View.OnClickListener { showDiscardDialog("cancel") }
             }

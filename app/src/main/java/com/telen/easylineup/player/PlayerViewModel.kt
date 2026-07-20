@@ -6,6 +6,7 @@ package com.telen.easylineup.player
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.domain.model.DomainErrors
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -197,12 +199,10 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getLineups() {
-        val disposable = getPlayerPositionsSummaryUseCase(playerId)
-            .subscribe({
-                _lineupsFlow.tryEmit(it)
-            }, {
-                Timber.e(it)
-            })
-        disposables.add(disposable)
+        viewModelScope.launch {
+            getPlayerPositionsSummaryUseCase(playerId)
+                .onSuccess { _lineupsFlow.tryEmit(it) }
+                .onFailure { Timber.e(it) }
+        }
     }
 }

@@ -4,19 +4,19 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.PlayerWithPosition
-import io.reactivex.rxjava3.core.Completable
+import com.telen.easylineup.domain.ports.DispatcherProvider
+import kotlinx.coroutines.withContext
 
-class UpdatePlayersWithBatters(private val schedulersProvider: SchedulersProvider) {
-    operator fun invoke(
+class UpdatePlayersWithBatters(private val dispatcherProvider: DispatcherProvider) {
+    suspend operator fun invoke(
         players: List<PlayerWithPosition>,
         batters: List<BatterState>
-    ): Completable {
-        return Completable.fromAction {
+    ): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
             batters.forEach { apply(players, it) }
-        }.subscribeOn(schedulersProvider.io())
+        }
     }
 
     private fun apply(players: List<PlayerWithPosition>, batter: BatterState) {
