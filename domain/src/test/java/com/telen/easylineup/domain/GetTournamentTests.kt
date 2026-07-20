@@ -7,7 +7,7 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.GetTournaments
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -27,6 +27,7 @@ internal class GetTournamentTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         getTournaments = GetTournaments(tournamentDao, testDispatcherProvider())
 
@@ -35,7 +36,8 @@ internal class GetTournamentTests {
         tournaments.add(Tournament(2, "tata", 2L, 3L, 4L, null))
         tournaments.add(Tournament(3, "titi", 3L, 4L, 5L, null))
 
-        Mockito.`when`(tournamentDao.getTournaments()).thenReturn(Single.just(tournaments))
+        Mockito.`when`(tournamentDao.getTournaments()).thenReturn(tournaments)
+    }
     }
 
     @Test

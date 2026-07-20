@@ -81,9 +81,11 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment"), OnActionB
                 .onEach { lineupCreationForm.setList(it) }
                 .launchIn(viewLifecycleOwner.lifecycleScope)
 
-            launch(lineupViewModel.getTeamType(), {
-                lineupCreationForm.setTeamType(TeamType.getTypeById(it))
-            })
+            viewLifecycleOwner.lifecycleScope.launch {
+                lineupViewModel.getTeamType()
+                    .onSuccess { lineupCreationForm.setTeamType(TeamType.getTypeById(it)) }
+                    .onFailure { Timber.e(it) }
+            }
 
             lineupCreationForm.setFragmentManager(childFragmentManager)
             lineupCreationForm.setOnActionClickListener(this@LineupCreationFragment)

@@ -6,7 +6,6 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class DeleteLineup(
@@ -16,8 +15,8 @@ class DeleteLineup(
     suspend operator fun invoke(lineupId: Long?): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
             val id = lineupId ?: throw Exception("Lineup id is null")
-            val lineup = lineupDao.getLineupByIdSingle(id).await()
-            lineupDao.deleteLineup(lineup).await()
+            val lineup = lineupDao.getLineupByIdSingle(id)
+            lineupDao.deleteLineup(lineup)
         }
     }
 }

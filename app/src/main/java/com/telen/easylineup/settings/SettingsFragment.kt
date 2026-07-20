@@ -134,7 +134,6 @@ SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        viewModel.clear()
         disposables.clear()
     }
 

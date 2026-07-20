@@ -27,13 +27,12 @@ import com.telen.easylineup.domain.usecases.GetTeamPhones
 import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.domain.usecases.SaveDashboardTiles
 import com.telen.easylineup.testDispatcherProvider
-import com.telen.easylineup.testSchedulersProvider
 import com.telen.easylineup.utils.SharedPreferencesHelper
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.observers.TestObserver
-import io.reactivex.rxjava3.processors.PublishProcessor
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -87,13 +86,14 @@ internal class DashboardViewModelTest {
     fun setup() {
         MockitoAnnotations.initMocks(this)
 
-        // lenient: each test only exercises one of these sub-ports
-        Mockito.lenient().`when`(teamRepository.getTeamsRx())
-            .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
+        runBlocking {
+            // lenient: each test only exercises one of these sub-ports
+            Mockito.lenient().`when`(teamRepository.getTeamsRx())
+                .thenReturn(listOf(Team(id = 1L, name = "Panthers", main = true)))
+        }
 
-        val schedulersProvider = testSchedulersProvider()
         val dispatcherProvider = testDispatcherProvider()
-        val getTeam = GetTeam(teamRepository, schedulersProvider)
+        val getTeam = GetTeam(teamRepository, dispatcherProvider)
         val getPlayers = GetPlayers(playerRepository, getTeam, dispatcherProvider)
 
         startKoin {
@@ -107,11 +107,11 @@ internal class DashboardViewModelTest {
                             playerFieldPositionRepository,
                             tilesRepository,
                             getTeam,
-                            CreateDashboardTiles(tilesRepository, schedulersProvider),
-                            schedulersProvider
+                            CreateDashboardTiles(tilesRepository, dispatcherProvider),
+                            dispatcherProvider
                         )
                     }
-                    single { SaveDashboardTiles(tilesRepository, schedulersProvider) }
+                    single { SaveDashboardTiles(tilesRepository, dispatcherProvider) }
                     single { GetShirtNumberHistory(playerRepository, getTeam, dispatcherProvider) }
                     single { GetTeamEmails(getPlayers, dispatcherProvider) }
                     single { GetTeamPhones(getPlayers, dispatcherProvider) }
@@ -130,17 +130,17 @@ internal class DashboardViewModelTest {
 
     @Test
     fun shouldRegisterTilesFlowAndSwitchToDashboardConfigurationsWhenTeamsChange() = runTest {
-        val teamsProcessor = PublishProcessor.create<List<Team>>()
+        val teamsProcessor = MutableSharedFlow<List<Team>>(replay = 1, extraBufferCapacity = 1)
         Mockito.`when`(teamRepository.getTeams()).thenReturn(teamsProcessor)
         val tile = DashboardTile(id = 1L, position = 0, type = TileType.TEAM_SIZE.type)
-        Mockito.`when`(tilesRepository.getTiles()).thenReturn(Single.just(listOf(tile)))
-        Mockito.`when`(playerRepository.getPlayersByTeamId(1L)).thenReturn(Single.just(emptyList()))
+        Mockito.`when`(tilesRepository.getTiles()).thenReturn(listOf(tile))
+        Mockito.`when`(playerRepository.getPlayersByTeamId(1L)).thenReturn(emptyList())
 
         val observedValues = mutableListOf<List<DashboardTile>>()
         val job = launch { viewModel.registerTilesFlow().toList(observedValues) }
         advanceUntilIdle()
 
-        teamsProcessor.onNext(emptyList())
+        teamsProcessor.tryEmit(emptyList())
         advanceUntilIdle()
 
         assertEquals(1, observedValues.size)
@@ -175,16 +175,14 @@ internal class DashboardViewModelTest {
     }
 
     @Test
-    fun shouldSaveTilesDelegateToUseCase() {
+    fun shouldSaveTilesDelegateToUseCase() = runTest {
         val tiles = listOf(DashboardTile(id = 1L, position = 0, type = 1))
         Mockito.`when`(tilesRepository.updateTiles(tiles))
-            .thenReturn(io.reactivex.rxjava3.core.Completable.complete())
+            .thenReturn(Unit)
 
-        val observer = TestObserver<Void>()
-        viewModel.saveTiles(tiles).subscribe(observer)
-        observer.await()
+        val result = viewModel.saveTiles(tiles)
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         Mockito.verify(tilesRepository).updateTiles(tiles)
     }
 
@@ -200,9 +198,9 @@ internal class DashboardViewModelTest {
             lineupName = "Game 1"
         )
         Mockito.`when`(playerRepository.getShirtNumberFromPlayers(1L, 8))
-            .thenReturn(Single.just(emptyList()))
+            .thenReturn(emptyList())
         Mockito.`when`(playerRepository.getShirtNumberFromNumberOverlays(1L, 8))
-            .thenReturn(Single.just(listOf(overlayEntry)))
+            .thenReturn(listOf(overlayEntry))
 
         val result = viewModel.getShirtNumberHistory(8)
 
@@ -214,7 +212,7 @@ internal class DashboardViewModelTest {
     fun shouldGetEmailsDelegateToUseCase() = runTest {
         val withEmail = Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L, email = "a@mail.com")
         Mockito.`when`(playerRepository.getPlayersByTeamId(1L))
-            .thenReturn(Single.just(listOf(withEmail)))
+            .thenReturn(listOf(withEmail))
 
         val result = viewModel.getEmails()
 
@@ -226,7 +224,7 @@ internal class DashboardViewModelTest {
     fun shouldGetPhonesDelegateToUseCase() = runTest {
         val withPhone = Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L, phone = "0102030405")
         Mockito.`when`(playerRepository.getPlayersByTeamId(1L))
-            .thenReturn(Single.just(listOf(withPhone)))
+            .thenReturn(listOf(withPhone))
 
         val result = viewModel.getPhones()
 

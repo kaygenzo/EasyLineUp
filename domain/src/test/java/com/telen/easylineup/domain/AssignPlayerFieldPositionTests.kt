@@ -20,7 +20,6 @@ import com.telen.easylineup.domain.model.reset
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.GetTeam
-import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -92,7 +91,7 @@ internal abstract class AssignPlayerFieldPositionTests(
     fun init() {
         MockitoAnnotations.initMocks(this)
         savePlayerFieldPosition =
-            AssignPlayerFieldPosition(GetTeam(teamDao, testSchedulersProvider()), testDispatcherProvider())
+            AssignPlayerFieldPosition(GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
 
         players = mutableListOf()
         teamType.getValidPositions(strategy).forEachIndexed { i, pos ->
@@ -130,7 +129,7 @@ internal abstract class AssignPlayerFieldPositionTests(
     ) {
         lineup.mode = mode
         Mockito.`when`(teamDao.getTeamsRx())
-            .thenReturn(Single.just(listOf(Team(id = 1L, type = teamType.id, main = true))))
+            .thenReturn(listOf(Team(id = 1L, type = teamType.id, main = true)))
         val playersSize = players.size
         val result = savePlayerFieldPosition(player, position, lineup, players)
         exception?.let {

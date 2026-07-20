@@ -22,7 +22,6 @@ import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.exceptions.FirstPositionEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.SamePlayerException
-import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -48,7 +47,7 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
     fun init() {
         MockitoAnnotations.initMocks(this)
         switchPlayersPosition = SwitchPlayersPosition(
-            GetTeam(teamDao, testSchedulersProvider()),
+            GetTeam(teamDao, testDispatcherProvider()),
             testDispatcherProvider()
         )
 
@@ -74,7 +73,7 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
     ) {
         lineup.mode = if (lineupMode) MODE_ENABLED else MODE_DISABLED
         Mockito.`when`(teamDao.getTeamsRx())
-            .thenReturn(Single.just(listOf(Team(id = 1L, type = teamType.id, main = true))))
+            .thenReturn(listOf(Team(id = 1L, type = teamType.id, main = true)))
         val playersSize = players.size
         val originalPlayers = players.map { it.copy() }
         val result = switchPlayersPosition(players, fromPosition, toPosition, lineup)

@@ -7,7 +7,6 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.PlayerRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class InsertPlayerNumberOverlays(
@@ -16,7 +15,7 @@ class InsertPlayerNumberOverlays(
 ) {
     suspend operator fun invoke(overlays: List<PlayerNumberOverlay>): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            dao.createPlayerNumberOverlays(overlays).await()
+            dao.createPlayerNumberOverlays(overlays)
         }
     }
 }

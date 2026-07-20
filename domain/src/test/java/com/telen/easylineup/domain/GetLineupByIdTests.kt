@@ -7,7 +7,6 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.GetLineupById
-import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -33,7 +32,7 @@ internal class GetLineupByIdTests {
     @Test
     fun shouldDelegateToRepository() = runTest {
         val lineup = Lineup(id = 1L, name = "toto", teamId = 1L, tournamentId = 1L)
-        Mockito.`when`(lineupDao.getLineupByIdSingle(1L)).thenReturn(Single.just(lineup))
+        Mockito.`when`(lineupDao.getLineupByIdSingle(1L)).thenReturn(lineup)
 
         val result = getLineupById(1L)
 

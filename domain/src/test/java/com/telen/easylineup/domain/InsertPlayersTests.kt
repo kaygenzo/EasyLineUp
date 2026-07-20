@@ -7,7 +7,6 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.InsertPlayers
-import io.reactivex.rxjava3.core.Completable
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -34,7 +33,7 @@ internal class InsertPlayersTests {
         val players = listOf(
             Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L)
         )
-        Mockito.`when`(playerDao.insertPlayers(players)).thenReturn(Completable.complete())
+        Mockito.`when`(playerDao.insertPlayers(players)).thenReturn(Unit)
 
         val result = insertPlayers(players)
 

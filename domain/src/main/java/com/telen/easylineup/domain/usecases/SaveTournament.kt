@@ -10,7 +10,6 @@ import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournamentException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class SaveTournament(
@@ -24,7 +23,7 @@ class SaveTournament(
             }
 
             val alreadyExists = try {
-                repository.getTournamentByName(tournament.name).await()
+                repository.getTournamentByName(tournament.name)
                 true
             } catch (c: CancellationException) {
                 throw c
@@ -36,7 +35,7 @@ class SaveTournament(
                 throw AlreadyExistingTournamentException()
             }
 
-            tournament.id = repository.insertTournament(tournament).await()
+            tournament.id = repository.insertTournament(tournament)
         }
     }
 }

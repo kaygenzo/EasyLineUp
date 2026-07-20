@@ -7,7 +7,6 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class DeleteTournamentLineups(
@@ -17,9 +16,9 @@ class DeleteTournamentLineups(
 ) {
     suspend operator fun invoke(tournament: Tournament): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            val team = getTeam().await()
-            val lineups = lineupDao.getLineupsForTournamentRx(tournament.id, team.id).await()
-            lineupDao.deleteLineups(lineups).await()
+            val team = getTeam().getOrThrow()
+            val lineups = lineupDao.getLineupsForTournamentRx(tournament.id, team.id)
+            lineupDao.deleteLineups(lineups)
         }
     }
 }

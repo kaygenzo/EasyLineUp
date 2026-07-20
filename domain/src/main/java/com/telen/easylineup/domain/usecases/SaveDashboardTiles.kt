@@ -4,19 +4,21 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.DashboardTile
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.TilesRepository
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.withContext
 
 class SaveDashboardTiles(
     private val dao: TilesRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(tiles: List<DashboardTile>): Completable {
-        for (i in tiles.indices) {
-            tiles[i].position = i
+    suspend operator fun invoke(tiles: List<DashboardTile>): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            for (i in tiles.indices) {
+                tiles[i].position = i
+            }
+            dao.updateTiles(tiles)
         }
-        return dao.updateTiles(tiles).subscribeOn(schedulersProvider.io())
     }
 }

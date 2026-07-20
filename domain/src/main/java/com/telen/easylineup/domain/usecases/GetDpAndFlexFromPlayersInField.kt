@@ -14,7 +14,6 @@ import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class GetDpAndFlexFromPlayersInField(
@@ -24,7 +23,7 @@ class GetDpAndFlexFromPlayersInField(
     suspend operator fun invoke(playersInLineup: List<PlayerWithPosition>): Result<DpAndFlexConfiguration> =
         runCatchingCancellable {
             withContext(dispatcherProvider.io()) {
-                val teamType = getTeam().await().type
+                val teamType = getTeam().getOrThrow().type
                 val players = playersInLineup.filter {
                     it.isAssigned() && !it.isSubstitute()
                 }

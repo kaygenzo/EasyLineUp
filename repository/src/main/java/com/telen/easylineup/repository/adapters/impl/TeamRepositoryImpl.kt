@@ -10,9 +10,8 @@ import com.telen.easylineup.repository.dao.TeamDao
 import com.telen.easylineup.repository.model.RoomTeam
 import com.telen.easylineup.repository.model.init
 import com.telen.easylineup.repository.model.toTeam
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
 internal class TeamRepositoryImpl(private val teamDao: TeamDao) : TeamRepository {
@@ -20,45 +19,43 @@ internal class TeamRepositoryImpl(private val teamDao: TeamDao) : TeamRepository
         Timber.i("TeamRepositoryImpl.init")
     }
 
-    override fun insertTeam(team: Team): Single<Long> {
+    override suspend fun insertTeam(team: Team): Long {
         return teamDao.insertTeam(RoomTeam().init(team))
     }
 
-    override fun deleteTeam(team: Team): Completable {
-        return teamDao.deleteTeam(RoomTeam().init(team))
+    override suspend fun deleteTeam(team: Team) {
+        teamDao.deleteTeam(RoomTeam().init(team))
     }
 
-    override fun deleteTeams(teams: List<Team>): Completable {
-        return teamDao.deleteTeams(teams.map { RoomTeam().init(it) })
+    override suspend fun deleteTeams(teams: List<Team>) {
+        teamDao.deleteTeams(teams.map { RoomTeam().init(it) })
     }
 
-    override fun updateTeam(team: Team): Completable {
-        return teamDao.updateTeam(RoomTeam().init(team))
+    override suspend fun updateTeam(team: Team) {
+        teamDao.updateTeam(RoomTeam().init(team))
     }
 
-    override fun updateTeams(teams: List<Team>): Completable {
-        return teamDao.updateTeams(teams.map { RoomTeam().init(it) })
+    override suspend fun updateTeams(teams: List<Team>) {
+        teamDao.updateTeams(teams.map { RoomTeam().init(it) })
     }
 
-    override fun updateTeamsWithRowCount(teams: List<Team>): Single<Int> {
+    override suspend fun updateTeamsWithRowCount(teams: List<Team>): Int {
         return teamDao.updateTeamsWithRowCount(teams.map { RoomTeam().init(it) })
     }
 
-    override fun getTeamById(teamId: Long): Single<Team> {
-        return teamDao.getTeamById(teamId).map { it.toTeam() }
+    override suspend fun getTeamById(teamId: Long): Team {
+        return teamDao.getTeamById(teamId).toTeam()
     }
 
-    override fun getTeamByHash(hash: String): Single<Team> {
-        return teamDao.getTeamByHash(hash).map { it.toTeam() }
+    override suspend fun getTeamByHash(hash: String): Team {
+        return teamDao.getTeamByHash(hash).toTeam()
     }
 
-    override fun getTeams(): Flowable<List<Team>> {
-        return teamDao.getTeams().map {
-            it.map { it.toTeam() }
-        }
+    override fun getTeams(): Flow<List<Team>> {
+        return teamDao.getTeams().map { list -> list.map { it.toTeam() } }
     }
 
-    override fun getTeamsRx(): Single<List<Team>> {
-        return teamDao.getTeamsRx().map { it.map { it.toTeam() } }
+    override suspend fun getTeamsRx(): List<Team> {
+        return teamDao.getTeamsRx().map { it.toTeam() }
     }
 }

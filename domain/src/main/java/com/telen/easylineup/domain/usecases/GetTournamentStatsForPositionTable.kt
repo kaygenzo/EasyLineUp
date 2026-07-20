@@ -13,7 +13,6 @@ import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.StringResourcesProvider
 import com.telen.easylineup.domain.repository.LineupRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class GetTournamentStatsForPositionTable(
@@ -27,8 +26,8 @@ class GetTournamentStatsForPositionTable(
         strategy: TeamStrategy
     ): Result<TournamentStatsUiConfig> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            val team = getTeam().await()
-            val list = dao.getAllPlayerPositionsForTournament(tournament.id, team.id).await()
+            val team = getTeam().getOrThrow()
+            val list = dao.getAllPlayerPositionsForTournament(tournament.id, team.id)
 
             val possiblePositions = strategy.positions
 

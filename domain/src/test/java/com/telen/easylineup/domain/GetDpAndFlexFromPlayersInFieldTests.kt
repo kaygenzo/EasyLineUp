@@ -17,7 +17,6 @@ import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetDpAndFlexFromPlayersInField
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
-import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -39,7 +38,7 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
     fun init() {
         MockitoAnnotations.initMocks(this)
         useCase = GetDpAndFlexFromPlayersInField(
-            GetTeam(teamDao, testSchedulersProvider()),
+            GetTeam(teamDao, testDispatcherProvider()),
             testDispatcherProvider()
         )
         val noFlag = PlayerFieldPosition.FLAG_NONE
@@ -58,7 +57,7 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
         exception: Class<out Throwable>? = null
     ): Result<DpAndFlexConfiguration> {
         Mockito.`when`(teamDao.getTeamsRx())
-            .thenReturn(Single.just(listOf(Team(id = 1L, name = "toto", type = teamType.id, main = true))))
+            .thenReturn(listOf(Team(id = 1L, name = "toto", type = teamType.id, main = true)))
         val playersSize = players.size
         val result = useCase(players)
         exception?.let {

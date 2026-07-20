@@ -8,33 +8,31 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.ShirtNumberEntry
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
 
 interface PlayerRepository {
-    fun insertPlayer(player: Player): Single<Long>
-    fun insertPlayers(players: List<Player>): Completable
-    fun deletePlayer(player: Player): Completable
-    fun updatePlayer(player: Player): Completable
-    fun updatePlayersWithRowCount(players: List<Player>): Single<Int>
-    fun getPlayerByHash(hash: String): Single<Player>
-    fun getPlayerById(playerId: Long): Flowable<Player>
-    fun getPlayerByIdAsSingle(playerId: Long): Single<Player>
-    fun getPlayersByTeamId(teamId: Long): Single<List<Player>>
-    fun getPlayers(): Single<List<Player>>
-    fun observePlayers(teamId: Long): Flowable<List<Player>>
-    fun getTeamPlayersAndMaybePositions(lineupId: Long): Flowable<List<PlayerWithPosition>>
+    suspend fun insertPlayer(player: Player): Long
+    suspend fun insertPlayers(players: List<Player>)
+    suspend fun deletePlayer(player: Player)
+    suspend fun updatePlayer(player: Player)
+    suspend fun updatePlayersWithRowCount(players: List<Player>): Int
+    suspend fun getPlayerByHash(hash: String): Player
+    fun getPlayerById(playerId: Long): Flow<Player>
+    suspend fun getPlayerByIdAsSingle(playerId: Long): Player
+    suspend fun getPlayersByTeamId(teamId: Long): List<Player>
+    suspend fun getPlayers(): List<Player>
+    fun observePlayers(teamId: Long): Flow<List<Player>>
+    fun getTeamPlayersAndMaybePositions(lineupId: Long): Flow<List<PlayerWithPosition>>
 
-    fun observePlayersNumberOverlay(lineupId: Long): Flowable<List<PlayerNumberOverlay>>
-    fun getPlayersNumberOverlay(lineupId: Long): Single<List<PlayerNumberOverlay>>
-    fun deletePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
-    fun updatePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
-    fun updatePlayerNumberOverlay(overlay: PlayerNumberOverlay): Completable
-    fun createPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>): Completable
-    fun createPlayerNumberOverlay(overlay: PlayerNumberOverlay): Completable
-    fun getShirtNumberFromPlayers(teamId: Long, number: Int): Single<List<ShirtNumberEntry>>
-    fun getShirtNumberFromNumberOverlays(teamId: Long, number: Int): Single<List<ShirtNumberEntry>>
-    fun getShirtNumberOverlay(playerId: Long, lineupId: Long): Single<PlayerNumberOverlay>
-    fun getPlayerNumberOverlayByHash(hash: String): Single<PlayerNumberOverlay>
+    fun observePlayersNumberOverlay(lineupId: Long): Flow<List<PlayerNumberOverlay>>
+    suspend fun getPlayersNumberOverlay(lineupId: Long): List<PlayerNumberOverlay>
+    suspend fun deletePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>)
+    suspend fun updatePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>)
+    suspend fun updatePlayerNumberOverlay(overlay: PlayerNumberOverlay)
+    suspend fun createPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>)
+    suspend fun createPlayerNumberOverlay(overlay: PlayerNumberOverlay)
+    suspend fun getShirtNumberFromPlayers(teamId: Long, number: Int): List<ShirtNumberEntry>
+    suspend fun getShirtNumberFromNumberOverlays(teamId: Long, number: Int): List<ShirtNumberEntry>
+    suspend fun getShirtNumberOverlay(playerId: Long, lineupId: Long): PlayerNumberOverlay
+    suspend fun getPlayerNumberOverlayByHash(hash: String): PlayerNumberOverlay
 }

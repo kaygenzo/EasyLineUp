@@ -7,7 +7,6 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.TeamRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class SaveCurrentTeam(
@@ -16,11 +15,11 @@ class SaveCurrentTeam(
 ) {
     suspend operator fun invoke(team: Team): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            val teams = dao.getTeamsRx().await().map {
+            val teams = dao.getTeamsRx().map {
                 it.main = it.id == team.id
                 it
             }
-            dao.updateTeams(teams).await()
+            dao.updateTeams(teams)
         }
     }
 }

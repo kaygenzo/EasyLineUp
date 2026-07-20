@@ -14,45 +14,42 @@ import com.telen.easylineup.repository.model.RoomPlayerFieldPosition
 import com.telen.easylineup.repository.model.RoomPlayerGamesCount
 import com.telen.easylineup.repository.model.RoomPlayerWithPosition
 import com.telen.easylineup.repository.model.RoomPositionWithLineup
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Maybe
-import io.reactivex.rxjava3.core.Single
 
 @Dao
 internal interface PlayerFieldPositionsDao {
     @Query("DELETE FROM playerFieldPosition")
-    fun deleteAll(): Completable
+    suspend fun deleteAll()
 
     @Insert
-    fun insertPlayerFieldPositions(fieldPositions: List<RoomPlayerFieldPosition>): Completable
+    suspend fun insertPlayerFieldPositions(fieldPositions: List<RoomPlayerFieldPosition>)
 
     @Update
-    fun updatePlayerFieldPositions(fieldPositions: List<RoomPlayerFieldPosition>): Completable
+    suspend fun updatePlayerFieldPositions(fieldPositions: List<RoomPlayerFieldPosition>)
 
     @Update
-    fun updatePlayerFieldPositionsWithRowCount(fieldPositions: List<RoomPlayerFieldPosition>):
-    Single<Int>
+    suspend fun updatePlayerFieldPositionsWithRowCount(fieldPositions: List<RoomPlayerFieldPosition>):
+    Int
 
     @Query("DELETE FROM playerFieldPosition where id=:id")
-    fun deletePositionById(id: Long): Completable
+    suspend fun deletePositionById(id: Long)
 
     @Delete
-    fun deletePositions(position: List<RoomPlayerFieldPosition>): Completable
+    suspend fun deletePositions(position: List<RoomPlayerFieldPosition>)
 
     @Update
-    fun updatePlayerFieldPosition(fieldPosition: RoomPlayerFieldPosition): Completable
+    suspend fun updatePlayerFieldPosition(fieldPosition: RoomPlayerFieldPosition)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertPlayerFieldPosition(fieldPositions: RoomPlayerFieldPosition): Single<Long>
+    suspend fun insertPlayerFieldPosition(fieldPositions: RoomPlayerFieldPosition): Long
 
     @Query("SELECT * from playerFieldPosition where hash = :hash")
-    fun getPlayerFieldPositionByHash(hash: String): Single<RoomPlayerFieldPosition>
+    suspend fun getPlayerFieldPositionByHash(hash: String): RoomPlayerFieldPosition
 
     @Query("SELECT * from playerFieldPosition")
-    fun getPlayerFieldPositions(): Single<List<RoomPlayerFieldPosition>>
+    suspend fun getPlayerFieldPositions(): List<RoomPlayerFieldPosition>
 
     @Query("SELECT * FROM playerFieldPosition WHERE id = :positionId")
-    fun getPlayerFieldPosition(positionId: Long): Single<RoomPlayerFieldPosition>
+    suspend fun getPlayerFieldPosition(positionId: Long): RoomPlayerFieldPosition
 
     @Query(
         """
@@ -60,7 +57,7 @@ internal interface PlayerFieldPositionsDao {
         WHERE playerFieldPosition.lineupID = :lineupId
     """
     )
-    fun getAllPlayerFieldPositionsForLineup(lineupId: Long): Single<List<RoomPlayerFieldPosition>>
+    suspend fun getAllPlayerFieldPositionsForLineup(lineupId: Long): List<RoomPlayerFieldPosition>
 
     @Query(
         """
@@ -82,7 +79,7 @@ internal interface PlayerFieldPositionsDao {
         ORDER BY playerFieldPosition.`order` ASC
     """
     )
-    fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): Single<List<RoomPlayerWithPosition>>
+    suspend fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): List<RoomPlayerWithPosition>
 
     @Query(
         """
@@ -92,7 +89,7 @@ internal interface PlayerFieldPositionsDao {
         WHERE playerFieldPosition.lineupID = :lineupId AND playerFieldPosition.playerID = :playerId
     """
     )
-    fun getPlayerPositionFor(lineupId: Long, playerId: Long): Maybe<RoomPlayerFieldPosition>
+    suspend fun getPlayerPositionFor(lineupId: Long, playerId: Long): RoomPlayerFieldPosition?
 
     @Query(
         """
@@ -110,7 +107,7 @@ internal interface PlayerFieldPositionsDao {
         ORDER BY lineups.editedAt DESC
     """
     )
-    fun getAllPositionsForPlayer(playerId: Long): Single<List<RoomPositionWithLineup>>
+    suspend fun getAllPositionsForPlayer(playerId: Long): List<RoomPositionWithLineup>
 
     @Query(
         """
@@ -121,5 +118,5 @@ internal interface PlayerFieldPositionsDao {
         GROUP BY playerID ORDER BY 2 DESC
      """
     )
-    fun getMostUsedPlayers(teamId: Long): Single<List<RoomPlayerGamesCount>>
+    suspend fun getMostUsedPlayers(teamId: Long): List<RoomPlayerGamesCount>
 }

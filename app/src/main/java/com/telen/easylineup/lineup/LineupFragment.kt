@@ -198,20 +198,24 @@ abstract class LineupFragment(
     }
 
     override fun onPrepareMenu(menu: Menu) {
-        launch(viewModel.getTeamType(), {
-            val teamType = TeamType.getTypeById(it)
-            menu.findItem(R.id.action_lineup_mode)?.apply {
-                when (teamType) {
-                    TeamType.UNKNOWN -> isVisible = false
-                    TeamType.BASEBALL -> setTitle(R.string.action_add_dh)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.getTeamType()
+                .onSuccess {
+                    val teamType = TeamType.getTypeById(it)
+                    menu.findItem(R.id.action_lineup_mode)?.apply {
+                        when (teamType) {
+                            TeamType.UNKNOWN -> isVisible = false
+                            TeamType.BASEBALL -> setTitle(R.string.action_add_dh)
 
-                    TeamType.SOFTBALL -> setTitle(R.string.action_add_dp_flex)
+                            TeamType.SOFTBALL -> setTitle(R.string.action_add_dp_flex)
 
-                    else -> {}
+                            else -> {}
+                        }
+                        isChecked = viewModel.lineup?.mode == MODE_ENABLED
+                    }
                 }
-                isChecked = viewModel.lineup?.mode == MODE_ENABLED
-            }
-        })
+                .onFailure { Timber.e(it) }
+        }
         super.onPrepareMenu(menu)
     }
 

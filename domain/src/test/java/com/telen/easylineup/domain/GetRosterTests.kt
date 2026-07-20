@@ -14,7 +14,7 @@ import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetTeam
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -45,12 +45,13 @@ internal class GetRosterTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
-        getRoster = GetRoster(playerDao, lineupDao, GetTeam(teamDao, testSchedulersProvider()), testDispatcherProvider())
+        getRoster = GetRoster(playerDao, lineupDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
 
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
-        Mockito.`when`(lineupDao.getLineupByIdSingle(1L)).thenReturn(Single.just(lineup))
-        Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(Single.just(listOf(player1, player2, player3)))
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
+        Mockito.`when`(lineupDao.getLineupByIdSingle(1L)).thenReturn(lineup)
+        Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(listOf(player1, player2, player3))
 
         val overlays: MutableList<PlayerNumberOverlay> =
             mutableListOf<PlayerNumberOverlay>().apply {
@@ -58,7 +59,8 @@ internal class GetRosterTests {
                 add(PlayerNumberOverlay(3L, 1L, player3.id, 69))
             }
 
-        Mockito.`when`(playerDao.getPlayersNumberOverlay(1L)).thenReturn(Single.just(overlays))
+        Mockito.`when`(playerDao.getPlayersNumberOverlay(1L)).thenReturn(overlays)
+    }
     }
 
     @Test

@@ -11,7 +11,6 @@ import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class GetRoster(
@@ -22,17 +21,17 @@ class GetRoster(
 ) {
     suspend operator fun invoke(lineupId: Long? = null): Result<TeamRosterSummary> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            val team = getTeam().await()
+            val team = getTeam().getOrThrow()
             val teamId = team.id
 
             if (lineupId != null) {
                 val overlays: MutableMap<Long, PlayerNumberOverlay> = mutableMapOf()
-                dao.getPlayersNumberOverlay(lineupId).await().forEach {
+                dao.getPlayersNumberOverlay(lineupId).forEach {
                     overlays[it.playerId] = it
                 }
-                val lineup = lineupDao.getLineupByIdSingle(lineupId).await()
+                val lineup = lineupDao.getLineupByIdSingle(lineupId)
                 val rosterIds = stringToRoster(lineup.roster)
-                val players = dao.getPlayersByTeamId(teamId).await()
+                val players = dao.getPlayersByTeamId(teamId)
                 // if rosterIds is null, it means that all players are selected
                 val status = rosterIds?.let {
                     if (it.size == players.size) {
@@ -49,7 +48,7 @@ class GetRoster(
                     )
                 })
             } else {
-                val players = dao.getPlayersByTeamId(teamId).await()
+                val players = dao.getPlayersByTeamId(teamId)
                 TeamRosterSummary(
                     Constants.STATUS_ALL,
                     players.map { RosterPlayerStatus(it, true, null) }

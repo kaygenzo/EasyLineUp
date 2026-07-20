@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.model.export.LineupExport
 import com.telen.easylineup.domain.model.export.PlayerExport
@@ -18,14 +17,13 @@ import com.telen.easylineup.domain.model.toPlayerFieldPositionsExport
 import com.telen.easylineup.domain.model.toPlayerNumberOverlayExport
 import com.telen.easylineup.domain.model.toTeamExport
 import com.telen.easylineup.domain.model.toTournamentExport
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.repository.TournamentRepository
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.withContext
 
 /**
  * Refreshes hashes for any record missing one, then builds the export payload. Writing that
@@ -39,102 +37,82 @@ class ExportData(
     private val tournamentDao: TournamentRepository,
     private val lineupDao: LineupRepository,
     private val playerFieldPositionsDao: PlayerFieldPositionRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(): Single<ExportBase> {
-        val teams: MutableList<TeamExport> = mutableListOf()
-        val root = ExportBase(teams)
-        return checkHashData()
-            .ignoreElement()
-            .andThen(
-                teamDao.getTeamsRx()
-                    .flatMapObservable { Observable.fromIterable(it) }
-                    .flatMapCompletable { team ->
+    suspend operator fun invoke(): Result<ExportBase> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            checkHashData().getOrThrow()
 
-                        val tournamentsExport: MutableList<TournamentExport> = mutableListOf()
-                        val playersExport: MutableList<PlayerExport> = mutableListOf()
-                        val teamExport = team.toTeamExport(playersExport, tournamentsExport)
+            val teams: MutableList<TeamExport> = mutableListOf()
+            val root = ExportBase(teams)
 
-                        if (!isNetworkUrl(teamExport.image)) {
-                            teamExport.image = null
-                        }
+            teamDao.getTeamsRx().forEach { team ->
+                val tournamentsExport: MutableList<TournamentExport> = mutableListOf()
+                val playersExport: MutableList<PlayerExport> = mutableListOf()
+                val teamExport = team.toTeamExport(playersExport, tournamentsExport)
 
-                        teams.add(teamExport)
+                if (!isNetworkUrl(teamExport.image)) {
+                    teamExport.image = null
+                }
 
-                        val playersUuidMap: MutableMap<Long, String?> = mutableMapOf()
+                teams.add(teamExport)
 
-                        playerDao.getPlayersByTeamId(team.id)
-                            .flatMapObservable { Observable.fromIterable(it) }
-                            .flatMapCompletable { player ->
+                val playersUuidMap: MutableMap<Long, String?> = mutableMapOf()
 
-                                val playerExport = player.toPlayerExport()
+                playerDao.getPlayersByTeamId(team.id).forEach { player ->
+                    val playerExport = player.toPlayerExport()
 
-                                if (!isNetworkUrl(playerExport.image)) {
-                                    playerExport.image = null
-                                }
-
-                                playersExport.add(playerExport)
-
-                                playersUuidMap[player.id] = player.hash
-                                Completable.complete()
-                            }
-                            .andThen(tournamentDao.getTournaments())
-                            .flatMapObservable { Observable.fromIterable(it) }
-                            .flatMapCompletable { tournament ->
-
-                                val lineupsExport: MutableList<LineupExport> = mutableListOf()
-                                val tournamentExport = tournament.toTournamentExport(lineupsExport)
-
-                                lineupDao.getLineupsForTournamentRx(tournament.id, team.id)
-                                    .flatMapObservable {
-                                        if (it.isNotEmpty()) {
-                                            tournamentsExport.add(tournamentExport)
-                                        }
-                                        Observable.fromIterable(it)
-                                    }
-                                    .flatMapCompletable { lineup ->
-
-                                        val positionsExport: MutableList<PlayerPositionExport> =
-                                            mutableListOf()
-                                        val playerNumberOverlays:
-                                            MutableList<PlayerNumberOverlayExport> =
-                                            mutableListOf()
-                                        val roster = rosterToUuid(playersUuidMap, lineup.roster)
-                                        val lineupExport = lineup.toLineupExport(
-                                            positionsExport,
-                                            playerNumberOverlays,
-                                            roster
-                                        )
-                                        lineupsExport.add(lineupExport)
-
-                                        playerFieldPositionsDao.getAllPlayerFieldPositionsForLineup(
-                                            lineup.id
-                                        )
-                                            .flatMapObservable { Observable.fromIterable(it) }
-                                            .flatMapCompletable {
-                                                val positionExport =
-                                                    it.toPlayerFieldPositionsExport(
-                                                        playersUuidMap[it.playerId]
-                                                    )
-                                                positionsExport.add(positionExport)
-                                                Completable.complete()
-                                            }
-                                            .andThen(playerDao.getPlayersNumberOverlay(lineup.id))
-                                            .flatMapObservable { Observable.fromIterable(it) }
-                                            .flatMapCompletable {
-                                                val playerNumberExport =
-                                                    it.toPlayerNumberOverlayExport(
-                                                        playersUuidMap[it.playerId]
-                                                    )
-                                                playerNumberOverlays.add(playerNumberExport)
-                                                Completable.complete()
-                                            }
-                                    }
-                            }
+                    if (!isNetworkUrl(playerExport.image)) {
+                        playerExport.image = null
                     }
-            )
-            .andThen(Single.just(root))
-            .subscribeOn(schedulersProvider.io())
+
+                    playersExport.add(playerExport)
+                    playersUuidMap[player.id] = player.hash
+                }
+
+                tournamentDao.getTournaments().forEach { tournament ->
+                    val lineupsExport: MutableList<LineupExport> = mutableListOf()
+                    val tournamentExport = tournament.toTournamentExport(lineupsExport)
+
+                    val lineups =
+                        lineupDao.getLineupsForTournamentRx(tournament.id, team.id)
+                    if (lineups.isNotEmpty()) {
+                        tournamentsExport.add(tournamentExport)
+                    }
+
+                    lineups.forEach { lineup ->
+                        val positionsExport: MutableList<PlayerPositionExport> = mutableListOf()
+                        val playerNumberOverlays: MutableList<PlayerNumberOverlayExport> =
+                            mutableListOf()
+                        val roster = rosterToUuid(playersUuidMap, lineup.roster)
+                        val lineupExport = lineup.toLineupExport(
+                            positionsExport,
+                            playerNumberOverlays,
+                            roster
+                        )
+                        lineupsExport.add(lineupExport)
+
+                        playerFieldPositionsDao.getAllPlayerFieldPositionsForLineup(lineup.id)
+                            
+                            .forEach {
+                                val positionExport = it.toPlayerFieldPositionsExport(
+                                    playersUuidMap[it.playerId]
+                                )
+                                positionsExport.add(positionExport)
+                            }
+
+                        playerDao.getPlayersNumberOverlay(lineup.id).forEach {
+                            val playerNumberExport = it.toPlayerNumberOverlayExport(
+                                playersUuidMap[it.playerId]
+                            )
+                            playerNumberOverlays.add(playerNumberExport)
+                        }
+                    }
+                }
+            }
+
+            root
+        }
     }
 
     private fun isNetworkUrl(url: String?): Boolean {

@@ -10,7 +10,6 @@ import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class CreateLineup(
@@ -35,9 +34,9 @@ class CreateLineup(
                 }
                 lineup.roster = rosterString
 
-                val team = getTeam().await()
+                val team = getTeam().getOrThrow()
                 lineup.teamId = team.id
-                lineup.id = lineupsDao.insertLineup(lineup).await()
+                lineup.id = lineupsDao.insertLineup(lineup)
                 lineup
             }
         }

@@ -11,42 +11,40 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.telen.easylineup.repository.model.RoomPlayerNumberOverlay
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface PlayerNumberOverlayDao {
     @Query("DELETE FROM playerNumberOverlay")
-    fun deleteAll(): Completable
+    suspend fun deleteAll()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertPlayerNumberOverlay(item: RoomPlayerNumberOverlay): Single<Long>
+    suspend fun insertPlayerNumberOverlay(item: RoomPlayerNumberOverlay): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertPlayerNumberOverlays(items: List<RoomPlayerNumberOverlay>): Completable
+    suspend fun insertPlayerNumberOverlays(items: List<RoomPlayerNumberOverlay>)
 
     @Delete
-    fun deletePlayerNumberOverlay(item: RoomPlayerNumberOverlay): Completable
+    suspend fun deletePlayerNumberOverlay(item: RoomPlayerNumberOverlay)
 
     @Delete
-    fun deletePlayerNumberOverlays(items: List<RoomPlayerNumberOverlay>): Completable
+    suspend fun deletePlayerNumberOverlays(items: List<RoomPlayerNumberOverlay>)
 
     @Update
-    fun updatePlayerNumberOverlay(item: RoomPlayerNumberOverlay): Completable
+    suspend fun updatePlayerNumberOverlay(item: RoomPlayerNumberOverlay)
 
     @Update
-    fun updatePlayerNumberOverlays(items: List<RoomPlayerNumberOverlay>): Completable
+    suspend fun updatePlayerNumberOverlays(items: List<RoomPlayerNumberOverlay>)
 
     @Query("SELECT * FROM playerNumberOverlay WHERE lineupID=:lineupId")
-    fun getPlayerNumberOverlays(lineupId: Long): Single<List<RoomPlayerNumberOverlay>>
+    suspend fun getPlayerNumberOverlays(lineupId: Long): List<RoomPlayerNumberOverlay>
 
     @Query("SELECT * FROM playerNumberOverlay WHERE lineupID=:lineupId")
-    fun observePlayerNumberOverlays(lineupId: Long): Flowable<List<RoomPlayerNumberOverlay>>
+    fun observePlayerNumberOverlays(lineupId: Long): Flow<List<RoomPlayerNumberOverlay>>
 
     @Query("SELECT * from playerNumberOverlay WHERE hash = :hash")
-    fun getPlayerNumberOverlayByHash(hash: String): Single<RoomPlayerNumberOverlay>
+    suspend fun getPlayerNumberOverlayByHash(hash: String): RoomPlayerNumberOverlay
 
     @Query("SELECT * from playerNumberOverlay WHERE playerID=:playerId AND lineupID=:lineupId")
-    fun getShirtNumberOverlay(playerId: Long, lineupId: Long): Single<RoomPlayerNumberOverlay>
+    suspend fun getShirtNumberOverlay(playerId: Long, lineupId: Long): RoomPlayerNumberOverlay
 }

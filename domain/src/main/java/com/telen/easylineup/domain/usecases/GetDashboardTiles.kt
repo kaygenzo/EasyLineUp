@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
@@ -14,12 +13,12 @@ import com.telen.easylineup.domain.model.tiles.MostUsedPlayerData
 import com.telen.easylineup.domain.model.tiles.TeamSizeData
 import com.telen.easylineup.domain.model.tiles.TileData
 import com.telen.easylineup.domain.model.tiles.TileType
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.repository.TilesRepository
-import io.reactivex.rxjava3.core.Maybe
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.withContext
 
 /**
  * Resolves the current team's dashboard tiles, auto-provisioning the default set the first
@@ -32,98 +31,58 @@ class GetDashboardTiles(
     private val tilesRepo: TilesRepository,
     private val getTeam: GetTeam,
     private val createDashboardTiles: CreateDashboardTiles,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(): Single<List<DashboardTile>> {
-        return getTeam()
-            .flatMap { team ->
-                fetchTiles(team).onErrorResumeNext {
-                    if (it is NoSuchElementException) {
-                        createDashboardTiles()
-                            .andThen(fetchTiles(team))
-                    } else {
-                        Single.error(it)
-                    }
-                }
+    suspend operator fun invoke(): Result<List<DashboardTile>> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            val team = getTeam().getOrThrow()
+            try {
+                fetchTiles(team)
+            } catch (e: NoSuchElementException) {
+                createDashboardTiles().getOrThrow()
+                fetchTiles(team)
             }
-            .subscribeOn(schedulersProvider.io())
-    }
-
-    private fun fetchTiles(team: Team): Single<List<DashboardTile>> {
-        return tilesRepo.getTiles().flatMap { tiles ->
-
-            if (tiles.isEmpty()) {
-                val resultError: Single<List<DashboardTile>> = Single.error(NoSuchElementException())
-                return@flatMap resultError
-            }
-
-            val tilesObservables: MutableList<Maybe<DashboardTile>> = mutableListOf()
-            tiles.forEach { tile ->
-                when (tile.type) {
-                    TileType.TEAM_SIZE.type -> tilesObservables.add(getTeamSize(team).map {
-                        tile.apply {
-                            data = it
-                        }
-                    })
-                    TileType.MOST_USED_PLAYER.type -> tilesObservables.add(getMostUsedPlayer(team).map {
-                        tile.apply {
-                            data = it
-                        }
-                    })
-                    TileType.LAST_LINEUP.type -> tilesObservables.add(getLastLineup(team).map {
-                        tile.apply {
-                            data = it
-                        }
-                    })
-                    TileType.LAST_PLAYER_NUMBER.type -> tilesObservables.add(getLastPlayerNumberResearch().map {
-                        tile.apply {
-                            data = it
-                        }
-                    })
-                }
-            }
-            Maybe.concat(tilesObservables)
-                .toList()
         }
     }
 
-    private fun getMostUsedPlayer(team: Team): Maybe<TileData> {
-        return playerFieldPositionDao.getMostUsedPlayers(team.id).toMaybe()
-            .flatMap { list ->
-                try {
-                    val mostUsed = list.first()
-                    playerDao.getPlayerByIdAsSingle(mostUsed.playerId)
-                        .toMaybe()
-                        .map { player ->
-                            MostUsedPlayerData(
-                                player.image,
-                                player.name,
-                                player.shirtNumber,
-                                mostUsed.size
-                            )
-                        }
-                } catch (e: NoSuchElementException) {
-                    e.printStackTrace()
-                    Maybe.empty()
-                }
+    private suspend fun fetchTiles(team: Team): List<DashboardTile> {
+        val tiles = tilesRepo.getTiles()
+
+        if (tiles.isEmpty()) {
+            throw NoSuchElementException()
+        }
+
+        return tiles.mapNotNull { tile ->
+            val data = when (tile.type) {
+                TileType.TEAM_SIZE.type -> getTeamSize(team)
+                TileType.MOST_USED_PLAYER.type -> getMostUsedPlayer(team)
+                TileType.LAST_LINEUP.type -> getLastLineup(team)
+                TileType.LAST_PLAYER_NUMBER.type -> getLastPlayerNumberResearch()
+                else -> null
             }
+            data?.let { tile.apply { this.data = it } }
+        }
     }
 
-    private fun getTeamSize(team: Team): Maybe<TileData> {
-        return playerDao.getPlayersByTeamId(team.id)
-            .toMaybe()
-            .map { TeamSizeData(it.size, teamType = team.type, teamImage = team.image) }
+    private suspend fun getMostUsedPlayer(team: Team): TileData? {
+        val list = playerFieldPositionDao.getMostUsedPlayers(team.id)
+        val mostUsed = list.firstOrNull() ?: return null
+        val player = playerDao.getPlayerByIdAsSingle(mostUsed.playerId)
+        return MostUsedPlayerData(player.image, player.name, player.shirtNumber, mostUsed.size)
     }
 
-    private fun getLastLineup(team: Team): Maybe<TileData> {
-        return lineupDao.getLastLineup(team.id)
-            .flatMap { lineup ->
-                val strategy = TeamStrategy.getStrategyById(lineup.strategy)
-                Maybe.just(LastLineupData(lineup.id, lineup.name, strategy, lineup.extraHitters))
-            }
+    private suspend fun getTeamSize(team: Team): TileData {
+        val players = playerDao.getPlayersByTeamId(team.id)
+        return TeamSizeData(players.size, teamType = team.type, teamImage = team.image)
     }
 
-    private fun getLastPlayerNumberResearch(): Maybe<TileData> {
-        return Maybe.just(LastPlayerNumberResearchData())
+    private suspend fun getLastLineup(team: Team): TileData? {
+        val lineup = lineupDao.getLastLineup(team.id) ?: return null
+        val strategy = TeamStrategy.getStrategyById(lineup.strategy)
+        return LastLineupData(lineup.id, lineup.name, strategy, lineup.extraHitters)
+    }
+
+    private fun getLastPlayerNumberResearch(): TileData {
+        return LastPlayerNumberResearchData()
     }
 }

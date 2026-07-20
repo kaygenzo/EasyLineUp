@@ -7,7 +7,7 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.ObserveTournaments
-import io.reactivex.rxjava3.core.Flowable
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -33,7 +33,7 @@ internal class ObserveTournamentsTests {
     @Test
     fun shouldDelegateToRepository() = runTest {
         val tournaments = listOf<Tournament>()
-        Mockito.`when`(tournamentDao.observeTournaments()).thenReturn(Flowable.just(tournaments))
+        Mockito.`when`(tournamentDao.observeTournaments()).thenReturn(flowOf(tournaments))
 
         val result = observeTournaments().toList()
 

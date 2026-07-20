@@ -9,7 +9,6 @@ import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.ports.DispatcherProvider
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class SetLineupMode(
@@ -24,7 +23,7 @@ class SetLineupMode(
     ): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
             lineup.mode = if (isEnabled) MODE_ENABLED else MODE_DISABLED
-            val team = getTeam().await()
+            val team = getTeam().getOrThrow()
             updatePlayersWithLineupMode(players, lineup, team.type).getOrThrow()
         }
     }

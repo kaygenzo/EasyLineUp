@@ -256,13 +256,17 @@ ActionMode.Callback {
     override fun onDestroyActionMode(mode: ActionMode?) {
         setActionMode(false)
         itemTouchedHelper.attachToRecyclerView(null)
-        launch(viewModel.saveTiles(tileAdapter.currentList), {
-            activity?.run {
-                if (BuildConfig.DEBUG) {
-                    Toast.makeText(this, "Save dashboard success", Toast.LENGTH_SHORT).show()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.saveTiles(tileAdapter.currentList)
+                .onSuccess {
+                    activity?.run {
+                        if (BuildConfig.DEBUG) {
+                            Toast.makeText(this, "Save dashboard success", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
-            }
-        })
+                .onFailure { Timber.e(it) }
+        }
     }
 
     override fun onPause() {

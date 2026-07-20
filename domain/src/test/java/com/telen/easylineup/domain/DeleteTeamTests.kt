@@ -13,8 +13,7 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.DeleteTeam
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -37,20 +36,22 @@ internal class DeleteTeamTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         deleteTeam = DeleteTeam(teamDao, testDispatcherProvider())
         team = Team(id = 1L, name = "toto", type = TeamType.BASEBALL.id, main = true)
         team2 = Team(id = 2L, name = "tata", type = TeamType.SOFTBALL.id, main = false)
         team3 = Team(id = 3L, name = "titi", type = TeamType.SOFTBALL.id, main = false)
         teams = mutableListOf(team2, team3)
-        Mockito.`when`(teamDao.deleteTeam(team)).thenReturn(Completable.complete())
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(teams))
-        Mockito.`when`(teamDao.updateTeam(team2)).thenReturn(Completable.complete())
+        Mockito.`when`(teamDao.deleteTeam(team)).thenReturn(Unit)
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(teams)
+        Mockito.`when`(teamDao.updateTeam(team2)).thenReturn(Unit)
+    }
     }
 
     @Test
     fun shouldTriggerAnExceptionIfItWasTheOnlyTeamInDatabase() = runTest {
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(mutableListOf()))
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(mutableListOf())
         val result = deleteTeam(team)
         assertTrue(result.exceptionOrNull() is NoSuchElementException)
     }

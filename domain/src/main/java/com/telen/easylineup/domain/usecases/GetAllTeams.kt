@@ -4,16 +4,18 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.TeamRepository
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.withContext
 
 class GetAllTeams(
     private val dao: TeamRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(): Single<List<Team>> {
-        return dao.getTeamsRx().subscribeOn(schedulersProvider.io())
+    suspend operator fun invoke(): Result<List<Team>> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            dao.getTeamsRx()
+        }
     }
 }

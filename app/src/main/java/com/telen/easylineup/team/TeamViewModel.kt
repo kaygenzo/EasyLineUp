@@ -14,7 +14,7 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.DeleteTeam
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObservePlayers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -49,7 +50,6 @@ class TeamViewModel : ViewModel(), KoinComponent {
         merge(_playersFromDao, _players).onEach { playerList = it }
     }
     private val _displayType: MutableStateFlow<DisplayType> = MutableStateFlow(DisplayType.GRID)
-    private val disposables = CompositeDisposable()
     private var playerSelectedId = 0L
     var team: Team? = null
     var sortType: SortType = SortType.ALPHA
@@ -71,7 +71,6 @@ class TeamViewModel : ViewModel(), KoinComponent {
     fun observeDisplayType(): Flow<DisplayType> = _displayType
 
     fun clear() {
-        disposables.clear()
     }
 
     fun observeCurrentTeamName(): Flow<String> {
@@ -107,14 +106,14 @@ class TeamViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getCurrentTeam() {
-        val disposable = getTeamUseCase()
-            .subscribe({
-                team = it
-                _team.tryEmit(it)
-            }, {
-                Timber.e(it)
-            })
-        disposables.add(disposable)
+        viewModelScope.launch {
+            getTeamUseCase()
+                .onSuccess {
+                    team = it
+                    _team.tryEmit(it)
+                }
+                .onFailure { Timber.e(it) }
+        }
     }
 
     fun switchDisplayType() {

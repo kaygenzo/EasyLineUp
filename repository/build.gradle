@@ -58,8 +58,6 @@ dependencies {
 
     implementation libs.room.ktx
     ksp libs.room.compiler
-    implementation libs.room.rxjava3
-    implementation libs.rx.java
     implementation libs.koin
     implementation libs.timber
 

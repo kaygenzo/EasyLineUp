@@ -5,19 +5,17 @@
 package com.telen.easylineup.domain.repository
 
 import com.telen.easylineup.domain.model.Tournament
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
 
 interface TournamentRepository {
-    fun getTournaments(): Single<List<Tournament>>
-    fun observeTournaments(): Flowable<List<Tournament>>
-    fun getTournamentByHash(hash: String): Single<Tournament>
-    fun getTournamentByName(name: String): Single<Tournament>
-    fun insertTournament(tournament: Tournament): Single<Long>
-    fun insertTournaments(tournaments: List<Tournament>): Completable
-    fun updateTournament(tournament: Tournament): Completable
-    fun updateTournamentsWithRowCount(tournaments: List<Tournament>): Single<Int>
-    fun deleteTournament(tournament: Tournament): Completable
-    fun deleteTournaments(tournaments: List<Tournament>): Completable
+    suspend fun getTournaments(): List<Tournament>
+    fun observeTournaments(): Flow<List<Tournament>>
+    suspend fun getTournamentByHash(hash: String): Tournament
+    suspend fun getTournamentByName(name: String): Tournament
+    suspend fun insertTournament(tournament: Tournament): Long
+    suspend fun insertTournaments(tournaments: List<Tournament>)
+    suspend fun updateTournament(tournament: Tournament)
+    suspend fun updateTournamentsWithRowCount(tournaments: List<Tournament>): Int
+    suspend fun deleteTournament(tournament: Tournament)
+    suspend fun deleteTournaments(tournaments: List<Tournament>)
 }

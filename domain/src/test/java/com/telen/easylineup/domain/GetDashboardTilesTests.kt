@@ -17,10 +17,10 @@ import com.telen.easylineup.domain.repository.TilesRepository
 import com.telen.easylineup.domain.usecases.CreateDashboardTiles
 import com.telen.easylineup.domain.usecases.GetDashboardTiles
 import com.telen.easylineup.domain.usecases.GetTeam
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,49 +42,47 @@ internal class GetDashboardTilesTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         getDashboardTiles = GetDashboardTiles(
             playerDao,
             lineupDao,
             playerFieldPositionDao,
             tilesRepo,
-            GetTeam(teamDao, testSchedulersProvider()),
-            CreateDashboardTiles(tilesRepo, testSchedulersProvider()),
-            testSchedulersProvider()
+            GetTeam(teamDao, testDispatcherProvider()),
+            CreateDashboardTiles(tilesRepo, testDispatcherProvider()),
+            testDispatcherProvider()
         )
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
+    }
     }
 
     @Test
-    fun shouldReturnExistingTiles() {
+    fun shouldReturnExistingTiles() = runTest {
         val tile = DashboardTile(id = 1L, position = 0, type = TileType.TEAM_SIZE.type)
-        Mockito.`when`(tilesRepo.getTiles()).thenReturn(Single.just(listOf(tile)))
+        Mockito.`when`(tilesRepo.getTiles()).thenReturn(listOf(tile))
         Mockito.`when`(playerDao.getPlayersByTeamId(team.id))
-            .thenReturn(Single.just(listOf(Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L))))
+            .thenReturn(listOf(Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L)))
 
-        val observer = TestObserver<List<DashboardTile>>()
-        getDashboardTiles().subscribe(observer)
-        observer.await()
+        val result = getDashboardTiles()
 
-        observer.assertComplete()
-        assertEquals(1, observer.values().first().size)
+        assertTrue(result.isSuccess)
+        assertEquals(1, result.getOrNull()?.size)
     }
 
     @Test
-    fun shouldCreateDefaultTilesWhenTeamHasNone() {
+    fun shouldCreateDefaultTilesWhenTeamHasNone() = runTest {
         val defaultTile = DashboardTile(id = 1L, position = 1, type = TileType.TEAM_SIZE.type)
         Mockito.`when`(tilesRepo.getTiles())
-            .thenReturn(Single.just(emptyList()), Single.just(listOf(defaultTile)))
-        Mockito.`when`(tilesRepo.createTiles(any())).thenReturn(Completable.complete())
+            .thenReturn(emptyList(), listOf(defaultTile))
+        Mockito.`when`(tilesRepo.createTiles(any())).thenReturn(Unit)
         Mockito.`when`(playerDao.getPlayersByTeamId(team.id))
-            .thenReturn(Single.just(listOf(Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L))))
+            .thenReturn(listOf(Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L)))
 
-        val observer = TestObserver<List<DashboardTile>>()
-        getDashboardTiles().subscribe(observer)
-        observer.await()
+        val result = getDashboardTiles()
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         Mockito.verify(tilesRepo).createTiles(any())
-        assertEquals(1, observer.values().first().size)
+        assertEquals(1, result.getOrNull()?.size)
     }
 }

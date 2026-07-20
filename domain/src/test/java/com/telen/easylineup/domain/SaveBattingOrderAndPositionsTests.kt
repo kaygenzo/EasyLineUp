@@ -17,8 +17,7 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -43,16 +42,17 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
 
     @Before
     fun init() {
+        runBlocking {
         saveBattingOrder = SaveBattingOrderAndPositions(
             lineupRepository, playerFieldPositionRepository, testDispatcherProvider()
         )
-        Mockito.`when`(lineupRepository.updateLineup(lineup)).thenReturn(Completable.complete())
+        Mockito.`when`(lineupRepository.updateLineup(lineup)).thenReturn(Unit)
         Mockito.`when`(playerFieldPositionRepository.updatePlayerFieldPosition(any()))
-            .thenReturn(Completable.complete())
+            .thenReturn(Unit)
         Mockito.`when`(playerFieldPositionRepository.insertPlayerFieldPosition(any()))
-            .thenReturn(Single.just(1L))
+            .thenReturn(1L)
         Mockito.`when`(playerFieldPositionRepository.deletePosition(any()))
-            .thenReturn(Completable.complete())
+            .thenReturn(Unit)
         players = mutableListOf(
             /* old position still acquired */
             generate(1L, FieldPosition.FIRST_BASE, 0, 1),
@@ -64,6 +64,7 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
             /* old position released */
             generate(5L, null, 0, 1),
         )
+    }
     }
 
     suspend fun startUseCase(exception: Class<out Throwable>? = null) {
@@ -90,28 +91,28 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
     @Test
     fun shouldTriggerAnErrorIfCannotSaveLineup() = runTest {
         Mockito.`when`(lineupRepository.updateLineup(any()))
-            .thenReturn(Completable.error(IllegalStateException()))
+            .thenAnswer { throw IllegalStateException() }
         startUseCase(IllegalStateException::class.java)
     }
 
     @Test
     fun shouldTriggerAnErrorIfCannotCreateAtLeastOnePlayer() = runTest {
         Mockito.`when`(playerFieldPositionRepository.insertPlayerFieldPosition(any()))
-            .thenReturn(Single.error(IllegalStateException()))
+            .thenAnswer { throw IllegalStateException() }
         startUseCase(IllegalStateException::class.java)
     }
 
     @Test
     fun shouldTriggerAnErrorIfCannotDeleteAtLeastOnePlayer() = runTest {
         Mockito.`when`(playerFieldPositionRepository.deletePosition(any()))
-            .thenReturn(Completable.error(IllegalStateException()))
+            .thenAnswer { throw IllegalStateException() }
         startUseCase(IllegalStateException::class.java)
     }
 
     @Test
     fun shouldTriggerAnErrorIfCannotUpdateAtLeastOnePlayer() = runTest {
         Mockito.`when`(playerFieldPositionRepository.updatePlayerFieldPosition(any()))
-            .thenReturn(Completable.error(IllegalStateException()))
+            .thenAnswer { throw IllegalStateException() }
         startUseCase(IllegalStateException::class.java)
     }
 

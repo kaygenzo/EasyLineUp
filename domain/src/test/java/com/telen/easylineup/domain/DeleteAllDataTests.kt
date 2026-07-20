@@ -10,9 +10,9 @@ import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.DeleteAllData
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,15 +25,15 @@ import org.mockito.junit.MockitoJUnitRunner
 internal class DeleteAllDataTests {
     private val tournaments: MutableList<Tournament> = mutableListOf()
     private val teams: MutableList<Team> = mutableListOf()
-    private val observer: TestObserver<Void> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     @Mock lateinit var tournamentDao: TournamentRepository
     lateinit var deleteAllData: DeleteAllData
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
-        deleteAllData = DeleteAllData(teamDao, tournamentDao, testSchedulersProvider())
+        deleteAllData = DeleteAllData(teamDao, tournamentDao, testDispatcherProvider())
 
         tournaments.add(Tournament(1, "t1", 1L, 2L, 3L, null))
         tournaments.add(Tournament(2, "t2", 2L, 3L, 4L, null))
@@ -42,48 +42,45 @@ internal class DeleteAllDataTests {
         teams.add(Team(1, "t1", null, TeamType.BASEBALL.id, true))
         teams.add(Team(2, "t2", null, TeamType.SOFTBALL.id, false))
 
-        Mockito.`when`(tournamentDao.getTournaments()).thenReturn(Single.just(tournaments))
-        Mockito.`when`(tournamentDao.deleteTournaments(tournaments)).thenReturn(Completable.complete())
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(teams))
-        Mockito.`when`(teamDao.deleteTeams(teams)).thenReturn(Completable.complete())
+        Mockito.`when`(tournamentDao.getTournaments()).thenReturn(tournaments)
+        Mockito.`when`(tournamentDao.deleteTournaments(tournaments)).thenReturn(Unit)
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(teams)
+        Mockito.`when`(teamDao.deleteTeams(teams)).thenReturn(Unit)
+    }
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfCannotGetTournaments() {
-        Mockito.`when`(tournamentDao.getTournaments()).thenReturn(Single.error(Exception()))
-        deleteAllData().subscribe(observer)
-        observer.await()
-        observer.assertError(Exception::class.java)
+    fun shouldTriggerAnExceptionIfCannotGetTournaments() = runTest {
+        Mockito.`when`(tournamentDao.getTournaments()).thenAnswer { throw Exception() }
+        val result = deleteAllData()
+        assertTrue(result.isFailure)
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfCannotDeleteTournaments() {
-        Mockito.`when`(tournamentDao.deleteTournaments(tournaments)).thenReturn(Completable.error(Exception()))
-        deleteAllData().subscribe(observer)
-        observer.await()
-        observer.assertError(Exception::class.java)
+    fun shouldTriggerAnExceptionIfCannotDeleteTournaments() = runTest {
+        Mockito.`when`(tournamentDao.deleteTournaments(tournaments))
+            .thenAnswer { throw Exception() }
+        val result = deleteAllData()
+        assertTrue(result.isFailure)
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfCannotGetTeams() {
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.error(Exception()))
-        deleteAllData().subscribe(observer)
-        observer.await()
-        observer.assertError(Exception::class.java)
+    fun shouldTriggerAnExceptionIfCannotGetTeams() = runTest {
+        Mockito.`when`(teamDao.getTeamsRx()).thenAnswer { throw Exception() }
+        val result = deleteAllData()
+        assertTrue(result.isFailure)
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfCannotDeleteTeams() {
-        Mockito.`when`(teamDao.deleteTeams(teams)).thenReturn(Completable.error(Exception()))
-        deleteAllData().subscribe(observer)
-        observer.await()
-        observer.assertError(Exception::class.java)
+    fun shouldTriggerAnExceptionIfCannotDeleteTeams() = runTest {
+        Mockito.`when`(teamDao.deleteTeams(teams)).thenAnswer { throw Exception() }
+        val result = deleteAllData()
+        assertTrue(result.isFailure)
     }
 
     @Test
-    fun shouldSuccessfullyDeleteAllData() {
-        deleteAllData().subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+    fun shouldSuccessfullyDeleteAllData() = runTest {
+        val result = deleteAllData()
+        assertTrue(result.isSuccess)
     }
 }

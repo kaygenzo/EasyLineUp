@@ -11,7 +11,6 @@ import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.domain.utils.ValidatorUtils
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 /**
@@ -47,7 +46,7 @@ class SavePlayer(
                 throw InvalidPhoneException()
             }
 
-            val team = getTeam().await()
+            val team = getTeam().getOrThrow()
             val player = Player(
                 id = playerId,
                 teamId = team.id,
@@ -64,11 +63,11 @@ class SavePlayer(
             )
 
             if (player.id == 0L) {
-                dao.insertPlayer(player).await()
+                dao.insertPlayer(player)
             } else {
-                val existing = dao.getPlayerByIdAsSingle(player.id).await()
+                val existing = dao.getPlayerByIdAsSingle(player.id)
                 player.hash = existing.hash
-                dao.updatePlayer(player).await()
+                dao.updatePlayer(player)
             }
         }
     }

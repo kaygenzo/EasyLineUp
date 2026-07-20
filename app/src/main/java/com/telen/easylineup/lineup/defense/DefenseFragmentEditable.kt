@@ -37,12 +37,11 @@ import com.telen.easylineup.views.DpFlexLinkView
 import com.telen.easylineup.views.OnPlayerButtonCallback
 import com.telen.easylineup.views.OnPlayerClickListener
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlayerButtonCallback {
     private var binder: FragmentLineupDefenseEditableBinding? = null
@@ -75,11 +74,12 @@ class DefenseFragmentEditable : BaseFragment("DefenseFragmentEditable"), OnPlaye
                             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
                             .onEach { players ->
                                 val lineupMode = viewModel.lineup?.mode ?: MODE_DISABLED
-                                launch(viewModel.getTeamType().flatMap {
-                                    Completable.timer(100, TimeUnit.MILLISECONDS).andThen(Single.just(it))
-                                }, { teamType ->
-                                    cardDefenseView.setListPlayer(players, lineupMode, teamType)
-                                })
+                                delay(100)
+                                viewModel.getTeamType()
+                                    .onSuccess { teamType ->
+                                        cardDefenseView.setListPlayer(players, lineupMode, teamType)
+                                    }
+                                    .onFailure { Timber.e(it) }
                             }
                             .launchIn(viewLifecycleOwner.lifecycleScope)
                     }

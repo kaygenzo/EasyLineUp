@@ -9,8 +9,7 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.DeletePlayer
 import com.telen.easylineup.domain.usecases.GetPlayer
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -30,6 +29,7 @@ internal class DeletePlayerTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         deletePlayer = DeletePlayer(
             playerDao,
@@ -47,8 +47,9 @@ internal class DeletePlayerTests {
             positions = 1
         )
 
-        Mockito.`when`(playerDao.getPlayerByIdAsSingle(1L)).thenReturn(Single.just(player))
-        Mockito.`when`(playerDao.deletePlayer(player)).thenReturn(Completable.complete())
+        Mockito.`when`(playerDao.getPlayerByIdAsSingle(1L)).thenReturn(player)
+        Mockito.`when`(playerDao.deletePlayer(player)).thenReturn(Unit)
+    }
     }
 
     @Test

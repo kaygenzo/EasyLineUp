@@ -11,7 +11,6 @@ import com.telen.easylineup.domain.model.toPlayerFieldPosition
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class SaveBattingOrderAndPositions(
@@ -26,18 +25,18 @@ class SaveBattingOrderAndPositions(
                     throw IllegalStateException("The lineup id cannot be less or equal 0")
                 }
 
-                lineupRepository.updateLineup(lineup).await()
+                lineupRepository.updateLineup(lineup)
 
                 players.forEach {
                     val playerPosition = it.toPlayerFieldPosition()
                     if (!it.isAssigned() && it.fieldPositionId > 0) {
                         // it is an old position that can be safely removed
-                        pfpRepository.deletePosition(playerPosition).await()
+                        pfpRepository.deletePosition(playerPosition)
                     } else if (it.isAssigned()) {
                         if (playerPosition.id == 0L) {
-                            pfpRepository.insertPlayerFieldPosition(playerPosition).await()
+                            pfpRepository.insertPlayerFieldPosition(playerPosition)
                         } else {
-                            pfpRepository.updatePlayerFieldPosition(playerPosition).await()
+                            pfpRepository.updatePlayerFieldPosition(playerPosition)
                         }
                     }
                 }

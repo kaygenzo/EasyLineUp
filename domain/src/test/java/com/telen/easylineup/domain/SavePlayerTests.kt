@@ -16,8 +16,7 @@ import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.SavePlayer
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.domain.utils.ValidatorUtils
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -39,10 +38,11 @@ internal class SavePlayerTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         savePlayer = SavePlayer(
             playerDao,
-            GetTeam(teamDao, testSchedulersProvider()),
+            GetTeam(teamDao, testDispatcherProvider()),
             ValidatorUtilsMock(),
             testDispatcherProvider()
         )
@@ -60,11 +60,12 @@ internal class SavePlayerTests {
             email = "p1@test.com",
             phone = "001"
         )
-        Mockito.`when`(playerDao.updatePlayer(any())).thenReturn(Completable.complete())
-        Mockito.`when`(playerDao.insertPlayer(any())).thenReturn(Single.just(1))
-        Mockito.`when`(playerDao.getPlayerByIdAsSingle(any())).thenReturn(Single.just(player))
+        Mockito.`when`(playerDao.updatePlayer(any())).thenReturn(Unit)
+        Mockito.`when`(playerDao.insertPlayer(any())).thenReturn(1)
+        Mockito.`when`(playerDao.getPlayerByIdAsSingle(any())).thenReturn(player)
         Mockito.`when`(teamDao.getTeamsRx())
-            .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
+            .thenReturn(listOf(Team(id = 1L, name = "Panthers", main = true)))
+    }
     }
 
     @Test

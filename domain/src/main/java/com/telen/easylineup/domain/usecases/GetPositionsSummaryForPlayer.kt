@@ -7,7 +7,6 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class GetPositionsSummaryForPlayer(
@@ -17,7 +16,7 @@ class GetPositionsSummaryForPlayer(
     suspend operator fun invoke(playerId: Long?): Result<Map<FieldPosition, Int>> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
             val id = playerId ?: throw IllegalArgumentException()
-            val list = dao.getAllPositionsForPlayer(id).await()
+            val list = dao.getAllPositionsForPlayer(id)
             val chartData: MutableMap<FieldPosition, Int> = mutableMapOf()
             list.forEach { position ->
                 val fieldPosition = FieldPosition.getFieldPositionById(position.position)

@@ -4,20 +4,20 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.repository.TournamentRepository
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.withContext
 
 class DeleteAllData(
     private val teamDao: TeamRepository,
     private val tournamentDao: TournamentRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(): Completable {
-        return tournamentDao.getTournaments()
-            .flatMapCompletable { tournamentDao.deleteTournaments(it) }
-            .andThen(teamDao.getTeamsRx().flatMapCompletable { teamDao.deleteTeams(it) })
-            .subscribeOn(schedulersProvider.io())
+    suspend operator fun invoke(): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            tournamentDao.deleteTournaments(tournamentDao.getTournaments())
+            teamDao.deleteTeams(teamDao.getTeamsRx())
+        }
     }
 }

@@ -11,7 +11,7 @@ import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetPlayers
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.GetTeamEmails
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -31,13 +31,15 @@ internal class GetTeamEmailsTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         getTeamEmails = GetTeamEmails(
-            GetPlayers(playerDao, GetTeam(teamDao, testSchedulersProvider()), testDispatcherProvider()),
+            GetPlayers(playerDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider()),
             testDispatcherProvider()
         )
         Mockito.`when`(teamDao.getTeamsRx())
-            .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
+            .thenReturn(listOf(Team(id = 1L, name = "Panthers", main = true)))
+    }
     }
 
     @Test
@@ -45,7 +47,7 @@ internal class GetTeamEmailsTests {
         val withEmail = Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L, email = "a@mail.com")
         val withoutEmail = Player(id = 2L, teamId = 1L, name = "Titi", shirtNumber = 2, licenseNumber = 2L, email = null)
         Mockito.`when`(playerDao.getPlayersByTeamId(1L))
-            .thenReturn(Single.just(listOf(withEmail, withoutEmail)))
+            .thenReturn(listOf(withEmail, withoutEmail))
 
         val result = getTeamEmails()
 

@@ -7,8 +7,8 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetTeam
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -21,41 +21,40 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class GetTeamTests {
     private var teams: MutableList<Team> = mutableListOf()
-    val observer: TestObserver<Team> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     lateinit var getTeam: GetTeam
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
-        getTeam = GetTeam(teamDao, testSchedulersProvider())
+        getTeam = GetTeam(teamDao, testDispatcherProvider())
 
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(teams))
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(teams)
+    }
     }
 
     @Test
-    fun shouldGetTheFirstTeam() {
+    fun shouldGetTheFirstTeam() = runTest {
         teams.add(Team(1, "toto", null, 0, true))
         teams.add(Team(2, "tata", null, 0, false))
         teams.add(Team(3, "titi", null, 0, false))
 
-        getTeam()
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(teams[0], observer.values().first())
+        val result = getTeam()
+
+        Assert.assertTrue(result.isSuccess)
+        Assert.assertEquals(teams[0], result.getOrNull())
     }
 
     @Test
-    fun shouldGetTheLastTeam() {
+    fun shouldGetTheLastTeam() = runTest {
         teams.add(Team(1, "toto", null, 0, false))
         teams.add(Team(2, "tata", null, 0, false))
         teams.add(Team(3, "titi", null, 0, true))
 
-        getTeam()
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(teams[2], observer.values().first())
+        val result = getTeam()
+
+        Assert.assertTrue(result.isSuccess)
+        Assert.assertEquals(teams[2], result.getOrNull())
     }
 }

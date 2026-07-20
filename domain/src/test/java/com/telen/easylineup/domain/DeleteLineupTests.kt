@@ -9,8 +9,7 @@ import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.DeleteLineup
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -30,14 +29,16 @@ internal class DeleteLineupTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         deleteLineup = DeleteLineup(dao, testDispatcherProvider())
 
         lineup1 =
                 Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id, extraHitters, 3L)
 
-        Mockito.`when`(dao.getLineupByIdSingle(1)).thenReturn(Single.just(lineup1))
-        Mockito.`when`(dao.getLineupByIdSingle(2)).thenReturn(Single.error(Exception()))
+        Mockito.`when`(dao.getLineupByIdSingle(1)).thenReturn(lineup1)
+        Mockito.`when`(dao.getLineupByIdSingle(2)).thenAnswer { throw Exception() }
+    }
     }
 
     @Test
@@ -48,7 +49,7 @@ internal class DeleteLineupTests {
 
     @Test
     fun shouldDeleteLineupIfIdExists() = runTest {
-        Mockito.`when`(dao.deleteLineup(lineup1)).thenReturn(Completable.complete())
+        Mockito.`when`(dao.deleteLineup(lineup1)).thenReturn(Unit)
         val result = deleteLineup(1)
         assertTrue(result.isSuccess)
     }
@@ -61,7 +62,7 @@ internal class DeleteLineupTests {
 
     @Test
     fun shouldReturnAnErrorIfLineupExistsButCannotBeDeleted() = runTest {
-        Mockito.`when`(dao.deleteLineup(lineup1)).thenReturn(Completable.error(Exception()))
+        Mockito.`when`(dao.deleteLineup(lineup1)).thenAnswer { throw Exception() }
         val result = deleteLineup(1)
         assertTrue(result.isFailure)
     }

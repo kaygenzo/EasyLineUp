@@ -10,9 +10,8 @@ import com.telen.easylineup.repository.dao.TournamentDao
 import com.telen.easylineup.repository.model.RoomTournament
 import com.telen.easylineup.repository.model.init
 import com.telen.easylineup.repository.model.toTournament
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
 internal class TournamentRepositoryImpl(private val tournamentDao: TournamentDao) : TournamentRepository {
@@ -20,43 +19,43 @@ internal class TournamentRepositoryImpl(private val tournamentDao: TournamentDao
         Timber.i("TournamentRepositoryImpl.init")
     }
 
-    override fun getTournaments(): Single<List<Tournament>> {
-        return tournamentDao.getTournaments().map { it.map { it.toTournament() } }
+    override suspend fun getTournaments(): List<Tournament> {
+        return tournamentDao.getTournaments().map { it.toTournament() }
     }
 
-    override fun observeTournaments(): Flowable<List<Tournament>> {
-        return tournamentDao.observeTournaments().map { it.map { it.toTournament() } }
+    override fun observeTournaments(): Flow<List<Tournament>> {
+        return tournamentDao.observeTournaments().map { list -> list.map { it.toTournament() } }
     }
 
-    override fun getTournamentByHash(hash: String): Single<Tournament> {
-        return tournamentDao.getTournamentByHash(hash).map { it.toTournament() }
+    override suspend fun getTournamentByHash(hash: String): Tournament {
+        return tournamentDao.getTournamentByHash(hash).toTournament()
     }
 
-    override fun getTournamentByName(name: String): Single<Tournament> {
-        return tournamentDao.getTournamentByName(name).map { it.toTournament() }
+    override suspend fun getTournamentByName(name: String): Tournament {
+        return tournamentDao.getTournamentByName(name).toTournament()
     }
 
-    override fun insertTournament(tournament: Tournament): Single<Long> {
+    override suspend fun insertTournament(tournament: Tournament): Long {
         return tournamentDao.insertTournament(RoomTournament().init(tournament))
     }
 
-    override fun insertTournaments(tournaments: List<Tournament>): Completable {
-        return tournamentDao.insertTournaments(tournaments.map { RoomTournament().init(it) })
+    override suspend fun insertTournaments(tournaments: List<Tournament>) {
+        tournamentDao.insertTournaments(tournaments.map { RoomTournament().init(it) })
     }
 
-    override fun updateTournament(tournament: Tournament): Completable {
-        return tournamentDao.updateTournament(RoomTournament().init(tournament))
+    override suspend fun updateTournament(tournament: Tournament) {
+        tournamentDao.updateTournament(RoomTournament().init(tournament))
     }
 
-    override fun updateTournamentsWithRowCount(tournaments: List<Tournament>): Single<Int> {
+    override suspend fun updateTournamentsWithRowCount(tournaments: List<Tournament>): Int {
         return tournamentDao.updateTournamentsWithRowCount(tournaments.map { RoomTournament().init(it) })
     }
 
-    override fun deleteTournament(tournament: Tournament): Completable {
-        return tournamentDao.deleteTournament(RoomTournament().init(tournament))
+    override suspend fun deleteTournament(tournament: Tournament) {
+        tournamentDao.deleteTournament(RoomTournament().init(tournament))
     }
 
-    override fun deleteTournaments(tournaments: List<Tournament>): Completable {
-        return tournamentDao.deleteTournaments(tournaments.map { RoomTournament().init(it) })
+    override suspend fun deleteTournaments(tournaments: List<Tournament>) {
+        tournamentDao.deleteTournaments(tournaments.map { RoomTournament().init(it) })
     }
 }

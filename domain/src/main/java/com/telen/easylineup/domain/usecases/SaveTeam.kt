@@ -8,7 +8,6 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.TeamRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 /**
@@ -29,9 +28,9 @@ class SaveTeam(
             }
 
             if (team.id == 0L) {
-                team.id = dao.insertTeam(team).await()
+                team.id = dao.insertTeam(team)
             } else {
-                dao.updateTeam(team).await()
+                dao.updateTeam(team)
             }
 
             saveCurrentTeam(team).getOrThrow()

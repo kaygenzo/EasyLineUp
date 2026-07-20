@@ -12,7 +12,6 @@ import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournamentException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
-import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -50,8 +49,8 @@ internal class SaveTournamentTests {
     @Test
     fun shouldInsertTournamentWhenNameDoesNotExist() = runTest {
         Mockito.`when`(repository.getTournamentByName("champs"))
-            .thenReturn(Single.error(NoSuchElementException()))
-        Mockito.`when`(repository.insertTournament(any())).thenReturn(Single.just(42L))
+            .thenAnswer { throw NoSuchElementException() }
+        Mockito.`when`(repository.insertTournament(any())).thenReturn(42L)
 
         val result = saveTournament(tournament)
 
@@ -62,7 +61,7 @@ internal class SaveTournamentTests {
     @Test
     fun shouldTriggerAlreadyExistingExceptionAndNotInsertWhenNameAlreadyExists() = runTest {
         val existing = tournament.copy(id = 1L)
-        Mockito.`when`(repository.getTournamentByName("champs")).thenReturn(Single.just(existing))
+        Mockito.`when`(repository.getTournamentByName("champs")).thenReturn(existing)
 
         val result = saveTournament(tournament)
 
@@ -74,8 +73,8 @@ internal class SaveTournamentTests {
     fun shouldPropagateUnrelatedInsertErrors() = runTest {
         val exception = Exception("db error")
         Mockito.`when`(repository.getTournamentByName("champs"))
-            .thenReturn(Single.error(NoSuchElementException()))
-        Mockito.`when`(repository.insertTournament(any())).thenReturn(Single.error(exception))
+            .thenAnswer { throw NoSuchElementException() }
+        Mockito.`when`(repository.insertTournament(any())).thenAnswer { throw exception }
 
         val result = saveTournament(tournament)
 

@@ -16,7 +16,7 @@ import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetTeam
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -39,12 +39,13 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
-        val getRoster = GetRoster(playerDao, lineupDao, GetTeam(teamDao, testSchedulersProvider()), testDispatcherProvider())
+        val getRoster = GetRoster(playerDao, lineupDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
         getListAvailablePlayersForSelection = GetListAvailablePlayersForSelection(getRoster, testDispatcherProvider())
 
         val team = Team(id = 1L, name = "toto", main = true)
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
 
         lineup = Lineup(id = 10L, teamId = team.id, roster = "1;2;3;4;5")
 
@@ -70,10 +71,11 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
             Player(id = 5L, teamId = team.id, name = "p5", shirtNumber = 5, licenseNumber = 5L)
         )
 
-        Mockito.`when`(lineupDao.getLineupByIdSingle(lineup.id)).thenReturn(Single.just(lineup))
-        Mockito.`when`(playerDao.getPlayersByTeamId(team.id)).thenReturn(Single.just(teamPlayers))
+        Mockito.`when`(lineupDao.getLineupByIdSingle(lineup.id)).thenReturn(lineup)
+        Mockito.`when`(playerDao.getPlayersByTeamId(team.id)).thenReturn(teamPlayers)
         Mockito.`when`(playerDao.getPlayersNumberOverlay(lineup.id))
-            .thenReturn(Single.just(emptyList()))
+            .thenReturn(emptyList())
+    }
     }
 
     private suspend fun startUseCase(

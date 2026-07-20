@@ -7,8 +7,7 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.reactive.asFlow
 
 class ObserveTeams(private val dao: TeamRepository) {
-    operator fun invoke(): Flow<List<Team>> = dao.getTeams().asFlow()
+    operator fun invoke(): Flow<List<Team>> = dao.getTeams()
 }

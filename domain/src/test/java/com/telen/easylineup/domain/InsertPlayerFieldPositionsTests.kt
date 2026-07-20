@@ -7,7 +7,6 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.InsertPlayerFieldPositions
-import io.reactivex.rxjava3.core.Completable
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -34,7 +33,7 @@ internal class InsertPlayerFieldPositionsTests {
     fun shouldDelegateToRepository() = runTest {
         val positions = listOf(PlayerFieldPosition(id = 1L, playerId = 1L, lineupId = 10L))
         Mockito.`when`(playerFieldPositionDao.insertPlayerFieldPositions(positions))
-            .thenReturn(Completable.complete())
+            .thenReturn(Unit)
 
         val result = insertPlayerFieldPositions(positions)
 

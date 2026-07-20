@@ -8,7 +8,6 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.exceptions.NotExistingPlayerException
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class GetPlayer(
@@ -21,7 +20,7 @@ class GetPlayer(
             if (id == 0L) {
                 throw NotExistingPlayerException()
             }
-            dao.getPlayerByIdAsSingle(id).await()
+            dao.getPlayerByIdAsSingle(id)
         }
     }
 }

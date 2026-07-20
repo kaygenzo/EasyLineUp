@@ -11,42 +11,40 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.telen.easylineup.repository.model.RoomTournament
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface TournamentDao {
     @Query("DELETE FROM tournaments")
-    fun deleteAll(): Completable
+    suspend fun deleteAll()
 
     @Query("SELECT * from tournaments ORDER BY createdAt DESC")
-    fun getTournaments(): Single<List<RoomTournament>>
+    suspend fun getTournaments(): List<RoomTournament>
 
     @Query("SELECT * from tournaments ORDER BY createdAt DESC")
-    fun observeTournaments(): Flowable<List<RoomTournament>>
+    fun observeTournaments(): Flow<List<RoomTournament>>
 
     @Query("SELECT * from tournaments where hash = :hash")
-    fun getTournamentByHash(hash: String): Single<RoomTournament>
+    suspend fun getTournamentByHash(hash: String): RoomTournament
 
     @Query("SELECT * from tournaments where name = :name")
-    fun getTournamentByName(name: String): Single<RoomTournament>
+    suspend fun getTournamentByName(name: String): RoomTournament
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTournament(tournament: RoomTournament): Single<Long>
+    suspend fun insertTournament(tournament: RoomTournament): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTournaments(tournaments: List<RoomTournament>): Completable
+    suspend fun insertTournaments(tournaments: List<RoomTournament>)
 
     @Update
-    fun updateTournament(tournament: RoomTournament): Completable
+    suspend fun updateTournament(tournament: RoomTournament)
 
     @Update
-    fun updateTournamentsWithRowCount(tournaments: List<RoomTournament>): Single<Int>
+    suspend fun updateTournamentsWithRowCount(tournaments: List<RoomTournament>): Int
 
     @Delete
-    fun deleteTournament(tournament: RoomTournament): Completable
+    suspend fun deleteTournament(tournament: RoomTournament)
 
     @Delete
-    fun deleteTournaments(tournaments: List<RoomTournament>): Completable
+    suspend fun deleteTournaments(tournaments: List<RoomTournament>)
 }

@@ -38,7 +38,9 @@ import com.telen.easylineup.views.OnSearchBarListener
 import io.reactivex.rxjava3.core.Completable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.rxCompletable
+import timber.log.Timber
 
 class LineupsScrollListener(private val view: FloatingActionButton) :
     RecyclerView.OnScrollListener() {
@@ -98,9 +100,11 @@ OnSearchBarListener {
                 .onEach { tournamentsAdapter.setList(it) }
                 .launchIn(viewLifecycleOwner.lifecycleScope)
 
-            launch(viewModel.getTeamType(), {
-                tournamentsAdapter.setTeamType(it)
-            })
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.getTeamType()
+                    .onSuccess { tournamentsAdapter.setTeamType(it) }
+                    .onFailure { Timber.e(it) }
+            }
 
             viewModel.setFilter("")
 

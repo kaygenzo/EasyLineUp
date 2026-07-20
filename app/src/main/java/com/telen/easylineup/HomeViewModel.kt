@@ -14,7 +14,6 @@ import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import kotlinx.coroutines.flow.Flow
@@ -50,14 +49,12 @@ class HomeViewModel : ViewModel(), KoinComponent {
     private val saveCurrentTeam: SaveCurrentTeam by inject()
     private val prefsHelper by inject<SharedPreferencesHelper>()
     private val _event: Subject<Event> = PublishSubject.create()
-    val disposables = CompositeDisposable()
 
     fun registerTeamUpdates(): Flow<List<Team>> {
         return observeTeams().catch { Timber.e(it) }
     }
 
     fun clear() {
-        disposables.clear()
     }
 
     fun observeEvents(): Subject<Event> {
@@ -65,37 +62,36 @@ class HomeViewModel : ViewModel(), KoinComponent {
     }
 
     fun getTeam() {
-        val disposable = getTeamUseCase()
-            .subscribe({
-                _event.onNext(GetTeamSuccess(it))
-            }, {
-                Timber.e(it)
-                _event.onNext(GetTeamFailure)
-            })
-        disposables.add(disposable)
+        viewModelScope.launch {
+            getTeamUseCase()
+                .onSuccess { _event.onNext(GetTeamSuccess(it)) }
+                .onFailure {
+                    Timber.e(it)
+                    _event.onNext(GetTeamFailure)
+                }
+        }
     }
 
     fun getTeamsCount() {
-        val disposable = getAllTeams()
-            .map { it.size }
-            .subscribe({
-                _event.onNext(GetTeamsCountSuccess(it))
-            }, {
-                Timber.e(it)
-                _event.onNext(GetTeamsCountFailure)
-            })
-        disposables.add(disposable)
+        viewModelScope.launch {
+            getAllTeams()
+                .onSuccess { _event.onNext(GetTeamsCountSuccess(it.size)) }
+                .onFailure {
+                    Timber.e(it)
+                    _event.onNext(GetTeamsCountFailure)
+                }
+        }
     }
 
     fun onSwapButtonClicked() {
-        val disposable = getAllTeams()
-            .subscribe({
-                _event.onNext(SwapButtonSuccess(it))
-            }, {
-                Timber.e(it)
-                _event.onNext(SwapButtonFailure)
-            })
-        disposables.add(disposable)
+        viewModelScope.launch {
+            getAllTeams()
+                .onSuccess { _event.onNext(SwapButtonSuccess(it)) }
+                .onFailure {
+                    Timber.e(it)
+                    _event.onNext(SwapButtonFailure)
+                }
+        }
     }
 
     fun updateCurrentTeam(currentTeam: Team) {

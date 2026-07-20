@@ -14,8 +14,7 @@ import com.telen.easylineup.domain.usecases.CheckTeam
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
 import com.telen.easylineup.domain.usecases.SaveTeam
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -40,6 +39,7 @@ internal class SaveTeamTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         saveTeam = SaveTeam(
             teamDao,
@@ -48,10 +48,11 @@ internal class SaveTeamTests {
             testDispatcherProvider()
         )
         team = Team(id = 1L, name = "test", type = TeamType.BASEBALL.id, main = true)
-        Mockito.`when`(teamDao.insertTeam(any())).thenReturn(Single.just(2L))
-        Mockito.`when`(teamDao.updateTeam(any())).thenReturn(Completable.complete())
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
-        Mockito.`when`(teamDao.updateTeams(any())).thenReturn(Completable.complete())
+        Mockito.`when`(teamDao.insertTeam(any())).thenReturn(2L)
+        Mockito.`when`(teamDao.updateTeam(any())).thenReturn(Unit)
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
+        Mockito.`when`(teamDao.updateTeams(any())).thenReturn(Unit)
+    }
     }
 
     @Test

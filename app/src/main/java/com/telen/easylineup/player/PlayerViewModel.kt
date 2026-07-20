@@ -21,7 +21,6 @@ import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.utils.getStrategiesDisplayName
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import kotlinx.coroutines.flow.Flow
@@ -41,7 +40,6 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     private val deletePlayerUseCase: DeletePlayer by inject()
     private val getPlayerPositionsSummaryUseCase: GetPositionsSummaryForPlayer by inject()
     private val errors: Subject<DomainErrors.Players> = PublishSubject.create()
-    private val disposables = CompositeDisposable()
     private val _teamTypeFlow: MutableSharedFlow<Int> =
         MutableSharedFlow<Int>(replay = 1, extraBufferCapacity = 1).apply {
             getTeamType()
@@ -132,15 +130,14 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
 
     private fun getTeamType() {
-        val disposable = getTeamUseCase()
-            .map { it.type }
-            .subscribe({
-                this.teamType = it
-                _teamTypeFlow.tryEmit(it)
-            }, {
-                Timber.e(it)
-            })
-        disposables.add(disposable)
+        viewModelScope.launch {
+            getTeamUseCase()
+                .onSuccess {
+                    this@PlayerViewModel.teamType = it.type
+                    _teamTypeFlow.tryEmit(it.type)
+                }
+                .onFailure { Timber.e(it) }
+        }
     }
 
     fun observeLineups(): Flow<Map<FieldPosition, Int>> {
@@ -148,7 +145,6 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
 
     fun clear() {
-        disposables.clear()
     }
 
     suspend fun savePlayer(

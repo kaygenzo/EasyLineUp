@@ -8,7 +8,7 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PositionWithLineup
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.GetPositionsSummaryForPlayer
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -29,6 +29,7 @@ internal class GetPositionsSummaryForPlayerTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         getPositionsSummaryForPlayer =
             GetPositionsSummaryForPlayer(playerFieldPositionsDao, testDispatcherProvider())
@@ -58,7 +59,8 @@ internal class GetPositionsSummaryForPlayerTests {
         )
 
         Mockito.`when`(playerFieldPositionsDao.getAllPositionsForPlayer(1L))
-            .thenReturn(Single.just(positions))
+            .thenReturn(positions)
+    }
     }
 
     @Test

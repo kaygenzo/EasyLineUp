@@ -7,7 +7,6 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class InsertLineups(
@@ -16,7 +15,7 @@ class InsertLineups(
 ) {
     suspend operator fun invoke(lineups: List<Lineup>): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            dao.insertLineups(lineups).await()
+            dao.insertLineups(lineups)
         }
     }
 }

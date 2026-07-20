@@ -7,7 +7,6 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.InsertTournaments
-import io.reactivex.rxjava3.core.Completable
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -33,7 +32,7 @@ internal class InsertTournamentsTests {
     fun shouldDelegateToRepository() = runTest {
         val tournaments = listOf(Tournament(id = 1L, name = "toto", createdAt = 1L, startTime = 2L, endTime = 3L))
         Mockito.`when`(tournamentDao.insertTournaments(tournaments))
-            .thenReturn(Completable.complete())
+            .thenReturn(Unit)
 
         val result = insertTournaments(tournaments)
 

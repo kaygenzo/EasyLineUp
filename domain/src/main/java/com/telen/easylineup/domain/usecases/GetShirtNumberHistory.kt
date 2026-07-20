@@ -8,7 +8,6 @@ import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.PlayerRepository
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class GetShirtNumberHistory(
@@ -19,16 +18,16 @@ class GetShirtNumberHistory(
     suspend operator fun invoke(number: Int): Result<List<ShirtNumberEntry>> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
             val overlaysAdded: MutableList<ShirtNumberEntry> = mutableListOf()
-            val team = getTeam().await()
+            val team = getTeam().getOrThrow()
             val teamId = team.id
 
-            val shirtNumbers = playersRepo.getShirtNumberFromPlayers(teamId, number).await()
+            val shirtNumbers = playersRepo.getShirtNumberFromPlayers(teamId, number)
             val items = shirtNumbers.map { shirtNumber ->
                 try {
                     val overlay = playersRepo.getShirtNumberOverlay(
                         shirtNumber.playerId,
                         shirtNumber.lineupId
-                    ).await()
+                    )
                     val newItem = ShirtNumberEntry(
                         overlay.number, shirtNumber.playerName, overlay.playerId,
                         shirtNumber.eventTime, shirtNumber.createdAt, overlay.lineupId,
@@ -43,7 +42,7 @@ class GetShirtNumberHistory(
                 }
             }.toMutableList()
 
-            val overlays = playersRepo.getShirtNumberFromNumberOverlays(teamId, number).await()
+            val overlays = playersRepo.getShirtNumberFromNumberOverlays(teamId, number)
             overlays.forEach { overlay ->
                 val first = overlaysAdded.find {
                     it.playerId == overlay.playerId && it.lineupId == overlay.lineupId

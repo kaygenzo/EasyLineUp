@@ -12,8 +12,7 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.UpdateLineupRoster
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -35,11 +34,13 @@ internal class UpdateLineupRosterTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         updateLineupRoster = UpdateLineupRoster(lineupRepository, testDispatcherProvider())
         lineup = Lineup(id = 1L, name = "test", teamId = 1L, tournamentId = 1L)
-        Mockito.`when`(lineupRepository.getLineupByIdSingle(1L)).thenReturn(Single.just(lineup))
-        Mockito.`when`(lineupRepository.updateLineup(any())).thenReturn(Completable.complete())
+        Mockito.`when`(lineupRepository.getLineupByIdSingle(1L)).thenReturn(lineup)
+        Mockito.`when`(lineupRepository.updateLineup(any())).thenReturn(Unit)
+    }
     }
 
     @Test
@@ -75,7 +76,7 @@ internal class UpdateLineupRosterTests {
     @Test
     fun shouldPropagateErrorWhenLineupNotFound() = runTest {
         val exception = Exception("not found")
-        Mockito.`when`(lineupRepository.getLineupByIdSingle(eq(1L))).thenReturn(Single.error(exception))
+        Mockito.`when`(lineupRepository.getLineupByIdSingle(eq(1L))).thenAnswer { throw exception }
 
         val result = updateLineupRoster(1L, emptyList())
 

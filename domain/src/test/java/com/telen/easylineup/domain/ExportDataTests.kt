@@ -26,8 +26,8 @@ import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.CheckHashData
 import com.telen.easylineup.domain.usecases.ExportData
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -40,7 +40,6 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class ExportDataTests {
     private val extraHitters = 0
-    val observer: TestObserver<ExportBase> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     @Mock lateinit var playerDao: PlayerRepository
     @Mock lateinit var tournamentDao: TournamentRepository
@@ -65,14 +64,15 @@ internal class ExportDataTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         val checkHashData = CheckHashData(
             teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao,
-            testSchedulersProvider()
+            testDispatcherProvider()
         )
         export = ExportData(
             checkHashData, teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao,
-            testSchedulersProvider()
+            testDispatcherProvider()
         )
 
         // team 1
@@ -90,53 +90,52 @@ internal class ExportDataTests {
         tournament2 = Tournament(2L, "B", 2L, 3L, 4L, null, "D")
         playerPosition2 = PlayerFieldPosition(2L, 2L, 2L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE, "H")
 
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team1, team2)))
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team1, team2))
 
-        Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(Single.just(listOf(player1)))
-        Mockito.`when`(playerDao.getPlayersByTeamId(2L)).thenReturn(Single.just(listOf(player2)))
+        Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(listOf(player1))
+        Mockito.`when`(playerDao.getPlayersByTeamId(2L)).thenReturn(listOf(player2))
 
-        Mockito.`when`(tournamentDao.getTournaments()).thenReturn(Single.just(listOf(tournament1, tournament2)))
+        Mockito.`when`(tournamentDao.getTournaments()).thenReturn(listOf(tournament1, tournament2))
 
         Mockito.`when`(lineupDao.getLineupsForTournamentRx(1L, 1L))
-            .thenReturn(Single.just(listOf(lineup1)))
+            .thenReturn(listOf(lineup1))
         Mockito.`when`(lineupDao.getLineupsForTournamentRx(2L, 2L))
-            .thenReturn(Single.just(listOf(lineup2)))
+            .thenReturn(listOf(lineup2))
 
         Mockito.`when`(lineupDao.getLineupsForTournamentRx(1L, 2L))
-            .thenReturn(Single.just(listOf()))
+            .thenReturn(listOf())
         Mockito.`when`(lineupDao.getLineupsForTournamentRx(2L, 1L))
-            .thenReturn(Single.just(listOf()))
+            .thenReturn(listOf())
 
         Mockito.`when`(playerPositionsDao.getAllPlayerFieldPositionsForLineup(1L))
-            .thenReturn(Single.just(listOf(playerPosition1)))
+            .thenReturn(listOf(playerPosition1))
         Mockito.`when`(playerPositionsDao.getAllPlayerFieldPositionsForLineup(2L))
-            .thenReturn(Single.just(listOf(playerPosition2)))
+            .thenReturn(listOf(playerPosition2))
 
         Mockito.`when`(playerDao.getPlayersNumberOverlay(1L))
-            .thenReturn(Single.just(listOf(playerNumberOverlay1)))
+            .thenReturn(listOf(playerNumberOverlay1))
         Mockito.`when`(playerDao.getPlayersNumberOverlay(2L))
-            .thenReturn(Single.just(listOf()))
+            .thenReturn(listOf())
 
         // CheckHashData runs first - every fixture already has a non-blank hash, so it finds
         // nothing to update; these repository calls just need a value to not NPE.
-        Mockito.`when`(playerDao.getPlayers()).thenReturn(Single.just(listOf(player1, player2)))
-        Mockito.`when`(playerDao.updatePlayersWithRowCount(any())).thenReturn(Single.just(0))
-        Mockito.`when`(teamDao.updateTeamsWithRowCount(any())).thenReturn(Single.just(0))
-        Mockito.`when`(tournamentDao.updateTournamentsWithRowCount(any())).thenReturn(Single.just(0))
-        Mockito.`when`(lineupDao.getLineups()).thenReturn(Single.just(listOf(lineup1, lineup2)))
-        Mockito.`when`(lineupDao.updateLineupsWithRowCount(any())).thenReturn(Single.just(0))
+        Mockito.`when`(playerDao.getPlayers()).thenReturn(listOf(player1, player2))
+        Mockito.`when`(playerDao.updatePlayersWithRowCount(any())).thenReturn(0)
+        Mockito.`when`(teamDao.updateTeamsWithRowCount(any())).thenReturn(0)
+        Mockito.`when`(tournamentDao.updateTournamentsWithRowCount(any())).thenReturn(0)
+        Mockito.`when`(lineupDao.getLineups()).thenReturn(listOf(lineup1, lineup2))
+        Mockito.`when`(lineupDao.updateLineupsWithRowCount(any())).thenReturn(0)
         Mockito.`when`(playerPositionsDao.getPlayerFieldPositions())
-            .thenReturn(Single.just(listOf(playerPosition1, playerPosition2)))
+            .thenReturn(listOf(playerPosition1, playerPosition2))
         Mockito.`when`(playerPositionsDao.updatePlayerFieldPositionsWithRowCount(any()))
-            .thenReturn(Single.just(0))
+            .thenReturn(0)
+    }
     }
 
     @Test
-    fun shouldExportAllData() {
-        export()
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+    fun shouldExportAllData() = runTest {
+        val result = export()
+        Assert.assertTrue(result.isSuccess)
 
         val root = ExportBase(listOf(
             team1.toTeamExport(
@@ -173,18 +172,16 @@ internal class ExportDataTests {
             )
         ))
 
-        Assert.assertEquals(root, observer.values().first())
+        Assert.assertEquals(root, result.getOrNull())
     }
 
     @Test
-    fun shouldNotExportTournament() {
-        Mockito.`when`(lineupDao.getLineupsForTournamentRx(1L, 1L)).thenReturn(Single.just(listOf(lineup1)))
-        Mockito.`when`(lineupDao.getLineupsForTournamentRx(2L, 2L)).thenReturn(Single.just(listOf()))
+    fun shouldNotExportTournament() = runTest {
+        Mockito.`when`(lineupDao.getLineupsForTournamentRx(1L, 1L)).thenReturn(listOf(lineup1))
+        Mockito.`when`(lineupDao.getLineupsForTournamentRx(2L, 2L)).thenReturn(listOf())
 
-        export()
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+        val result = export()
+        Assert.assertTrue(result.isSuccess)
 
         val root = ExportBase(listOf(
             team1.toTeamExport(
@@ -210,30 +207,28 @@ internal class ExportDataTests {
             )
         ))
 
-        Assert.assertEquals(root, observer.values().first())
+        Assert.assertEquals(root, result.getOrNull())
     }
 
     @Test
-    fun shouldNotExportNonWebUri() {
+    fun shouldNotExportNonWebUri() = runTest {
         team1.image = "file:///test.png"
         team2.image = ""
         player1.image = "http://test.com"
         player2.image = "https://test.com"
 
+        val result = export()
+        Assert.assertTrue(result.isSuccess)
 
-        export()
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-
-        Assert.assertEquals(null, observer.values().first().teams[0].image)
-        Assert.assertEquals(null, observer.values().first().teams[1].image)
-        Assert.assertEquals(player1.image, observer.values().first().teams[0].players[0].image)
-        Assert.assertEquals(player2.image, observer.values().first().teams[1].players[0].image)
+        val exported = result.getOrNull()!!
+        Assert.assertEquals(null, exported.teams[0].image)
+        Assert.assertEquals(null, exported.teams[1].image)
+        Assert.assertEquals(player1.image, exported.teams[0].players[0].image)
+        Assert.assertEquals(player2.image, exported.teams[1].players[0].image)
     }
 
     @Test
-    fun shouldExportAllDataWithMorePlayersOfSameTeamSameLineup() {
+    fun shouldExportAllDataWithMorePlayersOfSameTeamSameLineup() = runTest {
         val player3 = Player(3L, 1L, "A", 3, 3L, null, 1, 0, 0, "p3@test.com", "003", 0, "hash3")
         val player4 = Player(4L, 1L, "B", 4, 4L, null, 1, 0, 0, "p4@test.com", "004", 0, "hash4")
         lineup1.roster = "1;3;4"
@@ -241,14 +236,12 @@ internal class ExportDataTests {
         val playerPosition3 = PlayerFieldPosition(3L, 3L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE, "hash3")
         val playerPosition4 = PlayerFieldPosition(4L, 4L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE, "hash4")
 
-        Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(Single.just(listOf(player1, player3, player4)))
+        Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(listOf(player1, player3, player4))
         Mockito.`when`(playerPositionsDao.getAllPlayerFieldPositionsForLineup(1L))
-            .thenReturn(Single.just(listOf(playerPosition1, playerPosition3, playerPosition4)))
+            .thenReturn(listOf(playerPosition1, playerPosition3, playerPosition4))
 
-        export()
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+        val result = export()
+        Assert.assertTrue(result.isSuccess)
 
         val root = ExportBase(listOf(
             team1.toTeamExport(
@@ -292,6 +285,6 @@ internal class ExportDataTests {
             )
         ))
 
-        Assert.assertEquals(root, observer.values().first())
+        Assert.assertEquals(root, result.getOrNull())
     }
 }

@@ -12,32 +12,30 @@ import androidx.room.Query
 import androidx.room.Update
 
 import com.telen.easylineup.repository.model.RoomTile
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
 
 @Dao
 internal interface TilesDao {
     @Query("DELETE FROM tiles")
-    fun deleteAll(): Completable
+    suspend fun deleteAll()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTile(tile: RoomTile): Single<Long>
+    suspend fun insertTile(tile: RoomTile): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTiles(tiles: List<RoomTile>): Completable
+    suspend fun insertTiles(tiles: List<RoomTile>)
 
     @Delete
-    fun deleteTile(tile: RoomTile): Completable
+    suspend fun deleteTile(tile: RoomTile)
 
     @Delete
-    fun deleteTiles(tiles: List<RoomTile>): Completable
+    suspend fun deleteTiles(tiles: List<RoomTile>)
 
     @Update
-    fun updateTile(tile: RoomTile): Completable
+    suspend fun updateTile(tile: RoomTile)
 
     @Update
-    fun updateTiles(tiles: List<RoomTile>): Completable
+    suspend fun updateTiles(tiles: List<RoomTile>)
 
     @Query("SELECT * FROM tiles ORDER BY position ASC")
-    fun getTiles(): Single<List<RoomTile>>
+    suspend fun getTiles(): List<RoomTile>
 }

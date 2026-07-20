@@ -18,7 +18,7 @@ import com.telen.easylineup.domain.usecases.CreateLineup
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -107,10 +107,14 @@ internal open class CreateLineupTests {
     @Before
     open fun init() {
         MockitoAnnotations.initMocks(this)
-        createLineup = CreateLineup(lineupDao, GetTeam(teamDao, testSchedulersProvider()), testDispatcherProvider())
+        createLineup = CreateLineup(lineupDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
 
-        Mockito.`when`(teamDao.getTeamsRx())
-            .thenReturn(Single.just(listOf(Team(id = 1L, name = "toto", main = true))))
+        runBlocking {
+            Mockito.`when`(teamDao.getTeamsRx())
+                .thenReturn(listOf(Team(id = 1L, name = "toto", main = true)))
+
+            Mockito.`when`(lineupDao.insertLineup(any())).thenReturn(1L)
+        }
 
         lineup = Lineup(
             name = "title",
@@ -124,8 +128,6 @@ internal open class CreateLineupTests {
             RosterPlayerStatus(Player(2, 1, "tata", 1, 1), true, null),
             RosterPlayerStatus(Player(3, 1, "titi", 1, 1), true, null)
         )
-
-        Mockito.`when`(lineupDao.insertLineup(any())).thenReturn(Single.just(1L))
     }
 
     private suspend fun startUseCase(roster: List<RosterPlayerStatus>): Result<Lineup> {

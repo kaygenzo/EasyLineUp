@@ -61,7 +61,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.rx3.rxSingle
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -221,8 +220,8 @@ class LineupViewModel : ViewModel(), KoinComponent {
         return deleteLineupUseCase(lineupId)
     }
 
-    fun getTeamType(): Single<Int> {
-        return getTeamUseCase().map { it.type }
+    suspend fun getTeamType(): Result<Int> {
+        return getTeamUseCase().mapCatching { it.type }
     }
 
     fun onLineupModeChanged(isEnabled: Boolean) {
@@ -365,7 +364,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
                 val batterSize = TeamStrategy.getStrategyById(lineup.strategy).batterSize
                 val extraHitters = lineup.extraHitters
                 flow {
-                    val teamType = getTeamUseCase().await().type
+                    val teamType = getTeamUseCase().getOrThrow().type
                     getBattersStateUseCase(
                         players = players,
                         teamType = teamType,

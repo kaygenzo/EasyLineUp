@@ -8,7 +8,6 @@ import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.RosterItem
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.PlayerRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class SavePlayerNumberOverlay(
@@ -37,9 +36,9 @@ class SavePlayerNumberOverlay(
                     }
                 }
             }
-            playerRepository.deletePlayerNumberOverlays(toDelete).await()
-            playerRepository.updatePlayerNumberOverlays(toUpdate).await()
-            playerRepository.createPlayerNumberOverlays(toAdd).await()
+            playerRepository.deletePlayerNumberOverlays(toDelete)
+            playerRepository.updatePlayerNumberOverlays(toUpdate)
+            playerRepository.createPlayerNumberOverlays(toAdd)
         }
     }
 }

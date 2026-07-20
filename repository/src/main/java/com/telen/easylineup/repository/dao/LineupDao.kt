@@ -12,45 +12,42 @@ import androidx.room.Update
 import com.telen.easylineup.repository.model.RoomLineup
 import com.telen.easylineup.repository.model.RoomPlayerInLineup
 import com.telen.easylineup.repository.model.RoomTournamentWithLineup
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Maybe
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface LineupDao {
     @Query("DELETE FROM lineups")
-    fun deleteAll(): Completable
+    suspend fun deleteAll()
 
     @Insert
-    fun insertLineup(lineup: RoomLineup): Single<Long>
+    suspend fun insertLineup(lineup: RoomLineup): Long
 
     @Insert
-    fun insertLineups(lineups: List<RoomLineup>): Completable
+    suspend fun insertLineups(lineups: List<RoomLineup>)
 
     @Update
-    fun updateLineup(lineup: RoomLineup): Completable
+    suspend fun updateLineup(lineup: RoomLineup)
 
     @Update
-    fun updateLineupsWithRowCount(lineups: List<RoomLineup>): Single<Int>
+    suspend fun updateLineupsWithRowCount(lineups: List<RoomLineup>): Int
 
     @Delete
-    fun deleteLineup(lineup: RoomLineup): Completable
+    suspend fun deleteLineup(lineup: RoomLineup)
 
     @Delete
-    fun deleteLineups(lineups: List<RoomLineup>): Completable
+    suspend fun deleteLineups(lineups: List<RoomLineup>)
 
     @Query("SELECT * FROM lineups")
-    fun getLineups(): Single<List<RoomLineup>>
+    suspend fun getLineups(): List<RoomLineup>
 
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
-    fun getLineupById(lineupId: Long): Flowable<List<RoomLineup>>
+    fun getLineupById(lineupId: Long): Flow<List<RoomLineup>>
 
     @Query("SELECT * FROM lineups WHERE hash = :hash")
-    fun getLineupByHash(hash: String): Single<RoomLineup>
+    suspend fun getLineupByHash(hash: String): RoomLineup
 
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
-    fun getLineupByIdSingle(lineupId: Long): Single<RoomLineup>
+    suspend fun getLineupByIdSingle(lineupId: Long): RoomLineup
 
     @Query(
         """
@@ -58,10 +55,10 @@ internal interface LineupDao {
         WHERE lineups.tournamentID = :tournamentId AND lineups.teamID = :teamId
     """
     )
-    fun getLineupsForTournamentRx(tournamentId: Long, teamId: Long): Single<List<RoomLineup>>
+    suspend fun getLineupsForTournamentRx(tournamentId: Long, teamId: Long): List<RoomLineup>
 
     @Query("SELECT * FROM lineups WHERE teamID = :teamId ORDER BY editedAt DESC LIMIT 1")
-    fun getLastLineup(teamId: Long): Maybe<RoomLineup>
+    suspend fun getLastLineup(teamId: Long): RoomLineup?
 
     @Query(
         """
@@ -89,7 +86,7 @@ internal interface LineupDao {
         ORDER BY tournaments.createdAt DESC
     """
     )
-    fun getAllTournamentsWithLineups(filter: String, teamId: Long): Single<List<RoomTournamentWithLineup>>
+    suspend fun getAllTournamentsWithLineups(filter: String, teamId: Long): List<RoomTournamentWithLineup>
 
     @Query(
         """
@@ -105,5 +102,5 @@ internal interface LineupDao {
         WHERE lineups.teamID = :teamId AND lineups.tournamentID = :tournamentId
     """
     )
-    fun getAllPlayerPositionsForTournament(tournamentId: Long, teamId: Long): Single<List<RoomPlayerInLineup>>
+    suspend fun getAllPlayerPositionsForTournament(tournamentId: Long, teamId: Long): List<RoomPlayerInLineup>
 }

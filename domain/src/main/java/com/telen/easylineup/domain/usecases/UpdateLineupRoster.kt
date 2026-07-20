@@ -7,7 +7,6 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class UpdateLineupRoster(
@@ -18,9 +17,9 @@ class UpdateLineupRoster(
         runCatchingCancellable {
             withContext(dispatcherProvider.io()) {
                 val rosterString = rosterToString(roster)
-                val lineup = lineupRepository.getLineupByIdSingle(lineupId).await()
+                val lineup = lineupRepository.getLineupByIdSingle(lineupId)
                 lineup.roster = rosterString
-                lineupRepository.updateLineup(lineup).await()
+                lineupRepository.updateLineup(lineup)
             }
         }
 

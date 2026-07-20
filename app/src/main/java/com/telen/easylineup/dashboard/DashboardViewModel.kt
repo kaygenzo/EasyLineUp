@@ -19,11 +19,10 @@ import com.telen.easylineup.domain.usecases.SaveDashboardTiles
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -43,14 +42,10 @@ class DashboardViewModel : ViewModel(), KoinComponent {
             getDashboardTilesFlow()
         }
 
-    private fun getDashboardTilesFlow(): Flow<List<DashboardTile>> = callbackFlow {
-        val disposable = getDashboardTilesUseCase()
-            .subscribe({
-                trySend(it)
-            }, {
-                Timber.e(it)
-            })
-        awaitClose { disposable.dispose() }
+    private fun getDashboardTilesFlow(): Flow<List<DashboardTile>> = flow {
+        getDashboardTilesUseCase()
+            .onSuccess { emit(it) }
+            .onFailure { Timber.e(it) }
     }
 
     fun showNewReportIssueButtonFeature(): Single<Boolean> {
@@ -61,7 +56,7 @@ class DashboardViewModel : ViewModel(), KoinComponent {
         return Single.just(show)
     }
 
-    fun saveTiles(tiles: List<DashboardTile>) = saveDashboardTilesUseCase(tiles)
+    suspend fun saveTiles(tiles: List<DashboardTile>) = saveDashboardTilesUseCase(tiles)
 
     suspend fun getShirtNumberHistory(number: Int) = getShirtNumberHistoryUseCase(number)
 

@@ -15,8 +15,7 @@ import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
 import com.telen.easylineup.domain.usecases.GetTeam
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -39,10 +38,11 @@ internal class DeleteTournamentLineupsTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         deleteTournament = DeleteTournamentLineups(
             lineupsDao,
-            GetTeam(teamDao, testSchedulersProvider()),
+            GetTeam(teamDao, testDispatcherProvider()),
             testDispatcherProvider()
         )
 
@@ -59,11 +59,12 @@ internal class DeleteTournamentLineupsTests {
                 strategy = TeamStrategy.STANDARD.id, extraHitters = 0)
         ))
 
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
-        Mockito.`when`(lineupsDao.getLineupsForTournamentRx(tournament.id, team.id)).thenReturn(Single.just(listOf(
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
+        Mockito.`when`(lineupsDao.getLineupsForTournamentRx(tournament.id, team.id)).thenReturn(listOf(
             lineups[0], lineups[1]
-        )))
-        Mockito.`when`(lineupsDao.deleteLineups(any())).thenReturn(Completable.complete())
+        ))
+        Mockito.`when`(lineupsDao.deleteLineups(any())).thenReturn(Unit)
+    }
     }
 
     @Test

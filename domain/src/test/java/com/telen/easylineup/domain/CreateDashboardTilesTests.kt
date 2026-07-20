@@ -10,8 +10,8 @@ import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.tiles.TileType
 import com.telen.easylineup.domain.repository.TilesRepository
 import com.telen.easylineup.domain.usecases.CreateDashboardTiles
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -24,23 +24,24 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class CreateDashboardTilesTests {
-    val observer: TestObserver<Void> = TestObserver()
-    @Mock lateinit var tilesRepo: TilesRepository
+    @Mock
+    lateinit var tilesRepo: TilesRepository
     lateinit var createDashboardTiles: CreateDashboardTiles
 
     @Before
     fun init() {
-        MockitoAnnotations.initMocks(this)
-        createDashboardTiles = CreateDashboardTiles(tilesRepo, testSchedulersProvider())
-        Mockito.`when`(tilesRepo.createTiles(any())).thenReturn(Completable.complete())
+        runBlocking {
+            MockitoAnnotations.initMocks(this)
+            createDashboardTiles = CreateDashboardTiles(tilesRepo, testDispatcherProvider())
+            Mockito.`when`(tilesRepo.createTiles(any())).thenReturn(Unit)
+        }
     }
 
     @Test
-    fun shouldCreateTheFourDefaultTilesAllActive() {
-        createDashboardTiles().subscribe(observer)
-        observer.await()
+    fun shouldCreateTheFourDefaultTilesAllActive() = runTest {
+        val result = createDashboardTiles()
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         val captor = argumentCaptor<List<DashboardTile>>()
         Mockito.verify(tilesRepo).createTiles(captor.capture())
         val tiles = captor.firstValue
@@ -59,11 +60,10 @@ internal class CreateDashboardTilesTests {
     }
 
     @Test
-    fun shouldCreateTilesWithDistinctPositionsStartingAtOne() {
-        createDashboardTiles().subscribe(observer)
-        observer.await()
+    fun shouldCreateTilesWithDistinctPositionsStartingAtOne() = runTest {
+        val result = createDashboardTiles()
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         val captor = argumentCaptor<List<DashboardTile>>()
         Mockito.verify(tilesRepo).createTiles(captor.capture())
 
@@ -71,13 +71,12 @@ internal class CreateDashboardTilesTests {
     }
 
     @Test
-    fun shouldPropagateErrorFromRepository() {
+    fun shouldPropagateErrorFromRepository() = runTest {
         val exception = Exception("db error")
-        Mockito.`when`(tilesRepo.createTiles(any())).thenReturn(Completable.error(exception))
+        Mockito.`when`(tilesRepo.createTiles(any())).thenAnswer { throw exception }
 
-        createDashboardTiles().subscribe(observer)
-        observer.await()
+        val result = createDashboardTiles()
 
-        observer.assertError(exception)
+        assertEquals(exception.message, result.exceptionOrNull()?.message)
     }
 }

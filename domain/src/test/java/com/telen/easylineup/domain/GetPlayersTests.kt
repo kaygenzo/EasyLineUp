@@ -10,7 +10,7 @@ import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetPlayers
 import com.telen.easylineup.domain.usecases.GetTeam
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -30,8 +30,9 @@ internal class GetPlayersTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
-        getPlayers = GetPlayers(playerDao, GetTeam(teamDao, testSchedulersProvider()), testDispatcherProvider())
+        getPlayers = GetPlayers(playerDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
 
         val player1 = Player(id = 1L, teamId = 1L, name = "toto", shirtNumber = 1, licenseNumber = 1, image = null,
             positions = 1)
@@ -41,8 +42,9 @@ internal class GetPlayersTests {
         players = arrayListOf(player1, player2)
 
         Mockito.`when`(teamDao.getTeamsRx())
-            .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
-        Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(Single.just(players))
+            .thenReturn(listOf(Team(id = 1L, name = "Panthers", main = true)))
+        Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(players)
+    }
     }
 
     @Test

@@ -9,8 +9,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -31,6 +30,7 @@ internal class SaveCurrentTeamTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         saveCurrentTeam = SaveCurrentTeam(teamDao, testDispatcherProvider())
 
@@ -39,8 +39,9 @@ internal class SaveCurrentTeamTests {
         teams.add(Team(2, "tata", null, 0, true))
         teams.add(Team(3, "titi", null, 0, true))
 
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(teams))
-        Mockito.`when`(teamDao.updateTeams(teams)).thenReturn(Completable.complete())
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(teams)
+        Mockito.`when`(teamDao.updateTeams(teams)).thenReturn(Unit)
+    }
     }
 
     @Test

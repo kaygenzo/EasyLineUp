@@ -18,7 +18,6 @@ import com.telen.easylineup.domain.model.getPositionPercentage
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.model.reset
 import com.telen.easylineup.domain.ports.DispatcherProvider
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class AssignPlayerFieldPosition(
@@ -32,7 +31,7 @@ class AssignPlayerFieldPosition(
         players: List<PlayerWithPosition>
     ): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            val team = getTeam().await()
+            val team = getTeam().getOrThrow()
             val lineupMode = lineup.mode
             val strategy = TeamStrategy.getStrategyById(lineup.strategy)
             val batterSize = strategy.batterSize

@@ -9,7 +9,6 @@ import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.UpdateLineup
-import io.reactivex.rxjava3.core.Completable
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -35,7 +34,7 @@ internal class UpdateLineupTests {
 
     @Test
     fun shouldUpdateLineupThroughRepository() = runTest {
-        Mockito.`when`(lineupRepo.updateLineup(lineup)).thenReturn(Completable.complete())
+        Mockito.`when`(lineupRepo.updateLineup(lineup)).thenReturn(Unit)
 
         val result = updateLineup(lineup)
 
@@ -46,7 +45,7 @@ internal class UpdateLineupTests {
     @Test
     fun shouldPropagateErrorFromRepository() = runTest {
         val exception = Exception("db error")
-        Mockito.`when`(lineupRepo.updateLineup(lineup)).thenReturn(Completable.error(exception))
+        Mockito.`when`(lineupRepo.updateLineup(lineup)).thenAnswer { throw exception }
 
         val result = updateLineup(lineup)
 

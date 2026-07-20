@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerFieldPosition
@@ -18,16 +17,14 @@ import com.telen.easylineup.domain.model.export.PlayerNumberOverlayExport
 import com.telen.easylineup.domain.model.export.PlayerPositionExport
 import com.telen.easylineup.domain.model.export.TeamExport
 import com.telen.easylineup.domain.model.export.TournamentExport
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.repository.TournamentRepository
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
-
-import java.lang.Exception
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 /**
@@ -42,105 +39,83 @@ class ImportData(
     private val tournamentDao: TournamentRepository,
     private val lineupDao: LineupRepository,
     private val playerFieldPositionsDao: PlayerFieldPositionRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(exportBase: ExportBase, updateIfExists: Boolean): Single<ImportResult> {
-        val insertedArray = intArrayOf(0, 0, 0, 0, 0, 0)
-        val updatedArray = intArrayOf(0, 0, 0, 0, 0, 0)
-        return Single.just(exportBase)
-            .flatMapObservable { Observable.fromIterable(it.teams) }
-            .flatMapCompletable { teamExport ->
-                processTeam(teamExport, insertedArray, updatedArray, updateIfExists)
-                    .flatMapCompletable { team ->
-                        Observable.fromIterable(teamExport.players)
-                            .flatMapSingle { playerExport ->
-                                processPlayer(
-                                    playerExport,
-                                    team.id,
-                                    insertedArray,
-                                    updatedArray,
-                                    updateIfExists
-                                )
-                            }
-                            .toList().map {
-                                val map: MutableMap<String, Long> = mutableMapOf()
-                                it.forEach { p ->
-                                    map[p.hash ?: UUID.randomUUID().toString()] = p.id
-                                }
-                                map
-                            }
-                            .flatMapCompletable { playerIdMap ->
-                                Observable.fromIterable(teamExport.tournaments)
-                                    .flatMapCompletable { tournamentExport ->
-                                        processTournament(
-                                            tournamentExport,
-                                            insertedArray,
-                                            updatedArray,
-                                            updateIfExists
-                                        )
-                                            .flatMapCompletable { tournament ->
-                                                Observable.fromIterable(tournamentExport.lineups)
-                                                    .flatMapCompletable { lineupExport ->
-                                                        processLineup(
-                                                            lineupExport,
-                                                            team.id,
-                                                            tournament.id,
-                                                            playerIdMap,
-                                                            insertedArray,
-                                                            updatedArray,
-                                                            updateIfExists
-                                                        )
-                                                            .flatMapCompletable { lineup ->
-                                                                val positions =
-                                                                    lineupExport.playerPositions
-                                                                val playerPositionsCompletable =
-                                                                    Observable.fromIterable(
-                                                                        positions
-                                                                    )
-                                                                        .flatMapCompletable {
-                                                                            processPlayerFieldPosition(
-                                                                                it,
-                                                                                playerIdMap,
-                                                                                lineup.id,
-                                                                                insertedArray,
-                                                                                updatedArray,
-                                                                                updateIfExists
-                                                                            )
-                                                                        }
-                                                                val overlays =
-                                                                    lineupExport.playerNumberOverlays
-                                                                        ?: listOf()
-                                                                val playerNumberOverlayCompletable =
-                                                                    Observable.fromIterable(overlays)
-                                                                        .flatMapCompletable {
-                                                                            processPlayerNumberOverlays(
-                                                                                it,
-                                                                                playerIdMap,
-                                                                                lineup.id,
-                                                                                insertedArray,
-                                                                                updatedArray,
-                                                                                updateIfExists
-                                                                            )
-                                                                        }
-                                                                playerPositionsCompletable
-                                                                    .andThen(
-                                                                        playerNumberOverlayCompletable
-                                                                    )
-                                                            }
-                                                    }
-                                            }
-                                    }
-                            }
+    suspend operator fun invoke(
+        exportBase: ExportBase,
+        updateIfExists: Boolean
+    ): Result<ImportResult> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            val insertedArray = intArrayOf(0, 0, 0, 0, 0, 0)
+            val updatedArray = intArrayOf(0, 0, 0, 0, 0, 0)
+
+            exportBase.teams.forEach { teamExport ->
+                val team = processTeam(teamExport, insertedArray, updatedArray, updateIfExists)
+
+                val playerIdMap: MutableMap<String, Long> = mutableMapOf()
+                teamExport.players.forEach { playerExport ->
+                    val player = processPlayer(
+                        playerExport,
+                        team.id,
+                        insertedArray,
+                        updatedArray,
+                        updateIfExists
+                    )
+                    playerIdMap[player.hash ?: UUID.randomUUID().toString()] = player.id
+                }
+
+                teamExport.tournaments.forEach { tournamentExport ->
+                    val tournament = processTournament(
+                        tournamentExport,
+                        insertedArray,
+                        updatedArray,
+                        updateIfExists
+                    )
+
+                    tournamentExport.lineups.forEach { lineupExport ->
+                        val lineup = processLineup(
+                            lineupExport,
+                            team.id,
+                            tournament.id,
+                            playerIdMap,
+                            insertedArray,
+                            updatedArray,
+                            updateIfExists
+                        )
+
+                        lineupExport.playerPositions.forEach {
+                            processPlayerFieldPosition(
+                                it,
+                                playerIdMap,
+                                lineup.id,
+                                insertedArray,
+                                updatedArray,
+                                updateIfExists
+                            )
+                        }
+
+                        (lineupExport.playerNumberOverlays ?: listOf()).forEach {
+                            processPlayerNumberOverlays(
+                                it,
+                                playerIdMap,
+                                lineup.id,
+                                insertedArray,
+                                updatedArray,
+                                updateIfExists
+                            )
+                        }
                     }
+                }
             }
-            .andThen(Single.just(ImportResult(insertedArray, updatedArray)))
-            .subscribeOn(schedulersProvider.io())
+
+            ImportResult(insertedArray, updatedArray)
+        }
     }
 
-    private fun processTeam(
+    private suspend fun processTeam(
         teamExport: TeamExport, insertedArray: IntArray, updatedArray: IntArray,
         updateIfExists: Boolean
-    ): Single<Team> {
+    ): Team {
         val t = Team(
             0L,
             teamExport.name,
@@ -150,29 +125,29 @@ class ImportData(
             teamExport.id
         )
 
-        return teamDao.getTeamByHash(teamExport.id)
-            .flatMap { teamDb ->
-                if (updateIfExists) {
-                    updatedArray[RESULT_TEAMS_INDEX] += 1
-                    t.id = teamDb.id
-                    teamDao.updateTeam(t).andThen(Single.just(t))
-                } else {
-                    Single.just(teamDb)
-                }
+        return try {
+            val teamDb = teamDao.getTeamByHash(teamExport.id)
+            if (updateIfExists) {
+                updatedArray[RESULT_TEAMS_INDEX] += 1
+                t.id = teamDb.id
+                teamDao.updateTeam(t)
+                t
+            } else {
+                teamDb
             }
-            .onErrorResumeNext {
-                insertedArray[RESULT_TEAMS_INDEX] += 1
-                teamDao.insertTeam(t).map {
-                    t.id = it
-                    t
-                }
-            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            insertedArray[RESULT_TEAMS_INDEX] += 1
+            t.id = teamDao.insertTeam(t)
+            t
+        }
     }
 
-    private fun processPlayer(
+    private suspend fun processPlayer(
         playerExport: PlayerExport, teamId: Long, insertedArray: IntArray, updatedArray: IntArray,
         updateIfExists: Boolean
-    ): Single<Player> {
+    ): Player {
         val licenseNumber = try {
             playerExport.licenseNumber.toLong()
         } catch (e: Exception) {
@@ -195,60 +170,59 @@ class ImportData(
             hash = playerExport.id
         )
 
-        return playerDao.getPlayerByHash(playerExport.id)
-            .flatMap { playerDb ->
-                if (updateIfExists) {
-                    updatedArray[RESULT_PLAYERS_INDEX] += 1
-                    p.id = playerDb.id
-                    playerDao.updatePlayer(p).andThen(Single.just(p))
-                } else {
-                    Single.just(playerDb)
-                }
+        return try {
+            val playerDb = playerDao.getPlayerByHash(playerExport.id)
+            if (updateIfExists) {
+                updatedArray[RESULT_PLAYERS_INDEX] += 1
+                p.id = playerDb.id
+                playerDao.updatePlayer(p)
+                p
+            } else {
+                playerDb
             }
-            .onErrorResumeNext {
-                insertedArray[RESULT_PLAYERS_INDEX] += 1
-                playerDao.insertPlayer(p).map {
-                    p.id = it
-                    p
-                }
-            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            insertedArray[RESULT_PLAYERS_INDEX] += 1
+            p.id = playerDao.insertPlayer(p)
+            p
+        }
     }
 
-    private fun processTournament(
+    private suspend fun processTournament(
         export: TournamentExport, insertedArray: IntArray, updatedArray: IntArray,
         updateIfExists: Boolean
-    ): Single<Tournament> {
+    ): Tournament {
         val t = Tournament(
             0L, export.name, export.createdAt, export.startTime, export.endTime,
             export.address, export.id
         )
 
-        return tournamentDao.getTournamentByHash(export.id)
-            .flatMap { tournamentDb ->
-                if (updateIfExists) {
-                    updatedArray[RESULT_TOURNAMENTS_INDEX] += 1
-                    t.id = tournamentDb.id
-                    tournamentDao.updateTournament(t).andThen(Single.just(t))
-                } else {
-                    Single.just(tournamentDb)
-                }
+        return try {
+            val tournamentDb = tournamentDao.getTournamentByHash(export.id)
+            if (updateIfExists) {
+                updatedArray[RESULT_TOURNAMENTS_INDEX] += 1
+                t.id = tournamentDb.id
+                tournamentDao.updateTournament(t)
+                t
+            } else {
+                tournamentDb
             }
-            .onErrorResumeNext {
-                insertedArray[RESULT_TOURNAMENTS_INDEX] += 1
-                tournamentDao.insertTournament(t)
-                    .map {
-                        t.id = it
-                        t
-                    }
-            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            insertedArray[RESULT_TOURNAMENTS_INDEX] += 1
+            t.id = tournamentDao.insertTournament(t)
+            t
+        }
     }
 
-    private fun processLineup(
+    private suspend fun processLineup(
         lineup: LineupExport, teamId: Long, tournamentId: Long,
         players: Map<String, Long>,
         insertedArray: IntArray, updatedArray: IntArray,
         updateIfExists: Boolean
-    ): Single<Lineup> {
+    ): Lineup {
         val newLineup = Lineup(
             0L,
             lineup.name,
@@ -264,23 +238,23 @@ class ImportData(
             lineup.id
         )
 
-        return lineupDao.getLineupByHash(lineup.id)
-            .flatMap { lineupDb ->
-                if (updateIfExists) {
-                    updatedArray[RESULT_LINEUPS_INDEX] += 1
-                    newLineup.id = lineupDb.id
-                    lineupDao.updateLineup(newLineup).andThen(Single.just(newLineup))
-                } else {
-                    Single.just(lineupDb)
-                }
+        return try {
+            val lineupDb = lineupDao.getLineupByHash(lineup.id)
+            if (updateIfExists) {
+                updatedArray[RESULT_LINEUPS_INDEX] += 1
+                newLineup.id = lineupDb.id
+                lineupDao.updateLineup(newLineup)
+                newLineup
+            } else {
+                lineupDb
             }
-            .onErrorResumeNext {
-                insertedArray[RESULT_LINEUPS_INDEX] += 1
-                lineupDao.insertLineup(newLineup).map {
-                    newLineup.id = it
-                    newLineup
-                }
-            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            insertedArray[RESULT_LINEUPS_INDEX] += 1
+            newLineup.id = lineupDao.insertLineup(newLineup)
+            newLineup
+        }
     }
 
     private fun rosterToString(roster: List<String>?, players: Map<String, Long>): String? {
@@ -296,53 +270,51 @@ class ImportData(
         return builder.toString()
     }
 
-    private fun processPlayerFieldPosition(
+    private suspend fun processPlayerFieldPosition(
         export: PlayerPositionExport, players: Map<String, Long>, lineupId: Long,
         insertedArray: IntArray, updatedArray: IntArray,
         updateIfExists: Boolean
-    ): Completable {
+    ) {
         val p = PlayerFieldPosition(
             0L, players[export.playerId] ?: 0L, lineupId,
             export.position, export.x, export.y, export.order, export.flags, export.id
         )
 
-        return playerFieldPositionsDao.getPlayerFieldPositionByHash(export.id)
-            .flatMapCompletable {
-                if (updateIfExists) {
-                    updatedArray[RESULT_PLAYER_POSITION_INDEX] += 1
-                    p.id = it.id
-                    playerFieldPositionsDao.updatePlayerFieldPosition(p)
-                } else {
-                    Completable.complete()
-                }
+        try {
+            val positionDb = playerFieldPositionsDao.getPlayerFieldPositionByHash(export.id)
+            if (updateIfExists) {
+                updatedArray[RESULT_PLAYER_POSITION_INDEX] += 1
+                p.id = positionDb.id
+                playerFieldPositionsDao.updatePlayerFieldPosition(p)
             }
-            .onErrorResumeNext {
-                insertedArray[RESULT_PLAYER_POSITION_INDEX] += 1
-                playerFieldPositionsDao.insertPlayerFieldPosition(p).ignoreElement()
-            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            insertedArray[RESULT_PLAYER_POSITION_INDEX] += 1
+            playerFieldPositionsDao.insertPlayerFieldPosition(p)
+        }
     }
 
-    private fun processPlayerNumberOverlays(
+    private suspend fun processPlayerNumberOverlays(
         export: PlayerNumberOverlayExport, players: Map<String, Long>, lineupId: Long,
         insertedArray: IntArray, updatedArray: IntArray,
         updateIfExists: Boolean
-    ): Completable {
+    ) {
         val p = PlayerNumberOverlay(0L, lineupId, players[export.playerId] ?: 0L, export.number)
 
-        return playerDao.getPlayerNumberOverlayByHash(export.id)
-            .flatMapCompletable {
-                if (updateIfExists) {
-                    updatedArray[RESULT_PLAYER_NUMBER_OVERLAY_INDEX] += 1
-                    p.id = it.id
-                    playerDao.updatePlayerNumberOverlay(p)
-                } else {
-                    Completable.complete()
-                }
+        try {
+            val overlayDb = playerDao.getPlayerNumberOverlayByHash(export.id)
+            if (updateIfExists) {
+                updatedArray[RESULT_PLAYER_NUMBER_OVERLAY_INDEX] += 1
+                p.id = overlayDb.id
+                playerDao.updatePlayerNumberOverlay(p)
             }
-            .onErrorResumeNext {
-                insertedArray[RESULT_PLAYER_NUMBER_OVERLAY_INDEX] += 1
-                playerDao.createPlayerNumberOverlay(p)
-            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            insertedArray[RESULT_PLAYER_NUMBER_OVERLAY_INDEX] += 1
+            playerDao.createPlayerNumberOverlay(p)
+        }
     }
 
     companion object {

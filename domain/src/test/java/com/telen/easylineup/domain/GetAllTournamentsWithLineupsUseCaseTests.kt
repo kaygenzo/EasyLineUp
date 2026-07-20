@@ -9,7 +9,7 @@ import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineupsUseCase
 import com.telen.easylineup.domain.usecases.GetTeam
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -30,21 +30,23 @@ internal class GetAllTournamentsWithLineupsUseCaseTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         team = Team(id = 1L, name = "toto", main = true)
         getAllTournamentsWithLineups = GetAllTournamentsWithLineupsUseCase(
             lineupDao,
-            GetTeam(teamDao, testSchedulersProvider()),
+            GetTeam(teamDao, testDispatcherProvider()),
             testDispatcherProvider()
         )
 
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
+    }
     }
 
     @Test
     fun shouldReturnEmptyListWhenNoTournamentsForCurrentTeam() = runTest {
         Mockito.`when`(lineupDao.getAllTournamentsWithLineups("summer", team.id))
-            .thenReturn(Single.just(emptyList()))
+            .thenReturn(emptyList())
 
         val result = getAllTournamentsWithLineups("summer")
 

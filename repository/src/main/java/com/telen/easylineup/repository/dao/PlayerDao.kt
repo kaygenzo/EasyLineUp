@@ -13,50 +13,48 @@ import androidx.room.Update
 import com.telen.easylineup.repository.model.RoomPlayer
 import com.telen.easylineup.repository.model.RoomPlayerWithPosition
 import com.telen.easylineup.repository.model.RoomShirtNumberEntry
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface PlayerDao {
     @Query("DELETE FROM players")
-    fun deleteAll(): Completable
+    suspend fun deleteAll()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertPlayer(player: RoomPlayer): Single<Long>
+    suspend fun insertPlayer(player: RoomPlayer): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertPlayers(players: List<RoomPlayer>): Completable
+    suspend fun insertPlayers(players: List<RoomPlayer>)
 
     @Delete
-    fun deletePlayer(player: RoomPlayer): Completable
+    suspend fun deletePlayer(player: RoomPlayer)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun updatePlayer(player: RoomPlayer): Completable
+    suspend fun updatePlayer(player: RoomPlayer)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun updatePlayersWithRowCount(players: List<RoomPlayer>): Single<Int>
+    suspend fun updatePlayersWithRowCount(players: List<RoomPlayer>): Int
 
     @Query("SELECT * from players WHERE hash = :hash")
-    fun getPlayerByHash(hash: String): Single<RoomPlayer>
+    suspend fun getPlayerByHash(hash: String): RoomPlayer
 
     @Query("SELECT * from players WHERE id = :playerId")
-    fun getPlayerById(playerId: Long): Flowable<List<RoomPlayer>>
+    fun getPlayerById(playerId: Long): Flow<List<RoomPlayer>>
 
     @Query("SELECT * from players WHERE id = :playerId")
-    fun getPlayerByIdAsSingle(playerId: Long): Single<RoomPlayer>
+    suspend fun getPlayerByIdAsSingle(playerId: Long): RoomPlayer
 
     // @Query("SELECT * FROM players WHERE players.teamID = :teamID")
     // fun getPlayers(teamID: Long): LiveData<List<Player>>
 
     @Query("SELECT * FROM players WHERE players.teamID = :teamId")
-    fun getPlayersByTeamId(teamId: Long): Single<List<RoomPlayer>>
+    suspend fun getPlayersByTeamId(teamId: Long): List<RoomPlayer>
 
     @Query("SELECT * FROM players")
-    fun getPlayers(): Single<List<RoomPlayer>>
+    suspend fun getPlayers(): List<RoomPlayer>
 
     @Query("SELECT * FROM players WHERE players.teamID = :teamId")
-    fun getPlayersAsFlowable(teamId: Long): Flowable<List<RoomPlayer>>
+    fun getPlayersAsFlowable(teamId: Long): Flow<List<RoomPlayer>>
 
     @Query(
         """
@@ -79,7 +77,7 @@ internal interface PlayerDao {
         ORDER BY result.playerID
     """
     )
-    fun getTeamPlayersAndMaybePositions(lineupId: Long): Flowable<List<RoomPlayerWithPosition>>
+    fun getTeamPlayersAndMaybePositions(lineupId: Long): Flow<List<RoomPlayerWithPosition>>
 
     @Query(
         """
@@ -96,10 +94,10 @@ internal interface PlayerDao {
         WHERE players.teamID = :teamId AND lineupID > 0 AND number = :number;
     """
     )
-    fun getShirtNumberHistoryFromPlayers(
+    suspend fun getShirtNumberHistoryFromPlayers(
         teamId: Long,
         number: Int
-    ): Single<List<RoomShirtNumberEntry>>
+    ): List<RoomShirtNumberEntry>
 
     @Query(
         """
@@ -116,8 +114,8 @@ internal interface PlayerDao {
         WHERE players.teamID = :teamId AND number = :number;
     """
     )
-    fun getShirtNumberHistoryFromOverlays(
+    suspend fun getShirtNumberHistoryFromOverlays(
         teamId: Long,
         number: Int
-    ): Single<List<RoomShirtNumberEntry>>
+    ): List<RoomShirtNumberEntry>
 }

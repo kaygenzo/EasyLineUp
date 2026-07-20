@@ -11,42 +11,40 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.telen.easylineup.repository.model.RoomTeam
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 internal interface TeamDao {
     @Query("DELETE FROM teams")
-    fun deleteAll(): Completable
+    suspend fun deleteAll()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTeam(team: RoomTeam): Single<Long>
+    suspend fun insertTeam(team: RoomTeam): Long
 
     @Delete
-    fun deleteTeam(team: RoomTeam): Completable
+    suspend fun deleteTeam(team: RoomTeam)
 
     @Delete
-    fun deleteTeams(teams: List<RoomTeam>): Completable
+    suspend fun deleteTeams(teams: List<RoomTeam>)
 
     @Update
-    fun updateTeam(team: RoomTeam): Completable
+    suspend fun updateTeam(team: RoomTeam)
 
     @Update
-    fun updateTeams(teams: List<RoomTeam>): Completable
+    suspend fun updateTeams(teams: List<RoomTeam>)
 
     @Update
-    fun updateTeamsWithRowCount(teams: List<RoomTeam>): Single<Int>
+    suspend fun updateTeamsWithRowCount(teams: List<RoomTeam>): Int
 
     @Query("SELECT * FROM teams WHERE id = :teamId")
-    fun getTeamById(teamId: Long): Single<RoomTeam>
+    suspend fun getTeamById(teamId: Long): RoomTeam
 
     @Query("SELECT * FROM teams WHERE hash = :hash")
-    fun getTeamByHash(hash: String): Single<RoomTeam>
+    suspend fun getTeamByHash(hash: String): RoomTeam
 
     @Query("SELECT * FROM teams")
-    fun getTeams(): Flowable<List<RoomTeam>>
+    fun getTeams(): Flow<List<RoomTeam>>
 
     @Query("SELECT * FROM teams")
-    fun getTeamsRx(): Single<List<RoomTeam>>
+    suspend fun getTeamsRx(): List<RoomTeam>
 }

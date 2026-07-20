@@ -17,7 +17,6 @@ import com.telen.easylineup.domain.model.isFlex
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.exceptions.FirstPositionEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.SamePlayerException
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class SwitchPlayersPosition(
@@ -31,7 +30,7 @@ class SwitchPlayersPosition(
         lineup: Lineup
     ): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            val team = getTeam().await()
+            val team = getTeam().getOrThrow()
             val mutablePlayers = players.toMutableList()
             val extraHittersSize = lineup.extraHitters
             val lineupMode = lineup.mode

@@ -7,7 +7,6 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.PlayerRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class InsertPlayers(
@@ -16,7 +15,7 @@ class InsertPlayers(
 ) {
     suspend operator fun invoke(players: List<Player>): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            dao.insertPlayers(players).await()
+            dao.insertPlayers(players)
         }
     }
 }

@@ -8,7 +8,7 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.GetPlayer
 import com.telen.easylineup.domain.usecases.exceptions.NotExistingPlayerException
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -29,6 +29,7 @@ internal class GetPlayerTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         getPlayer = GetPlayer(playerDao, testDispatcherProvider())
 
@@ -42,8 +43,9 @@ internal class GetPlayerTests {
             positions = 1
         )
 
-        Mockito.`when`(playerDao.getPlayerByIdAsSingle(1L)).thenReturn(Single.just(player))
-        Mockito.`when`(playerDao.getPlayerByIdAsSingle(2L)).thenReturn(Single.error(Exception()))
+        Mockito.`when`(playerDao.getPlayerByIdAsSingle(1L)).thenReturn(player)
+        Mockito.`when`(playerDao.getPlayerByIdAsSingle(2L)).thenAnswer { throw Exception() }
+    }
     }
 
     @Test

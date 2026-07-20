@@ -7,7 +7,7 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
-import io.reactivex.rxjava3.core.Flowable
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -33,7 +33,7 @@ internal class ObservePlayerNumberOverlaysTests {
     @Test
     fun shouldDelegateToRepository() = runTest {
         val overlays = listOf<PlayerNumberOverlay>()
-        Mockito.`when`(playerDao.observePlayersNumberOverlay(10L)).thenReturn(Flowable.just(overlays))
+        Mockito.`when`(playerDao.observePlayersNumberOverlay(10L)).thenReturn(flowOf(overlays))
 
         val result = observePlayerNumberOverlays(10L).toList()
 

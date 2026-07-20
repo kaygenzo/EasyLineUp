@@ -11,7 +11,7 @@ import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.RosterItem
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -33,11 +33,13 @@ internal class SavePlayerNumberOverlayTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         savePlayerNumberOverlay = SavePlayerNumberOverlay(playerRepository, testDispatcherProvider())
-        Mockito.`when`(playerRepository.deletePlayerNumberOverlays(any())).thenReturn(Completable.complete())
-        Mockito.`when`(playerRepository.updatePlayerNumberOverlays(any())).thenReturn(Completable.complete())
-        Mockito.`when`(playerRepository.createPlayerNumberOverlays(any())).thenReturn(Completable.complete())
+        Mockito.`when`(playerRepository.deletePlayerNumberOverlays(any())).thenReturn(Unit)
+        Mockito.`when`(playerRepository.updatePlayerNumberOverlays(any())).thenReturn(Unit)
+        Mockito.`when`(playerRepository.createPlayerNumberOverlays(any())).thenReturn(Unit)
+    }
     }
 
     @Test
@@ -113,7 +115,7 @@ internal class SavePlayerNumberOverlayTests {
     @Test
     fun shouldPropagateErrorFromRepository() = runTest {
         val exception = Exception("db error")
-        Mockito.`when`(playerRepository.deletePlayerNumberOverlays(any())).thenReturn(Completable.error(exception))
+        Mockito.`when`(playerRepository.deletePlayerNumberOverlays(any())).thenAnswer { throw exception }
         val item = RosterItem(player(1L, shirtNumber = 1), selected = true, playerNumberOverlay = null)
 
         val result = savePlayerNumberOverlay(listOf(item))

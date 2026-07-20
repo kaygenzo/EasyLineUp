@@ -185,8 +185,8 @@ class LineupViewModel : ViewModel(), KoinComponent {
         return errors
     }
 
-    fun getTeamType(): Single<Int> {
-        return getTeamUseCase().map { it.type }
+    suspend fun getTeamType(): Result<Int> {
+        return getTeamUseCase().mapCatching { it.type }
     }
 
     suspend fun saveTournament(tournament: Tournament): Result<Unit> {

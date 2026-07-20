@@ -7,7 +7,6 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class GetLineupById(
@@ -16,7 +15,7 @@ class GetLineupById(
 ) {
     suspend operator fun invoke(lineupId: Long): Result<Lineup> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            dao.getLineupByIdSingle(lineupId).await()
+            dao.getLineupByIdSingle(lineupId)
         }
     }
 }

@@ -6,7 +6,6 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.PlayerRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class DeletePlayer(
@@ -17,7 +16,7 @@ class DeletePlayer(
     suspend operator fun invoke(playerId: Long?): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
             val player = getPlayer(playerId).getOrThrow()
-            dao.deletePlayer(player).await()
+            dao.deletePlayer(player)
         }
     }
 }

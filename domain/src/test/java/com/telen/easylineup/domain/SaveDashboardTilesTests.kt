@@ -10,8 +10,8 @@ import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.tiles.TileType
 import com.telen.easylineup.domain.repository.TilesRepository
 import com.telen.easylineup.domain.usecases.SaveDashboardTiles
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -23,38 +23,37 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveDashboardTilesTests {
-    val observer: TestObserver<Void> =
-        TestObserver()
     @Mock lateinit var tilesRepo: TilesRepository
     lateinit var saveDashboardTiles: SaveDashboardTiles
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
-        saveDashboardTiles = SaveDashboardTiles(tilesRepo, testSchedulersProvider())
+        saveDashboardTiles = SaveDashboardTiles(tilesRepo, testDispatcherProvider())
 
-        Mockito.`when`(tilesRepo.updateTiles(any())).thenReturn(Completable.complete())
+        Mockito.`when`(tilesRepo.updateTiles(any())).thenReturn(Unit)
+    }
     }
 
     @Test
-    fun shouldTriggerAnErrorIfSaveFails() {
-        Mockito.`when`(tilesRepo.updateTiles(any())).thenReturn(Completable.error(IllegalStateException()))
-        saveDashboardTiles(listOf()).subscribe(observer)
-        observer.await()
-        observer.assertError(IllegalStateException::class.java)
+    fun shouldTriggerAnErrorIfSaveFails() = runTest {
+        Mockito.`when`(tilesRepo.updateTiles(any()))
+            .thenAnswer { throw IllegalStateException() }
+        val result = saveDashboardTiles(listOf())
+        Assert.assertTrue(result.exceptionOrNull() is IllegalStateException)
     }
 
     @Test
-    fun shouldSaveTilesIfOrderAsc() {
+    fun shouldSaveTilesIfOrderAsc() = runTest {
         val list: MutableList<DashboardTile> = mutableListOf<DashboardTile>().apply {
             add(DashboardTile(1, 1, TileType.TEAM_SIZE.type, true))
             add(DashboardTile(2, 2, TileType.MOST_USED_PLAYER.type, true))
             add(DashboardTile(3, 3, TileType.LAST_LINEUP.type, true))
             add(DashboardTile(4, 4, TileType.LAST_PLAYER_NUMBER.type, true))
         }
-        saveDashboardTiles(list).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+        val result = saveDashboardTiles(list)
+        Assert.assertTrue(result.isSuccess)
 
         verify(tilesRepo).updateTiles(com.nhaarman.mockitokotlin2.check {
             Assert.assertEquals(0, it[0].position)
@@ -65,16 +64,15 @@ internal class SaveDashboardTilesTests {
     }
 
     @Test
-    fun shouldSaveTilesIfOrderDesc() {
+    fun shouldSaveTilesIfOrderDesc() = runTest {
         val list: MutableList<DashboardTile> = mutableListOf<DashboardTile>().apply {
             add(DashboardTile(4, 4, TileType.LAST_PLAYER_NUMBER.type, true))
             add(DashboardTile(3, 3, TileType.LAST_LINEUP.type, true))
             add(DashboardTile(2, 2, TileType.MOST_USED_PLAYER.type, true))
             add(DashboardTile(1, 1, TileType.TEAM_SIZE.type, true))
         }
-        saveDashboardTiles(list).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+        val result = saveDashboardTiles(list)
+        Assert.assertTrue(result.isSuccess)
 
         verify(tilesRepo).updateTiles(com.nhaarman.mockitokotlin2.check {
             Assert.assertEquals(0, it[0].position)

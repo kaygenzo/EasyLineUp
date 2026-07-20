@@ -7,7 +7,7 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.ObservePlayer
-import io.reactivex.rxjava3.core.Flowable
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -33,7 +33,7 @@ internal class ObservePlayerTests {
     @Test
     fun shouldDelegateToRepository() = runTest {
         val player = Player(teamId = 0, name = "", shirtNumber = 0, licenseNumber = 0)
-        Mockito.`when`(playerDao.getPlayerById(1L)).thenReturn(Flowable.just(player))
+        Mockito.`when`(playerDao.getPlayerById(1L)).thenReturn(flowOf(player))
 
         val result = observePlayer(1L).toList()
 

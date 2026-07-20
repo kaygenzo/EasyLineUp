@@ -14,7 +14,7 @@ import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.SetLineupMode
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithLineupMode
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertTrue
@@ -35,17 +35,19 @@ internal class SetLineupModeTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         setLineupMode = SetLineupMode(
-            GetTeam(teamDao, testSchedulersProvider()),
+            GetTeam(teamDao, testDispatcherProvider()),
             UpdatePlayersWithLineupMode(testDispatcherProvider()),
             testDispatcherProvider()
         )
 
         val team = Team(id = 1L, name = "toto", type = TeamType.SOFTBALL.id, main = true)
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(listOf(team)))
+        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
 
         lineup = Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id, extraHitters, 3L)
+    }
     }
 
     private suspend fun startUseCase(mode: Boolean) {

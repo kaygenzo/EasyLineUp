@@ -14,10 +14,8 @@ import com.telen.easylineup.repository.model.init
 import com.telen.easylineup.repository.model.toLineup
 import com.telen.easylineup.repository.model.toPlayerInLineup
 import com.telen.easylineup.repository.model.toTournamentWithLineup
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Maybe
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
 internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRepository {
@@ -25,73 +23,71 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
         Timber.i("LineupRepositoryImpl.init")
     }
 
-    override fun insertLineup(lineup: Lineup): Single<Long> {
+    override suspend fun insertLineup(lineup: Lineup): Long {
         return lineupDao.insertLineup(RoomLineup().init(lineup))
     }
 
-    override fun insertLineups(lineups: List<Lineup>): Completable {
-        return lineupDao.insertLineups(lineups.map { RoomLineup().init(it) })
+    override suspend fun insertLineups(lineups: List<Lineup>) {
+        lineupDao.insertLineups(lineups.map { RoomLineup().init(it) })
     }
 
-    override fun updateLineup(lineup: Lineup): Completable {
-        return lineupDao.updateLineup(RoomLineup().init(lineup))
+    override suspend fun updateLineup(lineup: Lineup) {
+        lineupDao.updateLineup(RoomLineup().init(lineup))
     }
 
-    override fun updateLineupsWithRowCount(lineups: List<Lineup>): Single<Int> {
+    override suspend fun updateLineupsWithRowCount(lineups: List<Lineup>): Int {
         return lineupDao.updateLineupsWithRowCount(lineups.map { RoomLineup().init(it) })
     }
 
-    override fun deleteLineup(lineup: Lineup): Completable {
-        return lineupDao.deleteLineup(RoomLineup().init(lineup))
+    override suspend fun deleteLineup(lineup: Lineup) {
+        lineupDao.deleteLineup(RoomLineup().init(lineup))
     }
 
-    override fun deleteLineups(lineups: List<Lineup>): Completable {
-        return lineupDao.deleteLineups(lineups.map { RoomLineup().init(it) })
+    override suspend fun deleteLineups(lineups: List<Lineup>) {
+        lineupDao.deleteLineups(lineups.map { RoomLineup().init(it) })
     }
 
-    override fun getLineups(): Single<List<Lineup>> {
-        return lineupDao.getLineups().map { it.map { it.toLineup() } }
+    override suspend fun getLineups(): List<Lineup> {
+        return lineupDao.getLineups().map { it.toLineup() }
     }
 
-    override fun getLineupById(lineupId: Long): Flowable<Lineup> {
+    override fun getLineupById(lineupId: Long): Flow<Lineup> {
         return lineupDao.getLineupById(lineupId).map {
             it.firstOrNull()?.toLineup() ?: Lineup()
         }
     }
 
-    override fun getLineupByHash(hash: String): Single<Lineup> {
-        return lineupDao.getLineupByHash(hash).map { it.toLineup() }
+    override suspend fun getLineupByHash(hash: String): Lineup {
+        return lineupDao.getLineupByHash(hash).toLineup()
     }
 
-    override fun getLineupByIdSingle(lineupId: Long): Single<Lineup> {
-        return lineupDao.getLineupByIdSingle(lineupId).map { it.toLineup() }
+    override suspend fun getLineupByIdSingle(lineupId: Long): Lineup {
+        return lineupDao.getLineupByIdSingle(lineupId).toLineup()
     }
 
-    override fun getLineupsForTournamentRx(tournamentId: Long, teamId: Long): Single<List<Lineup>> {
+    override suspend fun getLineupsForTournamentRx(tournamentId: Long, teamId: Long): List<Lineup> {
         return lineupDao.getLineupsForTournamentRx(tournamentId, teamId)
-            .map { it.map { it.toLineup() } }
+            .map { it.toLineup() }
     }
 
-    override fun getLastLineup(teamId: Long): Maybe<Lineup> {
-        return lineupDao.getLastLineup(teamId).map { it.toLineup() }
+    override suspend fun getLastLineup(teamId: Long): Lineup? {
+        return lineupDao.getLastLineup(teamId)?.toLineup()
     }
 
-    override fun getAllTournamentsWithLineups(
+    override suspend fun getAllTournamentsWithLineups(
         filter: String,
         teamId: Long
-    ): Single<List<TournamentWithLineup>> {
+    ): List<TournamentWithLineup> {
         return lineupDao.getAllTournamentsWithLineups(filter, teamId)
-            .map { it.map { it.toTournamentWithLineup() } }
+            .map { it.toTournamentWithLineup() }
     }
 
-    override fun getAllPlayerPositionsForTournament(
+    override suspend fun getAllPlayerPositionsForTournament(
         tournamentId: Long,
         teamId: Long
-    ): Single<List<PlayerInLineup>> {
+    ): List<PlayerInLineup> {
         return lineupDao.getAllPlayerPositionsForTournament(tournamentId, teamId).map {
-            it.map {
-                it.toPlayerInLineup()
-            }
+            it.toPlayerInLineup()
         }
     }
 }

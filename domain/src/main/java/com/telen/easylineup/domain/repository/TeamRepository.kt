@@ -5,19 +5,17 @@
 package com.telen.easylineup.domain.repository
 
 import com.telen.easylineup.domain.model.Team
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
 
 interface TeamRepository {
-    fun insertTeam(team: Team): Single<Long>
-    fun deleteTeam(team: Team): Completable
-    fun deleteTeams(teams: List<Team>): Completable
-    fun updateTeam(team: Team): Completable
-    fun updateTeams(teams: List<Team>): Completable
-    fun updateTeamsWithRowCount(teams: List<Team>): Single<Int>
-    fun getTeamById(teamId: Long): Single<Team>
-    fun getTeamByHash(hash: String): Single<Team>
-    fun getTeams(): Flowable<List<Team>>
-    fun getTeamsRx(): Single<List<Team>>
+    suspend fun insertTeam(team: Team): Long
+    suspend fun deleteTeam(team: Team)
+    suspend fun deleteTeams(teams: List<Team>)
+    suspend fun updateTeam(team: Team)
+    suspend fun updateTeams(teams: List<Team>)
+    suspend fun updateTeamsWithRowCount(teams: List<Team>): Int
+    suspend fun getTeamById(teamId: Long): Team
+    suspend fun getTeamByHash(hash: String): Team
+    fun getTeams(): Flow<List<Team>>
+    suspend fun getTeamsRx(): List<Team>
 }

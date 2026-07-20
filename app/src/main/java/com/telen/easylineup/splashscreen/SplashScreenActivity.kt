@@ -13,7 +13,8 @@ import com.telen.easylineup.BaseImportActivity
 import com.telen.easylineup.databinding.SplashscreenBinding
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.login.LoginActivity
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -34,15 +35,14 @@ class SplashScreenActivity : BaseImportActivity(), KoinComponent {
         data?.let {
             launchImportActivity(it)
         } ?: run {
-            val disposable = getTeam()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    launchHome()
-                }, {
-                    it.printStackTrace()
-                    launchLoginScreen()
-                })
-            disposables.add(disposable)
+            lifecycleScope.launch {
+                getTeam()
+                    .onSuccess { launchHome() }
+                    .onFailure {
+                        it.printStackTrace()
+                        launchLoginScreen()
+                    }
+            }
         }
     }
 

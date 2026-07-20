@@ -16,9 +16,6 @@ import com.telen.easylineup.repository.model.toPlayerFieldPosition
 import com.telen.easylineup.repository.model.toPlayerGamesCount
 import com.telen.easylineup.repository.model.toPlayerWithPosition
 import com.telen.easylineup.repository.model.toPositionWithLineup
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Maybe
-import io.reactivex.rxjava3.core.Single
 import timber.log.Timber
 
 internal class PlayerFieldPositionRepositoryImpl(private val playerFieldPositionsDao: PlayerFieldPositionsDao) :
@@ -27,23 +24,25 @@ internal class PlayerFieldPositionRepositoryImpl(private val playerFieldPosition
         Timber.i("PlayerFieldPositionRepositoryImpl.init")
     }
 
-    override fun insertPlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>): Completable {
-        return playerFieldPositionsDao.insertPlayerFieldPositions(fieldPositions.map {
+    override suspend fun insertPlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>) {
+        playerFieldPositionsDao.insertPlayerFieldPositions(fieldPositions.map {
             RoomPlayerFieldPosition().init(
                 it
             )
         })
     }
 
-    override fun updatePlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>): Completable {
-        return playerFieldPositionsDao.updatePlayerFieldPositions(fieldPositions.map {
+    override suspend fun updatePlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>) {
+        playerFieldPositionsDao.updatePlayerFieldPositions(fieldPositions.map {
             RoomPlayerFieldPosition().init(
                 it
             )
         })
     }
 
-    override fun updatePlayerFieldPositionsWithRowCount(fieldPositions: List<PlayerFieldPosition>): Single<Int> {
+    override suspend fun updatePlayerFieldPositionsWithRowCount(
+        fieldPositions: List<PlayerFieldPosition>
+    ): Int {
         return playerFieldPositionsDao.updatePlayerFieldPositionsWithRowCount(fieldPositions.map {
             RoomPlayerFieldPosition().init(
                 it
@@ -51,27 +50,27 @@ internal class PlayerFieldPositionRepositoryImpl(private val playerFieldPosition
         })
     }
 
-    override fun deletePosition(position: PlayerFieldPosition): Completable {
-        return playerFieldPositionsDao.deletePositionById(position.id)
+    override suspend fun deletePosition(position: PlayerFieldPosition) {
+        playerFieldPositionsDao.deletePositionById(position.id)
     }
 
-    override fun deletePositions(position: List<PlayerFieldPosition>): Completable {
-        return playerFieldPositionsDao.deletePositions(position.map {
+    override suspend fun deletePositions(position: List<PlayerFieldPosition>) {
+        playerFieldPositionsDao.deletePositions(position.map {
             RoomPlayerFieldPosition().init(
                 it
             )
         })
     }
 
-    override fun updatePlayerFieldPosition(fieldPosition: PlayerFieldPosition): Completable {
-        return playerFieldPositionsDao.updatePlayerFieldPosition(
+    override suspend fun updatePlayerFieldPosition(fieldPosition: PlayerFieldPosition) {
+        playerFieldPositionsDao.updatePlayerFieldPosition(
             RoomPlayerFieldPosition().init(
                 fieldPosition
             )
         )
     }
 
-    override fun insertPlayerFieldPosition(fieldPosition: PlayerFieldPosition): Single<Long> {
+    override suspend fun insertPlayerFieldPosition(fieldPosition: PlayerFieldPosition): Long {
         return playerFieldPositionsDao.insertPlayerFieldPosition(
             RoomPlayerFieldPosition().init(
                 fieldPosition
@@ -79,43 +78,45 @@ internal class PlayerFieldPositionRepositoryImpl(private val playerFieldPosition
         )
     }
 
-    override fun getPlayerFieldPositionByHash(hash: String): Single<PlayerFieldPosition> {
-        return playerFieldPositionsDao.getPlayerFieldPositionByHash(hash)
-            .map { it.toPlayerFieldPosition() }
+    override suspend fun getPlayerFieldPositionByHash(hash: String): PlayerFieldPosition {
+        return playerFieldPositionsDao.getPlayerFieldPositionByHash(hash).toPlayerFieldPosition()
     }
 
-    override fun getPlayerFieldPositions(): Single<List<PlayerFieldPosition>> {
+    override suspend fun getPlayerFieldPositions(): List<PlayerFieldPosition> {
         return playerFieldPositionsDao.getPlayerFieldPositions()
-            .map { it.map { it.toPlayerFieldPosition() } }
-    }
-
-    override fun getPlayerFieldPosition(positionId: Long): Single<PlayerFieldPosition> {
-        return playerFieldPositionsDao.getPlayerFieldPosition(positionId)
             .map { it.toPlayerFieldPosition() }
     }
 
-    override fun getAllPlayerFieldPositionsForLineup(lineupId: Long): Single<List<PlayerFieldPosition>> {
+    override suspend fun getPlayerFieldPosition(positionId: Long): PlayerFieldPosition {
+        return playerFieldPositionsDao.getPlayerFieldPosition(positionId).toPlayerFieldPosition()
+    }
+
+    override suspend fun getAllPlayerFieldPositionsForLineup(
+        lineupId: Long
+    ): List<PlayerFieldPosition> {
         return playerFieldPositionsDao.getAllPlayerFieldPositionsForLineup(lineupId)
-            .map { it.map { it.toPlayerFieldPosition() } }
-    }
-
-    override fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): Single<List<PlayerWithPosition>> {
-        return playerFieldPositionsDao.getAllPlayersWithPositionsForLineupRx(lineupId)
-            .map { it.map { it.toPlayerWithPosition() } }
-    }
-
-    override fun getPlayerPositionFor(lineupId: Long, playerId: Long): Maybe<PlayerFieldPosition> {
-        return playerFieldPositionsDao.getPlayerPositionFor(lineupId, playerId)
             .map { it.toPlayerFieldPosition() }
     }
 
-    override fun getAllPositionsForPlayer(playerId: Long): Single<List<PositionWithLineup>> {
-        return playerFieldPositionsDao.getAllPositionsForPlayer(playerId)
-            .map { it.map { it.toPositionWithLineup() } }
+    override suspend fun getAllPlayersWithPositionsForLineupRx(
+        lineupId: Long
+    ): List<PlayerWithPosition> {
+        return playerFieldPositionsDao.getAllPlayersWithPositionsForLineupRx(lineupId)
+            .map { it.toPlayerWithPosition() }
     }
 
-    override fun getMostUsedPlayers(teamId: Long): Single<List<PlayerGamesCount>> {
+    override suspend fun getPlayerPositionFor(lineupId: Long, playerId: Long): PlayerFieldPosition? {
+        return playerFieldPositionsDao.getPlayerPositionFor(lineupId, playerId)
+            ?.toPlayerFieldPosition()
+    }
+
+    override suspend fun getAllPositionsForPlayer(playerId: Long): List<PositionWithLineup> {
+        return playerFieldPositionsDao.getAllPositionsForPlayer(playerId)
+            .map { it.toPositionWithLineup() }
+    }
+
+    override suspend fun getMostUsedPlayers(teamId: Long): List<PlayerGamesCount> {
         return playerFieldPositionsDao.getMostUsedPlayers(teamId)
-            .map { it.map { it.toPlayerGamesCount() } }
+            .map { it.toPlayerGamesCount() }
     }
 }

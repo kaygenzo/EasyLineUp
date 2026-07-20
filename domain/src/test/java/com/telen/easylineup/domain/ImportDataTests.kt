@@ -26,10 +26,10 @@ import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.ImportData
 import com.telen.easylineup.domain.usecases.ImportResult
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -60,6 +60,7 @@ internal class ImportDataTests {
 
     @Before
     fun init() {
+        runBlocking {
         MockitoAnnotations.initMocks(this)
         importData = ImportData(
             teamDao,
@@ -67,7 +68,7 @@ internal class ImportDataTests {
             tournamentDao,
             lineupDao,
             playerFieldPositionsDao,
-            testSchedulersProvider()
+            testDispatcherProvider()
         )
 
         val playerExport = PlayerExport(
@@ -136,37 +137,38 @@ internal class ImportDataTests {
 
         exportBase = ExportBase(teams = listOf(teamExport))
     }
+    }
 
-    private fun mockAllNotFound() {
-        Mockito.`when`(teamDao.getTeamByHash(teamHash)).thenReturn(Single.error(NoSuchElementException()))
+    private suspend fun mockAllNotFound() {
+        Mockito.`when`(teamDao.getTeamByHash(teamHash)).thenAnswer { throw NoSuchElementException() }
         Mockito.`when`(playerDao.getPlayerByHash(playerHash))
-            .thenReturn(Single.error(NoSuchElementException()))
+            .thenAnswer { throw NoSuchElementException() }
         Mockito.`when`(tournamentDao.getTournamentByHash(tournamentHash))
-            .thenReturn(Single.error(NoSuchElementException()))
+            .thenAnswer { throw NoSuchElementException() }
         Mockito.`when`(lineupDao.getLineupByHash(lineupHash))
-            .thenReturn(Single.error(NoSuchElementException()))
+            .thenAnswer { throw NoSuchElementException() }
         Mockito.`when`(playerFieldPositionsDao.getPlayerFieldPositionByHash(positionHash))
-            .thenReturn(Single.error(NoSuchElementException()))
+            .thenAnswer { throw NoSuchElementException() }
         Mockito.`when`(playerDao.getPlayerNumberOverlayByHash(overlayHash))
-            .thenReturn(Single.error(NoSuchElementException()))
+            .thenAnswer { throw NoSuchElementException() }
     }
 
-    private fun mockAllInsertsSucceed() {
-        Mockito.`when`(teamDao.insertTeam(any())).thenReturn(Single.just(1L))
-        Mockito.`when`(playerDao.insertPlayer(any())).thenReturn(Single.just(2L))
-        Mockito.`when`(tournamentDao.insertTournament(any())).thenReturn(Single.just(3L))
-        Mockito.`when`(lineupDao.insertLineup(any())).thenReturn(Single.just(4L))
+    private suspend fun mockAllInsertsSucceed() {
+        Mockito.`when`(teamDao.insertTeam(any())).thenReturn(1L)
+        Mockito.`when`(playerDao.insertPlayer(any())).thenReturn(2L)
+        Mockito.`when`(tournamentDao.insertTournament(any())).thenReturn(3L)
+        Mockito.`when`(lineupDao.insertLineup(any())).thenReturn(4L)
         Mockito.`when`(playerFieldPositionsDao.insertPlayerFieldPosition(any()))
-            .thenReturn(Single.just(5L))
-        Mockito.`when`(playerDao.createPlayerNumberOverlay(any())).thenReturn(Completable.complete())
+            .thenReturn(5L)
+        Mockito.`when`(playerDao.createPlayerNumberOverlay(any())).thenReturn(Unit)
     }
 
-    private fun mockAllFound() {
+    private suspend fun mockAllFound() {
         Mockito.`when`(teamDao.getTeamByHash(teamHash))
-            .thenReturn(Single.just(Team(id = 1L, name = "team", hash = teamHash)))
+            .thenReturn(Team(id = 1L, name = "team", hash = teamHash))
         Mockito.`when`(playerDao.getPlayerByHash(playerHash))
             .thenReturn(
-                Single.just(
+                
                     Player(
                         id = 2L,
                         teamId = 1L,
@@ -175,11 +177,11 @@ internal class ImportDataTests {
                         licenseNumber = 123L,
                         hash = playerHash
                     )
-                )
+                
             )
         Mockito.`when`(tournamentDao.getTournamentByHash(tournamentHash))
             .thenReturn(
-                Single.just(
+                
                     Tournament(
                         id = 3L,
                         name = "champs",
@@ -188,49 +190,47 @@ internal class ImportDataTests {
                         endTime = 2000L,
                         hash = tournamentHash
                     )
-                )
+                
             )
         Mockito.`when`(lineupDao.getLineupByHash(lineupHash))
             .thenReturn(
-                Single.just(
+                
                     Lineup(id = 4L, teamId = 1L, tournamentId = 3L, hash = lineupHash)
-                )
+                
             )
         Mockito.`when`(playerFieldPositionsDao.getPlayerFieldPositionByHash(positionHash))
             .thenReturn(
-                Single.just(
+                
                     PlayerFieldPosition(id = 5L, playerId = 2L, lineupId = 4L, hash = positionHash)
-                )
+                
             )
         Mockito.`when`(playerDao.getPlayerNumberOverlayByHash(overlayHash))
             .thenReturn(
-                Single.just(
+                
                     PlayerNumberOverlay(id = 6L, lineupId = 4L, playerId = 2L, number = 99)
-                )
+                
             )
     }
 
-    private fun mockAllUpdatesSucceed() {
-        Mockito.`when`(teamDao.updateTeam(any())).thenReturn(Completable.complete())
-        Mockito.`when`(playerDao.updatePlayer(any())).thenReturn(Completable.complete())
-        Mockito.`when`(tournamentDao.updateTournament(any())).thenReturn(Completable.complete())
-        Mockito.`when`(lineupDao.updateLineup(any())).thenReturn(Completable.complete())
+    private suspend fun mockAllUpdatesSucceed() {
+        Mockito.`when`(teamDao.updateTeam(any())).thenReturn(Unit)
+        Mockito.`when`(playerDao.updatePlayer(any())).thenReturn(Unit)
+        Mockito.`when`(tournamentDao.updateTournament(any())).thenReturn(Unit)
+        Mockito.`when`(lineupDao.updateLineup(any())).thenReturn(Unit)
         Mockito.`when`(playerFieldPositionsDao.updatePlayerFieldPosition(any()))
-            .thenReturn(Completable.complete())
-        Mockito.`when`(playerDao.updatePlayerNumberOverlay(any())).thenReturn(Completable.complete())
+            .thenReturn(Unit)
+        Mockito.`when`(playerDao.updatePlayerNumberOverlay(any())).thenReturn(Unit)
     }
 
     @Test
-    fun shouldInsertEverythingWhenNothingExists() {
+    fun shouldInsertEverythingWhenNothingExists() = runTest {
         mockAllNotFound()
         mockAllInsertsSucceed()
 
-        val observer = TestObserver<ImportResult>()
-        importData(exportBase, updateIfExists = false).subscribe(observer)
-        observer.await()
+        val importResult = importData(exportBase, updateIfExists = false)
 
-        observer.assertComplete()
-        val result = observer.values().first()
+        assertTrue(importResult.isSuccess)
+        val result = importResult.getOrNull()!!
         assertEquals(listOf(1, 1, 1, 1, 1, 1), result.inserted.toList())
         assertEquals(listOf(0, 0, 0, 0, 0, 0), result.updated.toList())
 
@@ -243,13 +243,11 @@ internal class ImportDataTests {
     }
 
     @Test
-    fun shouldMapEmailAndPhoneWhenInsertingPlayer() {
+    fun shouldMapEmailAndPhoneWhenInsertingPlayer() = runTest {
         mockAllNotFound()
         mockAllInsertsSucceed()
 
-        val observer = TestObserver<ImportResult>()
-        importData(exportBase, updateIfExists = false).subscribe(observer)
-        observer.await()
+        importData(exportBase, updateIfExists = false)
 
         val captor = argumentCaptor<Player>()
         Mockito.verify(playerDao).insertPlayer(captor.capture())
@@ -258,13 +256,11 @@ internal class ImportDataTests {
     }
 
     @Test
-    fun shouldBuildRosterFromInsertedPlayerIds() {
+    fun shouldBuildRosterFromInsertedPlayerIds() = runTest {
         mockAllNotFound()
         mockAllInsertsSucceed()
 
-        val observer = TestObserver<ImportResult>()
-        importData(exportBase, updateIfExists = false).subscribe(observer)
-        observer.await()
+        importData(exportBase, updateIfExists = false)
 
         val captor = argumentCaptor<Lineup>()
         Mockito.verify(lineupDao).insertLineup(captor.capture())
@@ -272,16 +268,14 @@ internal class ImportDataTests {
     }
 
     @Test
-    fun shouldUpdateEverythingWhenAllExistAndUpdateIfExistsTrue() {
+    fun shouldUpdateEverythingWhenAllExistAndUpdateIfExistsTrue() = runTest {
         mockAllFound()
         mockAllUpdatesSucceed()
 
-        val observer = TestObserver<ImportResult>()
-        importData(exportBase, updateIfExists = true).subscribe(observer)
-        observer.await()
+        val importResult = importData(exportBase, updateIfExists = true)
 
-        observer.assertComplete()
-        val result = observer.values().first()
+        assertTrue(importResult.isSuccess)
+        val result = importResult.getOrNull()!!
         assertEquals(listOf(0, 0, 0, 0, 0, 0), result.inserted.toList())
         assertEquals(listOf(1, 1, 1, 1, 1, 1), result.updated.toList())
 
@@ -301,15 +295,13 @@ internal class ImportDataTests {
     }
 
     @Test
-    fun shouldSkipEverythingWhenAllExistAndUpdateIfExistsFalse() {
+    fun shouldSkipEverythingWhenAllExistAndUpdateIfExistsFalse() = runTest {
         mockAllFound()
 
-        val observer = TestObserver<ImportResult>()
-        importData(exportBase, updateIfExists = false).subscribe(observer)
-        observer.await()
+        val importResult = importData(exportBase, updateIfExists = false)
 
-        observer.assertComplete()
-        val result = observer.values().first()
+        assertTrue(importResult.isSuccess)
+        val result = importResult.getOrNull()!!
         assertEquals(listOf(0, 0, 0, 0, 0, 0), result.inserted.toList())
         assertEquals(listOf(0, 0, 0, 0, 0, 0), result.updated.toList())
 
@@ -320,86 +312,78 @@ internal class ImportDataTests {
     }
 
     @Test
-    fun shouldReturnAllZerosForEmptyExport() {
-        val observer = TestObserver<ImportResult>()
-        importData(ExportBase(teams = listOf()), updateIfExists = false).subscribe(observer)
-        observer.await()
+    fun shouldReturnAllZerosForEmptyExport() = runTest {
+        val importResult = importData(ExportBase(teams = listOf()), updateIfExists = false)
 
-        observer.assertComplete()
-        val result = observer.values().first()
+        assertTrue(importResult.isSuccess)
+        val result = importResult.getOrNull()!!
         assertEquals(listOf(0, 0, 0, 0, 0, 0), result.inserted.toList())
         assertEquals(listOf(0, 0, 0, 0, 0, 0), result.updated.toList())
     }
 
     @Test
-    fun shouldDefaultLicenseNumberToZeroWhenNotParsable() {
+    fun shouldDefaultLicenseNumberToZeroWhenNotParsable() = runTest {
         val teamExport = exportBase.teams.first()
         val brokenPlayer = teamExport.players.first().copy(licenseNumber = "not-a-number")
         val brokenExport = ExportBase(
             teams = listOf(teamExport.copy(players = listOf(brokenPlayer)))
         )
 
-        Mockito.`when`(teamDao.getTeamByHash(teamHash)).thenReturn(Single.error(NoSuchElementException()))
+        Mockito.`when`(teamDao.getTeamByHash(teamHash)).thenAnswer { throw NoSuchElementException() }
         Mockito.`when`(playerDao.getPlayerByHash(playerHash))
-            .thenReturn(Single.error(NoSuchElementException()))
-        Mockito.`when`(tournamentDao.getTournamentByHash(any())).thenReturn(Single.error(NoSuchElementException()))
-        Mockito.`when`(lineupDao.getLineupByHash(any())).thenReturn(Single.error(NoSuchElementException()))
+            .thenAnswer { throw NoSuchElementException() }
+        Mockito.`when`(tournamentDao.getTournamentByHash(any())).thenAnswer { throw NoSuchElementException() }
+        Mockito.`when`(lineupDao.getLineupByHash(any())).thenAnswer { throw NoSuchElementException() }
         Mockito.`when`(playerFieldPositionsDao.getPlayerFieldPositionByHash(any()))
-            .thenReturn(Single.error(NoSuchElementException()))
+            .thenAnswer { throw NoSuchElementException() }
         Mockito.`when`(playerDao.getPlayerNumberOverlayByHash(any()))
-            .thenReturn(Single.error(NoSuchElementException()))
+            .thenAnswer { throw NoSuchElementException() }
         mockAllInsertsSucceed()
 
-        val observer = TestObserver<ImportResult>()
-        importData(brokenExport, updateIfExists = false).subscribe(observer)
-        observer.await()
+        val importResult = importData(brokenExport, updateIfExists = false)
 
-        observer.assertComplete()
+        assertTrue(importResult.isSuccess)
         val captor = argumentCaptor<Player>()
         Mockito.verify(playerDao).insertPlayer(captor.capture())
         assertEquals(0L, captor.firstValue.licenseNumber)
     }
 
     @Test
-    fun shouldPropagateInsertErrors() {
+    fun shouldPropagateInsertErrors() = runTest {
         mockAllNotFound()
         val exception = Exception("db error")
-        Mockito.`when`(teamDao.insertTeam(any())).thenReturn(Single.error(exception))
+        Mockito.`when`(teamDao.insertTeam(any())).thenAnswer { throw exception }
 
-        val observer = TestObserver<ImportResult>()
-        importData(exportBase, updateIfExists = false).subscribe(observer)
-        observer.await()
+        val importResult = importData(exportBase, updateIfExists = false)
 
-        observer.assertError(exception)
+        assertEquals(exception.message, importResult.exceptionOrNull()?.message)
     }
 
     /**
      * Documents a potential issue: [teamDao.getTeamByHash] failing for any reason (not only
      * "not found") is silently interpreted as "team does not exist yet" because of the
-     * catch-all `onErrorResumeNext`, so an unrelated repository error still triggers an insert
+     * catch-all try/catch, so an unrelated repository error still triggers an insert
      * attempt instead of propagating the original error.
      */
     @Test
-    fun shouldAttemptInsertEvenWhenLookupFailsWithAnUnrelatedError() {
+    fun shouldAttemptInsertEvenWhenLookupFailsWithAnUnrelatedError() = runTest {
         Mockito.`when`(teamDao.getTeamByHash(teamHash))
-            .thenReturn(Single.error(RuntimeException("connection lost")))
+            .thenAnswer { throw RuntimeException("connection lost") }
         Mockito.`when`(playerDao.getPlayerByHash(playerHash))
-            .thenReturn(Single.error(NoSuchElementException()))
+            .thenAnswer { throw NoSuchElementException() }
         Mockito.`when`(tournamentDao.getTournamentByHash(tournamentHash))
-            .thenReturn(Single.error(NoSuchElementException()))
+            .thenAnswer { throw NoSuchElementException() }
         Mockito.`when`(lineupDao.getLineupByHash(lineupHash))
-            .thenReturn(Single.error(NoSuchElementException()))
+            .thenAnswer { throw NoSuchElementException() }
         Mockito.`when`(playerFieldPositionsDao.getPlayerFieldPositionByHash(positionHash))
-            .thenReturn(Single.error(NoSuchElementException()))
+            .thenAnswer { throw NoSuchElementException() }
         Mockito.`when`(playerDao.getPlayerNumberOverlayByHash(overlayHash))
-            .thenReturn(Single.error(NoSuchElementException()))
+            .thenAnswer { throw NoSuchElementException() }
         mockAllInsertsSucceed()
 
-        val observer = TestObserver<ImportResult>()
-        importData(exportBase, updateIfExists = false).subscribe(observer)
-        observer.await()
+        val importResult = importData(exportBase, updateIfExists = false)
 
-        observer.assertComplete()
+        assertTrue(importResult.isSuccess)
         Mockito.verify(teamDao).insertTeam(any())
     }
 }

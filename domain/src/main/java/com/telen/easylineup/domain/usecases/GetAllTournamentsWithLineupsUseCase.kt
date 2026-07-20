@@ -8,7 +8,6 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
-import kotlinx.coroutines.rx3.await
 import kotlinx.coroutines.withContext
 
 class GetAllTournamentsWithLineupsUseCase(
@@ -19,8 +18,8 @@ class GetAllTournamentsWithLineupsUseCase(
     suspend operator fun invoke(filter: String): Result<List<Pair<Tournament, List<Lineup>>>> =
         runCatchingCancellable {
             withContext(dispatcherProvider.io()) {
-                val team = getTeam().await()
-                val items = dao.getAllTournamentsWithLineups(filter, team.id).await()
+                val team = getTeam().getOrThrow()
+                val items = dao.getAllTournamentsWithLineups(filter, team.id)
 
                 val result: MutableMap<Tournament, MutableList<Lineup>> = mutableMapOf()
                 val lineups: MutableMap<Long, Lineup> = mutableMapOf()
