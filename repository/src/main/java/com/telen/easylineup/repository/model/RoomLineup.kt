@@ -58,35 +58,36 @@ internal data class RoomLineup(
     @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
 )
 
-internal fun RoomLineup.init(lineup: Lineup): RoomLineup {
-    id = lineup.id
-    name = lineup.name
-    teamId = lineup.teamId
-    tournamentId = lineup.tournamentId
-    mode = lineup.mode
-    eventTimeInMillis = lineup.eventTimeInMillis
-    createdTimeInMillis = lineup.createdTimeInMillis
-    editedTimeInMillis = lineup.editedTimeInMillis
-    roster = lineup.roster
-    hash = lineup.hash
-    strategy = lineup.strategy
-    extraHitters = lineup.extraHitters
-    return this
+internal fun Lineup.toRoom(): RoomLineup {
+    return RoomLineup(
+        id = id,
+        name = name,
+        teamId = teamId,
+        tournamentId = tournamentId,
+        mode = mode,
+        eventTimeInMillis = eventTimeInMillis,
+        createdTimeInMillis = createdTimeInMillis,
+        editedTimeInMillis = editedTimeInMillis,
+        roster = roster,
+        hash = hash,
+        strategy = strategy,
+        extraHitters = extraHitters
+    )
 }
 
-internal fun RoomLineup.toLineup(): Lineup {
+internal fun RoomLineup.toDomain(): Lineup {
     return Lineup(
-        id,
-        name,
-        teamId,
-        tournamentId,
-        mode,
-        strategy,
-        extraHitters,
-        eventTimeInMillis,
-        createdTimeInMillis,
-        editedTimeInMillis,
-        roster,
-        hash
+        id = id,
+        name = name,
+        teamId = teamId,
+        tournamentId = tournamentId,
+        mode = mode,
+        strategy = strategy,
+        extraHitters = extraHitters,
+        eventTimeInMillis = eventTimeInMillis,
+        createdTimeInMillis = createdTimeInMillis,
+        editedTimeInMillis = editedTimeInMillis,
+        roster = roster,
+        hash = hash
     )
 }

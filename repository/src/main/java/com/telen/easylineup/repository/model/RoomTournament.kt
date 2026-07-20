@@ -75,17 +75,26 @@ internal data class RoomTournament(
     }
 }
 
-internal fun RoomTournament.init(tournament: Tournament): RoomTournament {
-    id = tournament.id
-    name = tournament.name
-    createdAt = tournament.createdAt
-    startTime = tournament.startTime
-    endTime = tournament.endTime
-    address = tournament.address
-    hash = tournament.hash
-    return this
+internal fun Tournament.toRoom(): RoomTournament {
+    return RoomTournament(
+        id = id,
+        name = name,
+        createdAt = createdAt,
+        startTime = startTime,
+        endTime = endTime,
+        address = address,
+        hash = hash
+    )
 }
 
-internal fun RoomTournament.toTournament(): Tournament {
-    return Tournament(id, name, createdAt, startTime, endTime, address, hash)
+internal fun RoomTournament.toDomain(): Tournament {
+    return Tournament(
+        id = id,
+        name = name,
+        createdAt = createdAt,
+        startTime = startTime,
+        endTime = endTime,
+        address = address,
+        hash = hash
+    )
 }

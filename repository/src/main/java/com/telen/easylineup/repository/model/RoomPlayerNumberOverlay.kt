@@ -42,15 +42,22 @@ internal data class RoomPlayerNumberOverlay(
     @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
 ) : Serializable
 
-internal fun RoomPlayerNumberOverlay.toPlayerNumberOverlay(): PlayerNumberOverlay {
-    return PlayerNumberOverlay(id, lineupId, playerId, number, hash)
+internal fun RoomPlayerNumberOverlay.toDomain(): PlayerNumberOverlay {
+    return PlayerNumberOverlay(
+        id = id,
+        lineupId = lineupId,
+        playerId = playerId,
+        number = number,
+        hash = hash
+    )
 }
 
-internal fun RoomPlayerNumberOverlay.init(overlay: PlayerNumberOverlay): RoomPlayerNumberOverlay {
-    id = overlay.id
-    lineupId = overlay.lineupId
-    playerId = overlay.playerId
-    number = overlay.number
-    hash = overlay.hash
-    return this
+internal fun PlayerNumberOverlay.toRoom(): RoomPlayerNumberOverlay {
+    return RoomPlayerNumberOverlay(
+        id = id,
+        lineupId = lineupId,
+        playerId = playerId,
+        number = number,
+        hash = hash
+    )
 }

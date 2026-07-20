@@ -85,16 +85,24 @@ internal data class RoomTeam(
     }
 }
 
-internal fun RoomTeam.init(team: Team): RoomTeam {
-    id = team.id
-    name = team.name
-    image = team.image
-    type = team.type
-    main = team.main
-    hash = team.hash
-    return this
+internal fun Team.toRoom(): RoomTeam {
+    return RoomTeam(
+        id = id,
+        name = name,
+        image = image,
+        type = type,
+        main = main,
+        hash = hash
+    )
 }
 
-internal fun RoomTeam.toTeam(): Team {
-    return Team(id, name, image, type, main, hash)
+internal fun RoomTeam.toDomain(): Team {
+    return Team(
+        id = id,
+        name = name,
+        image = image,
+        type = type,
+        main = main,
+        hash = hash
+    )
 }

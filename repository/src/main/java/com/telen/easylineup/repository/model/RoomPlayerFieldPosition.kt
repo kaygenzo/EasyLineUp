@@ -49,19 +49,30 @@ internal data class RoomPlayerFieldPosition(
     @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
 )
 
-internal fun RoomPlayerFieldPosition.init(playerFieldPosition: PlayerFieldPosition): RoomPlayerFieldPosition {
-    id = playerFieldPosition.id
-    playerId = playerFieldPosition.playerId
-    lineupId = playerFieldPosition.lineupId
-    position = playerFieldPosition.position
-    x = playerFieldPosition.x
-    y = playerFieldPosition.y
-    order = playerFieldPosition.order
-    flags = playerFieldPosition.flags
-    hash = playerFieldPosition.hash
-    return this
+internal fun PlayerFieldPosition.toRoom(): RoomPlayerFieldPosition {
+    return RoomPlayerFieldPosition(
+        id = id,
+        playerId = playerId,
+        lineupId = lineupId,
+        position = position,
+        x = x,
+        y = y,
+        order = order,
+        flags = flags,
+        hash = hash
+    )
 }
 
-internal fun RoomPlayerFieldPosition.toPlayerFieldPosition(): PlayerFieldPosition {
-    return PlayerFieldPosition(id, playerId, lineupId, position, x, y, order, flags, hash)
+internal fun RoomPlayerFieldPosition.toDomain(): PlayerFieldPosition {
+    return PlayerFieldPosition(
+        id = id,
+        playerId = playerId,
+        lineupId = lineupId,
+        position = position,
+        x = x,
+        y = y,
+        order = order,
+        flags = flags,
+        hash = hash
+    )
 }

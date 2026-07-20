@@ -9,11 +9,8 @@ import com.telen.easylineup.domain.model.PlayerInLineup
 import com.telen.easylineup.domain.model.TournamentWithLineup
 import com.telen.easylineup.domain.repository.LineupRepository
 import com.telen.easylineup.repository.dao.LineupDao
-import com.telen.easylineup.repository.model.RoomLineup
-import com.telen.easylineup.repository.model.init
-import com.telen.easylineup.repository.model.toLineup
-import com.telen.easylineup.repository.model.toPlayerInLineup
-import com.telen.easylineup.repository.model.toTournamentWithLineup
+import com.telen.easylineup.repository.model.toDomain
+import com.telen.easylineup.repository.model.toRoom
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
@@ -24,54 +21,54 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
     }
 
     override suspend fun insertLineup(lineup: Lineup): Long {
-        return lineupDao.insertLineup(RoomLineup().init(lineup))
+        return lineupDao.insertLineup(lineup.toRoom())
     }
 
     override suspend fun insertLineups(lineups: List<Lineup>) {
-        lineupDao.insertLineups(lineups.map { RoomLineup().init(it) })
+        lineupDao.insertLineups(lineups.map { it.toRoom() })
     }
 
     override suspend fun updateLineup(lineup: Lineup) {
-        lineupDao.updateLineup(RoomLineup().init(lineup))
+        lineupDao.updateLineup(lineup.toRoom())
     }
 
     override suspend fun updateLineupsWithRowCount(lineups: List<Lineup>): Int {
-        return lineupDao.updateLineupsWithRowCount(lineups.map { RoomLineup().init(it) })
+        return lineupDao.updateLineupsWithRowCount(lineups.map { it.toRoom() })
     }
 
     override suspend fun deleteLineup(lineup: Lineup) {
-        lineupDao.deleteLineup(RoomLineup().init(lineup))
+        lineupDao.deleteLineup(lineup.toRoom())
     }
 
     override suspend fun deleteLineups(lineups: List<Lineup>) {
-        lineupDao.deleteLineups(lineups.map { RoomLineup().init(it) })
+        lineupDao.deleteLineups(lineups.map { it.toRoom() })
     }
 
     override suspend fun getLineups(): List<Lineup> {
-        return lineupDao.getLineups().map { it.toLineup() }
+        return lineupDao.getLineups().map { it.toDomain() }
     }
 
     override fun getLineupById(lineupId: Long): Flow<Lineup> {
         return lineupDao.getLineupById(lineupId).map {
-            it.firstOrNull()?.toLineup() ?: Lineup()
+            it.firstOrNull()?.toDomain() ?: Lineup()
         }
     }
 
     override suspend fun getLineupByHash(hash: String): Lineup {
-        return lineupDao.getLineupByHash(hash).toLineup()
+        return lineupDao.getLineupByHash(hash).toDomain()
     }
 
     override suspend fun getLineupByIdSingle(lineupId: Long): Lineup {
-        return lineupDao.getLineupByIdSingle(lineupId).toLineup()
+        return lineupDao.getLineupByIdSingle(lineupId).toDomain()
     }
 
     override suspend fun getLineupsForTournamentRx(tournamentId: Long, teamId: Long): List<Lineup> {
         return lineupDao.getLineupsForTournamentRx(tournamentId, teamId)
-            .map { it.toLineup() }
+            .map { it.toDomain() }
     }
 
     override suspend fun getLastLineup(teamId: Long): Lineup? {
-        return lineupDao.getLastLineup(teamId)?.toLineup()
+        return lineupDao.getLastLineup(teamId)?.toDomain()
     }
 
     override suspend fun getAllTournamentsWithLineups(
@@ -79,7 +76,7 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
         teamId: Long
     ): List<TournamentWithLineup> {
         return lineupDao.getAllTournamentsWithLineups(filter, teamId)
-            .map { it.toTournamentWithLineup() }
+            .map { it.toDomain() }
     }
 
     override suspend fun getAllPlayerPositionsForTournament(
@@ -87,7 +84,7 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
         teamId: Long
     ): List<PlayerInLineup> {
         return lineupDao.getAllPlayerPositionsForTournament(tournamentId, teamId).map {
-            it.toPlayerInLineup()
+            it.toDomain()
         }
     }
 }

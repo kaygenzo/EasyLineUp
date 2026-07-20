@@ -51,109 +51,40 @@ internal data class RoomPlayer(
     @ColumnInfo(name = "phone") var phone: String? = null,
     @ColumnInfo(name = "sex") var sex: Int = 0,
     @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        if (javaClass != other?.javaClass) {
-            return false
-        }
+)
 
-        other as RoomPlayer
-
-        if (id != other.id) {
-            return false
-        }
-        if (teamId != other.teamId) {
-            return false
-        }
-        if (name != other.name) {
-            return false
-        }
-        if (shirtNumber != other.shirtNumber) {
-            return false
-        }
-        if (licenseNumber != other.licenseNumber) {
-            return false
-        }
-        if (image != other.image) {
-            return false
-        }
-        if (positions != other.positions) {
-            return false
-        }
-        if (pitching != other.pitching) {
-            return false
-        }
-        if (batting != other.batting) {
-            return false
-        }
-        if (email != other.email) {
-            return false
-        }
-        if (phone != other.phone) {
-            return false
-        }
-        if (sex != other.sex) {
-            return false
-        }
-        if (hash != other.hash) {
-            return false
-        }
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + teamId.hashCode()
-        result = 31 * result + name.hashCode()
-        result = 31 * result + shirtNumber
-        result = 31 * result + licenseNumber.hashCode()
-        result = 31 * result + (image?.hashCode() ?: 0)
-        result = 31 * result + positions
-        result = 31 * result + pitching
-        result = 31 * result + batting
-        result = 31 * result + sex
-        result = 31 * result + (email?.hashCode() ?: 0)
-        result = 31 * result + (phone?.hashCode() ?: 0)
-        result = 31 * result + (hash?.hashCode() ?: 0)
-        return result
-    }
+internal fun Player.toRoom(): RoomPlayer {
+    return RoomPlayer(
+        id = id,
+        teamId = teamId,
+        name = name,
+        shirtNumber = shirtNumber,
+        licenseNumber = licenseNumber,
+        image = image,
+        positions = positions,
+        pitching = pitching,
+        batting = batting,
+        email = email,
+        phone = phone,
+        hash = hash,
+        sex = sex
+    )
 }
 
-internal fun RoomPlayer.init(player: Player): RoomPlayer {
-    id = player.id
-    teamId = player.teamId
-    name = player.name
-    shirtNumber = player.shirtNumber
-    licenseNumber = player.licenseNumber
-    image = player.image
-    positions = player.positions
-    pitching = player.pitching
-    batting = player.batting
-    email = player.email
-    phone = player.phone
-    hash = player.hash
-    sex = player.sex
-    return this
-}
-
-internal fun RoomPlayer.toPlayer(): Player {
+internal fun RoomPlayer.toDomain(): Player {
     return Player(
-        id,
-        teamId,
-        name,
-        shirtNumber,
-        licenseNumber,
-        image,
-        positions,
-        pitching,
-        batting,
-        email,
-        phone,
-        sex,
-        hash
+        id = id,
+        teamId = teamId,
+        name = name,
+        shirtNumber = shirtNumber,
+        licenseNumber = licenseNumber,
+        image = image,
+        positions = positions,
+        pitching = pitching,
+        batting = batting,
+        email = email,
+        phone = phone,
+        sex = sex,
+        hash = hash
     )
 }

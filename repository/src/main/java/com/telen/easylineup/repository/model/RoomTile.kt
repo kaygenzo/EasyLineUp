@@ -29,14 +29,15 @@ internal data class RoomTile(
     @ColumnInfo(name = "enabled") var enabled: Boolean = true
 ) : Serializable
 
-internal fun RoomTile.toDashboardTile(): DashboardTile {
+internal fun RoomTile.toDomain(): DashboardTile {
     return DashboardTile(id, position, type, enabled)
 }
 
-internal fun RoomTile.init(tile: DashboardTile): RoomTile {
-    id = tile.id
-    position = tile.position
-    type = tile.type
-    enabled = tile.enabled
-    return this
+internal fun DashboardTile.toRoom(): RoomTile {
+    return RoomTile(
+        id = id,
+        position = position,
+        type = type,
+        enabled = enabled
+    )
 }

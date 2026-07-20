@@ -51,25 +51,25 @@ internal data class RoomTournamentWithLineup(
     @ColumnInfo(name = "roster") var roster: String? = null
 )
 
-internal fun RoomTournamentWithLineup.toTournamentWithLineup(): TournamentWithLineup {
+internal fun RoomTournamentWithLineup.toDomain(): TournamentWithLineup {
     return TournamentWithLineup(
-        tournamentId,
-        tournamentName,
-        tournamentCreatedAt,
-        tournamentStartTime,
-        tournamentEndTime,
-        tournamentAddress,
-        fieldPositionId,
-        lineupName,
-        lineupId,
-        lineupMode,
-        lineupStrategy,
-        lineupExtraHittersSize,
-        x, y,
-        position,
-        teamId,
-        lineupEventTime,
-        lineupCreatedTime,
-        roster
+        tournamentId = tournamentId,
+        tournamentName = tournamentName,
+        tournamentCreatedAt = tournamentCreatedAt,
+        tournamentStartTime = tournamentStartTime,
+        tournamentEndTime = tournamentEndTime,
+        tournamentAddress = tournamentAddress,
+        fieldPositionId = fieldPositionId,
+        lineupName = lineupName,
+        lineupId = lineupId,
+        lineupMode = lineupMode,
+        lineupStrategy = lineupStrategy,
+        lineupExtraHittersSize = lineupExtraHittersSize,
+        x = x, y = y,
+        position = position,
+        teamId = teamId,
+        lineupEventTime = lineupEventTime,
+        lineupCreatedTime = lineupCreatedTime,
+        roster = roster
     )
 }

@@ -42,22 +42,22 @@ internal data class RoomPlayerWithPosition(
     @ColumnInfo(name = "playerPositions") val playerPositions: Int
 )
 
-internal fun RoomPlayerWithPosition.toPlayerWithPosition(): PlayerWithPosition {
+internal fun RoomPlayerWithPosition.toDomain(): PlayerWithPosition {
     return PlayerWithPosition(
-        playerName,
-        playerSex,
-        shirtNumber,
-        licenseNumber,
-        teamId,
-        image,
-        position,
-        x,
-        y,
-        flags,
-        order,
-        fieldPositionId,
-        playerId,
-        lineupId,
-        playerPositions
+        playerName = playerName,
+        playerSex = playerSex,
+        shirtNumber = shirtNumber,
+        licenseNumber = licenseNumber,
+        teamId = teamId,
+        image = image,
+        position = position,
+        x = x,
+        y = y,
+        flags = flags,
+        order = order,
+        fieldPositionId = fieldPositionId,
+        playerId = playerId,
+        lineupId = lineupId,
+        playerPositions = playerPositions
     )
 }

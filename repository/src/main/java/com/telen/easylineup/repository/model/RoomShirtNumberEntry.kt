@@ -26,7 +26,7 @@ internal data class RoomShirtNumberEntry(
     @ColumnInfo(name = "lineupName") val lineupName: String
 )
 
-internal fun RoomShirtNumberEntry.toShirtNumberEntry(): ShirtNumberEntry {
+internal fun RoomShirtNumberEntry.toDomain(): ShirtNumberEntry {
     return ShirtNumberEntry(
         number = number,
         playerName = playerName,

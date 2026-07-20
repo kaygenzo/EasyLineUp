@@ -7,9 +7,8 @@ package com.telen.easylineup.repository.adapters.impl
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.repository.TournamentRepository
 import com.telen.easylineup.repository.dao.TournamentDao
-import com.telen.easylineup.repository.model.RoomTournament
-import com.telen.easylineup.repository.model.init
-import com.telen.easylineup.repository.model.toTournament
+import com.telen.easylineup.repository.model.toDomain
+import com.telen.easylineup.repository.model.toRoom
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
@@ -22,46 +21,42 @@ internal class TournamentRepositoryImpl(
     }
 
     override suspend fun getTournaments(): List<Tournament> {
-        return tournamentDao.getTournaments().map { it.toTournament() }
+        return tournamentDao.getTournaments().map { it.toDomain() }
     }
 
     override fun observeTournaments(): Flow<List<Tournament>> {
-        return tournamentDao.observeTournaments().map { list -> list.map { it.toTournament() } }
+        return tournamentDao.observeTournaments().map { list -> list.map { it.toDomain() } }
     }
 
     override suspend fun getTournamentByHash(hash: String): Tournament {
-        return tournamentDao.getTournamentByHash(hash).toTournament()
+        return tournamentDao.getTournamentByHash(hash).toDomain()
     }
 
     override suspend fun getTournamentByName(name: String): Tournament {
-        return tournamentDao.getTournamentByName(name).toTournament()
+        return tournamentDao.getTournamentByName(name).toDomain()
     }
 
     override suspend fun insertTournament(tournament: Tournament): Long {
-        return tournamentDao.insertTournament(RoomTournament().init(tournament))
+        return tournamentDao.insertTournament(tournament.toRoom())
     }
 
     override suspend fun insertTournaments(tournaments: List<Tournament>) {
-        tournamentDao.insertTournaments(tournaments.map { RoomTournament().init(it) })
+        tournamentDao.insertTournaments(tournaments.map { it.toRoom() })
     }
 
     override suspend fun updateTournament(tournament: Tournament) {
-        tournamentDao.updateTournament(RoomTournament().init(tournament))
+        tournamentDao.updateTournament(tournament.toRoom())
     }
 
     override suspend fun updateTournamentsWithRowCount(tournaments: List<Tournament>): Int {
-        return tournamentDao.updateTournamentsWithRowCount(
-            tournaments = tournaments.map {
-                RoomTournament().init(tournament = it)
-            }
-        )
+        return tournamentDao.updateTournamentsWithRowCount(tournaments.map { it.toRoom() })
     }
 
     override suspend fun deleteTournament(tournament: Tournament) {
-        tournamentDao.deleteTournament(RoomTournament().init(tournament))
+        tournamentDao.deleteTournament(tournament.toRoom())
     }
 
     override suspend fun deleteTournaments(tournaments: List<Tournament>) {
-        tournamentDao.deleteTournaments(tournaments.map { RoomTournament().init(it) })
+        tournamentDao.deleteTournaments(tournaments.map { it.toRoom() })
     }
 }

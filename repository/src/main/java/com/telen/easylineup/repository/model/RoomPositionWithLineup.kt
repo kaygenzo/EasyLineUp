@@ -24,6 +24,13 @@ internal data class RoomPositionWithLineup(
     @ColumnInfo(name = "tournamentName") var tournamentName: String = ""
 )
 
-internal fun RoomPositionWithLineup.toPositionWithLineup(): PositionWithLineup {
-    return PositionWithLineup(position, x, y, order, lineupName, tournamentName)
+internal fun RoomPositionWithLineup.toDomain(): PositionWithLineup {
+    return PositionWithLineup(
+        position = position,
+        x = x,
+        y = y,
+        order = order,
+        lineupName = lineupName,
+        tournamentName = tournamentName
+    )
 }

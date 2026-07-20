@@ -16,6 +16,9 @@ internal data class RoomPlayerGamesCount(
     @ColumnInfo(name = "size") var size: Int = 0
 )
 
-internal fun RoomPlayerGamesCount.toPlayerGamesCount(): PlayerGamesCount {
-    return PlayerGamesCount(playerId, size)
+internal fun RoomPlayerGamesCount.toDomain(): PlayerGamesCount {
+    return PlayerGamesCount(
+        playerId = playerId,
+        size = size
+    )
 }

@@ -22,6 +22,12 @@ internal data class RoomPlayerInLineup(
     @ColumnInfo(name = "playerID") var playerId: Long?
 )
 
-internal fun RoomPlayerInLineup.toPlayerInLineup(): PlayerInLineup {
-    return PlayerInLineup(lineupName, lineupId, position, playerName, playerId)
+internal fun RoomPlayerInLineup.toDomain(): PlayerInLineup {
+    return PlayerInLineup(
+        lineupName = lineupName,
+        lineupId = lineupId,
+        position = position,
+        playerName = playerName,
+        playerId = playerId
+    )
 }
