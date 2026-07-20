@@ -14,12 +14,12 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.DeleteTeam
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObservePlayers
-import com.telen.easylineup.utils.asSafeFlow
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -37,7 +37,7 @@ class TeamViewModel : ViewModel(), KoinComponent {
     }
     private val _playersFromDao by lazy {
         _team.flatMapLatest {
-            observePlayers(it.id).asSafeFlow()
+            observePlayers(it.id).catch { e -> Timber.e(e) }
         }
     }
     private val _players: MutableSharedFlow<List<Player>> =

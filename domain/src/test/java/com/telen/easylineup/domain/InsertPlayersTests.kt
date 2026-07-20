@@ -8,7 +8,8 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.InsertPlayers
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,21 +26,19 @@ internal class InsertPlayersTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        insertPlayers = InsertPlayers(playerDao, testSchedulersProvider())
+        insertPlayers = InsertPlayers(playerDao, testDispatcherProvider())
     }
 
     @Test
-    fun shouldDelegateToRepository() {
+    fun shouldDelegateToRepository() = runTest {
         val players = listOf(
             Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L)
         )
         Mockito.`when`(playerDao.insertPlayers(players)).thenReturn(Completable.complete())
 
-        val observer = TestObserver<Void>()
-        insertPlayers(players).subscribe(observer)
-        observer.await()
+        val result = insertPlayers(players)
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         Mockito.verify(playerDao).insertPlayers(players)
     }
 }

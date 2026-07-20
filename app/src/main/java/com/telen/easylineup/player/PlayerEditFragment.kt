@@ -36,6 +36,7 @@ import com.telen.easylineup.utils.ImagePickerUtils
 import com.telen.easylineup.views.PlayerFormListener
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListener, MenuProvider {
@@ -194,27 +195,31 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListene
         phone: String?,
         sex: Int
     ) {
-        launch(viewModel.savePlayer(
-            name,
-            shirtNumber,
-            licenseNumber,
-            imageUri?.toString(),
-            positions,
-            pitching,
-            batting,
-            email,
-            phone,
-            sex
-        ), {
-            findNavController().navigateUp()
-        }, {
-            when (it) {
-                is NameEmptyException,
-                is InvalidEmailException,
-                is InvalidPhoneException -> Timber.w(it.message)
-                else -> Timber.e(it)
-            }
-        })
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.savePlayer(
+                name,
+                shirtNumber,
+                licenseNumber,
+                imageUri?.toString(),
+                positions,
+                pitching,
+                batting,
+                email,
+                phone,
+                sex
+            )
+                .onSuccess {
+                    findNavController().navigateUp()
+                }
+                .onFailure {
+                    when (it) {
+                        is NameEmptyException,
+                        is InvalidEmailException,
+                        is InvalidPhoneException -> Timber.w(it.message)
+                        else -> Timber.e(it)
+                    }
+                }
+        }
     }
 
     private fun showDiscardDialog(trigger: String) {

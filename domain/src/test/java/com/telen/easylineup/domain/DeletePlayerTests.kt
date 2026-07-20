@@ -11,7 +11,8 @@ import com.telen.easylineup.domain.usecases.DeletePlayer
 import com.telen.easylineup.domain.usecases.GetPlayer
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,8 +23,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class DeletePlayerTests {
-    val observer: TestObserver<Void> = TestObserver()
-
     @Mock
     lateinit var playerDao: PlayerRepository
     lateinit var deletePlayer: DeletePlayer
@@ -34,8 +33,8 @@ internal class DeletePlayerTests {
         MockitoAnnotations.initMocks(this)
         deletePlayer = DeletePlayer(
             playerDao,
-            GetPlayer(playerDao, testSchedulersProvider()),
-            testSchedulersProvider()
+            GetPlayer(playerDao, testDispatcherProvider()),
+            testDispatcherProvider()
         )
 
         player = Player(
@@ -53,10 +52,9 @@ internal class DeletePlayerTests {
     }
 
     @Test
-    fun shouldDeletePlayer() {
-        deletePlayer(1L).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+    fun shouldDeletePlayer() = runTest {
+        val result = deletePlayer(1L)
+        assertTrue(result.isSuccess)
         verify(playerDao).deletePlayer(player)
     }
 }

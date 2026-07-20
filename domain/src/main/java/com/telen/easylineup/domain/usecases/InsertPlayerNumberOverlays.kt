@@ -4,16 +4,19 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.PlayerRepository
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class InsertPlayerNumberOverlays(
     private val dao: PlayerRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(overlays: List<PlayerNumberOverlay>): Completable {
-        return dao.createPlayerNumberOverlays(overlays).subscribeOn(schedulersProvider.io())
+    suspend operator fun invoke(overlays: List<PlayerNumberOverlay>): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            dao.createPlayerNumberOverlays(overlays).await()
+        }
     }
 }

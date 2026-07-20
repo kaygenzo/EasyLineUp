@@ -12,8 +12,9 @@ import com.telen.easylineup.domain.usecases.GetPlayers
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.GetTeamPhones
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,25 +33,23 @@ internal class GetTeamPhonesTests {
     fun init() {
         MockitoAnnotations.initMocks(this)
         getTeamPhones = GetTeamPhones(
-            GetPlayers(playerDao, GetTeam(teamDao, testSchedulersProvider()), testSchedulersProvider()),
-            testSchedulersProvider()
+            GetPlayers(playerDao, GetTeam(teamDao, testSchedulersProvider()), testDispatcherProvider()),
+            testDispatcherProvider()
         )
         Mockito.`when`(teamDao.getTeamsRx())
             .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
     }
 
     @Test
-    fun shouldFilterOutPlayersWithoutPhone() {
+    fun shouldFilterOutPlayersWithoutPhone() = runTest {
         val withPhone = Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L, phone = "0102030405")
         val withoutPhone = Player(id = 2L, teamId = 1L, name = "Titi", shirtNumber = 2, licenseNumber = 2L, phone = null)
         Mockito.`when`(playerDao.getPlayersByTeamId(1L))
             .thenReturn(Single.just(listOf(withPhone, withoutPhone)))
 
-        val observer = TestObserver<List<String>>()
-        getTeamPhones().subscribe(observer)
-        observer.await()
+        val result = getTeamPhones()
 
-        observer.assertComplete()
-        assertEquals(listOf("0102030405"), observer.values().first())
+        assertTrue(result.isSuccess)
+        assertEquals(listOf("0102030405"), result.getOrNull())
     }
 }

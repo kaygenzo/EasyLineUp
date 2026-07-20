@@ -19,14 +19,13 @@ import com.telen.easylineup.domain.usecases.SavePlayer
 import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
-import com.telen.easylineup.utils.asSafeFlow
 import com.telen.easylineup.utils.getStrategiesDisplayName
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.koin.core.component.KoinComponent
@@ -53,7 +52,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
     }
     private val _player: Flow<Player> by lazy {
         playerId.takeIf { it > 0 }
-            ?.let { observePlayer(it).asSafeFlow() }
+            ?.let { observePlayer(it).catch { Timber.e(it) } }
             ?: flowOf(Player(teamId = 0, name = "", shirtNumber = 0, licenseNumber = 0))
     }
     var playerId: Long = 0
@@ -150,7 +149,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
         disposables.clear()
     }
 
-    fun savePlayer(
+    suspend fun savePlayer(
         name: String?,
         shirtNumber: Int?,
         licenseNumber: Long?,
@@ -161,7 +160,7 @@ class PlayerViewModel : ViewModel(), KoinComponent {
         email: String?,
         phone: String?,
         sex: Int
-    ): Completable {
+    ): Result<Unit> {
         return savePlayerUseCase(
             playerId,
             name,
@@ -174,20 +173,19 @@ class PlayerViewModel : ViewModel(), KoinComponent {
             email,
             phone,
             sex
-        )
-            .doOnError {
-                when (it) {
-                    is NameEmptyException ->
-                        errors.onNext(DomainErrors.Players.INVALID_PLAYER_NAME)
-                    is InvalidEmailException ->
-                        errors.onNext(DomainErrors.Players.INVALID_EMAIL_FORMAT)
-                    is InvalidPhoneException ->
-                        errors.onNext(DomainErrors.Players.INVALID_PHONE_NUMBER_FORMAT)
-                }
+        ).onFailure {
+            when (it) {
+                is NameEmptyException ->
+                    errors.onNext(DomainErrors.Players.INVALID_PLAYER_NAME)
+                is InvalidEmailException ->
+                    errors.onNext(DomainErrors.Players.INVALID_EMAIL_FORMAT)
+                is InvalidPhoneException ->
+                    errors.onNext(DomainErrors.Players.INVALID_PHONE_NUMBER_FORMAT)
             }
+        }
     }
 
-    fun deletePlayer(): Completable {
+    suspend fun deletePlayer(): Result<Unit> {
         return deletePlayerUseCase(playerId)
     }
 

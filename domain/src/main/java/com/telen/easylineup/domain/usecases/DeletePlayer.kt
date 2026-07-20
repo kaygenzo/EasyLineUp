@@ -4,18 +4,20 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.PlayerRepository
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class DeletePlayer(
     private val dao: PlayerRepository,
     private val getPlayer: GetPlayer,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(playerId: Long?): Completable {
-        return getPlayer(playerId)
-            .flatMapCompletable { dao.deletePlayer(it) }
-            .subscribeOn(schedulersProvider.io())
+    suspend operator fun invoke(playerId: Long?): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            val player = getPlayer(playerId).getOrThrow()
+            dao.deletePlayer(player).await()
+        }
     }
 }

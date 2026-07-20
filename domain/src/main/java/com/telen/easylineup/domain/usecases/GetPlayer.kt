@@ -4,25 +4,24 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.exceptions.NotExistingPlayerException
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class GetPlayer(
     private val dao: PlayerRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(playerId: Long?): Single<Player> {
-        return (
-            playerId?.let { id ->
-                if (id == 0L) {
-                    Single.error(NotExistingPlayerException())
-                } else {
-                    dao.getPlayerByIdAsSingle(id)
-                }
-            } ?: Single.error(IllegalArgumentException())
-            ).subscribeOn(schedulersProvider.io())
+    suspend operator fun invoke(playerId: Long?): Result<Player> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            val id = playerId ?: throw IllegalArgumentException()
+            if (id == 0L) {
+                throw NotExistingPlayerException()
+            }
+            dao.getPlayerByIdAsSingle(id).await()
+        }
     }
 }

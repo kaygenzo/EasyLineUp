@@ -26,6 +26,7 @@ import com.telen.easylineup.domain.usecases.GetTeamEmails
 import com.telen.easylineup.domain.usecases.GetTeamPhones
 import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.domain.usecases.SaveDashboardTiles
+import com.telen.easylineup.testDispatcherProvider
 import com.telen.easylineup.testSchedulersProvider
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import io.reactivex.rxjava3.core.Single
@@ -91,8 +92,9 @@ internal class DashboardViewModelTest {
             .thenReturn(Single.just(listOf(Team(id = 1L, name = "Panthers", main = true))))
 
         val schedulersProvider = testSchedulersProvider()
+        val dispatcherProvider = testDispatcherProvider()
         val getTeam = GetTeam(teamRepository, schedulersProvider)
-        val getPlayers = GetPlayers(playerRepository, getTeam, schedulersProvider)
+        val getPlayers = GetPlayers(playerRepository, getTeam, dispatcherProvider)
 
         startKoin {
             modules(
@@ -110,9 +112,9 @@ internal class DashboardViewModelTest {
                         )
                     }
                     single { SaveDashboardTiles(tilesRepository, schedulersProvider) }
-                    single { GetShirtNumberHistory(playerRepository, getTeam, schedulersProvider) }
-                    single { GetTeamEmails(getPlayers, schedulersProvider) }
-                    single { GetTeamPhones(getPlayers, schedulersProvider) }
+                    single { GetShirtNumberHistory(playerRepository, getTeam, dispatcherProvider) }
+                    single { GetTeamEmails(getPlayers, dispatcherProvider) }
+                    single { GetTeamPhones(getPlayers, dispatcherProvider) }
                     single { SharedPreferencesHelper(context) }
                 }
             )
@@ -187,7 +189,7 @@ internal class DashboardViewModelTest {
     }
 
     @Test
-    fun shouldGetShirtNumberHistoryDelegateToUseCase() {
+    fun shouldGetShirtNumberHistoryDelegateToUseCase() = runTest {
         val overlayEntry = ShirtNumberEntry(
             number = 8,
             playerName = "Toto",
@@ -202,39 +204,33 @@ internal class DashboardViewModelTest {
         Mockito.`when`(playerRepository.getShirtNumberFromNumberOverlays(1L, 8))
             .thenReturn(Single.just(listOf(overlayEntry)))
 
-        val observer = TestObserver<List<ShirtNumberEntry>>()
-        viewModel.getShirtNumberHistory(8).subscribe(observer)
-        observer.await()
+        val result = viewModel.getShirtNumberHistory(8)
 
-        observer.assertComplete()
-        assertEquals(listOf(overlayEntry), observer.values().first())
+        assertTrue(result.isSuccess)
+        assertEquals(listOf(overlayEntry), result.getOrNull())
     }
 
     @Test
-    fun shouldGetEmailsDelegateToUseCase() {
+    fun shouldGetEmailsDelegateToUseCase() = runTest {
         val withEmail = Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L, email = "a@mail.com")
         Mockito.`when`(playerRepository.getPlayersByTeamId(1L))
             .thenReturn(Single.just(listOf(withEmail)))
 
-        val observer = TestObserver<List<String>>()
-        viewModel.getEmails().subscribe(observer)
-        observer.await()
+        val result = viewModel.getEmails()
 
-        observer.assertComplete()
-        assertEquals(listOf("a@mail.com"), observer.values().first())
+        assertTrue(result.isSuccess)
+        assertEquals(listOf("a@mail.com"), result.getOrNull())
     }
 
     @Test
-    fun shouldGetPhonesDelegateToUseCase() {
+    fun shouldGetPhonesDelegateToUseCase() = runTest {
         val withPhone = Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L, phone = "0102030405")
         Mockito.`when`(playerRepository.getPlayersByTeamId(1L))
             .thenReturn(Single.just(listOf(withPhone)))
 
-        val observer = TestObserver<List<String>>()
-        viewModel.getPhones().subscribe(observer)
-        observer.await()
+        val result = viewModel.getPhones()
 
-        observer.assertComplete()
-        assertEquals(listOf("0102030405"), observer.values().first())
+        assertTrue(result.isSuccess)
+        assertEquals(listOf("0102030405"), result.getOrNull())
     }
 }

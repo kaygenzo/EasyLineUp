@@ -25,6 +25,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.rx3.rxCompletable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -99,7 +100,7 @@ class LineupEditionViewModel : ViewModel(), KoinComponent {
                             rosterItems.map { it.toRosterPlayerStatus() }
                         )
                     )
-                    .andThen(savePlayerNumberOverlayUseCase(rosterItems))
+                    .andThen(rxCompletable { savePlayerNumberOverlayUseCase(rosterItems).getOrThrow() })
             } ?: Completable.error(LineupNameEmptyException())
         }
     }

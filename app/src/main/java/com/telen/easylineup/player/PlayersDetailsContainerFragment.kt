@@ -28,6 +28,7 @@ import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.rx3.rxCompletable
 import timber.log.Timber
 
 class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFragment") {
@@ -122,7 +123,7 @@ class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFra
     private fun askUserConsentForDeletePlayerWithId(playerId: Long) {
         activity?.let { activity ->
             playerViewModel.playerId = playerId
-            val task = playerViewModel.deletePlayer()
+            val task = rxCompletable { playerViewModel.deletePlayer().getOrThrow() }
                 .doOnComplete { findNavController().popBackStack(R.id.navigation_team, false) }
                 .doOnError {
                     val message = "Something wrong happened: ${it.message}"

@@ -4,14 +4,15 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.domain.utils.ValidatorUtils
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 /**
  * Validates the player, then inserts/updates it under the current team.
@@ -20,9 +21,9 @@ class SavePlayer(
     private val dao: PlayerRepository,
     private val getTeam: GetTeam,
     private val validatorUtils: ValidatorUtils,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(
+    suspend operator fun invoke(
         playerId: Long,
         name: String?,
         shirtNumber: Int?,
@@ -34,36 +35,41 @@ class SavePlayer(
         email: String?,
         phone: String?,
         sex: Int
-    ): Completable {
-        return when {
-            name.isNullOrBlank() -> Completable.error(NameEmptyException())
-            !validatorUtils.isEmailValid(email) -> Completable.error(InvalidEmailException())
-            !validatorUtils.isValidPhoneNumber(phone) -> Completable.error(InvalidPhoneException())
-            else -> getTeam().flatMapCompletable { team ->
-                val player = Player(
-                    id = playerId,
-                    teamId = team.id,
-                    name = name.trim(),
-                    shirtNumber = shirtNumber ?: 0,
-                    licenseNumber = licenseNumber ?: 0L,
-                    image = image,
-                    positions = positions,
-                    pitching = pitching,
-                    batting = batting,
-                    email = email,
-                    phone = phone,
-                    sex = sex
-                )
-
-                if (player.id == 0L) {
-                    dao.insertPlayer(player).ignoreElement()
-                } else {
-                    dao.getPlayerByIdAsSingle(player.id).flatMapCompletable {
-                        player.hash = it.hash
-                        dao.updatePlayer(player)
-                    }
-                }
+    ): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            if (name.isNullOrBlank()) {
+                throw NameEmptyException()
             }
-        }.subscribeOn(schedulersProvider.io())
+            if (!validatorUtils.isEmailValid(email)) {
+                throw InvalidEmailException()
+            }
+            if (!validatorUtils.isValidPhoneNumber(phone)) {
+                throw InvalidPhoneException()
+            }
+
+            val team = getTeam().await()
+            val player = Player(
+                id = playerId,
+                teamId = team.id,
+                name = name.trim(),
+                shirtNumber = shirtNumber ?: 0,
+                licenseNumber = licenseNumber ?: 0L,
+                image = image,
+                positions = positions,
+                pitching = pitching,
+                batting = batting,
+                email = email,
+                phone = phone,
+                sex = sex
+            )
+
+            if (player.id == 0L) {
+                dao.insertPlayer(player).await()
+            } else {
+                val existing = dao.getPlayerByIdAsSingle(player.id).await()
+                player.hash = existing.hash
+                dao.updatePlayer(player).await()
+            }
+        }
     }
 }

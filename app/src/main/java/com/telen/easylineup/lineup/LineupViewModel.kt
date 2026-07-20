@@ -57,6 +57,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -416,7 +417,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
                     *positions.map { Pair(it.playerId, it) }.toTypedArray()
                 )
                 val currentLineupId = lineupId ?: 0
-                observePlayerNumberOverlays(currentLineupId).asSafeFlow()
+                observePlayerNumberOverlays(currentLineupId).catch { Timber.e(it) }
                     .map {
                         it.forEach { overlay ->
                             playerMap[overlay.playerId]?.shirtNumber = overlay.number

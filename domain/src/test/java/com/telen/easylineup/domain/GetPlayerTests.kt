@@ -9,8 +9,9 @@ import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.GetPlayer
 import com.telen.easylineup.domain.usecases.exceptions.NotExistingPlayerException
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
-import org.junit.Assert
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,8 +22,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetPlayerTests {
-    val observer: TestObserver<Player> = TestObserver()
-
     @Mock
     lateinit var playerDao: PlayerRepository
     lateinit var getPlayer: GetPlayer
@@ -31,7 +30,7 @@ internal class GetPlayerTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getPlayer = GetPlayer(playerDao, testSchedulersProvider())
+        getPlayer = GetPlayer(playerDao, testDispatcherProvider())
 
         player = Player(
             id = 1L,
@@ -48,31 +47,27 @@ internal class GetPlayerTests {
     }
 
     @Test
-    fun shouldGetPlayerIfValidId() {
-        getPlayer(1L).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(player, observer.values().first())
+    fun shouldGetPlayerIfValidId() = runTest {
+        val result = getPlayer(1L)
+        assertTrue(result.isSuccess)
+        assertEquals(player, result.getOrNull())
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfIdIsLessOrEqualsTo0() {
-        getPlayer(0L).subscribe(observer)
-        observer.await()
-        observer.assertError(NotExistingPlayerException::class.java)
+    fun shouldTriggerAnExceptionIfIdIsLessOrEqualsTo0() = runTest {
+        val result = getPlayer(0L)
+        assertTrue(result.exceptionOrNull() is NotExistingPlayerException)
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfUnknownId() {
-        getPlayer(2L).subscribe(observer)
-        observer.await()
-        observer.assertError(Exception::class.java)
+    fun shouldTriggerAnExceptionIfUnknownId() = runTest {
+        val result = getPlayer(2L)
+        assertTrue(result.isFailure)
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfIdIsNull() {
-        getPlayer(null).subscribe(observer)
-        observer.await()
-        observer.assertError(IllegalArgumentException::class.java)
+    fun shouldTriggerAnExceptionIfIdIsNull() = runTest {
+        val result = getPlayer(null)
+        assertTrue(result.exceptionOrNull() is IllegalArgumentException)
     }
 }

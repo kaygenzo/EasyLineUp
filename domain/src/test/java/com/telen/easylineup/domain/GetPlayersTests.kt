@@ -11,7 +11,7 @@ import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetPlayers
 import com.telen.easylineup.domain.usecases.GetTeam
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -23,7 +23,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetPlayersTests {
-    val observer: TestObserver<List<Player>> = TestObserver()
     @Mock lateinit var playerDao: PlayerRepository
     @Mock lateinit var teamDao: TeamRepository
     lateinit var getPlayers: GetPlayers
@@ -32,7 +31,7 @@ internal class GetPlayersTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        getPlayers = GetPlayers(playerDao, GetTeam(teamDao, testSchedulersProvider()), testSchedulersProvider())
+        getPlayers = GetPlayers(playerDao, GetTeam(teamDao, testSchedulersProvider()), testDispatcherProvider())
 
         val player1 = Player(id = 1L, teamId = 1L, name = "toto", shirtNumber = 1, licenseNumber = 1, image = null,
             positions = 1)
@@ -47,11 +46,10 @@ internal class GetPlayersTests {
     }
 
     @Test
-    fun shouldGetPlayersTeam() {
-        getPlayers().subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(players[0], observer.values().first()[0])
-        Assert.assertEquals(players[1], observer.values().first()[1])
+    fun shouldGetPlayersTeam() = runTest {
+        val result = getPlayers()
+        Assert.assertTrue(result.isSuccess)
+        Assert.assertEquals(players[0], result.getOrNull()?.get(0))
+        Assert.assertEquals(players[1], result.getOrNull()?.get(1))
     }
 }

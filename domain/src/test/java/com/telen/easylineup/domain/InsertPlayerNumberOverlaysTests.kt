@@ -8,7 +8,8 @@ import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,19 +26,17 @@ internal class InsertPlayerNumberOverlaysTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        insertPlayerNumberOverlays = InsertPlayerNumberOverlays(playerDao, testSchedulersProvider())
+        insertPlayerNumberOverlays = InsertPlayerNumberOverlays(playerDao, testDispatcherProvider())
     }
 
     @Test
-    fun shouldDelegateToRepository() {
+    fun shouldDelegateToRepository() = runTest {
         val overlays = listOf(PlayerNumberOverlay(id = 1L, lineupId = 10L, playerId = 1L, number = 8))
         Mockito.`when`(playerDao.createPlayerNumberOverlays(overlays)).thenReturn(Completable.complete())
 
-        val observer = TestObserver<Void>()
-        insertPlayerNumberOverlays(overlays).subscribe(observer)
-        observer.await()
+        val result = insertPlayerNumberOverlays(overlays)
 
-        observer.assertComplete()
+        assertTrue(result.isSuccess)
         Mockito.verify(playerDao).createPlayerNumberOverlays(overlays)
     }
 }

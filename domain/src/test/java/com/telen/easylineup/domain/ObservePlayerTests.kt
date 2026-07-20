@@ -8,7 +8,9 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.ObservePlayer
 import io.reactivex.rxjava3.core.Flowable
-import org.junit.Assert.assertSame
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,10 +31,12 @@ internal class ObservePlayerTests {
     }
 
     @Test
-    fun shouldDelegateToRepository() {
-        val flowable = Flowable.just(Player(teamId = 0, name = "", shirtNumber = 0, licenseNumber = 0))
-        Mockito.`when`(playerDao.getPlayerById(1L)).thenReturn(flowable)
+    fun shouldDelegateToRepository() = runTest {
+        val player = Player(teamId = 0, name = "", shirtNumber = 0, licenseNumber = 0)
+        Mockito.`when`(playerDao.getPlayerById(1L)).thenReturn(Flowable.just(player))
 
-        assertSame(flowable, observePlayer(1L))
+        val result = observePlayer(1L).toList()
+
+        assertEquals(listOf(player), result)
     }
 }

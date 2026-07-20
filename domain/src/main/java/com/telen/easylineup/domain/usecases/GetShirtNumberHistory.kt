@@ -4,62 +4,55 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.ShirtNumberEntry
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.PlayerRepository
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class GetShirtNumberHistory(
     private val playersRepo: PlayerRepository,
     private val getTeam: GetTeam,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(number: Int): Single<List<ShirtNumberEntry>> {
-        val overlaysAdded: MutableList<ShirtNumberEntry> = mutableListOf()
-        return getTeam()
-            .flatMap { team ->
-                val teamId = team.id
-                playersRepo.getShirtNumberFromPlayers(teamId, number)
-                    .flatMapObservable { items ->
-                        Observable.fromIterable(items)
-                    }
-                    .flatMapSingle { shirtNumber ->
-                        playersRepo.getShirtNumberOverlay(shirtNumber.playerId, shirtNumber.lineupId)
-                            .map {
-                                val newItem = ShirtNumberEntry(
-                                    it.number, shirtNumber.playerName, it.playerId,
-                                    shirtNumber.eventTime, shirtNumber.createdAt, it.lineupId,
-                                    shirtNumber.lineupName
-                                )
-                                overlaysAdded.add(newItem)
-                                newItem
-                            }
-                            .onErrorResumeNext {
-                                Single.just(shirtNumber)
-                            }
-                    }
-                    .toList()
-                    .flatMap { items ->
-                        playersRepo.getShirtNumberFromNumberOverlays(teamId, number)
-                            .map { overlays ->
-                                overlays.forEach { overlay ->
-                                    val first =
-                                        overlaysAdded.find {
-                                            it.playerId == overlay.playerId
-                                                    && it.lineupId == overlay.lineupId
-                                        }
-                                    first ?: items.add(overlay)
-                                }
-                                items.filter { it.number == number }
-                            }
-                    }
-            }
-            .map {
-                it.sortedByDescending { entry ->
-                    entry.eventTime.takeIf { it > 0 } ?: let { entry.createdAt }
+    suspend operator fun invoke(number: Int): Result<List<ShirtNumberEntry>> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            val overlaysAdded: MutableList<ShirtNumberEntry> = mutableListOf()
+            val team = getTeam().await()
+            val teamId = team.id
+
+            val shirtNumbers = playersRepo.getShirtNumberFromPlayers(teamId, number).await()
+            val items = shirtNumbers.map { shirtNumber ->
+                try {
+                    val overlay = playersRepo.getShirtNumberOverlay(
+                        shirtNumber.playerId,
+                        shirtNumber.lineupId
+                    ).await()
+                    val newItem = ShirtNumberEntry(
+                        overlay.number, shirtNumber.playerName, overlay.playerId,
+                        shirtNumber.eventTime, shirtNumber.createdAt, overlay.lineupId,
+                        shirtNumber.lineupName
+                    )
+                    overlaysAdded.add(newItem)
+                    newItem
+                } catch (c: CancellationException) {
+                    throw c
+                } catch (e: Exception) {
+                    shirtNumber
                 }
+            }.toMutableList()
+
+            val overlays = playersRepo.getShirtNumberFromNumberOverlays(teamId, number).await()
+            overlays.forEach { overlay ->
+                val first = overlaysAdded.find {
+                    it.playerId == overlay.playerId && it.lineupId == overlay.lineupId
+                }
+                first ?: items.add(overlay)
             }
-            .subscribeOn(schedulersProvider.io())
+
+            items.filter { it.number == number }
+                .sortedByDescending { entry -> entry.eventTime.takeIf { it > 0 } ?: entry.createdAt }
+        }
     }
 }

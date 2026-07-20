@@ -9,16 +9,17 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.ports.PhoneNumberValidator
 import com.telen.easylineup.domain.repository.PlayerRepository
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetTeam
-import com.telen.easylineup.domain.ports.PhoneNumberValidator
 import com.telen.easylineup.domain.usecases.SavePlayer
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.domain.utils.ValidatorUtils
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,8 +30,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerTests {
-    val observer: TestObserver<Void> = TestObserver()
-
     @Mock
     lateinit var playerDao: PlayerRepository
 
@@ -45,7 +44,7 @@ internal class SavePlayerTests {
             playerDao,
             GetTeam(teamDao, testSchedulersProvider()),
             ValidatorUtilsMock(),
-            testSchedulersProvider()
+            testDispatcherProvider()
         )
         val player = Player(
             id = 1L,
@@ -69,8 +68,8 @@ internal class SavePlayerTests {
     }
 
     @Test
-    fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() {
-        savePlayer(
+    fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() = runTest {
+        val result = savePlayer(
             playerId = 1L,
             name = "",
             positions = 1,
@@ -82,14 +81,13 @@ internal class SavePlayerTests {
             email = "p1@test.com",
             phone = "001",
             sex = 0
-        ).subscribe(observer)
-        observer.await()
-        observer.assertError(NameEmptyException::class.java)
+        )
+        assertTrue(result.exceptionOrNull() is NameEmptyException)
     }
 
     @Test
-    fun shouldTriggerNameEmptyExceptionIfNameIsWhitespaces() {
-        savePlayer(
+    fun shouldTriggerNameEmptyExceptionIfNameIsWhitespaces() = runTest {
+        val result = savePlayer(
             playerId = 1L,
             name = "     ",
             positions = 1,
@@ -101,14 +99,13 @@ internal class SavePlayerTests {
             email = "p1@test.com",
             phone = "001",
             sex = 0
-        ).subscribe(observer)
-        observer.await()
-        observer.assertError(NameEmptyException::class.java)
+        )
+        assertTrue(result.exceptionOrNull() is NameEmptyException)
     }
 
     @Test
-    fun shouldTriggerNameEmptyExceptionIfNameIsNull() {
-        savePlayer(
+    fun shouldTriggerNameEmptyExceptionIfNameIsNull() = runTest {
+        val result = savePlayer(
             playerId = 1L,
             name = null,
             positions = 1,
@@ -120,14 +117,13 @@ internal class SavePlayerTests {
             email = "p1@test.com",
             phone = "001",
             sex = 0
-        ).subscribe(observer)
-        observer.await()
-        observer.assertError(NameEmptyException::class.java)
+        )
+        assertTrue(result.exceptionOrNull() is NameEmptyException)
     }
 
     @Test
-    fun shouldInsertEventIfShirtNumberIsNull() {
-        savePlayer(
+    fun shouldInsertEventIfShirtNumberIsNull() = runTest {
+        val result = savePlayer(
             playerId = 0L,
             name = "Test",
             positions = 1,
@@ -139,15 +135,14 @@ internal class SavePlayerTests {
             email = "p1@test.com",
             phone = "001",
             sex = 0
-        ).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+        )
+        assertTrue(result.isSuccess)
         verify(playerDao).insertPlayer(any())
     }
 
     @Test
-    fun shouldInsertIfNewPlayer() {
-        savePlayer(
+    fun shouldInsertIfNewPlayer() = runTest {
+        val result = savePlayer(
             playerId = 0L,
             name = "Test",
             positions = 1,
@@ -159,16 +154,15 @@ internal class SavePlayerTests {
             email = "p1@test.com",
             phone = "001",
             sex = 0
-        ).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+        )
+        assertTrue(result.isSuccess)
         verify(playerDao).insertPlayer(any())
         verify(playerDao, never()).updatePlayer(any())
     }
 
     @Test
-    fun shouldUpdateIfKnownPlayer() {
-        savePlayer(
+    fun shouldUpdateIfKnownPlayer() = runTest {
+        val result = savePlayer(
             playerId = 1L,
             name = "Test",
             positions = 1,
@@ -180,9 +174,8 @@ internal class SavePlayerTests {
             email = "p1@test.com",
             phone = "001",
             sex = 0
-        ).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+        )
+        assertTrue(result.isSuccess)
         verify(playerDao).updatePlayer(any())
         verify(playerDao, never()).insertPlayer(any())
     }

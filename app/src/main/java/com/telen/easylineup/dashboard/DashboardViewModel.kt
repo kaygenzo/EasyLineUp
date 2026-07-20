@@ -63,9 +63,9 @@ class DashboardViewModel : ViewModel(), KoinComponent {
 
     fun saveTiles(tiles: List<DashboardTile>) = saveDashboardTilesUseCase(tiles)
 
-    fun getShirtNumberHistory(number: Int) = getShirtNumberHistoryUseCase(number)
+    suspend fun getShirtNumberHistory(number: Int) = getShirtNumberHistoryUseCase(number)
 
-    fun getEmails() = getTeamEmailsUseCase()
+    suspend fun getEmails() = getTeamEmailsUseCase()
 
-    fun getPhones() = getTeamPhonesUseCase()
+    suspend fun getPhones() = getTeamPhonesUseCase()
 }

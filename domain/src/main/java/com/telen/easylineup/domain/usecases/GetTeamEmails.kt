@@ -4,20 +4,18 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
-import io.reactivex.rxjava3.core.Single
+import com.telen.easylineup.domain.ports.DispatcherProvider
+import kotlinx.coroutines.withContext
 
 class GetTeamEmails(
     private val getPlayers: GetPlayers,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(): Single<List<String>> {
-        return getPlayers()
-            .map { players ->
-                players
-                    .filter { !it.email.isNullOrEmpty() }
-                    .map { it.email ?: "" }
-            }
-            .subscribeOn(schedulersProvider.io())
+    suspend operator fun invoke(): Result<List<String>> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            getPlayers().getOrThrow()
+                .filter { !it.email.isNullOrEmpty() }
+                .map { it.email ?: "" }
+        }
     }
 }

@@ -42,6 +42,7 @@ import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.utils.hideSoftKeyboard
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 import java.text.DateFormat
@@ -130,14 +131,18 @@ ActionMode.Callback {
         FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_search_player")
         hideSoftKeyboard()
 
-        launch(viewModel.getShirtNumberHistory(number), { history ->
-            val item = tileAdapter.currentList.firstOrNull {
-                it.data is LastPlayerNumberResearchData
-            }
-            (item?.data as? LastPlayerNumberResearchData)?.setHistory(history)
-            val indexOfTile = tileAdapter.currentList.indexOfFirst { it == item }
-            tileAdapter.notifyItemChanged(indexOfTile)
-        })
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.getShirtNumberHistory(number)
+                .onSuccess { history ->
+                    val item = tileAdapter.currentList.firstOrNull {
+                        it.data is LastPlayerNumberResearchData
+                    }
+                    (item?.data as? LastPlayerNumberResearchData)?.setHistory(history)
+                    val indexOfTile = tileAdapter.currentList.indexOfFirst { it == item }
+                    tileAdapter.notifyItemChanged(indexOfTile)
+                }
+                .onFailure { Timber.e(it) }
+        }
     }
 
     override fun onTileSearchNumberHistoryClicked(history: List<ShirtNumberEntry>) {
@@ -167,48 +172,56 @@ ActionMode.Callback {
                 when (i) {
                     INDEX_SEND_MESSAGES -> {
                         FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_send_message")
-                        launch(viewModel.getPhones(), {
-                            if (it.isEmpty()) {
-                                DialogFactory.getErrorDialog(
-                                    activity,
-                                    R.string.tile_team_size_send_empty_title,
-                                    R.string.tile_team_size_send_empty_phones
-                                ).show()
-                            } else {
-                                val contactsBuilder = StringBuilder("smsto:")
-                                it.forEach { contactsBuilder.append("$it;") }
-                                val smsIntent = Intent(
-                                    Intent.ACTION_SENDTO,
-                                    Uri.parse(contactsBuilder.toString())
-                                )
-                                smsIntent.resolveActivity(activity.packageManager)?.let {
-                                    startActivity(smsIntent)
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            viewModel.getPhones()
+                                .onSuccess {
+                                    if (it.isEmpty()) {
+                                        DialogFactory.getErrorDialog(
+                                            activity,
+                                            R.string.tile_team_size_send_empty_title,
+                                            R.string.tile_team_size_send_empty_phones
+                                        ).show()
+                                    } else {
+                                        val contactsBuilder = StringBuilder("smsto:")
+                                        it.forEach { contactsBuilder.append("$it;") }
+                                        val smsIntent = Intent(
+                                            Intent.ACTION_SENDTO,
+                                            Uri.parse(contactsBuilder.toString())
+                                        )
+                                        smsIntent.resolveActivity(activity.packageManager)?.let {
+                                            startActivity(smsIntent)
+                                        }
+                                    }
                                 }
-                            }
-                        })
+                                .onFailure { Timber.e(it) }
+                        }
                     }
 
                     INDEX_SEND_EMAILS -> {
                         FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_send_email")
-                        launch(viewModel.getEmails(), {
-                            if (it.isEmpty()) {
-                                DialogFactory.getErrorDialog(
-                                    activity,
-                                    R.string.tile_team_size_send_empty_title,
-                                    R.string.tile_team_size_send_empty_emails
-                                )
-                                    .show()
-                            } else {
-                                val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                    // only email apps should handle this
-                                    data = Uri.parse("mailto:")
-                                    putExtra(Intent.EXTRA_EMAIL, it.toTypedArray())
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            viewModel.getEmails()
+                                .onSuccess {
+                                    if (it.isEmpty()) {
+                                        DialogFactory.getErrorDialog(
+                                            activity,
+                                            R.string.tile_team_size_send_empty_title,
+                                            R.string.tile_team_size_send_empty_emails
+                                        )
+                                            .show()
+                                    } else {
+                                        val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                            // only email apps should handle this
+                                            data = Uri.parse("mailto:")
+                                            putExtra(Intent.EXTRA_EMAIL, it.toTypedArray())
+                                        }
+                                        intent.resolveActivity(activity.packageManager)?.let {
+                                            startActivity(intent)
+                                        }
+                                    }
                                 }
-                                intent.resolveActivity(activity.packageManager)?.let {
-                                    startActivity(intent)
-                                }
-                            }
-                        })
+                                .onFailure { Timber.e(it) }
+                        }
                     }
 
                     INDEX_SEND_OTHER -> {
