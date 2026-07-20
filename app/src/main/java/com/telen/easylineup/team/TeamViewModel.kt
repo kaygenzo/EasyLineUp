@@ -92,7 +92,7 @@ class TeamViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun deleteTeam(team: Team) = deleteTeamUseCase(team)
+    suspend fun deleteTeam(team: Team): Result<Unit> = deleteTeamUseCase(team)
 
     fun getPlayerId(): Long {
         return playerSelectedId

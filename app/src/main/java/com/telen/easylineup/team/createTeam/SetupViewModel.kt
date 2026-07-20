@@ -13,7 +13,6 @@ import com.telen.easylineup.domain.usecases.SaveTeam
 import com.telen.easylineup.utils.sportDrawableRes
 import com.telen.easylineup.utils.titleRes
 import com.telen.easylineup.views.TeamTypeCardItem
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import kotlinx.coroutines.flow.Flow
@@ -57,8 +56,8 @@ class SetupViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun onSaveClicked(): Completable {
-        return saveTeamUseCase(currentTeam).ignoreElement()
+    suspend fun onSaveClicked(): Result<Team> {
+        return saveTeamUseCase(currentTeam)
     }
 
     fun setTeam(team: Team?) {

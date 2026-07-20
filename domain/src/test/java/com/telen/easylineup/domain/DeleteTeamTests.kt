@@ -5,6 +5,7 @@
 package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.check
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
@@ -14,8 +15,9 @@ import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.DeleteTeam
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +28,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class DeleteTeamTests {
-    val observer: TestObserver<Void> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     lateinit var deleteTeam: DeleteTeam
     lateinit var team: Team
@@ -37,7 +38,7 @@ internal class DeleteTeamTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        deleteTeam = DeleteTeam(teamDao, testSchedulersProvider())
+        deleteTeam = DeleteTeam(teamDao, testDispatcherProvider())
         team = Team(id = 1L, name = "toto", type = TeamType.BASEBALL.id, main = true)
         team2 = Team(id = 2L, name = "tata", type = TeamType.SOFTBALL.id, main = false)
         team3 = Team(id = 3L, name = "titi", type = TeamType.SOFTBALL.id, main = false)
@@ -48,21 +49,17 @@ internal class DeleteTeamTests {
     }
 
     @Test
-    fun shouldTriggerAnExceptionIfItWasTheOnlyTeamInDatabase() {
+    fun shouldTriggerAnExceptionIfItWasTheOnlyTeamInDatabase() = runTest {
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(Single.just(mutableListOf()))
-        deleteTeam(team)
-            .subscribe(observer)
-        observer.await()
-        observer.assertError(NoSuchElementException::class.java)
+        val result = deleteTeam(team)
+        assertTrue(result.exceptionOrNull() is NoSuchElementException)
     }
 
     @Test
-    fun shouldReassignMainTeamToTheFirstElement() {
-        deleteTeam(team)
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        verify(teamDao).updateTeam(com.nhaarman.mockitokotlin2.check {
+    fun shouldReassignMainTeamToTheFirstElement() = runTest {
+        val result = deleteTeam(team)
+        assertTrue(result.isSuccess)
+        verify(teamDao).updateTeam(check {
             Assert.assertEquals(2L, it.id)
             Assert.assertEquals(true, it.main)
         })
@@ -70,21 +67,17 @@ internal class DeleteTeamTests {
     }
 
     @Test
-    fun shouldNotReassignMainTeam() {
+    fun shouldNotReassignMainTeam() = runTest {
         team.main = false
         team3.main = true
-        deleteTeam(team)
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+        val result = deleteTeam(team)
+        assertTrue(result.isSuccess)
         verify(teamDao, never()).updateTeam(any())
     }
 
     @Test
-    fun shouldDeleteSuccessfully() {
-        deleteTeam(team)
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+    fun shouldDeleteSuccessfully() = runTest {
+        val result = deleteTeam(team)
+        assertTrue(result.isSuccess)
     }
 }

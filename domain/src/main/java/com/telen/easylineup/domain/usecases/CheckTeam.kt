@@ -4,19 +4,17 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.withContext
 
-class CheckTeam(private val schedulersProvider: SchedulersProvider) {
-    operator fun invoke(team: Team): Completable {
-        return Completable.defer {
+class CheckTeam(private val dispatcherProvider: DispatcherProvider) {
+    suspend operator fun invoke(team: Team): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
             if ("" == team.name.trim()) {
-                Completable.error(NameEmptyException())
-            } else {
-                Completable.complete()
+                throw NameEmptyException()
             }
-        }.subscribeOn(schedulersProvider.io())
+        }
     }
 }

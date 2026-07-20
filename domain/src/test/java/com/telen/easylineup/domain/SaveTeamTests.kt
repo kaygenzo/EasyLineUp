@@ -16,8 +16,10 @@ import com.telen.easylineup.domain.usecases.SaveTeam
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,7 +34,6 @@ import org.mockito.junit.MockitoJUnitRunner
  */
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveTeamTests {
-    val observer: TestObserver<Team> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     lateinit var saveTeam: SaveTeam
     lateinit var team: Team
@@ -42,9 +43,9 @@ internal class SaveTeamTests {
         MockitoAnnotations.initMocks(this)
         saveTeam = SaveTeam(
             teamDao,
-            CheckTeam(testSchedulersProvider()),
-            SaveCurrentTeam(teamDao, testSchedulersProvider()),
-            testSchedulersProvider()
+            CheckTeam(testDispatcherProvider()),
+            SaveCurrentTeam(teamDao, testDispatcherProvider()),
+            testDispatcherProvider()
         )
         team = Team(id = 1L, name = "test", type = TeamType.BASEBALL.id, main = true)
         Mockito.`when`(teamDao.insertTeam(any())).thenReturn(Single.just(2L))
@@ -54,58 +55,52 @@ internal class SaveTeamTests {
     }
 
     @Test
-    fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() {
+    fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() = runTest {
         team.name = ""
-        saveTeam(team).subscribe(observer)
-        observer.await()
-        observer.assertError(NameEmptyException::class.java)
+        val result = saveTeam(team)
+        assertTrue(result.exceptionOrNull() is NameEmptyException)
         verify(teamDao, never()).insertTeam(any())
         verify(teamDao, never()).updateTeam(any())
     }
 
     @Test
-    fun shouldTriggerNameEmptyExceptionIfNameIsOnlyWhitespaces() {
+    fun shouldTriggerNameEmptyExceptionIfNameIsOnlyWhitespaces() = runTest {
         team.name = "\n\t\r       "
-        saveTeam(team).subscribe(observer)
-        observer.await()
-        observer.assertError(NameEmptyException::class.java)
+        val result = saveTeam(team)
+        assertTrue(result.exceptionOrNull() is NameEmptyException)
     }
 
     @Test
-    fun shouldUpdateTeamIfIdGreaterThatZero() {
-        saveTeam(team).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+    fun shouldUpdateTeamIfIdGreaterThatZero() = runTest {
+        val result = saveTeam(team)
+        assertTrue(result.isSuccess)
         verify(teamDao).updateTeam(any())
         verify(teamDao, never()).insertTeam(any())
-        Assert.assertEquals(1L, observer.values().first().id)
+        assertEquals(1L, result.getOrNull()?.id)
     }
 
     @Test
-    fun shouldInsertTeamIfIdEqualsToZero() {
+    fun shouldInsertTeamIfIdEqualsToZero() = runTest {
         team.id = 0L
-        saveTeam(team).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+        val result = saveTeam(team)
+        assertTrue(result.isSuccess)
         verify(teamDao).insertTeam(any())
         verify(teamDao, never()).updateTeam(any())
-        Assert.assertEquals(2L, observer.values().first().id)
+        assertEquals(2L, result.getOrNull()?.id)
     }
 
     @Test
-    fun shouldCorrectTeamTypeIfUnknown() {
+    fun shouldCorrectTeamTypeIfUnknown() = runTest {
         team.type = TeamType.UNKNOWN.id
-        saveTeam(team).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        Assert.assertEquals(TeamType.BASEBALL.id, observer.values().first().type)
+        val result = saveTeam(team)
+        assertTrue(result.isSuccess)
+        assertEquals(TeamType.BASEBALL.id, result.getOrNull()?.type)
     }
 
     @Test
-    fun shouldSetTeamAsCurrentAfterSaving() {
-        saveTeam(team).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+    fun shouldSetTeamAsCurrentAfterSaving() = runTest {
+        val result = saveTeam(team)
+        assertTrue(result.isSuccess)
         verify(teamDao).updateTeams(any())
     }
 }

@@ -8,8 +8,9 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.InsertTeam
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,19 +27,17 @@ internal class InsertTeamTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        insertTeam = InsertTeam(teamDao, testSchedulersProvider())
+        insertTeam = InsertTeam(teamDao, testDispatcherProvider())
     }
 
     @Test
-    fun shouldDelegateToRepository() {
+    fun shouldDelegateToRepository() = runTest {
         val team = Team(id = 0L, name = "Panthers")
         Mockito.`when`(teamDao.insertTeam(team)).thenReturn(Single.just(5L))
 
-        val observer = TestObserver<Long>()
-        insertTeam(team).subscribe(observer)
-        observer.await()
+        val result = insertTeam(team)
 
-        observer.assertComplete()
-        assertEquals(5L, observer.values().first())
+        assertTrue(result.isSuccess)
+        assertEquals(5L, result.getOrNull())
     }
 }

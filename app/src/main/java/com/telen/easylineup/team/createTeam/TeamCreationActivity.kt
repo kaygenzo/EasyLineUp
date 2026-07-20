@@ -8,12 +8,14 @@ import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.telen.easylineup.BaseActivity
 import com.telen.easylineup.databinding.ActivityTeamCreationBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class TeamCreationActivity : BaseActivity() {
@@ -28,13 +30,17 @@ class TeamCreationActivity : BaseActivity() {
             viewModel.setTeam(intent.extras?.get(Constants.EXTRA_TEAM) as? Team)
 
             teamCreationActionButtons.saveClickListener = View.OnClickListener {
-                disposables.add(viewModel.onSaveClicked().subscribe({
-                    FirebaseAnalyticsUtils.endTutorial(this@TeamCreationActivity)
-                    setResult(Activity.RESULT_OK)
-                    finish()
-                }, {
-                    Timber.d(it)
-                }))
+                lifecycleScope.launch {
+                    viewModel.onSaveClicked()
+                        .onSuccess {
+                            FirebaseAnalyticsUtils.endTutorial(this@TeamCreationActivity)
+                            setResult(Activity.RESULT_OK)
+                            finish()
+                        }
+                        .onFailure {
+                            Timber.d(it)
+                        }
+                }
             }
 
             teamCreationActionButtons.cancelClickListener = View.OnClickListener {

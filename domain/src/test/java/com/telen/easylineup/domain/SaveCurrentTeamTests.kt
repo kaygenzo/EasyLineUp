@@ -4,14 +4,16 @@
 
 package com.telen.easylineup.domain
 
+import com.nhaarman.mockitokotlin2.check
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +25,6 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveCurrentTeamTests {
     private var teams: MutableList<Team> = mutableListOf()
-    val observer: TestObserver<Void> = TestObserver()
     @Mock lateinit var teamDao: TeamRepository
     lateinit var saveCurrentTeam: SaveCurrentTeam
     lateinit var newTeam: Team
@@ -31,7 +32,7 @@ internal class SaveCurrentTeamTests {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        saveCurrentTeam = SaveCurrentTeam(teamDao, testSchedulersProvider())
+        saveCurrentTeam = SaveCurrentTeam(teamDao, testDispatcherProvider())
 
         newTeam = Team(1, "toto", null, 0, true)
         teams.add(newTeam)
@@ -43,11 +44,11 @@ internal class SaveCurrentTeamTests {
     }
 
     @Test
-    fun shouldChangeOfMainTeam() {
-        saveCurrentTeam(newTeam).subscribe(observer)
-        observer.await()
-        observer.assertComplete()
-        verify(teamDao).updateTeams(com.nhaarman.mockitokotlin2.check {
+    fun shouldChangeOfMainTeam() = runTest {
+        val result = saveCurrentTeam(newTeam)
+
+        assertTrue(result.isSuccess)
+        verify(teamDao).updateTeams(check {
             Assert.assertEquals(true, it[0].main)
             Assert.assertEquals(false, it[1].main)
             Assert.assertEquals(false, it[2].main)

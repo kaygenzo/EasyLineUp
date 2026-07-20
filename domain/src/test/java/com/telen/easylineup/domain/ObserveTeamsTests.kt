@@ -8,7 +8,9 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.ObserveTeams
 import io.reactivex.rxjava3.core.Flowable
-import org.junit.Assert.assertSame
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,10 +31,12 @@ internal class ObserveTeamsTests {
     }
 
     @Test
-    fun shouldDelegateToRepository() {
-        val flowable = Flowable.just(listOf<Team>())
-        Mockito.`when`(teamDao.getTeams()).thenReturn(flowable)
+    fun shouldDelegateToRepository() = runTest {
+        val teams = listOf(Team(1L, "toto"))
+        Mockito.`when`(teamDao.getTeams()).thenReturn(Flowable.just(teams))
 
-        assertSame(flowable, observeTeams())
+        val result = observeTeams().toList()
+
+        assertEquals(listOf(teams), result)
     }
 }

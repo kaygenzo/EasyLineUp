@@ -4,16 +4,19 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.TeamRepository
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class InsertTeam(
     private val dao: TeamRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(team: Team): Single<Long> {
-        return dao.insertTeam(team).subscribeOn(schedulersProvider.io())
+    suspend operator fun invoke(team: Team): Result<Long> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            dao.insertTeam(team).await()
+        }
     }
 }

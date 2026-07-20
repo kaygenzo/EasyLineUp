@@ -29,9 +29,9 @@ import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.tournaments.list.LineupViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import io.reactivex.rxjava3.core.Completable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.rx3.rxCompletable
 
 class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
     private val teamViewModel: TeamViewModel by viewModels()
@@ -158,12 +158,12 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
                             title = R.string.dialog_delete_team_title,
                             titleArgs = arrayOf(team.name),
                             message = R.string.dialog_delete_cannot_undo_message,
-                            task = Completable.defer {
+                            task = rxCompletable {
                                 FirebaseAnalyticsUtils.onClick(
                                     activity,
                                     "click_team_details_delete"
                                 )
-                                teamViewModel.deleteTeam(team)
+                                teamViewModel.deleteTeam(team).getOrThrow()
                             }.doOnComplete { findNavController().popBackStack() }
                         ).show()
                     }

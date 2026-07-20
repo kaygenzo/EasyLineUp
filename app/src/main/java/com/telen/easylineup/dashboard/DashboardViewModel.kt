@@ -17,12 +17,12 @@ import com.telen.easylineup.domain.usecases.GetTeamPhones
 import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.domain.usecases.SaveDashboardTiles
 import com.telen.easylineup.utils.SharedPreferencesHelper
-import com.telen.easylineup.utils.asSafeFlow
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -38,9 +38,10 @@ class DashboardViewModel : ViewModel(), KoinComponent {
     private val prefsHelper: SharedPreferencesHelper by inject()
     var actionMode: ActionMode? = null
 
-    fun registerTilesFlow(): Flow<List<DashboardTile>> = observeTeams().asSafeFlow().flatMapLatest {
-        getDashboardTilesFlow()
-    }
+    fun registerTilesFlow(): Flow<List<DashboardTile>> = observeTeams().catch { Timber.e(it) }
+        .flatMapLatest {
+            getDashboardTilesFlow()
+        }
 
     private fun getDashboardTilesFlow(): Flow<List<DashboardTile>> = callbackFlow {
         val disposable = getDashboardTilesUseCase()

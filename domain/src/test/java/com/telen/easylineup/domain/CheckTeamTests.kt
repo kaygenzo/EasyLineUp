@@ -7,7 +7,8 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.usecases.CheckTeam
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
-import io.reactivex.rxjava3.observers.TestObserver
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,39 +17,32 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class CheckTeamTests {
-    private val observer: TestObserver<Void> = TestObserver()
     val team = Team(1L, "A", null, 0, true, null)
     lateinit var checkTeam: CheckTeam
 
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        checkTeam = CheckTeam(testSchedulersProvider())
+        checkTeam = CheckTeam(testDispatcherProvider())
     }
 
     @Test
-    fun shouldAcceptTeamWithNameNotEmpty() {
-        checkTeam(team)
-            .subscribe(observer)
-        observer.await()
-        observer.assertComplete()
+    fun shouldAcceptTeamWithNameNotEmpty() = runTest {
+        val result = checkTeam(team)
+        assertTrue(result.isSuccess)
     }
 
     @Test
-    fun shouldRejectTeamWithNameEmpty() {
+    fun shouldRejectTeamWithNameEmpty() = runTest {
         team.name = ""
-        checkTeam(team)
-            .subscribe(observer)
-        observer.await()
-        observer.assertError(NameEmptyException::class.java)
+        val result = checkTeam(team)
+        assertTrue(result.exceptionOrNull() is NameEmptyException)
     }
 
     @Test
-    fun shouldRejectTeamWithNameOnlyWhitespaces() {
+    fun shouldRejectTeamWithNameOnlyWhitespaces() = runTest {
         team.name = "    "
-        checkTeam(team)
-            .subscribe(observer)
-        observer.await()
-        observer.assertError(NameEmptyException::class.java)
+        val result = checkTeam(team)
+        assertTrue(result.exceptionOrNull() is NameEmptyException)
     }
 }

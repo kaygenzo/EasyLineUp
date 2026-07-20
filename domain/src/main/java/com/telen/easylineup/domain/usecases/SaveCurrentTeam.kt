@@ -4,25 +4,23 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.TeamRepository
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Observable
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class SaveCurrentTeam(
     private val dao: TeamRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(team: Team): Completable {
-        return dao.getTeamsRx()
-            .flatMapObservable { Observable.fromIterable(it) }
-            .map {
+    suspend operator fun invoke(team: Team): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            val teams = dao.getTeamsRx().await().map {
                 it.main = it.id == team.id
                 it
             }
-            .toList()
-            .flatMapCompletable { dao.updateTeams(it) }
-            .subscribeOn(schedulersProvider.io())
+            dao.updateTeams(teams).await()
+        }
     }
 }

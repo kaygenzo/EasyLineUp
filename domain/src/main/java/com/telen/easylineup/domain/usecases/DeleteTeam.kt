@@ -4,37 +4,30 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.TeamRepository
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 class DeleteTeam(
     private val dao: TeamRepository,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(team: Team): Completable {
-        val isMain = team.main
-        return dao.deleteTeam(team)
-            .andThen(
-                if (isMain) {
-                    // we have deleted the main team, let's choose another as main
-                    dao.getTeamsRx()
-                        .flatMapCompletable { teams ->
-                            if (teams.isEmpty()) {
-                                Completable.error(NoSuchElementException())
-                            } else {
-                                val newMain = teams.first().apply {
-                                    main = true
-                                }
-                                dao.updateTeam(newMain)
-                            }
-                        }
-                } else {
-                    // the main team was not the one we deleted, no need to designate another one
-                    Completable.complete()
+    suspend operator fun invoke(team: Team): Result<Unit> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            val isMain = team.main
+            dao.deleteTeam(team).await()
+            if (isMain) {
+                // we have deleted the main team, let's choose another as main
+                val teams = dao.getTeamsRx().await()
+                if (teams.isEmpty()) {
+                    throw NoSuchElementException()
                 }
-            )
-            .subscribeOn(schedulersProvider.io())
+                val newMain = teams.first().apply { main = true }
+                dao.updateTeam(newMain).await()
+            }
+            // the main team was not the one we deleted, no need to designate another one
+        }
     }
 }

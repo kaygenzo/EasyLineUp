@@ -4,11 +4,12 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.ports.SchedulersProvider
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.TeamRepository
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.rx3.await
+import kotlinx.coroutines.withContext
 
 /**
  * Validates the team name, inserts or updates it, then marks it as the current team.
@@ -17,26 +18,24 @@ class SaveTeam(
     private val dao: TeamRepository,
     private val checkTeam: CheckTeam,
     private val saveCurrentTeam: SaveCurrentTeam,
-    private val schedulersProvider: SchedulersProvider
+    private val dispatcherProvider: DispatcherProvider
 ) {
-    operator fun invoke(team: Team): Single<Team> {
-        return checkTeam(team)
-            .andThen(Single.defer {
-                if (team.type == TeamType.UNKNOWN.id) {
-                    team.type = TeamType.BASEBALL.id
-                }
-                if (team.id == 0L) {
-                    dao.insertTeam(team).map { id ->
-                        team.id = id
-                        team
-                    }
-                } else {
-                    dao.updateTeam(team).andThen(Single.just(team))
-                }
-            })
-            .flatMap { savedTeam ->
-                saveCurrentTeam(savedTeam).andThen(Single.just(savedTeam))
+    suspend operator fun invoke(team: Team): Result<Team> = runCatchingCancellable {
+        withContext(dispatcherProvider.io()) {
+            checkTeam(team).getOrThrow()
+
+            if (team.type == TeamType.UNKNOWN.id) {
+                team.type = TeamType.BASEBALL.id
             }
-            .subscribeOn(schedulersProvider.io())
+
+            if (team.id == 0L) {
+                team.id = dao.insertTeam(team).await()
+            } else {
+                dao.updateTeam(team).await()
+            }
+
+            saveCurrentTeam(team).getOrThrow()
+            team
+        }
     }
 }

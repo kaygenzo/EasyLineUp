@@ -5,6 +5,7 @@
 package com.telen.easylineup
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.usecases.GetAllTeams
@@ -12,12 +13,13 @@ import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
 import com.telen.easylineup.utils.SharedPreferencesHelper
-import com.telen.easylineup.utils.asSafeFlow
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -51,7 +53,7 @@ class HomeViewModel : ViewModel(), KoinComponent {
     val disposables = CompositeDisposable()
 
     fun registerTeamUpdates(): Flow<List<Team>> {
-        return observeTeams().asSafeFlow()
+        return observeTeams().catch { Timber.e(it) }
     }
 
     fun clear() {
@@ -97,14 +99,16 @@ class HomeViewModel : ViewModel(), KoinComponent {
     }
 
     fun updateCurrentTeam(currentTeam: Team) {
-        val disposable = saveCurrentTeam(currentTeam)
-            .subscribe({
-                _event.onNext(UpdateCurrentTeamSuccess)
-            }, {
-                Timber.e(it)
-                _event.onNext(UpdateCurrentTeamFailure)
-            })
-        disposables.add(disposable)
+        viewModelScope.launch {
+            saveCurrentTeam(currentTeam)
+                .onSuccess {
+                    _event.onNext(UpdateCurrentTeamSuccess)
+                }
+                .onFailure {
+                    Timber.e(it)
+                    _event.onNext(UpdateCurrentTeamFailure)
+                }
+        }
     }
 
     // TODO use event
