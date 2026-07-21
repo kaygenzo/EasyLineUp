@@ -6,6 +6,8 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.toLineup
+import com.telen.easylineup.domain.model.toTournament
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.repository.LineupRepository
 import kotlinx.coroutines.withContext

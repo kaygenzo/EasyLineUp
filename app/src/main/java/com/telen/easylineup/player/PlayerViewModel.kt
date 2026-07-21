@@ -12,6 +12,7 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.getStrategies
 import com.telen.easylineup.domain.usecases.DeletePlayer
 import com.telen.easylineup.domain.usecases.GetPositionsSummaryForPlayer
 import com.telen.easylineup.domain.usecases.GetTeam

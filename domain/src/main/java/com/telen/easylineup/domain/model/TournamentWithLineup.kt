@@ -45,30 +45,30 @@ data class TournamentWithLineup(
     var lineupEventTime: Long = 0,
     var lineupCreatedTime: Long = 0,
     var roster: String? = null
-) {
-    fun toTournament(): Tournament {
-        return Tournament(
-            id = tournamentId,
-            name = tournamentName,
-            createdAt = tournamentCreatedAt,
-            startTime = tournamentStartTime,
-            endTime = tournamentEndTime,
-            address = tournamentAddress
-        )
-    }
+)
 
-    fun toLineup(): Lineup {
-        return Lineup(
-            id = lineupId,
-            name = lineupName ?: "",
-            tournamentId = tournamentId,
-            eventTimeInMillis = lineupEventTime,
-            teamId = teamId,
-            mode = lineupMode,
-            createdTimeInMillis = lineupCreatedTime,
-            roster = roster,
-            strategy = lineupStrategy,
-            extraHitters = lineupExtraHittersSize
-        )
-    }
+fun TournamentWithLineup.toTournament(): Tournament {
+    return Tournament(
+        id = tournamentId,
+        name = tournamentName,
+        createdAt = tournamentCreatedAt,
+        startTime = tournamentStartTime,
+        endTime = tournamentEndTime,
+        address = tournamentAddress
+    )
+}
+
+fun TournamentWithLineup.toLineup(): Lineup {
+    return Lineup(
+        id = lineupId,
+        name = lineupName ?: "",
+        tournamentId = tournamentId,
+        eventTimeInMillis = lineupEventTime,
+        teamId = teamId,
+        mode = lineupMode,
+        createdTimeInMillis = lineupCreatedTime,
+        roster = roster,
+        strategy = lineupStrategy,
+        extraHitters = lineupExtraHittersSize
+    )
 }

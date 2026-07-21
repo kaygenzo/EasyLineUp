@@ -13,6 +13,7 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.getDesignatedPlayerOrder
 import com.telen.easylineup.domain.model.isCatcher
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isFirstBase

@@ -11,6 +11,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.getStrategies
 import com.telen.easylineup.domain.usecases.GetTournamentStatsForPositionTable
 import com.telen.easylineup.utils.getStrategiesDisplayName
 import io.github.kaygenzo.androidtable.api.CellConfiguration

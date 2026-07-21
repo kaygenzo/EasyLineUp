@@ -13,6 +13,7 @@ import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.getDesignatedPlayerOrder
 import com.telen.easylineup.domain.model.getNextAvailableOrder
 import com.telen.easylineup.domain.model.getPositionPercentage
 import com.telen.easylineup.domain.model.isSubstitute

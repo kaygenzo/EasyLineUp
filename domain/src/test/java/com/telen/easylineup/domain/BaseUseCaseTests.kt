@@ -12,6 +12,7 @@ import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.getDesignatedPlayerOrder
 import com.telen.easylineup.domain.model.isDefensePlayer
 import com.telen.easylineup.domain.model.isPitcher
 

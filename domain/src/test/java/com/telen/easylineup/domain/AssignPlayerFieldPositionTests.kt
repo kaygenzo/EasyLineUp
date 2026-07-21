@@ -14,6 +14,7 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.getDesignatedPlayerOrder
 import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.model.isShortStop
 import com.telen.easylineup.domain.model.reset

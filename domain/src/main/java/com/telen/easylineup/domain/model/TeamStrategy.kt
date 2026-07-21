@@ -60,10 +60,6 @@ enum class TeamStrategy(val id: Int, val batterSize: Int, vararg val positions: 
     ),
     ;
 
-    fun getDesignatedPlayerOrder(extraHitterSize: Int): Int {
-        return batterSize + extraHitterSize + 1
-    }
-
     companion object {
         fun getStrategyById(id: Int): TeamStrategy {
             values().forEach {
@@ -74,4 +70,8 @@ enum class TeamStrategy(val id: Int, val batterSize: Int, vararg val positions: 
             return STANDARD
         }
     }
+}
+
+fun TeamStrategy.getDesignatedPlayerOrder(extraHitterSize: Int): Int {
+    return batterSize + extraHitterSize + 1
 }

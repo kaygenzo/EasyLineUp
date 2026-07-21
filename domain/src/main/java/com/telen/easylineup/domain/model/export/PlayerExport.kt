@@ -40,7 +40,6 @@ For support, please feel free to contact me at https://www.linkedin.com/in/syeda
  * @property sex
  */
 data class PlayerExport(
-
     @SerializedName("id") val id: String,
     @SerializedName("name") val name: String,
     @SerializedName("image") var image: String?,
@@ -52,66 +51,4 @@ data class PlayerExport(
     @SerializedName("email") var email: String?,
     @SerializedName("phone") var phone: String?,
     @SerializedName("sex") var sex: Int
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        if (javaClass != other?.javaClass) {
-            return false
-        }
-
-        other as PlayerExport
-
-        if (id != other.id) {
-            return false
-        }
-        if (name != other.name) {
-            return false
-        }
-        if (image != other.image) {
-            return false
-        }
-        if (shirtNumber != other.shirtNumber) {
-            return false
-        }
-        if (licenseNumber != other.licenseNumber) {
-            return false
-        }
-        if (positions != other.positions) {
-            return false
-        }
-        if (pitching != other.pitching) {
-            return false
-        }
-        if (batting != other.batting) {
-            return false
-        }
-        if (email != other.email) {
-            return false
-        }
-        if (phone != other.phone) {
-            return false
-        }
-        if (sex != other.sex) {
-            return false
-        }
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + name.hashCode()
-        result = 31 * result + (image?.hashCode() ?: 0)
-        result = 31 * result + shirtNumber
-        result = 31 * result + licenseNumber.hashCode()
-        result = 31 * result + positions
-        result = 31 * result + pitching
-        result = 31 * result + batting
-        result = 31 * result + sex
-        result = 31 * result + (email?.hashCode() ?: 0)
-        result = 31 * result + (phone?.hashCode() ?: 0)
-        return result
-    }
-}
+)

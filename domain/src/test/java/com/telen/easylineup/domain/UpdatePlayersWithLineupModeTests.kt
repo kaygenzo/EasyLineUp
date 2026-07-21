@@ -12,6 +12,7 @@ import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.getDesignatedPlayerOrder
 import com.telen.easylineup.domain.model.isDpDhOrFlex
 import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithLineupMode

@@ -20,19 +20,6 @@ enum class TeamType(
     BASEBALL_5(3, 2, TeamStrategy.B5_DEFAULT),
     ;
 
-    fun getStrategies(): Array<TeamStrategy> {
-        return when (this) {
-            SOFTBALL -> arrayOf(
-                TeamStrategy.STANDARD,
-                TeamStrategy.FIVE_MAN_STANDARD,
-                TeamStrategy.SLOWPITCH
-            )
-
-            BASEBALL_5 -> arrayOf(TeamStrategy.B5_DEFAULT)
-            else -> arrayOf(TeamStrategy.STANDARD, TeamStrategy.FIVE_MAN_STANDARD)
-        }
-    }
-
     companion object {
         fun getTypeById(id: Int): TeamType {
             values().forEach {
@@ -42,5 +29,18 @@ enum class TeamType(
             }
             return UNKNOWN
         }
+    }
+}
+
+fun TeamType.getStrategies(): Array<TeamStrategy> {
+    return when (this) {
+        TeamType.SOFTBALL -> arrayOf(
+            TeamStrategy.STANDARD,
+            TeamStrategy.FIVE_MAN_STANDARD,
+            TeamStrategy.SLOWPITCH
+        )
+
+        TeamType.BASEBALL_5 -> arrayOf(TeamStrategy.B5_DEFAULT)
+        else -> arrayOf(TeamStrategy.STANDARD, TeamStrategy.FIVE_MAN_STANDARD)
     }
 }
