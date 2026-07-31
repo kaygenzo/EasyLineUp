@@ -13,9 +13,10 @@ import com.telen.easylineup.domain.ports.PhoneNumberValidator
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.IsEmailValidUseCase
+import com.telen.easylineup.domain.usecases.IsValidPhoneNumberUseCase
 import com.telen.easylineup.domain.usecases.SavePlayer
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
-import com.telen.easylineup.domain.utils.ValidatorUtils
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
@@ -43,7 +44,12 @@ internal class SavePlayerTests {
         savePlayer = SavePlayer(
             playerDao,
             GetTeam(teamDao, testDispatcherProvider()),
-            ValidatorUtilsMock(),
+            IsEmailValidUseCase(),
+            IsValidPhoneNumberUseCase(
+                object : PhoneNumberValidator {
+                    override fun isGlobalPhoneNumber(phone: String) = true
+                }
+            ),
             testDispatcherProvider()
         )
         val player = Player(
@@ -179,19 +185,5 @@ internal class SavePlayerTests {
         assertTrue(result.isSuccess)
         verify(playerDao).updatePlayer(any())
         verify(playerDao, never()).insertPlayer(any())
-    }
-
-    class ValidatorUtilsMock : ValidatorUtils(
-        object : PhoneNumberValidator {
-            override fun isGlobalPhoneNumber(phone: String) = true
-        }
-    ) {
-        override fun isEmailValid(email: String?): Boolean {
-            return true
-        }
-
-        override fun isValidPhoneNumber(phone: String?): Boolean {
-            return true
-        }
     }
 }

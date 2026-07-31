@@ -10,7 +10,6 @@ import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
-import com.telen.easylineup.domain.utils.ValidatorUtils
 import kotlinx.coroutines.withContext
 
 /**
@@ -19,7 +18,8 @@ import kotlinx.coroutines.withContext
 class SavePlayer(
     private val dao: PlayerRepository,
     private val getTeam: GetTeam,
-    private val validatorUtils: ValidatorUtils,
+    private val isEmailValidUseCase: IsEmailValidUseCase,
+    private val isValidPhoneNumberUseCase: IsValidPhoneNumberUseCase,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(
@@ -39,10 +39,10 @@ class SavePlayer(
             if (name.isNullOrBlank()) {
                 throw NameEmptyException()
             }
-            if (!validatorUtils.isEmailValid(email)) {
+            if (!isEmailValidUseCase(email)) {
                 throw InvalidEmailException()
             }
-            if (!validatorUtils.isValidPhoneNumber(phone)) {
+            if (!isValidPhoneNumberUseCase(phone)) {
                 throw InvalidPhoneException()
             }
 

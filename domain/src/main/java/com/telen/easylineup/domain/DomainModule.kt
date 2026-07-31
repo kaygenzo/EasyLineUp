@@ -42,6 +42,8 @@ import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
 import com.telen.easylineup.domain.usecases.InsertPlayers
 import com.telen.easylineup.domain.usecases.InsertTeam
 import com.telen.easylineup.domain.usecases.InsertTournaments
+import com.telen.easylineup.domain.usecases.IsEmailValidUseCase
+import com.telen.easylineup.domain.usecases.IsValidPhoneNumberUseCase
 import com.telen.easylineup.domain.usecases.ObserveLineupById
 import com.telen.easylineup.domain.usecases.ObservePlayer
 import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
@@ -63,7 +65,6 @@ import com.telen.easylineup.domain.usecases.UpdateLineup
 import com.telen.easylineup.domain.usecases.UpdateLineupRoster
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithLineupMode
-import com.telen.easylineup.domain.utils.ValidatorUtils
 import org.koin.dsl.module
 
 object DomainModule {
@@ -80,7 +81,7 @@ object DomainModule {
         single { DeleteTournamentLineups(get(), get(), get()) }
         single { GetPlayer(get(), get()) }
         single { DeletePlayer(get(), get(), get()) }
-        single { SavePlayer(get(), get(), get(), get()) }
+        single { SavePlayer(get(), get(), get(), get(), get()) }
         single { GetPositionsSummaryForPlayer(get(), get()) }
         single { GetPlayers(get(), get(), get()) }
         single { GetTeamEmails(get(), get()) }
@@ -116,7 +117,8 @@ object DomainModule {
         single { SaveDpAndFlex(get()) }
         single { SavePlayerNumberOverlay(get(), get()) }
         single { GetShirtNumberHistory(get(), get(), get()) }
-        single { ValidatorUtils(get()) }
+        single { IsEmailValidUseCase() }
+        single { IsValidPhoneNumberUseCase(get()) }
         single { GetBattersState(get(), get()) }
         single { UpdateLineup(get(), get()) }
         single { UpdatePlayersWithBatters(get()) }
