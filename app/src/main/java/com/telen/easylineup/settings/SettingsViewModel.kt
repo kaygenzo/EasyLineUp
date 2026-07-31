@@ -9,11 +9,12 @@ import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.DeleteAllData
 import com.telen.easylineup.domain.usecases.ExportData
+import com.telen.easylineup.export.json.exportGson
+import com.telen.easylineup.export.json.toJson
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import kotlinx.coroutines.delay
@@ -75,7 +76,7 @@ class SettingsViewModel : ViewModel(), KoinComponent {
         val now = Calendar.getInstance().time
         val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ROOT)
         val dateTime = formatter.format(now)
-        val json = Gson().toJson(exportBase)
+        val json = exportGson.toJson(exportBase.toJson())
         val dir = DocumentFile.fromTreeUri(context, dirUri)
         val filename = "$dateTime.elu"
         val file = dir?.createFile("application/octet-stream", filename)

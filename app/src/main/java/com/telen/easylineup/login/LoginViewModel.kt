@@ -8,12 +8,13 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import com.telen.easylineup.domain.model.Team
-import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ImportData
+import com.telen.easylineup.export.json.JsonExportBase
+import com.telen.easylineup.export.json.exportGson
+import com.telen.easylineup.export.json.toDomain
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import kotlinx.coroutines.launch
@@ -50,7 +51,7 @@ class LoginViewModel : ViewModel(), KoinComponent {
                         ?: throw IllegalArgumentException("Cannot open uri")
                     val data = stream.use { s ->
                         s.bufferedReader().use { reader ->
-                            Gson().fromJson(reader, ExportBase::class.java)
+                            exportGson.fromJson(reader, JsonExportBase::class.java).toDomain()
                         }
                     }
                     importDataUseCase(data, updateIfExists).getOrThrow()

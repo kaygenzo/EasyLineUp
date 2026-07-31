@@ -4,51 +4,16 @@
 
 package com.telen.easylineup.domain.model.export
 
-import com.google.gson.annotations.SerializedName
-
-/*
-Copyright (c) 2020 Kotlin Data Classes Generated from JSON powered by http://www.json2kotlin.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
-associated documentation files (the "Software"), to deal in the Software without restriction,
-including without limitation the rights to use, copy, modify, merge, publish, distribute,
-sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial
-portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
-NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
-OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-For support, please feel free to contact me at https://www.linkedin.com/in/syedabsar */
-
-/**
- * @property id
- * @property name
- * @property image
- * @property shirtNumber
- * @property licenseNumber
- * @property positions
- * @property pitching
- * @property batting
- * @property email
- * @property phone
- * @property sex
- */
 data class PlayerExport(
-    @SerializedName("id") val id: String,
-    @SerializedName("name") val name: String,
-    @SerializedName("image") var image: String?,
-    @SerializedName("shirtNumber") val shirtNumber: Int,
-    @SerializedName("licenseNumber") val licenseNumber: String,
-    @SerializedName("positions") val positions: Int,
-    @SerializedName("pitching") val pitching: Int,
-    @SerializedName("batting") val batting: Int,
-    @SerializedName("email") var email: String?,
-    @SerializedName("phone") var phone: String?,
-    @SerializedName("sex") var sex: Int
+    val id: String,
+    val name: String,
+    var image: String?,
+    val shirtNumber: Int,
+    val licenseNumber: String,
+    val positions: Int,
+    val pitching: Int,
+    val batting: Int,
+    var email: String?,
+    var phone: String?,
+    var sex: Int
 )
