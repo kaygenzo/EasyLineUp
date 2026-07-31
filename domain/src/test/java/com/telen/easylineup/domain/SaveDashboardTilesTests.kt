@@ -4,8 +4,8 @@
 
 package com.telen.easylineup.domain
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.tiles.TileType
 import com.telen.easylineup.domain.ports.repository.TilesRepository
@@ -20,6 +20,7 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.check
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveDashboardTilesTests {
@@ -55,7 +56,7 @@ internal class SaveDashboardTilesTests {
         val result = saveDashboardTiles(list)
         Assert.assertTrue(result.isSuccess)
 
-        verify(tilesRepo).updateTiles(com.nhaarman.mockitokotlin2.check {
+        verify(tilesRepo).updateTiles(check {
             Assert.assertEquals(0, it[0].position)
             Assert.assertEquals(1, it[1].position)
             Assert.assertEquals(2, it[2].position)
@@ -74,7 +75,7 @@ internal class SaveDashboardTilesTests {
         val result = saveDashboardTiles(list)
         Assert.assertTrue(result.isSuccess)
 
-        verify(tilesRepo).updateTiles(com.nhaarman.mockitokotlin2.check {
+        verify(tilesRepo).updateTiles(check {
             Assert.assertEquals(0, it[0].position)
             Assert.assertEquals(4, it[0].id)
             Assert.assertEquals(1, it[1].position)

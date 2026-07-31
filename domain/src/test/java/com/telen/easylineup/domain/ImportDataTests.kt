@@ -4,8 +4,8 @@
 
 package com.telen.easylineup.domain
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.argumentCaptor
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerFieldPosition

@@ -24,8 +24,8 @@ baristaVersion = "4.3.0"
 fastlaneVersion = "2.1.1"
 uiAutomatorVersion = "2.3.0"
 rxIdlerVersion = "0.11.0"
-mockitoCoreVersion = "2.23.0"
-mockitoKotlinVersion = "2.2.0"
+mockitoCoreVersion = "5.14.2"
+mockitoKotlinVersion = "5.4.0"
 archCoreTestingVersion = "2.2.0"
 junit4Version = "4.13.2"
 # Others
@@ -71,7 +71,7 @@ firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx"
 kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk7", version.ref = "kotlinVersion" }
 annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotationVersion" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }
-mockito-kotlin = { module = "com.nhaarman.mockitokotlin2:mockito-kotlin", version.ref = "mockitoKotlinVersion" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlinVersion" }
 tests-archCore = { group = "androidx.arch.core", name = "core-testing", version.ref = "archCoreTestingVersion" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }

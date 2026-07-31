@@ -4,9 +4,9 @@
 
 package com.telen.easylineup.domain
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.any
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import com.telen.easylineup.domain.ports.PhoneNumberValidator
 import com.telen.easylineup.domain.usecases.IsValidPhoneNumberUseCase
 import org.junit.Assert.assertFalse

@@ -4,8 +4,8 @@
 
 package com.telen.easylineup.domain
 
-import com.nhaarman.mockitokotlin2.check
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.check
+import org.mockito.kotlin.verify
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam

@@ -4,8 +4,8 @@
 
 package com.telen.easylineup.domain
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerFieldPosition
@@ -28,6 +28,7 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.check
 
 @RunWith(MockitoJUnitRunner::class)
 internal class CheckHashDataTests {
@@ -127,23 +128,23 @@ internal class CheckHashDataTests {
         val result = checkHash()
 
         Assert.assertTrue(result.isSuccess)
-        verify(teamDao).updateTeamsWithRowCount(com.nhaarman.mockitokotlin2.check {
+        verify(teamDao).updateTeamsWithRowCount(check {
             Assert.assertEquals(0, it.filter { it.hash == null }.size)
         })
 
-        verify(playerDao).updatePlayersWithRowCount(com.nhaarman.mockitokotlin2.check {
+        verify(playerDao).updatePlayersWithRowCount(check {
             Assert.assertEquals(0, it.filter { it.hash == null }.size)
         })
 
-        verify(tournamentDao).updateTournamentsWithRowCount(com.nhaarman.mockitokotlin2.check {
+        verify(tournamentDao).updateTournamentsWithRowCount(check {
             Assert.assertEquals(0, it.filter { it.hash == null }.size)
         })
 
-        verify(lineupDao).updateLineupsWithRowCount(com.nhaarman.mockitokotlin2.check {
+        verify(lineupDao).updateLineupsWithRowCount(check {
             Assert.assertEquals(0, it.filter { it.hash == null }.size)
         })
 
-        verify(playerPositionsDao).updatePlayerFieldPositionsWithRowCount(com.nhaarman.mockitokotlin2.check {
+        verify(playerPositionsDao).updatePlayerFieldPositionsWithRowCount(check {
             Assert.assertEquals(0, it.filter { it.hash == null }.size)
         })
 

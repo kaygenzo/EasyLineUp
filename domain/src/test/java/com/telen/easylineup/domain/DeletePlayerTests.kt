@@ -4,7 +4,7 @@
 
 package com.telen.easylineup.domain
 
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.verify
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.DeletePlayer
