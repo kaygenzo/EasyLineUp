@@ -23,7 +23,7 @@ import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.databinding.FragmentPlayerEditBinding
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.model.DomainErrors
+import com.telen.easylineup.errors.DomainErrors
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException

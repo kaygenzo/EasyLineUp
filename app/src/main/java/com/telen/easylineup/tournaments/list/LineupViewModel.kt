@@ -12,7 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.model.DomainErrors
+import com.telen.easylineup.errors.DomainErrors
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MapInfo
 import com.telen.easylineup.domain.model.TeamRosterSummary
@@ -20,7 +20,7 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.usecases.CreateLineup
 import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
-import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineupsUseCase
+import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineups
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.GetTournamentMapLink
@@ -56,7 +56,7 @@ data class SaveSuccess(val lineup: Lineup) : SaveResult()
 class LineupViewModel : ViewModel(), KoinComponent {
     private val getTeamUseCase: GetTeam by inject()
     private val observeTournamentsUseCase: ObserveTournaments by inject()
-    private val getAllTournamentsWithLineupsUseCase: GetAllTournamentsWithLineupsUseCase by inject()
+    private val getAllTournamentsWithLineups: GetAllTournamentsWithLineups by inject()
     private val getTournamentMapLink: GetTournamentMapLink by inject()
     private val deleteTournamentLineups: DeleteTournamentLineups by inject()
     private val saveTournamentUseCase: SaveTournament by inject()
@@ -94,7 +94,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     fun observeCategorizedLineups(): Flow<List<TournamentItem>> {
         return filterFlow.flatMapLatest { filter ->
             flow {
-                getAllTournamentsWithLineupsUseCase(filter)
+                getAllTournamentsWithLineups(filter)
                     .onSuccess { pairs ->
                         val items = pairs.map { TournamentItem(it.first, it.second) }
                         tournamentItems.clear()

@@ -25,6 +25,7 @@ import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.ImportData
+import com.telen.easylineup.domain.usecases.ImportResult
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -217,6 +218,20 @@ internal class ImportDataTests {
         Mockito.`when`(playerDao.updatePlayerNumberOverlay(any())).thenReturn(Unit)
     }
 
+    private fun assertAllCounts(result: ImportResult, inserted: Int, updated: Int) {
+        listOf(
+            result.teams,
+            result.players,
+            result.tournaments,
+            result.lineups,
+            result.playerPositions,
+            result.playerNumberOverlays
+        ).forEach {
+            assertEquals(inserted, it.inserted)
+            assertEquals(updated, it.updated)
+        }
+    }
+
     @Test
     fun shouldInsertEverythingWhenNothingExists() = runTest {
         mockAllNotFound()
@@ -226,8 +241,7 @@ internal class ImportDataTests {
 
         assertTrue(importResult.isSuccess)
         val result = importResult.getOrNull()!!
-        assertEquals(listOf(1, 1, 1, 1, 1, 1), result.inserted.toList())
-        assertEquals(listOf(0, 0, 0, 0, 0, 0), result.updated.toList())
+        assertAllCounts(result, inserted = 1, updated = 0)
 
         Mockito.verify(teamDao).insertTeam(any())
         Mockito.verify(playerDao).insertPlayer(any())
@@ -271,8 +285,7 @@ internal class ImportDataTests {
 
         assertTrue(importResult.isSuccess)
         val result = importResult.getOrNull()!!
-        assertEquals(listOf(0, 0, 0, 0, 0, 0), result.inserted.toList())
-        assertEquals(listOf(1, 1, 1, 1, 1, 1), result.updated.toList())
+        assertAllCounts(result, inserted = 0, updated = 1)
 
         Mockito.verify(teamDao).updateTeam(any())
         Mockito.verify(playerDao).updatePlayer(any())
@@ -297,8 +310,7 @@ internal class ImportDataTests {
 
         assertTrue(importResult.isSuccess)
         val result = importResult.getOrNull()!!
-        assertEquals(listOf(0, 0, 0, 0, 0, 0), result.inserted.toList())
-        assertEquals(listOf(0, 0, 0, 0, 0, 0), result.updated.toList())
+        assertAllCounts(result, inserted = 0, updated = 0)
 
         Mockito.verify(teamDao, Mockito.never()).insertTeam(any())
         Mockito.verify(teamDao, Mockito.never()).updateTeam(any())
@@ -312,8 +324,7 @@ internal class ImportDataTests {
 
         assertTrue(importResult.isSuccess)
         val result = importResult.getOrNull()!!
-        assertEquals(listOf(0, 0, 0, 0, 0, 0), result.inserted.toList())
-        assertEquals(listOf(0, 0, 0, 0, 0, 0), result.updated.toList())
+        assertAllCounts(result, inserted = 0, updated = 0)
     }
 
     @Test

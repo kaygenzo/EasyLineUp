@@ -8,14 +8,14 @@ import com.telen.easylineup.domain.model.GeoLocation
 import com.telen.easylineup.domain.model.MapInfo
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.ports.DispatcherProvider
-import com.telen.easylineup.domain.ports.GeocodingPort
+import com.telen.easylineup.domain.ports.GeocodingProvider
 import com.telen.easylineup.domain.usecases.exceptions.AddressNotFoundException
 import com.telen.easylineup.domain.usecases.exceptions.MapApiKeyNotFoundException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentMapNotFoundException
 import kotlinx.coroutines.withContext
 
 class GetTournamentMapLink(
-    private val geocodingPort: GeocodingPort,
+    private val geocodingProvider: GeocodingProvider,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(
@@ -27,7 +27,7 @@ class GetTournamentMapLink(
         withContext(dispatcherProvider.io()) {
             apiKey?.takeIf { it.isNotEmpty() } ?: throw MapApiKeyNotFoundException()
             val address = tournament.address ?: throw AddressNotFoundException()
-            val location = geocodingPort.getLocationFromAddress(address)
+            val location = geocodingProvider.getLocationFromAddress(address)
                 ?: throw TournamentMapNotFoundException()
             val lat = location.latitude
             val long = location.longitude

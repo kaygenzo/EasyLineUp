@@ -2,6 +2,6 @@ package com.telen.easylineup.domain.ports
 
 import com.telen.easylineup.domain.model.GeoLocation
 
-interface GeocodingPort {
+interface GeocodingProvider {
     fun getLocationFromAddress(address: String): GeoLocation?
 }

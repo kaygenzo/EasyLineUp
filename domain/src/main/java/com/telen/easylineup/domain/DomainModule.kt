@@ -17,7 +17,7 @@ import com.telen.easylineup.domain.usecases.DeleteTeam
 import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
 import com.telen.easylineup.domain.usecases.ExportData
 import com.telen.easylineup.domain.usecases.GetAllTeams
-import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineupsUseCase
+import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineups
 import com.telen.easylineup.domain.usecases.GetBattersState
 import com.telen.easylineup.domain.usecases.GetDashboardTiles
 import com.telen.easylineup.domain.usecases.GetDpAndFlexFromPlayersInField
@@ -42,8 +42,8 @@ import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
 import com.telen.easylineup.domain.usecases.InsertPlayers
 import com.telen.easylineup.domain.usecases.InsertTeam
 import com.telen.easylineup.domain.usecases.InsertTournaments
-import com.telen.easylineup.domain.usecases.IsEmailValidUseCase
-import com.telen.easylineup.domain.usecases.IsValidPhoneNumberUseCase
+import com.telen.easylineup.domain.usecases.IsEmailValid
+import com.telen.easylineup.domain.usecases.IsValidPhoneNumber
 import com.telen.easylineup.domain.usecases.ObserveLineupById
 import com.telen.easylineup.domain.usecases.ObservePlayer
 import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
@@ -77,7 +77,7 @@ object DomainModule {
         single { CreateDashboardTiles(get(), get()) }
         single { CreateLineup(get(), get(), get()) }
         single { GetTournaments(get(), get()) }
-        single { GetAllTournamentsWithLineupsUseCase(get(), get(), get()) }
+        single { GetAllTournamentsWithLineups(get(), get(), get()) }
         single { DeleteTournamentLineups(get(), get(), get()) }
         single { GetPlayer(get(), get()) }
         single { DeletePlayer(get(), get(), get()) }
@@ -117,8 +117,8 @@ object DomainModule {
         single { SaveDpAndFlex(get()) }
         single { SavePlayerNumberOverlay(get(), get()) }
         single { GetShirtNumberHistory(get(), get(), get()) }
-        single { IsEmailValidUseCase() }
-        single { IsValidPhoneNumberUseCase(get()) }
+        single { IsEmailValid() }
+        single { IsValidPhoneNumber(get()) }
         single { GetBattersState(get(), get()) }
         single { UpdateLineup(get(), get()) }
         single { UpdatePlayersWithBatters(get()) }

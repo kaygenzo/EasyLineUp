@@ -7,7 +7,7 @@ package com.telen.easylineup.player
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.telen.easylineup.domain.model.DomainErrors
+import com.telen.easylineup.errors.DomainErrors
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.TeamStrategy

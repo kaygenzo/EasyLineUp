@@ -7,7 +7,7 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
-import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineupsUseCase
+import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineups
 import com.telen.easylineup.domain.usecases.GetTeam
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -22,10 +22,10 @@ import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-internal class GetAllTournamentsWithLineupsUseCaseTests {
+internal class GetAllTournamentsWithLineupsTests {
     @Mock lateinit var lineupDao: LineupRepository
     @Mock lateinit var teamDao: TeamRepository
-    lateinit var getAllTournamentsWithLineups: GetAllTournamentsWithLineupsUseCase
+    lateinit var getAllTournamentsWithLineups: GetAllTournamentsWithLineups
     lateinit var team: Team
 
     @Before
@@ -33,7 +33,7 @@ internal class GetAllTournamentsWithLineupsUseCaseTests {
         runBlocking {
         MockitoAnnotations.initMocks(this)
         team = Team(id = 1L, name = "toto", main = true)
-        getAllTournamentsWithLineups = GetAllTournamentsWithLineupsUseCase(
+        getAllTournamentsWithLineups = GetAllTournamentsWithLineups(
             lineupDao,
             GetTeam(teamDao, testDispatcherProvider()),
             testDispatcherProvider()

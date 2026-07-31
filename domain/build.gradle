@@ -37,7 +37,6 @@ apply from: '../detekt.gradle'
 def pureModelDataClasses = [
     'BatterState',
     'DashboardTile',
-    'DomainErrors*',
     'DpAndFlexConfiguration',
     'GeoLocation',
     'MapInfo',

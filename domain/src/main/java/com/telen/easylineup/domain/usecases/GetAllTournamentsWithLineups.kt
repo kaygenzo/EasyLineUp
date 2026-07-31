@@ -12,7 +12,7 @@ import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import kotlinx.coroutines.withContext
 
-class GetAllTournamentsWithLineupsUseCase(
+class GetAllTournamentsWithLineups(
     private val dao: LineupRepository,
     private val getTeam: GetTeam,
     private val dispatcherProvider: DispatcherProvider

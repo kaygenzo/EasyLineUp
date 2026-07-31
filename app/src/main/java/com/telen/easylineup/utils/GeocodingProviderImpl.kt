@@ -3,10 +3,10 @@ package com.telen.easylineup.utils
 import android.content.Context
 import android.location.Geocoder
 import com.telen.easylineup.domain.model.GeoLocation
-import com.telen.easylineup.domain.ports.GeocodingPort
+import com.telen.easylineup.domain.ports.GeocodingProvider
 import java.io.IOException
 
-class GeocodingPortImpl(context: Context) : GeocodingPort {
+class GeocodingProviderImpl(context: Context) : GeocodingProvider {
     private val geocoder = Geocoder(context)
 
     override fun getLocationFromAddress(address: String): GeoLocation? {

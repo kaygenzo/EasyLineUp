@@ -13,8 +13,8 @@ import com.telen.easylineup.domain.ports.PhoneNumberValidator
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetTeam
-import com.telen.easylineup.domain.usecases.IsEmailValidUseCase
-import com.telen.easylineup.domain.usecases.IsValidPhoneNumberUseCase
+import com.telen.easylineup.domain.usecases.IsEmailValid
+import com.telen.easylineup.domain.usecases.IsValidPhoneNumber
 import com.telen.easylineup.domain.usecases.SavePlayer
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import kotlinx.coroutines.runBlocking
@@ -44,8 +44,8 @@ internal class SavePlayerTests {
         savePlayer = SavePlayer(
             playerDao,
             GetTeam(teamDao, testDispatcherProvider()),
-            IsEmailValidUseCase(),
-            IsValidPhoneNumberUseCase(
+            IsEmailValid(),
+            IsValidPhoneNumber(
                 object : PhoneNumberValidator {
                     override fun isGlobalPhoneNumber(phone: String) = true
                 }

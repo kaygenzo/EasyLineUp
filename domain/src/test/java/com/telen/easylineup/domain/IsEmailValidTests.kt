@@ -4,18 +4,18 @@
 
 package com.telen.easylineup.domain
 
-import com.telen.easylineup.domain.usecases.IsEmailValidUseCase
+import com.telen.easylineup.domain.usecases.IsEmailValid
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-internal class IsEmailValidUseCaseTests {
-    lateinit var isEmailValid: IsEmailValidUseCase
+internal class IsEmailValidTests {
+    lateinit var isEmailValid: IsEmailValid
 
     @Before
     fun init() {
-        isEmailValid = IsEmailValidUseCase()
+        isEmailValid = IsEmailValid()
     }
 
     @Test

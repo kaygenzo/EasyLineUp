@@ -7,7 +7,7 @@ package com.telen.easylineup.domain.usecases
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class IsEmailValidUseCase {
+class IsEmailValid {
     operator fun invoke(email: String?): Boolean {
         return email.takeIf { !it.isNullOrEmpty() }?.let {
             val expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$"

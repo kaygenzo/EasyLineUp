@@ -20,7 +20,7 @@ import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.databinding.FragmentLineupCreationBinding
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.model.DomainErrors
+import com.telen.easylineup.errors.DomainErrors
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType

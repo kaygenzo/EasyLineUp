@@ -27,10 +27,39 @@ import kotlinx.coroutines.withContext
 import java.util.UUID
 
 /**
- * @property inserted
- * @property updated
+ * How many rows of one entity type were inserted vs. updated by an import.
  */
-class ImportResult(val inserted: IntArray, val updated: IntArray)
+class ImportCounts {
+    var inserted: Int = 0
+        private set
+    var updated: Int = 0
+        private set
+
+    fun recordInsert() {
+        inserted++
+    }
+
+    fun recordUpdate() {
+        updated++
+    }
+}
+
+/**
+ * @property teams
+ * @property players
+ * @property tournaments
+ * @property lineups
+ * @property playerPositions
+ * @property playerNumberOverlays
+ */
+class ImportResult(
+    val teams: ImportCounts = ImportCounts(),
+    val players: ImportCounts = ImportCounts(),
+    val tournaments: ImportCounts = ImportCounts(),
+    val lineups: ImportCounts = ImportCounts(),
+    val playerPositions: ImportCounts = ImportCounts(),
+    val playerNumberOverlays: ImportCounts = ImportCounts()
+)
 
 class ImportData(
     private val teamDao: TeamRepository,
@@ -45,19 +74,17 @@ class ImportData(
         updateIfExists: Boolean
     ): Result<ImportResult> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            val insertedArray = intArrayOf(0, 0, 0, 0, 0, 0)
-            val updatedArray = intArrayOf(0, 0, 0, 0, 0, 0)
+            val result = ImportResult()
 
             exportBase.teams.forEach { teamExport ->
-                val team = processTeam(teamExport, insertedArray, updatedArray, updateIfExists)
+                val team = processTeam(teamExport, result.teams, updateIfExists)
 
                 val playerIdMap: MutableMap<String, Long> = mutableMapOf()
                 teamExport.players.forEach { playerExport ->
                     val player = processPlayer(
                         playerExport,
                         team.id,
-                        insertedArray,
-                        updatedArray,
+                        result.players,
                         updateIfExists
                     )
                     playerIdMap[player.hash ?: UUID.randomUUID().toString()] = player.id
@@ -66,8 +93,7 @@ class ImportData(
                 teamExport.tournaments.forEach { tournamentExport ->
                     val tournament = processTournament(
                         tournamentExport,
-                        insertedArray,
-                        updatedArray,
+                        result.tournaments,
                         updateIfExists
                     )
 
@@ -77,8 +103,7 @@ class ImportData(
                             team.id,
                             tournament.id,
                             playerIdMap,
-                            insertedArray,
-                            updatedArray,
+                            result.lineups,
                             updateIfExists
                         )
 
@@ -87,8 +112,7 @@ class ImportData(
                                 it,
                                 playerIdMap,
                                 lineup.id,
-                                insertedArray,
-                                updatedArray,
+                                result.playerPositions,
                                 updateIfExists
                             )
                         }
@@ -98,8 +122,7 @@ class ImportData(
                                 it,
                                 playerIdMap,
                                 lineup.id,
-                                insertedArray,
-                                updatedArray,
+                                result.playerNumberOverlays,
                                 updateIfExists
                             )
                         }
@@ -107,12 +130,13 @@ class ImportData(
                 }
             }
 
-            ImportResult(insertedArray, updatedArray)
+            result
         }
     }
 
     private suspend fun processTeam(
-        teamExport: TeamExport, insertedArray: IntArray, updatedArray: IntArray,
+        teamExport: TeamExport,
+        counts: ImportCounts,
         updateIfExists: Boolean
     ): Team {
         val t = Team(
@@ -126,11 +150,11 @@ class ImportData(
 
         val teamDb = teamDao.getTeamByHash(teamExport.id)
         return if (teamDb == null) {
-            insertedArray[RESULT_TEAMS_INDEX] += 1
+            counts.recordInsert()
             t.id = teamDao.insertTeam(t)
             t
         } else if (updateIfExists) {
-            updatedArray[RESULT_TEAMS_INDEX] += 1
+            counts.recordUpdate()
             t.id = teamDb.id
             teamDao.updateTeam(t)
             t
@@ -140,7 +164,9 @@ class ImportData(
     }
 
     private suspend fun processPlayer(
-        playerExport: PlayerExport, teamId: Long, insertedArray: IntArray, updatedArray: IntArray,
+        playerExport: PlayerExport,
+        teamId: Long,
+        counts: ImportCounts,
         updateIfExists: Boolean
     ): Player {
         val licenseNumber = try {
@@ -167,11 +193,11 @@ class ImportData(
 
         val playerDb = playerDao.getPlayerByHash(playerExport.id)
         return if (playerDb == null) {
-            insertedArray[RESULT_PLAYERS_INDEX] += 1
+            counts.recordInsert()
             p.id = playerDao.insertPlayer(p)
             p
         } else if (updateIfExists) {
-            updatedArray[RESULT_PLAYERS_INDEX] += 1
+            counts.recordUpdate()
             p.id = playerDb.id
             playerDao.updatePlayer(p)
             p
@@ -181,7 +207,8 @@ class ImportData(
     }
 
     private suspend fun processTournament(
-        export: TournamentExport, insertedArray: IntArray, updatedArray: IntArray,
+        export: TournamentExport,
+        counts: ImportCounts,
         updateIfExists: Boolean
     ): Tournament {
         val t = Tournament(
@@ -191,11 +218,11 @@ class ImportData(
 
         val tournamentDb = tournamentDao.getTournamentByHash(export.id)
         return if (tournamentDb == null) {
-            insertedArray[RESULT_TOURNAMENTS_INDEX] += 1
+            counts.recordInsert()
             t.id = tournamentDao.insertTournament(t)
             t
         } else if (updateIfExists) {
-            updatedArray[RESULT_TOURNAMENTS_INDEX] += 1
+            counts.recordUpdate()
             t.id = tournamentDb.id
             tournamentDao.updateTournament(t)
             t
@@ -205,9 +232,11 @@ class ImportData(
     }
 
     private suspend fun processLineup(
-        lineup: LineupExport, teamId: Long, tournamentId: Long,
+        lineup: LineupExport,
+        teamId: Long,
+        tournamentId: Long,
         players: Map<String, Long>,
-        insertedArray: IntArray, updatedArray: IntArray,
+        counts: ImportCounts,
         updateIfExists: Boolean
     ): Lineup {
         val newLineup = Lineup(
@@ -227,11 +256,11 @@ class ImportData(
 
         val lineupDb = lineupDao.getLineupByHash(lineup.id)
         return if (lineupDb == null) {
-            insertedArray[RESULT_LINEUPS_INDEX] += 1
+            counts.recordInsert()
             newLineup.id = lineupDao.insertLineup(newLineup)
             newLineup
         } else if (updateIfExists) {
-            updatedArray[RESULT_LINEUPS_INDEX] += 1
+            counts.recordUpdate()
             newLineup.id = lineupDb.id
             lineupDao.updateLineup(newLineup)
             newLineup
@@ -254,8 +283,10 @@ class ImportData(
     }
 
     private suspend fun processPlayerFieldPosition(
-        export: PlayerPositionExport, players: Map<String, Long>, lineupId: Long,
-        insertedArray: IntArray, updatedArray: IntArray,
+        export: PlayerPositionExport,
+        players: Map<String, Long>,
+        lineupId: Long,
+        counts: ImportCounts,
         updateIfExists: Boolean
     ) {
         val p = PlayerFieldPosition(
@@ -265,39 +296,32 @@ class ImportData(
 
         val positionDb = playerFieldPositionsDao.getPlayerFieldPositionByHash(export.id)
         if (positionDb == null) {
-            insertedArray[RESULT_PLAYER_POSITION_INDEX] += 1
+            counts.recordInsert()
             playerFieldPositionsDao.insertPlayerFieldPosition(p)
         } else if (updateIfExists) {
-            updatedArray[RESULT_PLAYER_POSITION_INDEX] += 1
+            counts.recordUpdate()
             p.id = positionDb.id
             playerFieldPositionsDao.updatePlayerFieldPosition(p)
         }
     }
 
     private suspend fun processPlayerNumberOverlays(
-        export: PlayerNumberOverlayExport, players: Map<String, Long>, lineupId: Long,
-        insertedArray: IntArray, updatedArray: IntArray,
+        export: PlayerNumberOverlayExport,
+        players: Map<String, Long>,
+        lineupId: Long,
+        counts: ImportCounts,
         updateIfExists: Boolean
     ) {
         val p = PlayerNumberOverlay(0L, lineupId, players[export.playerId] ?: 0L, export.number)
 
         val overlayDb = playerDao.getPlayerNumberOverlayByHash(export.id)
         if (overlayDb == null) {
-            insertedArray[RESULT_PLAYER_NUMBER_OVERLAY_INDEX] += 1
+            counts.recordInsert()
             playerDao.createPlayerNumberOverlay(p)
         } else if (updateIfExists) {
-            updatedArray[RESULT_PLAYER_NUMBER_OVERLAY_INDEX] += 1
+            counts.recordUpdate()
             p.id = overlayDb.id
             playerDao.updatePlayerNumberOverlay(p)
         }
-    }
-
-    companion object {
-        const val RESULT_TEAMS_INDEX = 0
-        const val RESULT_PLAYERS_INDEX = 1
-        const val RESULT_TOURNAMENTS_INDEX = 2
-        const val RESULT_LINEUPS_INDEX = 3
-        const val RESULT_PLAYER_POSITION_INDEX = 4
-        const val RESULT_PLAYER_NUMBER_OVERLAY_INDEX = 5
     }
 }

@@ -18,8 +18,8 @@ import kotlinx.coroutines.withContext
 class SavePlayer(
     private val dao: PlayerRepository,
     private val getTeam: GetTeam,
-    private val isEmailValidUseCase: IsEmailValidUseCase,
-    private val isValidPhoneNumberUseCase: IsValidPhoneNumberUseCase,
+    private val isEmailValid: IsEmailValid,
+    private val isValidPhoneNumber: IsValidPhoneNumber,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(
@@ -39,10 +39,10 @@ class SavePlayer(
             if (name.isNullOrBlank()) {
                 throw NameEmptyException()
             }
-            if (!isEmailValidUseCase(email)) {
+            if (!isEmailValid(email)) {
                 throw InvalidEmailException()
             }
-            if (!isValidPhoneNumberUseCase(phone)) {
+            if (!isValidPhoneNumber(phone)) {
                 throw InvalidPhoneException()
             }
 
