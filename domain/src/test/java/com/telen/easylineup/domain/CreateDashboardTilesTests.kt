@@ -8,7 +8,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.tiles.TileType
-import com.telen.easylineup.domain.repository.TilesRepository
+import com.telen.easylineup.domain.ports.repository.TilesRepository
 import com.telen.easylineup.domain.usecases.CreateDashboardTiles
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest

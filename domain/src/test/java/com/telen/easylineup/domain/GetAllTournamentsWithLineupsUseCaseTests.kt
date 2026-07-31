@@ -5,8 +5,8 @@
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.Team
-import com.telen.easylineup.domain.repository.LineupRepository
-import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.ports.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineupsUseCase
 import com.telen.easylineup.domain.usecases.GetTeam
 import kotlinx.coroutines.runBlocking

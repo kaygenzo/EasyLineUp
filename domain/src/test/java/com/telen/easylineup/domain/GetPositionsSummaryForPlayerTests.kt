@@ -6,7 +6,7 @@ package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PositionWithLineup
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.GetPositionsSummaryForPlayer
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest

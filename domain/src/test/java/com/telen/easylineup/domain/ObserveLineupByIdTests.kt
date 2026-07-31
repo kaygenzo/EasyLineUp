@@ -5,7 +5,7 @@
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.Lineup
-import com.telen.easylineup.domain.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.ObserveLineupById
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList

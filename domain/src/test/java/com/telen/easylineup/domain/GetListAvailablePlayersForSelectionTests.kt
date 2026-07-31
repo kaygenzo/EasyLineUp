@@ -10,9 +10,9 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.Team
-import com.telen.easylineup.domain.repository.LineupRepository
-import com.telen.easylineup.domain.repository.PlayerRepository
-import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.ports.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetTeam

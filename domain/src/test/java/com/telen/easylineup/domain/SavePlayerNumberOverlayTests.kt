@@ -9,7 +9,7 @@ import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.RosterItem
-import com.telen.easylineup.domain.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest

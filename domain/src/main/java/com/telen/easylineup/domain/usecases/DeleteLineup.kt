@@ -5,7 +5,7 @@
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.ports.DispatcherProvider
-import com.telen.easylineup.domain.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.LineupRepository
 import kotlinx.coroutines.withContext
 
 class DeleteLineup(

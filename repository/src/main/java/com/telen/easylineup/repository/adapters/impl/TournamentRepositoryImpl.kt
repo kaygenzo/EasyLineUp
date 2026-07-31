@@ -5,7 +5,7 @@
 package com.telen.easylineup.repository.adapters.impl
 
 import com.telen.easylineup.domain.model.Tournament
-import com.telen.easylineup.domain.repository.TournamentRepository
+import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.repository.dao.TournamentDao
 import com.telen.easylineup.repository.model.toDomain
 import com.telen.easylineup.repository.model.toRoom

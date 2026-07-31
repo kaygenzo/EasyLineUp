@@ -7,8 +7,8 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
-import com.telen.easylineup.domain.repository.TeamRepository
-import com.telen.easylineup.domain.repository.TournamentRepository
+import com.telen.easylineup.domain.ports.repository.TeamRepository
+import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.DeleteAllData
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest

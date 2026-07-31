@@ -12,7 +12,7 @@ import com.telen.easylineup.domain.model.TournamentStatsUiConfig
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.StringResourcesProvider
-import com.telen.easylineup.domain.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.LineupRepository
 import kotlinx.coroutines.withContext
 
 class GetTournamentStatsForPositionTable(

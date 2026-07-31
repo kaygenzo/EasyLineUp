@@ -5,7 +5,7 @@
 package com.telen.easylineup.repository.adapters.impl
 
 import com.telen.easylineup.domain.model.DashboardTile
-import com.telen.easylineup.domain.repository.TilesRepository
+import com.telen.easylineup.domain.ports.repository.TilesRepository
 import com.telen.easylineup.repository.dao.TilesDao
 import com.telen.easylineup.repository.model.toDomain
 import com.telen.easylineup.repository.model.toRoom

@@ -14,8 +14,8 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.PlayerWithPosition
-import com.telen.easylineup.domain.repository.LineupRepository
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.ports.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest

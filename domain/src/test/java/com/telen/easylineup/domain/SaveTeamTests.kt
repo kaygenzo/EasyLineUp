@@ -9,14 +9,13 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.CheckTeam
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
 import com.telen.easylineup.domain.usecases.SaveTeam
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before

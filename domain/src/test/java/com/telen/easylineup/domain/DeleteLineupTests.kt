@@ -7,7 +7,7 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.TeamStrategy
-import com.telen.easylineup.domain.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.DeleteLineup
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest

@@ -8,7 +8,7 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.ShirtNumberEntry
-import com.telen.easylineup.domain.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.repository.dao.PlayerDao
 import com.telen.easylineup.repository.dao.PlayerNumberOverlayDao
 import com.telen.easylineup.repository.model.toDomain

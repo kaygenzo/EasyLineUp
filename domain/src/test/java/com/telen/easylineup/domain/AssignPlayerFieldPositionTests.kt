@@ -18,7 +18,7 @@ import com.telen.easylineup.domain.model.getDesignatedPlayerOrder
 import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.model.isShortStop
 import com.telen.easylineup.domain.model.reset
-import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.GetTeam
 import kotlinx.coroutines.test.runTest

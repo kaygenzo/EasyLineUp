@@ -11,7 +11,7 @@ import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.DeleteTeam
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest

@@ -9,11 +9,11 @@ import com.telen.easylineup.domain.model.DashboardTile
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.tiles.TileType
-import com.telen.easylineup.domain.repository.LineupRepository
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
-import com.telen.easylineup.domain.repository.PlayerRepository
-import com.telen.easylineup.domain.repository.TeamRepository
-import com.telen.easylineup.domain.repository.TilesRepository
+import com.telen.easylineup.domain.ports.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.ports.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.TeamRepository
+import com.telen.easylineup.domain.ports.repository.TilesRepository
 import com.telen.easylineup.domain.usecases.CreateDashboardTiles
 import com.telen.easylineup.domain.usecases.GetDashboardTiles
 import com.telen.easylineup.domain.usecases.GetTeam

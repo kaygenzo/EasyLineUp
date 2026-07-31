@@ -5,7 +5,7 @@
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.Player
-import com.telen.easylineup.domain.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.ObservePlayer
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList

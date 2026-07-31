@@ -6,7 +6,7 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.ports.DispatcherProvider
-import com.telen.easylineup.domain.repository.TournamentRepository
+import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournamentException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import kotlinx.coroutines.CancellationException

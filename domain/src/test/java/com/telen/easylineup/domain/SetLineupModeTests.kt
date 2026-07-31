@@ -10,7 +10,7 @@ import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.SetLineupMode
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithLineupMode

@@ -10,7 +10,7 @@ import com.nhaarman.mockitokotlin2.eq
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.RosterPlayerStatus
-import com.telen.easylineup.domain.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.UpdateLineupRoster
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest

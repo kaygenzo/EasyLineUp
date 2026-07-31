@@ -5,7 +5,7 @@
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.Tournament
-import com.telen.easylineup.domain.repository.TournamentRepository
+import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.GetTournaments
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest

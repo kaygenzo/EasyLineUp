@@ -8,7 +8,7 @@ import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerGamesCount
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.PositionWithLineup
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.repository.dao.PlayerFieldPositionsDao
 import com.telen.easylineup.repository.model.toDomain
 import com.telen.easylineup.repository.model.toRoom

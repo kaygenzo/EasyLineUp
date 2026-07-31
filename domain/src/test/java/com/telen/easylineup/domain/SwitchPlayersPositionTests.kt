@@ -18,7 +18,7 @@ import com.telen.easylineup.domain.model.isCatcher
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isFirstBase
 import com.telen.easylineup.domain.model.isPitcher
-import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.exceptions.FirstPositionEmptyException

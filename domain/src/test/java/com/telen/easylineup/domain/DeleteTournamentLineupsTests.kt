@@ -11,8 +11,8 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
-import com.telen.easylineup.domain.repository.LineupRepository
-import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.ports.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
 import com.telen.easylineup.domain.usecases.GetTeam
 import kotlinx.coroutines.runBlocking

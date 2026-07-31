@@ -5,7 +5,7 @@
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.ports.DispatcherProvider
-import com.telen.easylineup.domain.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import kotlinx.coroutines.withContext
 
 class DeletePlayer(

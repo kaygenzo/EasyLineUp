@@ -18,11 +18,11 @@ import com.telen.easylineup.domain.model.export.PlayerPositionExport
 import com.telen.easylineup.domain.model.export.TeamExport
 import com.telen.easylineup.domain.model.export.TournamentExport
 import com.telen.easylineup.domain.ports.DispatcherProvider
-import com.telen.easylineup.domain.repository.LineupRepository
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
-import com.telen.easylineup.domain.repository.PlayerRepository
-import com.telen.easylineup.domain.repository.TeamRepository
-import com.telen.easylineup.domain.repository.TournamentRepository
+import com.telen.easylineup.domain.ports.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.ports.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.TeamRepository
+import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import java.util.UUID

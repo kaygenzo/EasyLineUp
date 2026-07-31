@@ -6,7 +6,7 @@ package com.telen.easylineup.domain
 
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Player
-import com.telen.easylineup.domain.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.DeletePlayer
 import com.telen.easylineup.domain.usecases.GetPlayer
 import kotlinx.coroutines.runBlocking

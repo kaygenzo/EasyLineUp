@@ -8,7 +8,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.telen.easylineup.domain.model.Tournament
-import com.telen.easylineup.domain.repository.TournamentRepository
+import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournamentException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException

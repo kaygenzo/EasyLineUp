@@ -7,7 +7,7 @@ package com.telen.easylineup.repository.adapters.impl
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.PlayerInLineup
 import com.telen.easylineup.domain.model.TournamentWithLineup
-import com.telen.easylineup.domain.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.repository.dao.LineupDao
 import com.telen.easylineup.repository.model.toDomain
 import com.telen.easylineup.repository.model.toRoom

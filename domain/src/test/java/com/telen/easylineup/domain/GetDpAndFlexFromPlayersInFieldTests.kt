@@ -13,7 +13,7 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.model.isRightField
-import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetDpAndFlexFromPlayersInField
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException

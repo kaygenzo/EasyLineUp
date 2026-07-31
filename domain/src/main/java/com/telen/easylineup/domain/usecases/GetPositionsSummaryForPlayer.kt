@@ -6,7 +6,7 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.ports.DispatcherProvider
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import kotlinx.coroutines.withContext
 
 class GetPositionsSummaryForPlayer(

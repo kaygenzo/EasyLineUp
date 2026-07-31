@@ -9,8 +9,8 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.isAssigned
 import com.telen.easylineup.domain.model.toPlayerFieldPosition
 import com.telen.easylineup.domain.ports.DispatcherProvider
-import com.telen.easylineup.domain.repository.LineupRepository
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.ports.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import kotlinx.coroutines.withContext
 
 class SaveBattingOrderAndPositions(

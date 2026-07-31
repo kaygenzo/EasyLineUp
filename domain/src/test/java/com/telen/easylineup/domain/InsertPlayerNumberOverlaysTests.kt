@@ -5,7 +5,7 @@
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
-import com.telen.easylineup.domain.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue

@@ -5,7 +5,7 @@
 package com.telen.easylineup.repository.adapters.impl
 
 import com.telen.easylineup.domain.model.Team
-import com.telen.easylineup.domain.repository.TeamRepository
+import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.repository.dao.TeamDao
 import com.telen.easylineup.repository.model.toDomain
 import com.telen.easylineup.repository.model.toRoom

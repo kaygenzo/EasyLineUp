@@ -5,7 +5,7 @@
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.PlayerFieldPosition
-import com.telen.easylineup.domain.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.usecases.InsertPlayerFieldPositions
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
