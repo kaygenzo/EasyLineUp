@@ -139,17 +139,13 @@ internal class ImportDataTests {
     }
 
     private suspend fun mockAllNotFound() {
-        Mockito.`when`(teamDao.getTeamByHash(teamHash)).thenAnswer { throw NoSuchElementException() }
-        Mockito.`when`(playerDao.getPlayerByHash(playerHash))
-            .thenAnswer { throw NoSuchElementException() }
-        Mockito.`when`(tournamentDao.getTournamentByHash(tournamentHash))
-            .thenAnswer { throw NoSuchElementException() }
-        Mockito.`when`(lineupDao.getLineupByHash(lineupHash))
-            .thenAnswer { throw NoSuchElementException() }
+        Mockito.`when`(teamDao.getTeamByHash(teamHash)).thenReturn(null)
+        Mockito.`when`(playerDao.getPlayerByHash(playerHash)).thenReturn(null)
+        Mockito.`when`(tournamentDao.getTournamentByHash(tournamentHash)).thenReturn(null)
+        Mockito.`when`(lineupDao.getLineupByHash(lineupHash)).thenReturn(null)
         Mockito.`when`(playerFieldPositionsDao.getPlayerFieldPositionByHash(positionHash))
-            .thenAnswer { throw NoSuchElementException() }
-        Mockito.`when`(playerDao.getPlayerNumberOverlayByHash(overlayHash))
-            .thenAnswer { throw NoSuchElementException() }
+            .thenReturn(null)
+        Mockito.`when`(playerDao.getPlayerNumberOverlayByHash(overlayHash)).thenReturn(null)
     }
 
     private suspend fun mockAllInsertsSucceed() {
@@ -328,15 +324,12 @@ internal class ImportDataTests {
             teams = listOf(teamExport.copy(players = listOf(brokenPlayer)))
         )
 
-        Mockito.`when`(teamDao.getTeamByHash(teamHash)).thenAnswer { throw NoSuchElementException() }
-        Mockito.`when`(playerDao.getPlayerByHash(playerHash))
-            .thenAnswer { throw NoSuchElementException() }
-        Mockito.`when`(tournamentDao.getTournamentByHash(any())).thenAnswer { throw NoSuchElementException() }
-        Mockito.`when`(lineupDao.getLineupByHash(any())).thenAnswer { throw NoSuchElementException() }
-        Mockito.`when`(playerFieldPositionsDao.getPlayerFieldPositionByHash(any()))
-            .thenAnswer { throw NoSuchElementException() }
-        Mockito.`when`(playerDao.getPlayerNumberOverlayByHash(any()))
-            .thenAnswer { throw NoSuchElementException() }
+        Mockito.`when`(teamDao.getTeamByHash(teamHash)).thenReturn(null)
+        Mockito.`when`(playerDao.getPlayerByHash(playerHash)).thenReturn(null)
+        Mockito.`when`(tournamentDao.getTournamentByHash(any())).thenReturn(null)
+        Mockito.`when`(lineupDao.getLineupByHash(any())).thenReturn(null)
+        Mockito.`when`(playerFieldPositionsDao.getPlayerFieldPositionByHash(any())).thenReturn(null)
+        Mockito.`when`(playerDao.getPlayerNumberOverlayByHash(any())).thenReturn(null)
         mockAllInsertsSucceed()
 
         val importResult = importData(brokenExport, updateIfExists = false)
@@ -359,30 +352,18 @@ internal class ImportDataTests {
     }
 
     /**
-     * Documents a potential issue: [teamDao.getTeamByHash] failing for any reason (not only
-     * "not found") is silently interpreted as "team does not exist yet" because of the
-     * catch-all try/catch, so an unrelated repository error still triggers an insert
-     * attempt instead of propagating the original error.
+     * [teamDao.getTeamByHash] returning null means "not found" (an ordinary, expected outcome
+     * handled by inserting); an actual repository error is a distinct failure that must
+     * propagate instead of being interpreted as "team does not exist yet".
      */
     @Test
-    fun shouldAttemptInsertEvenWhenLookupFailsWithAnUnrelatedError() = runTest {
-        Mockito.`when`(teamDao.getTeamByHash(teamHash))
-            .thenAnswer { throw RuntimeException("connection lost") }
-        Mockito.`when`(playerDao.getPlayerByHash(playerHash))
-            .thenAnswer { throw NoSuchElementException() }
-        Mockito.`when`(tournamentDao.getTournamentByHash(tournamentHash))
-            .thenAnswer { throw NoSuchElementException() }
-        Mockito.`when`(lineupDao.getLineupByHash(lineupHash))
-            .thenAnswer { throw NoSuchElementException() }
-        Mockito.`when`(playerFieldPositionsDao.getPlayerFieldPositionByHash(positionHash))
-            .thenAnswer { throw NoSuchElementException() }
-        Mockito.`when`(playerDao.getPlayerNumberOverlayByHash(overlayHash))
-            .thenAnswer { throw NoSuchElementException() }
-        mockAllInsertsSucceed()
+    fun shouldPropagateLookupErrorsInsteadOfTreatingThemAsNotFound() = runTest {
+        val exception = RuntimeException("connection lost")
+        Mockito.`when`(teamDao.getTeamByHash(teamHash)).thenAnswer { throw exception }
 
         val importResult = importData(exportBase, updateIfExists = false)
 
-        assertTrue(importResult.isSuccess)
-        Mockito.verify(teamDao).insertTeam(any())
+        assertEquals(exception, importResult.exceptionOrNull())
+        Mockito.verify(teamDao, Mockito.never()).insertTeam(any())
     }
 }

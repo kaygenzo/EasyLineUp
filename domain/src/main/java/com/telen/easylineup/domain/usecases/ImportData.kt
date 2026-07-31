@@ -23,7 +23,6 @@ import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepositor
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.ports.repository.TournamentRepository
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import java.util.UUID
 
@@ -125,22 +124,18 @@ class ImportData(
             teamExport.id
         )
 
-        return try {
-            val teamDb = teamDao.getTeamByHash(teamExport.id)
-            if (updateIfExists) {
-                updatedArray[RESULT_TEAMS_INDEX] += 1
-                t.id = teamDb.id
-                teamDao.updateTeam(t)
-                t
-            } else {
-                teamDb
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+        val teamDb = teamDao.getTeamByHash(teamExport.id)
+        return if (teamDb == null) {
             insertedArray[RESULT_TEAMS_INDEX] += 1
             t.id = teamDao.insertTeam(t)
             t
+        } else if (updateIfExists) {
+            updatedArray[RESULT_TEAMS_INDEX] += 1
+            t.id = teamDb.id
+            teamDao.updateTeam(t)
+            t
+        } else {
+            teamDb
         }
     }
 
@@ -170,22 +165,18 @@ class ImportData(
             hash = playerExport.id
         )
 
-        return try {
-            val playerDb = playerDao.getPlayerByHash(playerExport.id)
-            if (updateIfExists) {
-                updatedArray[RESULT_PLAYERS_INDEX] += 1
-                p.id = playerDb.id
-                playerDao.updatePlayer(p)
-                p
-            } else {
-                playerDb
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+        val playerDb = playerDao.getPlayerByHash(playerExport.id)
+        return if (playerDb == null) {
             insertedArray[RESULT_PLAYERS_INDEX] += 1
             p.id = playerDao.insertPlayer(p)
             p
+        } else if (updateIfExists) {
+            updatedArray[RESULT_PLAYERS_INDEX] += 1
+            p.id = playerDb.id
+            playerDao.updatePlayer(p)
+            p
+        } else {
+            playerDb
         }
     }
 
@@ -198,22 +189,18 @@ class ImportData(
             export.address, export.id
         )
 
-        return try {
-            val tournamentDb = tournamentDao.getTournamentByHash(export.id)
-            if (updateIfExists) {
-                updatedArray[RESULT_TOURNAMENTS_INDEX] += 1
-                t.id = tournamentDb.id
-                tournamentDao.updateTournament(t)
-                t
-            } else {
-                tournamentDb
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+        val tournamentDb = tournamentDao.getTournamentByHash(export.id)
+        return if (tournamentDb == null) {
             insertedArray[RESULT_TOURNAMENTS_INDEX] += 1
             t.id = tournamentDao.insertTournament(t)
             t
+        } else if (updateIfExists) {
+            updatedArray[RESULT_TOURNAMENTS_INDEX] += 1
+            t.id = tournamentDb.id
+            tournamentDao.updateTournament(t)
+            t
+        } else {
+            tournamentDb
         }
     }
 
@@ -238,22 +225,18 @@ class ImportData(
             lineup.id
         )
 
-        return try {
-            val lineupDb = lineupDao.getLineupByHash(lineup.id)
-            if (updateIfExists) {
-                updatedArray[RESULT_LINEUPS_INDEX] += 1
-                newLineup.id = lineupDb.id
-                lineupDao.updateLineup(newLineup)
-                newLineup
-            } else {
-                lineupDb
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+        val lineupDb = lineupDao.getLineupByHash(lineup.id)
+        return if (lineupDb == null) {
             insertedArray[RESULT_LINEUPS_INDEX] += 1
             newLineup.id = lineupDao.insertLineup(newLineup)
             newLineup
+        } else if (updateIfExists) {
+            updatedArray[RESULT_LINEUPS_INDEX] += 1
+            newLineup.id = lineupDb.id
+            lineupDao.updateLineup(newLineup)
+            newLineup
+        } else {
+            lineupDb
         }
     }
 
@@ -280,18 +263,14 @@ class ImportData(
             export.position, export.x, export.y, export.order, export.flags, export.id
         )
 
-        try {
-            val positionDb = playerFieldPositionsDao.getPlayerFieldPositionByHash(export.id)
-            if (updateIfExists) {
-                updatedArray[RESULT_PLAYER_POSITION_INDEX] += 1
-                p.id = positionDb.id
-                playerFieldPositionsDao.updatePlayerFieldPosition(p)
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+        val positionDb = playerFieldPositionsDao.getPlayerFieldPositionByHash(export.id)
+        if (positionDb == null) {
             insertedArray[RESULT_PLAYER_POSITION_INDEX] += 1
             playerFieldPositionsDao.insertPlayerFieldPosition(p)
+        } else if (updateIfExists) {
+            updatedArray[RESULT_PLAYER_POSITION_INDEX] += 1
+            p.id = positionDb.id
+            playerFieldPositionsDao.updatePlayerFieldPosition(p)
         }
     }
 
@@ -302,18 +281,14 @@ class ImportData(
     ) {
         val p = PlayerNumberOverlay(0L, lineupId, players[export.playerId] ?: 0L, export.number)
 
-        try {
-            val overlayDb = playerDao.getPlayerNumberOverlayByHash(export.id)
-            if (updateIfExists) {
-                updatedArray[RESULT_PLAYER_NUMBER_OVERLAY_INDEX] += 1
-                p.id = overlayDb.id
-                playerDao.updatePlayerNumberOverlay(p)
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+        val overlayDb = playerDao.getPlayerNumberOverlayByHash(export.id)
+        if (overlayDb == null) {
             insertedArray[RESULT_PLAYER_NUMBER_OVERLAY_INDEX] += 1
             playerDao.createPlayerNumberOverlay(p)
+        } else if (updateIfExists) {
+            updatedArray[RESULT_PLAYER_NUMBER_OVERLAY_INDEX] += 1
+            p.id = overlayDb.id
+            playerDao.updatePlayerNumberOverlay(p)
         }
     }
 

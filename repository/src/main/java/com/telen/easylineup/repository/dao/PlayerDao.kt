@@ -36,7 +36,7 @@ internal interface PlayerDao {
     suspend fun updatePlayersWithRowCount(players: List<RoomPlayer>): Int
 
     @Query("SELECT * from players WHERE hash = :hash")
-    suspend fun getPlayerByHash(hash: String): RoomPlayer
+    suspend fun getPlayerByHash(hash: String): RoomPlayer?
 
     @Query("SELECT * from players WHERE id = :playerId")
     fun getPlayerById(playerId: Long): Flow<List<RoomPlayer>>

@@ -28,8 +28,8 @@ internal class TournamentRepositoryImpl(
         return tournamentDao.observeTournaments().map { list -> list.map { it.toDomain() } }
     }
 
-    override suspend fun getTournamentByHash(hash: String): Tournament {
-        return tournamentDao.getTournamentByHash(hash).toDomain()
+    override suspend fun getTournamentByHash(hash: String): Tournament? {
+        return tournamentDao.getTournamentByHash(hash)?.toDomain()
     }
 
     override suspend fun getTournamentByName(name: String): Tournament {

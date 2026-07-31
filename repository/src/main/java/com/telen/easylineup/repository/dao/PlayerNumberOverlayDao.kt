@@ -43,7 +43,7 @@ internal interface PlayerNumberOverlayDao {
     fun observePlayerNumberOverlays(lineupId: Long): Flow<List<RoomPlayerNumberOverlay>>
 
     @Query("SELECT * from playerNumberOverlay WHERE hash = :hash")
-    suspend fun getPlayerNumberOverlayByHash(hash: String): RoomPlayerNumberOverlay
+    suspend fun getPlayerNumberOverlayByHash(hash: String): RoomPlayerNumberOverlay?
 
     @Query("SELECT * from playerNumberOverlay WHERE playerID=:playerId AND lineupID=:lineupId")
     suspend fun getShirtNumberOverlay(playerId: Long, lineupId: Long): RoomPlayerNumberOverlay

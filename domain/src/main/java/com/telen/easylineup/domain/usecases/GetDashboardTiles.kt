@@ -36,23 +36,16 @@ class GetDashboardTiles(
     suspend operator fun invoke(): Result<List<DashboardTile>> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
             val team = getTeam().getOrThrow()
-            try {
-                fetchTiles(team)
-            } catch (e: NoSuchElementException) {
+            val tiles = tilesRepo.getTiles().ifEmpty {
                 createDashboardTiles().getOrThrow()
-                fetchTiles(team)
+                tilesRepo.getTiles()
             }
+            tiles.fetchData(team)
         }
     }
 
-    private suspend fun fetchTiles(team: Team): List<DashboardTile> {
-        val tiles = tilesRepo.getTiles()
-
-        if (tiles.isEmpty()) {
-            throw NoSuchElementException()
-        }
-
-        return tiles.mapNotNull { tile ->
+    private suspend fun List<DashboardTile>.fetchData(team: Team): List<DashboardTile> {
+        return mapNotNull { tile ->
             val data = when (tile.type) {
                 TileType.TEAM_SIZE.type -> getTeamSize(team)
                 TileType.MOST_USED_PLAYER.type -> getMostUsedPlayer(team)

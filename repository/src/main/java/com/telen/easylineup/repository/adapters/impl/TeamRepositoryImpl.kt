@@ -46,8 +46,8 @@ internal class TeamRepositoryImpl(private val teamDao: TeamDao) : TeamRepository
         return teamDao.getTeamById(teamId).toDomain()
     }
 
-    override suspend fun getTeamByHash(hash: String): Team {
-        return teamDao.getTeamByHash(hash).toDomain()
+    override suspend fun getTeamByHash(hash: String): Team? {
+        return teamDao.getTeamByHash(hash)?.toDomain()
     }
 
     override fun getTeams(): Flow<List<Team>> {

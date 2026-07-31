@@ -44,7 +44,7 @@ internal interface LineupDao {
     fun getLineupById(lineupId: Long): Flow<List<RoomLineup>>
 
     @Query("SELECT * FROM lineups WHERE hash = :hash")
-    suspend fun getLineupByHash(hash: String): RoomLineup
+    suspend fun getLineupByHash(hash: String): RoomLineup?
 
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
     suspend fun getLineupByIdSingle(lineupId: Long): RoomLineup

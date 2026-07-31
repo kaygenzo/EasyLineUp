@@ -40,7 +40,7 @@ internal interface TeamDao {
     suspend fun getTeamById(teamId: Long): RoomTeam
 
     @Query("SELECT * FROM teams WHERE hash = :hash")
-    suspend fun getTeamByHash(hash: String): RoomTeam
+    suspend fun getTeamByHash(hash: String): RoomTeam?
 
     @Query("SELECT * FROM teams")
     fun getTeams(): Flow<List<RoomTeam>>

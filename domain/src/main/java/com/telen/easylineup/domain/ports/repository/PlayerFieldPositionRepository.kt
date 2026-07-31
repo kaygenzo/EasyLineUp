@@ -20,7 +20,7 @@ interface PlayerFieldPositionRepository {
     suspend fun deletePositions(position: List<PlayerFieldPosition>)
     suspend fun updatePlayerFieldPosition(fieldPosition: PlayerFieldPosition)
     suspend fun insertPlayerFieldPosition(fieldPosition: PlayerFieldPosition): Long
-    suspend fun getPlayerFieldPositionByHash(hash: String): PlayerFieldPosition
+    suspend fun getPlayerFieldPositionByHash(hash: String): PlayerFieldPosition?
     suspend fun getPlayerFieldPositions(): List<PlayerFieldPosition>
     suspend fun getPlayerFieldPosition(positionId: Long): PlayerFieldPosition
     suspend fun getAllPlayerFieldPositionsForLineup(lineupId: Long): List<PlayerFieldPosition>

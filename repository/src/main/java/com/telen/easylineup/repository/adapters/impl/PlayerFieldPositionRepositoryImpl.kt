@@ -52,8 +52,8 @@ internal class PlayerFieldPositionRepositoryImpl(private val playerFieldPosition
         return playerFieldPositionsDao.insertPlayerFieldPosition(fieldPosition.toRoom())
     }
 
-    override suspend fun getPlayerFieldPositionByHash(hash: String): PlayerFieldPosition {
-        return playerFieldPositionsDao.getPlayerFieldPositionByHash(hash).toDomain()
+    override suspend fun getPlayerFieldPositionByHash(hash: String): PlayerFieldPosition? {
+        return playerFieldPositionsDao.getPlayerFieldPositionByHash(hash)?.toDomain()
     }
 
     override suspend fun getPlayerFieldPositions(): List<PlayerFieldPosition> {

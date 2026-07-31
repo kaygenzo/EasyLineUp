@@ -54,8 +54,8 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
         }
     }
 
-    override suspend fun getLineupByHash(hash: String): Lineup {
-        return lineupDao.getLineupByHash(hash).toDomain()
+    override suspend fun getLineupByHash(hash: String): Lineup? {
+        return lineupDao.getLineupByHash(hash)?.toDomain()
     }
 
     override suspend fun getLineupByIdSingle(lineupId: Long): Lineup {

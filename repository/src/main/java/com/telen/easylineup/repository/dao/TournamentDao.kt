@@ -25,7 +25,7 @@ internal interface TournamentDao {
     fun observeTournaments(): Flow<List<RoomTournament>>
 
     @Query("SELECT * from tournaments where hash = :hash")
-    suspend fun getTournamentByHash(hash: String): RoomTournament
+    suspend fun getTournamentByHash(hash: String): RoomTournament?
 
     @Query("SELECT * from tournaments where name = :name")
     suspend fun getTournamentByName(name: String): RoomTournament

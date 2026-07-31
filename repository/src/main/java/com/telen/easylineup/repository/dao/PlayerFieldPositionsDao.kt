@@ -44,7 +44,7 @@ internal interface PlayerFieldPositionsDao {
     suspend fun insertPlayerFieldPosition(fieldPositions: RoomPlayerFieldPosition): Long
 
     @Query("SELECT * from playerFieldPosition where hash = :hash")
-    suspend fun getPlayerFieldPositionByHash(hash: String): RoomPlayerFieldPosition
+    suspend fun getPlayerFieldPositionByHash(hash: String): RoomPlayerFieldPosition?
 
     @Query("SELECT * from playerFieldPosition")
     suspend fun getPlayerFieldPositions(): List<RoomPlayerFieldPosition>

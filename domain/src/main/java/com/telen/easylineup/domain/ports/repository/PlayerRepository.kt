@@ -16,7 +16,7 @@ interface PlayerRepository {
     suspend fun deletePlayer(player: Player)
     suspend fun updatePlayer(player: Player)
     suspend fun updatePlayersWithRowCount(players: List<Player>): Int
-    suspend fun getPlayerByHash(hash: String): Player
+    suspend fun getPlayerByHash(hash: String): Player?
     fun getPlayerById(playerId: Long): Flow<Player>
     suspend fun getPlayerByIdAsSingle(playerId: Long): Player
     suspend fun getPlayersByTeamId(teamId: Long): List<Player>
@@ -34,5 +34,5 @@ interface PlayerRepository {
     suspend fun getShirtNumberFromPlayers(teamId: Long, number: Int): List<ShirtNumberEntry>
     suspend fun getShirtNumberFromNumberOverlays(teamId: Long, number: Int): List<ShirtNumberEntry>
     suspend fun getShirtNumberOverlay(playerId: Long, lineupId: Long): PlayerNumberOverlay
-    suspend fun getPlayerNumberOverlayByHash(hash: String): PlayerNumberOverlay
+    suspend fun getPlayerNumberOverlayByHash(hash: String): PlayerNumberOverlay?
 }

@@ -45,8 +45,8 @@ internal class PlayerRepositoryImpl(
         return playerDao.updatePlayersWithRowCount(players.map { it.toRoom() })
     }
 
-    override suspend fun getPlayerByHash(hash: String): Player {
-        return playerDao.getPlayerByHash(hash).toDomain()
+    override suspend fun getPlayerByHash(hash: String): Player? {
+        return playerDao.getPlayerByHash(hash)?.toDomain()
     }
 
     override fun getPlayerById(playerId: Long): Flow<Player> {
@@ -139,7 +139,7 @@ internal class PlayerRepositoryImpl(
         numberOverlayDao.insertPlayerNumberOverlay(overlay.toRoom())
     }
 
-    override suspend fun getPlayerNumberOverlayByHash(hash: String): PlayerNumberOverlay {
-        return numberOverlayDao.getPlayerNumberOverlayByHash(hash).toDomain()
+    override suspend fun getPlayerNumberOverlayByHash(hash: String): PlayerNumberOverlay? {
+        return numberOverlayDao.getPlayerNumberOverlayByHash(hash)?.toDomain()
     }
 }
