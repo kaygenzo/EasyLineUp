@@ -62,6 +62,12 @@ dependencies {
     implementation libs.timber
 
     implementation project(path: ':domain')
+
+    testImplementation libs.junit4
+
+    androidTestImplementation libs.room.testing
+    androidTestImplementation libs.tests.runner
+    androidTestImplementation libs.tests.junit
 }
 
 apply from: '../detekt.gradle'

@@ -326,7 +326,9 @@ object RepositoryModule {
         }
     }
 
-    private fun migration16To17(): Migration {
+    // non-private: exercised directly by MigrationTest (repository/src/androidTest), the only
+    // migration we can test end-to-end since it's the oldest one with an exported schema.
+    fun migration16To17(): Migration {
         return object : Migration(16, 17) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
