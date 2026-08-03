@@ -90,7 +90,7 @@ internal class DashboardViewModelTest {
 
         runBlocking {
             // lenient: each test only exercises one of these sub-ports
-            Mockito.lenient().`when`(teamRepository.getTeamsRx())
+            Mockito.lenient().`when`(teamRepository.getTeams())
                 .thenReturn(listOf(Team(id = 1L, name = "Panthers", main = true)))
         }
 
@@ -140,7 +140,7 @@ internal class DashboardViewModelTest {
     @Test
     fun shouldRegisterTilesFlowAndSwitchToDashboardConfigurationsWhenTeamsChange() = runTest {
         val teamsProcessor = MutableSharedFlow<List<Team>>(replay = 1, extraBufferCapacity = 1)
-        Mockito.`when`(teamRepository.getTeams()).thenReturn(teamsProcessor)
+        Mockito.`when`(teamRepository.observeTeams()).thenReturn(teamsProcessor)
         val tile = DashboardTile(id = 1L, position = 0, type = TileType.TEAM_SIZE.type)
         Mockito.`when`(tilesRepository.getTiles()).thenReturn(listOf(tile))
         Mockito.`when`(playerRepository.getPlayersByTeamId(1L)).thenReturn(emptyList())

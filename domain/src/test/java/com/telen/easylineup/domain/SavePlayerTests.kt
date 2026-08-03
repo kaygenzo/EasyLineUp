@@ -66,8 +66,8 @@ internal class SavePlayerTests {
         )
         Mockito.`when`(playerDao.updatePlayer(any())).thenReturn(Unit)
         Mockito.`when`(playerDao.insertPlayer(any())).thenReturn(1)
-        Mockito.`when`(playerDao.getPlayerByIdAsSingle(any())).thenReturn(player)
-        Mockito.`when`(teamDao.getTeamsRx())
+        Mockito.`when`(playerDao.getPlayerById(any())).thenReturn(player)
+        Mockito.`when`(teamDao.getTeams())
             .thenReturn(listOf(Team(id = 1L, name = "Panthers", main = true)))
     }
     }

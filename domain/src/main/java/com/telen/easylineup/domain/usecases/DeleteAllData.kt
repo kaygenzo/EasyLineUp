@@ -17,7 +17,7 @@ class DeleteAllData(
     suspend operator fun invoke(): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
             tournamentDao.deleteTournaments(tournamentDao.getTournaments())
-            teamDao.deleteTeams(teamDao.getTeamsRx())
+            teamDao.deleteTeams(teamDao.getTeams())
         }
     }
 }

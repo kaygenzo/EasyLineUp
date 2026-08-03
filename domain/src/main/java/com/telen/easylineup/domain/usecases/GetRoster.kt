@@ -32,7 +32,7 @@ class GetRoster(
                     playerNumberOverlayDao.getPlayersNumberOverlay(lineupId).forEach {
                         overlays[it.playerId] = it
                     }
-                    val lineup = lineupDao.getLineupByIdSingle(lineupId)
+                    val lineup = lineupDao.getLineupById(lineupId)
                     val rosterIds = stringToRoster(lineup.roster)
                     val players = dao.getPlayersByTeamId(teamId)
                     // if rosterIds is null, it means that all players are selected

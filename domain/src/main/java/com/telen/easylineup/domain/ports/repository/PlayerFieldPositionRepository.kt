@@ -24,7 +24,7 @@ interface PlayerFieldPositionRepository {
     suspend fun getPlayerFieldPositions(): List<PlayerFieldPosition>
     suspend fun getPlayerFieldPosition(positionId: Long): PlayerFieldPosition
     suspend fun getAllPlayerFieldPositionsForLineup(lineupId: Long): List<PlayerFieldPosition>
-    suspend fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): List<PlayerWithPosition>
+    suspend fun getAllPlayersWithPositionsForLineup(lineupId: Long): List<PlayerWithPosition>
     suspend fun getPlayerPositionFor(lineupId: Long, playerId: Long): PlayerFieldPosition?
     suspend fun getAllPositionsForPlayer(playerId: Long): List<PositionWithLineup>
     suspend fun getMostUsedPlayers(teamId: Long): List<PlayerGamesCount>

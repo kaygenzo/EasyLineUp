@@ -35,7 +35,7 @@ internal class GetTeamPhonesTests {
             GetPlayers(playerDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider()),
             testDispatcherProvider()
         )
-        Mockito.`when`(teamDao.getTeamsRx())
+        Mockito.`when`(teamDao.getTeams())
             .thenReturn(listOf(Team(id = 1L, name = "Panthers", main = true)))
     }
     }

@@ -17,10 +17,10 @@ interface LineupRepository {
     suspend fun deleteLineup(lineup: Lineup)
     suspend fun deleteLineups(lineups: List<Lineup>)
     suspend fun getLineups(): List<Lineup>
-    fun getLineupById(lineupId: Long): Flow<Lineup>
+    fun observeLineupById(lineupId: Long): Flow<Lineup>
     suspend fun getLineupByHash(hash: String): Lineup?
-    suspend fun getLineupByIdSingle(lineupId: Long): Lineup
-    suspend fun getLineupsForTournamentRx(tournamentId: Long, teamId: Long): List<Lineup>
+    suspend fun getLineupById(lineupId: Long): Lineup
+    suspend fun getLineupsForTournament(tournamentId: Long, teamId: Long): List<Lineup>
     suspend fun getLastLineup(teamId: Long): Lineup?
     suspend fun getAllTournamentsWithLineups(
         filter: String,

@@ -17,7 +17,7 @@ class DeleteTournamentLineups(
     suspend operator fun invoke(tournament: Tournament): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
             val team = getTeam().getOrThrow()
-            val lineups = lineupDao.getLineupsForTournamentRx(tournament.id, team.id)
+            val lineups = lineupDao.getLineupsForTournament(tournament.id, team.id)
             lineupDao.deleteLineups(lineups)
         }
     }

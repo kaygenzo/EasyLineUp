@@ -71,7 +71,7 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
         exception: Class<out Throwable>? = null
     ) {
         lineup.mode = if (lineupMode) MODE_ENABLED else MODE_DISABLED
-        Mockito.`when`(teamDao.getTeamsRx())
+        Mockito.`when`(teamDao.getTeams())
             .thenReturn(listOf(Team(id = 1L, type = teamType.id, main = true)))
         val playersSize = players.size
         val originalPlayers = players.map { it.copy() }

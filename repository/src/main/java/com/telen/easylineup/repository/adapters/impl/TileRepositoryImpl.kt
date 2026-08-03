@@ -19,7 +19,7 @@ internal class TileRepositoryImpl(private val tilesDao: TilesDao) : TilesReposit
         tilesDao.updateTiles(tiles.map { it.toRoom() })
     }
 
-    override suspend fun createTiles(tiles: List<DashboardTile>) {
+    override suspend fun insertTiles(tiles: List<DashboardTile>) {
         tilesDao.insertTiles(tiles.map { it.toRoom() })
     }
 }

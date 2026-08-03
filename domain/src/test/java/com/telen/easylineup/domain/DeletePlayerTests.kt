@@ -45,7 +45,7 @@ internal class DeletePlayerTests {
             positions = 1
         )
 
-        Mockito.`when`(playerDao.getPlayerByIdAsSingle(1L)).thenReturn(player)
+        Mockito.`when`(playerDao.getPlayerById(1L)).thenReturn(player)
         Mockito.`when`(playerDao.deletePlayer(player)).thenReturn(Unit)
     }
     }

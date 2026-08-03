@@ -20,19 +20,19 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class GetLineupByIdTests {
     @Mock lateinit var lineupDao: LineupRepository
-    lateinit var getLineupById: GetLineupById
+    lateinit var observeLineupById: GetLineupById
 
     @Before
     fun init() {
-        getLineupById = GetLineupById(lineupDao, testDispatcherProvider())
+        observeLineupById = GetLineupById(lineupDao, testDispatcherProvider())
     }
 
     @Test
     fun shouldDelegateToRepository() = runTest {
         val lineup = Lineup(id = 1L, name = "toto", teamId = 1L, tournamentId = 1L)
-        Mockito.`when`(lineupDao.getLineupByIdSingle(1L)).thenReturn(lineup)
+        Mockito.`when`(lineupDao.getLineupById(1L)).thenReturn(lineup)
 
-        val result = getLineupById(1L)
+        val result = observeLineupById(1L)
 
         assertTrue(result.isSuccess)
         Assert.assertEquals(lineup, result.getOrNull())

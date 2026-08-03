@@ -47,7 +47,7 @@ internal class SaveTeamTests {
         team = Team(id = 1L, name = "test", type = TeamType.BASEBALL.id, main = true)
         Mockito.`when`(teamDao.insertTeam(any())).thenReturn(2L)
         Mockito.`when`(teamDao.updateTeam(any())).thenReturn(Unit)
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
+        Mockito.`when`(teamDao.getTeams()).thenReturn(listOf(team))
         Mockito.`when`(teamDao.updateTeams(any())).thenReturn(Unit)
     }
     }

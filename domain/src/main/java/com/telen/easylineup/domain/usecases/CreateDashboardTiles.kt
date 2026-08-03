@@ -21,7 +21,7 @@ class CreateDashboardTiles(
             tiles.add(DashboardTile(0, 2, TileType.MOST_USED_PLAYER.type, true))
             tiles.add(DashboardTile(0, 3, TileType.LAST_LINEUP.type, true))
             tiles.add(DashboardTile(0, 4, TileType.LAST_PLAYER_NUMBER.type, true))
-            dao.createTiles(tiles)
+            dao.insertTiles(tiles)
         }
     }
 }

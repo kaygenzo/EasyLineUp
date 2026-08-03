@@ -14,8 +14,8 @@ interface PlayerNumberOverlayRepository {
     suspend fun deletePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>)
     suspend fun updatePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>)
     suspend fun updatePlayerNumberOverlay(overlay: PlayerNumberOverlay)
-    suspend fun createPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>)
-    suspend fun createPlayerNumberOverlay(overlay: PlayerNumberOverlay)
+    suspend fun insertPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>)
+    suspend fun insertPlayerNumberOverlay(overlay: PlayerNumberOverlay)
     suspend fun getShirtNumberFromNumberOverlays(teamId: Long, number: Int): List<ShirtNumberEntry>
     suspend fun getShirtNumberOverlay(playerId: Long, lineupId: Long): PlayerNumberOverlay?
     suspend fun getPlayerNumberOverlayByHash(hash: String): PlayerNumberOverlay?

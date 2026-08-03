@@ -9,5 +9,5 @@ import com.telen.easylineup.domain.ports.repository.TeamRepository
 import kotlinx.coroutines.flow.Flow
 
 class ObserveTeams(private val dao: TeamRepository) {
-    operator fun invoke(): Flow<List<Team>> = dao.getTeams()
+    operator fun invoke(): Flow<List<Team>> = dao.observeTeams()
 }

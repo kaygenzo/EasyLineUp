@@ -16,6 +16,6 @@ interface TeamRepository {
     suspend fun updateTeamsWithRowCount(teams: List<Team>): Int
     suspend fun getTeamById(teamId: Long): Team
     suspend fun getTeamByHash(hash: String): Team?
-    fun getTeams(): Flow<List<Team>>
-    suspend fun getTeamsRx(): List<Team>
+    fun observeTeams(): Flow<List<Team>>
+    suspend fun getTeams(): List<Team>
 }

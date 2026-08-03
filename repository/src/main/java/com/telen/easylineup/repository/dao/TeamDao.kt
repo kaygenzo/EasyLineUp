@@ -43,8 +43,8 @@ internal interface TeamDao {
     suspend fun getTeamByHash(hash: String): RoomTeam?
 
     @Query("SELECT * FROM teams")
-    fun getTeams(): Flow<List<RoomTeam>>
+    fun observeTeams(): Flow<List<RoomTeam>>
 
     @Query("SELECT * FROM teams")
-    suspend fun getTeamsRx(): List<RoomTeam>
+    suspend fun getTeams(): List<RoomTeam>
 }

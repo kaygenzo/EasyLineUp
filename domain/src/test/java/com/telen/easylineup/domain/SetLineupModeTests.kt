@@ -42,7 +42,7 @@ internal class SetLineupModeTests {
         )
 
         val team = Team(id = 1L, name = "toto", type = TeamType.SOFTBALL.id, main = true)
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
+        Mockito.`when`(teamDao.getTeams()).thenReturn(listOf(team))
 
         lineup = Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id, extraHitters, 3L)
     }

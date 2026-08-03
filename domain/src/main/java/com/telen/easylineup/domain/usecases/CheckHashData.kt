@@ -39,7 +39,7 @@ class CheckHashData(
     }
 
     private suspend fun updateTeams(): Int {
-        val teams = teamDao.getTeamsRx()
+        val teams = teamDao.getTeams()
         val toUpdate: MutableList<Team> = mutableListOf()
         teams.forEach { team ->
             if (team.hash.isNullOrBlank()) {

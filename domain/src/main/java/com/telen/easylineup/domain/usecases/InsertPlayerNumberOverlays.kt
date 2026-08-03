@@ -16,7 +16,7 @@ class InsertPlayerNumberOverlays(
     suspend operator fun invoke(overlays: List<PlayerNumberOverlay>): Result<Unit> =
         runCatchingCancellable {
             withContext(dispatcherProvider.io()) {
-                dao.createPlayerNumberOverlays(overlays)
+                dao.insertPlayerNumberOverlays(overlays)
             }
         }
 }

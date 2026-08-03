@@ -319,7 +319,7 @@ class ImportData(
         val overlayDb = playerNumberOverlayDao.getPlayerNumberOverlayByHash(export.id)
         if (overlayDb == null) {
             counts.recordInsert()
-            playerNumberOverlayDao.createPlayerNumberOverlay(p)
+            playerNumberOverlayDao.insertPlayerNumberOverlay(p)
         } else if (updateIfExists) {
             counts.recordUpdate()
             p.id = overlayDb.id

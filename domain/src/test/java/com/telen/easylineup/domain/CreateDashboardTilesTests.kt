@@ -31,7 +31,7 @@ internal class CreateDashboardTilesTests {
     fun init() {
         runBlocking {
             createDashboardTiles = CreateDashboardTiles(tilesRepo, testDispatcherProvider())
-            Mockito.`when`(tilesRepo.createTiles(any())).thenReturn(Unit)
+            Mockito.`when`(tilesRepo.insertTiles(any())).thenReturn(Unit)
         }
     }
 
@@ -41,7 +41,7 @@ internal class CreateDashboardTilesTests {
 
         assertTrue(result.isSuccess)
         val captor = argumentCaptor<List<DashboardTile>>()
-        Mockito.verify(tilesRepo).createTiles(captor.capture())
+        Mockito.verify(tilesRepo).insertTiles(captor.capture())
         val tiles = captor.firstValue
 
         assertEquals(4, tiles.size)
@@ -63,7 +63,7 @@ internal class CreateDashboardTilesTests {
 
         assertTrue(result.isSuccess)
         val captor = argumentCaptor<List<DashboardTile>>()
-        Mockito.verify(tilesRepo).createTiles(captor.capture())
+        Mockito.verify(tilesRepo).insertTiles(captor.capture())
 
         assertEquals(listOf(1, 2, 3, 4), captor.firstValue.map { it.position })
     }
@@ -71,7 +71,7 @@ internal class CreateDashboardTilesTests {
     @Test
     fun shouldPropagateErrorFromRepository() = runTest {
         val exception = Exception("db error")
-        Mockito.`when`(tilesRepo.createTiles(any())).thenAnswer { throw exception }
+        Mockito.`when`(tilesRepo.insertTiles(any())).thenAnswer { throw exception }
 
         val result = createDashboardTiles()
 

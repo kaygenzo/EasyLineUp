@@ -16,8 +16,8 @@ interface PlayerRepository {
     suspend fun updatePlayer(player: Player)
     suspend fun updatePlayersWithRowCount(players: List<Player>): Int
     suspend fun getPlayerByHash(hash: String): Player?
-    fun getPlayerById(playerId: Long): Flow<Player>
-    suspend fun getPlayerByIdAsSingle(playerId: Long): Player
+    fun observePlayerById(playerId: Long): Flow<Player>
+    suspend fun getPlayerById(playerId: Long): Player
     suspend fun getPlayersByTeamId(teamId: Long): List<Player>
     suspend fun getPlayers(): List<Player>
     fun observePlayers(teamId: Long): Flow<List<Player>>

@@ -43,14 +43,14 @@ internal class DeleteTeamTests {
         team3 = Team(id = 3L, name = "titi", type = TeamType.SOFTBALL.id, main = false)
         teams = mutableListOf(team2, team3)
         Mockito.`when`(teamDao.deleteTeam(team)).thenReturn(Unit)
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(teams)
+        Mockito.`when`(teamDao.getTeams()).thenReturn(teams)
         Mockito.`when`(teamDao.updateTeam(team2)).thenReturn(Unit)
     }
     }
 
     @Test
     fun shouldTriggerAnExceptionIfItWasTheOnlyTeamInDatabase() = runTest {
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(mutableListOf())
+        Mockito.`when`(teamDao.getTeams()).thenReturn(mutableListOf())
         val result = deleteTeam(team)
         assertTrue(result.exceptionOrNull() is NoTeamsLeftException)
     }

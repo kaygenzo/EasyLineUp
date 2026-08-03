@@ -41,8 +41,8 @@ internal class GetPlayerTests {
             positions = 1
         )
 
-        Mockito.`when`(playerDao.getPlayerByIdAsSingle(1L)).thenReturn(player)
-        Mockito.`when`(playerDao.getPlayerByIdAsSingle(2L)).thenAnswer { throw Exception() }
+        Mockito.`when`(playerDao.getPlayerById(1L)).thenReturn(player)
+        Mockito.`when`(playerDao.getPlayerById(2L)).thenAnswer { throw Exception() }
     }
     }
 

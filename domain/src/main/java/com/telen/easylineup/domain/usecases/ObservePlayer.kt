@@ -9,5 +9,5 @@ import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import kotlinx.coroutines.flow.Flow
 
 class ObservePlayer(private val dao: PlayerRepository) {
-    operator fun invoke(playerId: Long): Flow<Player> = dao.getPlayerById(playerId)
+    operator fun invoke(playerId: Long): Flow<Player> = dao.observePlayerById(playerId)
 }

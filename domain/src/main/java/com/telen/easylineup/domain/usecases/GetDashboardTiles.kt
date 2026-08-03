@@ -60,7 +60,7 @@ class GetDashboardTiles(
     private suspend fun getMostUsedPlayer(team: Team): TileData? {
         val list = playerFieldPositionDao.getMostUsedPlayers(team.id)
         val mostUsed = list.firstOrNull() ?: return null
-        val player = playerDao.getPlayerByIdAsSingle(mostUsed.playerId)
+        val player = playerDao.getPlayerById(mostUsed.playerId)
         return MostUsedPlayerData(player.image, player.name, player.shirtNumber, mostUsed.size)
     }
 

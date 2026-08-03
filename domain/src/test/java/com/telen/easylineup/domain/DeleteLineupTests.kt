@@ -35,8 +35,8 @@ internal class DeleteLineupTests {
         lineup1 =
                 Lineup(1, "test1", 1, 1, MODE_DISABLED, TeamStrategy.STANDARD.id, extraHitters, 3L)
 
-        Mockito.`when`(dao.getLineupByIdSingle(1)).thenReturn(lineup1)
-        Mockito.`when`(dao.getLineupByIdSingle(2)).thenAnswer { throw Exception() }
+        Mockito.`when`(dao.getLineupById(1)).thenReturn(lineup1)
+        Mockito.`when`(dao.getLineupById(2)).thenAnswer { throw Exception() }
     }
     }
 

@@ -108,7 +108,7 @@ internal abstract class CreateLineupTests {
         createLineup = CreateLineup(lineupDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
 
         runBlocking {
-            Mockito.`when`(teamDao.getTeamsRx())
+            Mockito.`when`(teamDao.getTeams())
                 .thenReturn(listOf(Team(id = 1L, name = "toto", main = true)))
 
             Mockito.`when`(lineupDao.insertLineup(any())).thenReturn(1L)

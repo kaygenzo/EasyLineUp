@@ -28,7 +28,7 @@ internal class GetTeamTests {
         runBlocking {
         getTeam = GetTeam(teamDao, testDispatcherProvider())
 
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(teams)
+        Mockito.`when`(teamDao.getTeams()).thenReturn(teams)
     }
     }
 

@@ -48,8 +48,8 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
         return lineupDao.getLineups().map { it.toDomain() }
     }
 
-    override fun getLineupById(lineupId: Long): Flow<Lineup> {
-        return lineupDao.getLineupById(lineupId).map {
+    override fun observeLineupById(lineupId: Long): Flow<Lineup> {
+        return lineupDao.observeLineupById(lineupId).map {
             it.firstOrNull()?.toDomain() ?: Lineup()
         }
     }
@@ -58,12 +58,12 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
         return lineupDao.getLineupByHash(hash)?.toDomain()
     }
 
-    override suspend fun getLineupByIdSingle(lineupId: Long): Lineup {
-        return lineupDao.getLineupByIdSingle(lineupId).toDomain()
+    override suspend fun getLineupById(lineupId: Long): Lineup {
+        return lineupDao.getLineupById(lineupId).toDomain()
     }
 
-    override suspend fun getLineupsForTournamentRx(tournamentId: Long, teamId: Long): List<Lineup> {
-        return lineupDao.getLineupsForTournamentRx(tournamentId, teamId)
+    override suspend fun getLineupsForTournament(tournamentId: Long, teamId: Long): List<Lineup> {
+        return lineupDao.getLineupsForTournament(tournamentId, teamId)
             .map { it.toDomain() }
     }
 

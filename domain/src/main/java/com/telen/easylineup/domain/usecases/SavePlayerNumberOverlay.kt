@@ -38,7 +38,7 @@ class SavePlayerNumberOverlay(
             }
             playerNumberOverlayRepository.deletePlayerNumberOverlays(toDelete)
             playerNumberOverlayRepository.updatePlayerNumberOverlays(toUpdate)
-            playerNumberOverlayRepository.createPlayerNumberOverlays(toAdd)
+            playerNumberOverlayRepository.insertPlayerNumberOverlays(toAdd)
         }
     }
 }

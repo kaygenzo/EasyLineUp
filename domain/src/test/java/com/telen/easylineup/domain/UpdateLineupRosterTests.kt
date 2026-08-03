@@ -36,7 +36,7 @@ internal class UpdateLineupRosterTests {
         runBlocking {
         updateLineupRoster = UpdateLineupRoster(lineupRepository, testDispatcherProvider())
         lineup = Lineup(id = 1L, name = "test", teamId = 1L, tournamentId = 1L)
-        Mockito.`when`(lineupRepository.getLineupByIdSingle(1L)).thenReturn(lineup)
+        Mockito.`when`(lineupRepository.getLineupById(1L)).thenReturn(lineup)
         Mockito.`when`(lineupRepository.updateLineup(any())).thenReturn(Unit)
     }
     }
@@ -74,7 +74,7 @@ internal class UpdateLineupRosterTests {
     @Test
     fun shouldPropagateErrorWhenLineupNotFound() = runTest {
         val exception = Exception("not found")
-        Mockito.`when`(lineupRepository.getLineupByIdSingle(eq(1L))).thenAnswer { throw exception }
+        Mockito.`when`(lineupRepository.getLineupById(eq(1L))).thenAnswer { throw exception }
 
         val result = updateLineupRoster(1L, emptyList())
 

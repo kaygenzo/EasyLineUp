@@ -15,7 +15,7 @@ class SaveCurrentTeam(
 ) {
     suspend operator fun invoke(team: Team): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            val teams = dao.getTeamsRx().map {
+            val teams = dao.getTeams().map {
                 it.main = it.id == team.id
                 it
             }

@@ -55,8 +55,8 @@ internal class GetRosterTests {
             dispatcherProvider = testDispatcherProvider()
         )
 
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
-        Mockito.`when`(lineupDao.getLineupByIdSingle(1L)).thenReturn(lineup)
+        Mockito.`when`(teamDao.getTeams()).thenReturn(listOf(team))
+        Mockito.`when`(lineupDao.getLineupById(1L)).thenReturn(lineup)
         Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(listOf(player1, player2, player3))
 
         val overlays: MutableList<PlayerNumberOverlay> =

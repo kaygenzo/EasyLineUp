@@ -32,7 +32,7 @@ internal class GetAllTeamsTests {
         teams.add(Team(1, "toto", null, 0, true))
         teams.add(Team(2, "tata", null, 0, true))
         teams.add(Team(3, "titi", null, 0, true))
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(teams)
+        Mockito.`when`(teamDao.getTeams()).thenReturn(teams)
     }
     }
 

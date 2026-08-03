@@ -42,7 +42,7 @@ internal class GetTournamentStatsForPositionTableTests {
                 testDispatcherProvider()
             )
 
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
+        Mockito.`when`(teamDao.getTeams()).thenReturn(listOf(team))
     }
     }
 

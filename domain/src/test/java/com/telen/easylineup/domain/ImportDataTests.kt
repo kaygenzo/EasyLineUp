@@ -157,7 +157,7 @@ internal class ImportDataTests {
         Mockito.`when`(lineupDao.insertLineup(any())).thenReturn(4L)
         Mockito.`when`(playerFieldPositionsDao.insertPlayerFieldPosition(any()))
             .thenReturn(5L)
-        Mockito.`when`(playerNumberOverlayDao.createPlayerNumberOverlay(any())).thenReturn(Unit)
+        Mockito.`when`(playerNumberOverlayDao.insertPlayerNumberOverlay(any())).thenReturn(Unit)
     }
 
     private suspend fun mockAllFound() {
@@ -249,7 +249,7 @@ internal class ImportDataTests {
         Mockito.verify(tournamentDao).insertTournament(any())
         Mockito.verify(lineupDao).insertLineup(any())
         Mockito.verify(playerFieldPositionsDao).insertPlayerFieldPosition(any())
-        Mockito.verify(playerNumberOverlayDao).createPlayerNumberOverlay(any())
+        Mockito.verify(playerNumberOverlayDao).insertPlayerNumberOverlay(any())
     }
 
     @Test
@@ -300,7 +300,7 @@ internal class ImportDataTests {
         Mockito.verify(tournamentDao, Mockito.never()).insertTournament(any())
         Mockito.verify(lineupDao, Mockito.never()).insertLineup(any())
         Mockito.verify(playerFieldPositionsDao, Mockito.never()).insertPlayerFieldPosition(any())
-        Mockito.verify(playerNumberOverlayDao, Mockito.never()).createPlayerNumberOverlay(any())
+        Mockito.verify(playerNumberOverlayDao, Mockito.never()).insertPlayerNumberOverlay(any())
     }
 
     @Test

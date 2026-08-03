@@ -20,7 +20,7 @@ class GetPlayer(
             if (id == 0L) {
                 throw NotExistingPlayerException()
             }
-            dao.getPlayerByIdAsSingle(id)
+            dao.getPlayerById(id)
         }
     }
 }

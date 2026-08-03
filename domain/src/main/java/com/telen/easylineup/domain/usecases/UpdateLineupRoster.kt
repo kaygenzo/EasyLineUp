@@ -17,7 +17,7 @@ class UpdateLineupRoster(
         runCatchingCancellable {
             withContext(dispatcherProvider.io()) {
                 val rosterString = rosterToString(roster)
-                val lineup = lineupRepository.getLineupByIdSingle(lineupId)
+                val lineup = lineupRepository.getLineupById(lineupId)
                 lineup.roster = rosterString
                 lineupRepository.updateLineup(lineup)
             }

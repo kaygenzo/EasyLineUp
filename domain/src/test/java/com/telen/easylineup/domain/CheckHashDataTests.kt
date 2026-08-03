@@ -103,7 +103,7 @@ internal class CheckHashDataTests {
                 PlayerFieldPosition(2L, 2L, 2L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE, null)
             )
 
-            Mockito.`when`(teamDao.getTeamsRx()).thenReturn(teams)
+            Mockito.`when`(teamDao.getTeams()).thenReturn(teams)
             Mockito.`when`(teamDao.updateTeamsWithRowCount(any())).thenReturn(2)
 
             Mockito.`when`(playerDao.getPlayers()).thenReturn(players)

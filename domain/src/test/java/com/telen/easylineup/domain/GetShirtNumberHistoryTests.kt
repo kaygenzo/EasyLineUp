@@ -47,7 +47,7 @@ internal class GetShirtNumberHistoryTests {
             getTeam = GetTeam(teamRepo, testDispatcherProvider()),
             dispatcherProvider = testDispatcherProvider()
         )
-        Mockito.`when`(teamRepo.getTeamsRx())
+        Mockito.`when`(teamRepo.getTeams())
             .thenReturn(listOf(Team(id = 1L, name = "Panthers", main = true)))
 
         entry1 = ShirtNumberEntry(1, "toto", 1L, 1L, 1L, 1L, "lineup1")

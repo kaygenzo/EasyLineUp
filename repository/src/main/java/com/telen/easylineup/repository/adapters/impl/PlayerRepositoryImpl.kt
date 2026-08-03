@@ -46,8 +46,8 @@ internal class PlayerRepositoryImpl(
         return playerDao.getPlayerByHash(hash)?.toDomain()
     }
 
-    override fun getPlayerById(playerId: Long): Flow<Player> {
-        return playerDao.getPlayerById(playerId).map {
+    override fun observePlayerById(playerId: Long): Flow<Player> {
+        return playerDao.observePlayerById(playerId).map {
             // sometime the refresh it too quick and when the player is deleted, the player is null
             it.firstOrNull()?.toDomain() ?: Player(
                 teamId = 0,
@@ -58,8 +58,8 @@ internal class PlayerRepositoryImpl(
         }
     }
 
-    override suspend fun getPlayerByIdAsSingle(playerId: Long): Player {
-        return playerDao.getPlayerByIdAsSingle(playerId).toDomain()
+    override suspend fun getPlayerById(playerId: Long): Player {
+        return playerDao.getPlayerById(playerId).toDomain()
     }
 
     override suspend fun getPlayersByTeamId(teamId: Long): List<Player> {
@@ -71,7 +71,7 @@ internal class PlayerRepositoryImpl(
     }
 
     override fun observePlayers(teamId: Long): Flow<List<Player>> {
-        return playerDao.getPlayersAsFlowable(teamId).map { list ->
+        return playerDao.observePlayersByTeamId(teamId).map { list ->
             list.map { it.toDomain() }
         }
     }

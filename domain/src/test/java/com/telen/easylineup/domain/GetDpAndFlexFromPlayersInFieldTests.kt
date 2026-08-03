@@ -54,7 +54,7 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
         teamType: TeamType,
         exception: Class<out Throwable>? = null
     ): Result<DpAndFlexConfiguration> {
-        Mockito.`when`(teamDao.getTeamsRx())
+        Mockito.`when`(teamDao.getTeams())
             .thenReturn(listOf(Team(id = 1L, name = "toto", type = teamType.id, main = true)))
         val playersSize = players.size
         val result = useCase(players)

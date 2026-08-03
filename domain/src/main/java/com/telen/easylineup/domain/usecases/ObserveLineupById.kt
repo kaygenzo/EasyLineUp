@@ -9,5 +9,5 @@ import com.telen.easylineup.domain.ports.repository.LineupRepository
 import kotlinx.coroutines.flow.Flow
 
 class ObserveLineupById(private val dao: LineupRepository) {
-    operator fun invoke(lineupId: Long): Flow<Lineup> = dao.getLineupById(lineupId)
+    operator fun invoke(lineupId: Long): Flow<Lineup> = dao.observeLineupById(lineupId)
 }

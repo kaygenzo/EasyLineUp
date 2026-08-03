@@ -41,11 +41,11 @@ internal class PlayerNumberOverlayRepositoryImpl(
         numberOverlayDao.updatePlayerNumberOverlay(overlay.toRoom())
     }
 
-    override suspend fun createPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>) {
+    override suspend fun insertPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>) {
         numberOverlayDao.insertPlayerNumberOverlays(overlays.map { it.toRoom() })
     }
 
-    override suspend fun createPlayerNumberOverlay(overlay: PlayerNumberOverlay) {
+    override suspend fun insertPlayerNumberOverlay(overlay: PlayerNumberOverlay) {
         numberOverlayDao.insertPlayerNumberOverlay(overlay.toRoom())
     }
 

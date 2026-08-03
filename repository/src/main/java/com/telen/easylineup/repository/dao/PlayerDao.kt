@@ -39,10 +39,10 @@ internal interface PlayerDao {
     suspend fun getPlayerByHash(hash: String): RoomPlayer?
 
     @Query("SELECT * from players WHERE id = :playerId")
-    fun getPlayerById(playerId: Long): Flow<List<RoomPlayer>>
+    fun observePlayerById(playerId: Long): Flow<List<RoomPlayer>>
 
     @Query("SELECT * from players WHERE id = :playerId")
-    suspend fun getPlayerByIdAsSingle(playerId: Long): RoomPlayer
+    suspend fun getPlayerById(playerId: Long): RoomPlayer
 
     // @Query("SELECT * FROM players WHERE players.teamID = :teamID")
     // fun getPlayers(teamID: Long): LiveData<List<Player>>
@@ -54,7 +54,7 @@ internal interface PlayerDao {
     suspend fun getPlayers(): List<RoomPlayer>
 
     @Query("SELECT * FROM players WHERE players.teamID = :teamId")
-    fun getPlayersAsFlowable(teamId: Long): Flow<List<RoomPlayer>>
+    fun observePlayersByTeamId(teamId: Long): Flow<List<RoomPlayer>>
 
     @Query(
         """

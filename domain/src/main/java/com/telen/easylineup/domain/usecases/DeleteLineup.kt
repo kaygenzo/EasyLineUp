@@ -15,7 +15,7 @@ class DeleteLineup(
     suspend operator fun invoke(lineupId: Long?): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
             val id = requireNotNull(lineupId) { "Lineup id is null" }
-            val lineup = lineupDao.getLineupByIdSingle(id)
+            val lineup = lineupDao.getLineupById(id)
             lineupDao.deleteLineup(lineup)
         }
     }

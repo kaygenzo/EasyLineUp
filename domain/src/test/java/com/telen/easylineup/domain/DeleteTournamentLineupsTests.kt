@@ -57,8 +57,8 @@ internal class DeleteTournamentLineupsTests {
                 strategy = TeamStrategy.STANDARD.id, extraHitters = 0)
         ))
 
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
-        Mockito.`when`(lineupsDao.getLineupsForTournamentRx(tournament.id, team.id)).thenReturn(listOf(
+        Mockito.`when`(teamDao.getTeams()).thenReturn(listOf(team))
+        Mockito.`when`(lineupsDao.getLineupsForTournament(tournament.id, team.id)).thenReturn(listOf(
             lineups[0], lineups[1]
         ))
         Mockito.`when`(lineupsDao.deleteLineups(any())).thenReturn(Unit)

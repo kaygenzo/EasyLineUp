@@ -50,11 +50,11 @@ internal class TeamRepositoryImpl(private val teamDao: TeamDao) : TeamRepository
         return teamDao.getTeamByHash(hash)?.toDomain()
     }
 
-    override fun getTeams(): Flow<List<Team>> {
-        return teamDao.getTeams().map { list -> list.map { it.toDomain() } }
+    override fun observeTeams(): Flow<List<Team>> {
+        return teamDao.observeTeams().map { list -> list.map { it.toDomain() } }
     }
 
-    override suspend fun getTeamsRx(): List<Team> {
-        return teamDao.getTeamsRx().map { it.toDomain() }
+    override suspend fun getTeams(): List<Team> {
+        return teamDao.getTeams().map { it.toDomain() }
     }
 }

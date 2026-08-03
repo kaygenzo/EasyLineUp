@@ -48,7 +48,7 @@ class ExportData(
             val teams: MutableList<TeamExport> = mutableListOf()
             val root = ExportBase(teams)
 
-            teamDao.getTeamsRx().forEach { team ->
+            teamDao.getTeams().forEach { team ->
                 val tournamentsExport: MutableList<TournamentExport> = mutableListOf()
                 val playersExport: MutableList<PlayerExport> = mutableListOf()
                 val teamExport = team.toTeamExport(playersExport, tournamentsExport)
@@ -77,7 +77,7 @@ class ExportData(
                     val tournamentExport = tournament.toTournamentExport(lineupsExport)
 
                     val lineups =
-                        lineupDao.getLineupsForTournamentRx(tournament.id, team.id)
+                        lineupDao.getLineupsForTournament(tournament.id, team.id)
                     if (lineups.isNotEmpty()) {
                         tournamentsExport.add(tournamentExport)
                     }

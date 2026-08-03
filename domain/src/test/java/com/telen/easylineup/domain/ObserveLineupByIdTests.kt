@@ -31,7 +31,7 @@ internal class ObserveLineupByIdTests {
     @Test
     fun shouldDelegateToRepository() = runTest {
         val lineup = Lineup()
-        Mockito.`when`(lineupDao.getLineupById(1L)).thenReturn(flowOf(lineup))
+        Mockito.`when`(lineupDao.observeLineupById(1L)).thenReturn(flowOf(lineup))
 
         val result = observeLineupById(1L).toList()
 

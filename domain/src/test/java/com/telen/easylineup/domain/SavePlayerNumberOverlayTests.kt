@@ -36,7 +36,7 @@ internal class SavePlayerNumberOverlayTests {
         savePlayerNumberOverlay = SavePlayerNumberOverlay(playerNumberOverlayRepository, testDispatcherProvider())
         Mockito.`when`(playerNumberOverlayRepository.deletePlayerNumberOverlays(any())).thenReturn(Unit)
         Mockito.`when`(playerNumberOverlayRepository.updatePlayerNumberOverlays(any())).thenReturn(Unit)
-        Mockito.`when`(playerNumberOverlayRepository.createPlayerNumberOverlays(any())).thenReturn(Unit)
+        Mockito.`when`(playerNumberOverlayRepository.insertPlayerNumberOverlays(any())).thenReturn(Unit)
     }
     }
 
@@ -49,7 +49,7 @@ internal class SavePlayerNumberOverlayTests {
 
         assertTrue(result.isSuccess)
         val captor = argumentCaptor<List<PlayerNumberOverlay>>()
-        Mockito.verify(playerNumberOverlayRepository).createPlayerNumberOverlays(captor.capture())
+        Mockito.verify(playerNumberOverlayRepository).insertPlayerNumberOverlays(captor.capture())
         assertEquals(listOf(overlay), captor.firstValue)
         Mockito.verify(playerNumberOverlayRepository).updatePlayerNumberOverlays(emptyList())
         Mockito.verify(playerNumberOverlayRepository).deletePlayerNumberOverlays(emptyList())
@@ -66,7 +66,7 @@ internal class SavePlayerNumberOverlayTests {
         val captor = argumentCaptor<List<PlayerNumberOverlay>>()
         Mockito.verify(playerNumberOverlayRepository).updatePlayerNumberOverlays(captor.capture())
         assertEquals(listOf(overlay), captor.firstValue)
-        Mockito.verify(playerNumberOverlayRepository).createPlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).insertPlayerNumberOverlays(emptyList())
         Mockito.verify(playerNumberOverlayRepository).deletePlayerNumberOverlays(emptyList())
     }
 
@@ -81,7 +81,7 @@ internal class SavePlayerNumberOverlayTests {
         val captor = argumentCaptor<List<PlayerNumberOverlay>>()
         Mockito.verify(playerNumberOverlayRepository).deletePlayerNumberOverlays(captor.capture())
         assertEquals(listOf(overlay), captor.firstValue)
-        Mockito.verify(playerNumberOverlayRepository).createPlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).insertPlayerNumberOverlays(emptyList())
         Mockito.verify(playerNumberOverlayRepository).updatePlayerNumberOverlays(emptyList())
     }
 
@@ -95,7 +95,7 @@ internal class SavePlayerNumberOverlayTests {
         assertTrue(result.isSuccess)
         Mockito.verify(playerNumberOverlayRepository).deletePlayerNumberOverlays(emptyList())
         Mockito.verify(playerNumberOverlayRepository).updatePlayerNumberOverlays(emptyList())
-        Mockito.verify(playerNumberOverlayRepository).createPlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).insertPlayerNumberOverlays(emptyList())
     }
 
     @Test
@@ -107,7 +107,7 @@ internal class SavePlayerNumberOverlayTests {
         assertTrue(result.isSuccess)
         Mockito.verify(playerNumberOverlayRepository).deletePlayerNumberOverlays(emptyList())
         Mockito.verify(playerNumberOverlayRepository).updatePlayerNumberOverlays(emptyList())
-        Mockito.verify(playerNumberOverlayRepository).createPlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).insertPlayerNumberOverlays(emptyList())
     }
 
     @Test

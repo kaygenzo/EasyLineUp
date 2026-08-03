@@ -51,7 +51,7 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
         getListAvailablePlayersForSelection = GetListAvailablePlayersForSelection(getRoster, testDispatcherProvider())
 
         val team = Team(id = 1L, name = "toto", main = true)
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
+        Mockito.`when`(teamDao.getTeams()).thenReturn(listOf(team))
 
         lineup = Lineup(id = 10L, teamId = team.id, roster = "1;2;3;4;5")
 
@@ -77,7 +77,7 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
             Player(id = 5L, teamId = team.id, name = "p5", shirtNumber = 5, licenseNumber = 5L)
         )
 
-        Mockito.`when`(lineupDao.getLineupByIdSingle(lineup.id)).thenReturn(lineup)
+        Mockito.`when`(lineupDao.getLineupById(lineup.id)).thenReturn(lineup)
         Mockito.`when`(playerDao.getPlayersByTeamId(team.id)).thenReturn(teamPlayers)
         Mockito.`when`(playerNumberOverlayDao.getPlayersNumberOverlay(lineup.id))
             .thenReturn(emptyList())

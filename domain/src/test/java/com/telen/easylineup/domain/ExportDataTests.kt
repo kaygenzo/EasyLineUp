@@ -96,21 +96,21 @@ internal class ExportDataTests {
         tournament2 = Tournament(2L, "B", 2L, 3L, 4L, null, "D")
         playerPosition2 = PlayerFieldPosition(2L, 2L, 2L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE, "H")
 
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team1, team2))
+        Mockito.`when`(teamDao.getTeams()).thenReturn(listOf(team1, team2))
 
         Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(listOf(player1))
         Mockito.`when`(playerDao.getPlayersByTeamId(2L)).thenReturn(listOf(player2))
 
         Mockito.`when`(tournamentDao.getTournaments()).thenReturn(listOf(tournament1, tournament2))
 
-        Mockito.`when`(lineupDao.getLineupsForTournamentRx(1L, 1L))
+        Mockito.`when`(lineupDao.getLineupsForTournament(1L, 1L))
             .thenReturn(listOf(lineup1))
-        Mockito.`when`(lineupDao.getLineupsForTournamentRx(2L, 2L))
+        Mockito.`when`(lineupDao.getLineupsForTournament(2L, 2L))
             .thenReturn(listOf(lineup2))
 
-        Mockito.`when`(lineupDao.getLineupsForTournamentRx(1L, 2L))
+        Mockito.`when`(lineupDao.getLineupsForTournament(1L, 2L))
             .thenReturn(listOf())
-        Mockito.`when`(lineupDao.getLineupsForTournamentRx(2L, 1L))
+        Mockito.`when`(lineupDao.getLineupsForTournament(2L, 1L))
             .thenReturn(listOf())
 
         Mockito.`when`(playerPositionsDao.getAllPlayerFieldPositionsForLineup(1L))
@@ -183,8 +183,8 @@ internal class ExportDataTests {
 
     @Test
     fun shouldNotExportTournament() = runTest {
-        Mockito.`when`(lineupDao.getLineupsForTournamentRx(1L, 1L)).thenReturn(listOf(lineup1))
-        Mockito.`when`(lineupDao.getLineupsForTournamentRx(2L, 2L)).thenReturn(listOf())
+        Mockito.`when`(lineupDao.getLineupsForTournament(1L, 1L)).thenReturn(listOf(lineup1))
+        Mockito.`when`(lineupDao.getLineupsForTournament(2L, 2L)).thenReturn(listOf())
 
         val result = export()
         Assert.assertTrue(result.isSuccess)

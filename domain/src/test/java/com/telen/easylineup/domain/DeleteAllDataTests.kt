@@ -42,7 +42,7 @@ internal class DeleteAllDataTests {
 
         Mockito.`when`(tournamentDao.getTournaments()).thenReturn(tournaments)
         Mockito.`when`(tournamentDao.deleteTournaments(tournaments)).thenReturn(Unit)
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(teams)
+        Mockito.`when`(teamDao.getTeams()).thenReturn(teams)
         Mockito.`when`(teamDao.deleteTeams(teams)).thenReturn(Unit)
     }
     }
@@ -64,7 +64,7 @@ internal class DeleteAllDataTests {
 
     @Test
     fun shouldTriggerAnExceptionIfCannotGetTeams() = runTest {
-        Mockito.`when`(teamDao.getTeamsRx()).thenAnswer { throw Exception() }
+        Mockito.`when`(teamDao.getTeams()).thenAnswer { throw Exception() }
         val result = deleteAllData()
         assertTrue(result.isFailure)
     }

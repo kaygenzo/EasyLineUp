@@ -20,7 +20,7 @@ class DeleteTeam(
             dao.deleteTeam(team)
             if (isMain) {
                 // we have deleted the main team, let's choose another as main
-                val teams = dao.getTeamsRx()
+                val teams = dao.getTeams()
                 if (teams.isEmpty()) {
                     throw NoTeamsLeftException()
                 }

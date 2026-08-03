@@ -127,7 +127,7 @@ internal abstract class AssignPlayerFieldPositionTests(
         exception: Class<out Throwable>? = null
     ) {
         lineup.mode = mode
-        Mockito.`when`(teamDao.getTeamsRx())
+        Mockito.`when`(teamDao.getTeams())
             .thenReturn(listOf(Team(id = 1L, type = teamType.id, main = true)))
         val playersSize = players.size
         val result = savePlayerFieldPosition(player, position, lineup, players)

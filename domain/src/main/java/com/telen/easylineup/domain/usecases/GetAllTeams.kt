@@ -15,7 +15,7 @@ class GetAllTeams(
 ) {
     suspend operator fun invoke(): Result<List<Team>> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            dao.getTeamsRx()
+            dao.getTeams()
         }
     }
 }

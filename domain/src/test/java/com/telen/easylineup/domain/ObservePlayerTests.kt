@@ -31,7 +31,7 @@ internal class ObservePlayerTests {
     @Test
     fun shouldDelegateToRepository() = runTest {
         val player = Player(teamId = 0, name = "", shirtNumber = 0, licenseNumber = 0)
-        Mockito.`when`(playerDao.getPlayerById(1L)).thenReturn(flowOf(player))
+        Mockito.`when`(playerDao.observePlayerById(1L)).thenReturn(flowOf(player))
 
         val result = observePlayer(1L).toList()
 

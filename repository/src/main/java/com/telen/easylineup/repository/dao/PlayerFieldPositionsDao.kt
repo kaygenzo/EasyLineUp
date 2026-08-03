@@ -80,7 +80,7 @@ internal interface PlayerFieldPositionsDao {
         ORDER BY playerFieldPosition.`order` ASC
     """
     )
-    suspend fun getAllPlayersWithPositionsForLineupRx(lineupId: Long): List<RoomPlayerWithPosition>
+    suspend fun getAllPlayersWithPositionsForLineup(lineupId: Long): List<RoomPlayerWithPosition>
 
     @Query(
         """

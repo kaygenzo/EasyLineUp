@@ -41,13 +41,13 @@ internal interface LineupDao {
     suspend fun getLineups(): List<RoomLineup>
 
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
-    fun getLineupById(lineupId: Long): Flow<List<RoomLineup>>
+    fun observeLineupById(lineupId: Long): Flow<List<RoomLineup>>
 
     @Query("SELECT * FROM lineups WHERE hash = :hash")
     suspend fun getLineupByHash(hash: String): RoomLineup?
 
     @Query("SELECT * FROM lineups WHERE id = :lineupId")
-    suspend fun getLineupByIdSingle(lineupId: Long): RoomLineup
+    suspend fun getLineupById(lineupId: Long): RoomLineup
 
     @Query(
         """
@@ -55,7 +55,7 @@ internal interface LineupDao {
         WHERE lineups.tournamentID = :tournamentId AND lineups.teamID = :teamId
     """
     )
-    suspend fun getLineupsForTournamentRx(tournamentId: Long, teamId: Long): List<RoomLineup>
+    suspend fun getLineupsForTournament(tournamentId: Long, teamId: Long): List<RoomLineup>
 
     @Query("SELECT * FROM lineups WHERE teamID = :teamId ORDER BY editedAt DESC LIMIT 1")
     suspend fun getLastLineup(teamId: Long): RoomLineup?

@@ -39,7 +39,7 @@ internal class GetPlayersTests {
 
         players = arrayListOf(player1, player2)
 
-        Mockito.`when`(teamDao.getTeamsRx())
+        Mockito.`when`(teamDao.getTeams())
             .thenReturn(listOf(Team(id = 1L, name = "Panthers", main = true)))
         Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(players)
     }

@@ -15,7 +15,7 @@ class GetLineupById(
 ) {
     suspend operator fun invoke(lineupId: Long): Result<Lineup> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            dao.getLineupByIdSingle(lineupId)
+            dao.getLineupById(lineupId)
         }
     }
 }

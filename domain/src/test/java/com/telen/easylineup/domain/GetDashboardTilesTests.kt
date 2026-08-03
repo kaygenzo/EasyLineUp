@@ -51,7 +51,7 @@ internal class GetDashboardTilesTests {
             CreateDashboardTiles(tilesRepo, testDispatcherProvider()),
             testDispatcherProvider()
         )
-        Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
+        Mockito.`when`(teamDao.getTeams()).thenReturn(listOf(team))
     }
     }
 
@@ -73,14 +73,14 @@ internal class GetDashboardTilesTests {
         val defaultTile = DashboardTile(id = 1L, position = 1, type = TileType.TEAM_SIZE.type)
         Mockito.`when`(tilesRepo.getTiles())
             .thenReturn(emptyList(), listOf(defaultTile))
-        Mockito.`when`(tilesRepo.createTiles(any())).thenReturn(Unit)
+        Mockito.`when`(tilesRepo.insertTiles(any())).thenReturn(Unit)
         Mockito.`when`(playerDao.getPlayersByTeamId(team.id))
             .thenReturn(listOf(Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L)))
 
         val result = getDashboardTiles()
 
         assertTrue(result.isSuccess)
-        Mockito.verify(tilesRepo).createTiles(any())
+        Mockito.verify(tilesRepo).insertTiles(any())
         assertEquals(1, result.getOrNull()?.size)
     }
 }

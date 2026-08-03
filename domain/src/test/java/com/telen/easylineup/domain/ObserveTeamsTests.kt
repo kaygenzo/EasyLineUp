@@ -31,7 +31,7 @@ internal class ObserveTeamsTests {
     @Test
     fun shouldDelegateToRepository() = runTest {
         val teams = listOf(Team(1L, "toto"))
-        Mockito.`when`(teamDao.getTeams()).thenReturn(flowOf(teams))
+        Mockito.`when`(teamDao.observeTeams()).thenReturn(flowOf(teams))
 
         val result = observeTeams().toList()
 
