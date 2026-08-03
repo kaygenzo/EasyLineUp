@@ -20,6 +20,7 @@ import com.telen.easylineup.domain.model.export.TournamentExport
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.ports.repository.TournamentRepository
@@ -64,6 +65,7 @@ class ImportResult(
 class ImportData(
     private val teamDao: TeamRepository,
     private val playerDao: PlayerRepository,
+    private val playerNumberOverlayDao: PlayerNumberOverlayRepository,
     private val tournamentDao: TournamentRepository,
     private val lineupDao: LineupRepository,
     private val playerFieldPositionsDao: PlayerFieldPositionRepository,
@@ -314,14 +316,14 @@ class ImportData(
     ) {
         val p = PlayerNumberOverlay(0L, lineupId, players[export.playerId] ?: 0L, export.number)
 
-        val overlayDb = playerDao.getPlayerNumberOverlayByHash(export.id)
+        val overlayDb = playerNumberOverlayDao.getPlayerNumberOverlayByHash(export.id)
         if (overlayDb == null) {
             counts.recordInsert()
-            playerDao.createPlayerNumberOverlay(p)
+            playerNumberOverlayDao.createPlayerNumberOverlay(p)
         } else if (updateIfExists) {
             counts.recordUpdate()
             p.id = overlayDb.id
-            playerDao.updatePlayerNumberOverlay(p)
+            playerNumberOverlayDao.updatePlayerNumberOverlay(p)
         }
     }
 }

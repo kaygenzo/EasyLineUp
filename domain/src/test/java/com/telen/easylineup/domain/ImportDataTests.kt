@@ -21,6 +21,7 @@ import com.telen.easylineup.domain.model.export.TeamExport
 import com.telen.easylineup.domain.model.export.TournamentExport
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.ports.repository.TournamentRepository
@@ -42,6 +43,7 @@ internal class ImportDataTests {
 
     @Mock lateinit var teamDao: TeamRepository
     @Mock lateinit var playerDao: PlayerRepository
+    @Mock lateinit var playerNumberOverlayDao: PlayerNumberOverlayRepository
     @Mock lateinit var tournamentDao: TournamentRepository
     @Mock lateinit var lineupDao: LineupRepository
     @Mock lateinit var playerFieldPositionsDao: PlayerFieldPositionRepository
@@ -61,12 +63,13 @@ internal class ImportDataTests {
     fun init() {
         runBlocking {
         importData = ImportData(
-            teamDao,
-            playerDao,
-            tournamentDao,
-            lineupDao,
-            playerFieldPositionsDao,
-            testDispatcherProvider()
+            teamDao = teamDao,
+            playerDao = playerDao,
+            playerNumberOverlayDao = playerNumberOverlayDao,
+            tournamentDao = tournamentDao,
+            lineupDao = lineupDao,
+            playerFieldPositionsDao = playerFieldPositionsDao,
+            dispatcherProvider = testDispatcherProvider()
         )
 
         val playerExport = PlayerExport(
@@ -144,7 +147,7 @@ internal class ImportDataTests {
         Mockito.`when`(lineupDao.getLineupByHash(lineupHash)).thenReturn(null)
         Mockito.`when`(playerFieldPositionsDao.getPlayerFieldPositionByHash(positionHash))
             .thenReturn(null)
-        Mockito.`when`(playerDao.getPlayerNumberOverlayByHash(overlayHash)).thenReturn(null)
+        Mockito.`when`(playerNumberOverlayDao.getPlayerNumberOverlayByHash(overlayHash)).thenReturn(null)
     }
 
     private suspend fun mockAllInsertsSucceed() {
@@ -154,7 +157,7 @@ internal class ImportDataTests {
         Mockito.`when`(lineupDao.insertLineup(any())).thenReturn(4L)
         Mockito.`when`(playerFieldPositionsDao.insertPlayerFieldPosition(any()))
             .thenReturn(5L)
-        Mockito.`when`(playerDao.createPlayerNumberOverlay(any())).thenReturn(Unit)
+        Mockito.`when`(playerNumberOverlayDao.createPlayerNumberOverlay(any())).thenReturn(Unit)
     }
 
     private suspend fun mockAllFound() {
@@ -198,7 +201,7 @@ internal class ImportDataTests {
                     PlayerFieldPosition(id = 5L, playerId = 2L, lineupId = 4L, hash = positionHash)
                 
             )
-        Mockito.`when`(playerDao.getPlayerNumberOverlayByHash(overlayHash))
+        Mockito.`when`(playerNumberOverlayDao.getPlayerNumberOverlayByHash(overlayHash))
             .thenReturn(
                 
                     PlayerNumberOverlay(id = 6L, lineupId = 4L, playerId = 2L, number = 99)
@@ -213,7 +216,7 @@ internal class ImportDataTests {
         Mockito.`when`(lineupDao.updateLineup(any())).thenReturn(Unit)
         Mockito.`when`(playerFieldPositionsDao.updatePlayerFieldPosition(any()))
             .thenReturn(Unit)
-        Mockito.`when`(playerDao.updatePlayerNumberOverlay(any())).thenReturn(Unit)
+        Mockito.`when`(playerNumberOverlayDao.updatePlayerNumberOverlay(any())).thenReturn(Unit)
     }
 
     private fun assertAllCounts(result: ImportResult, inserted: Int, updated: Int) {
@@ -246,7 +249,7 @@ internal class ImportDataTests {
         Mockito.verify(tournamentDao).insertTournament(any())
         Mockito.verify(lineupDao).insertLineup(any())
         Mockito.verify(playerFieldPositionsDao).insertPlayerFieldPosition(any())
-        Mockito.verify(playerDao).createPlayerNumberOverlay(any())
+        Mockito.verify(playerNumberOverlayDao).createPlayerNumberOverlay(any())
     }
 
     @Test
@@ -290,14 +293,14 @@ internal class ImportDataTests {
         Mockito.verify(tournamentDao).updateTournament(any())
         Mockito.verify(lineupDao).updateLineup(any())
         Mockito.verify(playerFieldPositionsDao).updatePlayerFieldPosition(any())
-        Mockito.verify(playerDao).updatePlayerNumberOverlay(any())
+        Mockito.verify(playerNumberOverlayDao).updatePlayerNumberOverlay(any())
 
         Mockito.verify(teamDao, Mockito.never()).insertTeam(any())
         Mockito.verify(playerDao, Mockito.never()).insertPlayer(any())
         Mockito.verify(tournamentDao, Mockito.never()).insertTournament(any())
         Mockito.verify(lineupDao, Mockito.never()).insertLineup(any())
         Mockito.verify(playerFieldPositionsDao, Mockito.never()).insertPlayerFieldPosition(any())
-        Mockito.verify(playerDao, Mockito.never()).createPlayerNumberOverlay(any())
+        Mockito.verify(playerNumberOverlayDao, Mockito.never()).createPlayerNumberOverlay(any())
     }
 
     @Test
@@ -338,7 +341,7 @@ internal class ImportDataTests {
         Mockito.`when`(tournamentDao.getTournamentByHash(any())).thenReturn(null)
         Mockito.`when`(lineupDao.getLineupByHash(any())).thenReturn(null)
         Mockito.`when`(playerFieldPositionsDao.getPlayerFieldPositionByHash(any())).thenReturn(null)
-        Mockito.`when`(playerDao.getPlayerNumberOverlayByHash(any())).thenReturn(null)
+        Mockito.`when`(playerNumberOverlayDao.getPlayerNumberOverlayByHash(any())).thenReturn(null)
         mockAllInsertsSucceed()
 
         val importResult = importData(brokenExport, updateIfExists = false)

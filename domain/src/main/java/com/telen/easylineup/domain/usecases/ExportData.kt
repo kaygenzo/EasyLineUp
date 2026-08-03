@@ -20,6 +20,7 @@ import com.telen.easylineup.domain.model.toTournamentExport
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.ports.repository.TournamentRepository
@@ -34,6 +35,7 @@ class ExportData(
     private val checkHashData: CheckHashData,
     private val teamDao: TeamRepository,
     private val playerDao: PlayerRepository,
+    private val playerNumberOverlayDao: PlayerNumberOverlayRepository,
     private val tournamentDao: TournamentRepository,
     private val lineupDao: LineupRepository,
     private val playerFieldPositionsDao: PlayerFieldPositionRepository,
@@ -100,7 +102,7 @@ class ExportData(
                                 positionsExport.add(positionExport)
                             }
 
-                        playerDao.getPlayersNumberOverlay(lineup.id).forEach {
+                        playerNumberOverlayDao.getPlayersNumberOverlay(lineup.id).forEach {
                             val playerNumberExport = it.toPlayerNumberOverlayExport(
                                 playersUuidMap[it.playerId]
                             )

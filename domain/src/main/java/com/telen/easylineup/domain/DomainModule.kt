@@ -103,20 +103,20 @@ object DomainModule {
         single { DeleteLineup(get(), get()) }
         single { SetLineupMode(get(), get(), get()) }
         single { UpdatePlayersWithLineupMode(get()) }
-        single { GetRoster(get(), get(), get(), get()) }
+        single { GetRoster(get(), get(), get(), get(), get()) }
         single { UpdateLineupRoster(get(), get()) }
         single { DeleteTeam(get(), get()) }
         single { SwitchPlayersPosition(get(), get()) }
         single { DeleteAllData(get(), get(), get()) }
         single { GetTournamentStatsForPositionTable(get(), get(), get(), get()) }
         single { CheckHashData(get(), get(), get(), get(), get(), get()) }
-        single { ExportData(get(), get(), get(), get(), get(), get(), get()) }
-        single { ImportData(get(), get(), get(), get(), get(), get()) }
+        single { ExportData(get(), get(), get(), get(), get(), get(), get(), get()) }
+        single { ImportData(get(), get(), get(), get(), get(), get(), get()) }
         single { GetOnlyPlayersInField(get()) }
         single { GetDpAndFlexFromPlayersInField(get(), get()) }
         single { SaveDpAndFlex(get()) }
         single { SavePlayerNumberOverlay(get(), get()) }
-        single { GetShirtNumberHistory(get(), get(), get()) }
+        single { GetShirtNumberHistory(get(), get(), get(), get()) }
         single { IsEmailValid() }
         single { IsValidPhoneNumber(get()) }
         single { GetBattersState(get(), get()) }

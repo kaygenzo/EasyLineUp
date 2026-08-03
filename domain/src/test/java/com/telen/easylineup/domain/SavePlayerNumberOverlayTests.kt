@@ -9,7 +9,7 @@ import org.mockito.kotlin.argumentCaptor
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.RosterItem
-import com.telen.easylineup.domain.ports.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -24,7 +24,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerNumberOverlayTests {
-    @Mock lateinit var playerRepository: PlayerRepository
+    @Mock lateinit var playerNumberOverlayRepository: PlayerNumberOverlayRepository
     lateinit var savePlayerNumberOverlay: SavePlayerNumberOverlay
 
     private fun player(id: Long, shirtNumber: Int) =
@@ -33,10 +33,10 @@ internal class SavePlayerNumberOverlayTests {
     @Before
     fun init() {
         runBlocking {
-        savePlayerNumberOverlay = SavePlayerNumberOverlay(playerRepository, testDispatcherProvider())
-        Mockito.`when`(playerRepository.deletePlayerNumberOverlays(any())).thenReturn(Unit)
-        Mockito.`when`(playerRepository.updatePlayerNumberOverlays(any())).thenReturn(Unit)
-        Mockito.`when`(playerRepository.createPlayerNumberOverlays(any())).thenReturn(Unit)
+        savePlayerNumberOverlay = SavePlayerNumberOverlay(playerNumberOverlayRepository, testDispatcherProvider())
+        Mockito.`when`(playerNumberOverlayRepository.deletePlayerNumberOverlays(any())).thenReturn(Unit)
+        Mockito.`when`(playerNumberOverlayRepository.updatePlayerNumberOverlays(any())).thenReturn(Unit)
+        Mockito.`when`(playerNumberOverlayRepository.createPlayerNumberOverlays(any())).thenReturn(Unit)
     }
     }
 
@@ -49,10 +49,10 @@ internal class SavePlayerNumberOverlayTests {
 
         assertTrue(result.isSuccess)
         val captor = argumentCaptor<List<PlayerNumberOverlay>>()
-        Mockito.verify(playerRepository).createPlayerNumberOverlays(captor.capture())
+        Mockito.verify(playerNumberOverlayRepository).createPlayerNumberOverlays(captor.capture())
         assertEquals(listOf(overlay), captor.firstValue)
-        Mockito.verify(playerRepository).updatePlayerNumberOverlays(emptyList())
-        Mockito.verify(playerRepository).deletePlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).updatePlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).deletePlayerNumberOverlays(emptyList())
     }
 
     @Test
@@ -64,10 +64,10 @@ internal class SavePlayerNumberOverlayTests {
 
         assertTrue(result.isSuccess)
         val captor = argumentCaptor<List<PlayerNumberOverlay>>()
-        Mockito.verify(playerRepository).updatePlayerNumberOverlays(captor.capture())
+        Mockito.verify(playerNumberOverlayRepository).updatePlayerNumberOverlays(captor.capture())
         assertEquals(listOf(overlay), captor.firstValue)
-        Mockito.verify(playerRepository).createPlayerNumberOverlays(emptyList())
-        Mockito.verify(playerRepository).deletePlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).createPlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).deletePlayerNumberOverlays(emptyList())
     }
 
     @Test
@@ -79,10 +79,10 @@ internal class SavePlayerNumberOverlayTests {
 
         assertTrue(result.isSuccess)
         val captor = argumentCaptor<List<PlayerNumberOverlay>>()
-        Mockito.verify(playerRepository).deletePlayerNumberOverlays(captor.capture())
+        Mockito.verify(playerNumberOverlayRepository).deletePlayerNumberOverlays(captor.capture())
         assertEquals(listOf(overlay), captor.firstValue)
-        Mockito.verify(playerRepository).createPlayerNumberOverlays(emptyList())
-        Mockito.verify(playerRepository).updatePlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).createPlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).updatePlayerNumberOverlays(emptyList())
     }
 
     @Test
@@ -93,9 +93,9 @@ internal class SavePlayerNumberOverlayTests {
         val result = savePlayerNumberOverlay(listOf(item))
 
         assertTrue(result.isSuccess)
-        Mockito.verify(playerRepository).deletePlayerNumberOverlays(emptyList())
-        Mockito.verify(playerRepository).updatePlayerNumberOverlays(emptyList())
-        Mockito.verify(playerRepository).createPlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).deletePlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).updatePlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).createPlayerNumberOverlays(emptyList())
     }
 
     @Test
@@ -105,15 +105,15 @@ internal class SavePlayerNumberOverlayTests {
         val result = savePlayerNumberOverlay(listOf(item))
 
         assertTrue(result.isSuccess)
-        Mockito.verify(playerRepository).deletePlayerNumberOverlays(emptyList())
-        Mockito.verify(playerRepository).updatePlayerNumberOverlays(emptyList())
-        Mockito.verify(playerRepository).createPlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).deletePlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).updatePlayerNumberOverlays(emptyList())
+        Mockito.verify(playerNumberOverlayRepository).createPlayerNumberOverlays(emptyList())
     }
 
     @Test
     fun shouldPropagateErrorFromRepository() = runTest {
         val exception = Exception("db error")
-        Mockito.`when`(playerRepository.deletePlayerNumberOverlays(any())).thenAnswer { throw exception }
+        Mockito.`when`(playerNumberOverlayRepository.deletePlayerNumberOverlays(any())).thenAnswer { throw exception }
         val item = RosterItem(player(1L, shirtNumber = 1), selected = true, playerNumberOverlay = null)
 
         val result = savePlayerNumberOverlay(listOf(item))

@@ -6,11 +6,13 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.ports.DispatcherProvider
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import kotlinx.coroutines.withContext
 
 class GetShirtNumberHistory(
     private val playersRepo: PlayerRepository,
+    private val playerNumberOverlayRepo: PlayerNumberOverlayRepository,
     private val getTeam: GetTeam,
     private val dispatcherProvider: DispatcherProvider
 ) {
@@ -23,7 +25,7 @@ class GetShirtNumberHistory(
 
                 val shirtNumbers = playersRepo.getShirtNumberFromPlayers(teamId, number)
                 val items = shirtNumbers.map { shirtNumber ->
-                    val overlay = playersRepo.getShirtNumberOverlay(
+                    val overlay = playerNumberOverlayRepo.getShirtNumberOverlay(
                         shirtNumber.playerId,
                         shirtNumber.lineupId
                     )
@@ -40,7 +42,7 @@ class GetShirtNumberHistory(
                     }
                 }.toMutableList()
 
-                val overlays = playersRepo.getShirtNumberFromNumberOverlays(teamId, number)
+                val overlays = playerNumberOverlayRepo.getShirtNumberFromNumberOverlays(teamId, number)
                 overlays.forEach { overlay ->
                     val first = overlaysAdded.find {
                         it.playerId == overlay.playerId && it.lineupId == overlay.lineupId

@@ -7,11 +7,11 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.RosterItem
 import com.telen.easylineup.domain.ports.DispatcherProvider
-import com.telen.easylineup.domain.ports.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import kotlinx.coroutines.withContext
 
 class SavePlayerNumberOverlay(
-    private val playerRepository: PlayerRepository,
+    private val playerNumberOverlayRepository: PlayerNumberOverlayRepository,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(items: List<RosterItem>): Result<Unit> = runCatchingCancellable {
@@ -36,9 +36,9 @@ class SavePlayerNumberOverlay(
                     }
                 }
             }
-            playerRepository.deletePlayerNumberOverlays(toDelete)
-            playerRepository.updatePlayerNumberOverlays(toUpdate)
-            playerRepository.createPlayerNumberOverlays(toAdd)
+            playerNumberOverlayRepository.deletePlayerNumberOverlays(toDelete)
+            playerNumberOverlayRepository.updatePlayerNumberOverlays(toUpdate)
+            playerNumberOverlayRepository.createPlayerNumberOverlays(toAdd)
         }
     }
 }

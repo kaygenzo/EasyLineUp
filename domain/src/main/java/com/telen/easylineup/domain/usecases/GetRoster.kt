@@ -10,11 +10,13 @@ import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import kotlinx.coroutines.withContext
 
 class GetRoster(
     private val dao: PlayerRepository,
+    private val playerNumberOverlayDao: PlayerNumberOverlayRepository,
     private val lineupDao: LineupRepository,
     private val getTeam: GetTeam,
     private val dispatcherProvider: DispatcherProvider
@@ -27,7 +29,7 @@ class GetRoster(
 
                 if (lineupId != null) {
                     val overlays: MutableMap<Long, PlayerNumberOverlay> = mutableMapOf()
-                    dao.getPlayersNumberOverlay(lineupId).forEach {
+                    playerNumberOverlayDao.getPlayersNumberOverlay(lineupId).forEach {
                         overlays[it.playerId] = it
                     }
                     val lineup = lineupDao.getLineupByIdSingle(lineupId)

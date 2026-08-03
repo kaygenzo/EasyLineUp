@@ -14,6 +14,7 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.tiles.TileType
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.ports.repository.TilesRepository
@@ -65,6 +66,9 @@ internal class DashboardViewModelTest {
     lateinit var playerRepository: PlayerRepository
 
     @Mock
+    lateinit var playerNumberOverlayRepository: PlayerNumberOverlayRepository
+
+    @Mock
     lateinit var lineupRepository: LineupRepository
 
     @Mock
@@ -110,7 +114,14 @@ internal class DashboardViewModelTest {
                         )
                     }
                     single { SaveDashboardTiles(tilesRepository, dispatcherProvider) }
-                    single { GetShirtNumberHistory(playerRepository, getTeam, dispatcherProvider) }
+                    single {
+                        GetShirtNumberHistory(
+                            playerRepository,
+                            playerNumberOverlayRepository,
+                            getTeam,
+                            dispatcherProvider
+                        )
+                    }
                     single { GetTeamEmails(getPlayers, dispatcherProvider) }
                     single { GetTeamPhones(getPlayers, dispatcherProvider) }
                     single { SharedPreferencesHelper(context) }
@@ -197,7 +208,7 @@ internal class DashboardViewModelTest {
         )
         Mockito.`when`(playerRepository.getShirtNumberFromPlayers(1L, 8))
             .thenReturn(emptyList())
-        Mockito.`when`(playerRepository.getShirtNumberFromNumberOverlays(1L, 8))
+        Mockito.`when`(playerNumberOverlayRepository.getShirtNumberFromNumberOverlays(1L, 8))
             .thenReturn(listOf(overlayEntry))
 
         val result = viewModel.getShirtNumberHistory(8)

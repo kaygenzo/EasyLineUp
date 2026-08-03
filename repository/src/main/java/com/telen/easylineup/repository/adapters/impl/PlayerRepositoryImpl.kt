@@ -5,12 +5,10 @@
 package com.telen.easylineup.repository.adapters.impl
 
 import com.telen.easylineup.domain.model.Player
-import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.repository.dao.PlayerDao
-import com.telen.easylineup.repository.dao.PlayerNumberOverlayDao
 import com.telen.easylineup.repository.model.toDomain
 import com.telen.easylineup.repository.model.toRoom
 import kotlinx.coroutines.flow.Flow
@@ -18,8 +16,7 @@ import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
 internal class PlayerRepositoryImpl(
-    private val playerDao: PlayerDao,
-    private val numberOverlayDao: PlayerNumberOverlayDao
+    private val playerDao: PlayerDao
 ) : PlayerRepository {
     init {
         Timber.i("PlayerRepositoryImpl.init")
@@ -91,55 +88,5 @@ internal class PlayerRepositoryImpl(
     ): List<ShirtNumberEntry> {
         return playerDao.getShirtNumberHistoryFromPlayers(teamId, number)
             .map { it.toDomain() }
-    }
-
-    override suspend fun getShirtNumberFromNumberOverlays(
-        teamId: Long,
-        number: Int
-    ): List<ShirtNumberEntry> {
-        return playerDao.getShirtNumberHistoryFromOverlays(teamId, number)
-            .map { it.toDomain() }
-    }
-
-    override suspend fun getShirtNumberOverlay(
-        playerId: Long,
-        lineupId: Long
-    ): PlayerNumberOverlay? {
-        return numberOverlayDao.getShirtNumberOverlay(playerId, lineupId)?.toDomain()
-    }
-
-    override fun observePlayersNumberOverlay(lineupId: Long): Flow<List<PlayerNumberOverlay>> {
-        return numberOverlayDao.observePlayerNumberOverlays(lineupId).map { list ->
-            list.map { it.toDomain() }
-        }
-    }
-
-    override suspend fun getPlayersNumberOverlay(lineupId: Long): List<PlayerNumberOverlay> {
-        return numberOverlayDao.getPlayerNumberOverlays(lineupId)
-            .map { it.toDomain() }
-    }
-
-    override suspend fun deletePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>) {
-        numberOverlayDao.deletePlayerNumberOverlays(overlays.map { it.toRoom() })
-    }
-
-    override suspend fun updatePlayerNumberOverlays(overlays: List<PlayerNumberOverlay>) {
-        numberOverlayDao.updatePlayerNumberOverlays(overlays.map { it.toRoom() })
-    }
-
-    override suspend fun updatePlayerNumberOverlay(overlay: PlayerNumberOverlay) {
-        numberOverlayDao.updatePlayerNumberOverlay(overlay.toRoom())
-    }
-
-    override suspend fun createPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>) {
-        numberOverlayDao.insertPlayerNumberOverlays(overlays.map { it.toRoom() })
-    }
-
-    override suspend fun createPlayerNumberOverlay(overlay: PlayerNumberOverlay) {
-        numberOverlayDao.insertPlayerNumberOverlay(overlay.toRoom())
-    }
-
-    override suspend fun getPlayerNumberOverlayByHash(hash: String): PlayerNumberOverlay? {
-        return numberOverlayDao.getPlayerNumberOverlayByHash(hash)?.toDomain()
     }
 }

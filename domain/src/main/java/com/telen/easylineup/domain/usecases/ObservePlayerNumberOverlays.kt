@@ -5,10 +5,10 @@
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
-import com.telen.easylineup.domain.ports.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import kotlinx.coroutines.flow.Flow
 
-class ObservePlayerNumberOverlays(private val dao: PlayerRepository) {
+class ObservePlayerNumberOverlays(private val dao: PlayerNumberOverlayRepository) {
     operator fun invoke(lineupId: Long): Flow<List<PlayerNumberOverlay>> =
         dao.observePlayersNumberOverlay(lineupId)
 }

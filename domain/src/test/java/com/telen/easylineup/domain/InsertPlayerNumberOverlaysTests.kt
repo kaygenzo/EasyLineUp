@@ -5,7 +5,7 @@
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
-import com.telen.easylineup.domain.ports.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
@@ -18,7 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class InsertPlayerNumberOverlaysTests {
-    @Mock lateinit var playerDao: PlayerRepository
+    @Mock lateinit var playerDao: PlayerNumberOverlayRepository
     lateinit var insertPlayerNumberOverlays: InsertPlayerNumberOverlays
 
     @Before

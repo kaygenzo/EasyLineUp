@@ -7,6 +7,7 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
@@ -24,6 +25,7 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class GetShirtNumberHistoryTests {
     @Mock lateinit var playerRepo: PlayerRepository
+    @Mock lateinit var playerNumberOverlayRepo: PlayerNumberOverlayRepository
     @Mock lateinit var teamRepo: TeamRepository
     lateinit var getShirtNumberEntry: GetShirtNumberHistory
     lateinit var entry1: ShirtNumberEntry
@@ -40,9 +42,10 @@ internal class GetShirtNumberHistoryTests {
     fun init() {
         runBlocking {
         getShirtNumberEntry = GetShirtNumberHistory(
-            playerRepo,
-            GetTeam(teamRepo, testDispatcherProvider()),
-            testDispatcherProvider()
+            playersRepo = playerRepo,
+            playerNumberOverlayRepo = playerNumberOverlayRepo,
+            getTeam = GetTeam(teamRepo, testDispatcherProvider()),
+            dispatcherProvider = testDispatcherProvider()
         )
         Mockito.`when`(teamRepo.getTeamsRx())
             .thenReturn(listOf(Team(id = 1L, name = "Panthers", main = true)))
@@ -59,13 +62,13 @@ internal class GetShirtNumberHistoryTests {
         shirtNumberOverlay1 = ShirtNumberEntry(1, "titi", 3L, 6L, 2L, 2L, "lineup2")
         shirtNumberOverlay2 = ShirtNumberEntry(1, "test", 3L, 7L, 2L, 3L, "lineup3")
 
-        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(1L, 1L)).thenReturn(null)
-        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(2L, 1L)).thenReturn(null)
-        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(1L, 2L)).thenReturn(null)
-        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(2L, 2L)).thenReturn(null)
-        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(3L, 3L)).thenReturn(null)
+        Mockito.lenient().`when`(playerNumberOverlayRepo.getShirtNumberOverlay(1L, 1L)).thenReturn(null)
+        Mockito.lenient().`when`(playerNumberOverlayRepo.getShirtNumberOverlay(2L, 1L)).thenReturn(null)
+        Mockito.lenient().`when`(playerNumberOverlayRepo.getShirtNumberOverlay(1L, 2L)).thenReturn(null)
+        Mockito.lenient().`when`(playerNumberOverlayRepo.getShirtNumberOverlay(2L, 2L)).thenReturn(null)
+        Mockito.lenient().`when`(playerNumberOverlayRepo.getShirtNumberOverlay(3L, 3L)).thenReturn(null)
 
-        Mockito.`when`(playerRepo.getShirtNumberFromNumberOverlays(1L, 1)).thenReturn(listOf())
+        Mockito.`when`(playerNumberOverlayRepo.getShirtNumberFromNumberOverlays(1L, 1)).thenReturn(listOf())
     }
     }
 
@@ -83,7 +86,7 @@ internal class GetShirtNumberHistoryTests {
         Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 1)).thenReturn(listOf(entry1, entry2,
             entry3, entry4))
 
-        Mockito.`when`(playerRepo.getShirtNumberFromNumberOverlays(1L, 1)).thenReturn(listOf(
+        Mockito.`when`(playerNumberOverlayRepo.getShirtNumberFromNumberOverlays(1L, 1)).thenReturn(listOf(
             shirtNumberOverlay1, shirtNumberOverlay2
         ))
 
@@ -96,8 +99,8 @@ internal class GetShirtNumberHistoryTests {
     @Test
     fun shouldNotGetPlayerNumberIfOverlayExists() = runTest {
         Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 42)).thenReturn(listOf(entry5))
-        Mockito.`when`(playerRepo.getShirtNumberOverlay(3L, 3L)).thenReturn(overlay2)
-        Mockito.`when`(playerRepo.getShirtNumberFromNumberOverlays(1L, 42)).thenReturn(listOf())
+        Mockito.`when`(playerNumberOverlayRepo.getShirtNumberOverlay(3L, 3L)).thenReturn(overlay2)
+        Mockito.`when`(playerNumberOverlayRepo.getShirtNumberFromNumberOverlays(1L, 42)).thenReturn(listOf())
 
         val result = getShirtNumberEntry(42)
         Assert.assertTrue(result.isSuccess)

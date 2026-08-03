@@ -21,6 +21,7 @@ import com.telen.easylineup.domain.model.toTeamExport
 import com.telen.easylineup.domain.model.toTournamentExport
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.ports.repository.TournamentRepository
@@ -41,6 +42,7 @@ internal class ExportDataTests {
     private val extraHitters = 0
     @Mock lateinit var teamDao: TeamRepository
     @Mock lateinit var playerDao: PlayerRepository
+    @Mock lateinit var playerNumberOverlayDao: PlayerNumberOverlayRepository
     @Mock lateinit var tournamentDao: TournamentRepository
     @Mock lateinit var lineupDao: LineupRepository
     @Mock lateinit var playerPositionsDao: PlayerFieldPositionRepository
@@ -69,8 +71,14 @@ internal class ExportDataTests {
             testDispatcherProvider()
         )
         export = ExportData(
-            checkHashData, teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao,
-            testDispatcherProvider()
+            checkHashData = checkHashData,
+            teamDao = teamDao,
+            playerDao = playerDao,
+            playerNumberOverlayDao = playerNumberOverlayDao,
+            tournamentDao = tournamentDao,
+            lineupDao = lineupDao,
+            playerFieldPositionsDao = playerPositionsDao,
+            dispatcherProvider = testDispatcherProvider()
         )
 
         // team 1
@@ -110,9 +118,9 @@ internal class ExportDataTests {
         Mockito.`when`(playerPositionsDao.getAllPlayerFieldPositionsForLineup(2L))
             .thenReturn(listOf(playerPosition2))
 
-        Mockito.`when`(playerDao.getPlayersNumberOverlay(1L))
+        Mockito.`when`(playerNumberOverlayDao.getPlayersNumberOverlay(1L))
             .thenReturn(listOf(playerNumberOverlay1))
-        Mockito.`when`(playerDao.getPlayersNumberOverlay(2L))
+        Mockito.`when`(playerNumberOverlayDao.getPlayersNumberOverlay(2L))
             .thenReturn(listOf())
 
         // CheckHashData runs first - every fixture already has a non-blank hash, so it finds

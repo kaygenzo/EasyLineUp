@@ -11,6 +11,7 @@ import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.ports.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
@@ -31,6 +32,7 @@ import org.mockito.junit.MockitoJUnitRunner
 internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     @Mock lateinit var lineupDao: LineupRepository
     @Mock lateinit var playerDao: PlayerRepository
+    @Mock lateinit var playerNumberOverlayDao: PlayerNumberOverlayRepository
     @Mock lateinit var teamDao: TeamRepository
     lateinit var getListAvailablePlayersForSelection: GetListAvailablePlayersForSelection
     lateinit var players: MutableList<PlayerWithPosition>
@@ -39,7 +41,13 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     @Before
     fun init() {
         runBlocking {
-        val getRoster = GetRoster(playerDao, lineupDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
+        val getRoster = GetRoster(
+            dao = playerDao,
+            playerNumberOverlayDao = playerNumberOverlayDao,
+            lineupDao = lineupDao,
+            getTeam = GetTeam(teamDao, testDispatcherProvider()),
+            dispatcherProvider = testDispatcherProvider()
+        )
         getListAvailablePlayersForSelection = GetListAvailablePlayersForSelection(getRoster, testDispatcherProvider())
 
         val team = Team(id = 1L, name = "toto", main = true)
@@ -71,7 +79,7 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
 
         Mockito.`when`(lineupDao.getLineupByIdSingle(lineup.id)).thenReturn(lineup)
         Mockito.`when`(playerDao.getPlayersByTeamId(team.id)).thenReturn(teamPlayers)
-        Mockito.`when`(playerDao.getPlayersNumberOverlay(lineup.id))
+        Mockito.`when`(playerNumberOverlayDao.getPlayersNumberOverlay(lineup.id))
             .thenReturn(emptyList())
     }
     }

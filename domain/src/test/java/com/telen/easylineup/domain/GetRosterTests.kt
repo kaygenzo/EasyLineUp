@@ -10,6 +10,7 @@ import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.ports.repository.LineupRepository
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.GetRoster
@@ -39,13 +40,20 @@ internal class GetRosterTests {
         3, null, 1, 0, 0, "hash")
     @Mock lateinit var lineupDao: LineupRepository
     @Mock lateinit var playerDao: PlayerRepository
+    @Mock lateinit var playerNumberOverlayDao: PlayerNumberOverlayRepository
     @Mock lateinit var teamDao: TeamRepository
     lateinit var getRoster: GetRoster
 
     @Before
     fun init() {
         runBlocking {
-        getRoster = GetRoster(playerDao, lineupDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
+        getRoster = GetRoster(
+            dao = playerDao,
+            playerNumberOverlayDao = playerNumberOverlayDao,
+            lineupDao = lineupDao,
+            getTeam = GetTeam(teamDao, testDispatcherProvider()),
+            dispatcherProvider = testDispatcherProvider()
+        )
 
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(listOf(team))
         Mockito.`when`(lineupDao.getLineupByIdSingle(1L)).thenReturn(lineup)
@@ -57,7 +65,7 @@ internal class GetRosterTests {
                 add(PlayerNumberOverlay(3L, 1L, player3.id, 69))
             }
 
-        Mockito.`when`(playerDao.getPlayersNumberOverlay(1L)).thenReturn(overlays)
+        Mockito.`when`(playerNumberOverlayDao.getPlayersNumberOverlay(1L)).thenReturn(overlays)
     }
     }
 

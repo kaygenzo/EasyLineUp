@@ -6,11 +6,11 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.ports.DispatcherProvider
-import com.telen.easylineup.domain.ports.repository.PlayerRepository
+import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import kotlinx.coroutines.withContext
 
 class InsertPlayerNumberOverlays(
-    private val dao: PlayerRepository,
+    private val dao: PlayerNumberOverlayRepository,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(overlays: List<PlayerNumberOverlay>): Result<Unit> =
