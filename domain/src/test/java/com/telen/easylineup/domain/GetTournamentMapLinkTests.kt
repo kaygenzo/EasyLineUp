@@ -19,7 +19,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -30,7 +29,6 @@ internal class GetTournamentMapLinkTests {
 
     @Before
     fun init() {
-        MockitoAnnotations.initMocks(this)
         getTournamentMapLink = GetTournamentMapLink(geocodingProvider, testDispatcherProvider())
         tournament = Tournament(
             id = 1L, name = "champs", createdAt = 0L, startTime = 0L, endTime = 0L,

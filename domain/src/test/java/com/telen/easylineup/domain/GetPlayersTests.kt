@@ -18,7 +18,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -31,7 +30,6 @@ internal class GetPlayersTests {
     @Before
     fun init() {
         runBlocking {
-        MockitoAnnotations.initMocks(this)
         getPlayers = GetPlayers(playerDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
 
         val player1 = Player(id = 1L, teamId = 1L, name = "toto", shirtNumber = 1, licenseNumber = 1, image = null,

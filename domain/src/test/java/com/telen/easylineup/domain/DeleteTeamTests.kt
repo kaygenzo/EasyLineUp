@@ -22,7 +22,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -37,7 +36,6 @@ internal class DeleteTeamTests {
     @Before
     fun init() {
         runBlocking {
-        MockitoAnnotations.initMocks(this)
         deleteTeam = DeleteTeam(teamDao, testDispatcherProvider())
         team = Team(id = 1L, name = "toto", type = TeamType.BASEBALL.id, main = true)
         team2 = Team(id = 2L, name = "tata", type = TeamType.SOFTBALL.id, main = false)

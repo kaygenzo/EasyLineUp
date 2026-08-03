@@ -23,7 +23,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 /**
@@ -39,7 +38,6 @@ internal class SaveTeamTests {
     @Before
     fun init() {
         runBlocking {
-        MockitoAnnotations.initMocks(this)
         saveTeam = SaveTeam(
             teamDao,
             CheckTeam(testDispatcherProvider()),

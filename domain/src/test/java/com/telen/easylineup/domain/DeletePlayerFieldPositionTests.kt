@@ -21,7 +21,6 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 ////////////// NO HITTER SIZE //////////////
@@ -95,7 +94,6 @@ internal abstract class DeletePlayerFieldPositionTests(
 
     @Before
     fun init() {
-        MockitoAnnotations.initMocks(this)
         deletePlayerFieldPosition = DeletePlayerFieldPosition(testDispatcherProvider())
         players = mutableListOf()
         teamType.getValidPositions(strategy).forEachIndexed { index, pos ->

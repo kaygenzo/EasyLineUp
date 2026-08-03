@@ -20,7 +20,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -34,7 +33,6 @@ internal class SavePlayerNumberOverlayTests {
     @Before
     fun init() {
         runBlocking {
-        MockitoAnnotations.initMocks(this)
         savePlayerNumberOverlay = SavePlayerNumberOverlay(playerRepository, testDispatcherProvider())
         Mockito.`when`(playerRepository.deletePlayerNumberOverlays(any())).thenReturn(Unit)
         Mockito.`when`(playerRepository.updatePlayerNumberOverlays(any())).thenReturn(Unit)

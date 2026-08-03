@@ -15,7 +15,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -26,7 +25,6 @@ internal class UpdateLineupTests {
 
     @Before
     fun init() {
-        MockitoAnnotations.initMocks(this)
         updateLineup = UpdateLineup(lineupRepo, testDispatcherProvider())
         lineup = Lineup(id = 1L, name = "test", teamId = 1L, tournamentId = 1L)
     }

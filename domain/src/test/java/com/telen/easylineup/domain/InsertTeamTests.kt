@@ -15,7 +15,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -25,7 +24,6 @@ internal class InsertTeamTests {
 
     @Before
     fun init() {
-        MockitoAnnotations.initMocks(this)
         insertTeam = InsertTeam(teamDao, testDispatcherProvider())
     }
 

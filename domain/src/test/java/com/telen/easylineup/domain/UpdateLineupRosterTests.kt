@@ -21,7 +21,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -35,7 +34,6 @@ internal class UpdateLineupRosterTests {
     @Before
     fun init() {
         runBlocking {
-        MockitoAnnotations.initMocks(this)
         updateLineupRoster = UpdateLineupRoster(lineupRepository, testDispatcherProvider())
         lineup = Lineup(id = 1L, name = "test", teamId = 1L, tournamentId = 1L)
         Mockito.`when`(lineupRepository.getLineupByIdSingle(1L)).thenReturn(lineup)

@@ -18,7 +18,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.check
 
@@ -30,7 +29,6 @@ internal class SaveDashboardTilesTests {
     @Before
     fun init() {
         runBlocking {
-        MockitoAnnotations.initMocks(this)
         saveDashboardTiles = SaveDashboardTiles(tilesRepo, testDispatcherProvider())
 
         Mockito.`when`(tilesRepo.updateTiles(any())).thenReturn(Unit)

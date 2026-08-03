@@ -30,7 +30,6 @@ internal class DeleteLineupTests {
     @Before
     fun init() {
         runBlocking {
-        MockitoAnnotations.initMocks(this)
         deleteLineup = DeleteLineup(dao, testDispatcherProvider())
 
         lineup1 =

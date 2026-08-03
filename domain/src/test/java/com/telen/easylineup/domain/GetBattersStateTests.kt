@@ -20,7 +20,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -700,7 +699,6 @@ internal abstract class GetBattersStateTests {
     @Before
     open fun init() {
         initParameters()
-        MockitoAnnotations.initMocks(this)
         getBattersState = GetBattersState(stringResourcesProvider, testDispatcherProvider())
         batterSize = strategy.batterSize
 

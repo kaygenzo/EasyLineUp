@@ -26,7 +26,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.check
 
@@ -48,7 +47,6 @@ internal class CheckHashDataTests {
     @Before
     fun init() {
         runBlocking {
-            MockitoAnnotations.initMocks(this)
             checkHash = CheckHashData(
                 teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao,
                 testDispatcherProvider()

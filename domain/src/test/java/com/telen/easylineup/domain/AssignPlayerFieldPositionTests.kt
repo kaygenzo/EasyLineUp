@@ -28,7 +28,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 ////////////// NO HITTER SIZE //////////////
@@ -90,7 +89,6 @@ internal abstract class AssignPlayerFieldPositionTests(
 
     @Before
     fun init() {
-        MockitoAnnotations.initMocks(this)
         savePlayerFieldPosition =
             AssignPlayerFieldPosition(GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
 

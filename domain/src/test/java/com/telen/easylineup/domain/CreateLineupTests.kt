@@ -27,7 +27,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -92,7 +91,7 @@ internal class CreateLineupSoftballCustomSlowpitchTests : CreateLineupTests() {
     }
 }
 
-internal open class CreateLineupTests {
+internal abstract class CreateLineupTests {
     var strategy: TeamStrategy = TeamStrategy.STANDARD
     var extraHitters: Int = 0
     private lateinit var lineup: Lineup
@@ -106,7 +105,6 @@ internal open class CreateLineupTests {
 
     @Before
     open fun init() {
-        MockitoAnnotations.initMocks(this)
         createLineup = CreateLineup(lineupDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
 
         runBlocking {

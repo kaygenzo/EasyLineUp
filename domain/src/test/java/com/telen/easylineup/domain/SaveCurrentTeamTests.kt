@@ -18,7 +18,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -31,7 +30,6 @@ internal class SaveCurrentTeamTests {
     @Before
     fun init() {
         runBlocking {
-        MockitoAnnotations.initMocks(this)
         saveCurrentTeam = SaveCurrentTeam(teamDao, testDispatcherProvider())
 
         newTeam = Team(1, "toto", null, 0, true)

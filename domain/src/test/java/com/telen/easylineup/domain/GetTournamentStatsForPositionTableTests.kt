@@ -20,7 +20,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -35,7 +34,6 @@ internal class GetTournamentStatsForPositionTableTests {
     @Before
     fun init() {
         runBlocking {
-        MockitoAnnotations.initMocks(this)
         team = Team(id = 1L, name = "toto", type = 0, main = true)
         tournament = Tournament(id = 5L, name = "Summer cup", createdAt = 1000L, startTime = 2000L, endTime = 3000L)
         getTournamentStatsForPositionTable =
