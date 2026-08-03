@@ -334,7 +334,11 @@ class LineupViewModel : ViewModel(), KoinComponent {
         return Maybe.defer {
             if (position != FieldPosition.DP_DH) {
                 getNotSelectedPlayers(sortBy = position).flatMapMaybe {
-                    Maybe.just(ListAvailablePlayers(it, position))
+                    if (it.isEmpty()) {
+                        Maybe.empty()
+                    } else {
+                        Maybe.just(ListAvailablePlayers(it, position))
+                    }
                 }
             } else {
                 rxSingle { getDpAndFlexFromPlayersInFieldUseCase(_listPlayersWithPosition).getOrThrow() }
@@ -464,8 +468,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
 fun <T: Any> Maybe<T>.processError(): Maybe<T> {
     return this.onErrorResumeNext {
         when (it) {
-            is NeedAssignPitcherFirstException,
-            is NoSuchElementException -> {
+            is NeedAssignPitcherFirstException -> {
                 Timber.e(it.message.toString())
                 Maybe.empty()
             }

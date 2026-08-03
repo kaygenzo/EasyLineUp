@@ -45,10 +45,6 @@ class GetListAvailablePlayersForSelection(
                 }
             }
 
-            if (listAvailablePlayers.isEmpty()) {
-                throw NoSuchElementException()
-            }
-
             listAvailablePlayers
         }
     }

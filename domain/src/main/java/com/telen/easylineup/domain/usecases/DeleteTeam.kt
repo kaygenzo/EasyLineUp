@@ -7,6 +7,7 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.TeamRepository
+import com.telen.easylineup.domain.usecases.exceptions.NoTeamsLeftException
 import kotlinx.coroutines.withContext
 
 class DeleteTeam(
@@ -21,7 +22,7 @@ class DeleteTeam(
                 // we have deleted the main team, let's choose another as main
                 val teams = dao.getTeamsRx()
                 if (teams.isEmpty()) {
-                    throw NoSuchElementException()
+                    throw NoTeamsLeftException()
                 }
                 val newMain = teams.first().apply { main = true }
                 dao.updateTeam(newMain)

@@ -91,12 +91,9 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldTriggerAnErrorIfListEmpty() = runTest {
-        startUseCase(
-            players = mutableListOf(),
-            position = FieldPosition.PITCHER,
-            exception = NoSuchElementException::class.java
-        )
+    fun shouldReturnEmptyListIfNoPlayersAvailable() = runTest {
+        val result = startUseCase(players = mutableListOf(), position = FieldPosition.PITCHER)
+        Assert.assertEquals(emptyList<PlayerWithPosition>(), result.getOrNull())
     }
 
     @Test
@@ -129,12 +126,10 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
     }
 
     @Test
-    fun shouldRtriggerAnExceptionWhenRosterIsEmpty() = runTest {
+    fun shouldReturnEmptyListWhenRosterIsEmpty() = runTest {
         lineup.roster = ""
-        startUseCase(
-            position = FieldPosition.SECOND_BASE,
-            exception = NoSuchElementException::class.java
-        )
+        val result = startUseCase(position = FieldPosition.SECOND_BASE)
+        Assert.assertEquals(emptyList<PlayerWithPosition>(), result.getOrNull())
     }
 
     @Test

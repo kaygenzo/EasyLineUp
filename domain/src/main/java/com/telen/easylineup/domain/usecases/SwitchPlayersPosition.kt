@@ -38,11 +38,8 @@ class SwitchPlayersPosition(
             val strategy = TeamStrategy.getStrategyById(lineup.strategy)
             val teamType = team.type
 
-            val player1 = try {
-                mutablePlayers.first { it.position == position1.id }
-            } catch (e: NoSuchElementException) {
-                throw FirstPositionEmptyException()
-            }
+            val player1 = mutablePlayers.firstOrNull { it.position == position1.id }
+                ?: throw FirstPositionEmptyException()
 
             val player2 = mutablePlayers.firstOrNull { it.position == position2.id }
 

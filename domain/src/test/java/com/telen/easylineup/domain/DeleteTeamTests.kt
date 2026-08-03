@@ -13,6 +13,7 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.DeleteTeam
+import com.telen.easylineup.domain.usecases.exceptions.NoTeamsLeftException
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -51,7 +52,7 @@ internal class DeleteTeamTests {
     fun shouldTriggerAnExceptionIfItWasTheOnlyTeamInDatabase() = runTest {
         Mockito.`when`(teamDao.getTeamsRx()).thenReturn(mutableListOf())
         val result = deleteTeam(team)
-        assertTrue(result.exceptionOrNull() is NoSuchElementException)
+        assertTrue(result.exceptionOrNull() is NoTeamsLeftException)
     }
 
     @Test
