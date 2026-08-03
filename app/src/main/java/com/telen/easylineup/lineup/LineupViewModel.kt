@@ -43,7 +43,6 @@ import com.telen.easylineup.domain.usecases.SaveDpAndFlex
 import com.telen.easylineup.domain.usecases.SetLineupMode
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
-import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import com.telen.easylineup.views.LineupTypeface
 import io.reactivex.rxjava3.core.Completable
@@ -359,7 +358,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
                         )
                     }
             }
-        }.processError()
+        }
     }
 
     fun observeBatters(): Flow<List<BatterState>> {
@@ -462,18 +461,5 @@ class LineupViewModel : ViewModel(), KoinComponent {
 
     suspend fun onBattersChanged(batters: List<BatterState>): Result<Unit> {
         return updatePlayersWithBattersUseCase(_listPlayersWithPosition, batters)
-    }
-}
-
-fun <T: Any> Maybe<T>.processError(): Maybe<T> {
-    return this.onErrorResumeNext {
-        when (it) {
-            is NeedAssignPitcherFirstException -> {
-                Timber.e(it.message.toString())
-                Maybe.empty()
-            }
-
-            else -> Maybe.error(it)
-        }
     }
 }
