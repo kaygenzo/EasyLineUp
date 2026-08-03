@@ -68,7 +68,7 @@ fun FieldPosition.getPositionPercentage(strategy: TeamStrategy): FieldPositionCo
             FieldPosition.THIRD_BASE -> FieldPositionCoordinate(11.9f, 73.8f)
             FieldPosition.SHORT_STOP -> FieldPositionCoordinate(11.9f, 42.86f)
             FieldPosition.MID_FIELDER -> FieldPositionCoordinate(11.9f, 11.9f)
-            else -> throw Exception("Not a valid position for strategy $strategy")
+            else -> error("Not a valid position for strategy $strategy")
         }
 
         else -> when (this) {
@@ -88,7 +88,7 @@ fun FieldPosition.getPositionPercentage(strategy: TeamStrategy): FieldPositionCo
                     FieldPosition.LEFT_FIELD -> FieldPositionCoordinate(15f, 15f)
                     FieldPosition.CENTER_FIELD -> FieldPositionCoordinate(50f, 10f)
                     FieldPosition.RIGHT_FIELD -> FieldPositionCoordinate(85f, 15f)
-                    else -> throw Exception("Not a valid position $this for strategy $strategy")
+                    else -> error("Not a valid position $this for strategy $strategy")
                 }
 
                 TeamStrategy.SLOWPITCH -> when (this) {
@@ -96,14 +96,14 @@ fun FieldPosition.getPositionPercentage(strategy: TeamStrategy): FieldPositionCo
                     FieldPosition.SLOWPITCH_LCF -> FieldPositionCoordinate(38f, 10f)
                     FieldPosition.SLOWPITCH_RCF -> FieldPositionCoordinate(62f, 10f)
                     FieldPosition.SLOWPITCH_RF -> FieldPositionCoordinate(86f, 20f)
-                    else -> throw Exception("Not a valid position for strategy $strategy")
+                    else -> error("Not a valid position for strategy $strategy")
                 }
 
                 TeamStrategy.FIVE_MAN_STANDARD -> when (this) {
                     FieldPosition.LEFT_FIELD -> FieldPositionCoordinate(30f, 15f)
                     FieldPosition.RIGHT_FIELD -> FieldPositionCoordinate(70f, 15f)
                     FieldPosition.MID_FIELDER -> FieldPositionCoordinate(50f, 35f)
-                    else -> throw Exception("Not a valid position for strategy $strategy")
+                    else -> error("Not a valid position for strategy $strategy")
                 }
 
                 else -> FieldPositionCoordinate(0f, 0f)

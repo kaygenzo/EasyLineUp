@@ -16,7 +16,7 @@ class GetPlayer(
 ) {
     suspend operator fun invoke(playerId: Long?): Result<Player> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            val id = playerId ?: throw IllegalArgumentException()
+            val id = requireNotNull(playerId)
             if (id == 0L) {
                 throw NotExistingPlayerException()
             }

@@ -21,9 +21,7 @@ class SaveBattingOrderAndPositions(
     suspend operator fun invoke(lineup: Lineup, players: List<PlayerWithPosition>): Result<Unit> =
         runCatchingCancellable {
             withContext(dispatcherProvider.io()) {
-                if (lineup.id <= 0) {
-                    throw IllegalStateException("The lineup id cannot be less or equal 0")
-                }
+                check(lineup.id > 0) { "The lineup id cannot be less or equal 0" }
 
                 lineupRepository.updateLineup(lineup)
 

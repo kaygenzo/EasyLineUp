@@ -16,7 +16,7 @@ class GetPositionsSummaryForPlayer(
     suspend operator fun invoke(playerId: Long?): Result<Map<FieldPosition, Int>> =
         runCatchingCancellable {
             withContext(dispatcherProvider.io()) {
-                val id = playerId ?: throw IllegalArgumentException()
+                val id = requireNotNull(playerId)
                 val list = dao.getAllPositionsForPlayer(id)
                 val chartData: MutableMap<FieldPosition, Int> = mutableMapOf()
                 list.forEach { position ->
