@@ -59,11 +59,11 @@ internal class GetShirtNumberHistoryTests {
         shirtNumberOverlay1 = ShirtNumberEntry(1, "titi", 3L, 6L, 2L, 2L, "lineup2")
         shirtNumberOverlay2 = ShirtNumberEntry(1, "test", 3L, 7L, 2L, 3L, "lineup3")
 
-        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(1L, 1L)).thenAnswer { throw Exception() }
-        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(2L, 1L)).thenAnswer { throw Exception() }
-        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(1L, 2L)).thenAnswer { throw Exception() }
-        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(2L, 2L)).thenAnswer { throw Exception() }
-        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(3L, 3L)).thenAnswer { throw Exception() }
+        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(1L, 1L)).thenReturn(null)
+        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(2L, 1L)).thenReturn(null)
+        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(1L, 2L)).thenReturn(null)
+        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(2L, 2L)).thenReturn(null)
+        Mockito.lenient().`when`(playerRepo.getShirtNumberOverlay(3L, 3L)).thenReturn(null)
 
         Mockito.`when`(playerRepo.getShirtNumberFromNumberOverlays(1L, 1)).thenReturn(listOf())
     }
@@ -96,7 +96,7 @@ internal class GetShirtNumberHistoryTests {
     @Test
     fun shouldNotGetPlayerNumberIfOverlayExists() = runTest {
         Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 42)).thenReturn(listOf(entry5))
-        Mockito.doReturn(overlay2).`when`(playerRepo).getShirtNumberOverlay(3L, 3L)
+        Mockito.`when`(playerRepo.getShirtNumberOverlay(3L, 3L)).thenReturn(overlay2)
         Mockito.`when`(playerRepo.getShirtNumberFromNumberOverlays(1L, 42)).thenReturn(listOf())
 
         val result = getShirtNumberEntry(42)

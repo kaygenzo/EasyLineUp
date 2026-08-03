@@ -28,7 +28,7 @@ internal interface TournamentDao {
     suspend fun getTournamentByHash(hash: String): RoomTournament?
 
     @Query("SELECT * from tournaments where name = :name")
-    suspend fun getTournamentByName(name: String): RoomTournament
+    suspend fun getTournamentByName(name: String): RoomTournament?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTournament(tournament: RoomTournament): Long

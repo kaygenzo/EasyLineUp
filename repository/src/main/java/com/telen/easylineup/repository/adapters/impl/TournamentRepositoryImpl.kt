@@ -32,8 +32,8 @@ internal class TournamentRepositoryImpl(
         return tournamentDao.getTournamentByHash(hash)?.toDomain()
     }
 
-    override suspend fun getTournamentByName(name: String): Tournament {
-        return tournamentDao.getTournamentByName(name).toDomain()
+    override suspend fun getTournamentByName(name: String): Tournament? {
+        return tournamentDao.getTournamentByName(name)?.toDomain()
     }
 
     override suspend fun insertTournament(tournament: Tournament): Long {

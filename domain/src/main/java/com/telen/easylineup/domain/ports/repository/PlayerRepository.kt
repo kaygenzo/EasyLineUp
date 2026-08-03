@@ -33,6 +33,6 @@ interface PlayerRepository {
     suspend fun createPlayerNumberOverlay(overlay: PlayerNumberOverlay)
     suspend fun getShirtNumberFromPlayers(teamId: Long, number: Int): List<ShirtNumberEntry>
     suspend fun getShirtNumberFromNumberOverlays(teamId: Long, number: Int): List<ShirtNumberEntry>
-    suspend fun getShirtNumberOverlay(playerId: Long, lineupId: Long): PlayerNumberOverlay
+    suspend fun getShirtNumberOverlay(playerId: Long, lineupId: Long): PlayerNumberOverlay?
     suspend fun getPlayerNumberOverlayByHash(hash: String): PlayerNumberOverlay?
 }

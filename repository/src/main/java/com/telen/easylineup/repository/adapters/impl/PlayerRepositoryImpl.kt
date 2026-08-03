@@ -104,8 +104,8 @@ internal class PlayerRepositoryImpl(
     override suspend fun getShirtNumberOverlay(
         playerId: Long,
         lineupId: Long
-    ): PlayerNumberOverlay {
-        return numberOverlayDao.getShirtNumberOverlay(playerId, lineupId).toDomain()
+    ): PlayerNumberOverlay? {
+        return numberOverlayDao.getShirtNumberOverlay(playerId, lineupId)?.toDomain()
     }
 
     override fun observePlayersNumberOverlay(lineupId: Long): Flow<List<PlayerNumberOverlay>> {

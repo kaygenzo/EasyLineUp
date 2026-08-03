@@ -46,8 +46,7 @@ internal class SaveTournamentTests {
 
     @Test
     fun shouldInsertTournamentWhenNameDoesNotExist() = runTest {
-        Mockito.`when`(repository.getTournamentByName("champs"))
-            .thenAnswer { throw NoSuchElementException() }
+        Mockito.`when`(repository.getTournamentByName("champs")).thenReturn(null)
         Mockito.`when`(repository.insertTournament(any())).thenReturn(42L)
 
         val result = saveTournament(tournament)
@@ -70,13 +69,27 @@ internal class SaveTournamentTests {
     @Test
     fun shouldPropagateUnrelatedInsertErrors() = runTest {
         val exception = Exception("db error")
-        Mockito.`when`(repository.getTournamentByName("champs"))
-            .thenAnswer { throw NoSuchElementException() }
+        Mockito.`when`(repository.getTournamentByName("champs")).thenReturn(null)
         Mockito.`when`(repository.insertTournament(any())).thenAnswer { throw exception }
 
         val result = saveTournament(tournament)
 
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull()?.message == exception.message)
+    }
+
+    /**
+     * [repository.getTournamentByName] failing for an actual repository error must propagate,
+     * not be treated as "no tournament with this name yet".
+     */
+    @Test
+    fun shouldPropagateLookupErrorsInsteadOfTreatingThemAsNotFound() = runTest {
+        val exception = RuntimeException("connection lost")
+        Mockito.`when`(repository.getTournamentByName("champs")).thenAnswer { throw exception }
+
+        val result = saveTournament(tournament)
+
+        assertTrue(result.exceptionOrNull() === exception)
+        verify(repository, never()).insertTournament(any())
     }
 }

@@ -46,5 +46,5 @@ internal interface PlayerNumberOverlayDao {
     suspend fun getPlayerNumberOverlayByHash(hash: String): RoomPlayerNumberOverlay?
 
     @Query("SELECT * from playerNumberOverlay WHERE playerID=:playerId AND lineupID=:lineupId")
-    suspend fun getShirtNumberOverlay(playerId: Long, lineupId: Long): RoomPlayerNumberOverlay
+    suspend fun getShirtNumberOverlay(playerId: Long, lineupId: Long): RoomPlayerNumberOverlay?
 }

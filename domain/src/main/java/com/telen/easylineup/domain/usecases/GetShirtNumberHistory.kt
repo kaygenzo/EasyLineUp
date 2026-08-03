@@ -7,7 +7,6 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 
 class GetShirtNumberHistory(
@@ -24,11 +23,13 @@ class GetShirtNumberHistory(
 
                 val shirtNumbers = playersRepo.getShirtNumberFromPlayers(teamId, number)
                 val items = shirtNumbers.map { shirtNumber ->
-                    try {
-                        val overlay = playersRepo.getShirtNumberOverlay(
-                            shirtNumber.playerId,
-                            shirtNumber.lineupId
-                        )
+                    val overlay = playersRepo.getShirtNumberOverlay(
+                        shirtNumber.playerId,
+                        shirtNumber.lineupId
+                    )
+                    if (overlay == null) {
+                        shirtNumber
+                    } else {
                         val newItem = ShirtNumberEntry(
                             overlay.number, shirtNumber.playerName, overlay.playerId,
                             shirtNumber.eventTime, shirtNumber.createdAt, overlay.lineupId,
@@ -36,10 +37,6 @@ class GetShirtNumberHistory(
                         )
                         overlaysAdded.add(newItem)
                         newItem
-                    } catch (c: CancellationException) {
-                        throw c
-                    } catch (e: Exception) {
-                        shirtNumber
                     }
                 }.toMutableList()
 

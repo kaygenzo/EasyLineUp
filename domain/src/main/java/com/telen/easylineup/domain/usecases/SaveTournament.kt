@@ -9,7 +9,6 @@ import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournamentException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 
 class SaveTournament(
@@ -22,16 +21,7 @@ class SaveTournament(
                 throw TournamentNameEmptyException()
             }
 
-            val alreadyExists = try {
-                repository.getTournamentByName(tournament.name)
-                true
-            } catch (c: CancellationException) {
-                throw c
-            } catch (e: Exception) {
-                false
-            }
-
-            if (alreadyExists) {
+            if (repository.getTournamentByName(tournament.name) != null) {
                 throw AlreadyExistingTournamentException()
             }
 
