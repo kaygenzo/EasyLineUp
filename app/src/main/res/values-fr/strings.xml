@@ -106,6 +106,7 @@
     <string name="setting_day_night_style_description">Thème</string>
     <string name="setting_category_about_title">A propos</string>
     <string name="setting_delete_data_description">Supprimer toutes les données</string>
+    <string name="setting_delete_data_subtitle">Chaque équipe, sur cet appareil</string>
     <string name="setting_version_title">Version</string>
     <string name="setting_licenses_title">Licences</string>
     <string name="setting_play_store_title">Page officielle du Google Play store</string>
@@ -114,8 +115,10 @@
     <string name="login_import">Importez une équipe existante</string>
 
     <string name="setting_import_data_description">Importer les données à partir d\'un fichier</string>
+    <string name="setting_import_data_subtitle">Depuis un fichier .elu</string>
     <string name="setting_import_data_update_object_description">Mettre à jour les données si elles existent ?</string>
     <string name="setting_export_data_description">Exporter les données vers un fichier</string>
+    <string name="setting_export_data_subtitle">Sauvegarde chaque équipe dans un fichier .elu</string>
 
     <string name="settings_category_team">Équipe</string>
     <string name="settings_team_row_subtitle">Nom, logo, taille du roster</string>

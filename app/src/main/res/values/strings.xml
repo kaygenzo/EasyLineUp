@@ -126,9 +126,12 @@
 
     <string name="setting_category_about_title">About</string>
     <string name="setting_import_data_description">Import data from file</string>
+    <string name="setting_import_data_subtitle">From a .elu file</string>
     <string name="setting_import_data_update_object_description">Update data if already exists ?</string>
     <string name="setting_export_data_description">Export data to file</string>
+    <string name="setting_export_data_subtitle">Saves every team as a .elu file</string>
     <string name="setting_delete_data_description">Delete all data</string>
+    <string name="setting_delete_data_subtitle">Every team, on this device</string>
     <string name="setting_version_title">Version</string>
     <string name="setting_licenses_title">Licenses</string>
     <string name="setting_play_store_title">Google Play Store official page</string>
