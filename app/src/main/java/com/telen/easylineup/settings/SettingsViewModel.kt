@@ -16,13 +16,12 @@ import com.telen.easylineup.domain.usecases.ExportData
 import com.telen.easylineup.domain.usecases.GetAllTeams
 import com.telen.easylineup.export.json.exportGson
 import com.telen.easylineup.export.json.toJson
-import io.reactivex.rxjava3.subjects.PublishSubject
-import io.reactivex.rxjava3.subjects.Subject
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -42,13 +41,15 @@ object ExportDataEventFailure : Event()
 data class GetTeamsCountSuccess(val count: Int) : Event()
 object GetTeamsCountFailure : Event()
 
-class SettingsViewModel : ViewModel(), KoinComponent {
-    private val deleteAllDataUseCase: DeleteAllData by inject()
-    private val exportDataUseCase: ExportData by inject()
-    private val getAllTeamsUseCase: GetAllTeams by inject()
-    private val context: Context by inject()
-    private val dispatcherProvider: DispatcherProvider by inject()
-    private val _event: Subject<Event> = PublishSubject.create()
+class SettingsViewModel(
+    private val deleteAllDataUseCase: DeleteAllData,
+    private val exportDataUseCase: ExportData,
+    private val getAllTeamsUseCase: GetAllTeams,
+    private val context: Context,
+    private val dispatcherProvider: DispatcherProvider
+) : ViewModel() {
+    private val _events = Channel<Event>(Channel.BUFFERED)
+    val events: Flow<Event> = _events.receiveAsFlow()
 
     /**
      * Used by the Team row to know whether Team Details should show the
@@ -57,10 +58,10 @@ class SettingsViewModel : ViewModel(), KoinComponent {
     fun getTeamsCount() {
         viewModelScope.launch {
             getAllTeamsUseCase()
-                .onSuccess { _event.onNext(GetTeamsCountSuccess(it.size)) }
+                .onSuccess { _events.send(GetTeamsCountSuccess(it.size)) }
                 .onFailure {
                     Timber.e(it)
-                    _event.onNext(GetTeamsCountFailure)
+                    _events.send(GetTeamsCountFailure)
                 }
         }
     }
@@ -70,11 +71,11 @@ class SettingsViewModel : ViewModel(), KoinComponent {
             deleteAllDataUseCase()
                 .onSuccess {
                     delay(DELAY)
-                    _event.onNext(DeleteAllDataEventSuccess)
+                    _events.send(DeleteAllDataEventSuccess)
                 }
                 .onFailure {
                     Timber.e(it)
-                    _event.onNext(DeleteAllDataEventFailure)
+                    _events.send(DeleteAllDataEventFailure)
                 }
         }
     }
@@ -86,10 +87,10 @@ class SettingsViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             exportDataUseCase()
                 .mapCatching { withContext(dispatcherProvider.io()) { writeExportFile(it, dirUri) } }
-                .onSuccess { _event.onNext(ExportDataEventSuccess(it)) }
+                .onSuccess { _events.send(ExportDataEventSuccess(it)) }
                 .onFailure {
                     Timber.e(it)
-                    _event.onNext(ExportDataEventFailure)
+                    _events.send(ExportDataEventFailure)
                 }
         }
     }
@@ -112,10 +113,6 @@ class SettingsViewModel : ViewModel(), KoinComponent {
             }
         }
         return filename
-    }
-
-    fun observeEvent(): Subject<Event> {
-        return _event
     }
 
     companion object {
