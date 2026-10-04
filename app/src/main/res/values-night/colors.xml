@@ -3,4 +3,38 @@
     <color name="lineup_name">#4d5bc9</color>
     <color name="colorPrimary">@color/md_theme_dark_primary</color>
     <color name="colorTertiaryContainer">@color/md_theme_dark_tertiaryContainer</color>
+
+    <!-- Night-mode legibility pass only — these screens are not yet reskinned,
+         this just keeps them from looking broken against the new dark theme. -->
+    <color name="number_blue">#FF6B7BE0</color>
+    <color name="text_orange">#FFE08A4C</color>
+
+    <color name="infield">#B89F4A</color>
+    <color name="infield_stroke">#9CA23A</color>
+    <color name="baseball_field_color">#6B9A38</color>
+
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="grey">#9E9E9E</color>
+
+    <color name="tile_team_size_background_color">#16323D</color>
+    <color name="tile_player_most_used_background_color_dark">#5A7E2D</color>
+    <color name="tile_player_most_used_background_color">#719948</color>
+    <color name="tile_player_most_used_background_color_light">#8EAD6D</color>
+    <color name="tile_player_most_used_background_color_lighter">#C8C9A3</color>
+
+    <color name="tile_big_border_dark">#16323D</color>
+    <color name="tile_small_border_dark">#16323D</color>
+
+    <color name="blue_004a8d">#004a8d</color>
+    <color name="orange">#f47932</color>
+    <color name="red">#b40135</color>
+    <color name="brown">#726056</color>
+    <color name="blue_5bc0de">#5bc0de</color>
+    <color name="light_brown">#cdb79e</color>
+    <color name="yellow">#ffe200</color>
+    <color name="green">#b7deae</color>
+    <color name="violet">#9d77a6</color>
+    <color name="beige">#ffebcd</color>
+    <color name="lavanda">#b5c2ff</color>
 </resources>
