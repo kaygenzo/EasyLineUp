@@ -31,5 +31,6 @@
         <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
         <item name="actionModeCloseDrawable">@drawable/ic_close_24dp</item>
         <item name="windowActionModeOverlay">true</item>
+        <item name="bottomSheetStyle">@style/Widget.Dugout.BottomSheet</item>
     </style>
 </resources>

@@ -56,4 +56,12 @@
     <dimen name="lineup_creation_icon_size">24dp</dimen>
     <dimen name="lineup_creation_field_size">50dp</dimen>
 
+    <!-- Dugout Card spacing scale — new layouts should use these instead of
+         inventing per-screen margins; existing ad-hoc dimens above are untouched. -->
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">16dp</dimen>
+    <dimen name="spacing_lg">24dp</dimen>
+    <dimen name="spacing_xl">32dp</dimen>
+
 </resources>

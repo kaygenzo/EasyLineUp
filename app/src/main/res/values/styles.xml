@@ -224,4 +224,33 @@
         <item name="android:background">@color/white</item>
     </style>
 
+    <!-- Dugout Card design system — reused across every reskinned screen -->
+
+    <!-- Every number that matters — jersey number, batting order, stat, date —
+         should use this so digits align in a column and never jiggle. -->
+    <style name="TextAppearance.Dugout.Tabular" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">monospace</item>
+        <item name="fontFamily">monospace</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:letterSpacing">0.01</item>
+    </style>
+
+    <!-- Base shape/style for every BottomSheetDialogFragment going forward —
+         replaces ad-hoc AlertDialogs and the previously-unstyled default sheet. -->
+    <style name="ShapeAppearance.Dugout.BottomSheet" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerSizeTopLeft">24dp</item>
+        <item name="cornerSizeTopRight">24dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <style name="Widget.Dugout.BottomSheet" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="shapeAppearance">@style/ShapeAppearance.Dugout.BottomSheet</item>
+        <item name="backgroundTint">?attr/colorSurface</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">24dp</item>
+    </style>
+
 </resources>
