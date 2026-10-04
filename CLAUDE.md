@@ -22,6 +22,25 @@ hosting a single `ComposeView`, no XML layout, no ViewBinding.
   Compose row's `onClick` where no Compose equivalent exists yet — that's a
   normal interop boundary, not a regression.
 
+## No new RxJava — coroutines/Flow only
+
+RxJava3 is still used throughout the app (`BaseFragment`'s `launch(...)`
+overloads for `Flowable`/`Maybe`/`Single`/`Completable`/`Subject`, every
+ViewModel's event bus, `LoginViewModel`, `DialogFactory`'s task dialogs,
+etc). None of that is being migrated proactively — but **no new code
+introduces a new Rx usage**, including new call sites into existing
+Rx-based classes beyond what already exists (e.g. don't add a new
+`BaseFragment.launch(...)` call for a feature that doesn't already need
+one). New code uses coroutines/`Flow` end to end: `suspend` functions,
+`viewModelScope`/`lifecycleScope`, `Channel`/`Flow` for events,
+`repeatOnLifecycle` for collection.
+
+Where new code must call into an existing Rx-based class that is itself
+out of scope to touch (e.g. `LoginViewModel` from `SettingsFragment`),
+subscribing to its Rx `Subject` directly is the accepted interop
+boundary — the rule is about not writing *new* Rx, not about refusing to
+talk to code that has not been migrated yet.
+
 ## ViewModels: constructor injection + coroutines, no service locator
 
 Every ViewModel in the app today extends `KoinComponent` and pulls its
