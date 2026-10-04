@@ -117,6 +117,8 @@
     <string name="setting_import_data_update_object_description">Mettre à jour les données si elles existent ?</string>
     <string name="setting_export_data_description">Exporter les données vers un fichier</string>
 
+    <string name="settings_category_team">Équipe</string>
+    <string name="settings_team_row_subtitle">Nom, logo, taille du roster</string>
     <string name="settings_category_style">Style</string>
     <string name="bug_report_trigger_shake">Secouer</string>
     <string name="bug_report_trigger_floating_button">Bouton flottant</string>
