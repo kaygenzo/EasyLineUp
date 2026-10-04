@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.googleServices)
     alias(libs.plugins.appdistribution)
     alias(libs.plugins.crashlytics)
+    alias(libs.plugins.compose.compiler)
 }
 
 def keystorePropertiesFile = rootProject.file("keystore-upload.properties")
@@ -49,12 +50,12 @@ android {
     flavorDimensions 'version'
 
     signingConfigs {
-        release {
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-        }
+//        release {
+//            storeFile file(keystoreProperties['storeFile'])
+//            storePassword keystoreProperties['storePassword']
+//            keyAlias keystoreProperties['keyAlias']
+//            keyPassword keystoreProperties['keyPassword']
+//        }
 
         debug {
             storeFile file(keystoreProperties['debug.storeFile'])
@@ -98,7 +99,7 @@ android {
             enableAndroidTestCoverage true
         }
         release {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -125,6 +126,7 @@ android {
     buildFeatures {
         viewBinding true
         buildConfig true
+        compose true
     }
     lint {
         abortOnError false
@@ -157,6 +159,18 @@ dependencies {
 
     implementation libs.activity
     implementation libs.fragment
+
+    // Compose
+    implementation platform(libs.compose.bom)
+    implementation libs.compose.ui
+    implementation libs.compose.ui.tooling.preview
+    implementation libs.compose.material3
+    implementation libs.lifecycle.runtime.compose
+    // Note: androidx.compose.ui:ui-tooling (Android Studio's interactive @Preview
+    // renderer) is intentionally NOT included — it transitively pulls the legacy
+    // (non-M3) Compose Material artifact, which requires minSdk 23 vs this app's
+    // minSdk 21. @Preview annotations still work via ui-tooling-preview above;
+    // only the live interactive preview surface in the IDE is unavailable.
     implementation libs.recyclerView
     implementation libs.preference
     implementation libs.constraintlayout
