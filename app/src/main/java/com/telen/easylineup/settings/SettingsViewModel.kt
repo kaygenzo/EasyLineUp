@@ -13,6 +13,7 @@ import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.DeleteAllData
 import com.telen.easylineup.domain.usecases.ExportData
+import com.telen.easylineup.domain.usecases.GetAllTeams
 import com.telen.easylineup.export.json.exportGson
 import com.telen.easylineup.export.json.toJson
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -35,13 +36,34 @@ object DeleteAllDataEventFailure : Event()
  */
 data class ExportDataEventSuccess(val pathDirectory: String) : Event()
 object ExportDataEventFailure : Event()
+/**
+ * @property count
+ */
+data class GetTeamsCountSuccess(val count: Int) : Event()
+object GetTeamsCountFailure : Event()
 
 class SettingsViewModel : ViewModel(), KoinComponent {
     private val deleteAllDataUseCase: DeleteAllData by inject()
     private val exportDataUseCase: ExportData by inject()
+    private val getAllTeamsUseCase: GetAllTeams by inject()
     private val context: Context by inject()
     private val dispatcherProvider: DispatcherProvider by inject()
     private val _event: Subject<Event> = PublishSubject.create()
+
+    /**
+     * Used by the Team row to know whether Team Details should show the
+     * edit-only or edit-or-delete menu, same rule as the drawer header today.
+     */
+    fun getTeamsCount() {
+        viewModelScope.launch {
+            getAllTeamsUseCase()
+                .onSuccess { _event.onNext(GetTeamsCountSuccess(it.size)) }
+                .onFailure {
+                    Timber.e(it)
+                    _event.onNext(GetTeamsCountFailure)
+                }
+        }
+    }
 
     fun deleteAllData() {
         viewModelScope.launch {
