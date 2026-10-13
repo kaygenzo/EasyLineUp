@@ -66,3 +66,18 @@ This pattern is the template for the *next* ViewModel someone touches or
 reskins — it is **not** being retrofitted onto the rest of the app proactively.
 Screens still on the old pattern (every other ViewModel) keep working as-is
 until their own pass.
+
+## Code style: AOSP, 100-column hard limit
+
+All code (Kotlin, Java, XML, Gradle) follows the official AOSP style. Concretely:
+100 characters per line, **including comments** — a standalone URL is the only
+accepted exception, since wrapping it would make it unusable. This is enforced
+for Kotlin via `LONG_LINE` in `Formatting.yml` (diktat, run through `spotless`),
+set to `100` (was `120`).
+
+This applies to all new code going forward, and was applied retroactively to
+every line added across the Settings and Welcome/Login Compose pilots. It does
+not apply to prose documentation (`REDESIGN.md`) or to a TOML inline table that
+must stay on one line to parse (a couple of entries in `libs.versions.toml`
+slightly exceed 100 for this reason — a format constraint, not an exception to
+the rule).

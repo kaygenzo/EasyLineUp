@@ -237,7 +237,9 @@
 
     <!-- Base shape/style for every BottomSheetDialogFragment going forward —
          replaces ad-hoc AlertDialogs and the previously-unstyled default sheet. -->
-    <style name="ShapeAppearance.Dugout.BottomSheet" parent="ShapeAppearance.Material3.LargeComponent">
+    <style
+        name="ShapeAppearance.Dugout.BottomSheet"
+        parent="ShapeAppearance.Material3.LargeComponent">
         <item name="cornerSizeTopLeft">24dp</item>
         <item name="cornerSizeTopRight">24dp</item>
         <item name="cornerSizeBottomLeft">0dp</item>

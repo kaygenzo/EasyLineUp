@@ -116,10 +116,12 @@
   enabled: true
 
 # Checks that the line length is < lineLength parameter
+# AOSP style: 100 columns, including comments. A standalone URL is the only
+# accepted exception, wrapping it would make it unusable.
 - name: LONG_LINE
   enabled: true
   configuration:
-    lineLength: '120'
+    lineLength: '100'
 
 # Checks that usage of horizontal spaces doesn't violate code style guide
 - name: WRONG_WHITESPACE

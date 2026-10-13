@@ -86,7 +86,9 @@ class SettingsViewModel(
     fun exportData(dirUri: Uri) {
         viewModelScope.launch {
             exportDataUseCase()
-                .mapCatching { withContext(dispatcherProvider.io()) { writeExportFile(it, dirUri) } }
+                .mapCatching {
+                    withContext(dispatcherProvider.io()) { writeExportFile(it, dirUri) }
+                }
                 .onSuccess { _events.send(ExportDataEventSuccess(it)) }
                 .onFailure {
                     Timber.e(it)
