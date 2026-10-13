@@ -7,25 +7,27 @@ package com.telen.easylineup.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import com.telen.easylineup.BaseImportActivity
-import com.telen.easylineup.databinding.ActivityLoginBinding
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 
 class LoginActivity : BaseImportActivity() {
-    private var binding: ActivityLoginBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater).apply {
-            setContentView(root)
-            loginCreate.setOnClickListener {
-                FirebaseAnalyticsUtils.onClick(this@LoginActivity, "click_login_create")
-                launchTeamCreation()
-            }
-
-            loginImport.setOnClickListener {
-                FirebaseAnalyticsUtils.onClick(this@LoginActivity, "click_login_import")
-                importDataFromBrowser()
+        setContent {
+            DugoutTheme {
+                WelcomeScreen(
+                    onCreateTeam = {
+                        FirebaseAnalyticsUtils.onClick(this@LoginActivity, "click_login_create")
+                        launchTeamCreation()
+                    },
+                    onImportTeam = {
+                        FirebaseAnalyticsUtils.onClick(this@LoginActivity, "click_login_import")
+                        importDataFromBrowser()
+                    }
+                )
             }
         }
     }
