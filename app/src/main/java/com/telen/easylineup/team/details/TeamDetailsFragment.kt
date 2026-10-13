@@ -13,6 +13,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,11 +30,13 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.usecases.exceptions.NoTeamsLeftException
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.tournaments.list.LineupViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.rx3.rxCompletable
@@ -55,6 +58,7 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
     private var maleCount by mutableStateOf(0)
     private var femaleCount by mutableStateOf(0)
     private var unsetCount by mutableStateOf(0)
+    private var createdAt by mutableStateOf(0L)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,8 +70,6 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val canDelete = (arguments?.getInt(Constants.EXTRA_TEAM_COUNT) ?: 0) >= 2
-
         return ComposeView(requireContext()).apply {
             setContent {
                 DugoutTheme {
@@ -82,7 +84,7 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
                             maleCount = maleCount,
                             femaleCount = femaleCount,
                             unsetCount = unsetCount,
-                            canDelete = canDelete
+                            createdAt = createdAt
                         ),
                         onDeleteClick = ::showDeleteConfirmation
                     )
@@ -107,6 +109,11 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
         teamViewModel.observeCurrentTeamImage()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { teamImageUri = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        teamViewModel.observeCurrentTeamCreatedAt()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { createdAt = it }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         teamViewModel.observePlayers()
@@ -156,17 +163,30 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
     }
 
     private fun showDeleteConfirmation() {
-        activity?.let {
+        activity?.let { ctx ->
             teamViewModel.team?.let { team ->
                 DialogFactory.getWarningTaskDialog(
-                    context = it,
+                    context = ctx,
                     title = R.string.dialog_delete_team_title,
                     titleArgs = arrayOf(team.name),
                     message = R.string.dialog_delete_cannot_undo_message,
                     task = rxCompletable {
                         FirebaseAnalyticsUtils.onClick(activity, "click_team_details_delete")
                         teamViewModel.deleteTeam(team).getOrThrow()
-                    }.doOnComplete { findNavController().popBackStack() }
+                    }.observeOn(AndroidSchedulers.mainThread())
+                        .doOnComplete { findNavController().popBackStack() }
+                        .doOnError { throwable ->
+                            // DeleteTeam always deletes before throwing: NoTeamsLeftException
+                            // only means there was no other team left to promote to main, not
+                            // that the delete was refused - same outcome as doOnComplete.
+                            if (throwable is NoTeamsLeftException) {
+                                findNavController().popBackStack()
+                            } else {
+                                Toast.makeText(
+                                    ctx, R.string.error_when_deleting_team, Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
                 ).show()
             }
         }

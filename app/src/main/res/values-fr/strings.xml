@@ -109,6 +109,7 @@
     <string name="team_details_roster_label">Effectif</string>
     <string name="team_details_lineups_label">Lineups créés</string>
     <string name="team_details_tournaments_label">Tournois</string>
+    <string name="team_details_created_label">Créée</string>
     <string name="team_details_roster_by_gender">Répartition par genre</string>
     <string name="team_details_stat_label_unset">Non défini</string>
     <string name="team_details_delete_title">Supprimer l\'équipe</string>
@@ -167,6 +168,7 @@
     <string name="settings_export_success_title">Succès</string>
     <string name="settings_import_success_title">Succès</string>
     <string name="error_when_deleting_lineup">Une erreur s\'est produite pendant la suppression du lineup</string>
+    <string name="error_when_deleting_team">Une erreur s\'est produite pendant la suppression de l\'équipe</string>
 
     <plurals name="lineups_substitutes_size">
         <item quantity="one">Remplaçant: %d</item>

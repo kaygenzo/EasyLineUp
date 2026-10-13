@@ -91,6 +91,10 @@ class TeamViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    fun observeCurrentTeamCreatedAt(): Flow<Long> {
+        return _team.map { it.createdAt }
+    }
+
     suspend fun deleteTeam(team: Team): Result<Unit> = deleteTeamUseCase(team)
 
     fun getPlayerId(): Long {

@@ -48,6 +48,7 @@ object RepositoryModule {
                 .addMigrations(migration14To15())
                 .addMigrations(migration15To16())
                 .addMigrations(migration16To17())
+                .addMigrations(migration17To18())
             if (BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
                     .fallbackToDestructiveMigration()
@@ -330,7 +331,7 @@ object RepositoryModule {
     }
 
     // non-private: exercised directly by MigrationTest (repository/src/androidTest), the only
-    // migration we can test end-to-end since it's the oldest one with an exported schema.
+    // migrations we can test end-to-end since schemas only started being committed at version 16.
     fun migration16To17(): Migration {
         return object : Migration(16, 17) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -341,6 +342,15 @@ object RepositoryModule {
                     "ALTER TABLE tournaments ADD COLUMN endTime INTEGER NOT NULL DEFAULT 0"
                 )
                 database.execSQL("ALTER TABLE tournaments ADD COLUMN address TEXT DEFAULT null")
+            }
+        }
+    }
+
+    fun migration17To18(): Migration {
+        return object : Migration(17, 18) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database
+                    .execSQL("ALTER TABLE teams ADD COLUMN createdAt INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

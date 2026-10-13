@@ -10,6 +10,7 @@ data class TeamExport(
     var image: String?,
     val type: Int,
     val main: Boolean,
+    val createdAt: Long = 0L,
     val players: List<PlayerExport>,
     val tournaments: List<TournamentExport>
 )

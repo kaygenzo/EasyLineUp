@@ -142,12 +142,13 @@ class ImportData(
         updateIfExists: Boolean
     ): Team {
         val t = Team(
-            0L,
-            teamExport.name,
-            teamExport.image,
-            teamExport.type,
-            teamExport.main,
-            teamExport.id
+            id = 0L,
+            name = teamExport.name,
+            image = teamExport.image,
+            type = teamExport.type,
+            main = teamExport.main,
+            hash = teamExport.id,
+            createdAt = teamExport.createdAt
         )
 
         val teamDb = teamDao.getTeamByHash(teamExport.id)

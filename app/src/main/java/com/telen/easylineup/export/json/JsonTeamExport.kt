@@ -18,6 +18,7 @@ internal data class JsonTeamExport(
     @SerializedName("image") val image: String?,
     @SerializedName("type") val type: Int,
     @SerializedName("main") val main: Boolean,
+    @SerializedName("createdAt") val createdAt: Long = 0L,
     @SerializedName("players") val players: List<JsonPlayerExport>,
     @SerializedName("tournaments") val tournaments: List<JsonTournamentExport>
 )
@@ -29,6 +30,7 @@ internal fun TeamExport.toJson(): JsonTeamExport {
         image = image,
         type = type,
         main = main,
+        createdAt = createdAt,
         players = players.map { it.toJson() },
         tournaments = tournaments.map { it.toJson() }
     )
@@ -41,6 +43,7 @@ internal fun JsonTeamExport.toDomain(): TeamExport {
         image = image,
         type = type,
         main = main,
+        createdAt = createdAt,
         players = players.map { it.toDomain() },
         tournaments = tournaments.map { it.toDomain() }
     )

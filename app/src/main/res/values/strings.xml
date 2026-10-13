@@ -126,6 +126,7 @@
     <string name="team_details_roster_label">Roster</string>
     <string name="team_details_lineups_label">Lineups built</string>
     <string name="team_details_tournaments_label">Tournaments</string>
+    <string name="team_details_created_label">Created</string>
     <string name="team_details_roster_by_gender">Roster by gender</string>
     <string name="team_details_stat_label_unset">Unset</string>
     <string name="team_details_delete_title">Delete team</string>
@@ -189,6 +190,7 @@
     <string name="error_need_assign_both_players_message">Please select both your DP and Flex</string>
 
     <string name="error_when_deleting_lineup">"Something wrong happened when deleting lineup"</string>
+    <string name="error_when_deleting_team">Something wrong happened when deleting the team</string>
     <string name="create_player_favorite_positions">Favorite positions: (Max 3)</string>
     <string name="create_player_pitching_side">Pitching</string>
     <string name="create_player_batting_side">Batting</string>

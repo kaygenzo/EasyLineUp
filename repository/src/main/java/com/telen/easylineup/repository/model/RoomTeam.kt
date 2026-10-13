@@ -19,6 +19,8 @@ import java.util.UUID
  * @property type
  * @property main
  * @property hash
+ * @property createdAt epoch millis the team was first created; 0 for rows that existed before
+ * this column was added (see migration17To18).
  */
 @Entity(
     tableName = "teams",
@@ -30,7 +32,8 @@ internal data class RoomTeam(
     @ColumnInfo(name = "image") var image: String? = null,
     @ColumnInfo(name = "type") var type: Int = 0,
     @ColumnInfo(name = "main") var main: Boolean = false,
-    @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
+    @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString(),
+    @ColumnInfo(name = "createdAt") var createdAt: Long = 0L
 ) : Serializable {
     override fun toString(): String {
         val builder = StringBuffer().apply {
@@ -41,6 +44,7 @@ internal data class RoomTeam(
             append("type=$type")
             append("main=$main")
             append("hash=$hash")
+            append("createdAt=$createdAt")
             append("}")
         }
         return builder.toString()
@@ -92,7 +96,8 @@ internal fun Team.toRoom(): RoomTeam {
         image = image,
         type = type,
         main = main,
-        hash = hash
+        hash = hash,
+        createdAt = createdAt
     )
 }
 
@@ -103,6 +108,7 @@ internal fun RoomTeam.toDomain(): Team {
         image = image,
         type = type,
         main = main,
-        hash = hash
+        hash = hash,
+        createdAt = createdAt
     )
 }

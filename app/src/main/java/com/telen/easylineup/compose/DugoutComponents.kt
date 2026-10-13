@@ -69,16 +69,15 @@ fun DugoutCard(content: @Composable () -> Unit) {
 @Composable
 fun DugoutAvatar(name: String, imageUri: Uri?, size: Dp) {
     val bitmap = rememberDugoutAvatarBitmap(imageUri, size)
+    // size * 0.29 matches the mockup's own ratio (22px radius / 76px box, 12px / 40px box) -
+    // RoundedCornerShape needs a Dp here, not size.value (a bare Float is pixels, not dp).
+    val cornerRadius = RoundedCornerShape(size * 0.29f)
     Box(
         modifier = Modifier
             .size(size)
-            .clip(RoundedCornerShape(size.value * 0.29f))
+            .clip(cornerRadius)
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            .border(
-                1.dp,
-                MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
-                RoundedCornerShape(size.value * 0.29f)
-            ),
+            .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f), cornerRadius),
         contentAlignment = Alignment.Center
     ) {
         if (bitmap != null) {
@@ -93,7 +92,7 @@ fun DugoutAvatar(name: String, imageUri: Uri?, size: Dp) {
                 text = name.avatarInitials(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = (size.value * 0.26f).sp
+                fontSize = (size.value * 0.33f).sp
             )
         }
     }

@@ -28,6 +28,7 @@ class SaveTeam(
             }
 
             if (team.id == 0L) {
+                team.createdAt = System.currentTimeMillis()
                 team.id = dao.insertTeam(team)
             } else {
                 dao.updateTeam(team)

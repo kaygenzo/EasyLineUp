@@ -17,6 +17,8 @@ import java.util.UUID
  * @property type
  * @property main
  * @property hash
+ * @property createdAt epoch millis the team was first created; 0 for teams created before this
+ * field existed, or imported from an `.elu` file exported before it existed.
  */
 data class Team(
     var id: Long = 0,
@@ -24,7 +26,8 @@ data class Team(
     var image: String? = null,
     var type: Int = 0,
     var main: Boolean = false,
-    var hash: String? = UUID.randomUUID().toString()
+    var hash: String? = UUID.randomUUID().toString(),
+    var createdAt: Long = 0L
 ) : Serializable {
     override fun toString(): String {
         val builder = StringBuffer().apply {
@@ -35,6 +38,7 @@ data class Team(
             append("type=$type")
             append("main=$main")
             append("hash=$hash")
+            append("createdAt=$createdAt")
             append("}")
         }
         return builder.toString()
@@ -89,6 +93,7 @@ fun Team.toTeamExport(
         image,
         type,
         main,
+        createdAt,
         players,
         tournaments
     )

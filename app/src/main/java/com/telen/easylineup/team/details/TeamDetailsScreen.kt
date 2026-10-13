@@ -43,6 +43,9 @@ import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data class TeamDetailsState(
     val teamName: String,
@@ -54,8 +57,12 @@ data class TeamDetailsState(
     val maleCount: Int,
     val femaleCount: Int,
     val unsetCount: Int,
-    val canDelete: Boolean
+    val createdAt: Long
 )
+
+private fun formatCreatedAt(createdAt: Long): String =
+    if (createdAt <= 0L) "—" else SimpleDateFormat("MMM yyyy", Locale.getDefault())
+        .format(Date(createdAt))
 
 @Composable
 fun TeamDetailsScreen(state: TeamDetailsState, onDeleteClick: () -> Unit) {
@@ -74,26 +81,36 @@ fun TeamDetailsScreen(state: TeamDetailsState, onDeleteClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            InfoCell(
-                modifier = Modifier.weight(1f),
-                label = stringResource(R.string.team_details_roster_label),
-                value = pluralStringResource(
-                    R.plurals.team_details_roster_count,
-                    state.rosterSize,
-                    state.rosterSize
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                InfoCell(
+                    modifier = Modifier.weight(1f),
+                    label = stringResource(R.string.team_details_roster_label),
+                    value = pluralStringResource(
+                        R.plurals.team_details_roster_count,
+                        state.rosterSize,
+                        state.rosterSize
+                    )
                 )
-            )
-            InfoCell(
-                modifier = Modifier.weight(1f),
-                label = stringResource(R.string.team_details_lineups_label),
-                value = state.lineupsBuilt.toString()
-            )
-            InfoCell(
-                modifier = Modifier.weight(1f),
-                label = stringResource(R.string.team_details_tournaments_label),
-                value = state.tournamentsCount.toString()
-            )
+                InfoCell(
+                    modifier = Modifier.weight(1f),
+                    label = stringResource(R.string.team_details_lineups_label),
+                    value = state.lineupsBuilt.toString()
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                InfoCell(
+                    modifier = Modifier.weight(1f),
+                    label = stringResource(R.string.team_details_tournaments_label),
+                    value = state.tournamentsCount.toString()
+                )
+                InfoCell(
+                    modifier = Modifier.weight(1f),
+                    label = stringResource(R.string.team_details_created_label),
+                    value = formatCreatedAt(state.createdAt),
+                    tabular = false
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -129,36 +146,34 @@ fun TeamDetailsScreen(state: TeamDetailsState, onDeleteClick: () -> Unit) {
             }
         }
 
-        if (state.canDelete) {
-            Spacer(modifier = Modifier.height(12.dp))
-            DugoutCard {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(onClick = onDeleteClick)
-                        .padding(14.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.team_details_delete_title),
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                        Text(
-                            text = stringResource(R.string.team_details_delete_subtitle),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(top = 2.dp)
-                        )
-                    }
-                    Icon(
-                        painter = painterResource(R.drawable.ic_arrow_right_white_24dp),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(20.dp)
+        Spacer(modifier = Modifier.height(12.dp))
+        DugoutCard {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onDeleteClick)
+                    .padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.team_details_delete_title),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Text(
+                        text = stringResource(R.string.team_details_delete_subtitle),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 2.dp)
                     )
                 }
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrow_right_white_24dp),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
     }
@@ -205,7 +220,12 @@ private fun Pill(text: String, color: Color) {
 }
 
 @Composable
-private fun InfoCell(modifier: Modifier = Modifier, label: String, value: String) {
+private fun InfoCell(
+    modifier: Modifier = Modifier,
+    label: String,
+    value: String,
+    tabular: Boolean = true
+) {
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(10.dp))
@@ -226,9 +246,13 @@ private fun InfoCell(modifier: Modifier = Modifier, label: String, value: String
         Text(
             text = value,
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.bodyLarge,
+            style = if (tabular) {
+                MaterialTheme.typography.bodyLarge
+            } else {
+                MaterialTheme.typography.bodyMedium
+            },
             fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace
+            fontFamily = if (tabular) FontFamily.Monospace else FontFamily.Default
         )
     }
 }
@@ -246,7 +270,7 @@ private fun StatChip(modifier: Modifier = Modifier, value: Int, label: String, c
             color = color,
             fontWeight = FontWeight.ExtraBold,
             fontFamily = FontFamily.Monospace,
-            fontSize = 18.sp
+            fontSize = 19.sp
         )
         Text(
             text = label.uppercase(),
@@ -272,7 +296,7 @@ private fun TeamDetailsScreenPreview() {
                 maleCount = 8,
                 femaleCount = 5,
                 unsetCount = 1,
-                canDelete = true
+                createdAt = 1709251200000L
             ),
             onDeleteClick = {}
         )

@@ -52,6 +52,26 @@ class MigrationTest {
         }
     }
 
+    @Test
+    fun migrate17To18_addsTeamCreatedAtColumnWithDefault() {
+        helper.createDatabase(TEST_DB_NAME, 17).apply {
+            execSQL("INSERT INTO teams (id, name, hash) VALUES (1, 'Team', 'hash-1')")
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(
+            TEST_DB_NAME,
+            18,
+            true,
+            RepositoryModule.migration17To18()
+        )
+
+        db.query("SELECT createdAt FROM teams WHERE id = 1").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(0L, cursor.getLong(0))
+        }
+    }
+
     companion object {
         private const val TEST_DB_NAME = "migration-test"
     }
