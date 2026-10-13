@@ -50,6 +50,7 @@ import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutCard
+import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.SharedPreferencesUtils
@@ -477,4 +478,34 @@ private fun RowDivider() {
             .height(1.dp)
             .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
     )
+}
+
+@DugoutPreviews
+@Composable
+private fun SettingsScreenPreview() {
+    DugoutTheme {
+        SettingsScreen(
+            state = SettingsScreenState(
+                teamName = "Riverside Hawks",
+                teamType = TeamType.BASEBALL,
+                teamImageUri = null,
+                lineupStyleValue = "0",
+                themeValue = "0",
+                menColor = Color(0xFFD8324A),
+                womenColor = Color(0xFFE8B93F),
+                updateExistingOnImport = false
+            ),
+            onTeamClick = {},
+            onLineupStyleSelected = {},
+            onThemeSelected = {},
+            onMenColorPicked = {},
+            onWomenColorPicked = {},
+            onUpdateExistingChanged = {},
+            onExportClick = {},
+            onImportClick = {},
+            onDeleteAllDataClick = {},
+            onLicensesClick = {},
+            onPlayStoreClick = {}
+        )
+    }
 }

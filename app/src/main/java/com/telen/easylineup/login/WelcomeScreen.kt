@@ -35,6 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.DugoutPreviews
+import com.telen.easylineup.compose.DugoutTheme
 
 private data class ValueProp(val iconRes: Int, val text: String)
 
@@ -168,5 +170,13 @@ private fun ValuePropRow(prop: ValueProp) {
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.SemiBold
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun WelcomeScreenPreview() {
+    DugoutTheme {
+        WelcomeScreen(onCreateTeam = {}, onImportTeam = {})
     }
 }

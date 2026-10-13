@@ -81,3 +81,22 @@ not apply to prose documentation (`REDESIGN.md`) or to a TOML inline table that
 must stay on one line to parse (a couple of entries in `libs.versions.toml`
 slightly exceed 100 for this reason — a format constraint, not an exception to
 the rule).
+
+## Every Compose screen gets previews: small/large × portrait/landscape
+
+Any composable that renders a full screen (not a small reusable piece like a
+single row or icon) carries `@DugoutPreviews`
+(`app/src/main/java/com/telen/easylineup/compose/DugoutPreviews.kt`), a
+multipreview annotation covering small and large screen, portrait and
+landscape — four `@Preview` device specs in one annotation, so one
+`@DugoutPreviews` call is equivalent to writing all four by hand.
+
+Pattern (see `SettingsScreenPreview`/`WelcomeScreenPreview` at the bottom of
+`SettingsScreen.kt`/`WelcomeScreen.kt`): a private `@Composable *Preview()`
+function wraps the real screen in `DugoutTheme`, passing a representative
+state and no-op lambdas for every callback.
+
+This needs `androidx.compose.ui:ui-tooling` as a `debugImplementation` (added
+back once the BOM was pinned to 2025.09.01 — the minSdk-23 conflict that made
+us drop it originally was specific to the newer BOM, re-tested and confirmed
+gone on this one).
