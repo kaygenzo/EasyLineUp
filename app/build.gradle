@@ -165,6 +165,7 @@ dependencies {
     implementation libs.compose.ui
     implementation libs.compose.ui.tooling.preview
     implementation libs.compose.material3
+    implementation libs.compose.activity
     implementation libs.lifecycle.runtime.compose
     // Note: androidx.compose.ui:ui-tooling (Android Studio's interactive @Preview
     // renderer) is intentionally NOT included — it transitively pulls the legacy
