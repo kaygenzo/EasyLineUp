@@ -100,3 +100,28 @@ This needs `androidx.compose.ui:ui-tooling` as a `debugImplementation` (added
 back once the BOM was pinned to 2025.09.01 — the minSdk-23 conflict that made
 us drop it originally was specific to the newer BOM, re-tested and confirmed
 gone on this one).
+
+## Every Compose screen must be resilient on small screens
+
+A fixed, non-scrolling layout that only fits by coincidence on the device it
+was built against is not acceptable — a screen must actually be checked
+against a small/landscape config, not just assumed to work because the
+`@DugoutPreviews` small-screen variants render without an obvious visual
+glitch in a static preview.
+
+`WelcomeScreen` originally used a non-scrolling `Column` with a weighted
+spacer to pin two buttons to the bottom; checked against a small-screen
+emulator override (`adb shell wm size 360x640` / `640x360` for landscape, then
+`adb shell wm size reset`), the buttons and part of the content were entirely
+off-screen and unreachable in landscape. Fixed by wrapping the screen in
+`verticalScroll(rememberScrollState())` (same pattern `SettingsScreen` already
+used) and dropping the weighted spacer — `Modifier.weight` does not work
+inside a scrollable, unbounded-height `Column`.
+
+So for every new screen: wrap the root layout in `verticalScroll` unless it is
+already a `LazyColumn`/`LazyRow` (which scrolls natively), never rely on
+`Modifier.weight` to pin content to an edge inside a scrollable container, and
+actually verify on a small/landscape screen size before considering the
+screen done — the four `@DugoutPreviews` variants are the visual check, a
+real small-screen run (device override or the preview's interaction mode) is
+the functional one.
