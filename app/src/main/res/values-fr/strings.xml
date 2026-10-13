@@ -102,6 +102,18 @@
         <item quantity="other">Votre équipe est composée de %d membres</item>
     </plurals>
 
+    <plurals name="team_details_roster_count">
+        <item quantity="one">%d joueur</item>
+        <item quantity="other">%d joueurs</item>
+    </plurals>
+    <string name="team_details_roster_label">Effectif</string>
+    <string name="team_details_lineups_label">Lineups créés</string>
+    <string name="team_details_tournaments_label">Tournois</string>
+    <string name="team_details_roster_by_gender">Répartition par genre</string>
+    <string name="team_details_stat_label_unset">Non défini</string>
+    <string name="team_details_delete_title">Supprimer l\'équipe</string>
+    <string name="team_details_delete_subtitle">Supprime tous les joueurs, lineups et l\'historique</string>
+
     <string name="setting_lineup_style_description">Police d\'écriture des lineups</string>
     <string name="setting_day_night_style_description">Thème</string>
     <string name="setting_category_about_title">A propos</string>

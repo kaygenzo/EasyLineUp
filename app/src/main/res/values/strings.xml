@@ -119,6 +119,18 @@
         <item quantity="other">Your team is composed of %d members</item>
     </plurals>
 
+    <plurals name="team_details_roster_count">
+        <item quantity="one">%d player</item>
+        <item quantity="other">%d players</item>
+    </plurals>
+    <string name="team_details_roster_label">Roster</string>
+    <string name="team_details_lineups_label">Lineups built</string>
+    <string name="team_details_tournaments_label">Tournaments</string>
+    <string name="team_details_roster_by_gender">Roster by gender</string>
+    <string name="team_details_stat_label_unset">Unset</string>
+    <string name="team_details_delete_title">Delete team</string>
+    <string name="team_details_delete_subtitle">Removes all players, lineups and history</string>
+
     <string name="setting_lineup_style_description">Lineup font</string>
     <string name="setting_men_style_description">Men</string>
     <string name="setting_women_style_description">Women</string>

@@ -1,0 +1,280 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
+package com.telen.easylineup.team.details
+
+import android.net.Uri
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.telen.easylineup.R
+import com.telen.easylineup.compose.DugoutAvatar
+import com.telen.easylineup.compose.DugoutCard
+import com.telen.easylineup.compose.DugoutPreviews
+import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.utils.titleRes
+
+data class TeamDetailsState(
+    val teamName: String,
+    val teamType: TeamType,
+    val teamImageUri: Uri?,
+    val rosterSize: Int,
+    val lineupsBuilt: Int,
+    val tournamentsCount: Int,
+    val maleCount: Int,
+    val femaleCount: Int,
+    val unsetCount: Int,
+    val canDelete: Boolean
+)
+
+@Composable
+fun TeamDetailsScreen(state: TeamDetailsState, onDeleteClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ) {
+        ProfileHead(
+            teamName = state.teamName,
+            teamType = state.teamType,
+            teamImageUri = state.teamImageUri
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            InfoCell(
+                modifier = Modifier.weight(1f),
+                label = stringResource(R.string.team_details_roster_label),
+                value = pluralStringResource(
+                    R.plurals.team_details_roster_count,
+                    state.rosterSize,
+                    state.rosterSize
+                )
+            )
+            InfoCell(
+                modifier = Modifier.weight(1f),
+                label = stringResource(R.string.team_details_lineups_label),
+                value = state.lineupsBuilt.toString()
+            )
+            InfoCell(
+                modifier = Modifier.weight(1f),
+                label = stringResource(R.string.team_details_tournaments_label),
+                value = state.tournamentsCount.toString()
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        DugoutCard {
+            Column(modifier = Modifier.padding(14.dp)) {
+                Text(
+                    text = stringResource(R.string.team_details_roster_by_gender).uppercase(),
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelMedium
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    StatChip(
+                        modifier = Modifier.weight(1f),
+                        value = state.maleCount,
+                        label = stringResource(R.string.setting_men_style_description),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    StatChip(
+                        modifier = Modifier.weight(1f),
+                        value = state.femaleCount,
+                        label = stringResource(R.string.setting_women_style_description),
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    StatChip(
+                        modifier = Modifier.weight(1f),
+                        value = state.unsetCount,
+                        label = stringResource(R.string.team_details_stat_label_unset),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+
+        if (state.canDelete) {
+            Spacer(modifier = Modifier.height(12.dp))
+            DugoutCard {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = onDeleteClick)
+                        .padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.team_details_delete_title),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Text(
+                            text = stringResource(R.string.team_details_delete_subtitle),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    }
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_right_white_24dp),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProfileHead(teamName: String, teamType: TeamType, teamImageUri: Uri?) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        DugoutAvatar(name = teamName, imageUri = teamImageUri, size = 76.dp)
+        Column {
+            Text(
+                text = teamName,
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.titleLarge
+            )
+            Spacer(modifier = Modifier.height(5.dp))
+            if (teamType.titleRes() != 0) {
+                Pill(
+                    text = stringResource(teamType.titleRes()),
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun Pill(text: String, color: Color) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(color.copy(alpha = 0.16f))
+            .padding(horizontal = 10.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = text.uppercase(),
+            color = color,
+            style = MaterialTheme.typography.labelSmall
+        )
+    }
+}
+
+@Composable
+private fun InfoCell(modifier: Modifier = Modifier, label: String, value: String) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                RoundedCornerShape(10.dp)
+            )
+            .padding(horizontal = 10.dp, vertical = 10.dp)
+    ) {
+        Text(
+            text = label.uppercase(),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.labelSmall
+        )
+        Spacer(modifier = Modifier.height(3.dp))
+        Text(
+            text = value,
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.Monospace
+        )
+    }
+}
+
+@Composable
+private fun StatChip(modifier: Modifier = Modifier, value: Int, label: String, color: Color) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = value.toString(),
+            color = color,
+            fontWeight = FontWeight.ExtraBold,
+            fontFamily = FontFamily.Monospace,
+            fontSize = 18.sp
+        )
+        Text(
+            text = label.uppercase(),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(top = 2.dp)
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun TeamDetailsScreenPreview() {
+    DugoutTheme {
+        TeamDetailsScreen(
+            state = TeamDetailsState(
+                teamName = "Riverside Hawks",
+                teamType = TeamType.BASEBALL,
+                teamImageUri = null,
+                rosterSize = 14,
+                lineupsBuilt = 23,
+                tournamentsCount = 6,
+                maleCount = 8,
+                femaleCount = 5,
+                unsetCount = 1,
+                canDelete = true
+            ),
+            onDeleteClick = {}
+        )
+    }
+}

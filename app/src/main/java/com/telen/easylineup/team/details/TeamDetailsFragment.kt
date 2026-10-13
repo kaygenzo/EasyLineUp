@@ -5,6 +5,7 @@
 package com.telen.easylineup.team.details
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -13,17 +14,21 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
-import com.telen.easylineup.databinding.FragmentTeamDetailsBinding
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Sex
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.tournaments.list.LineupViewModel
@@ -36,11 +41,20 @@ import kotlinx.coroutines.rx3.rxCompletable
 class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
     private val teamViewModel: TeamViewModel by viewModels()
     private val lineupViewModel: LineupViewModel by viewModels()
-    private var binding: FragmentTeamDetailsBinding? = null
     private val editTeam =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             teamViewModel.loadTeam()
         }
+
+    private var teamName by mutableStateOf("")
+    private var teamType by mutableStateOf(TeamType.UNKNOWN)
+    private var teamImageUri by mutableStateOf<Uri?>(null)
+    private var rosterSize by mutableStateOf(0)
+    private var lineupsBuilt by mutableStateOf(0)
+    private var tournamentsCount by mutableStateOf(0)
+    private var maleCount by mutableStateOf(0)
+    private var femaleCount by mutableStateOf(0)
+    private var unsetCount by mutableStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,88 +66,75 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentTeamDetailsBinding.inflate(inflater, container, false)
-        this.binding = binding
+        val canDelete = (arguments?.getInt(Constants.EXTRA_TEAM_COUNT) ?: 0) >= 2
+
+        return ComposeView(requireContext()).apply {
+            setContent {
+                DugoutTheme {
+                    TeamDetailsScreen(
+                        state = TeamDetailsState(
+                            teamName = teamName,
+                            teamType = teamType,
+                            teamImageUri = teamImageUri,
+                            rosterSize = rosterSize,
+                            lineupsBuilt = lineupsBuilt,
+                            tournamentsCount = tournamentsCount,
+                            maleCount = maleCount,
+                            femaleCount = femaleCount,
+                            unsetCount = unsetCount,
+                            canDelete = canDelete
+                        ),
+                        onDeleteClick = ::showDeleteConfirmation
+                    )
+                }
+            }
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         teamViewModel.observeCurrentTeamName()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { binding.teamTypeRootView.setTeamName(it) }
+            .onEach { teamName = it }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         teamViewModel.observeCurrentTeamType()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { binding.teamTypeRootView.setTeamType(it.id) }
+            .onEach { teamType = it }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         teamViewModel.observeCurrentTeamImage()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { binding.teamTypeRootView.setTeamImage(it) }
+            .onEach { teamImageUri = it }
             .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        binding.teamTypeRootView.apply {
-            setDragEnabled(true)
-            setDragState(BottomSheetBehavior.STATE_HALF_EXPANDED)
-        }
 
         teamViewModel.observePlayers()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach {
-                val description =
-                    resources.getQuantityString(R.plurals.team_details_team_size, it.size, it.size)
-                binding.teamTypeRootView.setPlayersSize(R.drawable.ic_team, description)
-
-                val womenCount = it.filter { it.sex == Sex.FEMALE.id }.size.let {
-                    resources.getQuantityString(R.plurals.women_count, it, it)
-                }
-                val menCount = it.filter { it.sex == Sex.MALE.id }.size.let {
-                    resources.getQuantityString(R.plurals.men_count, it, it)
-                }
-                val sexUnsetCount = it.filter { it.sex == Sex.UNKNOWN.id }.size.let {
-                    resources.getQuantityString(R.plurals.unset_sex_count, it, it)
-                }
-                val sexRepartitionCountMessage = "$womenCount, $menCount, $sexUnsetCount"
-                binding.teamTypeRootView.setSexStats(
-                    R.drawable.ic_baseline_diversity_2_24,
-                    sexRepartitionCountMessage
-                )
+            .onEach { players ->
+                rosterSize = players.size
+                maleCount = players.count { it.sex == Sex.MALE.id }
+                femaleCount = players.count { it.sex == Sex.FEMALE.id }
+                unsetCount = players.count { it.sex == Sex.UNKNOWN.id }
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         lineupViewModel.observeCategorizedLineups()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach {
-                val tournamentsSize = it.size
-                val lineupsSize = it.sumOf { item -> item.lineups.count() }
-                val tournamentsQuantity = resources.getQuantityString(
-                    R.plurals.tournaments_quantity,
-                    tournamentsSize,
-                    tournamentsSize
-                )
-                val lineupsQuantity =
-                    resources.getQuantityString(R.plurals.lineups_quantity, lineupsSize, lineupsSize)
-                val headerText =
-                    getString(R.string.tournaments_summary_header, tournamentsQuantity, lineupsQuantity)
-                binding.teamTypeRootView.setLineupsSize(R.drawable.ic_list_black_24dp, headerText)
+                tournamentsCount = it.size
+                lineupsBuilt = it.sumOf { item -> item.lineups.count() }
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        return binding.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         teamViewModel.clear()
-        binding = null
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        arguments?.getInt(Constants.EXTRA_TEAM_COUNT)?.let {
-            if (it < 2) {
-                inflater.inflate(R.menu.team_edit_menu, menu)
-            } else {
-                inflater.inflate(R.menu.team_edit_or_delete_menu, menu)
-            }
-        }
+        inflater.inflate(R.menu.team_edit_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -150,27 +151,24 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
                 }
                 true
             }
-            R.id.action_delete -> {
-                activity?.let {
-                    teamViewModel.team?.let { team ->
-                        DialogFactory.getWarningTaskDialog(
-                            context = it,
-                            title = R.string.dialog_delete_team_title,
-                            titleArgs = arrayOf(team.name),
-                            message = R.string.dialog_delete_cannot_undo_message,
-                            task = rxCompletable {
-                                FirebaseAnalyticsUtils.onClick(
-                                    activity,
-                                    "click_team_details_delete"
-                                )
-                                teamViewModel.deleteTeam(team).getOrThrow()
-                            }.doOnComplete { findNavController().popBackStack() }
-                        ).show()
-                    }
-                }
-                true
-            }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun showDeleteConfirmation() {
+        activity?.let {
+            teamViewModel.team?.let { team ->
+                DialogFactory.getWarningTaskDialog(
+                    context = it,
+                    title = R.string.dialog_delete_team_title,
+                    titleArgs = arrayOf(team.name),
+                    message = R.string.dialog_delete_cannot_undo_message,
+                    task = rxCompletable {
+                        FirebaseAnalyticsUtils.onClick(activity, "click_team_details_delete")
+                        teamViewModel.deleteTeam(team).getOrThrow()
+                    }.doOnComplete { findNavController().popBackStack() }
+                ).show()
+            }
         }
     }
 }
