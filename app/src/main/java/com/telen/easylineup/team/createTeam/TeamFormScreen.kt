@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -26,7 +27,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -39,15 +39,24 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.compose.rememberDugoutAvatarBitmap
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.utils.sportDrawableRes
 import com.telen.easylineup.utils.titleRes
+
+// Matches the mockup's own type-card__icon glyphs exactly (it uses plain emoji, not SVG, for
+// this one spot) - flat and lightweight, unlike the photo-textured pitcher() art REDESIGN.md's
+// own "no photo-textured assets" rule is about getting rid of.
+private fun TeamType.emoji(): String = when (this) {
+    TeamType.SOFTBALL -> "🥎"
+    else -> "⚾"
+}
 
 data class TeamFormState(
     val isEditing: Boolean,
@@ -71,6 +80,7 @@ fun TeamFormScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .statusBarsPadding()
     ) {
         FormAppBar(isEditing = state.isEditing, onCloseClick = onCloseClick)
 
@@ -205,16 +215,25 @@ private fun AvatarPicker(imageUri: Uri?, onClick: () -> Unit) {
 @Composable
 private fun NameField(name: String, error: String?, onNameChanged: (String) -> Unit) {
     Column {
-        Text(
-            text = stringResource(R.string.team_form_name_label).uppercase(),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall
-        )
+        Row {
+            Text(
+                text = stringResource(R.string.team_form_name_label).uppercase(),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.labelSmall
+            )
+            Text(
+                text = "*",
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.padding(start = 2.dp)
+            )
+        }
         Spacer(modifier = Modifier.height(6.dp))
         OutlinedTextField(
             value = name,
             onValueChange = onNameChanged,
             modifier = Modifier.fillMaxWidth(),
+            textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
             singleLine = true,
             isError = error != null,
             supportingText = error?.let { { Text(it) } },
@@ -275,13 +294,11 @@ private fun TypeCard(
             .padding(vertical = 12.dp, horizontal = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(type.sportDrawableRes()),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(8.dp))
+        Text(
+            text = type.emoji(),
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(5.dp))
         Text(
@@ -294,29 +311,44 @@ private fun TypeCard(
 
 @Composable
 private fun FormBar(onCancelClick: () -> Unit, onSaveClick: () -> Unit) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
-            .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 18.dp)
     ) {
-        OutlinedButton(
-            onClick = onCancelClick,
-            modifier = Modifier.weight(1f),
-            shape = RoundedCornerShape(12.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 18.dp)
         ) {
-            Text(text = stringResource(R.string.cancel_button), fontWeight = FontWeight.Bold)
-        }
-        Button(
-            onClick = onSaveClick,
-            modifier = Modifier.weight(2f),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            )
-        ) {
-            Text(text = stringResource(R.string.save_button), fontWeight = FontWeight.Bold)
+            Button(
+                onClick = onCancelClick,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            ) {
+                Text(text = stringResource(R.string.cancel_button), fontWeight = FontWeight.Bold)
+            }
+            Button(
+                onClick = onSaveClick,
+                modifier = Modifier.weight(2f),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text(text = stringResource(R.string.save_button), fontWeight = FontWeight.Bold)
+            }
         }
     }
 }

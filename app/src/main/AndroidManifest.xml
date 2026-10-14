@@ -74,7 +74,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".team.createTeam.TeamCreationActivity"
-            android:theme="@style/AppTheme.NoActionBar.FullScreen"
+            android:theme="@style/AppTheme.NoActionBar"
             android:exported="false"/>
 
         <activity android:name=".login.LoginActivity"

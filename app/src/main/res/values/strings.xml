@@ -309,5 +309,5 @@
 
     <string name="title_baseball" translatable="false">Baseball</string>
     <string name="title_softball" translatable="false">Softball</string>
-    <string name="title_baseball_5" translatable="false">Baseball Five</string>
+    <string name="title_baseball_5" translatable="false">Baseball5</string>
 </resources>
