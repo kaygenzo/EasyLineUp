@@ -73,7 +73,6 @@ fun TeamFormScreen(
     onAvatarClick: () -> Unit,
     onNameChanged: (String) -> Unit,
     onTypeSelected: (TeamType) -> Unit,
-    onCancelClick: () -> Unit,
     onSaveClick: () -> Unit
 ) {
     Column(
@@ -111,7 +110,7 @@ fun TeamFormScreen(
             Spacer(modifier = Modifier.height(18.dp))
         }
 
-        FormBar(onCancelClick = onCancelClick, onSaveClick = onSaveClick)
+        FormBar(onSaveClick = onSaveClick)
     }
 }
 
@@ -314,7 +313,7 @@ private fun TypeCard(
 }
 
 @Composable
-private fun FormBar(onCancelClick: () -> Unit, onSaveClick: () -> Unit) {
+private fun FormBar(onSaveClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -327,25 +326,13 @@ private fun FormBar(onCancelClick: () -> Unit, onSaveClick: () -> Unit) {
                 .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
         )
         Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 18.dp)
         ) {
             Button(
-                onClick = onCancelClick,
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            ) {
-                Text(text = stringResource(R.string.cancel_button), fontWeight = FontWeight.Bold)
-            }
-            Button(
                 onClick = onSaveClick,
-                modifier = Modifier.weight(2f),
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
@@ -373,7 +360,6 @@ private fun TeamFormScreenCreatePreview() {
             onAvatarClick = {},
             onNameChanged = {},
             onTypeSelected = {},
-            onCancelClick = {},
             onSaveClick = {}
         )
     }
@@ -395,7 +381,6 @@ private fun TeamFormScreenEditPreview() {
             onAvatarClick = {},
             onNameChanged = {},
             onTypeSelected = {},
-            onCancelClick = {},
             onSaveClick = {}
         )
     }

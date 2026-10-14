@@ -86,7 +86,6 @@ class TeamCreationActivity : BaseActivity() {
                         viewModel.setTeamName(it)
                     },
                     onTypeSelected = { viewModel.setTeamType(it) },
-                    onCancelClick = { showDiscardDialog("cancel") },
                     onSaveClick = ::onSaveClicked
                 )
             }
