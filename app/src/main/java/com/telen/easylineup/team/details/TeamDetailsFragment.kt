@@ -152,7 +152,6 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
                 teamViewModel.team?.let {
                     FirebaseAnalyticsUtils.startTutorial(activity, false)
                     val intent = Intent(activity, TeamCreationActivity::class.java)
-                    intent.putExtra(Constants.EXTRA_CAN_EXIT, true)
                     intent.putExtra(Constants.EXTRA_TEAM, it)
                     editTeam.launch(intent)
                 }

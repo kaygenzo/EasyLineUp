@@ -9,6 +9,7 @@ import com.telen.easylineup.domain.ports.GeocodingProvider
 import com.telen.easylineup.domain.ports.PhoneNumberValidator
 import com.telen.easylineup.domain.ports.StringResourcesProvider
 import com.telen.easylineup.settings.SettingsViewModel
+import com.telen.easylineup.team.createTeam.SetupViewModel
 import com.telen.easylineup.utils.DispatcherProviderImpl
 import com.telen.easylineup.utils.GeocodingProviderImpl
 import com.telen.easylineup.utils.PhoneNumberValidatorImpl
@@ -28,4 +29,5 @@ val appModules = module {
     // follow going forward, replacing the KoinComponent field-injection pattern
     // still used by every other ViewModel in this codebase.
     viewModelOf(::SettingsViewModel)
+    viewModelOf(::SetupViewModel)
 }

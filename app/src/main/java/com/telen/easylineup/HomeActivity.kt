@@ -187,7 +187,6 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
         closeDrawer()
         FirebaseAnalyticsUtils.startTutorial(this, false)
         val intent = Intent(this, TeamCreationActivity::class.java)
-        intent.putExtra(Constants.EXTRA_CAN_EXIT, true)
         createTeam.launch(intent)
     }
 

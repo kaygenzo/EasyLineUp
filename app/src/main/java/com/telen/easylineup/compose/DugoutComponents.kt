@@ -29,8 +29,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -40,6 +47,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+
+/**
+ * Dashed outline for the Dugout Card system's recurring "nothing here yet" language (an empty
+ * player photo, an open field position, an "add team/tournament" row - all share this same
+ * treatment instead of each screen inventing its own empty state).
+ */
+fun Modifier.dashedBorder(
+    color: Color,
+    cornerRadius: Dp,
+    strokeWidth: Dp = 1.5.dp,
+    dashLength: Dp = 6.dp,
+    gapLength: Dp = 4.dp
+): Modifier = drawBehind {
+    val stroke = Stroke(
+        width = strokeWidth.toPx(),
+        pathEffect = PathEffect.dashPathEffect(floatArrayOf(dashLength.toPx(), gapLength.toPx()))
+    )
+    val inset = strokeWidth.toPx() / 2
+    drawRoundRect(
+        color = color,
+        topLeft = Offset(inset, inset),
+        size = Size(size.width - inset * 2, size.height - inset * 2),
+        cornerRadius = CornerRadius(cornerRadius.toPx() - inset),
+        style = stroke
+    )
+}
 
 /**
  * Shared flat card container for the Dugout Card design system - rounded corners, no elevation,
@@ -106,8 +139,13 @@ private fun String.avatarInitials(): String =
         .mapNotNull { it.firstOrNull()?.uppercaseChar() }
         .joinToString("")
 
+/**
+ * Picasso-backed bitmap loader shared by every Compose screen that displays a user-picked photo
+ * (team/player avatars today) - not private, so a screen needing a different wrapper than
+ * [DugoutAvatar] (e.g. an empty/dashed picker state) can still reuse the same loading logic.
+ */
 @Composable
-private fun rememberDugoutAvatarBitmap(uri: Uri?, size: Dp): ImageBitmap? {
+internal fun rememberDugoutAvatarBitmap(uri: Uri?, size: Dp): ImageBitmap? {
     var bitmap by remember(uri) { mutableStateOf<ImageBitmap?>(null) }
     val sizePx = with(LocalDensity.current) { size.roundToPx() }
 

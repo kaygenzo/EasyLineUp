@@ -37,6 +37,12 @@
     <string name="title_lineup_roster">Roster edition</string>
 
     <string name="team_creation_error_name_empty">Team name cannot be empty</string>
+    <string name="team_form_eyebrow">Team</string>
+    <string name="team_form_title_create">Create team</string>
+    <string name="team_form_title_edit">Edit details</string>
+    <string name="team_form_name_label">Team name</string>
+    <string name="team_form_type_label">Team type</string>
+    <string name="team_form_close_content_description">Close</string>
 
     <string name="player_creation_error_name_empty">Player name cannot be empty</string>
     <string name="player_creation_error_invalid_email_format">Invalid email format</string>

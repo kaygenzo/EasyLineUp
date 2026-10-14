@@ -30,6 +30,12 @@
     <string name="title_team_details">Infos d\'équipe</string>
 
     <string name="team_creation_error_name_empty">Le nom de l\'équipe ne peut pas être vide</string>
+    <string name="team_form_eyebrow">Équipe</string>
+    <string name="team_form_title_create">Créer une équipe</string>
+    <string name="team_form_title_edit">Modifier les détails</string>
+    <string name="team_form_name_label">Nom de l\'équipe</string>
+    <string name="team_form_type_label">Type d\'équipe</string>
+    <string name="team_form_close_content_description">Fermer</string>
 
     <string name="player_creation_error_name_empty">Le nom du joueur ne peut pas être vide</string>
 
