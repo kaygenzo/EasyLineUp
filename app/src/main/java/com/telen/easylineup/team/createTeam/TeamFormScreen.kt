@@ -90,7 +90,11 @@ fun TeamFormScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp)
         ) {
-            AvatarPicker(imageUri = state.teamImageUri, onClick = onAvatarClick)
+            AvatarPicker(
+                imageUri = state.teamImageUri,
+                onClick = onAvatarClick,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -155,10 +159,10 @@ private fun FormAppBar(isEditing: Boolean, onCloseClick: () -> Unit) {
 }
 
 @Composable
-private fun AvatarPicker(imageUri: Uri?, onClick: () -> Unit) {
+private fun AvatarPicker(imageUri: Uri?, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val bitmap = rememberDugoutAvatarBitmap(imageUri, 72.dp)
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(72.dp)
             .clip(RoundedCornerShape(20.dp))
             .let {
