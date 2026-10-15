@@ -6,6 +6,7 @@ package com.telen.easylineup.compose
 
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -76,9 +77,10 @@ fun Modifier.dashedBorder(
 
 /**
  * Shared flat card container for the Dugout Card design system - rounded corners, no elevation,
- * surface color. Used by every screen that groups rows/content into a card (Settings, Team
- * Details, ...). Extracted once a second screen needed the same chrome, instead of re-copying
- * a private composable.
+ * surface color, 1dp outline border (matches the mockup's `.card { border: 1px solid var(--line) }`
+ * - elevation alone doesn't read as a boundary on a flat card). Used by every screen that groups
+ * rows/content into a card (Settings, Team Details, ...). Extracted once a second screen needed
+ * the same chrome, instead of re-copying a private composable.
  */
 @Composable
 fun DugoutCard(content: @Composable () -> Unit) {
@@ -88,7 +90,8 @@ fun DugoutCard(content: @Composable () -> Unit) {
             .padding(bottom = 8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
     ) {
         Column { content() }
     }
