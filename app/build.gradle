@@ -213,7 +213,6 @@ dependencies {
 
     implementation libs.timber
     implementation libs.rx.android
-    implementation libs.mpAndroidChart
     implementation libs.picasso
     implementation libs.rounedImage
     implementation libs.koin

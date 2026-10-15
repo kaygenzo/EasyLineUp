@@ -15,7 +15,6 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.MenuProvider
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -37,10 +36,11 @@ import com.telen.easylineup.views.PlayerFormListener
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class PlayerEditFragment : BaseFragment("PlayerEditFragment"), PlayerFormListener, MenuProvider {
-    private val viewModel by viewModels<PlayerViewModel>()
+    private val viewModel by viewModel<PlayerViewModel>()
     private var binding: FragmentPlayerEditBinding? = null
     private val pickImage = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
         it?.let { uri ->

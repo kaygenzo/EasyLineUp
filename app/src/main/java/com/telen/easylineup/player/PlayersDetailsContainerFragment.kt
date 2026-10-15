@@ -12,7 +12,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -34,7 +33,7 @@ import timber.log.Timber
 
 class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFragment") {
     private val teamViewModel by viewModel<TeamViewModel>()
-    private val playerViewModel by viewModels<PlayerViewModel>()
+    private val playerViewModel by viewModel<PlayerViewModel>()
     private var binding: FragmentPlayersDetailsContainerBinding? = null
     private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {

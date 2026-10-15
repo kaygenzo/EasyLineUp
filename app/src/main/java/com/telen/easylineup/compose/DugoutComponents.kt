@@ -12,13 +12,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,12 +46,17 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.PlayerSide
 
 /**
  * Dashed outline for the Dugout Card system's recurring "nothing here yet" language (an empty
@@ -181,3 +190,127 @@ internal fun rememberDugoutAvatarBitmap(uri: Uri?, size: Dp): ImageBitmap? {
     }
     return bitmap
 }
+
+/**
+ * Photo-or-dashed-silhouette tile with a corner jersey-number badge, shared by anything that
+ * shows a player's identity at a glance (Roster rows, Player profile's header) - same filled
+ * tile or dashed placeholder either way, so identity reads consistently wherever a player shows
+ * up. The badge size is derived from [size] (0.46 is exactly 23dp/50dp, Roster's original fixed
+ * ratio) so existing call sites keep their exact look when this got promoted out of RosterScreen.
+ */
+@Composable
+fun PlayerPhotoTile(imageUri: Uri?, shirtNumber: Int, size: Dp) {
+    val bitmap = rememberDugoutAvatarBitmap(imageUri, size)
+    val cornerRadius = RoundedCornerShape(size * 0.29f)
+    val badgeSize = size * 0.46f
+    // The badge is a sibling of the clipped photo box, not a child of it, and pushed outward
+    // via offset - matches the mockup's player-photo__num, which sits at bottom:-6px;right:-6px,
+    // overflowing the tile rather than being cropped by its rounded corners.
+    Box(modifier = Modifier.size(size)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(cornerRadius)
+                .let {
+                    if (bitmap == null) {
+                        it.dashedBorder(
+                            MaterialTheme.colorScheme.outline,
+                            cornerRadius = size * 0.29f
+                        )
+                    } else {
+                        it
+                    }
+                }
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+            if (bitmap != null) {
+                Image(
+                    painter = BitmapPainter(bitmap),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.ic_person_silhouette_24dp),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(size * 0.4f)
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .offset(x = size * 0.12f, y = size * 0.12f)
+                .size(badgeSize)
+                .clip(RoundedCornerShape(badgeSize * 0.3f))
+                .background(MaterialTheme.colorScheme.primary)
+                .border(
+                    2.dp,
+                    MaterialTheme.colorScheme.background,
+                    RoundedCornerShape(badgeSize * 0.3f)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = shirtNumber.toString().padStart(2, '0'),
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.ExtraBold,
+                fontFamily = FontFamily.Monospace,
+                fontSize = (badgeSize.value * 0.43f).sp
+            )
+        }
+    }
+}
+
+/**
+ * Label + bordered value box shared by any screen that groups raw stats into quiet "info cells"
+ * (Team Details, Player profile) instead of competing plain data rows. [tabular] picks the bigger
+ * monospace style for a number meant to be scanned at a glance; off for free-text values (an
+ * email, a formatted date).
+ */
+@Composable
+fun InfoCell(modifier: Modifier = Modifier, label: String, value: String, tabular: Boolean = true) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                RoundedCornerShape(10.dp)
+            )
+            .padding(horizontal = 10.dp, vertical = 10.dp)
+    ) {
+        Text(
+            text = label.uppercase(),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.labelSmall
+        )
+        Spacer(modifier = Modifier.height(3.dp))
+        Text(
+            text = value,
+            color = MaterialTheme.colorScheme.onBackground,
+            style = if (tabular) {
+                MaterialTheme.typography.bodyLarge
+            } else {
+                MaterialTheme.typography.bodyMedium
+            },
+            fontWeight = FontWeight.Bold,
+            fontFamily = if (tabular) FontFamily.Monospace else FontFamily.Default
+        )
+    }
+}
+
+private fun PlayerSide.shortLabelRes(): Int = when (this) {
+    PlayerSide.LEFT -> R.string.player_side_abbr_left
+    PlayerSide.RIGHT -> R.string.player_side_abbr_right
+    PlayerSide.BOTH -> R.string.player_side_abbr_both
+}
+
+/** Shared "L"/"R"/"B" abbreviation for a batting/throwing side (Roster rows, Player profile). */
+@Composable
+fun PlayerSide.shortLabel(): String = stringResource(shortLabelRes())

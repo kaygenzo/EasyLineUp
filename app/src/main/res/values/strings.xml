@@ -265,6 +265,9 @@
     <string name="player_side_abbr_both">B</string>
     <string name="roster_player_bats">Bats %1$s</string>
     <string name="roster_player_throws">Throws %1$s</string>
+    <string name="player_profile_position_usage_label">Position usage</string>
+    <string name="player_profile_empty_title">No games played yet</string>
+    <string name="player_profile_empty_message">Shows up once they\'re in a lineup</string>
 
     <string name="permission_request_read_external_storage">"Media access is needed to display images"</string>
     <string name="permission_request_settings_action">"Settings"</string>

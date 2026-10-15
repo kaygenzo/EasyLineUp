@@ -5,7 +5,6 @@
 package com.telen.easylineup.team
 
 import android.net.Uri
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,19 +30,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.PlayerPhotoTile
 import com.telen.easylineup.compose.dashedBorder
-import com.telen.easylineup.compose.rememberDugoutAvatarBitmap
+import com.telen.easylineup.compose.shortLabel
 import com.telen.easylineup.domain.model.PlayerSide
 
 data class RosterRowState(
@@ -192,7 +186,7 @@ private fun PlayerRow(row: RosterRowState, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp)
     ) {
-        PlayerPhotoTile(imageUri = row.imageUri, shirtNumber = row.shirtNumber)
+        PlayerPhotoTile(imageUri = row.imageUri, shirtNumber = row.shirtNumber, size = 50.dp)
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -215,70 +209,6 @@ private fun PlayerRow(row: RosterRowState, onClick: () -> Unit) {
                     style = MaterialTheme.typography.bodySmall
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun PlayerPhotoTile(imageUri: Uri?, shirtNumber: Int) {
-    val size = 50.dp
-    val bitmap = rememberDugoutAvatarBitmap(imageUri, size)
-    val cornerRadius = RoundedCornerShape(size * 0.29f)
-    // The badge is a sibling of the clipped photo box, not a child of it, and pushed outward
-    // via offset - matches the mockup's player-photo__num, which sits at bottom:-6px;right:-6px,
-    // overflowing the tile rather than being cropped by its rounded corners.
-    Box(modifier = Modifier.size(size)) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(cornerRadius)
-                .let {
-                    if (bitmap == null) {
-                        it.dashedBorder(
-                            MaterialTheme.colorScheme.outline,
-                            cornerRadius = size * 0.29f
-                        )
-                    } else {
-                        it
-                    }
-                }
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
-        ) {
-            if (bitmap != null) {
-                Image(
-                    painter = BitmapPainter(bitmap),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                Icon(
-                    painter = painterResource(R.drawable.ic_person_silhouette_24dp),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .offset(x = 6.dp, y = 6.dp)
-                .size(23.dp)
-                .clip(RoundedCornerShape(7.dp))
-                .background(MaterialTheme.colorScheme.primary)
-                .border(2.dp, MaterialTheme.colorScheme.background, RoundedCornerShape(7.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = shirtNumber.toString().padStart(2, '0'),
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.ExtraBold,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 10.sp
-            )
         }
     }
 }
@@ -313,15 +243,6 @@ private fun RosterEmptyState() {
         )
     }
 }
-
-private fun PlayerSide.shortLabelRes(): Int = when (this) {
-    PlayerSide.LEFT -> R.string.player_side_abbr_left
-    PlayerSide.RIGHT -> R.string.player_side_abbr_right
-    PlayerSide.BOTH -> R.string.player_side_abbr_both
-}
-
-@Composable
-private fun PlayerSide.shortLabel(): String = stringResource(shortLabelRes())
 
 @DugoutPreviews
 @Composable

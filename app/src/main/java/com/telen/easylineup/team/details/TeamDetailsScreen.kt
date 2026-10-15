@@ -6,7 +6,6 @@ package com.telen.easylineup.team.details
 
 import android.net.Uri
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +40,7 @@ import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.InfoCell
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
 import java.text.SimpleDateFormat
@@ -215,44 +215,6 @@ private fun Pill(text: String, color: Color) {
             text = text.uppercase(),
             color = color,
             style = MaterialTheme.typography.labelSmall
-        )
-    }
-}
-
-@Composable
-private fun InfoCell(
-    modifier: Modifier = Modifier,
-    label: String,
-    value: String,
-    tabular: Boolean = true
-) {
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .border(
-                1.dp,
-                MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
-                RoundedCornerShape(10.dp)
-            )
-            .padding(horizontal = 10.dp, vertical = 10.dp)
-    ) {
-        Text(
-            text = label.uppercase(),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall
-        )
-        Spacer(modifier = Modifier.height(3.dp))
-        Text(
-            text = value,
-            color = MaterialTheme.colorScheme.onBackground,
-            style = if (tabular) {
-                MaterialTheme.typography.bodyLarge
-            } else {
-                MaterialTheme.typography.bodyMedium
-            },
-            fontWeight = FontWeight.Bold,
-            fontFamily = if (tabular) FontFamily.Monospace else FontFamily.Default
         )
     }
 }

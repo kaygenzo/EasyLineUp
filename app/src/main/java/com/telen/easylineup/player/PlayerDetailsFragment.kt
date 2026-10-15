@@ -4,170 +4,161 @@
 
 package com.telen.easylineup.player
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import androidx.fragment.app.viewModels
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.squareup.picasso.Picasso
 import com.telen.easylineup.BaseFragment
-import com.telen.easylineup.R
-import com.telen.easylineup.databinding.FragmentPlayerDetailsBinding
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.Sex
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.getStrategies
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import com.telen.easylineup.utils.ready
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-const val EMPTY_MARKER = "-"
+class PlayerDetailsFragment : BaseFragment("PlayerDetailsFragment") {
+    private val viewModel by viewModel<PlayerViewModel>()
 
-class PlayerDetailsFragment : BaseFragment("PlayerDetailsFragment"),
-AdapterView.OnItemSelectedListener {
-    private val viewModel by viewModels<PlayerViewModel>()
-    private var binding: FragmentPlayerDetailsBinding? = null
+    private var name by mutableStateOf("")
+    private var shirtNumber by mutableStateOf(0)
+    private var imageUri by mutableStateOf<Uri?>(null)
+    private var sex by mutableStateOf(Sex.UNKNOWN)
+    private var battingSide by mutableStateOf<PlayerSide?>(null)
+    private var pitchingSide by mutableStateOf<PlayerSide?>(null)
+    private var licenseNumber by mutableStateOf(0L)
+    private var email by mutableStateOf("")
+    private var phoneNumber by mutableStateOf("")
+    private var positionsData by mutableStateOf<Map<FieldPosition, Int>>(emptyMap())
+    private var teamTypeId by mutableStateOf(0)
+    private var strategy by mutableStateOf(TeamStrategy.STANDARD)
+    private var strategyOptions by mutableStateOf<List<String>>(emptyList())
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return FragmentPlayerDetailsBinding.inflate(inflater, container, false).apply {
-            binding = this
-            val playerId = arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
-            viewModel.playerId = playerId
-
-            viewModel.observePlayerName()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach { playerName.text = it.trim() }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
-
-            viewModel.observePlayerShirtNumber()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach { shirtNumberValue.text = it.toString() }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
-
-            viewModel.observePlayerLicenseNumber()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach { playerLicenseValue.text = it.toString() }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
-
-            viewModel.observePlayerImage()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach {
-                    playerImage.ready {
-                        try {
-                            Picasso.get()
-                                .load(it)
-                                .resize(playerImage.width, playerImage.height)
-                                .centerCrop()
-                                .placeholder(R.drawable.ic_unknown_field_player)
-                                .error(R.drawable.ic_unknown_field_player)
-                                .into(playerImage)
-                        } catch (e: IllegalArgumentException) {
-                            Timber.e(e)
-                        }
-                    }
+        val playerId = arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
+        viewModel.playerId = playerId
+        return ComposeView(requireContext()).apply {
+            setContent {
+                DugoutTheme {
+                    val teamType = TeamType.getTypeById(teamTypeId)
+                    PlayerProfileScreen(
+                        state = PlayerProfileState(
+                            name = name,
+                            shirtNumber = shirtNumber,
+                            imageUri = imageUri,
+                            sex = sex,
+                            battingSide = battingSide,
+                            pitchingSide = pitchingSide,
+                            licenseNumber = licenseNumber,
+                            email = email,
+                            phoneNumber = phoneNumber,
+                            positionsData = positionsData,
+                            teamType = teamType,
+                            strategy = strategy,
+                            strategyOptions = strategyOptions,
+                            selectedStrategyIndex = teamType.getStrategies().indexOf(strategy)
+                                .coerceAtLeast(0)
+                        ),
+                        onStrategySelected = ::onStrategySelected
+                    )
                 }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
+            }
+        }
+    }
 
-            viewModel.observePlayerPitchingSide()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach {
-                    pitchingSideValue.text = when (PlayerSide.getSideByValue(it)) {
-                        PlayerSide.LEFT -> getString(R.string.generic_left)
-                        PlayerSide.RIGHT -> getString(R.string.generic_right)
-                        PlayerSide.BOTH -> getString(R.string.generic_both)
-                        null -> getString(R.string.generic_unknown)
-                    }
-                }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-            viewModel.observePlayerBattingSide()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach {
-                    battingSideValue.text = when (PlayerSide.getSideByValue(it)) {
-                        PlayerSide.LEFT -> getString(R.string.generic_left)
-                        PlayerSide.RIGHT -> getString(R.string.generic_right)
-                        PlayerSide.BOTH -> getString(R.string.generic_both)
-                        null -> getString(R.string.generic_unknown)
-                    }
-                }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.observePlayerName()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { name = it.trim() }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-            viewModel.observePlayerEmail()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach { playerEmailValue.text = it.takeIf { !it.isNullOrEmpty() } ?: EMPTY_MARKER }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.observePlayerShirtNumber()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { shirtNumber = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-            viewModel.observePlayerPhoneNumber()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach { playerPhoneValue.text = it.takeIf { !it.isNullOrEmpty() } ?: EMPTY_MARKER }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.observePlayerLicenseNumber()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { licenseNumber = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-            viewModel.observeLineups()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach {
-                    gamesPlayedValue.text = it.values.sum().toString()
-                    positionsBarChart.setData(it)
-                }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.observePlayerImage()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { imageUri = it?.let(Uri::parse) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-            viewModel.observeTeamType()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach { positionsBarChart.setTeamType(it) }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.observePlayerPitchingSide()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { pitchingSide = PlayerSide.getSideByValue(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-            viewModel.observeStrategies(requireContext())
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach {
-                    positionsBarChart.binding.teamStrategy.apply {
-                        visibility = if (it.size > 1) View.VISIBLE else View.GONE
-                        adapter = ArrayAdapter(context, R.layout.item_team_strategy, it)
-                        setSelection(0, false)
-                        onItemSelectedListener = this@PlayerDetailsFragment
-                    }
-                }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.observePlayerBattingSide()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { battingSide = PlayerSide.getSideByValue(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-            viewModel.observeStrategy()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach { positionsBarChart.apply { setStrategy(it) } }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.observePlayerEmail()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { email = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-            viewModel.observePlayerSex()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach {
-                    val sex = Sex.getById(it)
-                    sexSymbol.visibility = if (sex != Sex.UNKNOWN) View.VISIBLE else View.GONE
-                    when (sex) {
-                        Sex.MALE -> sexSymbol.setImageResource(R.drawable.ic_male_black)
-                        Sex.FEMALE -> sexSymbol.setImageResource(R.drawable.ic_female_black)
-                        else -> {
-                            /* sex is not defined for this player */
-                        }
-                    }
-                }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
-        }.root
+        viewModel.observePlayerPhoneNumber()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { phoneNumber = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeLineups()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { positionsData = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeTeamType()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { teamTypeId = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeStrategies(requireContext())
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { strategyOptions = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeStrategy()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { strategy = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observePlayerSex()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { sex = Sex.getById(it) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.clear()
-        binding = null
     }
 
-    override fun onNothingSelected(adapter: AdapterView<*>?) {}
-    override fun onItemSelected(adapter: AdapterView<*>?, view: View?, position: Int, row: Long) {
+    private fun onStrategySelected(index: Int) {
         FirebaseAnalyticsUtils.onClick(activity, "click_player_details_strategy_selected")
-        viewModel.onStrategySelected(position)
+        viewModel.onStrategySelected(index)
     }
 }

@@ -30,16 +30,15 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import timber.log.Timber
 
-class PlayerViewModel : ViewModel(), KoinComponent {
-    private val getTeamUseCase: GetTeam by inject()
-    private val observePlayer: ObservePlayer by inject()
-    private val savePlayerUseCase: SavePlayer by inject()
-    private val deletePlayerUseCase: DeletePlayer by inject()
-    private val getPlayerPositionsSummaryUseCase: GetPositionsSummaryForPlayer by inject()
+class PlayerViewModel(
+    private val getTeamUseCase: GetTeam,
+    private val observePlayer: ObservePlayer,
+    private val savePlayerUseCase: SavePlayer,
+    private val deletePlayerUseCase: DeletePlayer,
+    private val getPlayerPositionsSummaryUseCase: GetPositionsSummaryForPlayer
+) : ViewModel() {
     private val errors: Subject<DomainErrors.Players> = PublishSubject.create()
     private val _teamTypeFlow: MutableSharedFlow<Int> =
         MutableSharedFlow<Int>(replay = 1, extraBufferCapacity = 1).apply {

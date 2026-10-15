@@ -228,6 +228,9 @@
     <string name="player_side_abbr_both">A</string>
     <string name="roster_player_bats">Frappe %1$s</string>
     <string name="roster_player_throws">Lance %1$s</string>
+    <string name="player_profile_position_usage_label">Postes joués</string>
+    <string name="player_profile_empty_title">Aucun match joué</string>
+    <string name="player_profile_empty_message">Apparaît une fois ce joueur aligné.</string>
 
     <string name="permission_request_read_external_storage">"L\'accès aux media est requis pour afficher les images"</string>
     <string name="permission_request_settings_action">"Paramètres"</string>

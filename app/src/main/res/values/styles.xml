@@ -137,13 +137,6 @@
         <item name="android:background">@drawable/shape_header_round_corner_black_border</item>
     </style>
 
-    <!-- DRAWER -->
-
-    <style name="PlayerDetailsContainer" parent="AppTheme">
-        <item name="android:background">@color/white</item>
-        <item name="android:padding">3dp</item>
-    </style>
-
     <!-- Swap team dialog begin-->
 
     <style name="ListEmptyText">

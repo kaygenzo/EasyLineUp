@@ -15,7 +15,6 @@ object LicensesManager {
         Library("Timber", "https://github.com/JakeWharton/timber", License.APACHE2),
         Library("RxJava", "https://github.com/ReactiveX/RxJava", License.APACHE2),
         Library("RxAndroid", "https://github.com/ReactiveX/RxAndroid", License.APACHE2),
-        Library("MPAndroidChart", "https://github.com/PhilJay/MPAndroidChart", License.APACHE2),
         Library("Picasso", "https://github.com/square/picasso", License.APACHE2),
         Library("RoundedImageView", "https://github.com/vinc3m1/RoundedImageView", License.APACHE2),
         Library("Koin", "https://github.com/InsertKoinIO/koin", License.APACHE2),
