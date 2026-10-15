@@ -273,7 +273,7 @@ private fun PlayerPhotoTile(imageUri: Uri?, shirtNumber: Int) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = shirtNumber.toString(),
+                text = shirtNumber.toString().padStart(2, '0'),
                 color = MaterialTheme.colorScheme.onPrimary,
                 fontWeight = FontWeight.ExtraBold,
                 fontFamily = FontFamily.Monospace,
