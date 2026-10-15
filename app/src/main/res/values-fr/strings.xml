@@ -218,10 +218,16 @@
     <string name="reorder_batter_title">Réorganisez l\'ordre des batteurs</string>
     <string name="reorder_batter_description">Appuyez longuement sur l\'icône de réorganisation pour déplacer verticalement le batteur à la position désirée</string>
 
-    <string name="sort_by_name">Nom</string>
-    <string name="sort_by_shirt_number">N° Maillot</string>
-    <string name="display_grid">Grille</string>
-    <string name="display_list">Liste</string>
+    <string name="roster_sort_by_name">Par nom</string>
+    <string name="roster_sort_by_number">Par numéro</string>
+    <string name="roster_empty_title">Aucun joueur</string>
+    <string name="roster_empty_message">Ajoutez un joueur pour constituer le roster.</string>
+    <string name="roster_add_player_content_description">Ajouter un joueur</string>
+    <string name="player_side_abbr_left">G</string>
+    <string name="player_side_abbr_right">D</string>
+    <string name="player_side_abbr_both">A</string>
+    <string name="roster_player_bats">Frappe %1$s</string>
+    <string name="roster_player_throws">Lance %1$s</string>
 
     <string name="permission_request_read_external_storage">"L\'accès aux media est requis pour afficher les images"</string>
     <string name="permission_request_settings_action">"Paramètres"</string>

@@ -9,6 +9,7 @@ import com.telen.easylineup.domain.ports.GeocodingProvider
 import com.telen.easylineup.domain.ports.PhoneNumberValidator
 import com.telen.easylineup.domain.ports.StringResourcesProvider
 import com.telen.easylineup.settings.SettingsViewModel
+import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.SetupViewModel
 import com.telen.easylineup.utils.DispatcherProviderImpl
 import com.telen.easylineup.utils.GeocodingProviderImpl
@@ -30,4 +31,5 @@ val appModules = module {
     // still used by every other ViewModel in this codebase.
     viewModelOf(::SettingsViewModel)
     viewModelOf(::SetupViewModel)
+    viewModelOf(::TeamViewModel)
 }

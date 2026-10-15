@@ -40,9 +40,10 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.rx3.rxCompletable
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
-    private val teamViewModel: TeamViewModel by viewModels()
+    private val teamViewModel: TeamViewModel by viewModel()
     private val lineupViewModel: LineupViewModel by viewModels()
     private val editTeam =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {

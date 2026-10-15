@@ -19,7 +19,6 @@
     <dimen name="radar_chart_size">155dp</dimen>
 
     <dimen name="image_circle_size">150dp</dimen>
-    <dimen name="image_item_player">@dimen/player_details_picture_height</dimen>
 
     <dimen name="player_details_picture_width">120dp</dimen>
     <dimen name="player_details_picture_height">150dp</dimen>

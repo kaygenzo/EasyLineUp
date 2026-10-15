@@ -21,8 +21,7 @@
     <fragment
         android:id="@+id/navigation_team"
         android:name="com.telen.easylineup.team.PlayersFragment"
-        android:label="@string/title_team"
-        tools:layout="@layout/fragment_player_list"/>
+        android:label="@string/title_team"/>
 
     <fragment
         android:id="@+id/playerDetailsFragment"

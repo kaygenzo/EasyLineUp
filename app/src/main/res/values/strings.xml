@@ -255,10 +255,16 @@
     <string name="reorder_batter_title">Reorder the batters order</string>
     <string name="reorder_batter_description">Long press the reorder icon to drag and drop vertically at the desired position.</string>
 
-    <string name="sort_by_name">Name</string>
-    <string name="sort_by_shirt_number">Shirt n°</string>
-    <string name="display_grid">Grid</string>
-    <string name="display_list">List</string>
+    <string name="roster_sort_by_name">By name</string>
+    <string name="roster_sort_by_number">By number</string>
+    <string name="roster_empty_title">No players yet</string>
+    <string name="roster_empty_message">Add your first player to build a roster.</string>
+    <string name="roster_add_player_content_description">Add player</string>
+    <string name="player_side_abbr_left">L</string>
+    <string name="player_side_abbr_right">R</string>
+    <string name="player_side_abbr_both">B</string>
+    <string name="roster_player_bats">Bats %1$s</string>
+    <string name="roster_player_throws">Throws %1$s</string>
 
     <string name="permission_request_read_external_storage">"Media access is needed to display images"</string>
     <string name="permission_request_settings_action">"Settings"</string>

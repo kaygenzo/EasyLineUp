@@ -18,21 +18,19 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import timber.log.Timber
 
-class TeamViewModel : ViewModel(), KoinComponent {
-    private val getTeamUseCase: GetTeam by inject()
-    private val deleteTeamUseCase: DeleteTeam by inject()
-    private val observePlayers: ObservePlayers by inject()
+class TeamViewModel(
+    private val getTeamUseCase: GetTeam,
+    private val deleteTeamUseCase: DeleteTeam,
+    private val observePlayers: ObservePlayers
+) : ViewModel() {
     private val _team: MutableSharedFlow<Team> by lazy {
         MutableSharedFlow<Team>(replay = 1, extraBufferCapacity = 1).apply { getCurrentTeam() }
     }
@@ -49,12 +47,9 @@ class TeamViewModel : ViewModel(), KoinComponent {
     private val _playersMerged: Flow<List<Player>> by lazy {
         merge(_playersFromDao, _players).onEach { playerList = it }
     }
-    private val _displayType: MutableStateFlow<DisplayType> = MutableStateFlow(DisplayType.GRID)
     private var playerSelectedId = 0L
     var team: Team? = null
     var sortType: SortType = SortType.ALPHA
-        private set
-    var displayType: DisplayType = DisplayType.GRID
         private set
     private var playerList: List<Player> = listOf()
 
@@ -67,8 +62,6 @@ class TeamViewModel : ViewModel(), KoinComponent {
     fun observePlayers(): Flow<List<Player>> = _playersMerged.map {
         sortPlayers(it)
     }
-
-    fun observeDisplayType(): Flow<DisplayType> = _displayType
 
     fun clear() {
     }
@@ -120,14 +113,6 @@ class TeamViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun switchDisplayType() {
-        when (this.displayType) {
-            DisplayType.LIST -> this.displayType = DisplayType.GRID
-            DisplayType.GRID -> this.displayType = DisplayType.LIST
-        }
-        _displayType.value = this.displayType
-    }
-
     fun setSortType(sortType: SortType) {
         this.sortType = sortType
         _players.tryEmit(playerList)
@@ -142,9 +127,5 @@ class TeamViewModel : ViewModel(), KoinComponent {
 
     enum class SortType {
         ALPHA, NUMERIC
-    }
-
-    enum class DisplayType {
-        LIST, GRID
     }
 }
