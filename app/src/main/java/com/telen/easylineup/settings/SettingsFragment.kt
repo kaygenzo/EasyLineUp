@@ -52,10 +52,7 @@ class SettingsFragment : BaseFragment("Settings") {
     private val viewModel: SettingsViewModel by viewModel()
     private val loginViewModel by viewModels<LoginViewModel>()
 
-    // TeamViewModel's DI stays on the existing KoinComponent pattern (shared with
-    // Roster/Player, not modernized here) - only its already-exposed Flow API is used,
-    // same interop boundary as LoginViewModel above.
-    private val teamViewModel by viewModels<TeamViewModel>()
+    private val teamViewModel by viewModel<TeamViewModel>()
 
     private var updateExistingOnImport = false
     private var teamName by mutableStateOf("")

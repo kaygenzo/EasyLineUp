@@ -29,10 +29,11 @@ import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.rx3.rxCompletable
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFragment") {
-    private val teamViewModel by viewModels<TeamViewModel>()
+    private val teamViewModel by viewModel<TeamViewModel>()
     private val playerViewModel by viewModels<PlayerViewModel>()
     private var binding: FragmentPlayersDetailsContainerBinding? = null
     private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
