@@ -9,6 +9,7 @@ import android.content.res.Configuration
 import androidx.annotation.AttrRes
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -16,6 +17,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.google.android.material.color.MaterialColors
 import androidx.appcompat.R as AppCompatR
 import com.google.android.material.R as MaterialR
@@ -38,8 +42,42 @@ fun DugoutTheme(content: @Composable () -> Unit) {
     // the ComposeView after a theme flip picks up the new palette.
     val uiMode = LocalConfiguration.current.uiMode and Configuration.UI_MODE_NIGHT_MASK
     val colorScheme = remember(uiMode) { context.toDugoutColorScheme() }
-    MaterialTheme(colorScheme = colorScheme, content = content)
+    MaterialTheme(colorScheme = colorScheme, typography = DugoutTypography, content = content)
 }
+
+/**
+ * Shared type scale for the Dugout Card design system - every screen sources its text size and
+ * weight from here instead of hardcoding its own, so fixing "this reads small" on one screen
+ * doesn't turn into a one-off literal that the next screen has to rediscover on its own. Slots
+ * this app doesn't override keep Compose's M3 defaults, so AlertDialog/TextButton/RadioButton
+ * (which already read MaterialTheme.typography internally) are unaffected.
+ *
+ * Deliberately not covered here - these aren't a typographic register, not a missing token:
+ * - DugoutAvatar's initials, sized proportionally to the avatar (size.value * 0.33f).
+ * - Roster's jersey-number badge (10sp monospace), sized to fit two digits inside a fixed
+ *   23dp circular badge rather than to read well as text.
+ * - TeamForm's TypeCard emoji (20sp), standing in for an icon, not text content.
+ */
+private val DugoutTypography = Typography(
+    displaySmall = TextStyle(fontWeight = FontWeight.Bold, fontSize = 34.sp, lineHeight = 36.sp),
+    titleLarge = TextStyle(fontWeight = FontWeight.Bold, fontSize = 22.sp),
+    titleMedium = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp),
+    titleSmall = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp),
+    bodyLarge = TextStyle(fontWeight = FontWeight.Normal, fontSize = 15.sp),
+    bodyMedium = TextStyle(fontWeight = FontWeight.Normal, fontSize = 14.sp),
+    bodySmall = TextStyle(fontWeight = FontWeight.Normal, fontSize = 13.sp),
+    labelLarge = TextStyle(fontWeight = FontWeight.ExtraBold, fontSize = 14.sp),
+    labelMedium = TextStyle(
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 12.sp,
+        letterSpacing = 0.5.sp
+    ),
+    labelSmall = TextStyle(
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 11.sp,
+        letterSpacing = 0.5.sp
+    )
+)
 
 private fun Context.toDugoutColorScheme(): ColorScheme {
     val isDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
