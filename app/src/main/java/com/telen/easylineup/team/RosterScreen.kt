@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -223,42 +224,52 @@ private fun PlayerPhotoTile(imageUri: Uri?, shirtNumber: Int) {
     val size = 50.dp
     val bitmap = rememberDugoutAvatarBitmap(imageUri, size)
     val cornerRadius = RoundedCornerShape(size * 0.29f)
-    Box(
-        modifier = Modifier
-            .size(size)
-            .clip(cornerRadius)
-            .let {
-                if (bitmap == null) {
-                    it.dashedBorder(MaterialTheme.colorScheme.outline, cornerRadius = size * 0.29f)
-                } else {
-                    it
+    // The badge is a sibling of the clipped photo box, not a child of it, and pushed outward
+    // via offset - matches the mockup's player-photo__num, which sits at bottom:-6px;right:-6px,
+    // overflowing the tile rather than being cropped by its rounded corners.
+    Box(modifier = Modifier.size(size)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(cornerRadius)
+                .let {
+                    if (bitmap == null) {
+                        it.dashedBorder(
+                            MaterialTheme.colorScheme.outline,
+                            cornerRadius = size * 0.29f
+                        )
+                    } else {
+                        it
+                    }
                 }
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+            if (bitmap != null) {
+                Image(
+                    painter = BitmapPainter(bitmap),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.ic_person_silhouette_24dp),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
             }
-            .background(MaterialTheme.colorScheme.surfaceVariant),
-        contentAlignment = Alignment.Center
-    ) {
-        if (bitmap != null) {
-            Image(
-                painter = BitmapPainter(bitmap),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            Icon(
-                painter = painterResource(R.drawable.ic_person_silhouette_24dp),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(20.dp)
-            )
         }
 
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
+                .offset(x = 6.dp, y = 6.dp)
                 .size(23.dp)
                 .clip(RoundedCornerShape(7.dp))
-                .background(MaterialTheme.colorScheme.primary),
+                .background(MaterialTheme.colorScheme.primary)
+                .border(2.dp, MaterialTheme.colorScheme.background, RoundedCornerShape(7.dp)),
             contentAlignment = Alignment.Center
         ) {
             Text(
