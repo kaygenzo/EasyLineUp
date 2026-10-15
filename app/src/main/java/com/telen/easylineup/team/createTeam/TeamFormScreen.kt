@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -160,40 +161,50 @@ private fun FormAppBar(isEditing: Boolean, onCloseClick: () -> Unit) {
 @Composable
 private fun AvatarPicker(imageUri: Uri?, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val bitmap = rememberDugoutAvatarBitmap(imageUri, 72.dp)
+    // The badge is a sibling of the clipped photo content, not a child of it, and pushed
+    // outward via offset - matches the mockup's avatar-picker__badge, which sits at
+    // right:-6px;bottom:-6px, overflowing the tile rather than being cropped by its own
+    // rounded corners.
     Box(
         modifier = modifier
             .size(72.dp)
-            .clip(RoundedCornerShape(20.dp))
-            .let {
-                if (bitmap == null) {
-                    it.dashedBorder(MaterialTheme.colorScheme.outline, cornerRadius = 20.dp)
-                } else {
-                    it
-                }
-            }
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
+            .clickable(onClick = onClick)
     ) {
-        if (bitmap != null) {
-            Image(
-                painter = BitmapPainter(bitmap),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            Icon(
-                painter = painterResource(R.drawable.ic_image_placeholder_24dp),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(24.dp)
-            )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(20.dp))
+                .let {
+                    if (bitmap == null) {
+                        it.dashedBorder(MaterialTheme.colorScheme.outline, cornerRadius = 20.dp)
+                    } else {
+                        it
+                    }
+                }
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+            if (bitmap != null) {
+                Image(
+                    painter = BitmapPainter(bitmap),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.ic_image_placeholder_24dp),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
 
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
+                .offset(x = 6.dp, y = 6.dp)
                 .size(26.dp)
                 .clip(RoundedCornerShape(9.dp))
                 .background(MaterialTheme.colorScheme.primary)
