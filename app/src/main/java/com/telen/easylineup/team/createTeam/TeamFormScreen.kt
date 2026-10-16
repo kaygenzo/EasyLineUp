@@ -5,7 +5,6 @@
 package com.telen.easylineup.team.createTeam
 
 import android.net.Uri
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,8 +34,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,10 +41,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.AvatarPicker
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
-import com.telen.easylineup.compose.dashedBorder
-import com.telen.easylineup.compose.rememberDugoutAvatarBitmap
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
 
@@ -93,6 +89,9 @@ fun TeamFormScreen(
             AvatarPicker(
                 imageUri = state.teamImageUri,
                 onClick = onAvatarClick,
+                size = 72.dp,
+                cornerRadius = 20.dp,
+                placeholderIcon = R.drawable.ic_image_placeholder_24dp,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
@@ -153,74 +152,6 @@ private fun FormAppBar(isEditing: Boolean, onCloseClick: () -> Unit) {
                 ),
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.titleMedium
-            )
-        }
-    }
-}
-
-@Composable
-private fun AvatarPicker(imageUri: Uri?, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val bitmap = rememberDugoutAvatarBitmap(imageUri, 72.dp)
-    // The badge is a sibling of the clipped photo content, not a child of it, and pushed
-    // outward via offset - matches the mockup's avatar-picker__badge, which sits at
-    // right:-6px;bottom:-6px, overflowing the tile rather than being cropped by its own
-    // rounded corners.
-    Box(
-        modifier = modifier
-            .size(72.dp)
-            .clickable(onClick = onClick)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(20.dp))
-                .let {
-                    if (bitmap == null) {
-                        it.dashedBorder(MaterialTheme.colorScheme.outline, cornerRadius = 20.dp)
-                    } else {
-                        it
-                    }
-                }
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
-        ) {
-            if (bitmap != null) {
-                Image(
-                    painter = BitmapPainter(bitmap),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                Icon(
-                    painter = painterResource(R.drawable.ic_image_placeholder_24dp),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .offset(x = 6.dp, y = 6.dp)
-                .size(26.dp)
-                .clip(RoundedCornerShape(9.dp))
-                .background(MaterialTheme.colorScheme.primary)
-                .border(2.dp, MaterialTheme.colorScheme.background, RoundedCornerShape(9.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            val badgeIcon = if (bitmap != null) {
-                R.drawable.ic_delete_white_24dp
-            } else {
-                R.drawable.ic_add_white_24dp
-            }
-            Icon(
-                painter = painterResource(badgeIcon),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(13.dp)
             )
         }
     }

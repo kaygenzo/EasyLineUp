@@ -205,6 +205,7 @@
     <string name="generic_right">Right</string>
     <string name="generic_both">Both</string>
     <string name="generic_unknown">Unknown</string>
+    <string name="generic_optional">Optional</string>
 
     <string name="settings_export_success_title">Success</string>
     <string name="settings_export_success_message">Successfully exported to external storage in the directory %s </string>

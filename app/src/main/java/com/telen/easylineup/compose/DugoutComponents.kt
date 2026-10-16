@@ -10,6 +10,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -302,6 +303,88 @@ fun InfoCell(modifier: Modifier = Modifier, label: String, value: String, tabula
             fontWeight = FontWeight.Bold,
             fontFamily = if (tabular) FontFamily.Monospace else FontFamily.Default
         )
+    }
+}
+
+/**
+ * Photo-or-dashed-placeholder picker with an overflowing add/delete corner badge, shared by any
+ * form that lets a user attach a photo (Team form, Player form) - same dashed-empty-state and
+ * sibling-offset-badge language as everything else in this system, just a different corner
+ * radius and placeholder glyph per caller ([cornerRadius] = size/2 gives Player form's circle,
+ * Team form keeps its own rounded-square ratio).
+ */
+@Composable
+fun AvatarPicker(
+    imageUri: Uri?,
+    onClick: () -> Unit,
+    size: Dp,
+    cornerRadius: Dp,
+    placeholderIcon: Int,
+    modifier: Modifier = Modifier
+) {
+    val bitmap = rememberDugoutAvatarBitmap(imageUri, size)
+    // The badge is a sibling of the clipped photo content, not a child of it, and pushed
+    // outward via offset - matches the mockup's avatar-picker__badge, which sits at
+    // right:-6px;bottom:-6px, overflowing the tile rather than being cropped by its own
+    // rounded corners.
+    Box(
+        modifier = modifier
+            .size(size)
+            .clickable(onClick = onClick)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(cornerRadius))
+                .let {
+                    if (bitmap == null) {
+                        it.dashedBorder(MaterialTheme.colorScheme.outline, cornerRadius)
+                    } else {
+                        it
+                    }
+                }
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+            if (bitmap != null) {
+                Image(
+                    painter = BitmapPainter(bitmap),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Icon(
+                    painter = painterResource(placeholderIcon),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(size * 0.33f)
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .offset(x = 6.dp, y = 6.dp)
+                .size(26.dp)
+                .clip(RoundedCornerShape(9.dp))
+                .background(MaterialTheme.colorScheme.primary)
+                .border(2.dp, MaterialTheme.colorScheme.background, RoundedCornerShape(9.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            val badgeIcon = if (bitmap != null) {
+                R.drawable.ic_delete_white_24dp
+            } else {
+                R.drawable.ic_add_white_24dp
+            }
+            Icon(
+                painter = painterResource(badgeIcon),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(13.dp)
+            )
+        }
     }
 }
 

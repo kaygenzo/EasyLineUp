@@ -171,6 +171,7 @@
     <string name="generic_right">Droitier</string>
     <string name="generic_both">Les deux</string>
     <string name="generic_unknown">Inconnu</string>
+    <string name="generic_optional">Facultatif</string>
     <string name="settings_export_success_title">Succès</string>
     <string name="settings_import_success_title">Succès</string>
     <string name="error_when_deleting_lineup">Une erreur s\'est produite pendant la suppression du lineup</string>
