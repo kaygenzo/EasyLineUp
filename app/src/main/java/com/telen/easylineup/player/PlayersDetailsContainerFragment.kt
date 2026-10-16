@@ -25,6 +25,7 @@ import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.rx3.rxCompletable
@@ -124,6 +125,7 @@ class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFra
         activity?.let { activity ->
             playerViewModel.playerId = playerId
             val task = rxCompletable { playerViewModel.deletePlayer().getOrThrow() }
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnComplete { findNavController().popBackStack(R.id.navigation_team, false) }
                 .doOnError {
                     val message = "Something wrong happened: ${it.message}"
