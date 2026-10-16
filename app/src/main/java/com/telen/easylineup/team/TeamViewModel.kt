@@ -120,7 +120,9 @@ class TeamViewModel(
 
     private fun sortPlayers(listPlayers: List<Player>): List<Player> {
         return when (sortType) {
-            SortType.ALPHA -> listPlayers.sortedBy { it.name }.toMutableList()
+            SortType.ALPHA -> listPlayers.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) {
+                it.name
+            }).toMutableList()
             SortType.NUMERIC -> listPlayers.sortedBy { it.shirtNumber }.toMutableList()
         }
     }

@@ -58,7 +58,7 @@ class GetListAvailablePlayersForSelection(
             } else if (!firstHasPosition && secondHasPosition) {
                 1
             } else {
-                position1.playerName.compareTo(position2.playerName)
+                position1.playerName.compareTo(position2.playerName, ignoreCase = true)
             }
         }
     }
