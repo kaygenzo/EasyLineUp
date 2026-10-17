@@ -4,11 +4,7 @@
 
 package com.telen.easylineup.dashboard
 
-import android.content.Context
-import android.content.SharedPreferences
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.DashboardTile
-import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.tiles.TileType
@@ -18,43 +14,32 @@ import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepositor
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.ports.repository.TilesRepository
+import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.CreateDashboardTiles
 import com.telen.easylineup.domain.usecases.GetDashboardTiles
-import com.telen.easylineup.domain.usecases.GetPlayers
 import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
 import com.telen.easylineup.domain.usecases.GetTeam
-import com.telen.easylineup.domain.usecases.GetTeamEmails
-import com.telen.easylineup.domain.usecases.GetTeamPhones
 import com.telen.easylineup.domain.usecases.ObserveTeams
-import com.telen.easylineup.domain.usecases.SaveDashboardTiles
 import com.telen.easylineup.testDispatcherProvider
-import com.telen.easylineup.utils.SharedPreferencesHelper
-import io.reactivex.rxjava3.observers.TestObserver
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.dsl.module
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 
 /**
- * Characterization tests for [DashboardViewModel], demonstrating a pattern for testing the
- * `app` module ViewModels that resolve their UseCases through Koin (`by inject()`). The
- * remaining ViewModels listed in the refactor plan can follow the same shape: construct real
- * UseCases with mocked repositories, register them in a Koin test module, then exercise the
- * ViewModel's public API.
+ * Characterization tests for [DashboardViewModel]: real UseCases wired to mocked repositories,
+ * constructor-injected directly (no Koin needed now that the ViewModel takes its dependencies
+ * as constructor params instead of resolving them as a [org.koin.core.component.KoinComponent]).
  */
 @RunWith(MockitoJUnitRunner::class)
 internal class DashboardViewModelTest {
@@ -78,16 +63,12 @@ internal class DashboardViewModelTest {
     lateinit var tilesRepository: TilesRepository
 
     @Mock
-    lateinit var context: Context
-
-    @Mock
-    lateinit var sharedPreferences: SharedPreferences
+    lateinit var tournamentRepository: TournamentRepository
 
     lateinit var viewModel: DashboardViewModel
 
     @Before
     fun setup() {
-
         runBlocking {
             // lenient: each test only exercises one of these sub-ports
             Mockito.lenient().`when`(teamRepository.getTeams())
@@ -96,45 +77,26 @@ internal class DashboardViewModelTest {
 
         val dispatcherProvider = testDispatcherProvider()
         val getTeam = GetTeam(teamRepository, dispatcherProvider)
-        val getPlayers = GetPlayers(playerRepository, getTeam, dispatcherProvider)
 
-        startKoin {
-            modules(
-                module {
-                    single { ObserveTeams(teamRepository) }
-                    single {
-                        GetDashboardTiles(
-                            playerRepository,
-                            lineupRepository,
-                            playerFieldPositionRepository,
-                            tilesRepository,
-                            getTeam,
-                            CreateDashboardTiles(tilesRepository, dispatcherProvider),
-                            dispatcherProvider
-                        )
-                    }
-                    single { SaveDashboardTiles(tilesRepository, dispatcherProvider) }
-                    single {
-                        GetShirtNumberHistory(
-                            playerRepository,
-                            playerNumberOverlayRepository,
-                            getTeam,
-                            dispatcherProvider
-                        )
-                    }
-                    single { GetTeamEmails(getPlayers, dispatcherProvider) }
-                    single { GetTeamPhones(getPlayers, dispatcherProvider) }
-                    single { SharedPreferencesHelper(context) }
-                }
+        viewModel = DashboardViewModel(
+            observeTeams = ObserveTeams(teamRepository),
+            getDashboardTilesUseCase = GetDashboardTiles(
+                playerRepository,
+                lineupRepository,
+                playerFieldPositionRepository,
+                tilesRepository,
+                tournamentRepository,
+                getTeam,
+                CreateDashboardTiles(tilesRepository, dispatcherProvider),
+                dispatcherProvider
+            ),
+            getShirtNumberHistoryUseCase = GetShirtNumberHistory(
+                playerRepository,
+                playerNumberOverlayRepository,
+                getTeam,
+                dispatcherProvider
             )
-        }
-
-        viewModel = DashboardViewModel()
-    }
-
-    @After
-    fun tearDown() {
-        stopKoin()
+        )
     }
 
     @Test
@@ -158,44 +120,6 @@ internal class DashboardViewModelTest {
     }
 
     @Test
-    fun shouldShowReportIssueButtonOnlyOnceThenDisableTheFeature() {
-        Mockito.`when`(
-            context.getSharedPreferences(Constants.APPLICATION_PREFERENCES, Context.MODE_PRIVATE)
-        ).thenReturn(sharedPreferences)
-        Mockito.`when`(
-            sharedPreferences.getBoolean(
-                Constants.PREF_FEATURE_SHOW_REPORT_ISSUE_BUTTON,
-                true
-            )
-        ).thenReturn(true)
-        val editor = Mockito.mock(SharedPreferences.Editor::class.java)
-        Mockito.`when`(sharedPreferences.edit()).thenReturn(editor)
-        Mockito.`when`(editor.putBoolean(Mockito.anyString(), Mockito.anyBoolean()))
-            .thenReturn(editor)
-
-        val observer = TestObserver<Boolean>()
-        viewModel.showNewReportIssueButtonFeature().subscribe(observer)
-        observer.await()
-
-        observer.assertComplete()
-        assertTrue(observer.values().first())
-        Mockito.verify(editor)
-            .putBoolean(Constants.PREF_FEATURE_SHOW_REPORT_ISSUE_BUTTON, false)
-    }
-
-    @Test
-    fun shouldSaveTilesDelegateToUseCase() = runTest {
-        val tiles = listOf(DashboardTile(id = 1L, position = 0, type = 1))
-        Mockito.`when`(tilesRepository.updateTiles(tiles))
-            .thenReturn(Unit)
-
-        val result = viewModel.saveTiles(tiles)
-
-        assertTrue(result.isSuccess)
-        Mockito.verify(tilesRepository).updateTiles(tiles)
-    }
-
-    @Test
     fun shouldGetShirtNumberHistoryDelegateToUseCase() = runTest {
         val overlayEntry = ShirtNumberEntry(
             number = 8,
@@ -215,29 +139,5 @@ internal class DashboardViewModelTest {
 
         assertTrue(result.isSuccess)
         assertEquals(listOf(overlayEntry), result.getOrNull())
-    }
-
-    @Test
-    fun shouldGetEmailsDelegateToUseCase() = runTest {
-        val withEmail = Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L, email = "a@mail.com")
-        Mockito.`when`(playerRepository.getPlayersByTeamId(1L))
-            .thenReturn(listOf(withEmail))
-
-        val result = viewModel.getEmails()
-
-        assertTrue(result.isSuccess)
-        assertEquals(listOf("a@mail.com"), result.getOrNull())
-    }
-
-    @Test
-    fun shouldGetPhonesDelegateToUseCase() = runTest {
-        val withPhone = Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L, phone = "0102030405")
-        Mockito.`when`(playerRepository.getPlayersByTeamId(1L))
-            .thenReturn(listOf(withPhone))
-
-        val result = viewModel.getPhones()
-
-        assertTrue(result.isSuccess)
-        assertEquals(listOf("0102030405"), result.getOrNull())
     }
 }

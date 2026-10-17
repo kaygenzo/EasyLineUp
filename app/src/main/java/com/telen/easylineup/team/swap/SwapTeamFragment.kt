@@ -4,17 +4,14 @@
 
 package com.telen.easylineup.team.swap
 
-import android.app.Dialog
-import android.content.DialogInterface
+import android.graphics.Color
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.telen.easylineup.R
-import com.telen.easylineup.databinding.TeamsListViewBinding
+import androidx.compose.ui.platform.ComposeView
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
@@ -24,76 +21,47 @@ interface SwapTeamActions {
     fun onCreateTeamClick()
 }
 
-data class ActivityNullException(override val message: String) : Exception(message)
-
-class SwapTeamFragment : DialogFragment() {
-    private var listAdapter: SwapTeamsListAdapter? = null
+class SwapTeamFragment : BottomSheetDialogFragment() {
     private var swapTeamActions: SwapTeamActions? = null
-    private var binding: TeamsListViewBinding? = null
 
     fun setSwapTeamActionsListener(swapTeamActions: SwapTeamActions) {
         this.swapTeamActions = swapTeamActions
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        activity?.let { activity ->
-            val binding = TeamsListViewBinding.inflate(activity.layoutInflater, null, false).apply {
-                this@SwapTeamFragment.binding = this
-            }
+    override fun onStart() {
+        super.onStart()
+        // The Compose content draws its own rounded top corners + surface color; clear the
+        // sheet window's own white rounded background so it doesn't show behind/around it.
+        (view?.parent as? View)?.setBackgroundColor(Color.TRANSPARENT)
+    }
 
-            val teams =
-                arguments?.getSerializable(Constants.EXTRA_TEAMS) as? List<Team> ?: mutableListOf()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        @Suppress("UNCHECKED_CAST")
+        val teams = arguments?.getSerializable(Constants.EXTRA_TEAMS) as? List<Team>
+            ?: emptyList()
 
-            binding.noTeamsView.run {
-                setImageHint(R.drawable.ic_oobe_conv_list)
-                if (teams.isEmpty()) {
-                    setTextHint(R.string.team_list_empty_text)
-                    visibility = View.VISIBLE
-                } else {
-                    visibility = View.GONE
-                }
-            }
-
-            listAdapter =
-                    SwapTeamsListAdapter(teams, object : SwapTeamsListAdapter.SwapTeamsAdapterListener {
-                        override fun onTeamClicked(team: Team) {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                DugoutTheme {
+                    SwitchTeamSheetContent(
+                        teams = teams,
+                        onTeamClick = { team ->
                             FirebaseAnalyticsUtils.onClick(activity, "click_team_swap_selection")
                             swapTeamActions?.onTeamClick(team)
                             dismiss()
+                        },
+                        onCreateTeamClick = {
+                            FirebaseAnalyticsUtils.onClick(activity, "click_team_swap_create")
+                            swapTeamActions?.onCreateTeamClick()
+                            dismiss()
                         }
-                    })
-
-            binding.list.apply {
-                layoutManager = object : LinearLayoutManager(activity) {
-                    override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
-                        return RecyclerView.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT
-                        )
-                    }
+                    )
                 }
-                setHasFixedSize(true)
-                adapter = listAdapter
             }
-
-            val dialogBuilder = MaterialAlertDialogBuilder(activity)
-                .setCancelable(true)
-                .setView(binding.root)
-                .setTitle(R.string.team_list_dialog_title)
-
-            dialogBuilder.setPositiveButton(R.string.team_list_dialog_create) { dialog, which ->
-                FirebaseAnalyticsUtils.onClick(activity, "click_team_swap_create")
-                swapTeamActions?.onCreateTeamClick()
-                dismiss()
-            }
-
-            return dialogBuilder.setNegativeButton(android.R.string.cancel, null)
-                .create()
-        } ?: throw ActivityNullException("Activity is null, it's not allowed at this step")
-    }
-
-    override fun onDismiss(dialog: DialogInterface) {
-        super.onDismiss(dialog)
-        binding = null
+        }
     }
 }

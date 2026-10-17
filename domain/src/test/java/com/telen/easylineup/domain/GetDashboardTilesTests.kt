@@ -14,6 +14,7 @@ import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepositor
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.ports.repository.TilesRepository
+import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.CreateDashboardTiles
 import com.telen.easylineup.domain.usecases.GetDashboardTiles
 import com.telen.easylineup.domain.usecases.GetTeam
@@ -34,6 +35,7 @@ internal class GetDashboardTilesTests {
     @Mock lateinit var lineupDao: LineupRepository
     @Mock lateinit var playerFieldPositionDao: PlayerFieldPositionRepository
     @Mock lateinit var tilesRepo: TilesRepository
+    @Mock lateinit var tournamentDao: TournamentRepository
     @Mock lateinit var teamDao: TeamRepository
     lateinit var getDashboardTiles: GetDashboardTiles
 
@@ -47,6 +49,7 @@ internal class GetDashboardTilesTests {
             lineupDao,
             playerFieldPositionDao,
             tilesRepo,
+            tournamentDao,
             GetTeam(teamDao, testDispatcherProvider()),
             CreateDashboardTiles(tilesRepo, testDispatcherProvider()),
             testDispatcherProvider()

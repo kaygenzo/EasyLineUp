@@ -61,10 +61,13 @@
     <string name="dialog_delete_cannot_undo_message">This action cannot be undo, are you sure ?</string>
     <string name="dialog_delete_progress_message">Deleting&#8230;</string>
 
-    <string name="tile_team_size_warning_message">Not enough players to have a complete team!</string>
     <string name="tile_most_used_player_header">Most used player</string>
     <string name="tile_most_used_player_games_played">Games played</string>
     <string name="tile_last_lineup_header">Last lineup</string>
+    <string name="dashboard_mini_roster_size_label">Roster size</string>
+    <string name="dashboard_mini_most_used_label">Most used</string>
+    <string name="dashboard_mini_last_built_label">Last built</string>
+    <string name="dashboard_hero_empty_title">No lineups built yet.</string>
 
     <string name="header_batting_order_player_name">Player name</string>
     <string name="header_batting_order_player_shirt">N°</string>
@@ -103,8 +106,13 @@
     <string name="share_lineup_subject">Here is the lineup of: %s</string>
 
     <string name="team_list_empty_text">Once you create a team, you’ll see it listed here</string>
-    <string name="team_list_dialog_title">Your teams</string>
-    <string name="team_list_dialog_create">Create</string>
+    <string name="switch_team_sheet_title">Switch team</string>
+    <plurals name="switch_team_sheet_subtitle">
+        <item quantity="one">%d team on this account</item>
+        <item quantity="other">%d teams on this account</item>
+    </plurals>
+    <string name="switch_team_sheet_create_row">Create a new team</string>
+    <string name="switch_team_sheet_current">Current</string>
 
     <string name="roster_size_status_all">All players</string>
     <plurals name="roster_size_status_selection">
@@ -218,7 +226,6 @@
         <item quantity="other">Substitutes: %d</item>
     </plurals>
 
-    <string name="dashboard_edit_mode">Dashboard edit mode</string>
     <string name="tile_last_player_number_message">Shirt N° history</string>
     <string name="tile_last_player_number_label_last">Last:</string>
 
@@ -232,14 +239,6 @@
     <string name="lineup_theme_night_value">Night</string>
 
     <string name="generic_not_found">Not found</string>
-
-    <string name="tile_team_size_send_text_message">Text message</string>
-    <string name="tile_team_size_send_email">Email</string>
-    <string name="tile_team_size_send_other">Other</string>
-
-    <string name="tile_team_size_send_empty_title">Something went wrong</string>
-    <string name="tile_team_size_send_empty_emails">No emails found into players</string>
-    <string name="tile_team_size_send_empty_phones">No phone numbers found into players</string>
 
     <string name="app_deeplink_file_import_title">Import data from this file ?</string>
 

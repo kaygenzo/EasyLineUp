@@ -4,279 +4,161 @@
 
 package com.telen.easylineup.dashboard
 
-import android.annotation.SuppressLint
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.ActionMode
-import androidx.fragment.app.viewModels
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
-
 import com.telen.easylineup.BaseFragment
-import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
-import com.telen.easylineup.databinding.FragmentDashboardBinding
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.ShirtNumberEntry
-import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_ID
-import com.telen.easylineup.domain.model.tiles.LastPlayerNumberResearchData
-import com.telen.easylineup.domain.model.tiles.TileData
-import com.telen.easylineup.launch
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.tiles.LastLineupData
+import com.telen.easylineup.domain.model.tiles.MostUsedPlayerData
+import com.telen.easylineup.domain.model.tiles.TeamSizeData
+import com.telen.easylineup.domain.model.tiles.TileType
 import com.telen.easylineup.lineup.LineupFragment
-import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.utils.hideSoftKeyboard
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-import java.text.DateFormat
-import java.util.Date
+class DashboardFragment : BaseFragment("DashboardFragment") {
+    private val viewModel by viewModel<DashboardViewModel>()
 
-class DashboardFragment : BaseFragment("DashboardFragment"), TileClickListener,
-ActionMode.Callback {
-    private val viewModel by viewModels<DashboardViewModel>()
-    private val tileAdapter = DashboardTileAdapter(this)
-    private val itemTouchedCallback = DashboardTileTouchCallback(tileAdapter)
-    private val itemTouchedHelper = ItemTouchHelper(itemTouchedCallback)
-    private var binding: FragmentDashboardBinding? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
+    private var teamSize by mutableStateOf<Int?>(null)
+    private var teamType by mutableStateOf(TeamType.UNKNOWN)
+    private var mostUsedPlayer by mutableStateOf<MostUsedPlayerUi?>(null)
+    private var lastLineup by mutableStateOf<LastLineupUi?>(null)
+    private var shirtNumberQuery by mutableStateOf("")
+    private var shirtNumberResult by mutableStateOf<String?>(null)
+    private var shirtNumberHistory by mutableStateOf<List<ShirtNumberEntry>>(emptyList())
+    private var showShirtNumberHistoryDialog by mutableStateOf(false)
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return FragmentDashboardBinding.inflate(inflater, container, false).apply {
-            binding = this
-            val columnCount = resources.getInteger(R.integer.dashboard_tile_count)
-            val gridLayoutManager = GridLayoutManager(context, columnCount)
+        return ComposeView(requireContext()).apply {
+            setContent {
+                DugoutTheme {
+                    DashboardScreen(
+                        state = DashboardState(
+                            teamSize = teamSize,
+                            teamType = teamType,
+                            mostUsedPlayer = mostUsedPlayer,
+                            lastLineup = lastLineup,
+                            shirtNumberQuery = shirtNumberQuery,
+                            shirtNumberResult = shirtNumberResult,
+                            shirtNumberHistory = shirtNumberHistory
+                        ),
+                        onRosterClick = ::onRosterClicked,
+                        onLastLineupClick = ::onLastLineupClicked,
+                        onShirtNumberQueryChanged = {
+                            shirtNumberQuery = it.filter(Char::isDigit)
+                        },
+                        onShirtNumberSearch = ::onShirtNumberSearch,
+                        onShirtNumberHistoryClick = {
+                            if (shirtNumberHistory.isNotEmpty()) {
+                                FirebaseAnalyticsUtils.onClick(
+                                    activity,
+                                    "click_dashboard_number_history"
+                                )
+                                showShirtNumberHistoryDialog = true
+                            }
+                        }
+                    )
 
-            tileRecyclerView.apply {
-                layoutManager = gridLayoutManager
-                adapter = tileAdapter
-            }
-
-            viewModel.registerTilesFlow()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach { tileAdapter.submitList(it) }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
-        }.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
-    }
-
-    override fun onTileClicked(type: Int, data: TileData) {
-        when (type) {
-            Constants.TYPE_TEAM_SIZE -> {
-                FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_team_size")
-                findNavController().navigate(
-                    R.id.navigation_team,
-                    null,
-                    NavigationUtils().getOptions()
-                )
-            }
-
-            Constants.TYPE_LAST_LINEUP -> {
-                FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_last_lineup")
-                val lineupId = data.getData()[KEY_LINEUP_ID] as? Long ?: 0L
-                val extras = LineupFragment.getArguments(lineupId).apply {
-                    putBoolean(Constants.EXTRA_IS_FROM_SHORTCUT, true)
-                }
-                findNavController().navigate(
-                    R.id.lineupFragmentFixed,
-                    extras,
-                    NavigationUtils().getOptions()
-                )
-            }
-
-            else -> Timber.d("Click on that tile is not supported, skip")
-        }
-    }
-
-    override fun onTileLongClicked(type: Int) {
-        (activity as? AppCompatActivity)?.let { activity ->
-            FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_reorder")
-            if (!tileAdapter.inEditMode) {
-                viewModel.actionMode = activity.startSupportActionMode(this)?.apply {
-                    title = getString(R.string.dashboard_edit_mode)
+                    if (showShirtNumberHistoryDialog) {
+                        ShirtNumberHistoryDialog(
+                            history = shirtNumberHistory,
+                            onDismiss = { showShirtNumberHistoryDialog = false }
+                        )
+                    }
                 }
             }
         }
     }
 
-    override fun onTileSearchNumberClicked(number: Int) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.registerTilesFlow()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { tiles ->
+                // Each emission is a fresh team's tile set (possibly missing a type entirely
+                // when that team has no games/lineups yet) - recompute every field from scratch
+                // instead of only updating the types present, or a team switch would leave the
+                // previous team's most-used-player/last-lineup/search state stuck on screen.
+                val teamSizeData = tiles.firstOrNull { it.type == TileType.TEAM_SIZE.type }
+                    ?.data as? TeamSizeData
+                teamSize = teamSizeData?.size
+                teamType = teamSizeData?.let { TeamType.getTypeById(it.teamType) }
+                    ?: TeamType.UNKNOWN
+
+                val mostUsedData = tiles.firstOrNull { it.type == TileType.MOST_USED_PLAYER.type }
+                    ?.data as? MostUsedPlayerData
+                mostUsedPlayer = mostUsedData?.let {
+                    MostUsedPlayerUi(it.name.trim(), it.shirtNumber, it.matchPlayed)
+                }
+
+                val lastLineupData = tiles.firstOrNull { it.type == TileType.LAST_LINEUP.type }
+                    ?.data as? LastLineupData
+                lastLineup = lastLineupData?.let {
+                    LastLineupUi(it.lineupId, it.name, it.eventTimeInMillis, it.tournamentName)
+                }
+
+                shirtNumberQuery = ""
+                shirtNumberResult = null
+                shirtNumberHistory = emptyList()
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun onRosterClicked() {
+        FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_team_size")
+        findNavController().navigate(R.id.navigation_team, null, NavigationUtils().getOptions())
+    }
+
+    private fun onLastLineupClicked(lineupId: Long) {
+        FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_last_lineup")
+        val extras = LineupFragment.getArguments(lineupId).apply {
+            putBoolean(Constants.EXTRA_IS_FROM_SHORTCUT, true)
+        }
+        findNavController().navigate(
+            R.id.lineupFragmentFixed,
+            extras,
+            NavigationUtils().getOptions()
+        )
+    }
+
+    private fun onShirtNumberSearch() {
+        val number = shirtNumberQuery.toIntOrNull() ?: return
         FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_search_player")
         hideSoftKeyboard()
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.getShirtNumberHistory(number)
                 .onSuccess { history ->
-                    val item = tileAdapter.currentList.firstOrNull {
-                        it.data is LastPlayerNumberResearchData
-                    }
-                    (item?.data as? LastPlayerNumberResearchData)?.setHistory(history)
-                    val indexOfTile = tileAdapter.currentList.indexOfFirst { it == item }
-                    tileAdapter.notifyItemChanged(indexOfTile)
+                    shirtNumberHistory = history
+                    shirtNumberResult = history.firstOrNull()?.playerName
+                        ?: getString(R.string.generic_not_found)
                 }
                 .onFailure { Timber.e(it) }
         }
-    }
-
-    override fun onTileSearchNumberHistoryClicked(history: List<ShirtNumberEntry>) {
-        if (history.isEmpty()) {
-            return
-        }
-
-        FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_number_history")
-
-        activity?.run {
-            AlertDialog.Builder(this)
-                .setItems(history.map {
-                    val dateInMillis = it.eventTime.takeIf { it > 0 } ?: run { it.createdAt }
-                    val date = DateFormat.getDateInstance().format(Date(dateInMillis))
-                    "${it.playerName} | $date | ${it.lineupName}"
-                }.toTypedArray(), null)
-                .create()
-                .show()
-        }
-    }
-
-    override fun onTileTeamSizeSendButtonClicked() {
-        activity?.let { activity ->
-            val list: MutableList<CharSequence> = mutableListOf()
-            list.addAll(activity.resources.getStringArray(R.array.tile_team_size_send_list_labels))
-            DialogFactory.getListDialog(activity, list.toTypedArray()) { dialogInterface, i ->
-                when (i) {
-                    INDEX_SEND_MESSAGES -> {
-                        FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_send_message")
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            viewModel.getPhones()
-                                .onSuccess {
-                                    if (it.isEmpty()) {
-                                        DialogFactory.getErrorDialog(
-                                            activity,
-                                            R.string.tile_team_size_send_empty_title,
-                                            R.string.tile_team_size_send_empty_phones
-                                        ).show()
-                                    } else {
-                                        val contactsBuilder = StringBuilder("smsto:")
-                                        it.forEach { contactsBuilder.append("$it;") }
-                                        val smsIntent = Intent(
-                                            Intent.ACTION_SENDTO,
-                                            Uri.parse(contactsBuilder.toString())
-                                        )
-                                        smsIntent.resolveActivity(activity.packageManager)?.let {
-                                            startActivity(smsIntent)
-                                        }
-                                    }
-                                }
-                                .onFailure { Timber.e(it) }
-                        }
-                    }
-
-                    INDEX_SEND_EMAILS -> {
-                        FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_send_email")
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            viewModel.getEmails()
-                                .onSuccess {
-                                    if (it.isEmpty()) {
-                                        DialogFactory.getErrorDialog(
-                                            activity,
-                                            R.string.tile_team_size_send_empty_title,
-                                            R.string.tile_team_size_send_empty_emails
-                                        )
-                                            .show()
-                                    } else {
-                                        val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                            // only email apps should handle this
-                                            data = Uri.parse("mailto:")
-                                            putExtra(Intent.EXTRA_EMAIL, it.toTypedArray())
-                                        }
-                                        intent.resolveActivity(activity.packageManager)?.let {
-                                            startActivity(intent)
-                                        }
-                                    }
-                                }
-                                .onFailure { Timber.e(it) }
-                        }
-                    }
-
-                    INDEX_SEND_OTHER -> {
-                        FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_send_other")
-                        val intent = Intent(Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                        }
-                        intent.resolveActivity(activity.packageManager)?.let {
-                            startActivity(intent)
-                        }
-                    }
-                }
-                dialogInterface.dismiss()
-            }.show()
-        }
-    }
-
-    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-        return false
-    }
-
-    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        setActionMode(true)
-        itemTouchedHelper.attachToRecyclerView(binding?.tileRecyclerView)
-        return true
-    }
-
-    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        return false
-    }
-
-    override fun onDestroyActionMode(mode: ActionMode?) {
-        setActionMode(false)
-        itemTouchedHelper.attachToRecyclerView(null)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.saveTiles(tileAdapter.currentList)
-                .onSuccess {
-                    activity?.run {
-                        if (BuildConfig.DEBUG) {
-                            Toast.makeText(this, "Save dashboard success", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-                .onFailure { Timber.e(it) }
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewModel.actionMode?.finish()
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun setActionMode(enable: Boolean) {
-        tileAdapter.inEditMode = enable
-        tileAdapter.notifyDataSetChanged()
     }
 }

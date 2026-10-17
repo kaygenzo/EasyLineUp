@@ -30,8 +30,6 @@ import com.telen.easylineup.domain.usecases.GetPositionsSummaryForPlayer
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
 import com.telen.easylineup.domain.usecases.GetTeam
-import com.telen.easylineup.domain.usecases.GetTeamEmails
-import com.telen.easylineup.domain.usecases.GetTeamPhones
 import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.GetTournamentStatsForPositionTable
 import com.telen.easylineup.domain.usecases.GetTournaments
@@ -72,7 +70,7 @@ object DomainModule {
         single { GetTeam(get(), get()) }
         single { GetAllTeams(get(), get()) }
         single { SaveCurrentTeam(get(), get()) }
-        single { GetDashboardTiles(get(), get(), get(), get(), get(), get(), get()) }
+        single { GetDashboardTiles(get(), get(), get(), get(), get(), get(), get(), get()) }
         single { SaveDashboardTiles(get(), get()) }
         single { CreateDashboardTiles(get(), get()) }
         single { CreateLineup(get(), get(), get()) }
@@ -84,8 +82,6 @@ object DomainModule {
         single { SavePlayer(get(), get(), get(), get(), get()) }
         single { GetPositionsSummaryForPlayer(get(), get()) }
         single { GetPlayers(get(), get(), get()) }
-        single { GetTeamEmails(get(), get()) }
-        single { GetTeamPhones(get(), get()) }
         single { ObservePlayer(get()) }
         single { ObservePlayers(get()) }
         single { ObservePlayerNumberOverlays(get()) }

@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.application
 
+import com.telen.easylineup.dashboard.DashboardViewModel
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.GeocodingProvider
 import com.telen.easylineup.domain.ports.PhoneNumberValidator
@@ -34,4 +35,5 @@ val appModules = module {
     viewModelOf(::SetupViewModel)
     viewModelOf(::TeamViewModel)
     viewModelOf(::PlayerViewModel)
+    viewModelOf(::DashboardViewModel)
 }

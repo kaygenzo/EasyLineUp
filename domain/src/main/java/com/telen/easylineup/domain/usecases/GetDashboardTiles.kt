@@ -18,6 +18,7 @@ import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TilesRepository
+import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import kotlinx.coroutines.withContext
 
 /**
@@ -29,6 +30,7 @@ class GetDashboardTiles(
     private val lineupDao: LineupRepository,
     private val playerFieldPositionDao: PlayerFieldPositionRepository,
     private val tilesRepo: TilesRepository,
+    private val tournamentDao: TournamentRepository,
     private val getTeam: GetTeam,
     private val createDashboardTiles: CreateDashboardTiles,
     private val dispatcherProvider: DispatcherProvider
@@ -72,7 +74,17 @@ class GetDashboardTiles(
     private suspend fun getLastLineup(team: Team): TileData? {
         val lineup = lineupDao.getLastLineup(team.id) ?: return null
         val strategy = TeamStrategy.getStrategyById(lineup.strategy)
-        return LastLineupData(lineup.id, lineup.name, strategy, lineup.extraHitters)
+        val tournamentName = lineup.tournamentId.takeIf { it > 0 }?.let { tournamentId ->
+            tournamentDao.getTournaments().firstOrNull { it.id == tournamentId }?.name
+        }
+        return LastLineupData(
+            lineup.id,
+            lineup.name,
+            strategy,
+            lineup.extraHitters,
+            lineup.eventTimeInMillis,
+            tournamentName
+        )
     }
 
     private fun getLastPlayerNumberResearch(): TileData {
