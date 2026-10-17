@@ -92,31 +92,36 @@ fun DashboardScreen(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            MiniStatCell(
-                modifier = Modifier.weight(1f),
-                label = stringResource(R.string.dashboard_mini_roster_size_label),
-                value = state.teamSize?.toString() ?: "—",
-                footer = if (state.teamType.titleRes() != 0) {
-                    stringResource(state.teamType.titleRes())
-                } else {
-                    null
-                },
-                onClick = onRosterClick
-            )
-            MiniStatCell(
-                modifier = Modifier.weight(1f),
-                label = stringResource(R.string.dashboard_mini_most_used_label),
-                value = state.mostUsedPlayer?.let { "#${it.shirtNumber}" } ?: "—",
-                footer = state.mostUsedPlayer?.name
-            )
-            MiniStatCell(
-                modifier = Modifier.weight(1f),
-                label = stringResource(R.string.dashboard_mini_last_built_label),
-                value = formatLineupDate(state.lastLineup?.eventTimeInMillis ?: 0L, "MMM d")
-                    ?: "—",
-                footer = state.lastLineup?.name
-            )
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                MiniStatCell(
+                    modifier = Modifier.weight(1f),
+                    label = stringResource(R.string.dashboard_mini_roster_size_label),
+                    value = state.teamSize?.toString() ?: "—",
+                    footer = if (state.teamType.titleRes() != 0) {
+                        stringResource(state.teamType.titleRes())
+                    } else {
+                        null
+                    },
+                    onClick = onRosterClick
+                )
+                MiniStatCell(
+                    modifier = Modifier.weight(1f),
+                    label = stringResource(R.string.dashboard_mini_most_used_label),
+                    value = state.mostUsedPlayer?.let { "#${it.shirtNumber}" } ?: "—",
+                    footer = state.mostUsedPlayer?.name
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                MiniStatCell(
+                    modifier = Modifier.weight(1f),
+                    label = stringResource(R.string.dashboard_mini_last_built_label),
+                    value = formatLineupDate(state.lastLineup?.eventTimeInMillis ?: 0L, "MMM d")
+                        ?: "—",
+                    footer = state.lastLineup?.name
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }
         }
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -193,32 +198,32 @@ private fun MiniStatCell(
 ) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surface)
             .then(
                 if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier
             )
-            .padding(horizontal = 10.dp, vertical = 10.dp)
+            .padding(horizontal = 14.dp, vertical = 14.dp)
     ) {
         Text(
             text = label.uppercase(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelMedium
         )
-        Spacer(modifier = Modifier.height(3.dp))
+        Spacer(modifier = Modifier.height(5.dp))
         Text(
             text = value,
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Monospace
         )
         if (footer != null) {
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(3.dp))
             Text(
                 text = footer,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1
             )
         }
