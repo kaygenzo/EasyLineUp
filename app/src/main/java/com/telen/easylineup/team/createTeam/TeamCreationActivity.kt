@@ -81,6 +81,10 @@ class TeamCreationActivity : BaseActivity() {
                         FirebaseAnalyticsUtils.onClick(this, "click_team_edit_image_pick")
                         ImagePickerUtils.launchPicker(pickImage)
                     },
+                    onAvatarRemoveClick = {
+                        FirebaseAnalyticsUtils.onClick(this, "click_team_edit_image_remove")
+                        viewModel.setTeamImage(null)
+                    },
                     onNameChanged = {
                         nameError = null
                         viewModel.setTeamName(it)

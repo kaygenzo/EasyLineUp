@@ -311,12 +311,15 @@ fun InfoCell(modifier: Modifier = Modifier, label: String, value: String, tabula
  * form that lets a user attach a photo (Team form, Player form) - same dashed-empty-state and
  * sibling-offset-badge language as everything else in this system, just a different corner
  * radius and placeholder glyph per caller ([cornerRadius] = size/2 gives Player form's circle,
- * Team form keeps its own rounded-square ratio).
+ * Team form keeps its own rounded-square ratio). The badge has its own tap target
+ * ([onRemoveClick]), separate from tapping the photo itself ([onClick], which always (re)opens
+ * the picker) - clearing the photo is a real, distinct action, not just a relabeled "pick again".
  */
 @Composable
 fun AvatarPicker(
     imageUri: Uri?,
     onClick: () -> Unit,
+    onRemoveClick: () -> Unit,
     size: Dp,
     cornerRadius: Dp,
     placeholderIcon: Int,
@@ -327,11 +330,7 @@ fun AvatarPicker(
     // outward via offset - matches the mockup's avatar-picker__badge, which sits at
     // right:-6px;bottom:-6px, overflowing the tile rather than being cropped by its own
     // rounded corners.
-    Box(
-        modifier = modifier
-            .size(size)
-            .clickable(onClick = onClick)
-    ) {
+    Box(modifier = modifier.size(size)) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -343,7 +342,8 @@ fun AvatarPicker(
                         it
                     }
                 }
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .clickable(onClick = onClick),
             contentAlignment = Alignment.Center
         ) {
             if (bitmap != null) {
@@ -366,11 +366,12 @@ fun AvatarPicker(
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .offset(x = 6.dp, y = 6.dp)
-                .size(26.dp)
-                .clip(RoundedCornerShape(9.dp))
+                .offset(x = 8.dp, y = 8.dp)
+                .size(34.dp)
+                .clip(RoundedCornerShape(11.dp))
                 .background(MaterialTheme.colorScheme.primary)
-                .border(2.dp, MaterialTheme.colorScheme.background, RoundedCornerShape(9.dp)),
+                .border(2.dp, MaterialTheme.colorScheme.background, RoundedCornerShape(11.dp))
+                .clickable(onClick = if (bitmap != null) onRemoveClick else onClick),
             contentAlignment = Alignment.Center
         ) {
             val badgeIcon = if (bitmap != null) {
@@ -382,7 +383,7 @@ fun AvatarPicker(
                 painter = painterResource(badgeIcon),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(13.dp)
+                modifier = Modifier.size(17.dp)
             )
         }
     }

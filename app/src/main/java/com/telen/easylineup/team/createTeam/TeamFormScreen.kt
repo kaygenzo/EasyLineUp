@@ -68,6 +68,7 @@ fun TeamFormScreen(
     state: TeamFormState,
     onCloseClick: () -> Unit,
     onAvatarClick: () -> Unit,
+    onAvatarRemoveClick: () -> Unit,
     onNameChanged: (String) -> Unit,
     onTypeSelected: (TeamType) -> Unit,
     onSaveClick: () -> Unit
@@ -89,6 +90,7 @@ fun TeamFormScreen(
             AvatarPicker(
                 imageUri = state.teamImageUri,
                 onClick = onAvatarClick,
+                onRemoveClick = onAvatarRemoveClick,
                 size = 72.dp,
                 cornerRadius = 20.dp,
                 placeholderIcon = R.drawable.ic_image_placeholder_24dp,
@@ -300,6 +302,7 @@ private fun TeamFormScreenCreatePreview() {
             ),
             onCloseClick = {},
             onAvatarClick = {},
+            onAvatarRemoveClick = {},
             onNameChanged = {},
             onTypeSelected = {},
             onSaveClick = {}
@@ -321,6 +324,7 @@ private fun TeamFormScreenEditPreview() {
             ),
             onCloseClick = {},
             onAvatarClick = {},
+            onAvatarRemoveClick = {},
             onNameChanged = {},
             onTypeSelected = {},
             onSaveClick = {}

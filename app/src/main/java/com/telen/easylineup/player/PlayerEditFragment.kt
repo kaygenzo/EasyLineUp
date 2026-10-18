@@ -153,6 +153,13 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), MenuProvider {
                         onShirtNumberChanged = { shirtNumberText = it.filter(Char::isDigit) },
                         onLicenseNumberChanged = { licenseNumberText = it.filter(Char::isDigit) },
                         onAvatarClick = ::onImagePickerRequested,
+                        onAvatarRemoveClick = {
+                            FirebaseAnalyticsUtils.onClick(
+                                activity,
+                                "click_player_edit_image_remove"
+                            )
+                            imageUri = null
+                        },
                         onSexSelected = { sex = it },
                         onBattingLeftToggled = { battingLeft = !battingLeft },
                         onBattingRightToggled = { battingRight = !battingRight },
