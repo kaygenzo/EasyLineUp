@@ -67,6 +67,7 @@
     <string name="dashboard_mini_roster_size_label">Roster size</string>
     <string name="dashboard_mini_most_used_label">Most used</string>
     <string name="dashboard_hero_empty_title">No lineups built yet.</string>
+    <string name="dashboard_lookup_hint">Who wore this number?</string>
 
     <string name="header_batting_order_player_name">Player name</string>
     <string name="header_batting_order_player_shirt">N°</string>

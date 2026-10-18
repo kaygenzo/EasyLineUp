@@ -265,9 +265,9 @@ private fun ShirtNumberLookupRow(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = stringResource(R.string.tile_last_player_number_message).uppercase(),
+                text = stringResource(R.string.dashboard_lookup_hint).uppercase(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.labelMedium
             )
             if (result != null) {
                 Spacer(modifier = Modifier.height(2.dp))
