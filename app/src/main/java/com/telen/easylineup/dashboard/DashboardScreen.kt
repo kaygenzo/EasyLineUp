@@ -92,36 +92,26 @@ fun DashboardScreen(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                MiniStatCell(
-                    modifier = Modifier.weight(1f),
-                    label = stringResource(R.string.dashboard_mini_roster_size_label),
-                    value = state.teamSize?.toString() ?: "—",
-                    footer = if (state.teamType.titleRes() != 0) {
-                        stringResource(state.teamType.titleRes())
-                    } else {
-                        null
-                    },
-                    onClick = onRosterClick
-                )
-                MiniStatCell(
-                    modifier = Modifier.weight(1f),
-                    label = stringResource(R.string.dashboard_mini_most_used_label),
-                    value = state.mostUsedPlayer?.let { "#${it.shirtNumber}" } ?: "—",
-                    footer = state.mostUsedPlayer?.name
-                )
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                MiniStatCell(
-                    modifier = Modifier.weight(1f),
-                    label = stringResource(R.string.dashboard_mini_last_built_label),
-                    value = formatLineupDate(state.lastLineup?.eventTimeInMillis ?: 0L, "MMM d")
-                        ?: "—",
-                    footer = state.lastLineup?.name
-                )
-                Spacer(modifier = Modifier.weight(1f))
-            }
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            MiniStatCell(
+                modifier = Modifier.weight(1f),
+                label = stringResource(R.string.dashboard_mini_roster_size_label),
+                value = state.teamSize?.toString() ?: "—",
+                footer = if (state.teamType.titleRes() != 0) {
+                    stringResource(state.teamType.titleRes())
+                } else {
+                    null
+                },
+                onClick = onRosterClick
+            )
+            MiniStatCell(
+                modifier = Modifier.weight(1f),
+                label = stringResource(R.string.dashboard_mini_most_used_label),
+                value = state.mostUsedPlayer?.let {
+                    "#${it.shirtNumber.toString().padStart(2, '0')}"
+                } ?: "—",
+                footer = state.mostUsedPlayer?.name
+            )
         }
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -210,12 +200,11 @@ private fun MiniStatCell(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelMedium
         )
-        Spacer(modifier = Modifier.height(5.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = value,
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.displaySmall,
             fontFamily = FontFamily.Monospace
         )
         if (footer != null) {

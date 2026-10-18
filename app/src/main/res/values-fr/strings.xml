@@ -56,7 +56,6 @@
     <string name="tile_most_used_player_games_played">Matchs joués</string>
     <string name="dashboard_mini_roster_size_label">Effectif</string>
     <string name="dashboard_mini_most_used_label">Plus utilisé</string>
-    <string name="dashboard_mini_last_built_label">Dernier créé</string>
     <string name="dashboard_hero_empty_title">Aucun lineup pour l\'instant.</string>
 
     <string name="header_batting_order_player_name">Nom du joueur</string>

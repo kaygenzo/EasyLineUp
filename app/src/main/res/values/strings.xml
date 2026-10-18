@@ -66,7 +66,6 @@
     <string name="tile_last_lineup_header">Last lineup</string>
     <string name="dashboard_mini_roster_size_label">Roster size</string>
     <string name="dashboard_mini_most_used_label">Most used</string>
-    <string name="dashboard_mini_last_built_label">Last built</string>
     <string name="dashboard_hero_empty_title">No lineups built yet.</string>
 
     <string name="header_batting_order_player_name">Player name</string>
