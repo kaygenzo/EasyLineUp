@@ -9,17 +9,25 @@ import com.telen.easylineup.domain.Constants
 const val KEY_DATA_SIZE = 0
 const val KEY_DATA_TEAM_IMAGE = 1
 const val KEY_DATA_TEAM_TYPE = 2
+const val KEY_DATA_TEAM_NAME = 3
 
 /**
  * @property size
  * @property teamType
  * @property teamImage
+ * @property teamName
  */
-class TeamSizeData(val size: Int, val teamType: Int, val teamImage: String?) : TileData {
+class TeamSizeData(
+    val size: Int,
+    val teamType: Int,
+    val teamImage: String?,
+    val teamName: String
+) : TileData {
     override fun getData(): Map<Int, Any> {
         val map: MutableMap<Int, Any> = mutableMapOf()
         map[KEY_DATA_SIZE] = size
         map[KEY_DATA_TEAM_TYPE] = teamType
+        map[KEY_DATA_TEAM_NAME] = teamName
         teamImage?.let { map.put(KEY_DATA_TEAM_IMAGE, it) }
         return map
     }

@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.dashboard
 
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,6 +47,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.dashedBorder
@@ -79,6 +82,8 @@ data class LastLineupUi(
 )
 
 data class DashboardState(
+    val teamName: String,
+    val teamImageUri: Uri?,
     val teamSize: Int?,
     val teamType: TeamType,
     val mostUsedPlayer: MostUsedPlayerUi?,
@@ -95,6 +100,7 @@ private fun formatLineupDate(eventTimeInMillis: Long, pattern: String): String? 
 @Composable
 fun DashboardScreen(
     state: DashboardState,
+    onSwitchTeamClick: () -> Unit,
     onRosterClick: () -> Unit,
     onLastLineupClick: (Long) -> Unit,
     onShirtNumberQueryChanged: (String) -> Unit,
@@ -109,6 +115,12 @@ fun DashboardScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
+        TeamSwitchHeader(
+            teamName = state.teamName,
+            teamImageUri = state.teamImageUri,
+            onClick = onSwitchTeamClick
+        )
+
         HeroLastLineupCard(lastLineup = state.lastLineup, onClick = onLastLineupClick)
 
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -140,6 +152,41 @@ fun DashboardScreen(
             onQueryChanged = onShirtNumberQueryChanged,
             onSearch = onShirtNumberSearch,
             onHistoryClick = onShirtNumberHistoryClick
+        )
+    }
+}
+
+/**
+ * The mockup's own app bar (team avatar + name + chevron, tappable to switch team) - built now
+ * as ordinary screen content, coexisting with the real drawer/toolbar that still owns team
+ * switching today. Once the drawer is retired (a later, separate pass), this row is already
+ * done and just needs to move up into the real app bar.
+ */
+@Composable
+private fun TeamSwitchHeader(teamName: String, teamImageUri: Uri?, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        DugoutAvatar(name = teamName, imageUri = teamImageUri, size = 32.dp)
+        Text(
+            text = teamName,
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleLarge,
+            maxLines = 1
+        )
+        Icon(
+            painter = painterResource(R.drawable.ic_arrow_right_white_24dp),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .size(16.dp)
+                .graphicsLayer(rotationZ = 90f)
         )
     }
 }
@@ -360,6 +407,8 @@ private fun DashboardScreenPreview() {
     DugoutTheme {
         DashboardScreen(
             state = DashboardState(
+                teamName = "Riverside Hawks",
+                teamImageUri = null,
                 teamSize = 14,
                 teamType = TeamType.BASEBALL,
                 mostUsedPlayer = MostUsedPlayerUi("Jonas Alvarez", 7, 15),
@@ -373,6 +422,7 @@ private fun DashboardScreenPreview() {
                 shirtNumberResult = "Jonas Alvarez",
                 shirtNumberHistory = emptyList()
             ),
+            onSwitchTeamClick = {},
             onRosterClick = {},
             onLastLineupClick = {},
             onShirtNumberQueryChanged = {},
@@ -388,6 +438,8 @@ private fun DashboardScreenEmptyPreview() {
     DugoutTheme {
         DashboardScreen(
             state = DashboardState(
+                teamName = "Riverside Storm",
+                teamImageUri = null,
                 teamSize = 3,
                 teamType = TeamType.SOFTBALL,
                 mostUsedPlayer = null,
@@ -396,6 +448,7 @@ private fun DashboardScreenEmptyPreview() {
                 shirtNumberResult = null,
                 shirtNumberHistory = emptyList()
             ),
+            onSwitchTeamClick = {},
             onRosterClick = {},
             onLastLineupClick = {},
             onShirtNumberQueryChanged = {},

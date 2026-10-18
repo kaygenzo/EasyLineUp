@@ -68,7 +68,12 @@ class GetDashboardTiles(
 
     private suspend fun getTeamSize(team: Team): TileData {
         val players = playerDao.getPlayersByTeamId(team.id)
-        return TeamSizeData(players.size, teamType = team.type, teamImage = team.image)
+        return TeamSizeData(
+            players.size,
+            teamType = team.type,
+            teamImage = team.image,
+            teamName = team.name
+        )
     }
 
     private suspend fun getLastLineup(team: Team): TileData? {

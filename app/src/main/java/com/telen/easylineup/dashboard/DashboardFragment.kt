@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.dashboard
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,11 +13,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.BaseFragment
+import com.telen.easylineup.HomeViewModel
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
@@ -38,7 +41,10 @@ import timber.log.Timber
 
 class DashboardFragment : BaseFragment("DashboardFragment") {
     private val viewModel by viewModel<DashboardViewModel>()
+    private val homeViewModel by activityViewModels<HomeViewModel>()
 
+    private var teamName by mutableStateOf("")
+    private var teamImageUri by mutableStateOf<Uri?>(null)
     private var teamSize by mutableStateOf<Int?>(null)
     private var teamType by mutableStateOf(TeamType.UNKNOWN)
     private var mostUsedPlayer by mutableStateOf<MostUsedPlayerUi?>(null)
@@ -58,6 +64,8 @@ class DashboardFragment : BaseFragment("DashboardFragment") {
                 DugoutTheme {
                     DashboardScreen(
                         state = DashboardState(
+                            teamName = teamName,
+                            teamImageUri = teamImageUri,
                             teamSize = teamSize,
                             teamType = teamType,
                             mostUsedPlayer = mostUsedPlayer,
@@ -66,6 +74,7 @@ class DashboardFragment : BaseFragment("DashboardFragment") {
                             shirtNumberResult = shirtNumberResult,
                             shirtNumberHistory = shirtNumberHistory
                         ),
+                        onSwitchTeamClick = ::onSwitchTeamClicked,
                         onRosterClick = ::onRosterClicked,
                         onLastLineupClick = ::onLastLineupClicked,
                         onShirtNumberQueryChanged = {
@@ -106,6 +115,8 @@ class DashboardFragment : BaseFragment("DashboardFragment") {
                 // previous team's most-used-player/last-lineup/search state stuck on screen.
                 val teamSizeData = tiles.firstOrNull { it.type == TileType.TEAM_SIZE.type }
                     ?.data as? TeamSizeData
+                teamName = teamSizeData?.teamName ?: ""
+                teamImageUri = teamSizeData?.teamImage?.let(Uri::parse)
                 teamSize = teamSizeData?.size
                 teamType = teamSizeData?.let { TeamType.getTypeById(it.teamType) }
                     ?: TeamType.UNKNOWN
@@ -127,6 +138,11 @@ class DashboardFragment : BaseFragment("DashboardFragment") {
                 shirtNumberHistory = emptyList()
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun onSwitchTeamClicked() {
+        FirebaseAnalyticsUtils.onClick(activity, "click_dashboard_switch_team")
+        homeViewModel.onSwapButtonClicked()
     }
 
     private fun onRosterClicked() {
