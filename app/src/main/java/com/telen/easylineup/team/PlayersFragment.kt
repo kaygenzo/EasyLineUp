@@ -32,6 +32,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class PlayersFragment : BaseFragment("TeamFragment") {
     private val viewModel: TeamViewModel by viewModel()
 
+    private var teamName by mutableStateOf("")
     private var players by mutableStateOf<List<RosterRowState>>(emptyList())
     private var sortType by mutableStateOf(TeamViewModel.SortType.ALPHA)
 
@@ -44,7 +45,12 @@ class PlayersFragment : BaseFragment("TeamFragment") {
             setContent {
                 DugoutTheme {
                     RosterScreen(
-                        state = RosterState(players = players, sortType = sortType),
+                        state = RosterState(
+                            teamName = teamName,
+                            players = players,
+                            sortType = sortType
+                        ),
+                        onBackClick = { findNavController().navigateUp() },
                         onSortSelected = ::onSortSelected,
                         onPlayerClick = ::onPlayerSelected,
                         onAddPlayerClick = ::onAddPlayerClicked
@@ -60,6 +66,11 @@ class PlayersFragment : BaseFragment("TeamFragment") {
         viewModel.observePlayers()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { playerList -> players = playerList.map { it.toRosterRowState() } }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeCurrentTeamName()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { teamName = it }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 

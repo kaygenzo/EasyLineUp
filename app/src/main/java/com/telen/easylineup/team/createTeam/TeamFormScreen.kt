@@ -44,6 +44,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.compose.AvatarPicker
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
 
@@ -118,45 +119,16 @@ fun TeamFormScreen(
 
 @Composable
 private fun FormAppBar(isEditing: Boolean, onCloseClick: () -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ScreenHeader(
+        icon = R.drawable.ic_close_24dp,
+        onIconClick = onCloseClick,
+        iconContentDescription = stringResource(R.string.team_form_close_content_description),
+        eyebrow = stringResource(R.string.team_form_eyebrow),
+        title = stringResource(
+            if (isEditing) R.string.team_form_title_edit else R.string.team_form_title_create
+        ),
         modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 14.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(30.dp)
-                .clip(RoundedCornerShape(9.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .clickable(onClick = onCloseClick),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_close_24dp),
-                contentDescription = stringResource(R.string.team_form_close_content_description),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(16.dp)
-            )
-        }
-        Column {
-            Text(
-                text = stringResource(R.string.team_form_eyebrow).uppercase(),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelMedium
-            )
-            Text(
-                text = stringResource(
-                    if (isEditing) {
-                        R.string.team_form_title_edit
-                    } else {
-                        R.string.team_form_title_create
-                    }
-                ),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-    }
+    )
 }
 
 @Composable

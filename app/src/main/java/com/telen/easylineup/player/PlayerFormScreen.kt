@@ -41,6 +41,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.compose.AvatarPicker
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamType
@@ -48,6 +49,7 @@ import com.telen.easylineup.domain.model.isDefensePlayer
 import com.telen.easylineup.utils.StringResourcesProviderImpl
 
 data class PlayerFormState(
+    val isEditing: Boolean,
     val name: String,
     val nameError: String?,
     val shirtNumberText: String,
@@ -83,9 +85,25 @@ fun PlayerFormScreen(
     onPositionToggled: (FieldPosition) -> Unit,
     onEmailChanged: (String) -> Unit,
     onPhoneChanged: (String) -> Unit,
+    onCloseClick: () -> Unit,
     onSaveClick: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        ScreenHeader(
+            icon = R.drawable.ic_close_24dp,
+            onIconClick = onCloseClick,
+            iconContentDescription = stringResource(R.string.team_form_close_content_description),
+            eyebrow = stringResource(R.string.title_team),
+            title = stringResource(
+                if (state.isEditing) {
+                    R.string.player_form_title_edit
+                } else {
+                    R.string.player_form_title_create
+                }
+            ),
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
+        )
+
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -423,6 +441,7 @@ private fun PlayerFormScreenCreatePreview() {
     DugoutTheme {
         PlayerFormScreen(
             state = PlayerFormState(
+                isEditing = false,
                 name = "",
                 nameError = null,
                 shirtNumberText = "",
@@ -455,6 +474,7 @@ private fun PlayerFormScreenCreatePreview() {
             onPositionToggled = {},
             onEmailChanged = {},
             onPhoneChanged = {},
+            onCloseClick = {},
             onSaveClick = {}
         )
     }
@@ -466,6 +486,7 @@ private fun PlayerFormScreenEditPreview() {
     DugoutTheme {
         PlayerFormScreen(
             state = PlayerFormState(
+                isEditing = true,
                 name = "Jonas Alvarez",
                 nameError = null,
                 shirtNumberText = "7",
@@ -502,6 +523,7 @@ private fun PlayerFormScreenEditPreview() {
             onPositionToggled = {},
             onEmailChanged = {},
             onPhoneChanged = {},
+            onCloseClick = {},
             onSaveClick = {}
         )
     }

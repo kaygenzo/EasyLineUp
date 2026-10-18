@@ -5,6 +5,9 @@
     <string name="action_share">Partager</string>
     <string name="action_report_issue">Reporter un problème</string>
 
+    <string name="generic_back">Retour</string>
+    <string name="screen_header_eyebrow_app">EasyLineUp</string>
+
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_offense">Attaque</string>
     <string name="new_lineup_substitute_label">Remplaçants</string>
@@ -28,6 +31,7 @@
     <string name="title_player_details">Statistiques</string>
     <string name="title_player_edition">Modification de joueur</string>
     <string name="title_team_details">Infos d\'équipe</string>
+    <string name="team_details_header_title">Équipe</string>
 
     <string name="team_creation_error_name_empty">Le nom de l\'équipe ne peut pas être vide</string>
     <string name="team_form_eyebrow">Équipe</string>
@@ -180,6 +184,8 @@
     <string name="generic_both">Les deux</string>
     <string name="generic_unknown">Inconnu</string>
     <string name="generic_optional">Facultatif</string>
+    <string name="player_form_title_create">Nouveau joueur</string>
+    <string name="player_form_title_edit">Modifier</string>
     <string name="settings_export_success_title">Succès</string>
     <string name="settings_import_success_title">Succès</string>
     <string name="error_when_deleting_lineup">Une erreur s\'est produite pendant la suppression du lineup</string>

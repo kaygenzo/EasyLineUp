@@ -40,7 +40,9 @@ import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.HeaderIconChip
 import com.telen.easylineup.compose.InfoCell
+import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
 import java.text.SimpleDateFormat
@@ -65,7 +67,12 @@ private fun formatCreatedAt(createdAt: Long): String =
         .format(Date(createdAt))
 
 @Composable
-fun TeamDetailsScreen(state: TeamDetailsState, onDeleteClick: () -> Unit) {
+fun TeamDetailsScreen(
+    state: TeamDetailsState,
+    onBackClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -73,6 +80,22 @@ fun TeamDetailsScreen(state: TeamDetailsState, onDeleteClick: () -> Unit) {
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
+        ScreenHeader(
+            icon = R.drawable.ic_arrow_left_white_24dp,
+            onIconClick = onBackClick,
+            iconContentDescription = stringResource(R.string.generic_back),
+            eyebrow = stringResource(R.string.title_settings),
+            title = stringResource(R.string.team_details_header_title),
+            modifier = Modifier.padding(bottom = 20.dp),
+            actions = {
+                HeaderIconChip(
+                    icon = R.drawable.ic_edit_24dp,
+                    contentDescription = stringResource(R.string.action_edit),
+                    onClick = onEditClick
+                )
+            }
+        )
+
         ProfileHead(
             teamName = state.teamName,
             teamType = state.teamType,
@@ -260,6 +283,8 @@ private fun TeamDetailsScreenPreview() {
                 unsetCount = 1,
                 createdAt = 1709251200000L
             ),
+            onBackClick = {},
+            onEditClick = {},
             onDeleteClick = {}
         )
     }

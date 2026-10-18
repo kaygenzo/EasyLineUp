@@ -81,6 +81,7 @@ class SettingsFragment : BaseFragment("Settings") {
                 DugoutTheme {
                     SettingsScreen(
                         state = state,
+                        onBackClick = { findNavController().navigateUp() },
                         onTeamClick = { viewModel.getTeamsCount() },
                         onLineupStyleSelected = { newValue ->
                             FirebaseAnalyticsUtils.onClick(activity, "click_settings_lineup_style")

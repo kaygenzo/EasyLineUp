@@ -37,6 +37,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.PlayerPhotoTile
+import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.compose.shortLabel
 import com.telen.easylineup.domain.model.PlayerSide
@@ -51,6 +52,7 @@ data class RosterRowState(
 )
 
 data class RosterState(
+    val teamName: String,
     val players: List<RosterRowState>,
     val sortType: TeamViewModel.SortType
 )
@@ -58,6 +60,7 @@ data class RosterState(
 @Composable
 fun RosterScreen(
     state: RosterState,
+    onBackClick: () -> Unit,
     onSortSelected: (TeamViewModel.SortType) -> Unit,
     onPlayerClick: (Long) -> Unit,
     onAddPlayerClick: () -> Unit
@@ -72,6 +75,15 @@ fun RosterScreen(
                 .fillMaxSize()
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
+            ScreenHeader(
+                icon = R.drawable.ic_arrow_left_white_24dp,
+                onIconClick = onBackClick,
+                iconContentDescription = stringResource(R.string.generic_back),
+                eyebrow = state.teamName,
+                title = stringResource(R.string.title_team),
+                modifier = Modifier.padding(bottom = 14.dp)
+            )
+
             SortPillsRow(selected = state.sortType, onSortSelected = onSortSelected)
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -250,6 +262,7 @@ private fun RosterScreenPreview() {
     DugoutTheme {
         RosterScreen(
             state = RosterState(
+                teamName = "Riverside Hawks",
                 players = listOf(
                     RosterRowState(
                         id = 1,
@@ -278,6 +291,7 @@ private fun RosterScreenPreview() {
                 ),
                 sortType = TeamViewModel.SortType.ALPHA
             ),
+            onBackClick = {},
             onSortSelected = {},
             onPlayerClick = {},
             onAddPlayerClick = {}
@@ -290,7 +304,12 @@ private fun RosterScreenPreview() {
 private fun RosterScreenEmptyPreview() {
     DugoutTheme {
         RosterScreen(
-            state = RosterState(players = emptyList(), sortType = TeamViewModel.SortType.ALPHA),
+            state = RosterState(
+                teamName = "Riverside Hawks",
+                players = emptyList(),
+                sortType = TeamViewModel.SortType.ALPHA
+            ),
+            onBackClick = {},
             onSortSelected = {},
             onPlayerClick = {},
             onAddPlayerClick = {}

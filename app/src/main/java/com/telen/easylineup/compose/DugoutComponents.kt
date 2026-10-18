@@ -11,8 +11,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -398,3 +401,66 @@ private fun PlayerSide.shortLabelRes(): Int = when (this) {
 /** Shared "L"/"R"/"B" abbreviation for a batting/throwing side (Roster rows, Player profile). */
 @Composable
 fun PlayerSide.shortLabel(): String = stringResource(shortLabelRes())
+
+/**
+ * The mockup's own `.appbar` (icon chip + eyebrow/title column + optional trailing action
+ * chips), built as ordinary screen content - every already-Compose screen still sits inside the
+ * real drawer/system toolbar, which keeps doing its real job (back navigation, edit/delete
+ * menu items) untouched. This header duplicates those same real actions for now, so once the
+ * drawer/toolbar are eventually retired (a separate, later pass), nothing here needs to change.
+ */
+@Composable
+fun ScreenHeader(
+    icon: Int,
+    onIconClick: () -> Unit,
+    iconContentDescription: String?,
+    eyebrow: String,
+    title: String,
+    modifier: Modifier = Modifier,
+    actions: (@Composable RowScope.() -> Unit)? = null
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = modifier
+    ) {
+        HeaderIconChip(
+            icon = icon,
+            contentDescription = iconContentDescription,
+            onClick = onIconClick
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = eyebrow.uppercase(),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.labelMedium
+            )
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+        actions?.invoke(this)
+    }
+}
+
+/** A single 30dp rounded-square icon chip - the header's leading icon and each trailing action. */
+@Composable
+fun HeaderIconChip(icon: Int, contentDescription: String?, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(30.dp)
+            .clip(RoundedCornerShape(9.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = contentDescription,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(16.dp)
+        )
+    }
+}

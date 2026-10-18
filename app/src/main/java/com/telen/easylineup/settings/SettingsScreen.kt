@@ -52,6 +52,7 @@ import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.SharedPreferencesUtils
 import com.telen.easylineup.utils.titleRes
@@ -108,6 +109,7 @@ fun currentSettingsScreenState(
 @Composable
 fun SettingsScreen(
     state: SettingsScreenState,
+    onBackClick: () -> Unit,
     onTeamClick: () -> Unit,
     onLineupStyleSelected: (String) -> Unit,
     onThemeSelected: (String) -> Unit,
@@ -130,6 +132,15 @@ fun SettingsScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 16.dp)
     ) {
+        ScreenHeader(
+            icon = R.drawable.ic_arrow_left_white_24dp,
+            onIconClick = onBackClick,
+            iconContentDescription = stringResource(R.string.generic_back),
+            eyebrow = stringResource(R.string.screen_header_eyebrow_app),
+            title = stringResource(R.string.title_settings),
+            modifier = Modifier.padding(bottom = 14.dp)
+        )
+
         SectionLabel(stringResource(R.string.settings_category_team))
         DugoutCard {
             val teamTypeLabel = if (state.teamType.titleRes() != 0) {
@@ -495,6 +506,7 @@ private fun SettingsScreenPreview() {
                 womenColor = Color(0xFFE8B93F),
                 updateExistingOnImport = false
             ),
+            onBackClick = {},
             onTeamClick = {},
             onLineupStyleSelected = {},
             onThemeSelected = {},

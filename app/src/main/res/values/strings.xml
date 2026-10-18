@@ -8,6 +8,9 @@
     <string name="action_share">Share</string>
     <string name="action_report_issue">Report an issue</string>
 
+    <string name="generic_back">Back</string>
+    <string name="screen_header_eyebrow_app">EasyLineUp</string>
+
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_offense">Offense</string>
     <string name="new_lineup_substitute_label">Substitutes</string>
@@ -34,6 +37,7 @@
     <string name="title_player_details">Statistics</string>
     <string name="title_player_edition">Player edition</string>
     <string name="title_team_details">Team details</string>
+    <string name="team_details_header_title">Team</string>
     <string name="title_lineup_roster">Roster edition</string>
 
     <string name="team_creation_error_name_empty">Team name cannot be empty</string>
@@ -214,6 +218,8 @@
     <string name="generic_both">Both</string>
     <string name="generic_unknown">Unknown</string>
     <string name="generic_optional">Optional</string>
+    <string name="player_form_title_create">New player</string>
+    <string name="player_form_title_edit">Edit details</string>
 
     <string name="settings_export_success_title">Success</string>
     <string name="settings_export_success_message">Successfully exported to external storage in the directory %s </string>

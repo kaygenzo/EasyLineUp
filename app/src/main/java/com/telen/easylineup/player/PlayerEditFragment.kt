@@ -131,6 +131,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), MenuProvider {
                 DugoutTheme {
                     PlayerFormScreen(
                         state = PlayerFormState(
+                            isEditing = viewModel.playerId > 0,
                             name = name,
                             nameError = nameError,
                             shirtNumberText = shirtNumberText,
@@ -168,6 +169,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), MenuProvider {
                         onPositionToggled = ::onPositionToggled,
                         onEmailChanged = { email = it },
                         onPhoneChanged = { phone = it },
+                        onCloseClick = { showDiscardDialog("close_icon") },
                         onSaveClick = ::onSaveClicked
                     )
                 }

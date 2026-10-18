@@ -87,6 +87,8 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
                             unsetCount = unsetCount,
                             createdAt = createdAt
                         ),
+                        onBackClick = { findNavController().navigateUp() },
+                        onEditClick = ::onEditClicked,
                         onDeleteClick = ::showDeleteConfirmation
                     )
                 }
@@ -149,16 +151,20 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_edit -> {
-                FirebaseAnalyticsUtils.onClick(activity, "click_team_details_edit")
-                teamViewModel.team?.let {
-                    FirebaseAnalyticsUtils.startTutorial(activity, false)
-                    val intent = Intent(activity, TeamCreationActivity::class.java)
-                    intent.putExtra(Constants.EXTRA_TEAM, it)
-                    editTeam.launch(intent)
-                }
+                onEditClicked()
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun onEditClicked() {
+        FirebaseAnalyticsUtils.onClick(activity, "click_team_details_edit")
+        teamViewModel.team?.let {
+            FirebaseAnalyticsUtils.startTutorial(activity, false)
+            val intent = Intent(activity, TeamCreationActivity::class.java)
+            intent.putExtra(Constants.EXTRA_TEAM, it)
+            editTeam.launch(intent)
         }
     }
 

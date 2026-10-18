@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -37,8 +38,10 @@ import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.HeaderIconChip
 import com.telen.easylineup.compose.InfoCell
 import com.telen.easylineup.compose.PlayerPhotoTile
+import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.compose.shortLabel
 import com.telen.easylineup.domain.model.FieldPosition
@@ -67,7 +70,13 @@ data class PlayerProfileState(
 )
 
 @Composable
-fun PlayerProfileScreen(state: PlayerProfileState, onStrategySelected: (Int) -> Unit) {
+fun PlayerProfileScreen(
+    state: PlayerProfileState,
+    onStrategySelected: (Int) -> Unit,
+    onBackClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -75,6 +84,28 @@ fun PlayerProfileScreen(state: PlayerProfileState, onStrategySelected: (Int) -> 
             .verticalScroll(rememberScrollState())
             .padding(20.dp)
     ) {
+        ScreenHeader(
+            icon = R.drawable.ic_arrow_left_white_24dp,
+            onIconClick = onBackClick,
+            iconContentDescription = stringResource(R.string.generic_back),
+            eyebrow = stringResource(R.string.title_team),
+            title = state.name,
+            modifier = Modifier.padding(bottom = 20.dp),
+            actions = {
+                HeaderIconChip(
+                    icon = R.drawable.ic_edit_24dp,
+                    contentDescription = stringResource(R.string.action_edit),
+                    onClick = onEditClick
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                HeaderIconChip(
+                    icon = R.drawable.ic_delete_24dp,
+                    contentDescription = stringResource(R.string.action_delete),
+                    onClick = onDeleteClick
+                )
+            }
+        )
+
         ProfileHeader(state)
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -377,7 +408,10 @@ private fun PlayerProfileScreenPreview() {
                 strategyOptions = listOf("Standard"),
                 selectedStrategyIndex = 0
             ),
-            onStrategySelected = {}
+            onStrategySelected = {},
+            onBackClick = {},
+            onEditClick = {},
+            onDeleteClick = {}
         )
     }
 }
@@ -403,7 +437,10 @@ private fun PlayerProfileScreenEmptyPreview() {
                 strategyOptions = listOf("Standard", "Slowpitch"),
                 selectedStrategyIndex = 0
             ),
-            onStrategySelected = {}
+            onStrategySelected = {},
+            onBackClick = {},
+            onEditClick = {},
+            onDeleteClick = {}
         )
     }
 }
