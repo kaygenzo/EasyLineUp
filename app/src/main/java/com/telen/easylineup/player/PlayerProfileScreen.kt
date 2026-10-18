@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -267,39 +266,52 @@ private fun PositionUsageChart(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
+        // The count label reserves its own space at the top of the chart area so the tallest
+        // bar (+ its label) still fits exactly within chartHeight, but every other bar's label
+        // floats right above that bar's own top edge instead of all labels lining up flush at
+        // the chart's top regardless of height.
+        val chartHeight = 88.dp
+        val labelReserve = 18.dp
+        val barMaxHeight = chartHeight - labelReserve
+
         strategy.positions.forEach { position ->
             val count = positionsData[position] ?: 0
             val isHighlighted = count > 0 && count == maxCount
+            val barHeight = barMaxHeight * (count / maxCount.toFloat())
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = if (count > 0) count.toString() else "",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontFamily = FontFamily.Monospace,
-                    style = MaterialTheme.typography.labelSmall
-                )
-                Spacer(modifier = Modifier.height(4.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(88.dp),
+                        .height(chartHeight),
                     contentAlignment = Alignment.BottomCenter
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(fraction = count / maxCount.toFloat())
-                            .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp))
-                            .background(
-                                if (isHighlighted) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.surfaceVariant
-                                }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        if (count > 0) {
+                            Text(
+                                text = count.toString(),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontFamily = FontFamily.Monospace,
+                                style = MaterialTheme.typography.labelSmall
                             )
-                    )
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(barHeight)
+                                .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp))
+                                .background(
+                                    if (isHighlighted) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.surfaceVariant
+                                    }
+                                )
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
