@@ -281,12 +281,14 @@ private fun ShirtNumberLookupRow(
             }
         }
 
-        Icon(
-            painter = painterResource(R.drawable.ic_arrow_right_white_24dp),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(20.dp)
-        )
+        if (history.isNotEmpty()) {
+            Icon(
+                painter = painterResource(R.drawable.ic_arrow_right_white_24dp),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }
 
