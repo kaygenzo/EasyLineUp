@@ -38,7 +38,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
-import com.telen.easylineup.compose.HeaderIconChip
+import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.InfoCell
 import com.telen.easylineup.compose.PlayerPhotoTile
 import com.telen.easylineup.compose.ScreenHeader
@@ -92,13 +92,13 @@ fun PlayerProfileScreen(
             title = stringResource(R.string.title_team),
             modifier = Modifier.padding(bottom = 20.dp),
             actions = {
-                HeaderIconChip(
+                HeaderActionIconChip(
                     icon = R.drawable.ic_edit_24dp,
                     contentDescription = stringResource(R.string.action_edit),
                     onClick = onEditClick
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                HeaderIconChip(
+                HeaderActionIconChip(
                     icon = R.drawable.ic_delete_24dp,
                     contentDescription = stringResource(R.string.action_delete),
                     onClick = onDeleteClick

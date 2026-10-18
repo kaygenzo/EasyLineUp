@@ -40,7 +40,7 @@ import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
-import com.telen.easylineup.compose.HeaderIconChip
+import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.InfoCell
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.domain.model.TeamType
@@ -88,7 +88,7 @@ fun TeamDetailsScreen(
             title = stringResource(R.string.team_details_header_title),
             modifier = Modifier.padding(bottom = 20.dp),
             actions = {
-                HeaderIconChip(
+                HeaderActionIconChip(
                     icon = R.drawable.ic_edit_24dp,
                     contentDescription = stringResource(R.string.action_edit),
                     onClick = onEditClick

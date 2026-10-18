@@ -447,7 +447,7 @@ fun ScreenHeader(
     }
 }
 
-/** A single 30dp rounded-square icon chip - the header's leading icon and each trailing action. */
+/** The header's own leading icon - a 30dp neutral rounded-square chip (mockup's `appbar__icon`). */
 @Composable
 fun HeaderIconChip(icon: Int, contentDescription: String?, onClick: () -> Unit) {
     Box(
@@ -463,6 +463,29 @@ fun HeaderIconChip(icon: Int, contentDescription: String?, onClick: () -> Unit) 
             contentDescription = contentDescription,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(16.dp)
+        )
+    }
+}
+
+/**
+ * A header's trailing action icon - a larger 34dp accent-tinted chip (mockup's `appbar__action`),
+ * visually distinct from the neutral leading [HeaderIconChip].
+ */
+@Composable
+fun HeaderActionIconChip(icon: Int, contentDescription: String?, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(34.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.16f))
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = contentDescription,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(17.dp)
         )
     }
 }
