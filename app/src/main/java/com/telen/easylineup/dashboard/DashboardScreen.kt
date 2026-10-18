@@ -4,9 +4,12 @@
 
 package com.telen.easylineup.dashboard
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,30 +17,34 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
-import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.dashedBorder
@@ -48,6 +55,19 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+private val dashboardCardShape = RoundedCornerShape(16.dp)
+
+/**
+ * The one card look every box on this screen shares (hero, mini-tiles, lookup row) - same
+ * border/radius/background everywhere, unlike the shared [com.telen.easylineup.compose.DugoutCard]
+ * which bakes in its own bottom margin (fine for stacked screens, but fights this screen's own
+ * explicit, uniform Arrangement.spacedBy gaps).
+ */
+private fun Modifier.dashboardCard(borderColor: Color, background: Color): Modifier = this
+    .clip(dashboardCardShape)
+    .background(background)
+    .border(BorderStroke(1.dp, borderColor), dashboardCardShape)
 
 data class MostUsedPlayerUi(val name: String, val shirtNumber: Int, val gamesPlayed: Int)
 
@@ -126,51 +146,53 @@ fun DashboardScreen(
 
 @Composable
 private fun HeroLastLineupCard(lastLineup: LastLineupUi?, onClick: (Long) -> Unit) {
-    DugoutCard {
-        if (lastLineup == null) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .dashedBorder(MaterialTheme.colorScheme.outline, 16.dp)
-                    .padding(20.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.dashboard_hero_empty_title),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            return@DugoutCard
-        }
+    val borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+    val background = MaterialTheme.colorScheme.surface
 
-        val date = formatLineupDate(lastLineup.eventTimeInMillis, "MMM d, yyyy")
-        val subtitle = listOfNotNull(date, lastLineup.tournamentName).joinToString(" · ")
-
+    if (lastLineup == null) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onClick(lastLineup.lineupId) }
-                .padding(16.dp)
+                .dashboardCard(borderColor, background)
+                .padding(20.dp)
         ) {
             Text(
-                text = stringResource(R.string.tile_last_lineup_header).uppercase(),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelMedium
+                text = stringResource(R.string.dashboard_hero_empty_title),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium
             )
-            Spacer(modifier = Modifier.height(6.dp))
+        }
+        return
+    }
+
+    val date = formatLineupDate(lastLineup.eventTimeInMillis, "MMM d, yyyy")
+    val subtitle = listOfNotNull(date, lastLineup.tournamentName).joinToString(" · ")
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .dashboardCard(borderColor, background)
+            .clickable { onClick(lastLineup.lineupId) }
+            .padding(16.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.tile_last_lineup_header).uppercase(),
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.labelMedium
+        )
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = lastLineup.name,
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleLarge
+        )
+        if (subtitle.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = lastLineup.name,
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleLarge
+                text = subtitle,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium
             )
-            if (subtitle.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = subtitle,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
         }
     }
 }
@@ -185,8 +207,10 @@ private fun MiniStatCell(
 ) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surface)
+            .dashboardCard(
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                MaterialTheme.colorScheme.surface
+            )
             .then(
                 if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier
             )
@@ -225,55 +249,79 @@ private fun ShirtNumberLookupRow(
     onSearch: () -> Unit,
     onHistoryClick: () -> Unit
 ) {
-    DugoutCard {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            OutlinedTextField(
-                value = query,
-                onValueChange = onQueryChanged,
-                modifier = Modifier.weight(1f),
-                placeholder = { Text(stringResource(R.string.tile_last_player_number_message)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                textStyle = MaterialTheme.typography.bodyLarge
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .dashboardCard(
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                MaterialTheme.colorScheme.surface
             )
+            .clickable(enabled = history.isNotEmpty(), onClick = onHistoryClick)
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        ShirtNumberInputBox(query = query, onQueryChanged = onQueryChanged, onSearch = onSearch)
 
-            Spacer(modifier = Modifier.width(8.dp))
-
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.tile_last_player_number_message).uppercase(),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.labelSmall
+            )
             if (result != null) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable(enabled = history.isNotEmpty(), onClick = onHistoryClick),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text(
-                        text = stringResource(R.string.tile_last_player_number_label_last),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                    Text(
-                        text = result,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1
-                    )
-                }
-            }
-
-            IconButton(onClick = onSearch) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_baseline_search_24),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = result,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
                 )
             }
         }
+
+        Icon(
+            painter = painterResource(R.drawable.ic_arrow_right_white_24dp),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+@Composable
+private fun ShirtNumberInputBox(
+    query: String,
+    onQueryChanged: (String) -> Unit,
+    onSearch: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
+            .dashedBorder(MaterialTheme.colorScheme.outline.copy(alpha = 0.8f), 12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        BasicTextField(
+            value = query,
+            onValueChange = onQueryChanged,
+            singleLine = true,
+            textStyle = TextStyle(
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                textAlign = TextAlign.Center
+            ),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(onDone = { onSearch() }),
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
