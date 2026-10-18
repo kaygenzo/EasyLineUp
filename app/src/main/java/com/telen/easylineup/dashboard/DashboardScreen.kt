@@ -86,11 +86,10 @@ fun DashboardScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         HeroLastLineupCard(lastLineup = state.lastLineup, onClick = onLastLineupClick)
-
-        Spacer(modifier = Modifier.height(4.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             MiniStatCell(
@@ -113,8 +112,6 @@ fun DashboardScreen(
                 footer = state.mostUsedPlayer?.name
             )
         }
-
-        Spacer(modifier = Modifier.height(4.dp))
 
         ShirtNumberLookupRow(
             query = state.shirtNumberQuery,
