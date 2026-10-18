@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -88,11 +89,17 @@ fun SwitchTeamSheetContent(
         } else {
             teams.forEach { team ->
                 TeamRow(team = team, onClick = { onTeamClick(team) })
+                RowDivider()
             }
         }
 
         CreateTeamRow(onClick = onCreateTeamClick)
     }
+}
+
+@Composable
+private fun RowDivider() {
+    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
 }
 
 @Composable
@@ -151,16 +158,14 @@ private fun CreateTeamRow(onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .dashedBorder(MaterialTheme.colorScheme.outline, 12.dp)
-            .padding(vertical = 14.dp, horizontal = 12.dp),
+            .padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(32.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .size(44.dp)
+                .dashedBorder(MaterialTheme.colorScheme.outline, 13.dp),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -171,8 +176,8 @@ private fun CreateTeamRow(onClick: () -> Unit) {
         }
         Text(
             text = stringResource(R.string.switch_team_sheet_create_row),
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodyLarge
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.titleSmall
         )
     }
 }
