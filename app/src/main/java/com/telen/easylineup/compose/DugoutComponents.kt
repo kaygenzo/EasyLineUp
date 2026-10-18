@@ -414,7 +414,7 @@ fun ScreenHeader(
     icon: Int,
     onIconClick: () -> Unit,
     iconContentDescription: String?,
-    eyebrow: String,
+    eyebrow: String?,
     title: String,
     modifier: Modifier = Modifier,
     actions: (@Composable RowScope.() -> Unit)? = null
@@ -430,11 +430,13 @@ fun ScreenHeader(
             onClick = onIconClick
         )
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = eyebrow.uppercase(),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelMedium
-            )
+            if (eyebrow != null) {
+                Text(
+                    text = eyebrow.uppercase(),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
             Text(
                 text = title,
                 color = MaterialTheme.colorScheme.onBackground,

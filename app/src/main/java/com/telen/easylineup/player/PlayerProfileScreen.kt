@@ -88,8 +88,8 @@ fun PlayerProfileScreen(
             icon = R.drawable.ic_arrow_left_white_24dp,
             onIconClick = onBackClick,
             iconContentDescription = stringResource(R.string.generic_back),
-            eyebrow = stringResource(R.string.title_team),
-            title = state.name,
+            eyebrow = null,
+            title = stringResource(R.string.title_team),
             modifier = Modifier.padding(bottom = 20.dp),
             actions = {
                 HeaderIconChip(
