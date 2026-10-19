@@ -93,13 +93,13 @@ fun PlayerProfileScreen(
             modifier = Modifier.padding(bottom = 20.dp),
             actions = {
                 HeaderActionIconChip(
-                    icon = R.drawable.ic_edit_24dp,
+                    icon = R.drawable.ic_edit_outline_24dp,
                     contentDescription = stringResource(R.string.action_edit),
                     onClick = onEditClick
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 HeaderActionIconChip(
-                    icon = R.drawable.ic_delete_24dp,
+                    icon = R.drawable.ic_delete_outline_24dp,
                     contentDescription = stringResource(R.string.action_delete),
                     onClick = onDeleteClick
                 )
