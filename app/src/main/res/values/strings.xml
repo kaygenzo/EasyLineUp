@@ -266,6 +266,18 @@
     <string name="roster_empty_title">No players yet</string>
     <string name="roster_empty_message">Add your first player to build a roster.</string>
     <string name="roster_add_player_content_description">Add player</string>
+    <string name="roster_message_team_content_description">Message the team</string>
+    <string name="roster_message_sheet_title">Message the team</string>
+    <string name="roster_message_text_label">Text message</string>
+    <string name="roster_message_phone_count">%1$d of %2$d have a number on file</string>
+    <string name="roster_message_email_label">Email</string>
+    <string name="roster_message_email_count">%1$d of %2$d have an email on file</string>
+    <string name="roster_message_share_label">Share another way</string>
+    <string name="roster_message_share_caption">Copies contacts as plain text</string>
+    <string name="roster_message_share_copied">Copied to clipboard</string>
+    <string name="roster_message_footnote">Players missing from a count above won\'t receive that
+        message — add their info from the roster to include them next time.</string>
+    <string name="roster_message_no_app">No app available to handle this</string>
     <string name="player_side_abbr_left">L</string>
     <string name="player_side_abbr_right">R</string>
     <string name="player_side_abbr_both">B</string>

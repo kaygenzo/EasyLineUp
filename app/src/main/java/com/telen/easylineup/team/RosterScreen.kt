@@ -20,22 +20,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.PlayerPhotoTile
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.dashedBorder
@@ -48,7 +55,9 @@ data class RosterRowState(
     val shirtNumber: Int,
     val imageUri: Uri?,
     val battingSide: PlayerSide?,
-    val pitchingSide: PlayerSide?
+    val pitchingSide: PlayerSide?,
+    val phone: String? = null,
+    val email: String? = null
 )
 
 data class RosterState(
@@ -63,7 +72,8 @@ fun RosterScreen(
     onBackClick: () -> Unit,
     onSortSelected: (TeamViewModel.SortType) -> Unit,
     onPlayerClick: (Long) -> Unit,
-    onAddPlayerClick: () -> Unit
+    onAddPlayerClick: () -> Unit,
+    onMessageTeamClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -81,7 +91,20 @@ fun RosterScreen(
                 iconContentDescription = stringResource(R.string.generic_back),
                 eyebrow = state.teamName,
                 title = stringResource(R.string.title_team),
-                modifier = Modifier.padding(bottom = 14.dp)
+                modifier = Modifier.padding(bottom = 14.dp),
+                actions = if (state.players.isNotEmpty()) {
+                    {
+                        HeaderActionIconChip(
+                            icon = R.drawable.ic_welcome_message,
+                            contentDescription = stringResource(
+                                R.string.roster_message_team_content_description
+                            ),
+                            onClick = onMessageTeamClick
+                        )
+                    }
+                } else {
+                    null
+                }
             )
 
             SortPillsRow(selected = state.sortType, onSortSelected = onSortSelected)
@@ -256,6 +279,137 @@ private fun RosterEmptyState() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MessageTeamSheet(
+    teamName: String,
+    players: List<RosterRowState>,
+    onDismiss: () -> Unit,
+    onTextMessageClick: () -> Unit,
+    onEmailClick: () -> Unit,
+    onShareAnotherWayClick: () -> Unit
+) {
+    val phoneCount = players.count { !it.phone.isNullOrBlank() }
+    val emailCount = players.count { !it.email.isNullOrBlank() }
+
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 18.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.roster_message_sheet_title),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = teamName + " · " + pluralStringResource(
+                    R.plurals.team_details_roster_count,
+                    players.size,
+                    players.size
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+            )
+            MessageSheetRow(
+                icon = R.drawable.ic_welcome_message,
+                iconTint = MaterialTheme.colorScheme.primary,
+                label = stringResource(R.string.roster_message_text_label),
+                caption = stringResource(
+                    R.string.roster_message_phone_count,
+                    phoneCount,
+                    players.size
+                ),
+                onClick = { onDismiss(); onTextMessageClick() }
+            )
+            MessageSheetRow(
+                icon = R.drawable.ic_baseline_email_24,
+                iconTint = MaterialTheme.colorScheme.secondary,
+                label = stringResource(R.string.roster_message_email_label),
+                caption = stringResource(
+                    R.string.roster_message_email_count,
+                    emailCount,
+                    players.size
+                ),
+                onClick = { onDismiss(); onEmailClick() }
+            )
+            MessageSheetRow(
+                icon = R.drawable.ic_share_white_24dp,
+                iconTint = MaterialTheme.colorScheme.tertiary,
+                label = stringResource(R.string.roster_message_share_label),
+                caption = stringResource(R.string.roster_message_share_caption),
+                showDivider = false,
+                onClick = { onDismiss(); onShareAnotherWayClick() }
+            )
+            Text(
+                text = stringResource(R.string.roster_message_footnote),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 10.dp, bottom = 24.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun MessageSheetRow(
+    icon: Int,
+    iconTint: Color,
+    label: String,
+    caption: String,
+    onClick: () -> Unit,
+    showDivider: Boolean = true
+) {
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(vertical = 11.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(RoundedCornerShape(11.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(icon),
+                    contentDescription = null,
+                    tint = iconTint,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = label,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    text = caption,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            Icon(
+                painter = painterResource(R.drawable.ic_arrow_right_white_24dp),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+        if (showDivider) {
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+        }
+    }
+}
+
 @DugoutPreviews
 @Composable
 private fun RosterScreenPreview() {
@@ -270,7 +424,9 @@ private fun RosterScreenPreview() {
                         shirtNumber = 7,
                         imageUri = null,
                         battingSide = PlayerSide.RIGHT,
-                        pitchingSide = PlayerSide.RIGHT
+                        pitchingSide = PlayerSide.RIGHT,
+                        phone = "555-0101",
+                        email = "jonas@example.com"
                     ),
                     RosterRowState(
                         id = 2,
@@ -278,7 +434,8 @@ private fun RosterScreenPreview() {
                         shirtNumber = 14,
                         imageUri = null,
                         battingSide = PlayerSide.LEFT,
-                        pitchingSide = null
+                        pitchingSide = null,
+                        phone = "555-0102"
                     ),
                     RosterRowState(
                         id = 3,
@@ -294,7 +451,8 @@ private fun RosterScreenPreview() {
             onBackClick = {},
             onSortSelected = {},
             onPlayerClick = {},
-            onAddPlayerClick = {}
+            onAddPlayerClick = {},
+            onMessageTeamClick = {}
         )
     }
 }
@@ -312,7 +470,8 @@ private fun RosterScreenEmptyPreview() {
             onBackClick = {},
             onSortSelected = {},
             onPlayerClick = {},
-            onAddPlayerClick = {}
+            onAddPlayerClick = {},
+            onMessageTeamClick = {}
         )
     }
 }

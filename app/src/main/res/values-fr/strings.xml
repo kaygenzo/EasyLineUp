@@ -230,6 +230,19 @@
     <string name="roster_empty_title">Aucun joueur</string>
     <string name="roster_empty_message">Ajoutez un joueur pour constituer le roster.</string>
     <string name="roster_add_player_content_description">Ajouter un joueur</string>
+    <string name="roster_message_team_content_description">Contacter l\'équipe</string>
+    <string name="roster_message_sheet_title">Contacter l\'équipe</string>
+    <string name="roster_message_text_label">SMS</string>
+    <string name="roster_message_phone_count">%1$d sur %2$d ont un numéro renseigné</string>
+    <string name="roster_message_email_label">E-mail</string>
+    <string name="roster_message_email_count">%1$d sur %2$d ont un e-mail renseigné</string>
+    <string name="roster_message_share_label">Partager autrement</string>
+    <string name="roster_message_share_caption">Copie les contacts en texte brut</string>
+    <string name="roster_message_share_copied">Copié dans le presse-papiers</string>
+    <string name="roster_message_footnote">Les joueurs absents d\'un des comptages ci-dessus ne
+        recevront pas ce message — complétez leurs informations depuis le roster pour les
+        inclure la prochaine fois.</string>
+    <string name="roster_message_no_app">Aucune application disponible pour cette action</string>
     <string name="player_side_abbr_left">G</string>
     <string name="player_side_abbr_right">D</string>
     <string name="player_side_abbr_both">A</string>
