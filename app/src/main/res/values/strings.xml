@@ -9,6 +9,7 @@
     <string name="action_report_issue">Report an issue</string>
 
     <string name="generic_back">Back</string>
+    <string name="generic_done">Done</string>
     <string name="screen_header_eyebrow_app">EasyLineUp</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>
@@ -166,6 +167,32 @@
     <string name="setting_version_title">Version</string>
     <string name="setting_licenses_title">Licenses</string>
     <string name="setting_play_store_title">Google Play Store official page</string>
+
+    <string name="data_transfer_count_teams">Teams</string>
+    <string name="data_transfer_count_players">Players</string>
+    <string name="data_transfer_count_lineups">Lineups</string>
+    <string name="data_transfer_count_tournaments">Tournaments</string>
+    <string name="data_transfer_added_updated">%1$d added · %2$d updated</string>
+
+    <string name="export_confirm_title">Export all data</string>
+    <string name="export_confirm_message">Every team on this device — not just %1$s — saved as
+        one .elu file</string>
+    <string name="export_confirm_footnote">You\'ll be asked to choose a folder next — Android\'s
+        own picker, not part of this app.</string>
+    <string name="export_confirm_action">Choose folder</string>
+    <string name="export_success_title">Export complete</string>
+    <string name="export_success_message">Saved to %1$s as %2$s</string>
+    <string name="export_success_message_no_folder">Saved as %1$s</string>
+
+    <string name="import_confirm_title">Import this file?</string>
+    <string name="import_confirm_overwrite_label">Overwrite existing</string>
+    <string name="import_confirm_overwrite_sub">Matching teams and players already on this
+        device get replaced instead of skipped</string>
+    <string name="import_confirm_footnote">This confirmation now appears whichever way you got
+        here — tapping \"Import data\" in Settings, or opening a .elu file directly — so this
+        choice is never made for you silently.</string>
+    <string name="import_confirm_action">Import</string>
+    <string name="import_success_title">Import complete</string>
 
     <string name="key_lineup_style" translatable="false">key_lineup_style</string>
     <string name="key_men_style" translatable="false">key_men_style</string>

@@ -6,6 +6,7 @@
     <string name="action_report_issue">Reporter un problème</string>
 
     <string name="generic_back">Retour</string>
+    <string name="generic_done">Terminé</string>
     <string name="screen_header_eyebrow_app">EasyLineUp</string>
 
     <string name="new_lineup_tab_field_defense">Defense</string>
@@ -141,6 +142,33 @@
     <string name="setting_version_title">Version</string>
     <string name="setting_licenses_title">Licences</string>
     <string name="setting_play_store_title">Page officielle du Google Play store</string>
+
+    <string name="data_transfer_count_teams">Équipes</string>
+    <string name="data_transfer_count_players">Joueurs</string>
+    <string name="data_transfer_count_lineups">Compositions</string>
+    <string name="data_transfer_count_tournaments">Tournois</string>
+    <string name="data_transfer_added_updated">%1$d ajouté(s) · %2$d mis à jour</string>
+
+    <string name="export_confirm_title">Exporter toutes les données</string>
+    <string name="export_confirm_message">Chaque équipe sur cet appareil — pas seulement %1$s —
+        enregistrée dans un seul fichier .elu</string>
+    <string name="export_confirm_footnote">On te demandera ensuite de choisir un dossier —
+        le sélecteur natif d\'Android, qui ne fait pas partie de cette refonte.</string>
+    <string name="export_confirm_action">Choisir un dossier</string>
+    <string name="export_success_title">Export terminé</string>
+    <string name="export_success_message">Enregistré dans %1$s sous %2$s</string>
+    <string name="export_success_message_no_folder">Enregistré sous %1$s</string>
+
+    <string name="import_confirm_title">Importer ce fichier ?</string>
+    <string name="import_confirm_overwrite_label">Écraser les données existantes</string>
+    <string name="import_confirm_overwrite_sub">Les équipes et joueurs déjà présents sur cet
+        appareil seront remplacés au lieu d\'être ignorés</string>
+    <string name="import_confirm_footnote">Cette confirmation apparaît maintenant quelle que soit
+        la façon dont tu es arrivé ici — en appuyant sur \"Importer les données\" dans les
+        réglages, ou en ouvrant directement un fichier .elu — ce choix n\'est donc jamais fait
+        silencieusement à ta place.</string>
+    <string name="import_confirm_action">Importer</string>
+    <string name="import_success_title">Import terminé</string>
 
     <string name="login_create">Créez votre première équipe</string>
     <string name="login_import">Importez une équipe existante</string>
