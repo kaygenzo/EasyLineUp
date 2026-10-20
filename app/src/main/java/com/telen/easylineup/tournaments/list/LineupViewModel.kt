@@ -118,7 +118,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
                     Constants.MAP_PIXEL_SIZE,
                     Constants.MAP_PIXEL_SIZE
                 ).getOrElse { MapInfo() }
-                if (mapInfo.url?.isNotEmpty() == true) {
+                if (mapInfo.location != null) {
                     mapsFlow.tryEmit(Pair(item.tournament, mapInfo))
                 }
             }
