@@ -11,144 +11,139 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
-import com.telen.easylineup.databinding.FragmentListTournamentsBinding
+import com.telen.easylineup.compose.ConfirmSheet
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.GeoLocation
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
-import com.telen.easylineup.launch
 import com.telen.easylineup.lineup.LineupFragment
 import com.telen.easylineup.lineup.edition.LineupEditionFragment
-import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
-import com.telen.easylineup.utils.hideSoftKeyboard
-import com.telen.easylineup.views.OnSearchBarListener
-import io.reactivex.rxjava3.core.Completable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx3.rxCompletable
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class LineupsScrollListener(private val view: FloatingActionButton) :
-    RecyclerView.OnScrollListener() {
-    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-        super.onScrolled(recyclerView, dx, dy)
-        if (dy > 0 && view.visibility == View.VISIBLE) {
-            view.hide()
-        } else if (dy < 0 && view.visibility != View.VISIBLE) {
-            view.show()
-        }
-    }
-}
-
-class TournamentListFragment : BaseFragment("TournamentListFragment"), OnTournamentItemListener,
-OnSearchBarListener {
+class TournamentListFragment : BaseFragment("TournamentListFragment") {
     private val viewModel by viewModels<LineupViewModel>()
-    private var binding: FragmentListTournamentsBinding? = null
-    private lateinit var tournamentsAdapter: TournamentsAdapter
+    private val teamViewModel: TeamViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        tournamentsAdapter = TournamentsAdapter(this)
-    }
+    private var teamName by mutableStateOf("")
+    private var teamType by mutableStateOf(TeamType.UNKNOWN)
+    private var tournamentItems by mutableStateOf<List<TournamentItem>>(emptyList())
+    private var mapsByTournamentId by mutableStateOf<Map<Long, GeoLocation>>(emptyMap())
+    private var searchQuery by mutableStateOf("")
+    private var tournamentPendingDeletion by mutableStateOf<Tournament?>(null)
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return FragmentListTournamentsBinding.inflate(layoutInflater, container, false).apply {
-            binding = this
+        return ComposeView(requireContext()).apply {
+            setContent {
+                DugoutTheme {
+                    TournamentListScreen(
+                        state = TournamentListState(
+                            teamName = teamName,
+                            teamType = teamType,
+                            items = tournamentItems,
+                            mapsByTournamentId = mapsByTournamentId,
+                            searchQuery = searchQuery
+                        ),
+                        onBackClick = { findNavController().navigateUp() },
+                        onSearchQueryChanged = {
+                            searchQuery = it
+                            viewModel.setFilter(it)
+                        },
+                        onCreateLineupClick = {
+                            FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_create")
+                            findNavController().navigate(
+                                R.id.lineupCreationFragment,
+                                null,
+                                NavigationUtils().getOptions()
+                            )
+                        },
+                        onLineupClick = ::onLineupClicked,
+                        onEditLineupClick = ::onEditLineupClicked,
+                        onStatsClick = ::onStatisticsTournamentClicked,
+                        onDeleteClick = { tournamentPendingDeletion = it },
+                        onMapClick = ::onMapClicked
+                    )
 
-            viewModel.mapsFlow
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach { tournamentsAdapter.setMapToTournament(it.first, it.second) }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
-
-            recyclerView.apply {
-                layoutManager = GridLayoutManager(context, 1)
-                adapter = tournamentsAdapter
-
-                // display or hide the fab when scrolling
-                addOnScrollListener(LineupsScrollListener(fab))
+                    tournamentPendingDeletion?.let { tournament ->
+                        ConfirmSheet(
+                            title = stringResource(
+                                R.string.dialog_delete_tournament_title,
+                                tournament.name
+                            ),
+                            message = stringResource(R.string.dialog_delete_cannot_undo_message),
+                            confirmLabel = stringResource(R.string.action_delete),
+                            cancelLabel = stringResource(R.string.cancel_button),
+                            onDismiss = { tournamentPendingDeletion = null },
+                            onConfirm = {
+                                FirebaseAnalyticsUtils.onClick(
+                                    activity,
+                                    "click_tournaments_delete"
+                                )
+                                deleteTournament(tournament)
+                            }
+                        )
+                    }
+                }
             }
-
-            fab.setOnClickListener {
-                FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_create")
-                findNavController().navigate(
-                    R.id.lineupCreationFragment,
-                    null,
-                    NavigationUtils().getOptions()
-                )
-            }
-
-            viewModel.observeCategorizedLineups()
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .onEach { tournamentsAdapter.setList(it) }
-                .launchIn(viewLifecycleOwner.lifecycleScope)
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.getTeamType()
-                    .onSuccess { tournamentsAdapter.setTeamType(it) }
-                    .onFailure { Timber.e(it) }
-            }
-
-            viewModel.setFilter("")
-
-            materialSearchBar.onSearchBarListener = this@TournamentListFragment
-        }.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding?.recyclerView?.apply {
-            adapter = null
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        binding?.materialSearchBar?.setIdle()
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onDeleteTournamentClicked(tournament: Tournament) {
-        activity?.let {
-            FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_delete")
-            val task: Completable = rxCompletable { viewModel.deleteTournament(tournament).getOrThrow() }
-                .doOnError { throwable ->
-                    Toast.makeText(
-                        activity,
-                        "Something wrong happened: ${throwable.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+        teamViewModel.observeCurrentTeamName()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { teamName = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.mapsFlow
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { (tournament, mapInfo) ->
+                mapInfo.location?.let { location ->
+                    mapsByTournamentId = mapsByTournamentId + (tournament.id to location)
                 }
-                .doOnComplete {
-                    viewModel.setFilter("")
-                }
-            DialogFactory.getWarningTaskDialog(
-                context = it,
-                title = R.string.dialog_delete_tournament_title,
-                titleArgs = arrayOf(tournament.name),
-                message = R.string.dialog_delete_cannot_undo_message,
-                task = task
-            ).show()
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeCategorizedLineups()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { tournamentItems = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.getTeamType()
+                .onSuccess { teamType = TeamType.getTypeById(it) }
+                .onFailure { Timber.e(it) }
         }
+
+        viewModel.setFilter("")
     }
 
-    override fun onStatisticsTournamentClicked(teamType: TeamType, tournament: Tournament) {
+    private fun onStatisticsTournamentClicked(tournament: Tournament) {
         FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_stats")
         val extras = Bundle()
         extras.putSerializable(Constants.EXTRA_TOURNAMENT, tournament)
@@ -160,7 +155,7 @@ OnSearchBarListener {
         )
     }
 
-    override fun onEditLineupClicked(lineup: Lineup) {
+    private fun onEditLineupClicked(lineup: Lineup) {
         findNavController().navigate(
             R.id.lineupRosterFragment,
             LineupEditionFragment.getBundle(lineup.id),
@@ -168,32 +163,33 @@ OnSearchBarListener {
         )
     }
 
-    override fun onMapClicked(location: GeoLocation) {
+    private fun onMapClicked(location: GeoLocation) {
         val urlString = "geo:${location.latitude},${location.longitude}"
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(urlString)))
     }
 
-    override fun onHeaderClicked() {
-
+    private fun onLineupClicked(lineup: Lineup) {
+        FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_lineup_selected")
+        findNavController().navigate(
+            R.id.lineupFragmentFixed,
+            LineupFragment.getArguments(lineup.id),
+            NavigationUtils().getOptions()
+        )
     }
 
-    override fun onLineupClicked(lineup: Lineup) {
-        activity?.let {
-            FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_lineup_selected")
-            val extras = LineupFragment.getArguments(lineup.id)
-            findNavController().navigate(
-                R.id.lineupFragmentFixed,
-                extras,
-                NavigationUtils().getOptions()
-            )
-        }
-    }
-
-    override fun onSearchConfirmed(text: String?) {
-        text?.let {
-            FirebaseAnalyticsUtils.onClick(activity, "click_tournaments_search")
-            viewModel.setFilter(it)
-            hideSoftKeyboard()
+    private fun deleteTournament(tournament: Tournament) {
+        val activity = activity ?: return
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.deleteTournament(tournament)
+                .onSuccess { viewModel.setFilter("") }
+                .onFailure { throwable ->
+                    Timber.e(throwable)
+                    Toast.makeText(
+                        activity,
+                        "Something wrong happened: ${throwable.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
         }
     }
 }
