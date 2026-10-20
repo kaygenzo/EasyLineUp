@@ -12,17 +12,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.telen.easylineup.BaseActivity
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
-import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import kotlinx.coroutines.flow.launchIn
@@ -39,6 +40,7 @@ class TeamCreationActivity : BaseActivity() {
     private var teamImageUri by mutableStateOf<Uri?>(null)
     private var teamType by mutableStateOf(TeamType.BASEBALL)
     private var nameError by mutableStateOf<String?>(null)
+    private var showDiscardSheet by mutableStateOf(false)
 
     private val pickImage = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
         it?.let { uri ->
@@ -92,6 +94,17 @@ class TeamCreationActivity : BaseActivity() {
                     onTypeSelected = { viewModel.setTeamType(it) },
                     onSaveClick = ::onSaveClicked
                 )
+
+                if (showDiscardSheet) {
+                    ConfirmSheet(
+                        title = stringResource(R.string.discard_change_title),
+                        message = stringResource(R.string.discard_change_message),
+                        confirmLabel = stringResource(R.string.generic_discard),
+                        cancelLabel = stringResource(R.string.discard_keep_editing),
+                        onDismiss = { showDiscardSheet = false },
+                        onConfirm = ::finish
+                    )
+                }
             }
         }
     }
@@ -121,6 +134,6 @@ class TeamCreationActivity : BaseActivity() {
 
     private fun showDiscardDialog(trigger: String) {
         FirebaseAnalyticsUtils.onClick(this, "click_create_team_cancel_$trigger")
-        DialogFactory.getDiscardDialog(this) { _, _ -> finish() }.show()
+        showDiscardSheet = true
     }
 }
