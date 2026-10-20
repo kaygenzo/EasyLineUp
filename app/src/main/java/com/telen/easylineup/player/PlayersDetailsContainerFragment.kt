@@ -12,6 +12,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -19,10 +23,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.ConfirmSheet
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.databinding.FragmentPlayersDetailsContainerBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.team.TeamViewModel
-import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -43,6 +48,7 @@ class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFra
     }
     private lateinit var playersAdapter: PlayersDetailsPagerAdapter
     private lateinit var pager: ViewPager2
+    private var showDeleteSheet by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +81,21 @@ class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFra
                 pager.setCurrentItem(playerIndex, false)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        binding.composeOverlay.setContent {
+            DugoutTheme {
+                if (showDeleteSheet) {
+                    ConfirmSheet(
+                        title = stringResource(R.string.dialog_delete_player_title),
+                        message = stringResource(R.string.dialog_delete_cannot_undo_message),
+                        confirmLabel = stringResource(R.string.action_delete),
+                        cancelLabel = stringResource(R.string.cancel_button),
+                        onDismiss = { showDeleteSheet = false },
+                        onConfirm = ::deleteSelectedPlayer
+                    )
+                }
+            }
+        }
 
         return binding.root
     }
@@ -114,30 +135,24 @@ class PlayersDetailsContainerFragment : BaseFragment("PlayersDetailsContainerFra
             }
             R.id.action_delete -> {
                 FirebaseAnalyticsUtils.onClick(activity, "click_player_details_delete")
-                askUserConsentForDeletePlayerWithId(selectedPlayerId)
+                playerViewModel.playerId = selectedPlayerId
+                showDeleteSheet = true
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun askUserConsentForDeletePlayerWithId(playerId: Long) {
-        activity?.let { activity ->
-            playerViewModel.playerId = playerId
-            val task = rxCompletable { playerViewModel.deletePlayer().getOrThrow() }
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnComplete { findNavController().popBackStack(R.id.navigation_team, false) }
-                .doOnError {
-                    val message = "Something wrong happened: ${it.message}"
-                    Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
-                }
-            DialogFactory.getWarningTaskDialog(
-                context = activity,
-                title = R.string.dialog_delete_player_title,
-                message = R.string.dialog_delete_cannot_undo_message,
-                task = task
-            ).show()
-        }
+    private fun deleteSelectedPlayer() {
+        val activity = activity ?: return
+        rxCompletable { playerViewModel.deletePlayer().getOrThrow() }
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnComplete { findNavController().popBackStack(R.id.navigation_team, false) }
+            .doOnError {
+                val message = "Something wrong happened: ${it.message}"
+                Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
+            }
+            .subscribe({}, {})
     }
 
     private fun pageSelected(position: Int) {
