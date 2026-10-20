@@ -73,6 +73,28 @@
 
     <string name="lineup_list_filter_unfocused_hint">Filtrer par nom</string>
 
+    <string name="tournaments_list_header_title">Tournois</string>
+    <string name="tournaments_list_search_placeholder">Rechercher des tournois ou des
+        compositions…</string>
+    <plurals name="tournaments_list_lineups_count">
+        <item quantity="one">%d composition</item>
+        <item quantity="other">%d compositions</item>
+    </plurals>
+    <plurals name="tournaments_list_show_more">
+        <item quantity="one">Afficher %d de plus</item>
+        <item quantity="other">Afficher %d de plus</item>
+    </plurals>
+    <string name="tournaments_list_empty_title">Pas encore de tournoi</string>
+    <string name="tournaments_list_empty_subtitle">Créez une composition pour ajouter le
+        premier</string>
+    <string name="tournaments_list_empty_search_title">Aucun résultat</string>
+    <string name="tournaments_list_empty_search_subtitle">Essayez un autre nom de tournoi ou de
+        composition</string>
+    <string name="tournaments_list_stats_content_description">Voir les statistiques du
+        tournoi</string>
+    <string name="tournaments_list_create_lineup_content_description">Créer une
+        composition</string>
+
     <string name="shake_beta_title">Un problème ? </string>
     <string name="shake_beta_description">Secouez votre périphérique ou cliquez ici pour envoyez un rapport</string>
 

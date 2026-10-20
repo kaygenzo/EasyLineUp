@@ -83,6 +83,24 @@
 
     <string name="lineup_list_filter_unfocused_hint">Filter name</string>
 
+    <string name="tournaments_list_header_title">Tournaments</string>
+    <string name="tournaments_list_search_placeholder">Search tournaments or lineups…</string>
+    <plurals name="tournaments_list_lineups_count">
+        <item quantity="one">%d lineup</item>
+        <item quantity="other">%d lineups</item>
+    </plurals>
+    <plurals name="tournaments_list_show_more">
+        <item quantity="one">Show %d more</item>
+        <item quantity="other">Show %d more</item>
+    </plurals>
+    <string name="tournaments_list_empty_title">No tournaments yet</string>
+    <string name="tournaments_list_empty_subtitle">Create a lineup to add your first one</string>
+    <string name="tournaments_list_empty_search_title">No matches</string>
+    <string name="tournaments_list_empty_search_subtitle">Try a different tournament or lineup
+        name</string>
+    <string name="tournaments_list_stats_content_description">View tournament stats</string>
+    <string name="tournaments_list_create_lineup_content_description">Create lineup</string>
+
     <string name="shake_beta_title">Any problem ?</string>
     <string name="shake_beta_description">Shake your phone or click here to send a report</string>
 
