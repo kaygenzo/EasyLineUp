@@ -24,10 +24,15 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -487,5 +492,60 @@ fun HeaderActionIconChip(icon: Int, contentDescription: String?, onClick: () -> 
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(17.dp)
         )
+    }
+}
+
+/**
+ * A destructive/discard confirmation bottom sheet (mockup's `.sheet` + `.formbar--danger`),
+ * replacing a native `AlertDialog` (`DialogFactory`) with the same two-button shape the mockup
+ * uses everywhere a confirm/cancel choice is destructive - "Keep editing"/"Discard", "Cancel"/
+ * "Delete team", etc.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ConfirmSheet(
+    title: String,
+    message: String,
+    confirmLabel: String,
+    cancelLabel: String,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(modifier = Modifier.padding(horizontal = 18.dp, vertical = 4.dp)) {
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = message,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 8.dp, bottom = 22.dp)
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(text = cancelLabel, fontWeight = FontWeight.Bold)
+                }
+                Button(
+                    onClick = {
+                        onDismiss()
+                        onConfirm()
+                    },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text(text = confirmLabel, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
     }
 }
