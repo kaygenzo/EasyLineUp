@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -25,6 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.FieldPosition
@@ -37,7 +39,6 @@ import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.errors.DomainErrors
 import com.telen.easylineup.launch
-import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import kotlinx.coroutines.flow.launchIn
@@ -70,6 +71,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), MenuProvider {
     private var pitchingRight by mutableStateOf(false)
     private var selectedPositions by mutableStateOf<Set<FieldPosition>>(emptySet())
     private var teamTypeId by mutableStateOf(0)
+    private var showDiscardSheet by mutableStateOf(false)
 
     private val pickImage = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) {
         it?.let { uri ->
@@ -172,6 +174,17 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), MenuProvider {
                         onCloseClick = { showDiscardDialog("close_icon") },
                         onSaveClick = ::onSaveClicked
                     )
+
+                    if (showDiscardSheet) {
+                        ConfirmSheet(
+                            title = stringResource(R.string.discard_change_title),
+                            message = stringResource(R.string.discard_change_message),
+                            confirmLabel = stringResource(R.string.generic_discard),
+                            cancelLabel = stringResource(R.string.discard_keep_editing),
+                            onDismiss = { showDiscardSheet = false },
+                            onConfirm = { findNavController().navigateUp() }
+                        )
+                    }
                 }
             }
         }
@@ -316,9 +329,7 @@ class PlayerEditFragment : BaseFragment("PlayerEditFragment"), MenuProvider {
 
     private fun showDiscardDialog(trigger: String) {
         FirebaseAnalyticsUtils.onClick(activity, "click_player_edit_cancel_$trigger")
-        DialogFactory.getDiscardDialog(requireContext()) { _, _ ->
-            findNavController().navigateUp()
-        }.show()
+        showDiscardSheet = true
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
