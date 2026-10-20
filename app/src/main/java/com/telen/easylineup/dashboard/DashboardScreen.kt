@@ -25,11 +25,12 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -374,31 +376,138 @@ private fun ShirtNumberInputBox(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShirtNumberHistoryDialog(history: List<ShirtNumberEntry>, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.ok))
+fun ShirtNumberHistorySheet(history: List<ShirtNumberEntry>, onDismiss: () -> Unit) {
+    val distinctPlayerCount = history.map { it.playerId }.distinct().size
+    val number = history.firstOrNull()?.number?.toString()?.padStart(2, '0').orEmpty()
+
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 18.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.shirt_number_history_title, number),
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = pluralStringResource(
+                    R.plurals.team_details_roster_count,
+                    distinctPlayerCount,
+                    distinctPlayerCount
+                ) + " · " + pluralStringResource(
+                    R.plurals.lineups_quantity,
+                    history.size,
+                    history.size
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
+            )
+            history.forEachIndexed { index, entry ->
+                ShirtNumberHistoryRow(
+                    entry = entry,
+                    isCurrent = index == 0,
+                    showDivider = index != history.lastIndex
+                )
             }
-        },
-        title = { Text(stringResource(R.string.tile_last_player_number_message)) },
-        text = {
-            Column {
-                history.forEach { entry ->
-                    val dateInMillis = entry.eventTime.takeIf { it > 0 } ?: entry.createdAt
-                    val date = DateFormat.getDateInstance().format(Date(dateInMillis))
-                    Text(
-                        text = "${entry.playerName} | $date | ${entry.lineupName}",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    )
-                }
+            Text(
+                text = stringResource(R.string.shirt_number_history_footnote),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 10.dp, bottom = 18.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ShirtNumberHistoryRow(
+    entry: ShirtNumberEntry,
+    isCurrent: Boolean,
+    showDivider: Boolean
+) {
+    Column {
+        Row(
+            modifier = Modifier.padding(vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .border(
+                        1.dp,
+                        if (isCurrent) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                        },
+                        RoundedCornerShape(12.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = entry.number.toString().padStart(2, '0'),
+                    color = if (isCurrent) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = entry.playerName,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = entry.lineupName,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            if (isCurrent) {
+                CurrentPill()
+            } else {
+                val dateInMillis = entry.eventTime.takeIf { it > 0 } ?: entry.createdAt
+                Text(
+                    text = DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(dateInMillis)),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontFamily = FontFamily.Monospace
+                )
             }
         }
-    )
+        if (showDivider) {
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+        }
+    }
+}
+
+@Composable
+private fun CurrentPill() {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.16f))
+            .padding(horizontal = 10.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.switch_team_sheet_current).uppercase(),
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.labelSmall
+        )
+    }
 }
 
 @DugoutPreviews

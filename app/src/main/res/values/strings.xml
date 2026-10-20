@@ -232,7 +232,9 @@
         <item quantity="other">Substitutes: %d</item>
     </plurals>
 
-    <string name="tile_last_player_number_message">Shirt N° history</string>
+    <string name="shirt_number_history_title">Number %1$s — history</string>
+    <string name="shirt_number_history_footnote">Sorted most recent first — pulled from every past
+        lineup, not just the current roster.</string>
     <string name="tile_last_player_number_label_last">Last:</string>
 
     <string name="lineup_style_normal_label">Normal</string>

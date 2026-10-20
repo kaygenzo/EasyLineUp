@@ -93,7 +93,7 @@ class DashboardFragment : BaseFragment("DashboardFragment") {
                     )
 
                     if (showShirtNumberHistoryDialog) {
-                        ShirtNumberHistoryDialog(
+                        ShirtNumberHistorySheet(
                             history = shirtNumberHistory,
                             onDismiss = { showShirtNumberHistoryDialog = false }
                         )
