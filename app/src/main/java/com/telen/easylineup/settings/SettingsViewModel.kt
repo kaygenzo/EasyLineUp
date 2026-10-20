@@ -9,6 +9,8 @@ import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.telen.easylineup.compose.DataCounts
+import com.telen.easylineup.compose.toDataCounts
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.DeleteAllData
@@ -31,9 +33,19 @@ sealed class Event
 object DeleteAllDataEventSuccess : Event()
 object DeleteAllDataEventFailure : Event()
 /**
- * @property pathDirectory
+ * @property exportBase the data about to be exported, before the folder picker runs
  */
-data class ExportDataEventSuccess(val pathDirectory: String) : Event()
+data class ExportPreviewReady(val exportBase: ExportBase) : Event()
+/**
+ * @property folderName the picked folder's display name, when the SAF provider exposes one
+ * @property fileName the written file's own name
+ * @property counts what actually got written
+ */
+data class ExportDataEventSuccess(
+    val folderName: String?,
+    val fileName: String,
+    val counts: DataCounts
+) : Event()
 object ExportDataEventFailure : Event()
 /**
  * @property count
@@ -81,15 +93,13 @@ class SettingsViewModel(
     }
 
     /**
-     * @return The directory name where the file is exported
+     * Walks the database to build the export payload, without writing anything yet - lets the
+     * confirm sheet show real counts before the native folder picker opens.
      */
-    fun exportData(dirUri: Uri) {
+    fun loadExportPreview() {
         viewModelScope.launch {
             exportDataUseCase()
-                .mapCatching {
-                    withContext(dispatcherProvider.io()) { writeExportFile(it, dirUri) }
-                }
-                .onSuccess { _events.send(ExportDataEventSuccess(it)) }
+                .onSuccess { _events.send(ExportPreviewReady(it)) }
                 .onFailure {
                     Timber.e(it)
                     _events.send(ExportDataEventFailure)
@@ -97,7 +107,29 @@ class SettingsViewModel(
         }
     }
 
-    private fun writeExportFile(exportBase: ExportBase, dirUri: Uri): String {
+    /**
+     * Writes the already-fetched [exportBase] (from [loadExportPreview]) to the chosen folder -
+     * doesn't re-walk the database, so what gets written matches exactly what the confirm sheet
+     * promised.
+     */
+    fun exportData(exportBase: ExportBase, dirUri: Uri) {
+        viewModelScope.launch {
+            runCatching {
+                withContext(dispatcherProvider.io()) { writeExportFile(exportBase, dirUri) }
+            }
+                .onSuccess { (fileName, folderName) ->
+                    _events.send(
+                        ExportDataEventSuccess(folderName, fileName, exportBase.toDataCounts())
+                    )
+                }
+                .onFailure {
+                    Timber.e(it)
+                    _events.send(ExportDataEventFailure)
+                }
+        }
+    }
+
+    private fun writeExportFile(exportBase: ExportBase, dirUri: Uri): Pair<String, String?> {
         val now = Calendar.getInstance().time
         val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ROOT)
         val dateTime = formatter.format(now)
@@ -114,7 +146,7 @@ class SettingsViewModel(
                 writer.flush()
             }
         }
-        return filename
+        return filename to dir.name
     }
 
     companion object {
