@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -26,6 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Sex
@@ -34,7 +36,6 @@ import com.telen.easylineup.domain.usecases.exceptions.NoTeamsLeftException
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.tournaments.list.LineupViewModel
-import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.coroutines.flow.launchIn
@@ -60,6 +61,7 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
     private var femaleCount by mutableStateOf(0)
     private var unsetCount by mutableStateOf(0)
     private var createdAt by mutableStateOf(0L)
+    private var showDeleteSheet by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,8 +91,19 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
                         ),
                         onBackClick = { findNavController().navigateUp() },
                         onEditClick = ::onEditClicked,
-                        onDeleteClick = ::showDeleteConfirmation
+                        onDeleteClick = { showDeleteSheet = true }
                     )
+
+                    if (showDeleteSheet) {
+                        ConfirmSheet(
+                            title = stringResource(R.string.dialog_delete_team_title, teamName),
+                            message = stringResource(R.string.dialog_delete_cannot_undo_message),
+                            confirmLabel = stringResource(R.string.action_delete),
+                            cancelLabel = stringResource(R.string.cancel_button),
+                            onDismiss = { showDeleteSheet = false },
+                            onConfirm = ::deleteTeam
+                        )
+                    }
                 }
             }
         }
@@ -168,33 +181,24 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
         }
     }
 
-    private fun showDeleteConfirmation() {
-        activity?.let { ctx ->
-            teamViewModel.team?.let { team ->
-                DialogFactory.getWarningTaskDialog(
-                    context = ctx,
-                    title = R.string.dialog_delete_team_title,
-                    titleArgs = arrayOf(team.name),
-                    message = R.string.dialog_delete_cannot_undo_message,
-                    task = rxCompletable {
-                        FirebaseAnalyticsUtils.onClick(activity, "click_team_details_delete")
-                        teamViewModel.deleteTeam(team).getOrThrow()
-                    }.observeOn(AndroidSchedulers.mainThread())
-                        .doOnComplete { findNavController().popBackStack() }
-                        .doOnError { throwable ->
-                            // DeleteTeam always deletes before throwing: NoTeamsLeftException
-                            // only means there was no other team left to promote to main, not
-                            // that the delete was refused - same outcome as doOnComplete.
-                            if (throwable is NoTeamsLeftException) {
-                                findNavController().popBackStack()
-                            } else {
-                                Toast.makeText(
-                                    ctx, R.string.error_when_deleting_team, Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
-                ).show()
+    private fun deleteTeam() {
+        val ctx = activity ?: return
+        val team = teamViewModel.team ?: return
+        rxCompletable {
+            FirebaseAnalyticsUtils.onClick(activity, "click_team_details_delete")
+            teamViewModel.deleteTeam(team).getOrThrow()
+        }.observeOn(AndroidSchedulers.mainThread())
+            .doOnComplete { findNavController().popBackStack() }
+            .doOnError { throwable ->
+                // DeleteTeam always deletes before throwing: NoTeamsLeftException
+                // only means there was no other team left to promote to main, not
+                // that the delete was refused - same outcome as doOnComplete.
+                if (throwable is NoTeamsLeftException) {
+                    findNavController().popBackStack()
+                } else {
+                    Toast.makeText(ctx, R.string.error_when_deleting_team, Toast.LENGTH_LONG).show()
+                }
             }
-        }
+            .subscribe({}, {})
     }
 }
