@@ -28,6 +28,8 @@ class LoginActivity : BaseImportActivity() {
                         importDataFromBrowser()
                     }
                 )
+
+                ImportSheets()
             }
         }
     }

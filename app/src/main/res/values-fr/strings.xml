@@ -243,7 +243,6 @@
     <string name="player_hint_phone">Numéro de téléphone</string>
     <string name="player_creation_error_invalid_email_format">Format d\'email invalide</string>
     <string name="player_creation_error_invalid_phone_format">Format de n° de téléphone invalide</string>
-    <string name="app_deeplink_file_import_title">Importer les données de ce fichier ?</string>
 
     <string name="form_lineup_creation_extra_hitters_label">Batteurs supplém.</string>
     <string name="form_lineup_creation_strategy_label">Type de match</string>

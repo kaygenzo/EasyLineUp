@@ -9,9 +9,20 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.preference.PreferenceManager
+import com.telen.easylineup.compose.ImportConfirmSheet
+import com.telen.easylineup.compose.ImportSuccessSheet
+import com.telen.easylineup.compose.toDataCounts
+import com.telen.easylineup.domain.model.export.ExportBase
+import com.telen.easylineup.domain.usecases.ImportResult
 import com.telen.easylineup.login.GetTeamFailed
 import com.telen.easylineup.login.GetTeamSuccess
 import com.telen.easylineup.login.ImportFailure
+import com.telen.easylineup.login.ImportPreviewReady
 import com.telen.easylineup.login.ImportSuccessfulEvent
 import com.telen.easylineup.login.LoginViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
@@ -21,24 +32,30 @@ import com.telen.easylineup.utils.StorageUtils
 import timber.log.Timber
 
 abstract class BaseImportActivity : BaseActivity() {
-    private val viewModel by viewModels<LoginViewModel>()
+    protected val viewModel by viewModels<LoginViewModel>()
+
+    private var pendingFileName by mutableStateOf("")
+    private var importPreview by mutableStateOf<ExportBase?>(null)
+    private var importResult by mutableStateOf<ImportResult?>(null)
+    protected var updateExistingOnImport by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        updateExistingOnImport = PreferenceManager.getDefaultSharedPreferences(this)
+            .getBoolean(getString(R.string.key_import_data_update_object), false)
+
         val disposable = viewModel.observeEvents().subscribe({
             when (it) {
-                ImportSuccessfulEvent -> {
+                is ImportPreviewReady -> {
+                    pendingFileName = it.fileName
+                    importPreview = it.exportBase
+                }
+
+                is ImportSuccessfulEvent -> {
                     FirebaseAnalyticsUtils.importData(this)
-                    val dialog = DialogFactory.getSuccessDialog(
-                        context = this@BaseImportActivity,
-                        title = R.string.settings_import_success_title,
-                        message = R.string.settings_import_success_message
-                    )
-                    dialog.setOnDismissListener {
-                        // check teams
-                        viewModel.getMainTeam()
-                    }
-                    dialog.show()
+                    importPreview = null
+                    importResult = it.result
                 }
 
                 ImportFailure -> displayImportFailure()
@@ -60,8 +77,47 @@ abstract class BaseImportActivity : BaseActivity() {
         this.disposables.add(disposable)
     }
 
-    protected fun importData(uri: Uri) {
-        importDataFromUri(uri)
+    /**
+     * Renders the import confirm/success sheets from this Activity's own shared state - a
+     * sibling to call inside each subclass's own `setContent {}`, so both the cold-start
+     * file-open flow and the Welcome screen's "Import an existing team" show the exact same
+     * confirmation regardless of how they got here.
+     */
+    @Composable
+    protected fun ImportSheets(onCancelled: () -> Unit = {}) {
+        importPreview?.let { exportBase ->
+            ImportConfirmSheet(
+                fileName = pendingFileName,
+                counts = exportBase.toDataCounts(),
+                overwriteExisting = updateExistingOnImport,
+                onOverwriteChanged = { checked ->
+                    updateExistingOnImport = checked
+                    PreferenceManager.getDefaultSharedPreferences(this)
+                        .edit()
+                        .putBoolean(getString(R.string.key_import_data_update_object), checked)
+                        .apply()
+                },
+                onDismiss = {
+                    importPreview = null
+                    onCancelled()
+                },
+                onConfirm = {
+                    FirebaseAnalyticsUtils.onClick(this, "click_import_data_confirm")
+                    viewModel.confirmImport(exportBase, updateExistingOnImport)
+                }
+            )
+        }
+
+        importResult?.let { result ->
+            ImportSuccessSheet(
+                fileName = pendingFileName,
+                result = result,
+                onDismiss = {
+                    importResult = null
+                    viewModel.getMainTeam()
+                }
+            )
+        }
     }
 
     protected fun importDataFromBrowser() {
@@ -74,14 +130,10 @@ abstract class BaseImportActivity : BaseActivity() {
             when (requestCode) {
                 StorageUtils.REQUEST_CODE_OPEN_DOCUMENT -> {
                     val uri = data?.data ?: return
-                    importDataFromUri(uri)
+                    viewModel.peekImportFile(uri)
                 }
             }
         }
-    }
-
-    private fun importDataFromUri(uri: Uri) {
-        viewModel.importData(uri, true)
     }
 
     override fun onDestroy() {
