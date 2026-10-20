@@ -30,10 +30,18 @@ import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.ExportConfirmSheet
+import com.telen.easylineup.compose.ExportSuccessSheet
+import com.telen.easylineup.compose.ImportConfirmSheet
+import com.telen.easylineup.compose.ImportSuccessSheet
+import com.telen.easylineup.compose.toDataCounts
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.export.ExportBase
+import com.telen.easylineup.domain.usecases.ImportResult
 import com.telen.easylineup.license.LicensesManager
 import com.telen.easylineup.login.ImportFailure
+import com.telen.easylineup.login.ImportPreviewReady
 import com.telen.easylineup.login.ImportSuccessfulEvent
 import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.login.LoginViewModel
@@ -55,23 +63,26 @@ class SettingsFragment : BaseFragment("Settings") {
 
     private val teamViewModel by viewModel<TeamViewModel>()
 
-    private var updateExistingOnImport = false
     private var teamName by mutableStateOf("")
     private var teamType by mutableStateOf(TeamType.UNKNOWN)
     private var teamImageUri by mutableStateOf<Uri?>(null)
     private var showDeleteAllDataSheet by mutableStateOf(false)
+
+    private var exportPreview by mutableStateOf<ExportBase?>(null)
+    private var exportSuccess by mutableStateOf<ExportDataEventSuccess?>(null)
+
+    private var importFileName by mutableStateOf("")
+    private var importPreview by mutableStateOf<ExportBase?>(null)
+    private var importOverwriteExisting by mutableStateOf(false)
+    private var importSuccess by mutableStateOf<ImportResult?>(null)
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        updateExistingOnImport = currentSettingsScreenState(
-            requireContext(),
-            teamName,
-            teamType,
-            teamImageUri
-        ).updateExistingOnImport
+        importOverwriteExisting = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .getBoolean(getString(R.string.key_import_data_update_object), false)
 
         return ComposeView(requireContext()).apply {
             setContent {
@@ -104,20 +115,9 @@ class SettingsFragment : BaseFragment("Settings") {
                             putIntPreference(R.string.key_women_style, color)
                             prefsVersion++
                         },
-                        onUpdateExistingChanged = { checked ->
-                            updateExistingOnImport = checked
-                            PreferenceManager.getDefaultSharedPreferences(requireContext())
-                                .edit()
-                                .putBoolean(
-                                    getString(R.string.key_import_data_update_object),
-                                    checked
-                                )
-                                .apply()
-                            prefsVersion++
-                        },
                         onExportClick = {
                             FirebaseAnalyticsUtils.onClick(activity, "click_settings_export_data")
-                            StorageUtils.createFile(this@SettingsFragment)
+                            viewModel.loadExportPreview()
                         },
                         onImportClick = {
                             FirebaseAnalyticsUtils.onClick(activity, "click_settings_import_data")
@@ -145,6 +145,58 @@ class SettingsFragment : BaseFragment("Settings") {
                                 )
                                 viewModel.deleteAllData()
                             }
+                        )
+                    }
+
+                    exportPreview?.let { base ->
+                        ExportConfirmSheet(
+                            teamName = teamName,
+                            counts = base.toDataCounts(),
+                            onDismiss = { exportPreview = null },
+                            onConfirm = {
+                                FirebaseAnalyticsUtils.onClick(activity, "click_export_confirm")
+                                StorageUtils.createFile(this@SettingsFragment)
+                            }
+                        )
+                    }
+
+                    exportSuccess?.let { success ->
+                        ExportSuccessSheet(
+                            folderName = success.folderName,
+                            fileName = success.fileName,
+                            counts = success.counts,
+                            onDismiss = { exportSuccess = null }
+                        )
+                    }
+
+                    importPreview?.let { base ->
+                        ImportConfirmSheet(
+                            fileName = importFileName,
+                            counts = base.toDataCounts(),
+                            overwriteExisting = importOverwriteExisting,
+                            onOverwriteChanged = { checked ->
+                                importOverwriteExisting = checked
+                                PreferenceManager.getDefaultSharedPreferences(requireContext())
+                                    .edit()
+                                    .putBoolean(
+                                        getString(R.string.key_import_data_update_object),
+                                        checked
+                                    )
+                                    .apply()
+                            },
+                            onDismiss = { importPreview = null },
+                            onConfirm = {
+                                FirebaseAnalyticsUtils.onClick(activity, "click_import_confirm")
+                                loginViewModel.confirmImport(base, importOverwriteExisting)
+                            }
+                        )
+                    }
+
+                    importSuccess?.let { result ->
+                        ImportSuccessSheet(
+                            fileName = importFileName,
+                            result = result,
+                            onDismiss = { importSuccess = null }
                         )
                     }
                 }
@@ -233,16 +285,11 @@ class SettingsFragment : BaseFragment("Settings") {
                             startActivity(intent)
                         }
 
+                        is ExportPreviewReady -> exportPreview = event.exportBase
+
                         is ExportDataEventSuccess -> {
-                            activity?.run {
-                                FirebaseAnalyticsUtils.exportData(this)
-                                DialogFactory.getSuccessDialog(
-                                    context = this,
-                                    title = R.string.settings_export_success_title,
-                                    message = R.string.settings_export_success_message,
-                                    messageArgs = arrayOf(event.pathDirectory)
-                                ).show()
-                            }
+                            activity?.let { FirebaseAnalyticsUtils.exportData(it) }
+                            exportSuccess = event
                             Timber.d("Successfully exported data!")
                         }
 
@@ -279,13 +326,15 @@ class SettingsFragment : BaseFragment("Settings") {
         val disposable = loginViewModel.observeEvents().subscribe({ event ->
             activity?.run {
                 when (event) {
-                    ImportSuccessfulEvent -> {
+                    is ImportPreviewReady -> {
+                        importFileName = event.fileName
+                        importPreview = event.exportBase
+                    }
+
+                    is ImportSuccessfulEvent -> {
                         FirebaseAnalyticsUtils.importData(this)
-                        DialogFactory.getSuccessDialog(
-                            context = this,
-                            title = R.string.settings_import_success_title,
-                            message = R.string.settings_import_success_message
-                        ).show()
+                        importPreview = null
+                        importSuccess = event.result
                     }
 
                     ImportFailure -> DialogFactory.getErrorDialog(
@@ -307,12 +356,14 @@ class SettingsFragment : BaseFragment("Settings") {
             when (requestCode) {
                 StorageUtils.REQUEST_CODE_OPEN_DOCUMENT -> {
                     val uri = data?.data ?: return
-                    loginViewModel.importData(uri, updateExistingOnImport)
+                    loginViewModel.peekImportFile(uri)
                 }
 
                 StorageUtils.REQUEST_CODE_CHOOSE_DIRECTORY -> {
                     val dirUri = data?.data ?: return
-                    viewModel.exportData(dirUri)
+                    val base = exportPreview ?: return
+                    exportPreview = null
+                    viewModel.exportData(base, dirUri)
                 }
             }
         }

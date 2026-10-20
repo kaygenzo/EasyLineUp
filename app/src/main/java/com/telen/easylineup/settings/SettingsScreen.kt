@@ -24,7 +24,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -64,8 +63,7 @@ data class SettingsScreenState(
     val lineupStyleValue: String,
     val themeValue: String,
     val menColor: Color,
-    val womenColor: Color,
-    val updateExistingOnImport: Boolean
+    val womenColor: Color
 )
 
 fun currentSettingsScreenState(
@@ -99,10 +97,7 @@ fun currentSettingsScreenState(
             context.getString(R.string.lineup_theme_default_value)
         ),
         menColor = Color(menColor),
-        womenColor = Color(womenColor),
-        updateExistingOnImport = androidx.preference.PreferenceManager
-            .getDefaultSharedPreferences(context)
-            .getBoolean(context.getString(R.string.key_import_data_update_object), false)
+        womenColor = Color(womenColor)
     )
 }
 
@@ -115,7 +110,6 @@ fun SettingsScreen(
     onThemeSelected: (String) -> Unit,
     onMenColorPicked: (Int) -> Unit,
     onWomenColorPicked: (Int) -> Unit,
-    onUpdateExistingChanged: (Boolean) -> Unit,
     onExportClick: () -> Unit,
     onImportClick: () -> Unit,
     onDeleteAllDataClick: () -> Unit,
@@ -220,16 +214,6 @@ fun SettingsScreen(
                 subtitle = stringResource(R.string.setting_import_data_subtitle),
                 onClick = onImportClick,
                 trailing = { ChevronIcon() }
-            )
-            RowDivider()
-            SettingsRow(
-                title = stringResource(R.string.setting_import_data_update_object_description),
-                trailing = {
-                    Switch(
-                        checked = state.updateExistingOnImport,
-                        onCheckedChange = onUpdateExistingChanged
-                    )
-                }
             )
             RowDivider()
             SettingsRow(
@@ -503,8 +487,7 @@ private fun SettingsScreenPreview() {
                 lineupStyleValue = "0",
                 themeValue = "0",
                 menColor = Color(0xFFD8324A),
-                womenColor = Color(0xFFE8B93F),
-                updateExistingOnImport = false
+                womenColor = Color(0xFFE8B93F)
             ),
             onBackClick = {},
             onTeamClick = {},
@@ -512,7 +495,6 @@ private fun SettingsScreenPreview() {
             onThemeSelected = {},
             onMenColorPicked = {},
             onWomenColorPicked = {},
-            onUpdateExistingChanged = {},
             onExportClick = {},
             onImportClick = {},
             onDeleteAllDataClick = {},
