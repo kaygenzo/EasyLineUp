@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -27,6 +28,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.TeamType
@@ -40,7 +42,6 @@ import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.utils.StorageUtils
-import io.reactivex.rxjava3.core.Completable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -58,6 +59,7 @@ class SettingsFragment : BaseFragment("Settings") {
     private var teamName by mutableStateOf("")
     private var teamType by mutableStateOf(TeamType.UNKNOWN)
     private var teamImageUri by mutableStateOf<Uri?>(null)
+    private var showDeleteAllDataSheet by mutableStateOf(false)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -121,28 +123,30 @@ class SettingsFragment : BaseFragment("Settings") {
                             FirebaseAnalyticsUtils.onClick(activity, "click_settings_import_data")
                             StorageUtils.openFile(this@SettingsFragment)
                         },
-                        onDeleteAllDataClick = {
-                            activity?.let {
-                                DialogFactory.getWarningTaskDialog(
-                                    context = it,
-                                    message = R.string.dialog_delete_cannot_undo_message,
-                                    task = Completable.create { emitter ->
-                                        FirebaseAnalyticsUtils.onClick(
-                                            activity,
-                                            "click_settings_delete_data"
-                                        )
-                                        viewModel.deleteAllData()
-                                        emitter.onComplete()
-                                    }
-                                ).show()
-                            }
-                        },
+                        onDeleteAllDataClick = { showDeleteAllDataSheet = true },
                         onLicensesClick = {
                             FirebaseAnalyticsUtils.onClick(activity, "click_settings_licenses")
                             activity?.let { LicensesManager.getDialog(it).show() }
                         },
                         onPlayStoreClick = { openPlayStore() }
                     )
+
+                    if (showDeleteAllDataSheet) {
+                        ConfirmSheet(
+                            title = stringResource(R.string.setting_delete_data_description),
+                            message = stringResource(R.string.dialog_delete_cannot_undo_message),
+                            confirmLabel = stringResource(R.string.action_delete),
+                            cancelLabel = stringResource(R.string.cancel_button),
+                            onDismiss = { showDeleteAllDataSheet = false },
+                            onConfirm = {
+                                FirebaseAnalyticsUtils.onClick(
+                                    activity,
+                                    "click_settings_delete_data"
+                                )
+                                viewModel.deleteAllData()
+                            }
+                        )
+                    }
                 }
             }
         }
