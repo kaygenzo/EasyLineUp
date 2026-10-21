@@ -682,12 +682,14 @@ fun RosterPickerSheet(
                     )
                     if (position != filtered.lastIndex) {
                         HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                            modifier = Modifier.padding(horizontal = 18.dp, vertical = 6.dp),
                             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
                         )
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(4.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
             Button(
                 onClick = onDismiss,
                 modifier = Modifier
@@ -723,7 +725,7 @@ private fun RosterPickerRow(
             .fillMaxWidth()
             .alpha(if (checked) 1f else 0.45f)
             .clickable { onCheckedChange(!checked) }
-            .padding(horizontal = 10.dp, vertical = 10.dp),
+            .padding(horizontal = 18.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
