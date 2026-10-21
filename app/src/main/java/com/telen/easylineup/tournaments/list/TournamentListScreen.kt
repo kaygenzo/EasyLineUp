@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -168,7 +169,10 @@ private fun TournamentsSearchField(
         singleLine = true,
         shape = RoundedCornerShape(14.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            unfocusedBorderColor = Color.Transparent,
+            focusedBorderColor = Color.Transparent
         )
     )
 }
@@ -192,7 +196,7 @@ private fun TournamentsEmptyState(isSearching: Boolean) {
                 }
             ),
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleSmall
+            style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
@@ -204,7 +208,7 @@ private fun TournamentsEmptyState(isSearching: Boolean) {
                 }
             ),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
@@ -248,7 +252,7 @@ private fun TournamentTicketCard(
                     Text(
                         text = item.tournament.name,
                         color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
@@ -258,7 +262,7 @@ private fun TournamentTicketCard(
                             item.lineups.size
                         ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodyMedium
                     )
                     item.tournament.address?.let { address ->
                         Row(
@@ -266,20 +270,20 @@ private fun TournamentTicketCard(
                                 .clickable(enabled = mapLocation != null) {
                                     mapLocation?.let(onMapClick)
                                 }
-                                .padding(top = 2.dp),
+                                .padding(top = 3.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            horizontalArrangement = Arrangement.spacedBy(5.dp)
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_place_outline_24dp),
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(13.dp)
+                                modifier = Modifier.size(15.dp)
                             )
                             Text(
                                 text = address,
                                 color = MaterialTheme.colorScheme.primary,
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -340,13 +344,13 @@ private fun TournamentTicketCard(
                             item.lineups.size - 2
                         ),
                         color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.titleSmall
                     )
                     Icon(
                         painter = painterResource(R.drawable.ic_chevron_down_24dp),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(12.dp)
+                        modifier = Modifier.size(14.dp)
                     )
                 }
             }
@@ -398,13 +402,13 @@ private fun TicketDateChip(startMillis: Long?) {
             Text(
                 text = SimpleDateFormat("MMM", Locale.getDefault()).format(date).uppercase(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.labelMedium
             )
         } else {
             Text(
                 text = "—",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleLarge
             )
         }
     }
@@ -429,7 +433,7 @@ private fun LineupRow(
             Text(
                 text = lineup.name,
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
             Row(
@@ -442,7 +446,7 @@ private fun LineupRow(
                     text = SimpleDateFormat("MMM d", Locale.getDefault())
                         .format(Date(eventDate)),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.bodySmall
                 )
                 val context = LocalContext.current
                 val strategyLabel = teamType.getStrategiesDisplayName(context)?.let { array ->
@@ -475,12 +479,12 @@ private fun LineupBadge(text: String) {
         modifier = Modifier
             .clip(RoundedCornerShape(50))
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(horizontal = 7.dp, vertical = 2.dp)
+            .padding(horizontal = 8.dp, vertical = 3.dp)
     ) {
         Text(
             text = text,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelMedium
         )
     }
 }
