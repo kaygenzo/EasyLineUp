@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -60,7 +62,9 @@ import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutSearchField
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.TeamRosterSummary
@@ -252,9 +256,10 @@ private fun SelectField(
     enabled: Boolean = true,
     isError: Boolean = false,
     errorText: String? = null,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Column {
+    Column(modifier = modifier) {
         FormLabel(label, required)
         Spacer(modifier = Modifier.height(6.dp))
         val borderColor = if (isError) {
@@ -429,6 +434,7 @@ private fun FormBar(
 @Composable
 fun TournamentPickerSheet(
     tournaments: List<Tournament>,
+    selectedTournamentId: Long?,
     onDismiss: () -> Unit,
     onTournamentSelected: (Tournament) -> Unit,
     onCreateTournamentClick: () -> Unit
@@ -445,7 +451,7 @@ fun TournamentPickerSheet(
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = stringResource(R.string.dialog_create_lineup_tournament),
+                text = stringResource(R.string.lineup_creation_tournament_sheet_title),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(horizontal = 18.dp, vertical = 4.dp)
@@ -464,6 +470,7 @@ fun TournamentPickerSheet(
                 items(items = filtered, key = { it.id }) { tournament ->
                     TournamentPickerRow(
                         tournament = tournament,
+                        isSelected = tournament.id == selectedTournamentId,
                         onClick = { onTournamentSelected(tournament); onDismiss() }
                     )
                 }
@@ -477,14 +484,20 @@ fun TournamentPickerSheet(
 }
 
 @Composable
-private fun TournamentPickerRow(tournament: Tournament, onClick: () -> Unit) {
+private fun TournamentPickerRow(
+    tournament: Tournament,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 18.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        MiniDateChip(tournament.startTime.takeIf { it > 0 } ?: tournament.createdAt)
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = tournament.name,
@@ -502,6 +515,52 @@ private fun TournamentPickerRow(tournament: Tournament, onClick: () -> Unit) {
                 )
             }
         }
+        if (isSelected) {
+            SelectedPill()
+        }
+    }
+}
+
+@Composable
+private fun MiniDateChip(startMillis: Long) {
+    val date = Date(startMillis)
+    Column(
+        modifier = Modifier
+            .width(44.dp)
+            .height(44.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = SimpleDateFormat("d", Locale.getDefault()).format(date),
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.ExtraBold
+        )
+        Text(
+            text = SimpleDateFormat("MMM", Locale.getDefault()).format(date).uppercase(),
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            style = MaterialTheme.typography.labelSmall
+        )
+    }
+}
+
+@Composable
+private fun SelectedPill() {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.16f))
+            .padding(horizontal = 10.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.lineup_creation_tournament_selected_pill),
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.labelSmall
+        )
     }
 }
 
@@ -511,19 +570,26 @@ private fun CreateTournamentRow(onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 14.dp),
+            .padding(horizontal = 18.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_add_white_24dp),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(18.dp)
-        )
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .dashedBorder(MaterialTheme.colorScheme.outline, cornerRadius = 12.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "+",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
         Text(
             text = stringResource(R.string.lineup_creation_tournament_create_row),
-            color = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.bodyLarge
         )
@@ -534,9 +600,10 @@ private fun CreateTournamentRow(onClick: () -> Unit) {
 @Composable
 fun RosterPickerSheet(
     roster: TeamRosterSummary,
+    teamType: TeamType,
     onDismiss: () -> Unit,
     onPlayerToggled: (Int, Boolean) -> Unit,
-    onToggleAll: () -> Unit
+    onClearAll: () -> Unit
 ) {
     var query by remember { mutableStateOf("") }
     val indexedPlayers = remember(roster) { roster.players.withIndex().toList() }
@@ -555,38 +622,47 @@ fun RosterPickerSheet(
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = stringResource(R.string.form_lineup_creation_roster_label),
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(horizontal = 18.dp, vertical = 4.dp)
-            )
-            Spacer(modifier = Modifier.height(14.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.form_lineup_creation_roster_label),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        text = summary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.lineup_creation_roster_clear_all),
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.clickable(onClick = onClearAll)
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
             DugoutSearchField(
                 value = query,
                 onValueChange = { query = it },
                 placeholder = stringResource(R.string.lineup_creation_roster_search_placeholder),
                 modifier = Modifier.padding(horizontal = 18.dp)
             )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = onToggleAll)
-                    .padding(horizontal = 18.dp, vertical = 10.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.lineup_creation_roster_toggle_all),
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+            Spacer(modifier = Modifier.height(4.dp))
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
             LazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
                 items(items = filtered, key = { it.index }) { (index, rosterPlayer) ->
                     RosterPickerRow(
-                        name = rosterPlayer.player.name,
-                        shirtNumber = rosterPlayer.player.shirtNumber,
+                        player = rosterPlayer.player,
+                        teamType = teamType,
                         checked = rosterPlayer.status,
                         onCheckedChange = { checked -> onPlayerToggled(index, checked) }
                     )
@@ -611,34 +687,199 @@ fun RosterPickerSheet(
 
 @Composable
 private fun RosterPickerRow(
-    name: String,
-    shirtNumber: Int,
+    player: Player,
+    teamType: TeamType,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
+    val positionLabel = primaryPositionLabel(player.positions, teamType)
+    val statusText = if (checked) {
+        stringResource(R.string.lineup_creation_roster_status_default, player.shirtNumber)
+    } else {
+        stringResource(R.string.lineup_creation_roster_status_sitting_out)
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .alpha(if (checked) 1f else 0.45f)
             .clickable { onCheckedChange(!checked) }
-            .padding(horizontal = 10.dp, vertical = 4.dp),
+            .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Checkbox(checked = checked, onCheckedChange = onCheckedChange)
-        Text(
-            text = name,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
-        )
-        Text(
-            text = "#$shirtNumber",
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-            style = MaterialTheme.typography.bodyMedium,
-            fontFamily = FontFamily.Monospace,
-            modifier = Modifier.padding(end = 8.dp)
-        )
+        Box(
+            modifier = Modifier
+                .size(34.dp)
+                .clip(RoundedCornerShape(9.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .border(
+                    1.5.dp,
+                    MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
+                    RoundedCornerShape(9.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "%02d".format(player.shirtNumber),
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = player.name,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = if (positionLabel != null) "$positionLabel · $statusText" else statusText,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
+}
+
+@Composable
+private fun primaryPositionLabel(positions: Int, teamType: TeamType): String? {
+    if (positions == 0) return null
+    val names = if (teamType == TeamType.SOFTBALL) {
+        stringArrayResource(R.array.field_positions_softball_list)
+    } else {
+        stringArrayResource(R.array.field_positions_baseball_list)
+    }
+    val match = FieldPosition.values().firstOrNull {
+        it.id != 0 && it.id != 16 && (positions and it.mask) != 0
+    } ?: return null
+    return names.getOrNull(match.id)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NewTournamentSheet(
+    name: String,
+    startTimeInMillis: Long,
+    endTimeInMillis: Long,
+    address: String,
+    onNameChanged: (String) -> Unit,
+    onStartDateClick: () -> Unit,
+    onEndDateClick: () -> Unit,
+    onAddressChanged: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onAddClick: () -> Unit
+) {
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(horizontal = 18.dp)) {
+                Text(
+                    text = stringResource(R.string.lineup_creation_new_tournament_title),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.lineup_creation_new_tournament_subtitle),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                FormLabel(
+                    stringResource(R.string.lineup_creation_new_tournament_name_label),
+                    required = true
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = onNameChanged,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 64.dp),
+                    placeholder = {
+                        Text(
+                            stringResource(R.string.lineup_creation_new_tournament_name_placeholder)
+                        )
+                    },
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    shape = RoundedCornerShape(10.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
+                        focusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
+                    )
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+
+                val dateText = { millis: Long ->
+                    SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(Date(millis))
+                }
+                val pickDatePlaceholder =
+                    stringResource(R.string.lineup_creation_new_tournament_pick_date)
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    SelectField(
+                        label = stringResource(
+                            R.string.lineup_creation_new_tournament_starts_label
+                        ),
+                        value = dateText(startTimeInMillis),
+                        placeholder = pickDatePlaceholder,
+                        subLabel = null,
+                        modifier = Modifier.weight(1f),
+                        onClick = onStartDateClick
+                    )
+                    SelectField(
+                        label = stringResource(
+                            R.string.lineup_creation_new_tournament_ends_label
+                        ),
+                        value = dateText(endTimeInMillis),
+                        placeholder = pickDatePlaceholder,
+                        subLabel = null,
+                        modifier = Modifier.weight(1f),
+                        onClick = onEndDateClick
+                    )
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+
+                FormLabel(stringResource(R.string.lineup_creation_new_tournament_location_label))
+                Spacer(modifier = Modifier.height(6.dp))
+                OutlinedTextField(
+                    value = address,
+                    onValueChange = onAddressChanged,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 64.dp),
+                    placeholder = {
+                        Text(
+                            stringResource(
+                                R.string.lineup_creation_new_tournament_location_placeholder
+                            )
+                        )
+                    },
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    shape = RoundedCornerShape(10.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
+                        focusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
+                    )
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            FormBar(
+                cancelLabel = stringResource(R.string.cancel_button),
+                saveLabel = stringResource(R.string.lineup_creation_new_tournament_save),
+                onCancel = onDismiss,
+                onSave = onAddClick
+            )
+        }
     }
 }
 

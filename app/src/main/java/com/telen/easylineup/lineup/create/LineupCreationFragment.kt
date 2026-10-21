@@ -35,7 +35,6 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.lineup.LineupFragment
-import com.telen.easylineup.tournaments.CreateTournamentDialog
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -54,12 +53,10 @@ private fun TeamRosterSummary.withToggledPlayer(position: Int, status: Boolean):
     )
 }
 
-private fun TeamRosterSummary.withAllToggled(): TeamRosterSummary {
-    val shouldSelectAll = players.any { !it.status }
-    val updatedPlayers = players.map { it.copy(status = shouldSelectAll) }
+private fun TeamRosterSummary.withAllCleared(): TeamRosterSummary {
     return TeamRosterSummary(
-        status = if (shouldSelectAll) Constants.STATUS_ALL else Constants.STATUS_PARTIAL,
-        players = updatedPlayers
+        status = Constants.STATUS_PARTIAL,
+        players = players.map { it.copy(status = false) }
     )
 }
 
@@ -79,6 +76,11 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
     private var showTournamentSheet by mutableStateOf(false)
     private var showRosterSheet by mutableStateOf(false)
     private var showDiscardSheet by mutableStateOf(false)
+    private var showNewTournamentSheet by mutableStateOf(false)
+    private var newTournamentName by mutableStateOf("")
+    private var newTournamentStartTime by mutableStateOf(System.currentTimeMillis())
+    private var newTournamentEndTime by mutableStateOf(System.currentTimeMillis())
+    private var newTournamentAddress by mutableStateOf("")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -118,6 +120,7 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
                     if (showTournamentSheet) {
                         TournamentPickerSheet(
                             tournaments = tournaments,
+                            selectedTournamentId = selectedTournament?.id,
                             onDismiss = { showTournamentSheet = false },
                             onTournamentSelected = { tournament ->
                                 selectedTournament = tournament
@@ -126,7 +129,11 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
                             },
                             onCreateTournamentClick = {
                                 showTournamentSheet = false
-                                openCreateTournamentDialog()
+                                newTournamentName = ""
+                                newTournamentStartTime = System.currentTimeMillis()
+                                newTournamentEndTime = System.currentTimeMillis()
+                                newTournamentAddress = ""
+                                showNewTournamentSheet = true
                             }
                         )
                     }
@@ -134,11 +141,27 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
                     if (showRosterSheet) {
                         RosterPickerSheet(
                             roster = roster,
+                            teamType = teamType,
                             onDismiss = { showRosterSheet = false },
                             onPlayerToggled = { position, checked ->
                                 roster = roster.withToggledPlayer(position, checked)
                             },
-                            onToggleAll = { roster = roster.withAllToggled() }
+                            onClearAll = { roster = roster.withAllCleared() }
+                        )
+                    }
+
+                    if (showNewTournamentSheet) {
+                        NewTournamentSheet(
+                            name = newTournamentName,
+                            startTimeInMillis = newTournamentStartTime,
+                            endTimeInMillis = newTournamentEndTime,
+                            address = newTournamentAddress,
+                            onNameChanged = { newTournamentName = it },
+                            onStartDateClick = { showNewTournamentDatePicker(isStart = true) },
+                            onEndDateClick = { showNewTournamentDatePicker(isStart = false) },
+                            onAddressChanged = { newTournamentAddress = it },
+                            onDismiss = { showNewTournamentSheet = false },
+                            onAddClick = { addNewTournament() }
                         )
                     }
 
@@ -238,18 +261,38 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
         datePicker.show(childFragmentManager, "createLineupDatePicker")
     }
 
-    private fun openCreateTournamentDialog() {
-        CreateTournamentDialog { tournament ->
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.saveTournamentInline(tournament)
-                    .onSuccess {
-                        selectedTournament = tournament
-                        tournamentError = null
-                        updateEventTimeForTournament(tournament)
-                    }
-                    .onFailure { Timber.e(it) }
+    private fun showNewTournamentDatePicker(isStart: Boolean) {
+        val initialTime = if (isStart) newTournamentStartTime else newTournamentEndTime
+        val datePicker = MaterialDatePicker.Builder.datePicker().setSelection(initialTime).build()
+        datePicker.addOnPositiveButtonClickListener { selection ->
+            if (isStart) {
+                newTournamentStartTime = selection
+            } else {
+                newTournamentEndTime = selection
             }
-        }.show(childFragmentManager, "createTournamentFragment")
+        }
+        val tag = if (isStart) "newTournamentStartDatePicker" else "newTournamentEndDatePicker"
+        datePicker.show(childFragmentManager, tag)
+    }
+
+    private fun addNewTournament() {
+        val tournament = Tournament(
+            name = newTournamentName,
+            createdAt = System.currentTimeMillis(),
+            startTime = newTournamentStartTime,
+            endTime = newTournamentEndTime,
+            address = newTournamentAddress.takeIf { it.isNotBlank() }
+        )
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.saveTournamentInline(tournament)
+                .onSuccess {
+                    selectedTournament = tournament
+                    tournamentError = null
+                    updateEventTimeForTournament(tournament)
+                    showNewTournamentSheet = false
+                }
+                .onFailure { Timber.e(it) }
+        }
     }
 
     private fun handleCancel() {

@@ -88,15 +88,32 @@
     <string name="lineup_creation_tournament_placeholder">Choose a tournament</string>
     <string name="lineup_creation_date_sub_within">Within %1$s\'s dates</string>
     <string name="lineup_creation_date_disabled_hint">Choose a tournament first</string>
+    <string name="lineup_creation_tournament_sheet_title">Pick a tournament</string>
     <string name="lineup_creation_tournament_search_placeholder">Search tournaments…</string>
     <string name="lineup_creation_tournament_create_row">Create a new tournament</string>
+    <string name="lineup_creation_tournament_selected_pill">Selected</string>
     <string name="lineup_creation_roster_search_placeholder">Find a player…</string>
-    <string name="lineup_creation_roster_toggle_all">Select / clear all</string>
+    <string name="lineup_creation_roster_clear_all">Clear all</string>
     <string name="lineup_creation_roster_selected_format">%1$d of %2$d selected</string>
+    <string name="lineup_creation_roster_status_default">default #%1$d</string>
+    <string name="lineup_creation_roster_status_sitting_out">Sitting out</string>
     <string name="lineup_creation_roster_done">Done</string>
     <string name="lineup_creation_save">Create lineup</string>
     <string name="action_keep_editing">Keep editing</string>
     <string name="action_discard">Discard</string>
+
+    <string name="lineup_creation_new_tournament_title">New tournament</string>
+    <string name="lineup_creation_new_tournament_subtitle">Selecting it here also adds it to the
+        tournament list</string>
+    <string name="lineup_creation_new_tournament_name_label">Name</string>
+    <string name="lineup_creation_new_tournament_name_placeholder">e.g. Winter League</string>
+    <string name="lineup_creation_new_tournament_starts_label">Starts</string>
+    <string name="lineup_creation_new_tournament_ends_label">Ends</string>
+    <string name="lineup_creation_new_tournament_pick_date">Pick date</string>
+    <string name="lineup_creation_new_tournament_location_label">Location</string>
+    <string name="lineup_creation_new_tournament_location_placeholder">Address — powers the map
+        pin</string>
+    <string name="lineup_creation_new_tournament_save">Add tournament</string>
 
     <string name="lineup_list_filter_unfocused_hint">Filter name</string>
 
@@ -372,11 +389,6 @@
     <string name="bug_report_trigger_manual">Manual</string>
     <string name="file_explorer_not_found">Cannot find any file explorer on this device</string>
 
-    <string name="form_tournament_creation_start_label">Start</string>
-    <string name="form_tournament_creation_end_label">End</string>
-    <string name="form_tournament_creation_address">Address (optional)</string>
-    <string name="form_tournament_creation_name">Name</string>
-    <string name="form_tournament_creation_title">Tournament creation...</string>
     <string name="discard_change_title">You are about to cancel your changes</string>
     <string name="discard_change_message">Changes would be discarded, are you really sure ?</string>
     <string name="discard_keep_editing">Keep editing</string>

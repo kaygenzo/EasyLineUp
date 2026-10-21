@@ -78,15 +78,32 @@
     <string name="lineup_creation_tournament_placeholder">Choisir un tournoi</string>
     <string name="lineup_creation_date_sub_within">Dans les dates de %1$s</string>
     <string name="lineup_creation_date_disabled_hint">Choisissez d\'abord un tournoi</string>
+    <string name="lineup_creation_tournament_sheet_title">Choisir un tournoi</string>
     <string name="lineup_creation_tournament_search_placeholder">Rechercher un tournoi…</string>
     <string name="lineup_creation_tournament_create_row">Créer un nouveau tournoi</string>
+    <string name="lineup_creation_tournament_selected_pill">Sélectionné</string>
     <string name="lineup_creation_roster_search_placeholder">Rechercher un joueur…</string>
-    <string name="lineup_creation_roster_toggle_all">Tout sélectionner / désélectionner</string>
+    <string name="lineup_creation_roster_clear_all">Tout désélectionner</string>
     <string name="lineup_creation_roster_selected_format">%1$d sur %2$d sélectionnés</string>
+    <string name="lineup_creation_roster_status_default">N° %1$d par défaut</string>
+    <string name="lineup_creation_roster_status_sitting_out">Ne joue pas</string>
     <string name="lineup_creation_roster_done">Terminé</string>
     <string name="lineup_creation_save">Créer le lineup</string>
     <string name="action_keep_editing">Continuer la modification</string>
     <string name="action_discard">Abandonner</string>
+
+    <string name="lineup_creation_new_tournament_title">Nouveau tournoi</string>
+    <string name="lineup_creation_new_tournament_subtitle">Le sélectionner ici l\'ajoute aussi à
+        la liste des tournois</string>
+    <string name="lineup_creation_new_tournament_name_label">Nom</string>
+    <string name="lineup_creation_new_tournament_name_placeholder">ex. Ligue d\'hiver</string>
+    <string name="lineup_creation_new_tournament_starts_label">Début</string>
+    <string name="lineup_creation_new_tournament_ends_label">Fin</string>
+    <string name="lineup_creation_new_tournament_pick_date">Choisir une date</string>
+    <string name="lineup_creation_new_tournament_location_label">Lieu</string>
+    <string name="lineup_creation_new_tournament_location_placeholder">Adresse — alimente le
+        repère sur la carte</string>
+    <string name="lineup_creation_new_tournament_save">Ajouter le tournoi</string>
 
     <string name="lineup_list_filter_unfocused_hint">Filtrer par nom</string>
 
@@ -343,11 +360,6 @@
 
     <string name="lineup_name_hint">Nom du lineup</string>
     <string name="file_explorer_not_found">Impossible de trouver d\'explorateur de fichier sur ce terminal</string>
-    <string name="form_tournament_creation_start_label">Début</string>
-    <string name="form_tournament_creation_end_label">Fin</string>
-    <string name="form_tournament_creation_address">Adresse (optionnel)</string>
-    <string name="form_tournament_creation_name">Nom</string>
-    <string name="form_tournament_creation_title">Création de tournoi...</string>
 
     <string name="discard_change_title">Vous êtes sur le point de perdre vos modifications</string>
     <string name="discard_change_message">Vous perdrez vos changements, êtes-vous vraiment sûr ?</string>
