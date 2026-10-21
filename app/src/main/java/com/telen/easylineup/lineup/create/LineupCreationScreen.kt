@@ -476,6 +476,10 @@ fun TournamentPickerSheet(
                         isSelected = tournament.id == selectedTournamentId,
                         onClick = { onTournamentSelected(tournament); onDismiss() }
                     )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 18.dp),
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                    )
                 }
                 item {
                     CreateTournamentRow(onClick = onCreateTournamentClick)
