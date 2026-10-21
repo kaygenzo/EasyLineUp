@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -669,13 +670,22 @@ fun RosterPickerSheet(
             Spacer(modifier = Modifier.height(4.dp))
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
             LazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
-                items(items = filtered, key = { it.index }) { (index, rosterPlayer) ->
+                itemsIndexed(
+                    items = filtered,
+                    key = { _, indexed -> indexed.index }
+                ) { position, (index, rosterPlayer) ->
                     RosterPickerRow(
                         player = rosterPlayer.player,
                         teamType = teamType,
                         checked = rosterPlayer.status,
                         onCheckedChange = { checked -> onPlayerToggled(index, checked) }
                     )
+                    if (position != filtered.lastIndex) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 10.dp),
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        )
+                    }
                 }
             }
             Button(
