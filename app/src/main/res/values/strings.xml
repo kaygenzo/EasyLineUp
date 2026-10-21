@@ -81,6 +81,20 @@
     <string name="form_lineup_creation_date_label">Date</string>
     <string name="form_lineup_creation_roster_label">Roster</string>
 
+    <string name="lineup_creation_header_title">Create lineup</string>
+    <string name="lineup_creation_name_placeholder">e.g. Game 3 — Starters</string>
+    <string name="lineup_creation_tournament_placeholder">Choose a tournament</string>
+    <string name="lineup_creation_date_sub_within">Within %1$s\'s dates</string>
+    <string name="lineup_creation_date_disabled_hint">Choose a tournament first</string>
+    <string name="lineup_creation_tournament_search_placeholder">Search tournaments…</string>
+    <string name="lineup_creation_tournament_create_row">Create a new tournament</string>
+    <string name="lineup_creation_roster_search_placeholder">Find a player…</string>
+    <string name="lineup_creation_roster_toggle_all">Select / clear all</string>
+    <string name="lineup_creation_roster_done">Done</string>
+    <string name="lineup_creation_save">Create lineup</string>
+    <string name="action_keep_editing">Keep editing</string>
+    <string name="action_discard">Discard</string>
+
     <string name="lineup_list_filter_unfocused_hint">Filter name</string>
 
     <string name="tournaments_list_header_title">Tournaments</string>

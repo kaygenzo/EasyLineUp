@@ -71,6 +71,20 @@
     <string name="form_lineup_creation_date_label">Date</string>
     <string name="form_lineup_creation_roster_label">Joueurs</string>
 
+    <string name="lineup_creation_header_title">Créer un lineup</string>
+    <string name="lineup_creation_name_placeholder">ex. Match 3 — Titulaires</string>
+    <string name="lineup_creation_tournament_placeholder">Choisir un tournoi</string>
+    <string name="lineup_creation_date_sub_within">Dans les dates de %1$s</string>
+    <string name="lineup_creation_date_disabled_hint">Choisissez d\'abord un tournoi</string>
+    <string name="lineup_creation_tournament_search_placeholder">Rechercher un tournoi…</string>
+    <string name="lineup_creation_tournament_create_row">Créer un nouveau tournoi</string>
+    <string name="lineup_creation_roster_search_placeholder">Rechercher un joueur…</string>
+    <string name="lineup_creation_roster_toggle_all">Tout sélectionner / désélectionner</string>
+    <string name="lineup_creation_roster_done">Terminé</string>
+    <string name="lineup_creation_save">Créer le lineup</string>
+    <string name="action_keep_editing">Continuer la modification</string>
+    <string name="action_discard">Abandonner</string>
+
     <string name="lineup_list_filter_unfocused_hint">Filtrer par nom</string>
 
     <string name="tournaments_list_header_title">Tournois</string>

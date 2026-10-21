@@ -33,6 +33,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -120,6 +122,40 @@ fun DugoutCard(
     ) {
         Column { content() }
     }
+}
+
+/**
+ * Shared flat search field - panel-2 background, no border, matching the mockup's
+ * `.search-field` (and the ticket's own date-chip background). Extracted once a second screen
+ * (a bottom-sheet picker) needed the exact same chrome as the Tournament list's own search box.
+ */
+@Composable
+fun DugoutSearchField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    modifier: Modifier = Modifier
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier.fillMaxWidth(),
+        placeholder = { Text(placeholder) },
+        leadingIcon = {
+            Icon(
+                painter = painterResource(R.drawable.ic_baseline_search_24),
+                contentDescription = null
+            )
+        },
+        singleLine = true,
+        shape = RoundedCornerShape(14.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            unfocusedBorderColor = Color.Transparent,
+            focusedBorderColor = Color.Transparent
+        )
+    )
 }
 
 /**

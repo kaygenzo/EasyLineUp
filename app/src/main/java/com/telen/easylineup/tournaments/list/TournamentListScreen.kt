@@ -27,8 +27,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,7 +39,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -52,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
+import com.telen.easylineup.compose.DugoutSearchField
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.ScreenHeader
@@ -103,9 +101,10 @@ fun TournamentListScreen(
                 modifier = Modifier.padding(bottom = 14.dp)
             )
 
-            TournamentsSearchField(
+            DugoutSearchField(
                 value = state.searchQuery,
                 onValueChange = onSearchQueryChanged,
+                placeholder = stringResource(R.string.tournaments_list_search_placeholder),
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
@@ -147,34 +146,6 @@ fun TournamentListScreen(
             )
         }
     }
-}
-
-@Composable
-private fun TournamentsSearchField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier.fillMaxWidth(),
-        placeholder = { Text(stringResource(R.string.tournaments_list_search_placeholder)) },
-        leadingIcon = {
-            Icon(
-                painter = painterResource(R.drawable.ic_baseline_search_24),
-                contentDescription = null
-            )
-        },
-        singleLine = true,
-        shape = RoundedCornerShape(14.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            unfocusedBorderColor = Color.Transparent,
-            focusedBorderColor = Color.Transparent
-        )
-    )
 }
 
 @Composable
