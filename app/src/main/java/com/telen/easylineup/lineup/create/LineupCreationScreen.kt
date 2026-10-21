@@ -836,7 +836,8 @@ fun NewTournamentSheet(
                 Text(
                     text = stringResource(R.string.lineup_creation_new_tournament_subtitle),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    style = MaterialTheme.typography.bodySmall
+                    fontWeight = FontWeight.Normal,
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
