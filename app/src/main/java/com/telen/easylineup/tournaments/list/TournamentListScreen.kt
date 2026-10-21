@@ -178,7 +178,7 @@ private fun TournamentsEmptyState(isSearching: Boolean) {
                     R.string.tournaments_list_empty_subtitle
                 }
             ),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             style = MaterialTheme.typography.bodyMedium
         )
     }
@@ -202,7 +202,7 @@ private fun TournamentTicketCard(
         label = "chevron-rotation"
     )
 
-    DugoutCard(borderWidth = 1.5.dp, borderAlpha = 0.7f) {
+    DugoutCard(borderWidth = 1.5.dp, borderAlpha = 0.85f) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -232,7 +232,7 @@ private fun TournamentTicketCard(
                             item.lineups.size,
                             item.lineups.size
                         ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     item.tournament.address?.let { address ->
@@ -376,7 +376,7 @@ private fun TicketDateChip(startMillis: Long?) {
             )
             Text(
                 text = SimpleDateFormat("MMM", Locale.getDefault()).format(date).uppercase(),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 style = MaterialTheme.typography.labelMedium
             )
         } else {
@@ -420,7 +420,7 @@ private fun LineupRow(
                 Text(
                     text = SimpleDateFormat("MMM d", Locale.getDefault())
                         .format(Date(eventDate)),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     style = MaterialTheme.typography.bodySmall
                 )
                 val context = LocalContext.current

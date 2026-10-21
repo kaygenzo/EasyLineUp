@@ -105,13 +105,13 @@ fun Modifier.dashedBorder(
 @Composable
 fun DugoutCard(
     borderWidth: Dp = 1.dp,
-    borderAlpha: Float = 0.4f,
+    borderAlpha: Float = 0.6f,
     content: @Composable () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp),
+            .padding(bottom = 10.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -332,14 +332,14 @@ fun InfoCell(modifier: Modifier = Modifier, label: String, value: String, tabula
             .background(MaterialTheme.colorScheme.surface)
             .border(
                 1.dp,
-                MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
                 RoundedCornerShape(10.dp)
             )
             .padding(horizontal = 10.dp, vertical = 10.dp)
     ) {
         Text(
             text = label.uppercase(),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             style = MaterialTheme.typography.labelSmall
         )
         Spacer(modifier = Modifier.height(3.dp))

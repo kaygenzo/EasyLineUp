@@ -9,8 +9,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -67,8 +69,9 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.getStrategies
 import com.telen.easylineup.utils.getStrategiesDisplayName
-import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 data class LineupCreationState(
     val teamType: TeamType,
@@ -118,10 +121,10 @@ fun LineupCreationScreen(
                 eyebrow = stringResource(R.string.lineup_creation_header_eyebrow),
                 title = stringResource(R.string.lineup_creation_header_title)
             )
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(26.dp))
 
             FormLabel(stringResource(R.string.dialog_create_lineup_name), required = true)
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = state.name,
                 onValueChange = onNameChanged,
@@ -137,11 +140,11 @@ fun LineupCreationScreen(
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                     focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
-                    focusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
+                    focusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
                 )
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             SelectField(
                 label = stringResource(R.string.dialog_create_lineup_tournament),
@@ -153,13 +156,13 @@ fun LineupCreationScreen(
                 errorText = state.tournamentError,
                 onClick = onTournamentClick
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             val dateEnabled = state.selectedTournament != null
             SelectField(
                 label = stringResource(R.string.form_lineup_creation_date_label),
                 value = if (dateEnabled) {
-                    DateFormat.getDateInstance(DateFormat.SHORT)
+                    SimpleDateFormat("EEE, MMM d", Locale.getDefault())
                         .format(Date(state.eventTimeInMillis))
                 } else {
                     null
@@ -170,7 +173,7 @@ fun LineupCreationScreen(
                 enabled = dateEnabled,
                 onClick = onDateClick
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             val rosterSummary = stringResource(
                 R.string.lineup_creation_roster_selected_format,
@@ -184,7 +187,7 @@ fun LineupCreationScreen(
                 subLabel = null,
                 onClick = onRosterClick
             )
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             if (strategyNames != null) {
                 val strategies = state.teamType.getStrategies()
@@ -194,7 +197,7 @@ fun LineupCreationScreen(
                     selectedIndex = strategies.indexOf(state.strategy).coerceAtLeast(0),
                     onSelect = { index -> onStrategySelected(strategies[index]) }
                 )
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(20.dp))
             }
 
             val extraHittersLabels = stringArrayResource(R.array.extra_hitters_labels)
@@ -205,7 +208,7 @@ fun LineupCreationScreen(
                 selectedIndex = extraHittersValues.indexOf(state.extraHitters).coerceAtLeast(0),
                 onSelect = { index -> onExtraHittersSelected(extraHittersValues[index]) }
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
         }
 
         FormBar(
@@ -251,11 +254,11 @@ private fun SelectField(
 ) {
     Column {
         FormLabel(label, required)
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         val borderColor = if (isError) {
             MaterialTheme.colorScheme.error
         } else {
-            MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+            MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
         }
         Row(
             modifier = Modifier
@@ -282,7 +285,7 @@ private fun SelectField(
                 subLabel?.let {
                     Text(
                         text = it,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -316,14 +319,19 @@ private fun SegmentedRow(
 ) {
     Column {
         FormLabel(label)
-        Spacer(modifier = Modifier.height(6.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.height(IntrinsicSize.Min),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
             options.forEachIndexed { index, text ->
                 SegmentOption(
                     text = text,
                     selected = index == selectedIndex,
                     onClick = { onSelect(index) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
                 )
             }
         }
@@ -347,14 +355,15 @@ private fun SegmentOption(
     } else {
         MaterialTheme.colorScheme.onSurfaceVariant
     }
-    val borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+    val borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
             .background(backgroundColor)
             .let { if (selected) it else it.border(1.dp, borderColor, RoundedCornerShape(8.dp)) }
             .clickable(onClick = onClick)
-            .padding(vertical = 10.dp)
+            .padding(vertical = 10.dp),
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = text,
@@ -438,7 +447,7 @@ fun TournamentPickerSheet(
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(horizontal = 18.dp, vertical = 4.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             DugoutSearchField(
                 value = query,
                 onValueChange = { query = it },
@@ -447,7 +456,7 @@ fun TournamentPickerSheet(
                 ),
                 modifier = Modifier.padding(horizontal = 18.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
                 items(items = filtered, key = { it.id }) { tournament ->
                     TournamentPickerRow(
@@ -483,7 +492,7 @@ private fun TournamentPickerRow(tournament: Tournament, onClick: () -> Unit) {
             tournament.address?.let {
                 Text(
                     text = it,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -549,7 +558,7 @@ fun RosterPickerSheet(
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(horizontal = 18.dp, vertical = 4.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             DugoutSearchField(
                 value = query,
                 onValueChange = { query = it },
@@ -622,7 +631,7 @@ private fun RosterPickerRow(
         )
         Text(
             text = "#$shirtNumber",
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             style = MaterialTheme.typography.bodyMedium,
             fontFamily = FontFamily.Monospace,
             modifier = Modifier.padding(end = 8.dp)
