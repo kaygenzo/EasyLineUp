@@ -10,13 +10,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,7 +38,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -225,74 +231,81 @@ private fun TournamentTicketCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = !expanded }
-                .padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                .height(IntrinsicSize.Min)
+                .clickable { expanded = !expanded },
+            verticalAlignment = Alignment.CenterVertically
         ) {
             TicketDateChip(item.getStart())
 
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = item.tournament.name,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = pluralStringResource(
-                        R.plurals.tournaments_list_lineups_count,
-                        item.lineups.size,
-                        item.lineups.size
-                    ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                item.tournament.address?.let { address ->
-                    Row(
-                        modifier = Modifier
-                            .clickable(enabled = mapLocation != null) {
-                                mapLocation?.let(onMapClick)
-                            }
-                            .padding(top = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_place_outline_24dp),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(13.dp)
-                        )
-                        Text(
-                            text = address,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 12.dp, horizontal = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = item.tournament.name,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = pluralStringResource(
+                            R.plurals.tournaments_list_lineups_count,
+                            item.lineups.size,
+                            item.lineups.size
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    item.tournament.address?.let { address ->
+                        Row(
+                            modifier = Modifier
+                                .clickable(enabled = mapLocation != null) {
+                                    mapLocation?.let(onMapClick)
+                                }
+                                .padding(top = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_place_outline_24dp),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(13.dp)
+                            )
+                            Text(
+                                text = address,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
                 }
-            }
 
-            HeaderActionIconChip(
-                icon = R.drawable.ic_show_chart_outline_24dp,
-                contentDescription = stringResource(
-                    R.string.tournaments_list_stats_content_description
-                ),
-                onClick = onStatsClick
-            )
-            HeaderActionIconChip(
-                icon = R.drawable.ic_delete_outline_24dp,
-                contentDescription = stringResource(R.string.action_delete),
-                onClick = onDeleteClick
-            )
-            Icon(
-                painter = painterResource(R.drawable.ic_chevron_down_24dp),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .size(16.dp)
-                    .rotate(chevronRotation)
-            )
+                HeaderActionIconChip(
+                    icon = R.drawable.ic_show_chart_outline_24dp,
+                    contentDescription = stringResource(
+                        R.string.tournaments_list_stats_content_description
+                    ),
+                    onClick = onStatsClick
+                )
+                HeaderActionIconChip(
+                    icon = R.drawable.ic_delete_outline_24dp,
+                    contentDescription = stringResource(R.string.action_delete),
+                    onClick = onDeleteClick
+                )
+                Icon(
+                    painter = painterResource(R.drawable.ic_chevron_down_24dp),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .rotate(chevronRotation)
+                )
+            }
         }
 
         if (expanded) {
@@ -342,12 +355,36 @@ private fun TournamentTicketCard(
 
 @Composable
 private fun TicketDateChip(startMillis: Long?) {
+    val notchColor = MaterialTheme.colorScheme.background
+    val dividerColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
     Column(
         modifier = Modifier
-            .clip(RoundedCornerShape(10.dp))
+            .fillMaxHeight()
+            .width(56.dp)
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(horizontal = 10.dp, vertical = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .drawWithContent {
+                drawContent()
+                drawLine(
+                    color = dividerColor,
+                    start = Offset(size.width, 0f),
+                    end = Offset(size.width, size.height),
+                    strokeWidth = 1.5.dp.toPx(),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(6.dp.toPx(), 4.dp.toPx()))
+                )
+                val notchRadius = 7.dp.toPx()
+                drawCircle(
+                    color = notchColor,
+                    radius = notchRadius,
+                    center = Offset(size.width, 0f)
+                )
+                drawCircle(
+                    color = notchColor,
+                    radius = notchRadius,
+                    center = Offset(size.width, size.height)
+                )
+            },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         if (startMillis != null) {
             val date = Date(startMillis)
