@@ -27,7 +27,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -47,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerArrayResource
 import androidx.compose.ui.res.painterResource
@@ -717,7 +717,7 @@ private fun RosterPickerRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+        RosterCheckbox(checked = checked, onCheckedChange = onCheckedChange)
         Box(
             modifier = Modifier
                 .size(34.dp)
@@ -749,6 +749,33 @@ private fun RosterPickerRow(
                 text = if (positionLabel != null) "$positionLabel · $statusText" else statusText,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
+}
+
+@Composable
+private fun RosterCheckbox(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    val borderColor = if (checked) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
+    }
+    Box(
+        modifier = Modifier
+            .size(20.dp)
+            .clip(RoundedCornerShape(6.dp))
+            .background(if (checked) MaterialTheme.colorScheme.primary else Color.Transparent)
+            .border(1.5.dp, borderColor, RoundedCornerShape(6.dp))
+            .clickable { onCheckedChange(!checked) },
+        contentAlignment = Alignment.Center
+    ) {
+        if (checked) {
+            Icon(
+                painter = painterResource(R.drawable.ic_check_green_24dp),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(13.dp)
             )
         }
     }
