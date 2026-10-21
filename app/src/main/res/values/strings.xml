@@ -9,6 +9,7 @@
     <string name="action_report_issue">Report an issue</string>
 
     <string name="generic_back">Back</string>
+    <string name="generic_close">Close</string>
     <string name="generic_done">Done</string>
     <string name="screen_header_eyebrow_app">EasyLineUp</string>
 

@@ -115,9 +115,9 @@ fun LineupCreationScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             ScreenHeader(
-                icon = R.drawable.ic_arrow_left_white_24dp,
+                icon = R.drawable.ic_close_24dp,
                 onIconClick = onBackClick,
-                iconContentDescription = stringResource(R.string.generic_back),
+                iconContentDescription = stringResource(R.string.generic_close),
                 eyebrow = stringResource(R.string.lineup_creation_header_eyebrow),
                 title = stringResource(R.string.lineup_creation_header_title)
             )
@@ -128,7 +128,9 @@ fun LineupCreationScreen(
             OutlinedTextField(
                 value = state.name,
                 onValueChange = onNameChanged,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 64.dp),
                 placeholder = { Text(stringResource(R.string.lineup_creation_name_placeholder)) },
                 singleLine = true,
                 isError = state.nameError != null,
@@ -263,6 +265,7 @@ private fun SelectField(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .heightIn(min = 64.dp)
                 .alpha(if (enabled) 1f else 0.45f)
                 .clip(RoundedCornerShape(10.dp))
                 .background(MaterialTheme.colorScheme.surface)
