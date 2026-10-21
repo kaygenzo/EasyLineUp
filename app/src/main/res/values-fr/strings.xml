@@ -16,7 +16,7 @@
     <string name="cancel_button">Annuler</string>
 
     <string name="dialog_create_lineup_title">Creation&#8230;</string>
-    <string name="dialog_create_lineup_name">Titre</string>
+    <string name="dialog_create_lineup_name">Nom du lineup</string>
     <string name="dialog_create_lineup_tournament">Tournoi</string>
     <string name="dialog_error_select_tournament_first_message">Selectionnez un tournoi d\'abord.</string>
     <string name="player_hint_name">Nom</string>
@@ -69,9 +69,10 @@
     <string name="header_batting_order_player_position">Pos.</string>
 
     <string name="form_lineup_creation_date_label">Date</string>
-    <string name="form_lineup_creation_roster_label">Joueurs</string>
+    <string name="form_lineup_creation_roster_label">Joueurs pour ce lineup</string>
 
-    <string name="lineup_creation_header_title">Créer un lineup</string>
+    <string name="lineup_creation_header_eyebrow">Lineups</string>
+    <string name="lineup_creation_header_title">Nouveau lineup</string>
     <string name="lineup_creation_name_placeholder">ex. Match 3 — Titulaires</string>
     <string name="lineup_creation_tournament_placeholder">Choisir un tournoi</string>
     <string name="lineup_creation_date_sub_within">Dans les dates de %1$s</string>
@@ -80,6 +81,7 @@
     <string name="lineup_creation_tournament_create_row">Créer un nouveau tournoi</string>
     <string name="lineup_creation_roster_search_placeholder">Rechercher un joueur…</string>
     <string name="lineup_creation_roster_toggle_all">Tout sélectionner / désélectionner</string>
+    <string name="lineup_creation_roster_selected_format">%1$d sur %2$d sélectionnés</string>
     <string name="lineup_creation_roster_done">Terminé</string>
     <string name="lineup_creation_save">Créer le lineup</string>
     <string name="action_keep_editing">Continuer la modification</string>
@@ -137,12 +139,6 @@
     </plurals>
     <string name="switch_team_sheet_create_row">Créer une nouvelle équipe</string>
     <string name="switch_team_sheet_current">Actuelle</string>
-
-    <string name="roster_size_status_all">Tous les joueurs</string>
-    <plurals name="roster_size_status_selection">
-        <item quantity="one">%d joueur</item>
-        <item quantity="other">%d joueurs</item>
-    </plurals>
 
     <string name="feature_manage_teams_title">Gérez vos équipes</string>
     <string name="feature_manage_teams_description">Cliquez ici pour accéder au menu vous permettant de créer ou de changer d\'équipe</string>
@@ -281,7 +277,7 @@
     <string name="player_creation_error_invalid_phone_format">Format de n° de téléphone invalide</string>
 
     <string name="form_lineup_creation_extra_hitters_label">Batteurs supplém.</string>
-    <string name="form_lineup_creation_strategy_label">Type de match</string>
+    <string name="form_lineup_creation_strategy_label">Stratégie</string>
 
     <string name="report_sending_message">Le rapport de bug est en cours d\'envoi, veuillez patienter&#8230;</string>
     <string name="report_sending_message_success">Envoyé avec succès! Merci!</string>

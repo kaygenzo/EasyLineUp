@@ -19,7 +19,7 @@
     <string name="cancel_button">Cancel</string>
 
     <string name="dialog_create_lineup_title">Creation&#8230;</string>
-    <string name="dialog_create_lineup_name">Title</string>
+    <string name="dialog_create_lineup_name">Lineup name</string>
     <string name="dialog_create_lineup_tournament">Tournament</string>
     <string name="dialog_error_select_tournament_first_message">Please select or create a tournament first</string>
 
@@ -79,9 +79,10 @@
     <string name="header_batting_order_player_position">Pos.</string>
 
     <string name="form_lineup_creation_date_label">Date</string>
-    <string name="form_lineup_creation_roster_label">Roster</string>
+    <string name="form_lineup_creation_roster_label">Roster for this lineup</string>
 
-    <string name="lineup_creation_header_title">Create lineup</string>
+    <string name="lineup_creation_header_eyebrow">Lineups</string>
+    <string name="lineup_creation_header_title">New lineup</string>
     <string name="lineup_creation_name_placeholder">e.g. Game 3 — Starters</string>
     <string name="lineup_creation_tournament_placeholder">Choose a tournament</string>
     <string name="lineup_creation_date_sub_within">Within %1$s\'s dates</string>
@@ -90,6 +91,7 @@
     <string name="lineup_creation_tournament_create_row">Create a new tournament</string>
     <string name="lineup_creation_roster_search_placeholder">Find a player…</string>
     <string name="lineup_creation_roster_toggle_all">Select / clear all</string>
+    <string name="lineup_creation_roster_selected_format">%1$d of %2$d selected</string>
     <string name="lineup_creation_roster_done">Done</string>
     <string name="lineup_creation_save">Create lineup</string>
     <string name="action_keep_editing">Keep editing</string>
@@ -150,12 +152,6 @@
     </plurals>
     <string name="switch_team_sheet_create_row">Create a new team</string>
     <string name="switch_team_sheet_current">Current</string>
-
-    <string name="roster_size_status_all">All players</string>
-    <plurals name="roster_size_status_selection">
-        <item quantity="one">%d player</item>
-        <item quantity="other">%d players</item>
-    </plurals>
 
     <string name="feature_manage_teams_title">Manage your teams</string>
     <string name="feature_manage_teams_description">Click here to access a menu to let you create and change the main team</string>
@@ -311,7 +307,7 @@
     <string name="lineup_list_extra_hitters" translatable="false">  &#8212;  EH: %s</string>
     <string name="generic_infinite" translatable="false">&#8734;</string>
     <string name="form_lineup_creation_extra_hitters_label">Extra hitters</string>
-    <string name="form_lineup_creation_strategy_label">Game type</string>
+    <string name="form_lineup_creation_strategy_label">Strategy</string>
 
     <string name="report_sending_message">The issue report is currently sending, please wait&#8230;</string>
     <string name="report_sending_message_success">Report sent successfully! Thank you!</string>

@@ -35,7 +35,6 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.lineup.LineupFragment
-import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.tournaments.CreateTournamentDialog
 import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.coroutines.flow.launchIn
@@ -66,9 +65,7 @@ private fun TeamRosterSummary.withAllToggled(): TeamRosterSummary {
 
 class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
     private val viewModel: LineupCreationViewModel by viewModel()
-    private val teamViewModel: TeamViewModel by viewModel()
 
-    private var teamName by mutableStateOf("")
     private var teamType by mutableStateOf(TeamType.UNKNOWN)
     private var name by mutableStateOf("")
     private var nameError by mutableStateOf<String?>(null)
@@ -93,7 +90,6 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
                 DugoutTheme {
                     LineupCreationScreen(
                         state = LineupCreationState(
-                            teamName = teamName,
                             teamType = teamType,
                             name = name,
                             nameError = nameError,
@@ -167,11 +163,6 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             handleCancel()
         }
-
-        teamViewModel.observeCurrentTeamName()
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { teamName = it }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.getTournaments()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)

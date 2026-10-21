@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,7 +46,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerArrayResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -71,7 +71,6 @@ import java.text.DateFormat
 import java.util.Date
 
 data class LineupCreationState(
-    val teamName: String,
     val teamType: TeamType,
     val name: String,
     val nameError: String?,
@@ -116,7 +115,7 @@ fun LineupCreationScreen(
                 icon = R.drawable.ic_arrow_left_white_24dp,
                 onIconClick = onBackClick,
                 iconContentDescription = stringResource(R.string.generic_back),
-                eyebrow = state.teamName,
+                eyebrow = stringResource(R.string.lineup_creation_header_eyebrow),
                 title = stringResource(R.string.lineup_creation_header_title)
             )
             Spacer(modifier = Modifier.height(18.dp))
@@ -130,8 +129,17 @@ fun LineupCreationScreen(
                 placeholder = { Text(stringResource(R.string.lineup_creation_name_placeholder)) },
                 singleLine = true,
                 isError = state.nameError != null,
-                supportingText = state.nameError?.let { { Text(it) } },
-                shape = RoundedCornerShape(10.dp)
+                supportingText = state.nameError?.let {
+                    { Text(it, style = MaterialTheme.typography.bodySmall) }
+                },
+                textStyle = MaterialTheme.typography.bodyLarge,
+                shape = RoundedCornerShape(10.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                    focusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                )
             )
             Spacer(modifier = Modifier.height(14.dp))
 
@@ -164,12 +172,11 @@ fun LineupCreationScreen(
             )
             Spacer(modifier = Modifier.height(14.dp))
 
-            val rosterSummary = if (state.roster.status == Constants.STATUS_ALL) {
-                stringResource(R.string.roster_size_status_all)
-            } else {
-                val selected = state.roster.players.count { it.status }
-                pluralStringResource(R.plurals.roster_size_status_selection, selected, selected)
-            }
+            val rosterSummary = stringResource(
+                R.string.lineup_creation_roster_selected_format,
+                state.roster.players.count { it.status },
+                state.roster.players.size
+            )
             SelectField(
                 label = stringResource(R.string.form_lineup_creation_roster_label),
                 value = rosterSummary,
@@ -216,14 +223,14 @@ private fun FormLabel(text: String, required: Boolean = false) {
         Text(
             text = text.uppercase(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold
         )
         if (required) {
             Text(
                 text = " *",
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -270,13 +277,13 @@ private fun SelectField(
                         MaterialTheme.colorScheme.onSurfaceVariant
                     },
                     fontWeight = if (value != null) FontWeight.Bold else FontWeight.Normal,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 subLabel?.let {
                     Text(
                         text = it,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
@@ -293,7 +300,7 @@ private fun SelectField(
             Text(
                 text = errorText,
                 color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(top = 4.dp)
             )
         }
@@ -340,17 +347,19 @@ private fun SegmentOption(
     } else {
         MaterialTheme.colorScheme.onSurfaceVariant
     }
+    val borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
             .background(backgroundColor)
+            .let { if (selected) it else it.border(1.dp, borderColor, RoundedCornerShape(8.dp)) }
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp)
+            .padding(vertical = 10.dp)
     ) {
         Text(
             text = text,
             color = contentColor,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Monospace,
             textAlign = TextAlign.Center,
@@ -383,14 +392,22 @@ private fun FormBar(
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(text = cancelLabel, fontWeight = FontWeight.Bold)
+                Text(
+                    text = cancelLabel,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
             Button(
                 onClick = onSave,
                 modifier = Modifier.weight(2f),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(text = saveLabel, fontWeight = FontWeight.Bold)
+                Text(
+                    text = saveLabel,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -418,7 +435,7 @@ fun TournamentPickerSheet(
             Text(
                 text = stringResource(R.string.dialog_create_lineup_tournament),
                 color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(horizontal = 18.dp, vertical = 4.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -461,13 +478,13 @@ private fun TournamentPickerRow(tournament: Tournament, onClick: () -> Unit) {
                 text = tournament.name,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyLarge
             )
             tournament.address?.let {
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -496,7 +513,7 @@ private fun CreateTournamentRow(onClick: () -> Unit) {
             text = stringResource(R.string.lineup_creation_tournament_create_row),
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyLarge
         )
     }
 }
@@ -518,19 +535,18 @@ fun RosterPickerSheet(
             indexedPlayers.filter { it.value.player.name.contains(query, ignoreCase = true) }
         }
     }
-    val summary = if (roster.status == Constants.STATUS_ALL) {
-        stringResource(R.string.roster_size_status_all)
-    } else {
-        val selected = roster.players.count { it.status }
-        pluralStringResource(R.plurals.roster_size_status_selection, selected, selected)
-    }
+    val summary = stringResource(
+        R.string.lineup_creation_roster_selected_format,
+        roster.players.count { it.status },
+        roster.players.size
+    )
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = stringResource(R.string.form_lineup_creation_roster_label),
                 color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(horizontal = 18.dp, vertical = 4.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -550,7 +566,7 @@ fun RosterPickerSheet(
                     text = stringResource(R.string.lineup_creation_roster_toggle_all),
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
@@ -573,7 +589,8 @@ fun RosterPickerSheet(
             ) {
                 Text(
                     text = "${stringResource(R.string.lineup_creation_roster_done)} · $summary",
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
         }
@@ -600,13 +617,13 @@ private fun RosterPickerRow(
             text = name,
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f)
         )
         Text(
             text = "#$shirtNumber",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.bodyMedium,
             fontFamily = FontFamily.Monospace,
             modifier = Modifier.padding(end = 8.dp)
         )
@@ -619,7 +636,6 @@ private fun LineupCreationScreenPreview() {
     DugoutTheme {
         LineupCreationScreen(
             state = LineupCreationState(
-                teamName = "Riverside Hawks",
                 teamType = TeamType.BASEBALL,
                 name = "Game 3 — Starters",
                 nameError = null,
@@ -680,7 +696,6 @@ private fun LineupCreationScreenEmptyPreview() {
     DugoutTheme {
         LineupCreationScreen(
             state = LineupCreationState(
-                teamName = "Riverside Hawks",
                 teamType = TeamType.BASEBALL,
                 name = "",
                 nameError = null,
