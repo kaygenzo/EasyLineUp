@@ -37,8 +37,7 @@
     <fragment
         android:id="@+id/lineupCreationFragment"
         android:name="com.telen.easylineup.lineup.create.LineupCreationFragment"
-        android:label="@string/dialog_create_lineup_title"
-        tools:layout="@layout/fragment_lineup_creation"/>
+        android:label="@string/dialog_create_lineup_title"/>
 
     <fragment
         android:id="@+id/teamDetailsFragment"
