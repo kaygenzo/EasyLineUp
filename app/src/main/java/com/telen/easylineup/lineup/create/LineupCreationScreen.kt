@@ -682,7 +682,7 @@ fun RosterPickerSheet(
                     )
                     if (position != filtered.lastIndex) {
                         HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 10.dp),
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
                         )
                     }
@@ -723,20 +723,20 @@ private fun RosterPickerRow(
             .fillMaxWidth()
             .alpha(if (checked) 1f else 0.45f)
             .clickable { onCheckedChange(!checked) }
-            .padding(horizontal = 10.dp, vertical = 6.dp),
+            .padding(horizontal = 10.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         RosterCheckbox(checked = checked, onCheckedChange = onCheckedChange)
         Box(
             modifier = Modifier
-                .size(34.dp)
-                .clip(RoundedCornerShape(9.dp))
+                .size(42.dp)
+                .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .border(
                     1.5.dp,
                     MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
-                    RoundedCornerShape(9.dp)
+                    RoundedCornerShape(12.dp)
                 ),
             contentAlignment = Alignment.Center
         ) {
@@ -745,7 +745,7 @@ private fun RosterPickerRow(
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.Monospace,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.titleSmall
             )
         }
         Column(modifier = Modifier.weight(1f)) {
@@ -753,12 +753,12 @@ private fun RosterPickerRow(
                 text = player.name,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.titleSmall
             )
             Text(
                 text = if (positionLabel != null) "$positionLabel · $statusText" else statusText,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
