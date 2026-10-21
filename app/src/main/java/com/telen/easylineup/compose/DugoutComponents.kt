@@ -101,7 +101,11 @@ fun Modifier.dashedBorder(
  * the same chrome, instead of re-copying a private composable.
  */
 @Composable
-fun DugoutCard(content: @Composable () -> Unit) {
+fun DugoutCard(
+    borderWidth: Dp = 1.dp,
+    borderAlpha: Float = 0.4f,
+    content: @Composable () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -109,7 +113,10 @@ fun DugoutCard(content: @Composable () -> Unit) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
+        border = BorderStroke(
+            borderWidth,
+            MaterialTheme.colorScheme.outline.copy(alpha = borderAlpha)
+        )
     ) {
         Column { content() }
     }

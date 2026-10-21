@@ -227,7 +227,7 @@ private fun TournamentTicketCard(
         label = "chevron-rotation"
     )
 
-    DugoutCard {
+    DugoutCard(borderWidth = 1.5.dp, borderAlpha = 0.7f) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -273,13 +273,14 @@ private fun TournamentTicketCard(
                             Icon(
                                 painter = painterResource(R.drawable.ic_place_outline_24dp),
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(13.dp)
                             )
                             Text(
                                 text = address,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.bodySmall
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold
                             )
                         }
                     }
@@ -360,7 +361,7 @@ private fun TicketDateChip(startMillis: Long?) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
-            .width(56.dp)
+            .width(68.dp)
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .drawWithContent {
                 drawContent()
@@ -371,7 +372,7 @@ private fun TicketDateChip(startMillis: Long?) {
                     strokeWidth = 1.5.dp.toPx(),
                     pathEffect = PathEffect.dashPathEffect(floatArrayOf(6.dp.toPx(), 4.dp.toPx()))
                 )
-                val notchRadius = 7.dp.toPx()
+                val notchRadius = 10.dp.toPx()
                 drawCircle(
                     color = notchColor,
                     radius = notchRadius,
@@ -391,7 +392,7 @@ private fun TicketDateChip(startMillis: Long?) {
             Text(
                 text = SimpleDateFormat("d", Locale.getDefault()).format(date),
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.ExtraBold
             )
             Text(
