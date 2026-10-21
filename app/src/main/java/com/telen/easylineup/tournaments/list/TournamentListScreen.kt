@@ -320,15 +320,19 @@ private fun TournamentTicketCard(
             } else {
                 item.lineups.take(2)
             }
-            visibleLineups.forEach { lineup ->
+            val showMore = !showAllLineups && item.lineups.size > 2
+            visibleLineups.forEachIndexed { index, lineup ->
                 LineupRow(
                     lineup = lineup,
                     teamType = teamType,
                     onClick = { onLineupClick(lineup) },
                     onEditClick = { onEditLineupClick(lineup) }
                 )
+                if (index != visibleLineups.lastIndex || showMore) {
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                }
             }
-            if (!showAllLineups && item.lineups.size > 2) {
+            if (showMore) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
