@@ -292,7 +292,10 @@ fun MessageTeamSheet(
     val phoneCount = players.count { !it.phone.isNullOrBlank() }
     val emailCount = players.count { !it.email.isNullOrBlank() }
 
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())

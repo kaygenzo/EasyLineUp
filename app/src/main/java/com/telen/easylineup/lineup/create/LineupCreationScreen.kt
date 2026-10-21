@@ -448,7 +448,10 @@ fun TournamentPickerSheet(
         }
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = stringResource(R.string.lineup_creation_tournament_sheet_title),
@@ -620,7 +623,10 @@ fun RosterPickerSheet(
         roster.players.size
     )
 
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier
@@ -772,7 +778,10 @@ fun NewTournamentSheet(
     onDismiss: () -> Unit,
     onAddClick: () -> Unit
 ) {
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(horizontal = 18.dp)) {
                 Text(

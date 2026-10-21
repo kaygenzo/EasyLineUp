@@ -554,7 +554,10 @@ fun ConfirmSheet(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
         Column(modifier = Modifier.padding(horizontal = 18.dp, vertical = 4.dp)) {
             Text(
                 text = title,

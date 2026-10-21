@@ -382,7 +382,10 @@ fun ShirtNumberHistorySheet(history: List<ShirtNumberEntry>, onDismiss: () -> Un
     val distinctPlayerCount = history.map { it.playerId }.distinct().size
     val number = history.firstOrNull()?.number?.toString()?.padStart(2, '0').orEmpty()
 
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
