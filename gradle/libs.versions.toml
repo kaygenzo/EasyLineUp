@@ -113,6 +113,7 @@ picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "pic
 rounedImage = { group = "com.makeramen", name = "roundedimageview", version.ref = "roundedImageView" }
 koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koinVersion" }
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koinVersion" }
+koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koinVersion" }
 detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detektPluginVersion" }
 taptaptarget = { group = "com.getkeepsafe.taptargetview", name = "taptargetview", version.ref = "taptargetviewVersion" }
 dexter = { group = "com.karumi", name = "dexter", version.ref = "dexterVersion" }

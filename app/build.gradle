@@ -216,6 +216,7 @@ dependencies {
     implementation libs.picasso
     implementation libs.rounedImage
     implementation libs.koin
+    implementation libs.koin.androidx.compose
     implementation libs.taptaptarget
     implementation libs.dexter
     implementation libs.licenser
