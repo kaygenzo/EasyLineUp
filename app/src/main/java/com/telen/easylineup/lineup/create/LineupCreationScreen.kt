@@ -26,6 +26,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,7 +35,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -46,8 +47,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.integerArrayResource
 import androidx.compose.ui.res.painterResource
@@ -55,6 +56,7 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -62,7 +64,10 @@ import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutSearchField
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.FormBar
+import com.telen.easylineup.compose.FormLabel
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.SelectField
 import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.FieldPosition
@@ -228,98 +233,6 @@ fun LineupCreationScreen(
 }
 
 @Composable
-private fun FormLabel(text: String, required: Boolean = false) {
-    Row {
-        Text(
-            text = text.uppercase(),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold
-        )
-        if (required) {
-            Text(
-                text = " *",
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-@Composable
-private fun SelectField(
-    label: String,
-    value: String?,
-    placeholder: String,
-    subLabel: String?,
-    required: Boolean = false,
-    enabled: Boolean = true,
-    isError: Boolean = false,
-    errorText: String? = null,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Column(modifier = modifier) {
-        FormLabel(label, required)
-        Spacer(modifier = Modifier.height(6.dp))
-        val borderColor = if (isError) {
-            MaterialTheme.colorScheme.error
-        } else {
-            MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 64.dp)
-                .alpha(if (enabled) 1f else 0.45f)
-                .clip(RoundedCornerShape(10.dp))
-                .background(MaterialTheme.colorScheme.surface)
-                .border(1.dp, borderColor, RoundedCornerShape(10.dp))
-                .clickable(enabled = enabled, onClick = onClick)
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = value ?: placeholder,
-                    color = if (value != null) {
-                        MaterialTheme.colorScheme.onBackground
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
-                    fontWeight = if (value != null) FontWeight.Bold else FontWeight.Normal,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                subLabel?.let {
-                    Text(
-                        text = it,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-            Icon(
-                painter = painterResource(R.drawable.ic_chevron_down_24dp),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .size(16.dp)
-                    .rotate(-90f)
-            )
-        }
-        if (isError && errorText != null) {
-            Text(
-                text = errorText,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-        }
-    }
-}
-
-@Composable
 private fun SegmentedRow(
     label: String,
     options: List<String>,
@@ -386,51 +299,6 @@ private fun SegmentOption(
     }
 }
 
-@Composable
-private fun FormBar(
-    cancelLabel: String,
-    saveLabel: String,
-    onCancel: () -> Unit,
-    onSave: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-    ) {
-        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            OutlinedButton(
-                onClick = onCancel,
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = cancelLabel,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-            Button(
-                onClick = onSave,
-                modifier = Modifier.weight(2f),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = saveLabel,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TournamentPickerSheet(
@@ -438,7 +306,7 @@ fun TournamentPickerSheet(
     selectedTournamentId: Long?,
     onDismiss: () -> Unit,
     onTournamentSelected: (Tournament) -> Unit,
-    onCreateTournamentClick: () -> Unit
+    onCreateTournamentClick: (() -> Unit)? = null
 ) {
     var query by remember { mutableStateOf("") }
     val filtered = remember(query, tournaments) {
@@ -482,8 +350,10 @@ fun TournamentPickerSheet(
                         color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
                     )
                 }
-                item {
-                    CreateTournamentRow(onClick = onCreateTournamentClick)
+                if (onCreateTournamentClick != null) {
+                    item {
+                        CreateTournamentRow(onClick = onCreateTournamentClick)
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
@@ -611,7 +481,39 @@ fun RosterPickerSheet(
     teamType: TeamType,
     onDismiss: () -> Unit,
     onPlayerToggled: (Int, Boolean) -> Unit,
-    onClearAll: () -> Unit
+    onClearAll: () -> Unit,
+    onNumberChanged: ((Int, Int) -> Unit)? = null
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
+        RosterPickerContent(
+            roster = roster,
+            teamType = teamType,
+            onPlayerToggled = onPlayerToggled,
+            onClearAll = onClearAll,
+            onDoneClick = onDismiss,
+            onNumberChanged = onNumberChanged
+        )
+    }
+}
+
+/**
+ * The roster picker's content, without the `ModalBottomSheet` wrapper - extracted so
+ * the Edit Lineup sheet can render it as a content-swap inside its own single sheet
+ * (per the mockup, the roster step replaces the edit-lineup fields in place, it is
+ * never a second sheet stacked on top), while `RosterPickerSheet` above still wraps
+ * it in its own sheet for Create Lineup's usage.
+ */
+@Composable
+fun RosterPickerContent(
+    roster: TeamRosterSummary,
+    teamType: TeamType,
+    onPlayerToggled: (Int, Boolean) -> Unit,
+    onClearAll: () -> Unit,
+    onDoneClick: () -> Unit,
+    onNumberChanged: ((Int, Int) -> Unit)? = null
 ) {
     var query by remember { mutableStateOf("") }
     val indexedPlayers = remember(roster) { roster.players.withIndex().toList() }
@@ -628,97 +530,111 @@ fun RosterPickerSheet(
         roster.players.size
     )
 
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surface
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 18.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(R.string.form_lineup_creation_roster_label),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Text(
-                        text = summary,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 18.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Column {
                 Text(
-                    text = stringResource(R.string.lineup_creation_roster_clear_all),
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.clickable(onClick = onClearAll)
+                    text = stringResource(R.string.form_lineup_creation_roster_label),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Text(
+                    text = summary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
-            Spacer(modifier = Modifier.height(10.dp))
-            DugoutSearchField(
-                value = query,
-                onValueChange = { query = it },
-                placeholder = stringResource(R.string.lineup_creation_roster_search_placeholder),
-                modifier = Modifier.padding(horizontal = 18.dp)
+            Text(
+                text = stringResource(R.string.lineup_creation_roster_clear_all),
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.clickable(onClick = onClearAll)
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-            LazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
-                itemsIndexed(
-                    items = filtered,
-                    key = { _, indexed -> indexed.index }
-                ) { position, (index, rosterPlayer) ->
-                    RosterPickerRow(
-                        player = rosterPlayer.player,
-                        teamType = teamType,
-                        checked = rosterPlayer.status,
-                        onCheckedChange = { checked -> onPlayerToggled(index, checked) }
-                    )
-                    if (position != filtered.lastIndex) {
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 18.dp, vertical = 6.dp),
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                        )
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        DugoutSearchField(
+            value = query,
+            onValueChange = { query = it },
+            placeholder = stringResource(R.string.lineup_creation_roster_search_placeholder),
+            modifier = Modifier.padding(horizontal = 18.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+        LazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
+            itemsIndexed(
+                items = filtered,
+                key = { _, indexed -> indexed.index }
+            ) { position, (index, rosterPlayer) ->
+                RosterPickerRow(
+                    player = rosterPlayer.player,
+                    teamType = teamType,
+                    checked = rosterPlayer.status,
+                    onCheckedChange = { checked -> onPlayerToggled(index, checked) },
+                    overrideNumber = rosterPlayer.playerNumberOverlay?.number,
+                    onNumberChange = onNumberChanged?.let { callback ->
+                        { number: Int -> callback(index, number) }
                     }
+                )
+                if (position != filtered.lastIndex) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 18.dp, vertical = 6.dp),
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                    )
                 }
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-            Button(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 18.dp, vertical = 12.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = "${stringResource(R.string.lineup_creation_roster_done)} · $summary",
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+        Button(
+            onClick = onDoneClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 18.dp, vertical = 12.dp),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(
+                text = "${stringResource(R.string.lineup_creation_roster_done)} · $summary",
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }
+
+/** Mockup's `--gold` token (line ~24 of the CSS) - no bridged M3 role covers it. */
+private val RosterNumberOverrideColor = Color(0xFFE8B93F)
 
 @Composable
 private fun RosterPickerRow(
     player: Player,
     teamType: TeamType,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    overrideNumber: Int? = null,
+    onNumberChange: ((Int) -> Unit)? = null
 ) {
     val positionLabel = primaryPositionLabel(player.positions, teamType)
+    val isOverridden = overrideNumber != null && overrideNumber != player.shirtNumber
     val statusText = if (checked) {
-        stringResource(R.string.lineup_creation_roster_status_default, player.shirtNumber)
+        if (isOverridden) {
+            stringResource(R.string.lineup_creation_roster_status_override, overrideNumber)
+        } else {
+            stringResource(R.string.lineup_creation_roster_status_default, player.shirtNumber)
+        }
     } else {
         stringResource(R.string.lineup_creation_roster_status_sitting_out)
+    }
+    val numberTint = if (isOverridden) {
+        RosterNumberOverrideColor
+    } else {
+        MaterialTheme.colorScheme.primary
     }
     Row(
         modifier = Modifier
@@ -737,18 +653,42 @@ private fun RosterPickerRow(
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .border(
                     1.5.dp,
-                    MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
+                    numberTint.copy(alpha = if (isOverridden) 1f else 0.6f),
                     RoundedCornerShape(12.dp)
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "%02d".format(player.shirtNumber),
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace,
-                style = MaterialTheme.typography.titleSmall
-            )
+            if (onNumberChange != null) {
+                var text by remember(overrideNumber, player.id) {
+                    mutableStateOf("%02d".format(overrideNumber ?: player.shirtNumber))
+                }
+                BasicTextField(
+                    value = text,
+                    onValueChange = { newValue ->
+                        val digitsOnly = newValue.filter { it.isDigit() }.take(2)
+                        text = digitsOnly
+                        digitsOnly.toIntOrNull()?.let(onNumberChange)
+                    },
+                    modifier = Modifier.width(28.dp),
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.titleSmall.copy(
+                        color = numberTint,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace,
+                        textAlign = TextAlign.Center
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    cursorBrush = SolidColor(numberTint)
+                )
+            } else {
+                Text(
+                    text = "%02d".format(player.shirtNumber),
+                    color = numberTint,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace,
+                    style = MaterialTheme.typography.titleSmall
+                )
+            }
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(
