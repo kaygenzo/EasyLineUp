@@ -8,7 +8,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
-import com.telen.easylineup.domain.model.RosterItem
+import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
 import kotlinx.coroutines.runBlocking
@@ -43,7 +43,11 @@ internal class SavePlayerNumberOverlayTests {
     @Test
     fun shouldCreateNewOverlayWhenNumberDiffersAndOverlayIsNew() = runTest {
         val overlay = PlayerNumberOverlay(id = 0L, lineupId = 1L, playerId = 1L, number = 99)
-        val item = RosterItem(player(1L, shirtNumber = 1), selected = true, playerNumberOverlay = overlay)
+        val item = RosterPlayerStatus(
+            player(1L, shirtNumber = 1),
+            status = true,
+            playerNumberOverlay = overlay
+        )
 
         val result = savePlayerNumberOverlay(listOf(item))
 
@@ -58,7 +62,11 @@ internal class SavePlayerNumberOverlayTests {
     @Test
     fun shouldUpdateExistingOverlayWhenNumberDiffersAndOverlayAlreadyExists() = runTest {
         val overlay = PlayerNumberOverlay(id = 5L, lineupId = 1L, playerId = 1L, number = 99)
-        val item = RosterItem(player(1L, shirtNumber = 1), selected = true, playerNumberOverlay = overlay)
+        val item = RosterPlayerStatus(
+            player(1L, shirtNumber = 1),
+            status = true,
+            playerNumberOverlay = overlay
+        )
 
         val result = savePlayerNumberOverlay(listOf(item))
 
@@ -73,7 +81,11 @@ internal class SavePlayerNumberOverlayTests {
     @Test
     fun shouldDeleteExistingOverlayWhenNumberMatchesShirtNumber() = runTest {
         val overlay = PlayerNumberOverlay(id = 5L, lineupId = 1L, playerId = 1L, number = 1)
-        val item = RosterItem(player(1L, shirtNumber = 1), selected = true, playerNumberOverlay = overlay)
+        val item = RosterPlayerStatus(
+            player(1L, shirtNumber = 1),
+            status = true,
+            playerNumberOverlay = overlay
+        )
 
         val result = savePlayerNumberOverlay(listOf(item))
 
@@ -88,7 +100,11 @@ internal class SavePlayerNumberOverlayTests {
     @Test
     fun shouldDoNothingWhenNumberMatchesShirtNumberAndOverlayIsNotPersisted() = runTest {
         val overlay = PlayerNumberOverlay(id = 0L, lineupId = 1L, playerId = 1L, number = 1)
-        val item = RosterItem(player(1L, shirtNumber = 1), selected = true, playerNumberOverlay = overlay)
+        val item = RosterPlayerStatus(
+            player(1L, shirtNumber = 1),
+            status = true,
+            playerNumberOverlay = overlay
+        )
 
         val result = savePlayerNumberOverlay(listOf(item))
 
@@ -100,7 +116,11 @@ internal class SavePlayerNumberOverlayTests {
 
     @Test
     fun shouldIgnoreItemsWithNullOverlay() = runTest {
-        val item = RosterItem(player(1L, shirtNumber = 1), selected = true, playerNumberOverlay = null)
+        val item = RosterPlayerStatus(
+            player(1L, shirtNumber = 1),
+            status = true,
+            playerNumberOverlay = null
+        )
 
         val result = savePlayerNumberOverlay(listOf(item))
 
@@ -114,7 +134,11 @@ internal class SavePlayerNumberOverlayTests {
     fun shouldPropagateErrorFromRepository() = runTest {
         val exception = Exception("db error")
         Mockito.`when`(playerNumberOverlayRepository.deletePlayerNumberOverlays(any())).thenAnswer { throw exception }
-        val item = RosterItem(player(1L, shirtNumber = 1), selected = true, playerNumberOverlay = null)
+        val item = RosterPlayerStatus(
+            player(1L, shirtNumber = 1),
+            status = true,
+            playerNumberOverlay = null
+        )
 
         val result = savePlayerNumberOverlay(listOf(item))
 

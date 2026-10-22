@@ -5,7 +5,7 @@
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
-import com.telen.easylineup.domain.model.RosterItem
+import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
 import kotlinx.coroutines.withContext
@@ -14,7 +14,9 @@ class SavePlayerNumberOverlay(
     private val playerNumberOverlayRepository: PlayerNumberOverlayRepository,
     private val dispatcherProvider: DispatcherProvider
 ) {
-    suspend operator fun invoke(items: List<RosterItem>): Result<Unit> = runCatchingCancellable {
+    suspend operator fun invoke(
+        items: List<RosterPlayerStatus>
+    ): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
             val toAdd: MutableList<PlayerNumberOverlay> = mutableListOf()
             val toDelete: MutableList<PlayerNumberOverlay> = mutableListOf()
