@@ -85,6 +85,10 @@ class LineupViewModel : ViewModel(), KoinComponent {
         filterFlow.value = filter
     }
 
+    fun reloadList() {
+        reloadTrigger.value++
+    }
+
     fun registerSaveResults(): Flow<SaveResult> {
         return saveResult
     }

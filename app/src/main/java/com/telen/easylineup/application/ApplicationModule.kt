@@ -10,6 +10,7 @@ import com.telen.easylineup.domain.ports.GeocodingProvider
 import com.telen.easylineup.domain.ports.PhoneNumberValidator
 import com.telen.easylineup.domain.ports.StringResourcesProvider
 import com.telen.easylineup.lineup.create.LineupCreationViewModel
+import com.telen.easylineup.lineup.edition.LineupEditionViewModel
 import com.telen.easylineup.player.PlayerViewModel
 import com.telen.easylineup.settings.SettingsViewModel
 import com.telen.easylineup.team.TeamViewModel
@@ -38,4 +39,5 @@ val appModules = module {
     viewModelOf(::PlayerViewModel)
     viewModelOf(::DashboardViewModel)
     viewModelOf(::LineupCreationViewModel)
+    viewModelOf(::LineupEditionViewModel)
 }
