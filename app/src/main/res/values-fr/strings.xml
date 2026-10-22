@@ -158,8 +158,6 @@
     <string name="switch_team_sheet_create_row">Créer une nouvelle équipe</string>
     <string name="switch_team_sheet_current">Actuelle</string>
 
-    <string name="feature_manage_teams_title">Gérez vos équipes</string>
-    <string name="feature_manage_teams_description">Cliquez ici pour accéder au menu vous permettant de créer ou de changer d\'équipe</string>
 
     <string name="feature_roster_title">Gérez votre composition initiale</string>
     <string name="feature_roster_description">Vous pouvez changer les joueurs qui participeront au match</string>

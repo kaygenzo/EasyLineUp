@@ -171,8 +171,6 @@
     <string name="switch_team_sheet_create_row">Create a new team</string>
     <string name="switch_team_sheet_current">Current</string>
 
-    <string name="feature_manage_teams_title">Manage your teams</string>
-    <string name="feature_manage_teams_description">Click here to access a menu to let you create and change the main team</string>
 
     <string name="feature_roster_title">Setup your roster</string>
     <string name="feature_roster_description">You can now change players who will play the game!</string>
