@@ -6,6 +6,8 @@ package com.telen.easylineup.compose
 
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -591,6 +593,70 @@ fun ConfirmSheet(
                 ) {
                     Text(text = confirmLabel, fontWeight = FontWeight.Bold)
                 }
+            }
+        }
+    }
+}
+
+/**
+ * The 4 top-level destinations the mockup's own `.bottomnav` component switches between,
+ * replacing the retired drawer's tab-switching role. `destinationId` matches the nav graph
+ * entries the old drawer menu (`activity_main_drawer.xml`) used to point at.
+ */
+enum class BottomNavTab(
+    @StringRes val labelRes: Int,
+    @DrawableRes val iconRes: Int,
+    val destinationId: Int
+) {
+    HOME(R.string.title_last_lineup, R.drawable.ic_dashboard_black_24dp, R.id.navigation_home),
+    ROSTER(R.string.title_team, R.drawable.ic_team, R.id.navigation_team),
+    LINEUPS(R.string.title_lineups, R.drawable.ic_list_black_24dp, R.id.navigation_lineups),
+    SETTINGS(R.string.title_settings, R.drawable.ic_settings_black_24dp, R.id.navigation_settings)
+}
+
+@Composable
+fun DugoutBottomNav(selected: BottomNavTab?, onSelect: (BottomNavTab) -> Unit) {
+    val outlineColor = MaterialTheme.colorScheme.outline
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .drawBehind {
+                drawLine(
+                    color = outlineColor,
+                    start = Offset(0f, 0f),
+                    end = Offset(size.width, 0f),
+                    strokeWidth = 1.dp.toPx()
+                )
+            }
+            .padding(top = 10.dp, bottom = 16.dp, start = 8.dp, end = 8.dp),
+        horizontalArrangement = Arrangement.SpaceAround
+    ) {
+        BottomNavTab.values().forEach { tab ->
+            val active = tab == selected
+            val tint = if (active) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .clickable { onSelect(tab) }
+                    .padding(4.dp)
+            ) {
+                Icon(
+                    painter = painterResource(tab.iconRes),
+                    contentDescription = stringResource(tab.labelRes),
+                    tint = tint,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(tab.labelRes).uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = tint
+                )
             }
         }
     }
