@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -68,6 +69,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val filterFlow: MutableStateFlow<String> by lazy {
         MutableStateFlow("")
     }
+    private val reloadTrigger = MutableStateFlow(0)
     private var chosenRoster: TeamRosterSummary =
         TeamRosterSummary(Constants.STATUS_ALL, mutableListOf())
     private val saveResult: MutableSharedFlow<SaveResult> =
@@ -92,19 +94,20 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     fun observeCategorizedLineups(): Flow<List<TournamentItem>> {
-        return filterFlow.flatMapLatest { filter ->
-            flow {
-                getAllTournamentsWithLineups(filter)
-                    .onSuccess { pairs ->
-                        val items = pairs.map { TournamentItem(it.first, it.second) }
-                        tournamentItems.clear()
-                        tournamentItems.addAll(items)
-                        emit(tournamentItems.toList())
-                        loadMaps(items)
-                    }
-                    .onFailure { Timber.e(it) }
+        return combine(filterFlow, reloadTrigger) { filter, _ -> filter }
+            .flatMapLatest { filter ->
+                flow {
+                    getAllTournamentsWithLineups(filter)
+                        .onSuccess { pairs ->
+                            val items = pairs.map { TournamentItem(it.first, it.second) }
+                            tournamentItems.clear()
+                            tournamentItems.addAll(items)
+                            emit(tournamentItems.toList())
+                            loadMaps(items)
+                        }
+                        .onFailure { Timber.e(it) }
+                }
             }
-        }
     }
 
     private fun loadMaps(tournamentItems: List<TournamentItem>) {
@@ -130,7 +133,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     suspend fun deleteTournament(tournament: Tournament): Result<Unit> {
-        return deleteTournamentLineups(tournament)
+        return deleteTournamentLineups(tournament).onSuccess { reloadTrigger.value++ }
     }
 
     suspend fun getCompleteRoster(): Result<TeamRosterSummary> {

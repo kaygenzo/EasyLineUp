@@ -181,7 +181,6 @@ class TournamentListFragment : BaseFragment("TournamentListFragment") {
         val activity = activity ?: return
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.deleteTournament(tournament)
-                .onSuccess { viewModel.setFilter("") }
                 .onFailure { throwable ->
                     Timber.e(throwable)
                     Toast.makeText(
