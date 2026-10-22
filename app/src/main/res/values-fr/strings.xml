@@ -86,11 +86,19 @@
     <string name="lineup_creation_roster_clear_all">Tout désélectionner</string>
     <string name="lineup_creation_roster_selected_format">%1$d sur %2$d sélectionnés</string>
     <string name="lineup_creation_roster_status_default">N° %1$d par défaut</string>
+    <string name="lineup_creation_roster_status_override">porte le n°%1$d ce soir</string>
     <string name="lineup_creation_roster_status_sitting_out">Ne joue pas</string>
     <string name="lineup_creation_roster_done">Terminé</string>
     <string name="lineup_creation_save">Créer le lineup</string>
     <string name="action_keep_editing">Continuer la modification</string>
     <string name="action_discard">Abandonner</string>
+
+    <string name="edit_lineup_title">Modifier le lineup</string>
+    <string name="edit_lineup_footnote">La date, la stratégie et les frappeurs
+        supplémentaires sont verrouillés une fois le lineup créé — les modifier après
+        que les positions ont été assignées invaliderait l\'ordre de batte et le schéma
+        de terrain.</string>
+    <string name="edit_lineup_save_changes">Enregistrer les modifications</string>
 
     <string name="lineup_creation_new_tournament_title">Nouveau tournoi</string>
     <string name="lineup_creation_new_tournament_subtitle">Le sélectionner ici l\'ajoute aussi à
@@ -272,7 +280,6 @@
         <item quantity="other">Remplaçants: %d</item>
     </plurals>
     
-    <string name="title_lineup_roster">Edition de l\'équipe</string>
     <string name="tile_last_lineup_header">Dern. lineup</string>
 
     <string name="lineup_style_normal_label">Normal</string>

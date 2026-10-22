@@ -40,7 +40,6 @@
     <string name="title_player_edition">Player edition</string>
     <string name="title_team_details">Team details</string>
     <string name="team_details_header_title">Team</string>
-    <string name="title_lineup_roster">Roster edition</string>
 
     <string name="team_creation_error_name_empty">Team name cannot be empty</string>
     <string name="team_form_eyebrow">Team</string>
@@ -96,11 +95,18 @@
     <string name="lineup_creation_roster_clear_all">Clear all</string>
     <string name="lineup_creation_roster_selected_format">%1$d of %2$d selected</string>
     <string name="lineup_creation_roster_status_default">default #%1$d</string>
+    <string name="lineup_creation_roster_status_override">wearing #%1$d tonight</string>
     <string name="lineup_creation_roster_status_sitting_out">Sitting out</string>
     <string name="lineup_creation_roster_done">Done</string>
     <string name="lineup_creation_save">Create lineup</string>
     <string name="action_keep_editing">Keep editing</string>
     <string name="action_discard">Discard</string>
+
+    <string name="edit_lineup_title">Edit lineup</string>
+    <string name="edit_lineup_footnote">Date, strategy and extra hitters are locked once a
+        lineup exists — changing them after positions are already assigned would invalidate
+        the batting order and field diagram underneath.</string>
+    <string name="edit_lineup_save_changes">Save changes</string>
 
     <string name="lineup_creation_new_tournament_title">New tournament</string>
     <string name="lineup_creation_new_tournament_subtitle">Selecting it here also adds it to the
