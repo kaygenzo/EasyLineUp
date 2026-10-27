@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,6 +40,26 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SwapTeamSheet(
+    teams: List<Team>,
+    onDismiss: () -> Unit,
+    onTeamClick: (Team) -> Unit,
+    onCreateTeamClick: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
+        SwitchTeamSheetContent(
+            teams = teams,
+            onTeamClick = onTeamClick,
+            onCreateTeamClick = onCreateTeamClick
+        )
+    }
+}
+
 @Composable
 fun SwitchTeamSheetContent(
     teams: List<Team>,
@@ -47,20 +69,8 @@ fun SwitchTeamSheetContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-            .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .size(width = 36.dp, height = 4.dp)
-                .clip(RoundedCornerShape(2.dp))
-                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
         Text(
             text = stringResource(R.string.switch_team_sheet_title),
             color = MaterialTheme.colorScheme.onSurface,

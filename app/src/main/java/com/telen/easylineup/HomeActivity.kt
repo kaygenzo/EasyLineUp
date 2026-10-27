@@ -23,17 +23,14 @@ import com.telen.easylineup.compose.BottomNavTab
 import com.telen.easylineup.compose.DugoutBottomNav
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.databinding.ActivityHomeBinding
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
-import com.telen.easylineup.team.swap.SwapTeamActions
-import com.telen.easylineup.team.swap.SwapTeamFragment
+import com.telen.easylineup.team.swap.SwapTeamSheet
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import timber.log.Timber
-import java.io.Serializable
 
-class HomeActivity : BaseActivity(), SwapTeamActions {
+class HomeActivity : BaseActivity() {
     private val viewModel by viewModels<HomeViewModel>()
     private val navController by lazy { findNavController(R.id.nav_host_fragment) }
     private val appBarConfiguration = AppBarConfiguration(
@@ -46,6 +43,8 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
     )
     private var binding: ActivityHomeBinding? = null
     private var currentTab by mutableStateOf<BottomNavTab?>(null)
+    private var showSwapTeamSheet by mutableStateOf(false)
+    private var swapTeamTeams by mutableStateOf<List<Team>>(emptyList())
     private val createTeam =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
@@ -55,6 +54,12 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        savedInstanceState?.let {
+            showSwapTeamSheet = it.getBoolean(KEY_SHOW_SWAP_TEAM_SHEET)
+            @Suppress("UNCHECKED_CAST")
+            swapTeamTeams = it.getSerializable(KEY_SWAP_TEAM_TEAMS) as? List<Team>
+                ?: emptyList()
+        }
         binding = ActivityHomeBinding.inflate(layoutInflater).apply {
             setContentView(root)
             val toolbar: Toolbar = findViewById(R.id.toolbar)
@@ -80,6 +85,29 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
                             }
                         }
                     )
+
+                    if (showSwapTeamSheet) {
+                        SwapTeamSheet(
+                            teams = swapTeamTeams,
+                            onDismiss = { showSwapTeamSheet = false },
+                            onTeamClick = { team ->
+                                FirebaseAnalyticsUtils.onClick(
+                                    this@HomeActivity,
+                                    "click_team_swap_selection"
+                                )
+                                viewModel.updateCurrentTeam(team)
+                                showSwapTeamSheet = false
+                            },
+                            onCreateTeamClick = {
+                                FirebaseAnalyticsUtils.onClick(
+                                    this@HomeActivity,
+                                    "click_team_swap_create"
+                                )
+                                onCreateTeamClick()
+                                showSwapTeamSheet = false
+                            }
+                        )
+                    }
                 }
             }
 
@@ -95,12 +123,8 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
                     }
 
                     is SwapButtonSuccess -> {
-                        val argument = Bundle()
-                        argument.putSerializable(Constants.EXTRA_TEAMS, it.teams as Serializable)
-                        SwapTeamFragment().apply {
-                            arguments = argument
-                            setSwapTeamActionsListener(this@HomeActivity)
-                        }.show(supportFragmentManager, "SwapTeamFragment")
+                        swapTeamTeams = it.teams
+                        showSwapTeamSheet = true
                     }
 
                     else -> {}
@@ -118,24 +142,24 @@ class HomeActivity : BaseActivity(), SwapTeamActions {
         viewModel.clear()
     }
 
-    override fun onResume() {
-        super.onResume()
-        supportFragmentManager.findFragmentByTag("SwapTeamFragment")?.let {
-            (it as SwapTeamFragment).setSwapTeamActionsListener(this)
-        }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_SHOW_SWAP_TEAM_SHEET, showSwapTeamSheet)
+        outState.putSerializable(KEY_SWAP_TEAM_TEAMS, ArrayList(swapTeamTeams))
     }
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(appBarConfiguration)
     }
 
-    override fun onCreateTeamClick() {
+    private fun onCreateTeamClick() {
         FirebaseAnalyticsUtils.startTutorial(this, false)
         val intent = Intent(this, TeamCreationActivity::class.java)
         createTeam.launch(intent)
     }
 
-    override fun onTeamClick(team: Team) {
-        viewModel.updateCurrentTeam(team)
+    private companion object {
+        const val KEY_SHOW_SWAP_TEAM_SHEET = "key_show_swap_team_sheet"
+        const val KEY_SWAP_TEAM_TEAMS = "key_swap_team_teams"
     }
 }
