@@ -10,7 +10,6 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.telen.easylineup.BaseImportActivity
-import com.telen.easylineup.databinding.SplashscreenBinding
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.login.LoginActivity
 import androidx.lifecycle.lifecycleScope
@@ -18,9 +17,15 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
+/**
+ * Pure bootstrap/routing - decides between Home, Login or an import flow. The system
+ * SplashScreen API's own icon-on-background splash (Theme.App.Starting, set in the
+ * manifest) stays up the whole time (setKeepOnScreenCondition { true }), so this
+ * Activity never actually shows its own UI; it used to inflate a custom splashscreen.xml
+ * layout that was permanently hidden behind that system splash and has been removed.
+ */
 class SplashScreenActivity : BaseImportActivity(), KoinComponent {
     private val getTeam: GetTeam by inject()
-    private var binding: SplashscreenBinding? = null
     private val activityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             finish()
