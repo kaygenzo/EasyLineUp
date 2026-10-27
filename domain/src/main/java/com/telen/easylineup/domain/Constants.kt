@@ -19,7 +19,6 @@ object Constants {
     const val EXTRA_LINEUP_EXTRA_HITTERS = "com.telen.extra.lineup_extra_hitters"
 
     // extras
-    const val EXTRA_EDITABLE = "com.telen.extra.editable"
     const val EXTRA_TEAM = "com.telen.extra.team"
     const val EXTRA_TEAMS = "com.telen.extra.teams"
     const val EXTRA_TEAM_COUNT = "com.telen.extra.team_count"

@@ -4,12 +4,10 @@
 
 package com.telen.easylineup.lineup
 
-import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.lineup.attack.AttackFragment
 import com.telen.easylineup.lineup.defense.DefenseFragmentEditable
 import com.telen.easylineup.lineup.defense.DefenseFragmentFixed
@@ -29,13 +27,7 @@ class LineupPagerAdapter(fragment: Fragment, private val editable: Boolean) :
                 DefenseFragmentFixed()
             }
 
-            FRAGMENT_ATTACK_INDEX -> {
-                val bundle = Bundle()
-                bundle.putBoolean(Constants.EXTRA_EDITABLE, editable)
-                AttackFragment().apply {
-                    arguments = bundle
-                }
-            }
+            FRAGMENT_ATTACK_INDEX -> AttackFragment()
 
             else -> Fragment()
         }
