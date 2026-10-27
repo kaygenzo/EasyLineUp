@@ -20,9 +20,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -73,12 +76,33 @@ fun AttackScreen(
     }
 
     val fontFamily = lineupTypefaceFontFamily(typeface)
+    var showLegend by remember { mutableStateOf(false) }
+
+    if (showLegend) {
+        PositionLegendDialog(editable = editable, onDismiss = { showLegend = false })
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        if (editable) {
-            EditingOrderBadge(
-                modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp)
-            )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            if (editable) {
+                EditingOrderBadge()
+            } else {
+                Box {}
+            }
+            IconButton(onClick = { showLegend = true }) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_settings_info),
+                    contentDescription = stringResource(R.string.attack_legend_content_description),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
 
         LazyColumn(
@@ -176,6 +200,22 @@ private fun EditingOrderBadge(modifier: Modifier = Modifier) {
 }
 
 @Composable
+private fun PositionLegendDialog(editable: Boolean, onDismiss: () -> Unit) {
+    val body = stringResource(R.string.attack_legend_body) +
+        if (editable) stringResource(R.string.attack_legend_body_editable_suffix) else ""
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(android.R.string.ok))
+            }
+        },
+        title = { Text(stringResource(R.string.attack_legend_title)) },
+        text = { Text(body) }
+    )
+}
+
+@Composable
 private fun lineupTypefaceFontFamily(typeface: LineupTypeface): FontFamily? {
     if (typeface != LineupTypeface.HAND_WRITING) return null
     val context = LocalContext.current
@@ -195,10 +235,16 @@ private fun BatterRow(
     onDragEnd: () -> Unit
 ) {
     val isExtraHitter = batter.playerPosition.isSubstitute() && batter.canShowOrder
-    val positionText = if (batter.canShowPosition || batter.canShowDescription) {
+    val positionNumber = batter.playerPosition.position.takeIf { batter.canShowPosition }
+    val positionDesc = if (batter.canShowPosition || batter.canShowDescription) {
         batter.playerPositionDesc.takeIf { it.isNotBlank() }
     } else {
         null
+    }
+    val positionText = when {
+        positionNumber != null && positionDesc != null -> "$positionNumber · $positionDesc"
+        positionNumber != null -> positionNumber.toString()
+        else -> positionDesc
     }
     val subtitle = listOfNotNull(
         positionText,

@@ -67,6 +67,13 @@
 
     <string name="attack_extra_hitter_suffix">frappeur supplémentaire</string>
     <string name="attack_editing_order_badge">Modification de l\'ordre</string>
+    <string name="attack_legend_content_description">Comment lire cette liste</string>
+    <string name="attack_legend_title">Comment lire cette liste</string>
+    <string name="attack_legend_body">Le chiffre à gauche est l\'ordre de passage au batting. Sous
+        le nom du joueur se trouve son poste défensif : le numéro classique de feuille de match
+        (1 à 9) suivi de son abréviation. Le chiffre à droite est son numéro de maillot.</string>
+    <string name="attack_legend_body_editable_suffix"> En mode édition, maintenez l\'icône à
+        gauche pour faire glisser un joueur vers une nouvelle position.</string>
 
     <string name="form_lineup_creation_date_label">Date</string>
     <string name="form_lineup_creation_roster_label">Joueurs pour ce lineup</string>
