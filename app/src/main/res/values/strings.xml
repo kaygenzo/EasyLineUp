@@ -74,6 +74,7 @@
     <string name="dashboard_lookup_hint">Who wore this number?</string>
 
     <string name="attack_extra_hitter_suffix">extra hitter</string>
+    <string name="attack_editing_order_badge">Editing order</string>
 
     <string name="form_lineup_creation_date_label">Date</string>
     <string name="form_lineup_creation_roster_label">Roster for this lineup</string>

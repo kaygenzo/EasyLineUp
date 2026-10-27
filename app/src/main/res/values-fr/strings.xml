@@ -66,6 +66,7 @@
     <string name="dashboard_lookup_hint">Qui a porté ce numéro ?</string>
 
     <string name="attack_extra_hitter_suffix">frappeur supplémentaire</string>
+    <string name="attack_editing_order_badge">Modification de l\'ordre</string>
 
     <string name="form_lineup_creation_date_label">Date</string>
     <string name="form_lineup_creation_roster_label">Joueurs pour ce lineup</string>

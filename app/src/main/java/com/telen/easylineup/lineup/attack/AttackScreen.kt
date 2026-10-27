@@ -10,12 +10,15 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -71,68 +74,104 @@ fun AttackScreen(
 
     val fontFamily = lineupTypefaceFontFamily(typeface)
 
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(7.dp)
-    ) {
-        items(localBatters, key = { batter -> batter.playerId }) { batter ->
-            val isDragged = batter.playerId == draggedId
-            BatterRow(
-                batter = batter,
-                editable = editable,
-                fontFamily = fontFamily,
-                modifier = Modifier
-                    .onGloballyPositioned { coordinates ->
-                        if (rowHeightPx == 0f) {
-                            rowHeightPx = coordinates.size.height.toFloat()
-                        }
-                    }
-                    .zIndex(if (isDragged) 1f else 0f)
-                    .graphicsLayer {
-                        translationY = if (isDragged) dragOffsetPx else 0f
-                    }
-                    .then(if (isDragged) Modifier else Modifier.animateItem()),
-                onDragStart = {
-                    if (batter.canMove) {
-                        draggedId = batter.playerId
-                        dragOffsetPx = 0f
-                    }
-                },
-                onDrag = { delta ->
-                    if (draggedId == null || rowHeightPx == 0f) return@BatterRow
-                    dragOffsetPx += delta
-                    while (true) {
-                        val fromIndex = localBatters.indexOfFirst { it.playerId == draggedId }
-                        val direction = if (dragOffsetPx > 0) 1 else -1
-                        val targetIndex = fromIndex + direction
-                        if (fromIndex == -1 ||
-                            targetIndex !in localBatters.indices ||
-                            kotlin.math.abs(dragOffsetPx) < rowHeightPx
-                        ) {
-                            break
-                        }
-                        val fromBatter = localBatters[fromIndex]
-                        val targetBatter = localBatters[targetIndex]
-                        if (fromBatter.canMove && targetBatter.canMove) {
-                            val swappedFrom =
-                                fromBatter.copy(playerOrder = targetBatter.playerOrder)
-                            val swappedTarget =
-                                targetBatter.copy(playerOrder = fromBatter.playerOrder)
-                            localBatters = localBatters.toMutableList().apply {
-                                this[fromIndex] = swappedTarget
-                                this[targetIndex] = swappedFrom
-                            }
-                            onReorder(listOf(swappedFrom, swappedTarget))
-                        }
-                        dragOffsetPx -= rowHeightPx * direction
-                    }
-                },
-                onDragEnd = {
-                    draggedId = null
-                    dragOffsetPx = 0f
-                }
+    Column(modifier = Modifier.fillMaxSize()) {
+        if (editable) {
+            EditingOrderBadge(
+                modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp)
             )
         }
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(localBatters, key = { batter -> batter.playerId }) { batter ->
+                val isDragged = batter.playerId == draggedId
+                BatterRow(
+                    batter = batter,
+                    editable = editable,
+                    fontFamily = fontFamily,
+                    modifier = Modifier
+                        .onGloballyPositioned { coordinates ->
+                            if (rowHeightPx == 0f) {
+                                rowHeightPx = coordinates.size.height.toFloat()
+                            }
+                        }
+                        .zIndex(if (isDragged) 1f else 0f)
+                        .graphicsLayer {
+                            translationY = if (isDragged) dragOffsetPx else 0f
+                        }
+                        .then(if (isDragged) Modifier else Modifier.animateItem()),
+                    onDragStart = {
+                        if (batter.canMove) {
+                            draggedId = batter.playerId
+                            dragOffsetPx = 0f
+                        }
+                    },
+                    onDrag = { delta ->
+                        if (draggedId == null || rowHeightPx == 0f) return@BatterRow
+                        dragOffsetPx += delta
+                        while (true) {
+                            val fromIndex =
+                                localBatters.indexOfFirst { it.playerId == draggedId }
+                            val direction = if (dragOffsetPx > 0) 1 else -1
+                            val targetIndex = fromIndex + direction
+                            if (fromIndex == -1 ||
+                                targetIndex !in localBatters.indices ||
+                                kotlin.math.abs(dragOffsetPx) < rowHeightPx
+                            ) {
+                                break
+                            }
+                            val fromBatter = localBatters[fromIndex]
+                            val targetBatter = localBatters[targetIndex]
+                            if (fromBatter.canMove && targetBatter.canMove) {
+                                val swappedFrom =
+                                    fromBatter.copy(playerOrder = targetBatter.playerOrder)
+                                val swappedTarget =
+                                    targetBatter.copy(playerOrder = fromBatter.playerOrder)
+                                localBatters = localBatters.toMutableList().apply {
+                                    this[fromIndex] = swappedTarget
+                                    this[targetIndex] = swappedFrom
+                                }
+                                onReorder(listOf(swappedFrom, swappedTarget))
+                            }
+                            dragOffsetPx -= rowHeightPx * direction
+                        }
+                    },
+                    onDragEnd = {
+                        draggedId = null
+                        dragOffsetPx = 0f
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun EditingOrderBadge(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.16f))
+            .padding(horizontal = 11.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(6.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
+        )
+        Text(
+            text = stringResource(R.string.attack_editing_order_badge).uppercase(),
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.labelMedium
+        )
     }
 }
 
@@ -182,14 +221,14 @@ private fun BatterRow(
                 MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
                 RoundedCornerShape(11.dp)
             )
-            .padding(horizontal = 10.dp, vertical = 8.dp),
+            .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         if (editable) {
             Box(
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(28.dp)
                     .then(
                         if (batter.canMove) {
                             Modifier.pointerInput(batter.playerId) {
@@ -211,8 +250,9 @@ private fun BatterRow(
             ) {
                 if (batter.canMove) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_reorder_24dp),
+                        painter = painterResource(R.drawable.ic_drag_handle_grip_24dp),
                         contentDescription = null,
+                        modifier = Modifier.size(18.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                 }
@@ -222,8 +262,8 @@ private fun BatterRow(
         if (batter.canShowOrder) {
             Box(
                 modifier = Modifier
-                    .size(30.dp)
-                    .clip(RoundedCornerShape(9.dp))
+                    .size(34.dp)
+                    .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)),
                 contentAlignment = Alignment.Center
             ) {
@@ -232,7 +272,7 @@ private fun BatterRow(
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily.Monospace,
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
         }
@@ -243,26 +283,26 @@ private fun BatterRow(
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
                 fontFamily = fontFamily,
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.titleMedium
             )
             subtitle?.let {
                 Text(
                     text = it,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    style = MaterialTheme.typography.bodySmall
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
 
         Box(
             modifier = Modifier
-                .size(30.dp)
-                .clip(RoundedCornerShape(9.dp))
+                .size(34.dp)
+                .clip(RoundedCornerShape(10.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .border(
-                    1.5.dp,
-                    MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
-                    RoundedCornerShape(9.dp)
+                    2.dp,
+                    MaterialTheme.colorScheme.outline,
+                    RoundedCornerShape(10.dp)
                 ),
             contentAlignment = Alignment.Center
         ) {
@@ -271,7 +311,7 @@ private fun BatterRow(
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 fontFamily = fontFamily ?: FontFamily.Monospace,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.titleSmall
             )
         }
     }
