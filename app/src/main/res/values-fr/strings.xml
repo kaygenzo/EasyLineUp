@@ -65,9 +65,7 @@
     <string name="dashboard_hero_empty_title">Aucun lineup pour l\'instant.</string>
     <string name="dashboard_lookup_hint">Qui a porté ce numéro ?</string>
 
-    <string name="header_batting_order_player_name">Nom du joueur</string>
-    <string name="header_batting_order_player_shirt">N°</string>
-    <string name="header_batting_order_player_position">Pos.</string>
+    <string name="attack_extra_hitter_suffix">frappeur supplémentaire</string>
 
     <string name="form_lineup_creation_date_label">Date</string>
     <string name="form_lineup_creation_roster_label">Joueurs pour ce lineup</string>
@@ -305,9 +303,6 @@
     <string name="report_sending_message">Le rapport de bug est en cours d\'envoi, veuillez patienter&#8230;</string>
     <string name="report_sending_message_success">Envoyé avec succès! Merci!</string>
     <string name="report_sending_message_failure">Une erreur est survenue, veuillez réessayer</string>
-
-    <string name="reorder_batter_title">Réorganisez l\'ordre des batteurs</string>
-    <string name="reorder_batter_description">Appuyez longuement sur l\'icône de réorganisation pour déplacer verticalement le batteur à la position désirée</string>
 
     <string name="roster_sort_by_name">Par nom</string>
     <string name="roster_sort_by_number">Par numéro</string>
