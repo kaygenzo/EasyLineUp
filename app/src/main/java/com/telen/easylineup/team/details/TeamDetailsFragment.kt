@@ -8,9 +8,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -62,11 +59,6 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
     private var unsetCount by mutableStateOf(0)
     private var createdAt by mutableStateOf(0L)
     private var showDeleteSheet by mutableStateOf(false)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -154,21 +146,6 @@ class TeamDetailsFragment : BaseFragment("TeamDetailsFragment") {
     override fun onDestroyView() {
         super.onDestroyView()
         teamViewModel.clear()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.team_edit_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_edit -> {
-                onEditClicked()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 
     private fun onEditClicked() {
