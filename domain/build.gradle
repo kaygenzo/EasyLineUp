@@ -39,7 +39,6 @@ def pureModelDataClasses = [
     'DashboardTile',
     'DpAndFlexConfiguration',
     'GeoLocation',
-    'MapInfo',
     'PlayerFieldPosition',
     'PlayerGamesCount',
     'PlayerInLineup',

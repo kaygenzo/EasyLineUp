@@ -45,10 +45,7 @@ object Constants {
     const val STATUS_PARTIAL = 1
     const val MODE_NIGHT_NO = 1
     const val MODE_NIGHT_YES = 2
-    const val MIN_FETCH_INTERVAL_REMOTE_CONFIG_DEBUG = 600L
-    const val MIN_FETCH_INTERVAL_REMOTE_CONFIG_RELEASE = 3_600L
     const val REPORTING_COMPRESSION_QUALITY = 75
     const val REPORTING_IMAGE_PREVIEW_SCALE = 0.3f
-    const val MAP_PIXEL_SIZE = 500
     const val MAX_EXTRA_HITTERS_BEFORE_UNLIMITED = 4
 }

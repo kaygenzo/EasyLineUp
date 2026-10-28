@@ -6,7 +6,6 @@ package com.telen.easylineup.application
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDexApplication
 import com.google.firebase.appcheck.ktx.appCheck
@@ -14,11 +13,8 @@ import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderF
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
-import com.google.firebase.remoteconfig.ktx.remoteConfig
-import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.utils.SharedPreferencesUtils
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -66,32 +62,6 @@ open class App : MultiDexApplication() {
                 else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             })
         }
-
-        val remoteConfig = Firebase.remoteConfig
-        val configSettings = remoteConfigSettings {
-            minimumFetchIntervalInSeconds = if (BuildConfig.DEBUG) {
-                Constants.MIN_FETCH_INTERVAL_REMOTE_CONFIG_DEBUG
-            } else {
-                Constants.MIN_FETCH_INTERVAL_REMOTE_CONFIG_RELEASE
-            }
-        }
-        remoteConfig.setConfigSettingsAsync(configSettings)
-        remoteConfig.setDefaultsAsync(R.xml.remote_config_default)
-        remoteConfig.fetchAndActivate()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val updated = task.result
-                    Timber.d("Config params updated: $updated")
-                    if (BuildConfig.DEBUG) {
-                        Toast.makeText(this, "Fetch and activate succeeded", Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                } else {
-                    if (BuildConfig.DEBUG) {
-                        Toast.makeText(this, "Fetch failed", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
     }
 
     class ReleaseTree(private val context: Context) : Timber.DebugTree() {

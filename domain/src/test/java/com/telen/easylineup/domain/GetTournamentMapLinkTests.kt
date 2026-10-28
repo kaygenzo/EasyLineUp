@@ -9,7 +9,6 @@ import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.ports.GeocodingProvider
 import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.exceptions.AddressNotFoundException
-import com.telen.easylineup.domain.usecases.exceptions.MapApiKeyNotFoundException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentMapNotFoundException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -37,43 +36,28 @@ internal class GetTournamentMapLinkTests {
     }
 
     @Test
-    fun shouldTriggerMapApiKeyNotFoundExceptionWhenApiKeyIsNull() = runTest {
-        val result = getTournamentMapLink(tournament, null, 100, 100)
-        assertTrue(result.exceptionOrNull() is MapApiKeyNotFoundException)
-    }
-
-    @Test
-    fun shouldTriggerMapApiKeyNotFoundExceptionWhenApiKeyIsEmpty() = runTest {
-        val result = getTournamentMapLink(tournament, "", 100, 100)
-        assertTrue(result.exceptionOrNull() is MapApiKeyNotFoundException)
-    }
-
-    @Test
     fun shouldTriggerAddressNotFoundExceptionWhenTournamentAddressIsNull() = runTest {
         tournament.address = null
-        val result = getTournamentMapLink(tournament, "apiKey", 100, 100)
+        val result = getTournamentMapLink(tournament)
         assertTrue(result.exceptionOrNull() is AddressNotFoundException)
     }
 
     @Test
     fun shouldTriggerTournamentMapNotFoundExceptionWhenGeocodingReturnsNull() = runTest {
         Mockito.`when`(geocodingProvider.getLocationFromAddress("1 rue de Paris")).thenReturn(null)
-        val result = getTournamentMapLink(tournament, "apiKey", 100, 100)
+        val result = getTournamentMapLink(tournament)
         assertTrue(result.exceptionOrNull() is TournamentMapNotFoundException)
     }
 
     @Test
-    fun shouldBuildMapInfoWhenGeocodingSucceeds() = runTest {
+    fun shouldReturnLocationWhenGeocodingSucceeds() = runTest {
         val location = GeoLocation(latitude = 48.85, longitude = 2.35)
-        Mockito.`when`(geocodingProvider.getLocationFromAddress("1 rue de Paris")).thenReturn(location)
+        Mockito.`when`(geocodingProvider.getLocationFromAddress("1 rue de Paris"))
+            .thenReturn(location)
 
-        val result = getTournamentMapLink(tournament, "apiKey", 300, 200)
+        val result = getTournamentMapLink(tournament)
 
         assertTrue(result.isSuccess)
-        val mapInfo = result.getOrNull()
-        assertEquals(location, mapInfo?.location)
-        assertTrue(mapInfo?.url!!.contains("2.35,48.85"))
-        assertTrue(mapInfo.url!!.contains("300x200"))
-        assertTrue(mapInfo.url!!.contains("apikey=apiKey"))
+        assertEquals(location, result.getOrNull())
     }
 }

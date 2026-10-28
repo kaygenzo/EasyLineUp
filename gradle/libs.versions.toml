@@ -63,11 +63,7 @@ firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref =
 firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx" }
 firebase-appcheck-ktx = { module = "com.google.firebase:firebase-appcheck-ktx" }
 firebase-appcheck-playintegrity = { module = "com.google.firebase:firebase-appcheck-playintegrity" }
-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
-firebase-config-ktx = { module = "com.google.firebase:firebase-config-ktx" }
 firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx" }
-firebase-storage-ktx = { module = "com.google.firebase:firebase-storage-ktx" }
-firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx" }
 kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk7", version.ref = "kotlinVersion" }
 annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotationVersion" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }

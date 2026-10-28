@@ -9,12 +9,10 @@ package com.telen.easylineup.tournaments.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.errors.DomainErrors
+import com.telen.easylineup.domain.model.GeoLocation
 import com.telen.easylineup.domain.model.Lineup
-import com.telen.easylineup.domain.model.MapInfo
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.Tournament
@@ -77,8 +75,7 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val disposables = CompositeDisposable()
     private var tournament: Tournament? = null
     private val lineup = Lineup()
-    private val remoteConfig = Firebase.remoteConfig
-    val mapsFlow: MutableSharedFlow<Pair<Tournament, MapInfo>> =
+    val mapsFlow: MutableSharedFlow<Pair<Tournament, GeoLocation>> =
         MutableSharedFlow(extraBufferCapacity = 1, replay = 1)
 
     fun setFilter(filter: String) {
@@ -115,19 +112,11 @@ class LineupViewModel : ViewModel(), KoinComponent {
     }
 
     private fun loadMaps(tournamentItems: List<TournamentItem>) {
-        val apiKey = remoteConfig.getString("maps_api_key")
         val items = tournamentItems.filter { it.tournament.address != null }
         viewModelScope.launch {
             items.forEach { item ->
-                val mapInfo = getTournamentMapLink(
-                    item.tournament,
-                    apiKey,
-                    Constants.MAP_PIXEL_SIZE,
-                    Constants.MAP_PIXEL_SIZE
-                ).getOrElse { MapInfo() }
-                if (mapInfo.location != null) {
-                    mapsFlow.tryEmit(Pair(item.tournament, mapInfo))
-                }
+                getTournamentMapLink(item.tournament)
+                    .onSuccess { location -> mapsFlow.tryEmit(Pair(item.tournament, location)) }
             }
         }
     }

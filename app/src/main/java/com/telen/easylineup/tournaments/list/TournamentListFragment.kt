@@ -245,10 +245,8 @@ class TournamentListFragment : BaseFragment("TournamentListFragment") {
 
         viewModel.mapsFlow
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { (tournament, mapInfo) ->
-                mapInfo.location?.let { location ->
-                    mapsByTournamentId = mapsByTournamentId + (tournament.id to location)
-                }
+            .onEach { (tournament, location) ->
+                mapsByTournamentId = mapsByTournamentId + (tournament.id to location)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
