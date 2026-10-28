@@ -32,7 +32,13 @@ class SaveBattingOrderAndPositions(
                         pfpRepository.deletePosition(playerPosition)
                     } else if (it.isAssigned()) {
                         if (playerPosition.id == 0L) {
-                            pfpRepository.insertPlayerFieldPosition(playerPosition)
+                            // Write the new row id back onto the in-memory player: without
+                            // this, a second save() in the same session (e.g. a Save
+                            // double-tap) would still see fieldPositionId == 0 and insert
+                            // a duplicate row instead of updating the one just created.
+                            it.fieldPositionId = pfpRepository.insertPlayerFieldPosition(
+                                playerPosition
+                            )
                         } else {
                             pfpRepository.updatePlayerFieldPosition(playerPosition)
                         }

@@ -37,6 +37,10 @@ class GetBattersState(
             var subsFoundNumber = 0
             players
                 .filter { it.order > 0 }
+                // Defensive: a data-integrity issue upstream (e.g. a duplicate
+                // playerFieldPosition row) must never surface as two BatterState entries
+                // sharing one playerId - LazyColumn's key(playerId) would crash on that.
+                .distinctBy { it.playerId }
                 .sortedBy { it.order }
                 .forEach { player ->
                     val playerFlag = player.flags
