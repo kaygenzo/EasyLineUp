@@ -53,12 +53,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.rxSingle
 import org.koin.core.component.KoinComponent
@@ -125,21 +127,27 @@ class LineupViewModel : ViewModel(), KoinComponent {
 
     // Direct pushes from refreshPlayers(), merged with the DB-observed source below -
     // emulates the former MediatorLiveData.addSource() wiring (source + ad-hoc direct writes).
+    // shareIn is required, not just merge: a plain cold Flow re-runs getLineupAndPositions()
+    // (a fresh Room query) every time a downstream flatMapLatest restarts this collection -
+    // e.g. observeBatters()'s own flatMapLatest restarting on every refreshPlayers() emission -
+    // which clobbers _listPlayersWithPosition with the still-unsaved, stale DB state.
     private val _directPlayersPush: MutableSharedFlow<List<PlayerWithPosition>> =
         MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
     private val _players: Flow<List<PlayerWithPosition>> by lazy {
         merge(getLineupAndPositions(), _directPlayersPush)
+            .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
     }
     // lineup
     var lineup: Lineup? = null
         private set
 
     // Direct pushes from setLineup(), merged with the DB-observed source below - same pattern
-    // as _directPlayersPush/_players above.
+    // as _directPlayersPush/_players above, same reason for shareIn.
     private val _directLineupPush: MutableSharedFlow<Lineup> =
         MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
     private val _lineup: Flow<Lineup> by lazy {
         merge(getLineup(), _directLineupPush)
+            .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
     }
     var lineupId: Long? = 0
     var editable = false
