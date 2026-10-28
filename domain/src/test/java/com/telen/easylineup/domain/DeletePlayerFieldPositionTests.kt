@@ -120,18 +120,22 @@ internal abstract class DeletePlayerFieldPositionTests(
             Assert.assertEquals("Size of player list must not change", playersSize, players.size)
             players.first { it.playerId == player.id }.let {
                 Assert.assertEquals("The player batting order is reset", 0, it.order)
-                Assert.assertEquals("The player position is reset", -1, it.position)
+                Assert.assertEquals(
+                    "The player position is reset",
+                    FieldPosition.SUBSTITUTE.id,
+                    it.position
+                )
             }
         }
     }
 
     private fun assertPlayerDeleted(player: PlayerWithPosition) {
-        Assert.assertEquals(-1, player.position)
+        Assert.assertEquals(FieldPosition.SUBSTITUTE.id, player.position)
         Assert.assertEquals(0, player.order)
     }
 
     private fun assertPlayerNotDeleted(player: PlayerWithPosition) {
-        Assert.assertNotEquals(-1, player.position)
+        Assert.assertNotEquals(FieldPosition.SUBSTITUTE.id, player.position)
         Assert.assertNotEquals(0, player.order)
     }
 
@@ -196,7 +200,7 @@ internal abstract class DeletePlayerFieldPositionTests(
         Assert.assertEquals(
             "Only one substitute must be deleted",
             1,
-            players.filter { it.position == -1 }.size
+            players.filter { it.order == 0 }.size
         )
     }
 

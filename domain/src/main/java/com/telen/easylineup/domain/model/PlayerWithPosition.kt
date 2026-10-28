@@ -109,7 +109,7 @@ fun PlayerWithPosition.isDefensePlayer(): Boolean {
 }
 
 fun PlayerWithPosition.reset() {
-    this.position = -1
+    this.position = FieldPosition.SUBSTITUTE.id
     this.order = 0
     this.flags = PlayerFieldPosition.FLAG_NONE
 }
