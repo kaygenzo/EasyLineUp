@@ -9,6 +9,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.tiles.TileType
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
@@ -49,6 +50,7 @@ object RepositoryModule {
                 .addMigrations(migration15To16())
                 .addMigrations(migration16To17())
                 .addMigrations(migration17To18())
+                .addMigrations(migration18To19())
             if (BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
                     .fallbackToDestructiveMigration()
@@ -351,6 +353,28 @@ object RepositoryModule {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database
                     .execSQL("ALTER TABLE teams ADD COLUMN createdAt INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+    }
+
+    // Data-only fix: LineupCreationFragment used to hardcode its strategy default to
+    // TeamStrategy.STANDARD and never correct it for team types with no strategy picker
+    // (Baseball5 only ever has one valid strategy, so the picker never shows and the user
+    // never gets a chance to fix the wrong default themselves). Re-derives the correct
+    // strategy for every Baseball5 lineup that was created with the stale STANDARD default.
+    fun migration18To19(): Migration {
+        return object : Migration(18, 19) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    """
+                    update lineups
+                    set strategy = ${TeamStrategy.B5_DEFAULT.id}
+                    where strategy = ${TeamStrategy.STANDARD.id}
+                    and teamID in (
+                        select id from teams where type = ${TeamType.BASEBALL_5.id}
+                    )
+                    """
+                )
             }
         }
     }
