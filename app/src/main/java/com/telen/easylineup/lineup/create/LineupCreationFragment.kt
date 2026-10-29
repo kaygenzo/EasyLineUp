@@ -194,7 +194,15 @@ class LineupCreationFragment : BaseFragment("LineupCreationFragment") {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.getTeamType()
-                .onSuccess { teamType = TeamType.getTypeById(it) }
+                .onSuccess {
+                    val resolvedType = TeamType.getTypeById(it)
+                    teamType = resolvedType
+                    // The strategy picker is only shown for team types with more than one
+                    // valid strategy (getStrategiesDisplayName() returns null otherwise, e.g.
+                    // BASEBALL_5) - for those, this default is never offered to the user to
+                    // confirm or change, so it must already be correct for the team's type.
+                    strategy = resolvedType.defaultStrategy
+                }
                 .onFailure { Timber.e(it) }
         }
 
