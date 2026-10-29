@@ -57,7 +57,13 @@ class MigrationTest {
     @Test
     fun migrate17To18_addsTeamCreatedAtColumnWithDefault() {
         helper.createDatabase(TEST_DB_NAME, 17).apply {
-            execSQL("INSERT INTO teams (id, name, hash) VALUES (1, 'Team', 'hash-1')")
+            // type/main have no SQL-level DEFAULT in the exported v17 schema (ALTER TABLE ...
+            // DEFAULT only takes effect on a real upgrade's live table, not on the schema
+            // createDatabase() replays from the frozen 17.json) - must be supplied explicitly.
+            execSQL(
+                "INSERT INTO teams (id, name, type, main, hash) " +
+                    "VALUES (1, 'Team', 0, 1, 'hash-1')"
+            )
             close()
         }
 
