@@ -13,6 +13,7 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.model.isShortStop
+import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.model.reset
 import com.telen.easylineup.domain.model.toPlayer
 import com.telen.easylineup.domain.usecases.DeletePlayerFieldPosition
@@ -111,6 +112,8 @@ internal abstract class DeletePlayerFieldPositionTests(
         exception: Class<out Throwable>? = null
     ) {
         val playersSize = players.size
+        val wasSubstitute = players.firstOrNull { it.playerId == player.id }?.isSubstitute()
+            ?: false
         val result = deletePlayerFieldPosition(players, player, lineupMode, extraHitterSize)
         exception?.let {
             Assert.assertTrue(result.isFailure)
@@ -122,7 +125,9 @@ internal abstract class DeletePlayerFieldPositionTests(
                 Assert.assertEquals("The player batting order is reset", 0, it.order)
                 Assert.assertEquals(
                     "The player position is reset",
-                    FieldPosition.SUBSTITUTE.id,
+                    // a substitute being deleted is fully unassigned (-1), a field player
+                    // being deleted is only demoted to the bench (SUBSTITUTE.id)
+                    if (wasSubstitute) -1 else FieldPosition.SUBSTITUTE.id,
                     it.position
                 )
             }

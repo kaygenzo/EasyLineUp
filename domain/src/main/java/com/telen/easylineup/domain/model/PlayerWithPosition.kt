@@ -114,6 +114,15 @@ fun PlayerWithPosition.reset() {
     this.flags = PlayerFieldPosition.FLAG_NONE
 }
 
+// Unlike reset() (field player -> bench), this fully removes a player who was already a
+// substitute: position goes to the model's own "not assigned" default (-1), which makes
+// SaveBattingOrderAndPositions delete the row instead of writing it back as SUBSTITUTE.
+fun PlayerWithPosition.unassign() {
+    this.position = -1
+    this.order = 0
+    this.flags = PlayerFieldPosition.FLAG_NONE
+}
+
 // here we exclude the position itself because it's also a candidate for the order.
 // For instance, if the order is 1, order 1 is a new candidate as well as others because it
 // will be a free order

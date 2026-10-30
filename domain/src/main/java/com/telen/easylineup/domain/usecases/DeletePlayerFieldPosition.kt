@@ -11,6 +11,7 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.isDpDhOrFlex
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.model.reset
+import com.telen.easylineup.domain.model.unassign
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import kotlinx.coroutines.withContext
 
@@ -28,10 +29,14 @@ class DeletePlayerFieldPosition(private val dispatcherProvider: DispatcherProvid
             val playerIsSubstitute = player.isSubstitute()
             val playerOrder = player.order
             if (lineupMode == MODE_ENABLED && player.isDpDhOrFlex()) {
-                players.filter { it.isDpDhOrFlex() }
+                players.filter { it.isDpDhOrFlex() }.forEach { it.reset() }
+            } else if (playerIsSubstitute) {
+                // already on the bench - "deleting" them removes them from the lineup
+                // entirely, rather than resetting them back to the same substitute state
+                player.unassign()
             } else {
-                listOf(player)
-            }.forEach { it.reset() }
+                player.reset()
+            }
 
             // check if substitutes was a batter, update the next substitutes order to replace
             // it if necessary
