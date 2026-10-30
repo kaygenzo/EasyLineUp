@@ -110,7 +110,7 @@ fun LineupScreen(
             actions = {
                 if (!editable) {
                     HeaderIconChip(
-                        icon = R.drawable.ic_share_white_24dp,
+                        icon = R.drawable.ic_share_outline_24dp,
                         contentDescription = stringResource(R.string.action_share),
                         onClick = {
                             scope.launch {
@@ -120,7 +120,7 @@ fun LineupScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     HeaderIconChip(
-                        icon = R.drawable.ic_delete_24dp,
+                        icon = R.drawable.ic_delete_outline_24dp,
                         contentDescription = stringResource(R.string.action_delete),
                         onClick = onDeleteClick
                     )
