@@ -61,7 +61,7 @@
     <string name="dialog_delete_lineup_title">Delete lineup ?</string>
     <string name="dialog_delete_player_title">Delete player ?</string>
     <string name="dialog_delete_tournament_title">Delete tournament %s ?</string>
-    <string name="dialog_delete_position_title">Delete position ?</string>
+    <string name="dialog_delete_substitute_title">Remove %1$s?</string>
     <string name="dialog_delete_cannot_undo_message">This action cannot be undo, are you sure ?</string>
     <string name="dialog_delete_progress_message">Deleting&#8230;</string>
 
@@ -156,6 +156,8 @@
 
     <string name="action_add_dp_flex">Use DP/Flex</string>
     <string name="action_add_dh">Use DH</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_back">Back</string>
 
     <string name="tournaments_summary_header" translatable="false">%1$s / %2$s</string>
 
@@ -309,11 +311,6 @@
     <string name="settings_import_success_title">Success</string>
     <string name="settings_import_success_message">Successfully imported data into the application</string>
 
-    <plurals name="lineups_substitutes_size">
-        <item quantity="one">Substitute: %d</item>
-        <item quantity="other">Substitutes: %d</item>
-    </plurals>
-
     <string name="shirt_number_history_title">Number %1$s — history</string>
     <string name="shirt_number_history_footnote">Sorted most recent first — pulled from every past
         lineup, not just the current roster.</string>
@@ -365,6 +362,45 @@
     <string name="player_profile_position_usage_label">Position usage</string>
     <string name="player_profile_empty_title">No games played yet</string>
     <string name="player_profile_empty_message">Shows up once they\'re in a lineup</string>
+
+    <string name="defense_trash_content_description">Remove from field</string>
+    <string name="defense_add_substitute_content_description">Add substitute</string>
+    <string name="defense_empty_position_content_description">Add player to this position</string>
+    <string name="defense_mode_badge_editing">Editing positions</string>
+    <string name="defense_dh_toggle_sub_baseball">Pitcher won\'t bat — a separate hitter takes
+        their turn</string>
+    <string name="defense_dh_toggle_sub_softball">The Flex fielder won\'t bat — the DP takes
+        their turn</string>
+    <string name="defense_dh_slot_batting_format">Bats for %1$s (%2$s) · batting #%3$d</string>
+    <string name="defense_dh_slot_unassigned">Tap to assign</string>
+    <string name="defense_substitute_slots_free">%1$d of %2$d extra hitter slot free</string>
+    <string name="defense_substitute_slots_unlimited">Unlimited extra hitters</string>
+    <string name="defense_turn_off_dh_title_baseball">Turn off DH?</string>
+    <string name="defense_turn_off_dh_title_softball">Turn off DP/Flex?</string>
+    <string name="defense_turn_off_dh_message">%1$s and %2$s will both be removed from this lineup
+        entirely — not just unlinked. You\'ll need to re-add them to bat or field again.</string>
+    <string name="defense_turn_off_dh_confirm">Turn off</string>
+    <string name="defense_keep_dh_on">Keep DH on</string>
+    <string name="defense_keep_dp_flex_on">Keep DP/Flex on</string>
+    <string name="defense_add_substitute_sheet_title">Add substitute</string>
+    <string name="defense_select_player_sheet_title">Select a player</string>
+    <string name="defense_add_substitute_budget_free">%1$d of %2$d extra hitter slot free — next
+        pick bats</string>
+    <string name="defense_add_substitute_budget_none">No extra hitter slot free — next pick sits
+        on the bench</string>
+    <string name="defense_add_substitute_budget_unlimited">Unlimited extra hitters — every pick
+        bats</string>
+    <string name="defense_add_substitute_will_bat">Will bat</string>
+    <string name="defense_add_substitute_bench_only">Bench only</string>
+    <string name="defense_add_substitute_candidate_position_format">%1$s · Bench</string>
+    <string name="defense_add_substitute_bench_label">Bench</string>
+    <string name="defense_add_substitute_footnote">Once the free slot above is used, every other
+        substitute you add sits on the bench with no batting turn — until you swap them in for
+        someone already in the order.</string>
+    <string name="link_dp_flex_locked_footnote">The locked slot is tied to whoever\'s assigned to
+        pitcher on the field — change the pitcher there to change who this links to.</string>
+    <string name="link_dp_flex_batting_role_format">%1$s · batting #%2$d</string>
+    <string name="link_dp_flex_wont_bat_role_format">%1$s · won\'t bat</string>
 
     <string name="permission_request_read_external_storage">"Media access is needed to display images"</string>
     <string name="permission_request_settings_action">"Settings"</string>

@@ -45,10 +45,7 @@ import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import com.telen.easylineup.views.LineupTypeface
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -62,7 +59,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx3.rxSingle
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -205,16 +201,16 @@ class LineupViewModel : ViewModel(), KoinComponent {
             .mapCatching { TeamStrategy.getStrategyById(it.strategy) }
     }
 
-    private fun getNotSelectedPlayers(sortBy: FieldPosition?): Single<List<PlayerWithPosition>> {
-        return rxSingle {
-            val currentLineup = lineup
-                ?: throw IllegalArgumentException("Lineup is not expected to be null")
-            getListAvailablePlayersForSelectionUseCase(
-                _listPlayersWithPosition,
-                sortBy,
-                currentLineup
-            ).getOrThrow()
-        }
+    private suspend fun getNotSelectedPlayers(
+        sortBy: FieldPosition?
+    ): Result<List<PlayerWithPosition>> {
+        val currentLineup = lineup
+            ?: return Result.failure(IllegalArgumentException("Lineup is not expected to be null"))
+        return getListAvailablePlayersForSelectionUseCase(
+            _listPlayersWithPosition,
+            sortBy,
+            currentLineup
+        )
     }
 
     suspend fun save(): Result<Unit> {
@@ -337,34 +333,19 @@ class LineupViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun onPlayerClicked(position: FieldPosition): Maybe<EventCase> {
-        return Maybe.defer {
-            if (position != FieldPosition.DP_DH) {
-                getNotSelectedPlayers(sortBy = position).flatMapMaybe {
-                    if (it.isEmpty()) {
-                        Maybe.empty()
-                    } else {
-                        Maybe.just(ListAvailablePlayers(it, position))
-                    }
+    suspend fun onPlayerClicked(position: FieldPosition): Result<EventCase?> {
+        return if (position != FieldPosition.DP_DH) {
+            getNotSelectedPlayers(sortBy = position).map { players ->
+                if (players.isEmpty()) null else ListAvailablePlayers(players, position)
+            }
+        } else {
+            getDpAndFlexFromPlayersInFieldUseCase(_listPlayersWithPosition).map {
+                val title = if (it.teamType == TeamType.SOFTBALL.id) {
+                    R.string.link_dp_and_flex_dialog_title
+                } else {
+                    R.string.link_dh_and_pitcher_dialog_title
                 }
-            } else {
-                rxSingle { getDpAndFlexFromPlayersInFieldUseCase(_listPlayersWithPosition).getOrThrow() }
-                    .flatMapMaybe {
-                        val title = if (it.teamType == TeamType.SOFTBALL.id) {
-                            R.string.link_dp_and_flex_dialog_title
-                        } else {
-                            R.string.link_dh_and_pitcher_dialog_title
-                        }
-                        Maybe.just(
-                            LinkDpFlex(
-                                Pair(it.dp, it.flex),
-                                it.dpLocked,
-                                it.flexLocked,
-                                it.teamType,
-                                title
-                            )
-                        )
-                    }
+                LinkDpFlex(Pair(it.dp, it.flex), it.dpLocked, it.flexLocked, it.teamType, title)
             }
         }
     }
@@ -440,12 +421,11 @@ class LineupViewModel : ViewModel(), KoinComponent {
         return _helpEvent
     }
 
-    fun getPlayerSelectionForDp(): Single<List<PlayerWithPosition>> {
-        return getNotSelectedPlayers(null)
-            .onErrorResumeNext {
-                Timber.e(it)
-                Single.just(listOf())
-            }
+    suspend fun getPlayerSelectionForDp(): Result<List<PlayerWithPosition>> {
+        return getNotSelectedPlayers(null).recoverCatching {
+            Timber.e(it)
+            listOf()
+        }
     }
 
     suspend fun getPlayerSelectionForFlex(): Result<List<PlayerWithPosition>> {

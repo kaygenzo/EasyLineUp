@@ -25,7 +25,11 @@ class SaveBattingOrderAndPositions(
 
                 lineupRepository.updateLineup(lineup)
 
-                players.forEach {
+                // Snapshot before iterating: each suspend write below can trigger a reactive
+                // DB-observing Flow upstream (ViewModel's shareIn'd _players) to concurrently
+                // clear()/addAll() this same backing list, which would otherwise throw a
+                // ConcurrentModificationException mid-loop.
+                players.toList().forEach {
                     val playerPosition = it.toPlayerFieldPosition()
                     if (!it.isAssigned() && it.fieldPositionId > 0) {
                         // it is an old position that can be safely removed

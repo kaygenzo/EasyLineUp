@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -47,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.ModeBadge
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.views.LineupTypeface
@@ -91,7 +91,7 @@ fun AttackScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             if (editable) {
-                EditingOrderBadge()
+                ModeBadge(stringResource(R.string.attack_editing_order_badge))
             } else {
                 Box {}
             }
@@ -172,30 +172,6 @@ fun AttackScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun EditingOrderBadge(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.16f))
-            .padding(horizontal = 11.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(6.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary)
-        )
-        Text(
-            text = stringResource(R.string.attack_editing_order_badge).uppercase(),
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.labelMedium
-        )
     }
 }
 

@@ -54,7 +54,7 @@
     <string name="dialog_delete_lineup_title">Supprimer le lineup ?</string>
     <string name="dialog_delete_player_title">Supprimer le joueur ?</string>
     <string name="dialog_delete_tournament_title">Supprimer le tournoi %s ?</string>
-    <string name="dialog_delete_position_title">Supprimer la position ?</string>
+    <string name="dialog_delete_substitute_title">Retirer %1$s ?</string>
     <string name="dialog_delete_cannot_undo_message">Cette action ne peut pas être annulée, êtes-vous sûr ?</string>
     <string name="dialog_delete_progress_message">Suppression&#8230;</string>
 
@@ -148,6 +148,8 @@
 
     <string name="action_add_dp_flex">Utiliser un DP/Flex</string>
     <string name="action_add_dh">Utiliser un DH</string>
+    <string name="action_confirm">Confirmer</string>
+    <string name="action_back">Retour</string>
 
     <plurals name="tournaments_quantity">
         <item quantity="one">%d tournoi</item>
@@ -281,11 +283,6 @@
     <string name="error_when_deleting_lineup">Une erreur s\'est produite pendant la suppression du lineup</string>
     <string name="error_when_deleting_team">Une erreur s\'est produite pendant la suppression de l\'équipe</string>
 
-    <plurals name="lineups_substitutes_size">
-        <item quantity="one">Remplaçant: %d</item>
-        <item quantity="other">Remplaçants: %d</item>
-    </plurals>
-    
     <string name="tile_last_lineup_header">Dern. lineup</string>
 
     <string name="lineup_style_normal_label">Normal</string>
@@ -338,6 +335,48 @@
     <string name="player_profile_position_usage_label">Postes joués</string>
     <string name="player_profile_empty_title">Aucun match joué</string>
     <string name="player_profile_empty_message">Apparaît une fois ce joueur aligné.</string>
+
+    <string name="defense_trash_content_description">Retirer du terrain</string>
+    <string name="defense_add_substitute_content_description">Ajouter un remplaçant</string>
+    <string name="defense_empty_position_content_description">Ajouter un joueur à cette
+        position</string>
+    <string name="defense_mode_badge_editing">Modification des positions</string>
+    <string name="defense_dh_toggle_sub_baseball">Le lanceur ne frappe pas — un autre frappeur
+        prend son tour</string>
+    <string name="defense_dh_toggle_sub_softball">Le joueur lié au Flex ne frappe pas — le DP
+        prend son tour</string>
+    <string name="defense_dh_slot_batting_format">Frappe pour %1$s (%2$s) · ordre #%3$d</string>
+    <string name="defense_dh_slot_unassigned">Appuyez pour assigner</string>
+    <string name="defense_substitute_slots_free">%1$d place(s) sur %2$d frappeur(s)
+        supplémentaire(s) libre(s)</string>
+    <string name="defense_substitute_slots_unlimited">Frappeurs supplémentaires illimités</string>
+    <string name="defense_turn_off_dh_title_baseball">Désactiver le DH ?</string>
+    <string name="defense_turn_off_dh_title_softball">Désactiver le DP/Flex ?</string>
+    <string name="defense_turn_off_dh_message">%1$s et %2$s seront tous les deux retirés de ce
+        lineup entièrement — pas seulement déliés. Vous devrez les rajouter pour frapper ou
+        défendre à nouveau.</string>
+    <string name="defense_turn_off_dh_confirm">Désactiver</string>
+    <string name="defense_keep_dh_on">Garder le DH actif</string>
+    <string name="defense_keep_dp_flex_on">Garder le DP/Flex actif</string>
+    <string name="defense_add_substitute_sheet_title">Ajouter un remplaçant</string>
+    <string name="defense_select_player_sheet_title">Sélectionner un joueur</string>
+    <string name="defense_add_substitute_budget_free">%1$d place(s) sur %2$d frappeur(s)
+        supplémentaire(s) libre(s) — le prochain choix frappera</string>
+    <string name="defense_add_substitute_budget_none">Aucune place de frappeur supplémentaire
+        libre — le prochain choix restera sur le banc</string>
+    <string name="defense_add_substitute_budget_unlimited">Frappeurs supplémentaires illimités —
+        chaque choix frappera</string>
+    <string name="defense_add_substitute_will_bat">Frappera</string>
+    <string name="defense_add_substitute_bench_only">Banc seulement</string>
+    <string name="defense_add_substitute_candidate_position_format">%1$s · Banc</string>
+    <string name="defense_add_substitute_bench_label">Banc</string>
+    <string name="defense_add_substitute_footnote">Une fois la place libre ci-dessus utilisée,
+        chaque autre remplaçant ajouté reste sur le banc sans tour de frappe — jusqu\'à ce que
+        vous l\'échangiez avec un joueur déjà dans l\'ordre de passage.</string>
+    <string name="link_dp_flex_locked_footnote">La place verrouillée est liée au joueur assigné
+        au lanceur sur le terrain — changez le lanceur là-bas pour changer ce lien.</string>
+    <string name="link_dp_flex_batting_role_format">%1$s · frappe n°%2$d</string>
+    <string name="link_dp_flex_wont_bat_role_format">%1$s · ne frappe pas</string>
 
     <string name="permission_request_read_external_storage">"L\'accès aux media est requis pour afficher les images"</string>
     <string name="permission_request_settings_action">"Paramètres"</string>

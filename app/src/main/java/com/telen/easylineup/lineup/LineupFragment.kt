@@ -34,11 +34,9 @@ import com.telen.easylineup.databinding.FragmentLineupBinding
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.launch
 import com.telen.easylineup.lineup.attack.AttackFragment
-import com.telen.easylineup.lineup.defense.DefenseFragmentEditable
-import com.telen.easylineup.lineup.defense.DefenseFragmentFixed
+import com.telen.easylineup.lineup.defense.DefenseFragment
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
@@ -88,7 +86,6 @@ abstract class LineupFragment(
             })
 
         if (isEditable) {
-            binder.substitutesIndication?.visibility = View.GONE
             binder.bottomChoice?.apply {
                 visibility = View.VISIBLE
                 saveClickListener = View.OnClickListener {
@@ -104,17 +101,12 @@ abstract class LineupFragment(
                 cancelClickListener = View.OnClickListener { showDiscardDialog("cancel") }
             }
         } else {
-            binder.substitutesIndication?.visibility = View.VISIBLE
             binder.bottomChoice?.visibility = View.GONE
         }
 
-        pagerAdapter = LineupPagerAdapter(this, viewModel.editable)
+        pagerAdapter = LineupPagerAdapter(this)
         binder.viewpager?.let { pager ->
-            childFragmentManager.fragments.filterIsInstance<DefenseFragmentEditable>().forEach {
-                childFragmentManager.beginTransaction().remove(it).commit()
-            }
-
-            childFragmentManager.fragments.filterIsInstance<DefenseFragmentFixed>().forEach {
+            childFragmentManager.fragments.filterIsInstance<DefenseFragment>().forEach {
                 childFragmentManager.beginTransaction().remove(it).commit()
             }
 
@@ -141,20 +133,11 @@ abstract class LineupFragment(
             })
         }
 
-        if (isEditable) {
-            replaceFragmentIfNeeded<DefenseFragmentEditable>(
-                binder.fragmentDefenseEdition,
-                R.id.fragment_defense_edition
-            ) {
-                DefenseFragmentEditable()
-            }
-        } else {
-            replaceFragmentIfNeeded<DefenseFragmentFixed>(
-                binder.fragmentDefenseEdition,
-                R.id.fragment_defense_edition
-            ) {
-                DefenseFragmentFixed()
-            }
+        replaceFragmentIfNeeded<DefenseFragment>(
+            binder.fragmentDefenseEdition,
+            R.id.fragment_defense_edition
+        ) {
+            DefenseFragment()
         }
 
         replaceFragmentIfNeeded<AttackFragment>(
@@ -167,15 +150,6 @@ abstract class LineupFragment(
         viewModel.observeLineupName()
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { (activity as AppCompatActivity).supportActionBar?.title = it }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        viewModel.observeDefensePlayers()
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach {
-                val size = it.filter { item -> item.isSubstitute() }.size
-                binder.substitutesIndication?.text =
-                        resources.getQuantityString(R.plurals.lineups_substitutes_size, size, size)
-            }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         return binder.root

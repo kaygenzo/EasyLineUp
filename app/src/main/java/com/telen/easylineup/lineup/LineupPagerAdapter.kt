@@ -9,23 +9,17 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
 import com.telen.easylineup.lineup.attack.AttackFragment
-import com.telen.easylineup.lineup.defense.DefenseFragmentEditable
-import com.telen.easylineup.lineup.defense.DefenseFragmentFixed
+import com.telen.easylineup.lineup.defense.DefenseFragment
 
 const val FRAGMENT_DEFENSE_INDEX = 0
 const val FRAGMENT_ATTACK_INDEX = 1
 
-class LineupPagerAdapter(fragment: Fragment, private val editable: Boolean) :
-    FragmentStateAdapter(fragment) {
+class LineupPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     val map: MutableMap<Int, View> = mutableMapOf()
 
     override fun createFragment(position: Int): Fragment {
         val result = when (position) {
-            FRAGMENT_DEFENSE_INDEX -> if (editable) {
-                DefenseFragmentEditable()
-            } else {
-                DefenseFragmentFixed()
-            }
+            FRAGMENT_DEFENSE_INDEX -> DefenseFragment()
 
             FRAGMENT_ATTACK_INDEX -> AttackFragment()
 

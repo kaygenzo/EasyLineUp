@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -215,7 +216,7 @@ private fun String.avatarInitials(): String =
  * [DugoutAvatar] (e.g. an empty/dashed picker state) can still reuse the same loading logic.
  */
 @Composable
-internal fun rememberDugoutAvatarBitmap(uri: Uri?, size: Dp): ImageBitmap? {
+fun rememberDugoutAvatarBitmap(uri: Uri?, size: Dp): ImageBitmap? {
     var bitmap by remember(uri) { mutableStateOf<ImageBitmap?>(null) }
     val sizePx = with(LocalDensity.current) { size.roundToPx() }
 
@@ -321,6 +322,35 @@ fun PlayerPhotoTile(imageUri: Uri?, shirtNumber: Int, size: Dp) {
                 fontSize = (badgeSize.value * 0.43f).sp
             )
         }
+    }
+}
+
+/**
+ * Small dot + uppercase label pill marking a screen as mid-edit (Attack's "Editing order",
+ * Defense's "Editing positions") - promoted here once a second screen needed the exact same
+ * badge, just with different text.
+ */
+@Composable
+fun ModeBadge(label: String, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.16f))
+            .padding(horizontal = 11.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(6.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
+        )
+        Text(
+            text = label.uppercase(),
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.labelMedium
+        )
     }
 }
 
