@@ -5,60 +5,85 @@
 package com.telen.easylineup.lineup
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.IdRes
-import androidx.annotation.MenuRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.MenuProvider
-import androidx.core.view.drawToBitmap
-import androidx.fragment.app.Fragment
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayoutMediator
 import com.telen.easylineup.BaseFragment
-import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
-import com.telen.easylineup.databinding.FragmentLineupBinding
+import com.telen.easylineup.compose.ConfirmSheet
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.model.MODE_ENABLED
+import com.telen.easylineup.domain.model.BatterState
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.MODE_DISABLED
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.toPlayer
+import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
+import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.launch
-import com.telen.easylineup.lineup.attack.AttackFragment
-import com.telen.easylineup.lineup.defense.DefenseFragment
-import com.telen.easylineup.utils.DialogFactory
+import com.telen.easylineup.lineup.defense.AvailablePlayersSheet
+import com.telen.easylineup.lineup.defense.DpFlexLinkSheet
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
+import com.telen.easylineup.views.LineupTypeface
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx3.rxCompletable
 import timber.log.Timber
 
-class LineupFragmentFixed : LineupFragment("LineupFragmentFixed", R.menu.menu_lineup_summary, false)
+const val FRAGMENT_DEFENSE_INDEX = 0
+const val FRAGMENT_ATTACK_INDEX = 1
 
-class LineupFragmentEditable :
-    LineupFragment("LineupFragmentEditable", R.menu.menu_lineup_edition, true)
+class LineupFragmentFixed : LineupFragment("LineupFragmentFixed", false)
+
+class LineupFragmentEditable : LineupFragment("LineupFragmentEditable", true)
 
 abstract class LineupFragment(
     fragmentName: String,
-    @MenuRes private val menuRes: Int,
     private val isEditable: Boolean
-) : BaseFragment(fragmentName), MenuProvider {
+) : BaseFragment(fragmentName) {
     private val viewModel by viewModels<LineupViewModel>()
-    private var binder: FragmentLineupBinding? = null
-    lateinit var pagerAdapter: LineupPagerAdapter
+
+    private var lineupName by mutableStateOf("")
+    private var selectedTab by mutableStateOf(FRAGMENT_DEFENSE_INDEX)
+
+    private var defensePlayers by mutableStateOf<List<PlayerWithPosition>>(emptyList())
+    private var defenseStrategy by mutableStateOf(TeamStrategy.STANDARD)
+    private var lineupMode by mutableStateOf(MODE_DISABLED)
+    private var teamType by mutableStateOf(TeamType.UNKNOWN.id)
+    private var extraHitters by mutableStateOf(0)
+
+    private var availablePlayersEvent by mutableStateOf<ListAvailablePlayers?>(null)
+    private var dpFlexEvent by mutableStateOf<LinkDpFlex?>(null)
+    private var deleteConfirmPlayer by mutableStateOf<Player?>(null)
+    private var infoMessageRes by mutableStateOf<Int?>(null)
+
+    private var batters by mutableStateOf<List<BatterState>>(emptyList())
+    private var typeface by mutableStateOf(LineupTypeface.NORMAL)
+
+    private var showDiscardSheet by mutableStateOf(false)
+    private var showDeleteSheet by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,223 +100,313 @@ abstract class LineupFragment(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val binder = FragmentLineupBinding.inflate(inflater)
-        this.binder = binder
-
+    ): View {
         activity?.onBackPressedDispatcher?.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(isEditable) {
-                override fun handleOnBackPressed() { showDiscardDialog("back_pressed") }
-            })
+                override fun handleOnBackPressed() {
+                    FirebaseAnalyticsUtils.onClick(
+                        activity,
+                        "click_lineup_edit_cancel_back_pressed"
+                    )
+                    showDiscardSheet = true
+                }
+            }
+        )
 
-        if (isEditable) {
-            binder.bottomChoice?.apply {
-                visibility = View.VISIBLE
-                saveClickListener = View.OnClickListener {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        viewModel.save()
-                            .onSuccess {
-                                Timber.d("Successfully saved")
-                                goBack()
+        return ComposeView(requireContext()).apply {
+            setContent {
+                DugoutTheme {
+                    LineupScreen(
+                        lineupName = lineupName,
+                        editable = isEditable,
+                        selectedTab = selectedTab,
+                        onTabSelected = { selectedTab = it },
+                        onBackClick = { goBack() },
+                        onCancelClick = {
+                            FirebaseAnalyticsUtils.onClick(
+                                activity,
+                                "click_lineup_edit_cancel_cancel"
+                            )
+                            showDiscardSheet = true
+                        },
+                        onSaveClick = {
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                viewModel.save()
+                                    .onSuccess {
+                                        Timber.d("Successfully saved")
+                                        goBack()
+                                    }
+                                    .onFailure { Timber.e(it) }
                             }
-                            .onFailure { Timber.e(it) }
+                        },
+                        onShareCaptured = { bitmap -> shareLineup(bitmap) },
+                        onDeleteClick = {
+                            FirebaseAnalyticsUtils.onClick(activity, "click_lineup_delete")
+                            showDeleteSheet = true
+                        },
+                        onEditClick = {
+                            FirebaseAnalyticsUtils.onClick(activity, "click_lineup_edit")
+                            val extras = getArguments(lineupId = viewModel.lineupId ?: 0)
+                            findNavController().navigate(
+                                R.id.lineupFragmentEditable,
+                                extras,
+                                NavigationUtils().getOptions()
+                            )
+                        },
+                        defenseStrategy = defenseStrategy,
+                        defensePlayers = defensePlayers,
+                        lineupMode = lineupMode,
+                        teamType = teamType,
+                        extraHitters = extraHitters,
+                        onPositionClicked = ::handlePositionClicked,
+                        onPlayersSwitched = { player1, player2 ->
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                viewModel.switchPlayersPosition(player1, player2)
+                                    .onFailure { Timber.e("Cannot switch players: ${it.message}") }
+                            }
+                        },
+                        onPlayerReassigned = { player, newPosition ->
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                viewModel.switchPlayersPosition(player, newPosition)
+                                    .onFailure {
+                                        Timber.e("Cannot change player position: ${it.message}")
+                                    }
+                            }
+                        },
+                        onPlayerSentToTrash = { player, _ -> viewModel.onDeletePosition(player) },
+                        onSubstituteLongClicked = { player -> deleteConfirmPlayer = player },
+                        onAddSubstitute = { handlePositionClicked(FieldPosition.SUBSTITUTE) },
+                        onLineupModeChanged = { enabled -> viewModel.onLineupModeChanged(enabled) },
+                        batters = batters,
+                        typeface = typeface,
+                        onReorder = { updated ->
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                viewModel.onBattersChanged(updated)
+                                    .onFailure { Timber.e(it) }
+                            }
+                        }
+                    )
+
+                    availablePlayersEvent?.let { event ->
+                        AvailablePlayersSheet(
+                            players = event.players,
+                            lineupPlayers = defensePlayers,
+                            filterPosition = event.position,
+                            teamType = teamType,
+                            extraHitters = extraHitters,
+                            onPlayerSelected = { player ->
+                                viewModel.onPlayerSelected(player, event.position)
+                                availablePlayersEvent = null
+                            },
+                            onDismiss = { availablePlayersEvent = null }
+                        )
+                    }
+
+                    dpFlexEvent?.let { event ->
+                        DpFlexLinkSheet(
+                            initialDp = event.initialData.first?.toPlayer(),
+                            initialFlex = event.initialData.second?.toPlayer(),
+                            dpBattingOrder = event.initialData.first?.order,
+                            dpLocked = event.dpLocked,
+                            flexLocked = event.flexLocked,
+                            teamType = event.teamType,
+                            title = stringResource(event.title),
+                            onRequestDpPlayers = {
+                                viewModel.getPlayerSelectionForDp()
+                                    .getOrElse { emptyList() }
+                                    .map { it.toPlayer() }
+                            },
+                            onRequestFlexPlayers = {
+                                viewModel.getPlayerSelectionForFlex()
+                                    .getOrElse { emptyList() }
+                                    .map { it.toPlayer() }
+                            },
+                            onConfirm = { dp, flex ->
+                                viewLifecycleOwner.lifecycleScope.launch {
+                                    viewModel.linkDpAndFlex(dp, flex)
+                                        .onSuccess { dpFlexEvent = null }
+                                        .onFailure { throwable ->
+                                            if (throwable is NeedAssignBothPlayersException) {
+                                                Timber.w(throwable.message)
+                                                activity?.let(FirebaseAnalyticsUtils::missingDpFlex)
+                                                infoMessageRes =
+                                                    R.string.error_need_assign_both_players_message
+                                            } else {
+                                                Timber.e(throwable)
+                                            }
+                                        }
+                                }
+                            },
+                            onDismiss = { dpFlexEvent = null }
+                        )
+                    }
+
+                    deleteConfirmPlayer?.let { player ->
+                        ConfirmSheet(
+                            title = stringResource(
+                                R.string.dialog_delete_substitute_title,
+                                player.name
+                            ),
+                            message = stringResource(R.string.dialog_delete_cannot_undo_message),
+                            confirmLabel = stringResource(R.string.action_delete),
+                            cancelLabel = stringResource(R.string.cancel_button),
+                            onDismiss = { deleteConfirmPlayer = null },
+                            onConfirm = { viewModel.onDeletePosition(player) }
+                        )
+                    }
+
+                    infoMessageRes?.let { messageRes ->
+                        AlertDialog(
+                            onDismissRequest = { infoMessageRes = null },
+                            text = { Text(stringResource(messageRes)) },
+                            confirmButton = {
+                                TextButton(onClick = { infoMessageRes = null }) {
+                                    Text(stringResource(android.R.string.ok))
+                                }
+                            }
+                        )
+                    }
+
+                    if (showDiscardSheet) {
+                        ConfirmSheet(
+                            title = stringResource(R.string.discard_change_title),
+                            message = stringResource(R.string.discard_change_message),
+                            confirmLabel = stringResource(R.string.action_discard),
+                            cancelLabel = stringResource(R.string.action_keep_editing),
+                            onDismiss = { showDiscardSheet = false },
+                            onConfirm = { goBack() }
+                        )
+                    }
+
+                    if (showDeleteSheet) {
+                        ConfirmSheet(
+                            title = stringResource(R.string.dialog_delete_lineup_title),
+                            message = stringResource(R.string.dialog_delete_cannot_undo_message),
+                            confirmLabel = stringResource(R.string.action_delete),
+                            cancelLabel = stringResource(R.string.cancel_button),
+                            onDismiss = { showDeleteSheet = false },
+                            onConfirm = { deleteLineup() }
+                        )
                     }
                 }
-                cancelClickListener = View.OnClickListener { showDiscardDialog("cancel") }
             }
-        } else {
-            binder.bottomChoice?.visibility = View.GONE
         }
-
-        pagerAdapter = LineupPagerAdapter(this)
-        binder.viewpager?.let { pager ->
-            childFragmentManager.fragments.filterIsInstance<DefenseFragment>().forEach {
-                childFragmentManager.beginTransaction().remove(it).commit()
-            }
-
-            childFragmentManager.fragments.filterIsInstance<AttackFragment>().forEach {
-                childFragmentManager.beginTransaction().remove(it).commit()
-            }
-
-            pager.isSaveEnabled = false
-            pager.adapter = pagerAdapter
-            binder.lineupTabLayout?.let {
-                TabLayoutMediator(it, pager) { tab, position ->
-                    tab.text = when (position) {
-                        FRAGMENT_DEFENSE_INDEX -> getString(R.string.new_lineup_tab_field_defense)
-                        FRAGMENT_ATTACK_INDEX -> getString(R.string.new_lineup_tab_field_offense)
-                        else -> ""
-                    }
-                }.attach()
-            }
-
-            pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    activity?.let { viewModel.onScreenChanged(position) }
-                }
-            })
-        }
-
-        replaceFragmentIfNeeded<DefenseFragment>(
-            binder.fragmentDefenseEdition,
-            R.id.fragment_defense_edition
-        ) {
-            DefenseFragment()
-        }
-
-        replaceFragmentIfNeeded<AttackFragment>(
-            binder.fragmentAttackEdition,
-            R.id.fragment_attack_edition
-        ) {
-            AttackFragment()
-        }
-
-        viewModel.observeLineupName()
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { (activity as AppCompatActivity).supportActionBar?.title = it }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        return binder.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        activity?.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+        viewModel.observeLineupName()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { lineupName = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeLineupStrategy()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { defenseStrategy = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeLineupMode()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { lineupMode = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeLineup()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { extraHitters = it.extraHitters }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeDefensePlayers()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            // PlayerWithPosition instances are mutated in place by the domain use cases and the
+            // same backing list is re-emitted - snapshot each element via .copy() so Compose's
+            // structural-equality state check actually sees a change instead of comparing the
+            // same mutated objects against themselves.
+            .onEach { defensePlayers = it.map { player -> player.copy() } }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeBatters()
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { batters = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewModel.observeLineupTypeface(requireContext())
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { typeface = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.getTeamType()
+                .onSuccess { teamType = it }
+                .onFailure { Timber.e(it) }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // This screen draws its own ScreenHeader - the shared HomeActivity toolbar (still used
+        // by every other, not-yet-migrated screen) would otherwise show a second, redundant app
+        // bar above it. Paired with onPause rather than onViewCreated/onDestroyView: during a
+        // Navigation Component transaction (e.g. view mode -> edit mode), the outgoing
+        // fragment's onDestroyView can fire after the incoming one's onViewCreated, which would
+        // re-show the toolbar right after this screen just hid it.
+        (activity as? AppCompatActivity)?.supportActionBar?.hide()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        (activity as? AppCompatActivity)?.supportActionBar?.show()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binder?.viewpager?.let { it.adapter = null }
         disposables.clear()
-        binder = null
     }
 
-    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-        menuInflater.inflate(menuRes, menu)
-    }
-
-    override fun onPrepareMenu(menu: Menu) {
+    private fun handlePositionClicked(position: FieldPosition) {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.getTeamType()
-                .onSuccess {
-                    val teamType = TeamType.getTypeById(it)
-                    menu.findItem(R.id.action_lineup_mode)?.apply {
-                        when (teamType) {
-                            TeamType.UNKNOWN -> isVisible = false
-                            TeamType.BASEBALL -> setTitle(R.string.action_add_dh)
-
-                            TeamType.SOFTBALL -> setTitle(R.string.action_add_dp_flex)
-
-                            else -> {}
-                        }
-                        isChecked = viewModel.lineup?.mode == MODE_ENABLED
+            viewModel.onPlayerClicked(position)
+                .onSuccess { event ->
+                    when (event) {
+                        is LinkDpFlex -> dpFlexEvent = event
+                        is ListAvailablePlayers -> availablePlayersEvent = event
+                        null -> infoMessageRes = R.string.players_list_empty
                     }
                 }
-                .onFailure { Timber.e(it) }
-        }
-        super.onPrepareMenu(menu)
-    }
-
-    override fun onMenuItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_edit -> {
-                FirebaseAnalyticsUtils.onClick(activity, "click_lineup_edit")
-                val extras = Companion.getArguments(lineupId = viewModel.lineupId ?: 0)
-                findNavController().navigate(
-                    R.id.lineupFragmentEditable,
-                    extras,
-                    NavigationUtils().getOptions()
-                )
-                true
-            }
-
-            R.id.action_delete -> {
-                FirebaseAnalyticsUtils.onClick(activity, "click_lineup_delete")
-                askUserConsentForDelete()
-                true
-            }
-
-            R.id.action_share -> {
-                FirebaseAnalyticsUtils.onClick(activity, "click_lineup_share")
-                exportLineupToExternalStorage()
-                true
-            }
-
-            R.id.action_lineup_mode -> {
-                if (BuildConfig.DEBUG) {
-                    Toast.makeText(activity, "Mode is ${item.isChecked}", Toast.LENGTH_SHORT).show()
+                .onFailure { throwable ->
+                    if (throwable is NeedAssignPitcherFirstException) {
+                        activity?.let(FirebaseAnalyticsUtils::missingPitcher)
+                        infoMessageRes = R.string.error_need_assign_pitcher_first_message
+                    } else {
+                        Timber.e(throwable)
+                    }
                 }
-                FirebaseAnalyticsUtils.onClick(activity, "click_lineup_mode")
-                viewModel.onLineupModeChanged(!item.isChecked)
-                true
-            }
+        }
+    }
 
-            else -> {
-                if (isEditable) {
-                    showDiscardDialog("navigation_up")
-                    true
-                } else {
-                    false
+    private fun deleteLineup() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.deleteLineup()
+                .onSuccess { goBack(showFixedView = false) }
+                .onFailure {
+                    Timber.e(it)
+                    Toast.makeText(
+                        activity,
+                        R.string.error_when_deleting_lineup,
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-            }
         }
     }
 
-    private fun askUserConsentForDelete() {
-        activity?.let { ctx ->
-            DialogFactory
-                .getWarningTaskDialog(context = ctx,
-                    title = R.string.dialog_delete_lineup_title,
-                    message = R.string.dialog_delete_cannot_undo_message,
-                    task = rxCompletable { viewModel.deleteLineup().getOrThrow() }
-                        .doOnComplete { goBack(showFixedView = false) }
-                        .doOnError {
-                            Toast.makeText(
-                                ctx, R.string.error_when_deleting_lineup, Toast.LENGTH_LONG
-                            ).show()
-                        })
-                .show()
-        }
-    }
-
-    private fun exportLineupToExternalStorage() {
+    private fun shareLineup(bitmap: Bitmap) {
         activity?.let {
-            binder?.viewpager?.currentItem?.let { index ->
-                val views = mapOf(index to pagerAdapter.map[index]?.drawToBitmap())
-                launch(viewModel.exportLineupToExternalStorage(it, views), { intent ->
-                    startActivity(Intent.createChooser(intent, ""))
-                })
-            }
+            val views = mapOf(selectedTab to bitmap)
+            launch(viewModel.exportLineupToExternalStorage(it, views), { intent ->
+                startActivity(Intent.createChooser(intent, ""))
+            })
         }
-    }
-
-    private inline fun <reified E : Fragment> replaceFragmentIfNeeded(
-        root: View?,
-        @IdRes fragmentId: Int,
-        create: () -> E
-    ) {
-        root?.let {
-            childFragmentManager.fragments.filterIsInstance<E>()
-                .lastOrNull()?.let {
-                    if (!it.isRemoving) {
-                        childFragmentManager
-                            .beginTransaction()
-                            .replace(fragmentId, it)
-                            .commit()
-                    }
-                } ?: run {
-                childFragmentManager
-                    .beginTransaction()
-                    .replace(fragmentId, create())
-                    .commit()
-            }
-        }
-    }
-
-    private fun showDiscardDialog(trigger: String) {
-        FirebaseAnalyticsUtils.onClick(activity, "click_lineup_edit_cancel_$trigger")
-        DialogFactory.getDiscardDialog(requireContext()) { _, _ -> goBack() }.show()
     }
 
     private fun goBack(showFixedView: Boolean = true) {

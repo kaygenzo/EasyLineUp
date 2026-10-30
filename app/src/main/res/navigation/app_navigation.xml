@@ -58,13 +58,11 @@
     <fragment
         android:id="@+id/lineupFragmentFixed"
         android:name="com.telen.easylineup.lineup.LineupFragmentFixed"
-        android:label="@string/title_lineups"
-        tools:layout="@layout/fragment_lineup"/>
+        android:label="@string/title_lineups"/>
 
     <fragment
         android:id="@+id/lineupFragmentEditable"
         android:name="com.telen.easylineup.lineup.LineupFragmentEditable"
-        android:label="@string/title_lineups"
-        tools:layout="@layout/fragment_lineup"/>
+        android:label="@string/title_lineups"/>
 
 </navigation>

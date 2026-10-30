@@ -17,6 +17,7 @@
     <string name="new_lineup_substitute_label">Substitutes</string>
     <string name="save_button">Save</string>
     <string name="cancel_button">Cancel</string>
+    <string name="action_save_lineup">Save lineup</string>
 
     <string name="dialog_create_lineup_title">Creation&#8230;</string>
     <string name="dialog_create_lineup_name">Lineup name</string>

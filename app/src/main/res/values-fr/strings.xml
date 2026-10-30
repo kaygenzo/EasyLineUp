@@ -15,6 +15,7 @@
     <string name="new_lineup_substitute_label">Remplaçants</string>
     <string name="save_button">Sauvegarder</string>
     <string name="cancel_button">Annuler</string>
+    <string name="action_save_lineup">Enregistrer le lineup</string>
 
     <string name="dialog_create_lineup_title">Creation&#8230;</string>
     <string name="dialog_create_lineup_name">Nom du lineup</string>

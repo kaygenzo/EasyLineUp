@@ -43,7 +43,6 @@ import com.telen.easylineup.domain.usecases.SaveDpAndFlex
 import com.telen.easylineup.domain.usecases.SetLineupMode
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
-import com.telen.easylineup.utils.SharedPreferencesHelper
 import com.telen.easylineup.views.LineupTypeface
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -94,7 +93,6 @@ data class ListAvailablePlayers(
 ) : EventCase()
 
 class LineupViewModel : ViewModel(), KoinComponent {
-    private val prefsHelper by inject<SharedPreferencesHelper>()
     private val getTeamUseCase: GetTeam by inject()
     private val observePlayerNumberOverlays: ObservePlayerNumberOverlays by inject()
     private val deletePlayerFieldPositionUseCase: DeletePlayerFieldPosition by inject()
@@ -116,7 +114,6 @@ class LineupViewModel : ViewModel(), KoinComponent {
     private val updatePlayersWithBattersUseCase: UpdatePlayersWithBatters by inject()
 
     // private val _designatedPlayerTitle = MutableStateFlow<String>()
-    private val _helpEvent: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     // players
     private val _listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
@@ -405,20 +402,6 @@ class LineupViewModel : ViewModel(), KoinComponent {
                 this@LineupViewModel.lineup = this
             }
         }
-    }
-
-    fun onScreenChanged(position: Int) {
-        val show = prefsHelper.isFeatureEnabled(Constants.PREF_FEATURE_SHOW_REORDER_HELP)
-        if (position == FRAGMENT_ATTACK_INDEX && editable && show) {
-            prefsHelper.disableFeature(Constants.PREF_FEATURE_SHOW_REORDER_HELP)
-            _helpEvent.value = true
-        } else {
-            _helpEvent.value = false
-        }
-    }
-
-    fun observeHelpEvent(): Flow<Boolean> {
-        return _helpEvent
     }
 
     suspend fun getPlayerSelectionForDp(): Result<List<PlayerWithPosition>> {
