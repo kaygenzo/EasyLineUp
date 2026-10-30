@@ -1,6 +1,4 @@
 <resources>
-    <dimen name="field_size">600dp</dimen>
-
     <!-- Common values with land -->
 
     <dimen name="image_circle_size">250dp</dimen>

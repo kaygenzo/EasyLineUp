@@ -1,5 +1,4 @@
 <resources>
-    <dimen name="field_size">400dp</dimen>
     <dimen name="image_circle_size">250dp</dimen>
 
     <dimen name="item_attack_height">30dp</dimen>
