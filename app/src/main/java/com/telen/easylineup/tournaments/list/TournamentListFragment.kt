@@ -296,7 +296,7 @@ class TournamentListFragment : BaseFragment("TournamentListFragment") {
         extras.putSerializable(Constants.EXTRA_TOURNAMENT, tournament)
         extras.putInt(Constants.EXTRA_TEAM_TYPE, teamType.id)
         findNavController().navigate(
-            R.id.tournamentStatisticsTableFragment,
+            R.id.tournamentStatisticsFragment,
             extras,
             NavigationUtils().getOptions()
         )

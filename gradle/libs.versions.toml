@@ -39,7 +39,6 @@ dexterVersion = "6.2.3"
 colorPickerVersion = "2.0.6"
 licenserVersion = "2.0.0"
 picassoVersion = "2.8"
-tablemultiscrollVersion = "1.1.1"
 taptargetviewVersion = "1.13.3"
 koinVersion = "4.1.0"
 annotationVersion = "1.9.1"
@@ -97,7 +96,6 @@ documentFile = { group = "androidx.documentfile", name = "documentfile", version
 splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreenVersion" }
 android-core = { group = "androidx.core", name = "core-ktx", version.ref = "coreVersion" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gsonVersion" }
-androidTable = { group = "io.github.kaygenzo", name = "androidtable", version.ref = "tablemultiscrollVersion" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timberVersion" }
 rx-android = { group = "io.reactivex.rxjava3", name = "rxandroid", version.ref = "rxAndroidVersion" }
 rx-java = { group = "io.reactivex.rxjava3", name = "rxjava", version.ref = "rxJavaVersion" }

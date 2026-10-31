@@ -438,7 +438,12 @@
     <string name="discard_keep_editing">Keep editing</string>
 
     <string name="tournament_stats_unknown_player_name">Unknown</string>
-    <string name="tournament_stats_label_games_played">Total</string>
+    <string name="title_tournament_statistics">Statistics</string>
+    <string name="tournament_stats_playing_time_label">Playing time</string>
+    <string name="tournament_stats_avg_games_label">Avg games</string>
+    <string name="tournament_stats_low_games_label">Low</string>
+    <string name="tournament_stats_high_games_label">High</string>
+    <string name="tournament_stats_select_player_placeholder">Select a player</string>
 
     <string name="softball_strategy_fastpitch" translatable="false">Fastpitch</string>
     <string name="softball_strategy_fastpitch_five_man" translatable="false">Fastpitch 5th man</string>

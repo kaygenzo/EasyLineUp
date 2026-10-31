@@ -415,5 +415,10 @@
     <string name="discard_keep_editing">Continuer la modification</string>
 
     <string name="tournament_stats_unknown_player_name">Inconnu</string>
-    <string name="tournament_stats_label_games_played">Total</string>
+    <string name="title_tournament_statistics">Statistiques</string>
+    <string name="tournament_stats_playing_time_label">Temps de jeu</string>
+    <string name="tournament_stats_avg_games_label">Moy. matchs</string>
+    <string name="tournament_stats_low_games_label">Minimum</string>
+    <string name="tournament_stats_high_games_label">Maximum</string>
+    <string name="tournament_stats_select_player_placeholder">Choisir un joueur</string>
 </resources>

@@ -203,7 +203,6 @@ dependencies {
 
     implementation project(path: ':repository')
     implementation project(path: ':domain')
-    implementation libs.androidTable
 
     ////////// OTHERS //////////
 

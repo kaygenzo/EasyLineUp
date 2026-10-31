@@ -50,10 +50,9 @@
         android:label="@string/title_settings" />
 
     <fragment
-        android:id="@+id/tournamentStatisticsTableFragment"
-        android:name="com.telen.easylineup.tournaments.statistics.TournamentStatisticsTableFragment"
-        android:label="@string/title_tournament_summary"
-        tools:layout="@layout/fragment_tournament_statistics_table"/>
+        android:id="@+id/tournamentStatisticsFragment"
+        android:name="com.telen.easylineup.tournaments.statistics.TournamentStatisticsFragment"
+        android:label="@string/title_tournament_statistics"/>
 
     <fragment
         android:id="@+id/lineupFragmentFixed"

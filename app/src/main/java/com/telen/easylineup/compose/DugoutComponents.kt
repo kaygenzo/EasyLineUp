@@ -63,6 +63,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -74,7 +75,11 @@ import androidx.compose.ui.unit.sp
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
+import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.getStrategies
+import com.telen.easylineup.utils.StringResourcesProviderImpl
 
 /**
  * Dashed outline for the Dugout Card system's recurring "nothing here yet" language (an empty
@@ -453,6 +458,180 @@ fun InfoCell(modifier: Modifier = Modifier, label: String, value: String, tabula
 private fun InfoCellPreview() {
     DugoutTheme {
         InfoCell(label = "Games played", value = "128")
+    }
+}
+
+/**
+ * A single number-over-label chip, 3 side by side in a `.stat-row` (team roster's gender
+ * breakdown, this screen's avg/low/high) - the mockup's `.stat-chip`.
+ */
+@Composable
+fun StatChip(
+    modifier: Modifier = Modifier,
+    value: Int,
+    label: String,
+    color: Color = MaterialTheme.colorScheme.onBackground
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = value.toString(),
+            color = color,
+            fontWeight = FontWeight.ExtraBold,
+            fontFamily = FontFamily.Monospace,
+            fontSize = 19.sp
+        )
+        Text(
+            text = label.uppercase(),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(top = 2.dp)
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun StatChipPreview() {
+    DugoutTheme {
+        StatChip(value = 12, label = "Avg games")
+    }
+}
+
+/**
+ * A per-position usage bar chart - one bar per entry in [positions], tallest bar highlighted,
+ * count printed above each bar. Originally built for the player-profile screen's all-time usage
+ * (callers there pass `state.strategy.positions`, since a single strategy's columns is exactly
+ * right once a selector resolves which strategy); the tournament statistics screen instead passes
+ * the union of positions actually played across the tournament, since defaulting to one strategy's
+ * column set would silently hide real data for a team that played under a different strategy
+ * (e.g. softball's 4-outfielder Slowpitch vs the usual 3) or mixed strategies across lineups.
+ */
+@Composable
+fun PositionUsageChart(
+    positionsData: Map<FieldPosition, Int>,
+    positions: List<FieldPosition>,
+    teamType: TeamType
+) {
+    val context = LocalContext.current
+    val positionNames = StringResourcesProviderImpl(context).positionShortNames(teamType.id)
+    val maxCount = positionsData.values.maxOrNull()?.takeIf { it > 0 } ?: 1
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        // The count label reserves its own space at the top of the chart area so the tallest
+        // bar (+ its label) still fits exactly within chartHeight, but every other bar's label
+        // floats right above that bar's own top edge instead of all labels lining up flush at
+        // the chart's top regardless of height.
+        val chartHeight = 88.dp
+        val labelReserve = 18.dp
+        val barMaxHeight = chartHeight - labelReserve
+
+        positions.forEach { position ->
+            val count = positionsData[position] ?: 0
+            val isHighlighted = count > 0 && count == maxCount
+            val barHeight = barMaxHeight * (count / maxCount.toFloat())
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(chartHeight),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        if (count > 0) {
+                            Text(
+                                text = count.toString(),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontFamily = FontFamily.Monospace,
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(barHeight)
+                                .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp))
+                                .background(
+                                    if (isHighlighted) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.surfaceVariant
+                                    }
+                                )
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = positionNames.getOrNull(position.id) ?: "",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+        }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun PositionUsageChartPreview() {
+    DugoutTheme {
+        PositionUsageChart(
+            positionsData = mapOf(
+                FieldPosition.SHORT_STOP to 15,
+                FieldPosition.SECOND_BASE to 6,
+                FieldPosition.THIRD_BASE to 3
+            ),
+            positions = TeamType.BASEBALL.getStrategies()[0].positions.toList(),
+            teamType = TeamType.BASEBALL
+        )
+    }
+}
+
+/**
+ * Dashed-outline "nothing to show yet" state for [PositionUsageChart], same empty-state language
+ * as every other "nothing here yet" surface in this system.
+ */
+@Composable
+fun PositionUsageEmptyState() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .dashedBorder(MaterialTheme.colorScheme.outline, cornerRadius = 12.dp)
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(R.string.player_profile_empty_title),
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleSmall
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.player_profile_empty_message),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun PositionUsageEmptyStatePreview() {
+    DugoutTheme {
+        PositionUsageEmptyState()
     }
 }
 
@@ -898,8 +1077,10 @@ fun SelectField(
     onClick: () -> Unit
 ) {
     Column(modifier = modifier) {
-        FormLabel(label, required)
-        Spacer(modifier = Modifier.height(6.dp))
+        if (label.isNotBlank()) {
+            FormLabel(label, required)
+            Spacer(modifier = Modifier.height(6.dp))
+        }
         val borderColor = if (isError) {
             MaterialTheme.colorScheme.error
         } else {

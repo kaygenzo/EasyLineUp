@@ -15,6 +15,7 @@ import com.telen.easylineup.player.PlayerViewModel
 import com.telen.easylineup.settings.SettingsViewModel
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.SetupViewModel
+import com.telen.easylineup.tournaments.statistics.TournamentStatisticsViewModel
 import com.telen.easylineup.utils.DispatcherProviderImpl
 import com.telen.easylineup.utils.GeocodingProviderImpl
 import com.telen.easylineup.utils.PhoneNumberValidatorImpl
@@ -40,4 +41,5 @@ val appModules = module {
     viewModelOf(::DashboardViewModel)
     viewModelOf(::LineupCreationViewModel)
     viewModelOf(::LineupEditionViewModel)
+    viewModelOf(::TournamentStatisticsViewModel)
 }

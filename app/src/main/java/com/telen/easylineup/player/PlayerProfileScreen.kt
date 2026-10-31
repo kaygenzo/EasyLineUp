@@ -32,7 +32,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutCard
@@ -41,8 +40,9 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.InfoCell
 import com.telen.easylineup.compose.PlayerPhotoTile
+import com.telen.easylineup.compose.PositionUsageChart
+import com.telen.easylineup.compose.PositionUsageEmptyState
 import com.telen.easylineup.compose.ScreenHeader
-import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.compose.shortLabel
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
@@ -161,7 +161,7 @@ fun PlayerProfileScreen(
                 } else {
                     PositionUsageChart(
                         positionsData = state.positionsData,
-                        strategy = state.strategy,
+                        positions = state.strategy.positions.toList(),
                         teamType = state.teamType
                     )
                 }
@@ -338,126 +338,6 @@ private fun StrategyPill(text: String, selected: Boolean, onClick: () -> Unit) {
 private fun StrategyPillPreview() {
     DugoutTheme {
         StrategyPill(text = "Standard", selected = true, onClick = {})
-    }
-}
-
-@Composable
-private fun PositionUsageChart(
-    positionsData: Map<FieldPosition, Int>,
-    strategy: TeamStrategy,
-    teamType: TeamType
-) {
-    val context = LocalContext.current
-    val positionNames = StringResourcesProviderImpl(context).positionShortNames(teamType.id)
-    val maxCount = positionsData.values.maxOrNull()?.takeIf { it > 0 } ?: 1
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        // The count label reserves its own space at the top of the chart area so the tallest
-        // bar (+ its label) still fits exactly within chartHeight, but every other bar's label
-        // floats right above that bar's own top edge instead of all labels lining up flush at
-        // the chart's top regardless of height.
-        val chartHeight = 88.dp
-        val labelReserve = 18.dp
-        val barMaxHeight = chartHeight - labelReserve
-
-        strategy.positions.forEach { position ->
-            val count = positionsData[position] ?: 0
-            val isHighlighted = count > 0 && count == maxCount
-            val barHeight = barMaxHeight * (count / maxCount.toFloat())
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(chartHeight),
-                    contentAlignment = Alignment.BottomCenter
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        if (count > 0) {
-                            Text(
-                                text = count.toString(),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontFamily = FontFamily.Monospace,
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                        }
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(barHeight)
-                                .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp))
-                                .background(
-                                    if (isHighlighted) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.surfaceVariant
-                                    }
-                                )
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = positionNames.getOrNull(position.id) ?: "",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.labelSmall
-                )
-            }
-        }
-    }
-}
-
-@DugoutPreviews
-@Composable
-private fun PositionUsageChartPreview() {
-    DugoutTheme {
-        PositionUsageChart(
-            positionsData = mapOf(
-                FieldPosition.SHORT_STOP to 15,
-                FieldPosition.SECOND_BASE to 6,
-                FieldPosition.THIRD_BASE to 3
-            ),
-            strategy = TeamType.BASEBALL.getStrategies()[0],
-            teamType = TeamType.BASEBALL
-        )
-    }
-}
-
-@Composable
-private fun PositionUsageEmptyState() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .dashedBorder(MaterialTheme.colorScheme.outline, cornerRadius = 12.dp)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(R.string.player_profile_empty_title),
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleSmall
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = stringResource(R.string.player_profile_empty_message),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall
-        )
-    }
-}
-
-@DugoutPreviews
-@Composable
-private fun PositionUsageEmptyStatePreview() {
-    DugoutTheme {
-        PositionUsageEmptyState()
     }
 }
 

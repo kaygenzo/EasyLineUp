@@ -43,13 +43,13 @@ def pureModelDataClasses = [
     'PlayerGamesCount',
     'PlayerInLineup',
     'PlayerNumberOverlay',
+    'PlayerTournamentStats',
     'PlayerWithPosition',
     'PositionWithLineup',
     'RosterItem',
     'RosterPlayerStatus',
     'ShirtNumberEntry',
     'TeamRosterSummary',
-    'TournamentStatsUiConfig',
     'TournamentWithLineup',
 ].collect { "**/domain/model/${it}.class" }
 

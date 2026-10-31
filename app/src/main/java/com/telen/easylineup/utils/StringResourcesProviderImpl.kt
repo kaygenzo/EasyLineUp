@@ -18,10 +18,6 @@ class StringResourcesProviderImpl(private val context: Context) : StringResource
         return context.getString(R.string.tournament_stats_unknown_player_name)
     }
 
-    override fun gamesPlayedLabel(): String {
-        return context.getString(R.string.tournament_stats_label_games_played)
-    }
-
     override fun strategyDisplayNames(teamType: Int): Array<String>? {
         return TeamType.getTypeById(teamType).getStrategiesDisplayName(context)
     }

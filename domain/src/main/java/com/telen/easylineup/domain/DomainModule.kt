@@ -31,7 +31,7 @@ import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.GetTournamentMapLink
-import com.telen.easylineup.domain.usecases.GetTournamentStatsForPositionTable
+import com.telen.easylineup.domain.usecases.GetTournamentPlayerStats
 import com.telen.easylineup.domain.usecases.GetTournaments
 import com.telen.easylineup.domain.usecases.ImportData
 import com.telen.easylineup.domain.usecases.InsertLineups
@@ -104,7 +104,7 @@ object DomainModule {
         single { DeleteTeam(get(), get()) }
         single { SwitchPlayersPosition(get(), get()) }
         single { DeleteAllData(get(), get(), get()) }
-        single { GetTournamentStatsForPositionTable(get(), get(), get(), get()) }
+        single { GetTournamentPlayerStats(get(), get(), get(), get()) }
         single { CheckHashData(get(), get(), get(), get(), get(), get()) }
         single { ExportData(get(), get(), get(), get(), get(), get(), get(), get()) }
         single { ImportData(get(), get(), get(), get(), get(), get(), get()) }
