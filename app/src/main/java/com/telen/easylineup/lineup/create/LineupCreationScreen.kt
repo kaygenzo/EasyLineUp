@@ -96,6 +96,23 @@ data class LineupCreationState(
     val extraHitters: Int
 )
 
+private val LineupCreationPreviewTournament = Tournament(
+    id = 1L,
+    name = "Fall Classic",
+    createdAt = 1760000000000L,
+    startTime = 1760000000000L,
+    endTime = 1760003600000L,
+    address = "Riverside Park"
+)
+
+private val LineupCreationPreviewRoster = TeamRosterSummary(
+    status = Constants.STATUS_PARTIAL,
+    players = listOf(
+        RosterPlayerStatus(Player(1L, 1L, "Alex Rivera", 12, 0L), true, null),
+        RosterPlayerStatus(Player(2L, 1L, "Sam Cole", 7, 0L), false, null)
+    )
+)
+
 @Composable
 fun LineupCreationScreen(
     state: LineupCreationState,
@@ -299,6 +316,27 @@ private fun SegmentOption(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun SegmentedRowPreview() {
+    DugoutTheme {
+        SegmentedRow(
+            label = "Strategy",
+            options = listOf("Standard", "5-man"),
+            selectedIndex = 0,
+            onSelect = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun SegmentOptionPreview() {
+    DugoutTheme {
+        SegmentOption(text = "Standard", selected = true, onClick = {})
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TournamentPickerSheet(
@@ -361,6 +399,20 @@ fun TournamentPickerSheet(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun TournamentPickerSheetPreview() {
+    DugoutTheme {
+        TournamentPickerSheet(
+            tournaments = listOf(LineupCreationPreviewTournament),
+            selectedTournamentId = LineupCreationPreviewTournament.id,
+            onDismiss = {},
+            onTournamentSelected = {},
+            onCreateTournamentClick = {}
+        )
+    }
+}
+
 @Composable
 private fun TournamentPickerRow(
     tournament: Tournament,
@@ -399,6 +451,18 @@ private fun TournamentPickerRow(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun TournamentPickerRowPreview() {
+    DugoutTheme {
+        TournamentPickerRow(
+            tournament = LineupCreationPreviewTournament,
+            isSelected = true,
+            onClick = {}
+        )
+    }
+}
+
 @Composable
 private fun MiniDateChip(startMillis: Long) {
     val date = Date(startMillis)
@@ -425,6 +489,14 @@ private fun MiniDateChip(startMillis: Long) {
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun MiniDateChipPreview() {
+    DugoutTheme {
+        MiniDateChip(startMillis = 1760000000000L)
+    }
+}
+
 @Composable
 private fun SelectedPill() {
     Box(
@@ -439,6 +511,14 @@ private fun SelectedPill() {
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.labelSmall
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun SelectedPillPreview() {
+    DugoutTheme {
+        SelectedPill()
     }
 }
 
@@ -474,6 +554,14 @@ private fun CreateTournamentRow(onClick: () -> Unit) {
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun CreateTournamentRowPreview() {
+    DugoutTheme {
+        CreateTournamentRow(onClick = {})
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RosterPickerSheet(
@@ -495,6 +583,21 @@ fun RosterPickerSheet(
             onClearAll = onClearAll,
             onDoneClick = onDismiss,
             onNumberChanged = onNumberChanged
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun RosterPickerSheetPreview() {
+    DugoutTheme {
+        RosterPickerSheet(
+            roster = LineupCreationPreviewRoster,
+            teamType = TeamType.BASEBALL,
+            onDismiss = {},
+            onPlayerToggled = { _, _ -> },
+            onClearAll = {},
+            onNumberChanged = { _, _ -> }
         )
     }
 }
@@ -608,6 +711,21 @@ fun RosterPickerContent(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun RosterPickerContentPreview() {
+    DugoutTheme {
+        RosterPickerContent(
+            roster = LineupCreationPreviewRoster,
+            teamType = TeamType.BASEBALL,
+            onPlayerToggled = { _, _ -> },
+            onClearAll = {},
+            onDoneClick = {},
+            onNumberChanged = { _, _ -> }
+        )
+    }
+}
+
 /** Mockup's `--gold` token (line ~24 of the CSS) - no bridged M3 role covers it. */
 private val RosterNumberOverrideColor = Color(0xFFE8B93F)
 
@@ -706,6 +824,21 @@ private fun RosterPickerRow(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun RosterPickerRowPreview() {
+    DugoutTheme {
+        RosterPickerRow(
+            player = Player(1L, 1L, "Alex Rivera", 12, 0L),
+            teamType = TeamType.BASEBALL,
+            checked = true,
+            onCheckedChange = {},
+            overrideNumber = 24,
+            onNumberChange = {}
+        )
+    }
+}
+
 @Composable
 private fun RosterCheckbox(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     val borderColor = if (checked) {
@@ -730,6 +863,14 @@ private fun RosterCheckbox(checked: Boolean, onCheckedChange: (Boolean) -> Unit)
                 modifier = Modifier.size(13.dp)
             )
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun RosterCheckboxPreview() {
+    DugoutTheme {
+        RosterCheckbox(checked = true, onCheckedChange = {})
     }
 }
 
@@ -873,6 +1014,25 @@ fun NewTournamentSheet(
                 onSave = onAddClick
             )
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun NewTournamentSheetPreview() {
+    DugoutTheme {
+        NewTournamentSheet(
+            name = "Fall Classic",
+            startTimeInMillis = 1760000000000L,
+            endTimeInMillis = 1760003600000L,
+            address = "Riverside Park",
+            onNameChanged = {},
+            onStartDateClick = {},
+            onEndDateClick = {},
+            onAddressChanged = {},
+            onDismiss = {},
+            onAddClick = {}
+        )
     }
 }
 

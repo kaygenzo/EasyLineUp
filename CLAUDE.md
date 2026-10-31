@@ -82,19 +82,34 @@ must stay on one line to parse (a couple of entries in `libs.versions.toml`
 slightly exceed 100 for this reason — a format constraint, not an exception to
 the rule).
 
-## Every Compose screen gets previews: small/large × portrait/landscape
+## Every composable gets previews: small/large × portrait/landscape
 
-Any composable that renders a full screen (not a small reusable piece like a
-single row or icon) carries `@DugoutPreviews`
+Every single `@Composable` function carries `@DugoutPreviews`
 (`app/src/main/java/com/telen/easylineup/compose/DugoutPreviews.kt`), a
 multipreview annotation covering small and large screen, portrait and
 landscape — four `@Preview` device specs in one annotation, so one
-`@DugoutPreviews` call is equivalent to writing all four by hand.
+`@DugoutPreviews` call is equivalent to writing all four by hand. This is not
+limited to full screens: bottom sheets/dialogs (`ConfirmSheet`,
+`EditLineupSheet`, `DpFlexLinkSheet`, ...) and small reusable pieces (a single
+row, chip, marker, icon button, badge) all get their own preview too — an
+earlier version of this rule scoped previews to full screens only; it was
+broadened deliberately to cover every composable, no exceptions.
 
 Pattern (see `SettingsScreenPreview`/`WelcomeScreenPreview` at the bottom of
 `SettingsScreen.kt`/`WelcomeScreen.kt`): a private `@Composable *Preview()`
-function wraps the real screen in `DugoutTheme`, passing a representative
-state and no-op lambdas for every callback.
+function wraps the real composable in `DugoutTheme`, passing representative
+state and a no-op lambda matching the exact arity for every callback. The
+preview lives in the same file as the composable it previews, right after it
+(or grouped at the bottom if that reads better) — a `private` composable's
+preview is necessarily `private` too and can't live anywhere else. A
+composable with two meaningfully different, cheap-to-show states (editable vs
+fixed, populated vs empty) gets two preview functions instead of one; default
+to one otherwise. For the rare composable that returns a non-UI value (e.g. a
+`String`, a `FontFamily?`) rather than rendering anything, the preview still
+calls it inside `DugoutTheme` — wrap the result in a `Text` so the preview
+shows something, matching the already-established treatment of
+`PlayerSide.shortLabel()`/`arrayLabel`/`mostPlayedPositionLabel` — rather than
+skipping it.
 
 This needs `androidx.compose.ui:ui-tooling` as a `debugImplementation` (added
 back once the BOM was pinned to 2025.09.01 — the minSdk-23 conflict that made

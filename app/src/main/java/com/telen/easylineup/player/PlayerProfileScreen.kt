@@ -224,6 +224,31 @@ private fun ProfileHeader(state: PlayerProfileState) {
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun ProfileHeaderPreview() {
+    DugoutTheme {
+        ProfileHeader(
+            state = PlayerProfileState(
+                name = "Jonas Alvarez",
+                shirtNumber = 7,
+                imageUri = null,
+                sex = Sex.MALE,
+                battingSide = PlayerSide.RIGHT,
+                pitchingSide = PlayerSide.RIGHT,
+                licenseNumber = 22841,
+                email = "jonas.a@mail.com",
+                phoneNumber = "(555) 019-2231",
+                positionsData = mapOf(FieldPosition.SHORT_STOP to 15),
+                teamType = TeamType.BASEBALL,
+                strategy = TeamType.BASEBALL.getStrategies()[0],
+                strategyOptions = listOf("Standard"),
+                selectedStrategyIndex = 0
+            )
+        )
+    }
+}
+
 @Composable
 private fun mostPlayedPositionLabel(
     positionsData: Map<FieldPosition, Int>,
@@ -236,6 +261,19 @@ private fun mostPlayedPositionLabel(
     return names.getOrNull(topEntry.key.id)
 }
 
+@DugoutPreviews
+@Composable
+private fun mostPlayedPositionLabelPreview() {
+    DugoutTheme {
+        Text(
+            text = mostPlayedPositionLabel(
+                positionsData = mapOf(FieldPosition.SHORT_STOP to 15),
+                teamType = TeamType.BASEBALL
+            ) ?: ""
+        )
+    }
+}
+
 @Composable
 private fun StrategyPillsRow(options: List<String>, selectedIndex: Int, onSelected: (Int) -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -246,6 +284,18 @@ private fun StrategyPillsRow(options: List<String>, selectedIndex: Int, onSelect
                 onClick = { onSelected(index) }
             )
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun StrategyPillsRowPreview() {
+    DugoutTheme {
+        StrategyPillsRow(
+            options = listOf("Standard", "Slowpitch"),
+            selectedIndex = 0,
+            onSelected = {}
+        )
     }
 }
 
@@ -280,6 +330,14 @@ private fun StrategyPill(text: String, selected: Boolean, onClick: () -> Unit) {
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Text(text = text, color = contentColor, style = MaterialTheme.typography.labelSmall)
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun StrategyPillPreview() {
+    DugoutTheme {
+        StrategyPill(text = "Standard", selected = true, onClick = {})
     }
 }
 
@@ -355,6 +413,22 @@ private fun PositionUsageChart(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun PositionUsageChartPreview() {
+    DugoutTheme {
+        PositionUsageChart(
+            positionsData = mapOf(
+                FieldPosition.SHORT_STOP to 15,
+                FieldPosition.SECOND_BASE to 6,
+                FieldPosition.THIRD_BASE to 3
+            ),
+            strategy = TeamType.BASEBALL.getStrategies()[0],
+            teamType = TeamType.BASEBALL
+        )
+    }
+}
+
 @Composable
 private fun PositionUsageEmptyState() {
     Column(
@@ -376,6 +450,14 @@ private fun PositionUsageEmptyState() {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun PositionUsageEmptyStatePreview() {
+    DugoutTheme {
+        PositionUsageEmptyState()
     }
 }
 

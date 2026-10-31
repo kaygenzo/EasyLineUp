@@ -193,6 +193,14 @@ private fun TeamSwitchHeader(teamName: String, teamImageUri: Uri?, onClick: () -
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun TeamSwitchHeaderPreview() {
+    DugoutTheme {
+        TeamSwitchHeader(teamName = "Riverside Hawks", teamImageUri = null, onClick = {})
+    }
+}
+
 @Composable
 private fun HeroLastLineupCard(lastLineup: LastLineupUi?, onClick: (Long) -> Unit) {
     val borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
@@ -246,6 +254,30 @@ private fun HeroLastLineupCard(lastLineup: LastLineupUi?, onClick: (Long) -> Uni
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun HeroLastLineupCardPreview() {
+    DugoutTheme {
+        HeroLastLineupCard(
+            lastLineup = LastLineupUi(
+                lineupId = 1L,
+                name = "Fall Classic — Game 3",
+                eventTimeInMillis = 1760000000000L,
+                tournamentName = "Fall Classic"
+            ),
+            onClick = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun HeroLastLineupCardEmptyPreview() {
+    DugoutTheme {
+        HeroLastLineupCard(lastLineup = null, onClick = {})
+    }
+}
+
 @Composable
 private fun MiniStatCell(
     modifier: Modifier = Modifier,
@@ -286,6 +318,19 @@ private fun MiniStatCell(
                 maxLines = 1
             )
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun MiniStatCellPreview() {
+    DugoutTheme {
+        MiniStatCell(
+            label = "Roster size",
+            value = "14",
+            footer = "Baseball",
+            onClick = {}
+        )
     }
 }
 
@@ -341,6 +386,31 @@ private fun ShirtNumberLookupRow(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun ShirtNumberLookupRowPreview() {
+    DugoutTheme {
+        ShirtNumberLookupRow(
+            query = "07",
+            result = "Jonas Alvarez",
+            history = listOf(
+                ShirtNumberEntry(
+                    number = 7,
+                    playerName = "Jonas Alvarez",
+                    playerId = 1L,
+                    eventTime = 1760000000000L,
+                    createdAt = 1760000000000L,
+                    lineupId = 1L,
+                    lineupName = "Fall Classic — Game 3"
+                )
+            ),
+            onQueryChanged = {},
+            onSearch = {},
+            onHistoryClick = {}
+        )
+    }
+}
+
 @Composable
 private fun ShirtNumberInputBox(
     query: String,
@@ -373,6 +443,14 @@ private fun ShirtNumberInputBox(
             keyboardActions = KeyboardActions(onDone = { onSearch() }),
             modifier = Modifier.fillMaxWidth()
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun ShirtNumberInputBoxPreview() {
+    DugoutTheme {
+        ShirtNumberInputBox(query = "07", onQueryChanged = {}, onSearch = {})
     }
 }
 
@@ -424,6 +502,36 @@ fun ShirtNumberHistorySheet(history: List<ShirtNumberEntry>, onDismiss: () -> Un
                 modifier = Modifier.padding(top = 10.dp, bottom = 18.dp)
             )
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun ShirtNumberHistorySheetPreview() {
+    DugoutTheme {
+        ShirtNumberHistorySheet(
+            history = listOf(
+                ShirtNumberEntry(
+                    number = 7,
+                    playerName = "Jonas Alvarez",
+                    playerId = 1L,
+                    eventTime = 1760000000000L,
+                    createdAt = 1760000000000L,
+                    lineupId = 1L,
+                    lineupName = "Fall Classic — Game 3"
+                ),
+                ShirtNumberEntry(
+                    number = 7,
+                    playerName = "Marcus Bell",
+                    playerId = 2L,
+                    eventTime = 1750000000000L,
+                    createdAt = 1750000000000L,
+                    lineupId = 2L,
+                    lineupName = "Spring Opener"
+                )
+            ),
+            onDismiss = {}
+        )
     }
 }
 
@@ -497,6 +605,26 @@ private fun ShirtNumberHistoryRow(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun ShirtNumberHistoryRowPreview() {
+    DugoutTheme {
+        ShirtNumberHistoryRow(
+            entry = ShirtNumberEntry(
+                number = 7,
+                playerName = "Jonas Alvarez",
+                playerId = 1L,
+                eventTime = 1760000000000L,
+                createdAt = 1760000000000L,
+                lineupId = 1L,
+                lineupName = "Fall Classic — Game 3"
+            ),
+            isCurrent = true,
+            showDivider = true
+        )
+    }
+}
+
 @Composable
 private fun CurrentPill() {
     Box(
@@ -510,6 +638,14 @@ private fun CurrentPill() {
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.labelSmall
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun CurrentPillPreview() {
+    DugoutTheme {
+        CurrentPill()
     }
 }
 

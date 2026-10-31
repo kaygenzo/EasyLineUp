@@ -34,10 +34,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.DugoutPreviews
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.isDefensePlayer
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.model.toPlayer
@@ -239,4 +242,67 @@ private fun primaryPositionShortName(player: Player, shortNames: Array<String>):
     return FieldPosition.values()
         .firstOrNull { it.isDefensePlayer() && (player.positions and it.mask) > 0 }
         ?.let { shortNames.getOrNull(it.ordinal) }
+}
+
+private val AvailablePlayersSheetPreviewCandidates = listOf(
+    PlayerWithPosition(
+        playerName = "Mia Chen",
+        playerSex = 0,
+        shirtNumber = 7,
+        licenseNumber = 100L,
+        teamId = 1L,
+        image = null,
+        position = -1,
+        playerId = 1L,
+        lineupId = 1L,
+        playerPositions = FieldPosition.PITCHER.mask or FieldPosition.CATCHER.mask
+    ),
+    PlayerWithPosition(
+        playerName = "Jordan Lee",
+        playerSex = 1,
+        shirtNumber = 12,
+        licenseNumber = 101L,
+        teamId = 1L,
+        image = null,
+        position = -1,
+        playerId = 2L,
+        lineupId = 1L,
+        playerPositions = FieldPosition.SHORT_STOP.mask
+    ),
+    PlayerWithPosition(
+        playerName = "Ava Brooks",
+        playerSex = 1,
+        shirtNumber = 23,
+        licenseNumber = 102L,
+        teamId = 1L,
+        image = null,
+        position = -1,
+        playerId = 3L,
+        lineupId = 1L,
+        playerPositions = 0
+    )
+)
+
+@DugoutPreviews
+@Composable
+private fun AvailablePlayersSheetPreview() {
+    DugoutTheme {
+        AvailablePlayersSheet(
+            players = AvailablePlayersSheetPreviewCandidates,
+            lineupPlayers = emptyList(),
+            filterPosition = FieldPosition.SUBSTITUTE,
+            teamType = TeamType.BASEBALL.id,
+            extraHitters = 2,
+            onPlayerSelected = {},
+            onDismiss = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun CandidatePillPreview() {
+    DugoutTheme {
+        CandidatePill(text = "Will bat", emphasized = true)
+    }
 }

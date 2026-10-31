@@ -184,6 +184,14 @@ private fun TournamentsEmptyState(isSearching: Boolean) {
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun TournamentsEmptyStatePreview() {
+    DugoutTheme {
+        TournamentsEmptyState(isSearching = false)
+    }
+}
+
 @Composable
 private fun TournamentTicketCard(
     item: TournamentItem,
@@ -333,6 +341,40 @@ private fun TournamentTicketCard(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun TournamentTicketCardPreview() {
+    DugoutTheme {
+        TournamentTicketCard(
+            item = TournamentItem(
+                tournament = Tournament(
+                    id = 1L,
+                    name = "Fall Classic",
+                    createdAt = 1760000000000L,
+                    startTime = 1760000000000L,
+                    endTime = 1760003600000L,
+                    address = "Riverside Park"
+                ),
+                lineups = listOf(
+                    Lineup(
+                        id = 1L,
+                        name = "Game 3 — Starters",
+                        eventTimeInMillis = 1760000000000L,
+                        extraHitters = 1
+                    )
+                )
+            ),
+            teamType = TeamType.BASEBALL,
+            mapLocation = GeoLocation(41.0, -74.0),
+            onLineupClick = {},
+            onEditLineupClick = {},
+            onStatsClick = {},
+            onDeleteClick = {},
+            onMapClick = {}
+        )
+    }
+}
+
 @Composable
 private fun TicketDateChip(startMillis: Long?) {
     val notchColor = MaterialTheme.colorScheme.background
@@ -386,6 +428,14 @@ private fun TicketDateChip(startMillis: Long?) {
                 style = MaterialTheme.typography.titleLarge
             )
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun TicketDateChipPreview() {
+    DugoutTheme {
+        TicketDateChip(startMillis = 1760000000000L)
     }
 }
 
@@ -448,6 +498,25 @@ private fun LineupRow(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun LineupRowPreview() {
+    DugoutTheme {
+        LineupRow(
+            lineup = Lineup(
+                id = 1L,
+                name = "Game 3 — Starters",
+                eventTimeInMillis = 1760000000000L,
+                strategy = TeamStrategy.FIVE_MAN_STANDARD.id,
+                extraHitters = 2
+            ),
+            teamType = TeamType.BASEBALL,
+            onClick = {},
+            onEditClick = {}
+        )
+    }
+}
+
 @Composable
 private fun LineupBadge(text: String) {
     Box(
@@ -461,6 +530,14 @@ private fun LineupBadge(text: String) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelMedium
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun LineupBadgePreview() {
+    DugoutTheme {
+        LineupBadge(text = "+2")
     }
 }
 

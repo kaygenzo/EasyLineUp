@@ -27,10 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.DugoutPreviews
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.FormBar
 import com.telen.easylineup.compose.FormLabel
 import com.telen.easylineup.compose.HeaderIconChip
 import com.telen.easylineup.compose.SelectField
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
@@ -102,6 +106,49 @@ fun EditLineupSheet(
                 onClearAll = onClearAll
             )
         }
+    }
+}
+
+private val EditLineupPreviewRoster = TeamRosterSummary(
+    status = 1,
+    players = listOf(
+        RosterPlayerStatus(Player(1L, 1L, "Alex Rivera", 12, 0L), true, null),
+        RosterPlayerStatus(Player(2L, 1L, "Sam Cole", 7, 0L), false, null)
+    )
+)
+
+private val EditLineupPreviewTournament = Tournament(
+    id = 1L,
+    name = "Fall Classic",
+    createdAt = 1760000000000L,
+    startTime = 1760000000000L,
+    endTime = 1760003600000L,
+    address = "Riverside Park"
+)
+
+@DugoutPreviews
+@Composable
+private fun EditLineupSheetPreview() {
+    DugoutTheme {
+        EditLineupSheet(
+            name = "Game 3 — Starters",
+            nameError = null,
+            selectedTournament = EditLineupPreviewTournament,
+            tournamentError = null,
+            roster = EditLineupPreviewRoster,
+            step = EditLineupStep.FIELDS,
+            teamType = TeamType.BASEBALL,
+            onDismiss = {},
+            onNameChanged = {},
+            onTournamentClick = {},
+            onRosterClick = {},
+            onRosterBackClick = {},
+            onPlayerToggled = { _, _ -> },
+            onNumberChanged = { _, _ -> },
+            onClearAll = {},
+            onCancelClick = {},
+            onSaveClick = {}
+        )
     }
 }
 
@@ -204,6 +251,25 @@ private fun EditLineupFieldsContent(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun EditLineupFieldsContentPreview() {
+    DugoutTheme {
+        EditLineupFieldsContent(
+            name = "Game 3 — Starters",
+            nameError = null,
+            selectedTournament = EditLineupPreviewTournament,
+            tournamentError = null,
+            roster = EditLineupPreviewRoster,
+            onNameChanged = {},
+            onTournamentClick = {},
+            onRosterClick = {},
+            onCancelClick = {},
+            onSaveClick = {}
+        )
+    }
+}
+
 @Composable
 private fun EditLineupRosterContent(
     roster: TeamRosterSummary,
@@ -233,6 +299,21 @@ private fun EditLineupRosterContent(
             onClearAll = onClearAll,
             onDoneClick = onBackClick,
             onNumberChanged = onNumberChanged
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun EditLineupRosterContentPreview() {
+    DugoutTheme {
+        EditLineupRosterContent(
+            roster = EditLineupPreviewRoster,
+            teamType = TeamType.BASEBALL,
+            onBackClick = {},
+            onPlayerToggled = { _, _ -> },
+            onNumberChanged = { _, _ -> },
+            onClearAll = {}
         )
     }
 }

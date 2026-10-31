@@ -236,6 +236,14 @@ private fun SexRow(selected: Sex, onSexSelected: (Sex) -> Unit) {
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun SexRowPreview() {
+    DugoutTheme {
+        SexRow(selected = Sex.MALE, onSexSelected = {})
+    }
+}
+
 @Composable
 private fun SideToggleRow(
     label: String,
@@ -263,6 +271,20 @@ private fun SideToggleRow(
                 onClick = onRightToggled
             )
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun SideToggleRowPreview() {
+    DugoutTheme {
+        SideToggleRow(
+            label = "Batting side",
+            leftSelected = true,
+            rightSelected = false,
+            onLeftToggled = {},
+            onRightToggled = {}
+        )
     }
 }
 
@@ -297,6 +319,14 @@ private fun FormPill(text: String, selected: Boolean, onClick: () -> Unit) {
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(text = text, color = contentColor, style = MaterialTheme.typography.labelSmall)
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun FormPillPreview() {
+    DugoutTheme {
+        FormPill(text = "Right", selected = true, onClick = {})
     }
 }
 
@@ -339,6 +369,19 @@ private fun RequiredField(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun RequiredFieldPreview() {
+    DugoutTheme {
+        RequiredField(
+            label = "Name",
+            value = "Jonas Alvarez",
+            error = null,
+            onValueChanged = {}
+        )
+    }
+}
+
 @Composable
 private fun OptionalField(
     modifier: Modifier = Modifier,
@@ -374,6 +417,18 @@ private fun OptionalField(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun OptionalFieldPreview() {
+    DugoutTheme {
+        OptionalField(
+            label = "Email",
+            value = "jonas.a@mail.com",
+            onValueChanged = {}
+        )
+    }
+}
+
 @Composable
 private fun FavoritePositions(
     availablePositions: List<FieldPosition>,
@@ -400,6 +455,20 @@ private fun FavoritePositions(
                 )
             }
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun FavoritePositionsPreview() {
+    DugoutTheme {
+        FavoritePositions(
+            availablePositions = FieldPosition.values().filter { it.isDefensePlayer() }
+                .distinctBy { it.mask },
+            selectedPositions = setOf(FieldPosition.SHORT_STOP, FieldPosition.SECOND_BASE),
+            teamType = TeamType.BASEBALL,
+            onPositionToggled = {}
+        )
     }
 }
 
@@ -432,6 +501,14 @@ private fun FormBar(onSaveClick: () -> Unit) {
                 Text(text = stringResource(R.string.save_button), fontWeight = FontWeight.Bold)
             }
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun FormBarPreview() {
+    DugoutTheme {
+        FormBar(onSaveClick = {})
     }
 }
 

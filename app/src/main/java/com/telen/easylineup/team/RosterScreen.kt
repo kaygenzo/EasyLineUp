@@ -173,6 +173,14 @@ private fun SortPillsRow(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun SortPillsRowPreview() {
+    DugoutTheme {
+        SortPillsRow(selected = TeamViewModel.SortType.ALPHA, onSortSelected = {})
+    }
+}
+
 @Composable
 private fun SortPill(text: String, selected: Boolean, onClick: () -> Unit) {
     val backgroundColor = if (selected) {
@@ -208,6 +216,14 @@ private fun SortPill(text: String, selected: Boolean, onClick: () -> Unit) {
             color = contentColor,
             style = MaterialTheme.typography.labelSmall
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun SortPillPreview() {
+    DugoutTheme {
+        SortPill(text = "Name", selected = true, onClick = {})
     }
 }
 
@@ -248,6 +264,26 @@ private fun PlayerRow(row: RosterRowState, onClick: () -> Unit) {
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun PlayerRowPreview() {
+    DugoutTheme {
+        PlayerRow(
+            row = RosterRowState(
+                id = 1,
+                name = "Jonas Alvarez",
+                shirtNumber = 7,
+                imageUri = null,
+                battingSide = PlayerSide.RIGHT,
+                pitchingSide = PlayerSide.RIGHT,
+                phone = "555-0101",
+                email = "jonas@example.com"
+            ),
+            onClick = {}
+        )
+    }
+}
+
 @Composable
 private fun RosterEmptyState() {
     Column(
@@ -276,6 +312,14 @@ private fun RosterEmptyState() {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun RosterEmptyStatePreview() {
+    DugoutTheme {
+        RosterEmptyState()
     }
 }
 
@@ -356,6 +400,41 @@ fun MessageTeamSheet(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun MessageTeamSheetPreview() {
+    DugoutTheme {
+        MessageTeamSheet(
+            teamName = "Riverside Hawks",
+            players = listOf(
+                RosterRowState(
+                    id = 1,
+                    name = "Jonas Alvarez",
+                    shirtNumber = 7,
+                    imageUri = null,
+                    battingSide = PlayerSide.RIGHT,
+                    pitchingSide = PlayerSide.RIGHT,
+                    phone = "555-0101",
+                    email = "jonas@example.com"
+                ),
+                RosterRowState(
+                    id = 2,
+                    name = "Marcus Bell",
+                    shirtNumber = 14,
+                    imageUri = null,
+                    battingSide = PlayerSide.LEFT,
+                    pitchingSide = null,
+                    phone = "555-0102"
+                )
+            ),
+            onDismiss = {},
+            onTextMessageClick = {},
+            onEmailClick = {},
+            onShareAnotherWayClick = {}
+        )
+    }
+}
+
 @Composable
 private fun MessageSheetRow(
     icon: Int,
@@ -410,6 +489,20 @@ private fun MessageSheetRow(
         if (showDivider) {
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun MessageSheetRowPreview() {
+    DugoutTheme {
+        MessageSheetRow(
+            icon = R.drawable.ic_welcome_message,
+            iconTint = MaterialTheme.colorScheme.primary,
+            label = "Text message",
+            caption = "12 of 14 players",
+            onClick = {}
+        )
     }
 }
 

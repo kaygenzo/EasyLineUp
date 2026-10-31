@@ -299,6 +299,20 @@ private fun arrayLabel(labelsRes: Int, valuesRes: Int, value: String): String {
     return if (index >= 0) labels[index] else ""
 }
 
+@DugoutPreviews
+@Composable
+private fun arrayLabelPreview() {
+    DugoutTheme {
+        Text(
+            text = arrayLabel(
+                labelsRes = R.array.pref_lineup_font_style_labels,
+                valuesRes = R.array.pref_lineup_font_style_values,
+                value = "0"
+            )
+        )
+    }
+}
+
 @Composable
 private fun SingleChoiceDialog(
     titleRes: Int,
@@ -341,6 +355,21 @@ private fun SingleChoiceDialog(
     )
 }
 
+@DugoutPreviews
+@Composable
+private fun SingleChoiceDialogPreview() {
+    DugoutTheme {
+        SingleChoiceDialog(
+            titleRes = R.string.setting_lineup_style_description,
+            labelsRes = R.array.pref_lineup_font_style_labels,
+            valuesRes = R.array.pref_lineup_font_style_values,
+            currentValue = "0",
+            onSelected = {},
+            onDismiss = {}
+        )
+    }
+}
+
 @Composable
 private fun SectionLabel(text: String) {
     Text(
@@ -349,6 +378,14 @@ private fun SectionLabel(text: String) {
         style = MaterialTheme.typography.labelMedium,
         modifier = Modifier.padding(start = 4.dp, top = 16.dp, bottom = 8.dp)
     )
+}
+
+@DugoutPreviews
+@Composable
+private fun SectionLabelPreview() {
+    DugoutTheme {
+        SectionLabel(text = "Style")
+    }
 }
 
 @Composable
@@ -388,6 +425,20 @@ private fun SettingsRow(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun SettingsRowPreview() {
+    DugoutTheme {
+        SettingsRow(
+            leading = { RowIconChip(R.drawable.ic_settings_font) },
+            title = "Lineup style",
+            subtitle = "Classic",
+            onClick = {},
+            trailing = { ChevronIcon() }
+        )
+    }
+}
+
 @Composable
 private fun RowIconChip(
     iconRes: Int,
@@ -407,6 +458,14 @@ private fun RowIconChip(
             tint = tint,
             modifier = Modifier.size(18.dp)
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun RowIconChipPreview() {
+    DugoutTheme {
+        RowIconChip(iconRes = R.drawable.ic_settings_font)
     }
 }
 
@@ -454,6 +513,19 @@ private fun ColorSwatchRow(
     )
 }
 
+@DugoutPreviews
+@Composable
+private fun ColorSwatchRowPreview() {
+    DugoutTheme {
+        ColorSwatchRow(
+            title = "Men",
+            color = Color(0xFFD8324A),
+            chipTint = MaterialTheme.colorScheme.primary,
+            onColorPicked = {}
+        )
+    }
+}
+
 @Composable
 private fun ChevronIcon(tint: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
     Icon(
@@ -462,6 +534,14 @@ private fun ChevronIcon(tint: Color = MaterialTheme.colorScheme.onSurfaceVariant
         tint = tint,
         modifier = Modifier.size(20.dp)
     )
+}
+
+@DugoutPreviews
+@Composable
+private fun ChevronIconPreview() {
+    DugoutTheme {
+        ChevronIcon()
+    }
 }
 
 @Composable
@@ -473,6 +553,14 @@ private fun RowDivider() {
             .height(1.dp)
             .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
     )
+}
+
+@DugoutPreviews
+@Composable
+private fun RowDividerPreview() {
+    DugoutTheme {
+        RowDivider()
+    }
 }
 
 @DugoutPreviews

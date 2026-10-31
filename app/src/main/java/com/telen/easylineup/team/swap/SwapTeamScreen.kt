@@ -60,6 +60,22 @@ fun SwapTeamSheet(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun SwapTeamSheetPreview() {
+    DugoutTheme {
+        SwapTeamSheet(
+            teams = listOf(
+                Team(id = 1, name = "Riverside Hawks", type = TeamType.BASEBALL.id, main = true),
+                Team(id = 2, name = "Riverside Storm", type = TeamType.SOFTBALL.id)
+            ),
+            onDismiss = {},
+            onTeamClick = {},
+            onCreateTeamClick = {}
+        )
+    }
+}
+
 @Composable
 fun SwitchTeamSheetContent(
     teams: List<Team>,
@@ -112,6 +128,14 @@ private fun RowDivider() {
     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
 }
 
+@DugoutPreviews
+@Composable
+private fun RowDividerPreview() {
+    DugoutTheme {
+        RowDivider()
+    }
+}
+
 @Composable
 private fun TeamRow(team: Team, onClick: () -> Unit) {
     Row(
@@ -146,6 +170,17 @@ private fun TeamRow(team: Team, onClick: () -> Unit) {
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun TeamRowPreview() {
+    DugoutTheme {
+        TeamRow(
+            team = Team(id = 1, name = "Riverside Hawks", type = TeamType.BASEBALL.id, main = true),
+            onClick = {}
+        )
+    }
+}
+
 @Composable
 private fun CurrentPill() {
     Box(
@@ -159,6 +194,14 @@ private fun CurrentPill() {
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.labelSmall
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun CurrentPillPreview() {
+    DugoutTheme {
+        CurrentPill()
     }
 }
 
@@ -189,6 +232,14 @@ private fun CreateTeamRow(onClick: () -> Unit) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.titleSmall
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun CreateTeamRowPreview() {
+    DugoutTheme {
+        CreateTeamRow(onClick = {})
     }
 }
 

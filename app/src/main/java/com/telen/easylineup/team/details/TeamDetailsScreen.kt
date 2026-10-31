@@ -226,6 +226,18 @@ private fun ProfileHead(teamName: String, teamType: TeamType, teamImageUri: Uri?
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun ProfileHeadPreview() {
+    DugoutTheme {
+        ProfileHead(
+            teamName = "Riverside Hawks",
+            teamType = TeamType.BASEBALL,
+            teamImageUri = null
+        )
+    }
+}
+
 @Composable
 private fun Pill(text: String, color: Color) {
     Box(
@@ -239,6 +251,14 @@ private fun Pill(text: String, color: Color) {
             color = color,
             style = MaterialTheme.typography.labelSmall
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun PillPreview() {
+    DugoutTheme {
+        Pill(text = "Baseball", color = MaterialTheme.colorScheme.secondary)
     }
 }
 
@@ -263,6 +283,14 @@ private fun StatChip(modifier: Modifier = Modifier, value: Int, label: String, c
             style = MaterialTheme.typography.labelSmall,
             modifier = Modifier.padding(top = 2.dp)
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun StatChipPreview() {
+    DugoutTheme {
+        StatChip(value = 8, label = "Men", color = MaterialTheme.colorScheme.primary)
     }
 }
 

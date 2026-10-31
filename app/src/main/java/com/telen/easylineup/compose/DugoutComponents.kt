@@ -131,6 +131,16 @@ fun DugoutCard(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun DugoutCardPreview() {
+    DugoutTheme {
+        DugoutCard {
+            Text(text = "Sample card content", modifier = Modifier.padding(16.dp))
+        }
+    }
+}
+
 /**
  * Shared flat search field - panel-2 background, no border, matching the mockup's
  * `.search-field` (and the ticket's own date-chip background). Extracted once a second screen
@@ -163,6 +173,18 @@ fun DugoutSearchField(
             focusedBorderColor = Color.Transparent
         )
     )
+}
+
+@DugoutPreviews
+@Composable
+private fun DugoutSearchFieldPreview() {
+    DugoutTheme {
+        DugoutSearchField(
+            value = "Hawks",
+            onValueChange = {},
+            placeholder = "Search teams"
+        )
+    }
 }
 
 /**
@@ -199,6 +221,14 @@ fun DugoutAvatar(name: String, imageUri: Uri?, size: Dp) {
                 fontSize = (size.value * 0.33f).sp
             )
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun DugoutAvatarPreview() {
+    DugoutTheme {
+        DugoutAvatar(name = "John Doe", imageUri = null, size = 56.dp)
     }
 }
 
@@ -248,6 +278,15 @@ fun rememberDugoutAvatarBitmap(uri: Uri?, size: Dp): ImageBitmap? {
         onDispose { Picasso.get().cancelRequest(target) }
     }
     return bitmap
+}
+
+@DugoutPreviews
+@Composable
+private fun RememberDugoutAvatarBitmapPreview() {
+    DugoutTheme {
+        val bitmap = rememberDugoutAvatarBitmap(uri = null, size = 56.dp)
+        Text(text = if (bitmap != null) "Loaded" else "No image")
+    }
 }
 
 /**
@@ -325,6 +364,14 @@ fun PlayerPhotoTile(imageUri: Uri?, shirtNumber: Int, size: Dp) {
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun PlayerPhotoTilePreview() {
+    DugoutTheme {
+        PlayerPhotoTile(imageUri = null, shirtNumber = 7, size = 64.dp)
+    }
+}
+
 /**
  * Small dot + uppercase label pill marking a screen as mid-edit (Attack's "Editing order",
  * Defense's "Editing positions") - promoted here once a second screen needed the exact same
@@ -351,6 +398,14 @@ fun ModeBadge(label: String, modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.labelMedium
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun ModeBadgePreview() {
+    DugoutTheme {
+        ModeBadge(label = "Editing order")
     }
 }
 
@@ -390,6 +445,14 @@ fun InfoCell(modifier: Modifier = Modifier, label: String, value: String, tabula
             fontWeight = FontWeight.Bold,
             fontFamily = if (tabular) FontFamily.Monospace else FontFamily.Default
         )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun InfoCellPreview() {
+    DugoutTheme {
+        InfoCell(label = "Games played", value = "128")
     }
 }
 
@@ -476,6 +539,21 @@ fun AvatarPicker(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun AvatarPickerPreview() {
+    DugoutTheme {
+        AvatarPicker(
+            imageUri = null,
+            onClick = {},
+            onRemoveClick = {},
+            size = 84.dp,
+            cornerRadius = 16.dp,
+            placeholderIcon = R.drawable.ic_person_silhouette_24dp
+        )
+    }
+}
+
 private fun PlayerSide.shortLabelRes(): Int = when (this) {
     PlayerSide.LEFT -> R.string.player_side_abbr_left
     PlayerSide.RIGHT -> R.string.player_side_abbr_right
@@ -485,6 +563,14 @@ private fun PlayerSide.shortLabelRes(): Int = when (this) {
 /** Shared "L"/"R"/"B" abbreviation for a batting/throwing side (Roster rows, Player profile). */
 @Composable
 fun PlayerSide.shortLabel(): String = stringResource(shortLabelRes())
+
+@DugoutPreviews
+@Composable
+private fun PlayerSideShortLabelPreview() {
+    DugoutTheme {
+        Text(text = PlayerSide.LEFT.shortLabel())
+    }
+}
 
 /**
  * The mockup's own `.appbar` (icon chip + eyebrow/title column + optional trailing action
@@ -531,6 +617,27 @@ fun ScreenHeader(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun ScreenHeaderPreview() {
+    DugoutTheme {
+        ScreenHeader(
+            icon = R.drawable.ic_arrow_left_white_24dp,
+            onIconClick = {},
+            iconContentDescription = "Back",
+            eyebrow = "Settings",
+            title = "Team details",
+            actions = {
+                HeaderActionIconChip(
+                    icon = R.drawable.ic_edit_outline_24dp,
+                    contentDescription = "Edit",
+                    onClick = {}
+                )
+            }
+        )
+    }
+}
+
 /** The header's own leading icon - a 30dp neutral rounded-square chip (mockup's `appbar__icon`). */
 @Composable
 fun HeaderIconChip(icon: Int, contentDescription: String?, onClick: () -> Unit) {
@@ -547,6 +654,18 @@ fun HeaderIconChip(icon: Int, contentDescription: String?, onClick: () -> Unit) 
             contentDescription = contentDescription,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(16.dp)
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun HeaderIconChipPreview() {
+    DugoutTheme {
+        HeaderIconChip(
+            icon = R.drawable.ic_arrow_left_white_24dp,
+            contentDescription = "Back",
+            onClick = {}
         )
     }
 }
@@ -570,6 +689,18 @@ fun HeaderActionIconChip(icon: Int, contentDescription: String?, onClick: () -> 
             contentDescription = contentDescription,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(17.dp)
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun HeaderActionIconChipPreview() {
+    DugoutTheme {
+        HeaderActionIconChip(
+            icon = R.drawable.ic_edit_outline_24dp,
+            contentDescription = "Edit",
+            onClick = {}
         )
     }
 }
@@ -629,6 +760,21 @@ fun ConfirmSheet(
                 }
             }
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun ConfirmSheetPreview() {
+    DugoutTheme {
+        ConfirmSheet(
+            title = "Discard changes?",
+            message = "You have unsaved changes that will be lost.",
+            confirmLabel = "Discard",
+            cancelLabel = "Keep editing",
+            onDismiss = {},
+            onConfirm = {}
+        )
     }
 }
 
@@ -696,6 +842,14 @@ fun DugoutBottomNav(selected: BottomNavTab?, onSelect: (BottomNavTab) -> Unit) {
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun DugoutBottomNavPreview() {
+    DugoutTheme {
+        DugoutBottomNav(selected = BottomNavTab.HOME, onSelect = {})
+    }
+}
+
 /**
  * Shared form chrome - promoted here once the Edit Lineup sheet needed the exact
  * same name-field/select-field/cancel+save-formbar pieces the Create Lineup
@@ -719,6 +873,14 @@ fun FormLabel(text: String, required: Boolean = false) {
                 fontWeight = FontWeight.Bold
             )
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun FormLabelPreview() {
+    DugoutTheme {
+        FormLabel(text = "Team name", required = true)
     }
 }
 
@@ -794,6 +956,21 @@ fun SelectField(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun SelectFieldPreview() {
+    DugoutTheme {
+        SelectField(
+            label = "Team",
+            value = "Riverside Hawks",
+            placeholder = "Select a team",
+            subLabel = "Tap to change",
+            required = true,
+            onClick = {}
+        )
+    }
+}
+
 @Composable
 fun FormBar(
     cancelLabel: String,
@@ -836,5 +1013,18 @@ fun FormBar(
                 )
             }
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun FormBarPreview() {
+    DugoutTheme {
+        FormBar(
+            cancelLabel = "Cancel",
+            saveLabel = "Save",
+            onCancel = {},
+            onSave = {}
+        )
     }
 }

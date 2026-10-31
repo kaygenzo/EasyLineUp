@@ -50,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutAvatar
+import com.telen.easylineup.compose.DugoutPreviews
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.TeamType
@@ -355,5 +357,46 @@ private fun DpFlexSlotRow(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun DpFlexLinkSheetPreview() {
+    DugoutTheme {
+        DpFlexLinkSheet(
+            initialDp = Player(1L, 1L, "Alex Rivera", 12, 0L),
+            initialFlex = null,
+            dpBattingOrder = 4,
+            dpLocked = false,
+            flexLocked = false,
+            teamType = TeamType.SOFTBALL.id,
+            title = "Link DP / Flex",
+            onRequestDpPlayers = { listOf(Player(1L, 1L, "Alex Rivera", 12, 0L)) },
+            onRequestFlexPlayers = { listOf(Player(2L, 1L, "Sam Cole", 7, 0L)) },
+            onConfirm = { _, _ -> },
+            onDismiss = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun SheetBackRowPreview() {
+    DugoutTheme {
+        SheetBackRow(onBack = {})
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun DpFlexSlotRowPreview() {
+    DugoutTheme {
+        DpFlexSlotRow(
+            role = "Designated Player",
+            player = Player(1L, 1L, "Alex Rivera", 12, 0L),
+            locked = false,
+            onClick = {}
+        )
     }
 }

@@ -33,6 +33,21 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.usecases.ImportResult
 
+private val DataTransferPreviewCounts = DataCounts(
+    teams = 2,
+    players = 24,
+    lineups = 11,
+    tournaments = 3
+)
+
+private val DataTransferPreviewImportResult = ImportResult().apply {
+    teams.recordInsert()
+    players.recordInsert()
+    players.recordUpdate()
+    lineups.recordInsert()
+    tournaments.recordUpdate()
+}
+
 /**
  * How many teams/players/lineups/tournaments an export/import payload covers - shown before
  * either native file picker takes over, and again after, so the sheet's promise and the actual
@@ -77,6 +92,14 @@ private fun DataCountsGrid(counts: DataCounts, modifier: Modifier = Modifier) {
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun DataCountsGridPreview() {
+    DugoutTheme {
+        DataCountsGrid(counts = DataTransferPreviewCounts)
+    }
+}
+
 @Composable
 private fun ImportResultGrid(result: ImportResult, modifier: Modifier = Modifier) {
     @Composable
@@ -115,6 +138,14 @@ private fun ImportResultGrid(result: ImportResult, modifier: Modifier = Modifier
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun ImportResultGridPreview() {
+    DugoutTheme {
+        ImportResultGrid(result = DataTransferPreviewImportResult)
+    }
+}
+
 @Composable
 private fun SheetButtonRow(
     cancelLabel: String?,
@@ -140,6 +171,19 @@ private fun SheetButtonRow(
         ) {
             Text(text = confirmLabel, fontWeight = FontWeight.Bold)
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun SheetButtonRowPreview() {
+    DugoutTheme {
+        SheetButtonRow(
+            cancelLabel = "Cancel",
+            confirmLabel = "Confirm",
+            onCancel = {},
+            onConfirm = {}
+        )
     }
 }
 
@@ -173,6 +217,19 @@ private fun ToggleRow(
             }
             Switch(checked = checked, onCheckedChange = onCheckedChange)
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun ToggleRowPreview() {
+    DugoutTheme {
+        ToggleRow(
+            label = "Overwrite existing data",
+            sub = "Replace rows that already exist on this device",
+            checked = true,
+            onCheckedChange = {}
+        )
     }
 }
 
@@ -222,6 +279,19 @@ fun ExportConfirmSheet(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun ExportConfirmSheetPreview() {
+    DugoutTheme {
+        ExportConfirmSheet(
+            teamName = "Riverside Hawks",
+            counts = DataTransferPreviewCounts,
+            onDismiss = {},
+            onConfirm = {}
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExportSuccessSheet(
@@ -264,6 +334,19 @@ fun ExportSuccessSheet(
             )
             Spacer(modifier = Modifier.height(4.dp))
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun ExportSuccessSheetPreview() {
+    DugoutTheme {
+        ExportSuccessSheet(
+            folderName = "Documents",
+            fileName = "easylineup_export_2026-10-31.json",
+            counts = DataTransferPreviewCounts,
+            onDismiss = {}
+        )
     }
 }
 
@@ -323,6 +406,21 @@ fun ImportConfirmSheet(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun ImportConfirmSheetPreview() {
+    DugoutTheme {
+        ImportConfirmSheet(
+            fileName = "easylineup_export_2026-10-31.json",
+            counts = DataTransferPreviewCounts,
+            overwriteExisting = false,
+            onOverwriteChanged = {},
+            onDismiss = {},
+            onConfirm = {}
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImportSuccessSheet(fileName: String, result: ImportResult, onDismiss: () -> Unit) {
@@ -357,5 +455,17 @@ fun ImportSuccessSheet(fileName: String, result: ImportResult, onDismiss: () -> 
             )
             Spacer(modifier = Modifier.height(4.dp))
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun ImportSuccessSheetPreview() {
+    DugoutTheme {
+        ImportSuccessSheet(
+            fileName = "easylineup_export_2026-10-31.json",
+            result = DataTransferPreviewImportResult,
+            onDismiss = {}
+        )
     }
 }

@@ -46,8 +46,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.DugoutPreviews
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ModeBadge
 import com.telen.easylineup.domain.model.BatterState
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.views.LineupTypeface
 
@@ -336,5 +339,111 @@ private fun BatterRow(
                 style = MaterialTheme.typography.titleSmall
             )
         }
+    }
+}
+
+private val AttackScreenPreviewBatters = listOf(
+    BatterState(
+        playerId = 1L,
+        playerFlag = 0,
+        playerOrder = 1,
+        playerName = "Mia Chen",
+        playerNumber = "7",
+        playerPosition = FieldPosition.PITCHER,
+        playerPositionDesc = "Pitcher",
+        canShowPosition = true,
+        canMove = true,
+        canShowDescription = true,
+        canShowOrder = true,
+        applyBackground = false,
+        isEditable = true
+    ),
+    BatterState(
+        playerId = 2L,
+        playerFlag = 0,
+        playerOrder = 2,
+        playerName = "Jordan Lee",
+        playerNumber = "12",
+        playerPosition = FieldPosition.SHORT_STOP,
+        playerPositionDesc = "Shortstop",
+        canShowPosition = true,
+        canMove = true,
+        canShowDescription = true,
+        canShowOrder = true,
+        applyBackground = false,
+        isEditable = true
+    ),
+    BatterState(
+        playerId = 3L,
+        playerFlag = 0,
+        playerOrder = 10,
+        playerName = "Ava Brooks",
+        playerNumber = "23",
+        playerPosition = FieldPosition.SUBSTITUTE,
+        playerPositionDesc = "",
+        canShowPosition = false,
+        canMove = false,
+        canShowDescription = false,
+        canShowOrder = true,
+        applyBackground = true,
+        isEditable = true
+    )
+)
+
+@DugoutPreviews
+@Composable
+private fun AttackScreenPreview() {
+    DugoutTheme {
+        AttackScreen(
+            batters = AttackScreenPreviewBatters,
+            editable = true,
+            typeface = LineupTypeface.NORMAL,
+            onReorder = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun PositionLegendDialogPreview() {
+    DugoutTheme {
+        PositionLegendDialog(editable = true, onDismiss = {})
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun LineupTypefaceFontFamilyPreview() {
+    DugoutTheme {
+        lineupTypefaceFontFamily(LineupTypeface.HAND_WRITING)
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun BatterRowPreview() {
+    DugoutTheme {
+        BatterRow(
+            batter = BatterState(
+                playerId = 1L,
+                playerFlag = 0,
+                playerOrder = 3,
+                playerName = "Mia Chen",
+                playerNumber = "7",
+                playerPosition = FieldPosition.SHORT_STOP,
+                playerPositionDesc = "Shortstop",
+                canShowPosition = true,
+                canMove = true,
+                canShowDescription = true,
+                canShowOrder = true,
+                applyBackground = false,
+                isEditable = true
+            ),
+            editable = true,
+            fontFamily = null,
+            onDragStart = {},
+            onDrag = {},
+            onDragEnd = {}
+        )
     }
 }

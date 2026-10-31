@@ -175,6 +175,16 @@ private fun ValuePropRow(prop: ValueProp) {
 
 @DugoutPreviews
 @Composable
+private fun ValuePropRowPreview() {
+    DugoutTheme {
+        ValuePropRow(
+            ValueProp(R.drawable.ic_welcome_lineup, "Lineups & batting order in minutes")
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
 private fun WelcomeScreenPreview() {
     DugoutTheme {
         WelcomeScreen(onCreateTeam = {}, onImportTeam = {})

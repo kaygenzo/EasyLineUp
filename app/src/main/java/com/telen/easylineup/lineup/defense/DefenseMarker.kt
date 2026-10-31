@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.DugoutPreviews
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.rememberDugoutAvatarBitmap
 import com.telen.easylineup.utils.toLetters
 import com.telen.easylineup.views.StateDefense
@@ -185,4 +187,49 @@ fun SexIndicatorDot(color: Color, dotSize: Dp, modifier: Modifier = Modifier) {
             .clip(CircleShape)
             .background(color)
     )
+}
+
+@DugoutPreviews
+@Composable
+private fun DefenseMarkerPreview() {
+    DugoutTheme {
+        DefenseMarker(
+            state = StateDefense.PLAYER,
+            imageUri = null,
+            fallbackName = "Mia Chen",
+            size = 56.dp,
+            borderColor = Color.Black,
+            label = null,
+            onClick = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun PlayerMarkerContentPreview() {
+    DugoutTheme {
+        PlayerMarkerContent(
+            imageUri = null,
+            fallbackName = "Mia Chen",
+            size = 56.dp,
+            borderColor = Color.Black
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun DefenseTrashButtonPreview() {
+    DugoutTheme {
+        DefenseTrashButton(size = 56.dp, isDragTarget = true)
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun SexIndicatorDotPreview() {
+    DugoutTheme {
+        SexIndicatorDot(color = Color.Red, dotSize = 14.dp)
+    }
 }

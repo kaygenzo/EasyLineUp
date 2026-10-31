@@ -131,6 +131,14 @@ private fun FormAppBar(isEditing: Boolean, onCloseClick: () -> Unit) {
     )
 }
 
+@DugoutPreviews
+@Composable
+private fun FormAppBarPreview() {
+    DugoutTheme {
+        FormAppBar(isEditing = false, onCloseClick = {})
+    }
+}
+
 @Composable
 private fun NameField(name: String, error: String?, onNameChanged: (String) -> Unit) {
     Column {
@@ -165,6 +173,14 @@ private fun NameField(name: String, error: String?, onNameChanged: (String) -> U
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun NameFieldPreview() {
+    DugoutTheme {
+        NameField(name = "Riverside Hawks", error = null, onNameChanged = {})
+    }
+}
+
 @Composable
 private fun TypeField(selectedType: TeamType, onTypeSelected: (TeamType) -> Unit) {
     Column {
@@ -184,6 +200,14 @@ private fun TypeField(selectedType: TeamType, onTypeSelected: (TeamType) -> Unit
                 )
             }
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun TypeFieldPreview() {
+    DugoutTheme {
+        TypeField(selectedType = TeamType.BASEBALL, onTypeSelected = {})
     }
 }
 
@@ -228,6 +252,14 @@ private fun TypeCard(
     }
 }
 
+@DugoutPreviews
+@Composable
+private fun TypeCardPreview() {
+    DugoutTheme {
+        TypeCard(type = TeamType.BASEBALL, selected = true, onClick = {})
+    }
+}
+
 @Composable
 private fun FormBar(onSaveClick: () -> Unit) {
     Column(
@@ -257,6 +289,14 @@ private fun FormBar(onSaveClick: () -> Unit) {
                 Text(text = stringResource(R.string.save_button), fontWeight = FontWeight.Bold)
             }
         }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun FormBarPreview() {
+    DugoutTheme {
+        FormBar(onSaveClick = {})
     }
 }
 

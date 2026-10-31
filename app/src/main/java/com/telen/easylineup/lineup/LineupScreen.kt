@@ -36,13 +36,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.DugoutPreviews
+import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderIconChip
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.lineup.attack.AttackScreen
 import com.telen.easylineup.lineup.defense.DefenseScreen
 import com.telen.easylineup.views.LineupTypeface
@@ -295,5 +299,142 @@ private fun LineupFormBar(
                 )
             }
         }
+    }
+}
+
+private val LineupScreenPreviewDefensePlayers = listOf(
+    PlayerWithPosition(
+        playerName = "Mia Chen",
+        playerSex = 0,
+        shirtNumber = 7,
+        licenseNumber = 100L,
+        teamId = 1L,
+        image = null,
+        position = FieldPosition.PITCHER.id,
+        order = 1,
+        fieldPositionId = 1L,
+        playerId = 1L,
+        lineupId = 1L,
+        playerPositions = FieldPosition.PITCHER.mask
+    ),
+    PlayerWithPosition(
+        playerName = "Jordan Lee",
+        playerSex = 1,
+        shirtNumber = 12,
+        licenseNumber = 101L,
+        teamId = 1L,
+        image = null,
+        position = FieldPosition.SHORT_STOP.id,
+        order = 2,
+        fieldPositionId = 2L,
+        playerId = 2L,
+        lineupId = 1L,
+        playerPositions = FieldPosition.SHORT_STOP.mask
+    )
+)
+
+private val LineupScreenPreviewBatters = listOf(
+    BatterState(
+        playerId = 1L,
+        playerFlag = 0,
+        playerOrder = 1,
+        playerName = "Mia Chen",
+        playerNumber = "7",
+        playerPosition = FieldPosition.PITCHER,
+        playerPositionDesc = "Pitcher",
+        canShowPosition = true,
+        canMove = true,
+        canShowDescription = true,
+        canShowOrder = true,
+        applyBackground = false,
+        isEditable = true
+    ),
+    BatterState(
+        playerId = 2L,
+        playerFlag = 0,
+        playerOrder = 2,
+        playerName = "Jordan Lee",
+        playerNumber = "12",
+        playerPosition = FieldPosition.SHORT_STOP,
+        playerPositionDesc = "Shortstop",
+        canShowPosition = true,
+        canMove = true,
+        canShowDescription = true,
+        canShowOrder = true,
+        applyBackground = false,
+        isEditable = true
+    )
+)
+
+@DugoutPreviews
+@Composable
+private fun LineupScreenPreview() {
+    DugoutTheme {
+        LineupScreen(
+            lineupName = "vs Riverside Hawks",
+            editable = true,
+            selectedTab = FRAGMENT_DEFENSE_INDEX,
+            onTabSelected = {},
+            onBackClick = {},
+            onCancelClick = {},
+            onSaveClick = {},
+            onShareCaptured = {},
+            onDeleteClick = {},
+            onEditClick = {},
+            defenseStrategy = TeamStrategy.STANDARD,
+            defensePlayers = LineupScreenPreviewDefensePlayers,
+            lineupMode = MODE_ENABLED,
+            teamType = TeamType.BASEBALL.id,
+            extraHitters = 1,
+            onPositionClicked = {},
+            onPlayersSwitched = { _, _ -> },
+            onPlayerReassigned = { _, _ -> },
+            onPlayerSentToTrash = { _, _ -> },
+            onSubstituteLongClicked = {},
+            onAddSubstitute = {},
+            onLineupModeChanged = {},
+            batters = LineupScreenPreviewBatters,
+            typeface = LineupTypeface.NORMAL,
+            onReorder = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun EditModePillPreview() {
+    DugoutTheme {
+        EditModePill(onClick = {})
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun LineupTabBarPreview() {
+    DugoutTheme {
+        LineupTabBar(
+            selectedTab = FRAGMENT_DEFENSE_INDEX,
+            onTabSelected = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun LineupTabItemPreview() {
+    DugoutTheme {
+        LineupTabItem(
+            label = "Defense",
+            active = true,
+            onClick = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun LineupFormBarPreview() {
+    DugoutTheme {
+        LineupFormBar(onCancelClick = {}, onSaveClick = {})
     }
 }
