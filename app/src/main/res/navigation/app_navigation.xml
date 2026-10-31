@@ -53,7 +53,7 @@
         android:id="@+id/tournamentStatisticsTableFragment"
         android:name="com.telen.easylineup.tournaments.statistics.TournamentStatisticsTableFragment"
         android:label="@string/title_tournament_summary"
-        tools:layout="@layout/view_table_multi_scroll"/>
+        tools:layout="@layout/fragment_tournament_statistics_table"/>
 
     <fragment
         android:id="@+id/lineupFragmentFixed"
