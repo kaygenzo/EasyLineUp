@@ -25,6 +25,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.telen.easylineup.BaseFragment
 import com.telen.easylineup.R
@@ -33,9 +34,12 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.toPlayer
@@ -44,13 +48,56 @@ import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstExc
 import com.telen.easylineup.launch
 import com.telen.easylineup.lineup.defense.AvailablePlayersSheet
 import com.telen.easylineup.lineup.defense.DpFlexLinkSheet
+import com.telen.easylineup.lineup.edition.LineupEditionViewModel
+import com.telen.easylineup.lineup.edition.LineupUpdated
+import com.telen.easylineup.lineup.edition.RosterEditSheet
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.NavigationUtils
 import com.telen.easylineup.views.LineupTypeface
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
+
+private fun TeamRosterSummary.withToggledPlayer(position: Int, status: Boolean): TeamRosterSummary {
+    val updatedPlayers = players.mapIndexed { index, player ->
+        if (index == position) player.copy(status = status) else player
+    }
+    val allSelected = updatedPlayers.all { it.status }
+    return TeamRosterSummary(
+        status = if (allSelected) Constants.STATUS_ALL else Constants.STATUS_PARTIAL,
+        players = updatedPlayers
+    )
+}
+
+private fun TeamRosterSummary.withAllCleared(): TeamRosterSummary {
+    return TeamRosterSummary(
+        status = Constants.STATUS_PARTIAL,
+        players = players.map { it.copy(status = false) }
+    )
+}
+
+private fun TeamRosterSummary.withNumberOverride(
+    position: Int,
+    number: Int,
+    lineupId: Long
+): TeamRosterSummary {
+    val updatedPlayers = players.mapIndexed { index, rosterPlayer ->
+        if (index == position) {
+            val overlay = rosterPlayer.playerNumberOverlay?.copy(number = number)
+                ?: PlayerNumberOverlay(
+                    lineupId = lineupId,
+                    playerId = rosterPlayer.player.id,
+                    number = number
+                )
+            rosterPlayer.copy(playerNumberOverlay = overlay)
+        } else {
+            rosterPlayer
+        }
+    }
+    return copy(players = updatedPlayers)
+}
 
 const val FRAGMENT_DEFENSE_INDEX = 0
 const val FRAGMENT_ATTACK_INDEX = 1
@@ -64,6 +111,7 @@ abstract class LineupFragment(
     private val isEditable: Boolean
 ) : BaseFragment(fragmentName) {
     private val viewModel by viewModels<LineupViewModel>()
+    private val editionViewModel: LineupEditionViewModel by viewModel()
 
     private var lineupName by mutableStateOf("")
     private var selectedTab by mutableStateOf(FRAGMENT_DEFENSE_INDEX)
@@ -84,6 +132,14 @@ abstract class LineupFragment(
 
     private var showDiscardSheet by mutableStateOf(false)
     private var showDeleteSheet by mutableStateOf(false)
+
+    private var rosterEditLineup by mutableStateOf<Lineup?>(null)
+    private var rosterEditSummary by mutableStateOf(
+        TeamRosterSummary(Constants.STATUS_ALL, emptyList())
+    )
+    private var rosterEditOriginalSummary: TeamRosterSummary? = null
+    private var showRosterEditSheet by mutableStateOf(false)
+    private var showRosterEditDiscardSheet by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -154,6 +210,7 @@ abstract class LineupFragment(
                                 NavigationUtils().getOptions()
                             )
                         },
+                        onEditRosterClick = { onEditRosterClicked() },
                         defenseStrategy = defenseStrategy,
                         defensePlayers = defensePlayers,
                         lineupMode = lineupMode,
@@ -289,6 +346,38 @@ abstract class LineupFragment(
                             onConfirm = { deleteLineup() }
                         )
                     }
+
+                    if (showRosterEditSheet) {
+                        RosterEditSheet(
+                            roster = rosterEditSummary,
+                            teamType = TeamType.getTypeById(teamType),
+                            onDismiss = { handleRosterEditDismiss() },
+                            onPlayerToggled = { position, checked ->
+                                rosterEditSummary =
+                                    rosterEditSummary.withToggledPlayer(position, checked)
+                            },
+                            onNumberChanged = { position, number ->
+                                rosterEditSummary = rosterEditSummary.withNumberOverride(
+                                    position,
+                                    number,
+                                    rosterEditLineup?.id ?: 0L
+                                )
+                            },
+                            onClearAll = { rosterEditSummary = rosterEditSummary.withAllCleared() },
+                            onDoneClick = { saveRosterEdit() }
+                        )
+                    }
+
+                    if (showRosterEditDiscardSheet) {
+                        ConfirmSheet(
+                            title = stringResource(R.string.discard_change_title),
+                            message = stringResource(R.string.discard_change_message),
+                            confirmLabel = stringResource(R.string.action_discard),
+                            cancelLabel = stringResource(R.string.action_keep_editing),
+                            onDismiss = { showRosterEditDiscardSheet = false },
+                            onConfirm = { closeRosterEditSheet() }
+                        )
+                    }
                 }
             }
         }
@@ -341,6 +430,14 @@ abstract class LineupFragment(
                 .onSuccess { teamType = it }
                 .onFailure { Timber.e(it) }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                editionViewModel.events.collect { event ->
+                    if (event == LineupUpdated) closeRosterEditSheet()
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -383,6 +480,36 @@ abstract class LineupFragment(
                     }
                 }
         }
+    }
+
+    private fun onEditRosterClicked() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            editionViewModel.load(viewModel.lineupId ?: 0)
+                .onSuccess { (loadedLineup, roster) ->
+                    rosterEditLineup = loadedLineup
+                    rosterEditSummary = roster
+                    rosterEditOriginalSummary = roster
+                    showRosterEditSheet = true
+                }
+                .onFailure { Timber.e(it) }
+        }
+    }
+
+    private fun handleRosterEditDismiss() {
+        if (rosterEditSummary != rosterEditOriginalSummary) {
+            showRosterEditDiscardSheet = true
+        } else {
+            closeRosterEditSheet()
+        }
+    }
+
+    private fun closeRosterEditSheet() {
+        showRosterEditSheet = false
+        showRosterEditDiscardSheet = false
+    }
+
+    private fun saveRosterEdit() {
+        rosterEditLineup?.let { editionViewModel.save(it, rosterEditSummary) }
     }
 
     private fun deleteLineup() {

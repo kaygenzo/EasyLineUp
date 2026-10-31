@@ -3,6 +3,7 @@
     <string name="app_name" translatable="false">Baseball Softball Lineups Keeper</string>
 
     <string name="action_edit">Edit</string>
+    <string name="action_edit_roster">Edit roster</string>
     <string name="action_delete">Delete</string>
     <string name="action_share">Share</string>
     <string name="action_report_issue">Report an issue</string>

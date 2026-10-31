@@ -72,6 +72,7 @@ fun LineupScreen(
     onShareCaptured: (Bitmap) -> Unit,
     onDeleteClick: () -> Unit,
     onEditClick: () -> Unit,
+    onEditRosterClick: () -> Unit,
     defenseStrategy: TeamStrategy,
     defensePlayers: List<PlayerWithPosition>,
     lineupMode: Int,
@@ -112,7 +113,13 @@ fun LineupScreen(
             ),
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 10.dp),
             actions = {
-                if (!editable) {
+                if (editable) {
+                    HeaderIconChip(
+                        icon = R.drawable.ic_people_outline_24dp,
+                        contentDescription = stringResource(R.string.action_edit_roster),
+                        onClick = onEditRosterClick
+                    )
+                } else {
                     HeaderIconChip(
                         icon = R.drawable.ic_share_outline_24dp,
                         contentDescription = stringResource(R.string.action_share),
@@ -381,6 +388,7 @@ private fun LineupScreenPreview() {
             onShareCaptured = {},
             onDeleteClick = {},
             onEditClick = {},
+            onEditRosterClick = {},
             defenseStrategy = TeamStrategy.STANDARD,
             defensePlayers = LineupScreenPreviewDefensePlayers,
             lineupMode = MODE_ENABLED,
