@@ -1,10 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.navigation)
     alias(libs.plugins.googleServices)
     alias(libs.plugins.appdistribution)
     alias(libs.plugins.crashlytics)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 def keystorePropertiesFile = rootProject.file("keystore-upload.properties")
@@ -182,9 +182,8 @@ dependencies {
     implementation libs.kotlinx.coroutines.rx3
 
     implementation libs.multidex
-    implementation libs.navigation.runtime
-    implementation libs.navigation.fragment
-    implementation libs.navigation.ui
+    implementation libs.navigation.compose
+    implementation libs.kotlinx.serialization.json
     implementation libs.documentFile
     implementation libs.splashscreen
     implementation libs.android.core

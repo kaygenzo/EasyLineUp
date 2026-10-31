@@ -2,6 +2,7 @@
 # Main
 kotlinVersion = '2.3.20'
 kspVersion = "2.3.2"
+kotlinxSerializationVersion = "1.7.3"
 androidGradlePluginVersion = "9.1.0"
 # Jetpack
 splashscreenVersion = "1.0.1"
@@ -49,7 +50,6 @@ materialVersion = "1.13.0"
 gsonVersion = "2.13.2"
 #Plugins
 detektPluginVersion = "1.23.8"
-navigationPluginVersion = "2.9.7"
 googleServicesPluginVersion = "4.4.4"
 sonarqubePluginVersion = "3.3"
 appDistributionPluginVersion = "5.2.1"
@@ -89,13 +89,12 @@ viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", ve
 livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleVersion" }
 lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleVersion" }
 multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidexVersion" }
-navigation-runtime = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationVersion" }
-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationVersion" }
-navigation-ui = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationVersion" }
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationVersion" }
 documentFile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentFileVersion" }
 splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreenVersion" }
 android-core = { group = "androidx.core", name = "core-ktx", version.ref = "coreVersion" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gsonVersion" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationVersion" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timberVersion" }
 rx-android = { group = "io.reactivex.rxjava3", name = "rxandroid", version.ref = "rxAndroidVersion" }
 rx-java = { group = "io.reactivex.rxjava3", name = "rxjava", version.ref = "rxJavaVersion" }
@@ -127,9 +126,9 @@ android-application = { id = "com.android.application", version.ref = "androidGr
 android-library = { id = "com.android.library", version.ref = "androidGradlePluginVersion" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinVersion" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinVersion" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinVersion" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "googleServicesPluginVersion" }
-navigation = { id = "androidx.navigation.safeargs", version.ref = "navigationPluginVersion" }
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqubePluginVersion" }
 dependencyCheck = { id = "org.owasp.dependencycheck", version.ref = "dependencyCheckPluginVerison" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektPluginVersion" }

@@ -5,134 +5,105 @@
 package com.telen.easylineup.player
 
 import android.net.Uri
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import com.telen.easylineup.BaseFragment
+import androidx.navigation.NavController
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
-import com.telen.easylineup.compose.DugoutTheme
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.getStrategies
+import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import com.telen.easylineup.utils.NavigationUtils
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * Hosts a swipeable carousel of player profiles (the roster's full id list, starting on
- * whichever player was tapped) - the Compose replacement for the old
- * `PlayersDetailsContainerFragment` (`ViewPager2` + per-page `PlayerDetailsFragment`) and its
- * now-redundant toolbar menu (edit/delete already live in [PlayerProfileScreen]'s own header).
+ * whichever player was tapped) - replaces `PlayerDetailsFragment`/the old
+ * `PlayersDetailsContainerFragment` (`ViewPager2` + per-page `PlayerDetailsFragment`).
  */
-class PlayerDetailsFragment : BaseFragment("PlayerDetailsFragment") {
-    private val teamViewModel: TeamViewModel by viewModel()
+@Composable
+fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {
+    val teamViewModel = koinViewModel<TeamViewModel>()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
-    private var playerIds by mutableStateOf<List<Long>>(emptyList())
-    private var showDeleteAction by mutableStateOf<(suspend () -> Result<Unit>)?>(null)
+    var playerIds by remember { mutableStateOf<List<Long>>(emptyList()) }
+    var showDeleteAction by remember { mutableStateOf<(suspend () -> Result<Unit>)?>(null) }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val initialPlayerId = arguments?.getLong(Constants.PLAYER_ID, 0) ?: 0
-        return ComposeView(requireContext()).apply {
-            setContent {
-                DugoutTheme {
-                    val ids = playerIds
-                    if (ids.isNotEmpty()) {
-                        val pagerState = rememberPagerState(
-                            initialPage = remember(ids) {
-                                ids.indexOf(initialPlayerId).coerceAtLeast(0)
-                            }
-                        ) { ids.size }
-                        HorizontalPager(
-                            state = pagerState,
-                            modifier = Modifier.fillMaxSize()
-                        ) { page ->
-                            PlayerProfilePage(
-                                playerId = ids[page],
-                                onBackClick = { findNavController().navigateUp() },
-                                onEditRequested = ::onEditClicked,
-                                onDeleteRequested = { showDeleteAction = it }
-                            )
+    LaunchedEffect(teamViewModel) {
+        teamViewModel.observePlayers()
+            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { players -> playerIds = players.map { it.id } }
+            .launchIn(this)
+    }
+
+    val ids = playerIds
+    if (ids.isNotEmpty()) {
+        val pagerState = rememberPagerState(
+            initialPage = remember(ids) {
+                ids.indexOf(initialPlayerId).coerceAtLeast(0)
+            }
+        ) { ids.size }
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { page ->
+            PlayerProfilePage(
+                playerId = ids[page],
+                onBackClick = { navController.navigateUp() },
+                onEditRequested = { playerId ->
+                    FirebaseAnalyticsUtils.onClick(context, "click_player_details_edit")
+                    navController.navigate(Routes.PlayerEdit(playerId))
+                },
+                onDeleteRequested = { showDeleteAction = it }
+            )
+        }
+    }
+
+    showDeleteAction?.let { deleteAction ->
+        ConfirmSheet(
+            title = stringResource(R.string.dialog_delete_player_title),
+            message = stringResource(R.string.dialog_delete_cannot_undo_message),
+            confirmLabel = stringResource(R.string.action_delete),
+            cancelLabel = stringResource(R.string.cancel_button),
+            onDismiss = { showDeleteAction = null },
+            onConfirm = {
+                FirebaseAnalyticsUtils.onClick(context, "click_player_details_delete")
+                coroutineScope.launch {
+                    deleteAction()
+                        .onSuccess { navController.popBackStack(Routes.Roster, false) }
+                        .onFailure {
+                            val message = "Something wrong happened: ${it.message}"
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                         }
-                    }
-
-                    showDeleteAction?.let { deleteAction ->
-                        ConfirmSheet(
-                            title = stringResource(R.string.dialog_delete_player_title),
-                            message = stringResource(R.string.dialog_delete_cannot_undo_message),
-                            confirmLabel = stringResource(R.string.action_delete),
-                            cancelLabel = stringResource(R.string.cancel_button),
-                            onDismiss = { showDeleteAction = null },
-                            onConfirm = { deletePlayer(deleteAction) }
-                        )
-                    }
                 }
             }
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        teamViewModel.observePlayers()
-            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { players -> playerIds = players.map { it.id } }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
-    }
-
-    private fun onEditClicked(playerId: Long) {
-        FirebaseAnalyticsUtils.onClick(activity, "click_player_details_edit")
-        val extras = Bundle().apply { putLong(Constants.PLAYER_ID, playerId) }
-        findNavController().navigate(
-            R.id.playerEditFragment,
-            extras,
-            NavigationUtils().getOptions()
         )
-    }
-
-    private fun deletePlayer(deleteAction: suspend () -> Result<Unit>) {
-        val activity = activity ?: return
-        FirebaseAnalyticsUtils.onClick(activity, "click_player_details_delete")
-        viewLifecycleOwner.lifecycleScope.launch {
-            deleteAction()
-                .onSuccess { findNavController().popBackStack(R.id.navigation_team, false) }
-                .onFailure {
-                    val message = "Something wrong happened: ${it.message}"
-                    Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
-                }
-        }
     }
 }
 

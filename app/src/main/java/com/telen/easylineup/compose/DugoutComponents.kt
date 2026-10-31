@@ -79,6 +79,7 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.getStrategies
+import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.utils.StringResourcesProviderImpl
 
 /**
@@ -959,18 +960,18 @@ private fun ConfirmSheetPreview() {
 
 /**
  * The 4 top-level destinations the mockup's own `.bottomnav` component switches between,
- * replacing the retired drawer's tab-switching role. `destinationId` matches the nav graph
- * entries the old drawer menu (`activity_main_drawer.xml`) used to point at.
+ * replacing the retired drawer's tab-switching role. `route` matches the one
+ * [com.telen.easylineup.navigation.AppNavHost] registers for each of them.
  */
 enum class BottomNavTab(
     @StringRes val labelRes: Int,
     @DrawableRes val iconRes: Int,
-    val destinationId: Int
+    val route: Routes
 ) {
-    HOME(R.string.title_last_lineup, R.drawable.ic_dashboard_black_24dp, R.id.navigation_home),
-    ROSTER(R.string.title_team, R.drawable.ic_team, R.id.navigation_team),
-    LINEUPS(R.string.title_lineups, R.drawable.ic_list_black_24dp, R.id.navigation_lineups),
-    SETTINGS(R.string.title_settings, R.drawable.ic_settings_black_24dp, R.id.navigation_settings)
+    HOME(R.string.title_last_lineup, R.drawable.ic_dashboard_black_24dp, Routes.Dashboard),
+    ROSTER(R.string.title_team, R.drawable.ic_team, Routes.Roster),
+    LINEUPS(R.string.title_lineups, R.drawable.ic_list_black_24dp, Routes.Tournaments),
+    SETTINGS(R.string.title_settings, R.drawable.ic_settings_black_24dp, Routes.Settings)
 }
 
 @Composable

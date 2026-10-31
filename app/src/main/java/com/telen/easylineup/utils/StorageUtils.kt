@@ -7,7 +7,6 @@ package com.telen.easylineup.utils
 import android.app.Activity
 import android.content.Intent
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
 
 class StorageUtils {
     companion object {
@@ -23,10 +22,6 @@ class StorageUtils {
             )
         }
 
-        fun openFile(fragment: Fragment) {
-            fragment.startActivityForResult(getOpenFileIntent(), REQUEST_CODE_OPEN_DOCUMENT)
-        }
-
         private fun getOpenFileIntent(): Intent {
             return Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 type = "application/octet-stream"
@@ -39,13 +34,6 @@ class StorageUtils {
                 getChooseDirectoryIntent(),
                 REQUEST_CODE_CHOOSE_DIRECTORY,
                 null
-            )
-        }
-
-        fun createFile(fragment: Fragment) {
-            fragment.startActivityForResult(
-                getChooseDirectoryIntent(),
-                REQUEST_CODE_CHOOSE_DIRECTORY
             )
         }
 
