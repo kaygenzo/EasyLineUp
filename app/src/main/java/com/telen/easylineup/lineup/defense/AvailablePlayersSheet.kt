@@ -36,14 +36,14 @@ import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.SubstituteBattingSlots
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.isDefensePlayer
-import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.model.toPlayer
+import com.telen.easylineup.domain.usecases.GetSubstituteBattingSlots
 import com.telen.easylineup.utils.StringResourcesProviderImpl
 import com.telen.easylineup.views.StateDefense
 
@@ -66,7 +66,8 @@ fun AvailablePlayersSheet(
     teamType: Int,
     extraHitters: Int,
     onPlayerSelected: (Player) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    getSubstituteBattingSlots: GetSubstituteBattingSlots = GetSubstituteBattingSlots()
 ) {
     val context = LocalContext.current
     val positionShortNames = StringResourcesProviderImpl(context).positionShortNames(teamType)
@@ -75,17 +76,13 @@ fun AvailablePlayersSheet(
     // The budget must be counted from the full lineup roster (`lineupPlayers`), not from
     // `players` - the latter is already the not-yet-assigned candidate list, so none of its
     // entries could ever count as an already-batting substitute.
-    val remainingBattingSlots = remember(lineupPlayers, extraHitters) {
-        if (extraHitters > Constants.MAX_EXTRA_HITTERS_BEFORE_UNLIMITED) {
-            Int.MAX_VALUE
-        } else {
-            val batting = lineupPlayers.count {
-                it.isSubstitute() && it.order in 1 until Constants.SUBSTITUTE_ORDER_VALUE
-            }
-            (extraHitters - batting).coerceAtLeast(0)
-        }
+    val battingSlots = remember(lineupPlayers, extraHitters) {
+        getSubstituteBattingSlots(lineupPlayers, extraHitters)
     }
-    val nextPickWillBat = remainingBattingSlots > 0
+    val nextPickWillBat = when (battingSlots) {
+        SubstituteBattingSlots.Unlimited -> true
+        is SubstituteBattingSlots.Limited -> battingSlots.remaining > 0
+    }
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(modifier = Modifier.navigationBarsPadding()) {
@@ -103,16 +100,19 @@ fun AvailablePlayersSheet(
                 )
                 if (isSubstituteSheet) {
                     Text(
-                        text = when {
-                            extraHitters > Constants.MAX_EXTRA_HITTERS_BEFORE_UNLIMITED ->
+                        text = when (battingSlots) {
+                            SubstituteBattingSlots.Unlimited ->
                                 stringResource(R.string.defense_add_substitute_budget_unlimited)
-                            remainingBattingSlots > 0 ->
+
+                            is SubstituteBattingSlots.Limited -> if (battingSlots.remaining > 0) {
                                 stringResource(
                                     R.string.defense_add_substitute_budget_free,
-                                    remainingBattingSlots,
-                                    extraHitters
+                                    battingSlots.remaining,
+                                    battingSlots.total
                                 )
-                            else -> stringResource(R.string.defense_add_substitute_budget_none)
+                            } else {
+                                stringResource(R.string.defense_add_substitute_budget_none)
+                            }
                         },
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelMedium,

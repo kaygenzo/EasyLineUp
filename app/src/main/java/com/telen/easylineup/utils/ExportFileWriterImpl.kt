@@ -1,0 +1,32 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
+package com.telen.easylineup.utils
+
+import android.content.Context
+import android.net.Uri
+import androidx.documentfile.provider.DocumentFile
+import com.telen.easylineup.domain.ports.ExportFileWriter
+import com.telen.easylineup.domain.ports.WrittenExportFile
+
+class ExportFileWriterImpl(private val context: Context) : ExportFileWriter {
+    override fun write(
+        content: String,
+        directoryUri: String,
+        fileName: String
+    ): WrittenExportFile {
+        val dir = DocumentFile.fromTreeUri(context, Uri.parse(directoryUri))
+        val file = dir?.createFile("application/octet-stream", fileName)
+            ?: throw Exception("Cannot open directory")
+        val outputStream = context.contentResolver.openOutputStream(file.uri)
+            ?: throw Exception("Cannot write in file")
+        outputStream.use { stream ->
+            stream.bufferedWriter().use { writer ->
+                writer.write(content)
+                writer.flush()
+            }
+        }
+        return WrittenExportFile(fileName = fileName, folderName = dir.name)
+    }
+}

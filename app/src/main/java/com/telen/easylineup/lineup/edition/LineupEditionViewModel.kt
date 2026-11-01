@@ -15,6 +15,8 @@ import com.telen.easylineup.domain.usecases.ObserveTournaments
 import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
 import com.telen.easylineup.domain.usecases.UpdateLineup
 import com.telen.easylineup.domain.usecases.UpdateLineupRoster
+import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
+import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -69,19 +71,17 @@ class LineupEditionViewModel(
 
     fun save(lineup: Lineup, roster: TeamRosterSummary) {
         viewModelScope.launch {
-            when {
-                lineup.name.isBlank() -> _events.send(InvalidLineupName)
-                lineup.tournamentId <= 0 -> _events.send(InvalidTournament)
-                else -> updateLineup(lineup)
-                    .mapCatching {
-                        updateLineupRoster(lineup.id, roster.players).getOrThrow()
+            updateLineup(lineup)
+                .mapCatching { updateLineupRoster(lineup.id, roster.players).getOrThrow() }
+                .mapCatching { savePlayerNumberOverlay(roster.players).getOrThrow() }
+                .onSuccess { _events.send(LineupUpdated) }
+                .onFailure { throwable ->
+                    when (throwable) {
+                        is LineupNameEmptyException -> _events.send(InvalidLineupName)
+                        is TournamentNameEmptyException -> _events.send(InvalidTournament)
+                        else -> Timber.e(throwable)
                     }
-                    .mapCatching {
-                        savePlayerNumberOverlay(roster.players).getOrThrow()
-                    }
-                    .onSuccess { _events.send(LineupUpdated) }
-                    .onFailure { Timber.e(it) }
-            }
+                }
         }
     }
 }

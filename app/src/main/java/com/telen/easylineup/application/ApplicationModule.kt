@@ -6,6 +6,7 @@ package com.telen.easylineup.application
 
 import com.telen.easylineup.dashboard.DashboardViewModel
 import com.telen.easylineup.domain.ports.DispatcherProvider
+import com.telen.easylineup.domain.ports.ExportFileWriter
 import com.telen.easylineup.domain.ports.GeocodingProvider
 import com.telen.easylineup.domain.ports.PhoneNumberValidator
 import com.telen.easylineup.domain.ports.StringResourcesProvider
@@ -20,6 +21,7 @@ import com.telen.easylineup.team.createTeam.SetupViewModel
 import com.telen.easylineup.tournaments.list.LineupListViewModel
 import com.telen.easylineup.tournaments.statistics.TournamentStatisticsViewModel
 import com.telen.easylineup.utils.DispatcherProviderImpl
+import com.telen.easylineup.utils.ExportFileWriterImpl
 import com.telen.easylineup.utils.GeocodingProviderImpl
 import com.telen.easylineup.utils.PhoneNumberValidatorImpl
 import com.telen.easylineup.utils.SharedPreferencesHelper
@@ -32,6 +34,7 @@ val appModules = module {
     single<StringResourcesProvider> { StringResourcesProviderImpl(get()) }
     single<GeocodingProvider> { GeocodingProviderImpl(get()) }
     single<PhoneNumberValidator> { PhoneNumberValidatorImpl() }
+    single<ExportFileWriter> { ExportFileWriterImpl(get()) }
     single { SharedPreferencesHelper(get()) }
 
     // Constructor-injected ViewModel — the pattern new/reskinned screens should

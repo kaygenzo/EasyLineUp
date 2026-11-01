@@ -71,6 +71,7 @@ import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.Sex
+import com.telen.easylineup.domain.model.SubstituteBattingSlots
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.getPositionPercentage
@@ -79,6 +80,7 @@ import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isFlex
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.model.toPlayer
+import com.telen.easylineup.domain.usecases.GetSubstituteBattingSlots
 import com.telen.easylineup.utils.StringResourcesProviderImpl
 import com.telen.easylineup.utils.getColor
 import com.telen.easylineup.views.StateDefense
@@ -365,7 +367,8 @@ private fun DpDhSlotRow(
 private fun SubstituteAddRow(
     extraHitters: Int,
     players: List<PlayerWithPosition>,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    getSubstituteBattingSlots: GetSubstituteBattingSlots = GetSubstituteBattingSlots()
 ) {
     Row(
         modifier = Modifier
@@ -391,14 +394,12 @@ private fun SubstituteAddRow(
                 color = MaterialTheme.colorScheme.primary
             )
         }
-        val hint = if (extraHitters > Constants.MAX_EXTRA_HITTERS_BEFORE_UNLIMITED) {
-            stringResource(R.string.defense_substitute_slots_unlimited)
-        } else {
-            val batting = players.count {
-                it.isSubstitute() && it.order in 1 until Constants.SUBSTITUTE_ORDER_VALUE
-            }
-            val free = (extraHitters - batting).coerceAtLeast(0)
-            stringResource(R.string.defense_substitute_slots_free, free, extraHitters)
+        val hint = when (val slots = getSubstituteBattingSlots(players, extraHitters)) {
+            SubstituteBattingSlots.Unlimited ->
+                stringResource(R.string.defense_substitute_slots_unlimited)
+
+            is SubstituteBattingSlots.Limited ->
+                stringResource(R.string.defense_substitute_slots_free, slots.remaining, slots.total)
         }
         Text(
             text = hint,

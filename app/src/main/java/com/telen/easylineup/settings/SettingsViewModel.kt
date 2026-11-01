@@ -8,7 +8,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
-import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.R
@@ -16,8 +15,11 @@ import com.telen.easylineup.compose.DataCounts
 import com.telen.easylineup.compose.toDataCounts
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.ports.DispatcherProvider
+import com.telen.easylineup.domain.ports.ExportFileWriter
+import com.telen.easylineup.domain.ports.WrittenExportFile
 import com.telen.easylineup.domain.usecases.DeleteAllData
 import com.telen.easylineup.domain.usecases.ExportData
+import com.telen.easylineup.domain.usecases.GenerateExportFileName
 import com.telen.easylineup.domain.usecases.GetAllTeams
 import com.telen.easylineup.domain.usecases.ImportResult
 import com.telen.easylineup.export.json.exportGson
@@ -34,9 +36,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
 /**
  * @property folderName the picked folder's display name, when the SAF provider exposes one
@@ -77,6 +76,8 @@ class SettingsViewModel(
     private val deleteAllDataUseCase: DeleteAllData,
     private val exportDataUseCase: ExportData,
     private val getAllTeamsUseCase: GetAllTeams,
+    private val generateExportFileName: GenerateExportFileName,
+    private val exportFileWriter: ExportFileWriter,
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
@@ -207,12 +208,12 @@ class SettingsViewModel(
             runCatching {
                 withContext(dispatcherProvider.io()) { writeExportFile(exportBase, dirUri) }
             }
-                .onSuccess { (fileName, folderName) ->
+                .onSuccess { written ->
                     _uiState.update {
                         it.copy(
                             exportSuccess = ExportDataEventSuccess(
-                                folderName,
-                                fileName,
+                                written.folderName,
+                                written.fileName,
                                 exportBase.toDataCounts()
                             )
                         )
@@ -226,24 +227,10 @@ class SettingsViewModel(
         }
     }
 
-    private fun writeExportFile(exportBase: ExportBase, dirUri: Uri): Pair<String, String?> {
-        val now = Calendar.getInstance().time
-        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ROOT)
-        val dateTime = formatter.format(now)
+    private fun writeExportFile(exportBase: ExportBase, dirUri: Uri): WrittenExportFile {
         val json = exportGson.toJson(exportBase.toJson())
-        val dir = DocumentFile.fromTreeUri(context, dirUri)
-        val filename = "$dateTime.elu"
-        val file = dir?.createFile("application/octet-stream", filename)
-            ?: throw Exception("Cannot open directory")
-        val outputStream = context.contentResolver.openOutputStream(file.uri)
-            ?: throw Exception("Cannot write in file")
-        outputStream.use { stream ->
-            stream.bufferedWriter().use { writer ->
-                writer.write(json)
-                writer.flush()
-            }
-        }
-        return filename to dir.name
+        val fileName = generateExportFileName()
+        return exportFileWriter.write(json, dirUri.toString(), fileName)
     }
 
     fun onImportPreviewReady(fileName: String, exportBase: ExportBase) {

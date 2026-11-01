@@ -19,6 +19,7 @@ import com.telen.easylineup.domain.usecases.DeleteTeam
 import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
 import com.telen.easylineup.domain.usecases.EncodePlayerSideFlag
 import com.telen.easylineup.domain.usecases.ExportData
+import com.telen.easylineup.domain.usecases.GenerateExportFileName
 import com.telen.easylineup.domain.usecases.GetAllTeams
 import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineups
 import com.telen.easylineup.domain.usecases.GetBattersState
@@ -32,9 +33,12 @@ import com.telen.easylineup.domain.usecases.GetPlayers
 import com.telen.easylineup.domain.usecases.GetPositionsSummaryForPlayer
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
+import com.telen.easylineup.domain.usecases.GetSubstituteBattingSlots
 import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.GetTournamentDisplayStart
 import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.GetTournamentPlayerStats
+import com.telen.easylineup.domain.usecases.GetTournamentPlayerStatsWithProfiles
 import com.telen.easylineup.domain.usecases.GetTournaments
 import com.telen.easylineup.domain.usecases.ImportData
 import com.telen.easylineup.domain.usecases.InsertLineups
@@ -142,5 +146,9 @@ object DomainModule {
         single { EncodePlayerSideFlag() }
         single { DecodePlayerSideFlag() }
         single { SortPlayers() }
+        single { GetSubstituteBattingSlots() }
+        single { GetTournamentDisplayStart() }
+        single { GetTournamentPlayerStatsWithProfiles(get(), get()) }
+        single { GenerateExportFileName() }
     }
 }

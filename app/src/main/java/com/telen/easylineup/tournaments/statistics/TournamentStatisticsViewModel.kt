@@ -9,8 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
-import com.telen.easylineup.domain.usecases.GetPlayers
-import com.telen.easylineup.domain.usecases.GetTournamentPlayerStats
+import com.telen.easylineup.domain.usecases.GetTournamentPlayerStatsWithProfiles
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,8 +26,7 @@ data class TournamentStatisticsUiState(
 )
 
 class TournamentStatisticsViewModel(
-    private val getTournamentPlayerStats: GetTournamentPlayerStats,
-    private val getPlayers: GetPlayers
+    private val getTournamentPlayerStatsWithProfiles: GetTournamentPlayerStatsWithProfiles
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TournamentStatisticsUiState())
     val uiState: StateFlow<TournamentStatisticsUiState> = _uiState.asStateFlow()
@@ -47,18 +45,16 @@ class TournamentStatisticsViewModel(
                 startTime = 0,
                 endTime = 0
             )
-            getTournamentPlayerStats(tournament)
-                .mapCatching { stats ->
-                    val playersById = getPlayers().getOrThrow().associateBy { it.id }
-                    stats.map { stat ->
-                        val player = playersById[stat.playerId]
+            getTournamentPlayerStatsWithProfiles(tournament)
+                .mapCatching { profiles ->
+                    profiles.map { profile ->
                         PlayerStatsRow(
-                            playerId = stat.playerId,
-                            name = stat.playerName,
-                            shirtNumber = player?.shirtNumber ?: 0,
-                            imageUri = player?.image?.let { uri -> Uri.parse(uri) },
-                            totalGames = stat.totalGames,
-                            positionCounts = stat.positionCounts
+                            playerId = profile.playerId,
+                            name = profile.playerName,
+                            shirtNumber = profile.shirtNumber,
+                            imageUri = profile.image?.let { uri -> Uri.parse(uri) },
+                            totalGames = profile.totalGames,
+                            positionCounts = profile.positionCounts
                         )
                     }
                 }
