@@ -9,9 +9,7 @@ package com.telen.easylineup.lineup
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import androidx.annotation.StringRes
-import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
@@ -48,6 +46,7 @@ import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
+import com.telen.easylineup.utils.LineupShareImageWriter
 import com.telen.easylineup.views.LineupTypeface
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -61,10 +60,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.util.Calendar
 
 sealed class EventCase
 
@@ -140,7 +135,8 @@ class LineupViewModel(
     private val updatePlayersWithBattersUseCase: UpdatePlayersWithBatters,
     private val toggleRosterPlayerUseCase: ToggleRosterPlayer,
     private val clearRosterUseCase: ClearRoster,
-    private val overrideRosterPlayerNumberUseCase: OverrideRosterPlayerNumber
+    private val overrideRosterPlayerNumberUseCase: OverrideRosterPlayerNumber,
+    private val lineupShareImageWriter: LineupShareImageWriter
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LineupUiState())
     val uiState: StateFlow<LineupUiState> = _uiState.asStateFlow()
@@ -292,42 +288,12 @@ class LineupViewModel(
         }
     }
 
-    // TODO use case ?
     fun exportLineupToExternalStorage(
         context: Context,
         views: Map<Int, Bitmap?>
     ): Single<Intent> {
         return Single.defer {
-            val tmpPath = context.cacheDir.path
-            val timeInMillis = Calendar.getInstance().timeInMillis
-
-            val uris: ArrayList<Uri> = arrayListOf()
-
-            views.forEach { entry ->
-                val pathBuilder = StringBuilder(tmpPath)
-                    .append("/")
-                    .append(timeInMillis)
-                    .append("_")
-                when (entry.key) {
-                    FRAGMENT_DEFENSE_INDEX -> pathBuilder.append("defense.png")
-                    FRAGMENT_ATTACK_INDEX -> pathBuilder.append("attack.png")
-                    else -> pathBuilder.append("all.png")
-                }
-                val filePath = pathBuilder.toString()
-                val authority = context.packageName + ".fileprovider"
-                val uri = FileProvider.getUriForFile(context, authority, File(filePath))
-                try {
-                    FileOutputStream(filePath).use {
-                        entry.value?.run {
-                            compress(Bitmap.CompressFormat.PNG, 100, it)
-                                .takeIf { true }?.let { uris.add(uri) }
-                        }
-                    }
-                } catch (e: IOException) {
-                    Timber.e(e)
-                }
-            }
-
+            val uris = ArrayList(lineupShareImageWriter.write(views))
             val title = lineup?.name.toString()
             val message = context.getString(R.string.share_lineup_subject, title)
             val intent = Intent(Intent.ACTION_SEND_MULTIPLE).run {

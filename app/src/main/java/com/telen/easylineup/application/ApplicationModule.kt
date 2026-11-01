@@ -23,6 +23,8 @@ import com.telen.easylineup.tournaments.statistics.TournamentStatisticsViewModel
 import com.telen.easylineup.utils.DispatcherProviderImpl
 import com.telen.easylineup.utils.ExportFileWriterImpl
 import com.telen.easylineup.utils.GeocodingProviderImpl
+import com.telen.easylineup.utils.LineupShareImageWriter
+import com.telen.easylineup.utils.LineupShareImageWriterImpl
 import com.telen.easylineup.utils.PhoneNumberValidatorImpl
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import com.telen.easylineup.utils.StringResourcesProviderImpl
@@ -35,6 +37,7 @@ val appModules = module {
     single<GeocodingProvider> { GeocodingProviderImpl(get()) }
     single<PhoneNumberValidator> { PhoneNumberValidatorImpl() }
     single<ExportFileWriter> { ExportFileWriterImpl(get()) }
+    single<LineupShareImageWriter> { LineupShareImageWriterImpl(get()) }
     single { SharedPreferencesHelper(get()) }
 
     // Constructor-injected ViewModel — the pattern new/reskinned screens should
