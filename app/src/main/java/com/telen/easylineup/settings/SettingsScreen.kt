@@ -42,7 +42,6 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import com.telen.easylineup.BuildConfig
@@ -53,7 +52,6 @@ import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.utils.SharedPreferencesUtils
 import com.telen.easylineup.utils.titleRes
 
 data class SettingsScreenState(
@@ -65,41 +63,6 @@ data class SettingsScreenState(
     val menColor: Color,
     val womenColor: Color
 )
-
-fun currentSettingsScreenState(
-    context: android.content.Context,
-    teamName: String,
-    teamType: TeamType,
-    teamImageUri: Uri?
-): SettingsScreenState {
-    val menColor = SharedPreferencesUtils.getIntSetting(
-        context,
-        R.string.key_men_style,
-        ContextCompat.getColor(context, R.color.default_men_color)
-    )
-    val womenColor = SharedPreferencesUtils.getIntSetting(
-        context,
-        R.string.key_women_style,
-        ContextCompat.getColor(context, R.color.default_women_color)
-    )
-    return SettingsScreenState(
-        teamName = teamName,
-        teamType = teamType,
-        teamImageUri = teamImageUri,
-        lineupStyleValue = SharedPreferencesUtils.getStringSetting(
-            context,
-            R.string.key_lineup_style,
-            context.getString(R.string.lineup_style_default_value)
-        ),
-        themeValue = SharedPreferencesUtils.getStringSetting(
-            context,
-            R.string.key_day_night_theme,
-            context.getString(R.string.lineup_theme_default_value)
-        ),
-        menColor = Color(menColor),
-        womenColor = Color(womenColor)
-    )
-}
 
 @Composable
 fun SettingsScreen(

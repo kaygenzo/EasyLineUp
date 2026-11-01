@@ -23,7 +23,9 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
@@ -32,7 +34,6 @@ import com.telen.easylineup.domain.usecases.DeletePlayerFieldPosition
 import com.telen.easylineup.domain.usecases.GetBattersState
 import com.telen.easylineup.domain.usecases.GetDpAndFlexFromPlayersInField
 import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
-import com.telen.easylineup.domain.usecases.GetLineupById
 import com.telen.easylineup.domain.usecases.GetOnlyPlayersInField
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObserveLineupById
@@ -43,28 +44,64 @@ import com.telen.easylineup.domain.usecases.SaveDpAndFlex
 import com.telen.easylineup.domain.usecases.SetLineupMode
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
+import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
+import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.views.LineupTypeface
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.Calendar
+
+private fun TeamRosterSummary.withToggledPlayer(position: Int, status: Boolean): TeamRosterSummary {
+    val updatedPlayers = players.mapIndexed { index, player ->
+        if (index == position) player.copy(status = status) else player
+    }
+    val allSelected = updatedPlayers.all { it.status }
+    return TeamRosterSummary(
+        status = if (allSelected) Constants.STATUS_ALL else Constants.STATUS_PARTIAL,
+        players = updatedPlayers
+    )
+}
+
+private fun TeamRosterSummary.withAllCleared(): TeamRosterSummary {
+    return TeamRosterSummary(
+        status = Constants.STATUS_PARTIAL,
+        players = players.map { it.copy(status = false) }
+    )
+}
+
+private fun TeamRosterSummary.withNumberOverride(
+    position: Int,
+    number: Int,
+    lineupId: Long
+): TeamRosterSummary {
+    val updatedPlayers = players.mapIndexed { index, rosterPlayer ->
+        if (index == position) {
+            val overlay = rosterPlayer.playerNumberOverlay?.copy(number = number)
+                ?: PlayerNumberOverlay(
+                    lineupId = lineupId,
+                    playerId = rosterPlayer.player.id,
+                    number = number
+                )
+            rosterPlayer.copy(playerNumberOverlay = overlay)
+        } else {
+            rosterPlayer
+        }
+    }
+    return copy(players = updatedPlayers)
+}
 
 sealed class EventCase
 
@@ -92,110 +129,155 @@ data class ListAvailablePlayers(
     val position: FieldPosition
 ) : EventCase()
 
-class LineupViewModel : ViewModel(), KoinComponent {
-    private val getTeamUseCase: GetTeam by inject()
-    private val observePlayerNumberOverlays: ObservePlayerNumberOverlays by inject()
-    private val deletePlayerFieldPositionUseCase: DeletePlayerFieldPosition by inject()
-    private val switchPlayersPositionUseCase: SwitchPlayersPosition by inject()
-    private val assignPlayerFieldPositionUseCase: AssignPlayerFieldPosition by inject()
-    private val getLineupByIdUseCase: GetLineupById by inject()
-    private val getListAvailablePlayersForSelectionUseCase: GetListAvailablePlayersForSelection
-    by inject()
-    private val saveBattingOrderAndPositionsUseCase: SaveBattingOrderAndPositions by inject()
-    private val deleteLineupUseCase: DeleteLineup by inject()
-    private val setLineupModeUseCase: SetLineupMode by inject()
-    private val getDpAndFlexFromPlayersInFieldUseCase: GetDpAndFlexFromPlayersInField by inject()
-    private val getBattersStateUseCase: GetBattersState by inject()
+const val FRAGMENT_DEFENSE_INDEX = 0
+const val FRAGMENT_ATTACK_INDEX = 1
+
+/** Everything [LineupScreen] and its sheets need to render. */
+data class LineupUiState(
+    val isLoading: Boolean = true,
+    val lineupName: String = "",
+    val defensePlayers: List<PlayerWithPosition> = emptyList(),
+    val defenseStrategy: TeamStrategy = TeamStrategy.STANDARD,
+    val lineupMode: Int = MODE_DISABLED,
+    val teamType: Int = TeamType.UNKNOWN.id,
+    val extraHitters: Int = 0,
+    val batters: List<BatterState> = emptyList(),
+    val typeface: LineupTypeface = LineupTypeface.NORMAL,
+    val selectedTab: Int = FRAGMENT_DEFENSE_INDEX,
+    val availablePlayersEvent: ListAvailablePlayers? = null,
+    val dpFlexEvent: LinkDpFlex? = null,
+    val deleteConfirmPlayer: Player? = null,
+    val infoMessageRes: Int? = null,
+    val showDiscardSheet: Boolean = false,
+    val showDeleteSheet: Boolean = false,
+    val rosterEditLineup: Lineup? = null,
+    val rosterEditSummary: TeamRosterSummary = TeamRosterSummary(Constants.STATUS_ALL, emptyList()),
+    val rosterEditOriginalSummary: TeamRosterSummary? = null,
+    val showRosterEditSheet: Boolean = false,
+    val showRosterEditDiscardSheet: Boolean = false
+)
+
+class LineupViewModel(
+    private val getTeamUseCase: GetTeam,
+    private val observePlayerNumberOverlays: ObservePlayerNumberOverlays,
+    private val deletePlayerFieldPositionUseCase: DeletePlayerFieldPosition,
+    private val switchPlayersPositionUseCase: SwitchPlayersPosition,
+    private val assignPlayerFieldPositionUseCase: AssignPlayerFieldPosition,
+    private val getListAvailablePlayersForSelectionUseCase: GetListAvailablePlayersForSelection,
+    private val saveBattingOrderAndPositionsUseCase: SaveBattingOrderAndPositions,
+    private val deleteLineupUseCase: DeleteLineup,
+    private val setLineupModeUseCase: SetLineupMode,
+    private val getDpAndFlexFromPlayersInFieldUseCase: GetDpAndFlexFromPlayersInField,
+    private val getBattersStateUseCase: GetBattersState,
     private val observeTeamPlayersAndMaybePositionsForLineupUseCase:
-    ObserveTeamPlayersAndMaybePositionsForLineup by inject()
-    private val observeLineupByIdUseCase: ObserveLineupById by inject()
-    private val getOnlyPlayersInFieldUseCase: GetOnlyPlayersInField by inject()
-    private val saveDpAndFlexUseCase: SaveDpAndFlex by inject()
-    private val updatePlayersWithBattersUseCase: UpdatePlayersWithBatters by inject()
+    ObserveTeamPlayersAndMaybePositionsForLineup,
+    private val observeLineupByIdUseCase: ObserveLineupById,
+    private val getOnlyPlayersInFieldUseCase: GetOnlyPlayersInField,
+    private val saveDpAndFlexUseCase: SaveDpAndFlex,
+    private val updatePlayersWithBattersUseCase: UpdatePlayersWithBatters
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(LineupUiState())
+    val uiState: StateFlow<LineupUiState> = _uiState.asStateFlow()
 
-    // private val _designatedPlayerTitle = MutableStateFlow<String>()
-
-    // players
     private val _listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
+    private var teamTypeId: Int = TeamType.UNKNOWN.id
+    private var observeJob: Job? = null
 
-    // Direct pushes from refreshPlayers(), merged with the DB-observed source below -
-    // emulates the former MediatorLiveData.addSource() wiring (source + ad-hoc direct writes).
-    // shareIn is required, not just merge: a plain cold Flow re-runs getLineupAndPositions()
-    // (a fresh Room query) every time a downstream flatMapLatest restarts this collection -
-    // e.g. observeBatters()'s own flatMapLatest restarting on every refreshPlayers() emission -
-    // which clobbers _listPlayersWithPosition with the still-unsaved, stale DB state.
-    private val _directPlayersPush: MutableSharedFlow<List<PlayerWithPosition>> =
-        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
-    private val _players: Flow<List<PlayerWithPosition>> by lazy {
-        merge(getLineupAndPositions(), _directPlayersPush)
-            .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
-    }
-    // lineup
     var lineup: Lineup? = null
         private set
-
-    // Direct pushes from setLineup(), merged with the DB-observed source below - same pattern
-    // as _directPlayersPush/_players above, same reason for shareIn.
-    private val _directLineupPush: MutableSharedFlow<Lineup> =
-        MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
-    private val _lineup: Flow<Lineup> by lazy {
-        merge(getLineup(), _directLineupPush)
-            .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1)
-    }
     var lineupId: Long? = 0
+        set(value) {
+            field = value
+            observeLineup()
+        }
     var editable = false
 
-    private fun setLineup(lineup: Lineup) {
-        this.lineup = lineup
-        _directLineupPush.tryEmit(lineup)
+    private fun observeLineup() {
+        val id = lineupId ?: return
+
+        viewModelScope.launch {
+            getTeamUseCase()
+                .onSuccess {
+                    teamTypeId = it.type
+                    _uiState.update { state -> state.copy(teamType = it.type) }
+                }
+                .onFailure { Timber.e(it) }
+        }
+
+        observeJob?.cancel()
+        observeJob = viewModelScope.launch {
+            observeLineupByIdUseCase(id)
+                .catch { Timber.e(it) }
+                .flatMapLatest { loadedLineup ->
+                    lineup = loadedLineup
+                    _uiState.update {
+                        it.copy(
+                            lineupName = loadedLineup.name,
+                            defenseStrategy = TeamStrategy.getStrategyById(loadedLineup.strategy),
+                            lineupMode = loadedLineup.mode,
+                            extraHitters = loadedLineup.extraHitters
+                        )
+                    }
+                    observeTeamPlayersAndMaybePositionsForLineupUseCase(loadedLineup.id)
+                        .catch { e -> Timber.e(e) }
+                }
+                .flatMapLatest { positions ->
+                    _listPlayersWithPosition.clear()
+                    _listPlayersWithPosition.addAll(positions)
+                    val playerMap = mutableMapOf(
+                        *positions.map { Pair(it.playerId, it) }.toTypedArray()
+                    )
+                    observePlayerNumberOverlays(id).catch { e -> Timber.e(e) }
+                        .map { overlays ->
+                            overlays.forEach { overlay ->
+                                playerMap[overlay.playerId]?.shirtNumber = overlay.number
+                            }
+                            positions
+                        }
+                }
+                .collect { recomputeAndPublish() }
+        }
     }
 
-    private fun refreshPlayers(players: List<PlayerWithPosition>) {
-        _directPlayersPush.tryEmit(players)
+    /**
+     * Snapshots [_listPlayersWithPosition] into [LineupUiState.defensePlayers] and recomputes
+     * the batting order from it - called both after a fresh DB load and after every local
+     * mutation below, since those mutate [_listPlayersWithPosition] in place rather than
+     * going through another DB round-trip.
+     */
+    private suspend fun recomputeAndPublish() {
+        // PlayerWithPosition instances are mutated in place by the domain use cases and the
+        // same backing list is re-emitted - snapshot each element via .copy() so Compose's
+        // structural-equality state check actually sees a change instead of comparing the
+        // same mutated objects against themselves.
+        _uiState.update {
+            it.copy(isLoading = false, defensePlayers = _listPlayersWithPosition.map { p -> p.copy() })
+        }
+        val currentLineup = lineup ?: return
+        val batterSize = TeamStrategy.getStrategyById(currentLineup.strategy).batterSize
+        getBattersStateUseCase(
+            players = _listPlayersWithPosition,
+            teamType = teamTypeId,
+            batterSize = batterSize,
+            extraHitterSize = currentLineup.extraHitters,
+            isDebug = BuildConfig.DEBUG,
+            isEditable = editable
+        )
+            .onSuccess { batters -> _uiState.update { it.copy(batters = batters) } }
+            .onFailure { Timber.e(it) }
     }
 
-    fun clearData() {
-    }
-
-    fun observeLineupName(): Flow<String> {
-        return _lineup.map { it.name }
-    }
-
-    fun observeLineupStrategy(): Flow<TeamStrategy> {
-        return _lineup.map { TeamStrategy.getStrategyById(it.strategy) }
-    }
-
-    fun observeLineupMode(): Flow<Int> {
-        return _lineup.map { it.mode }
-    }
-
-    fun observeLineup(): Flow<Lineup> {
-        return _lineup
-    }
-
-    fun observeLineupTypeface(context: Context): Flow<LineupTypeface> {
+    fun loadTypeface(context: Context) {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)
         val lineupValue = preferences.getString(
             context.getString(R.string.key_lineup_style),
             context.getString(R.string.lineup_style_default_value)
         )
-        val lineupTypeface = LineupTypeface.getByValue(lineupValue)
-        return flowOf(lineupTypeface)
+        _uiState.update { it.copy(typeface = LineupTypeface.getByValue(lineupValue)) }
     }
 
-    fun onDeletePosition(player: Player) {
-        val lineupMode = lineup?.mode ?: MODE_DISABLED
-        val hitters = lineup?.extraHitters ?: 0
-        viewModelScope.launch {
-            deletePlayerFieldPositionUseCase(_listPlayersWithPosition, player, lineupMode, hitters)
-                .onSuccess { refreshPlayers(_listPlayersWithPosition) }
-                .onFailure { Timber.e(it) }
-        }
-    }
-
-    suspend fun getTeamStrategy(): Result<TeamStrategy> {
-        return getLineupByIdUseCase(lineupId ?: 0)
-            .mapCatching { TeamStrategy.getStrategyById(it.strategy) }
+    fun onTabSelected(index: Int) {
+        _uiState.update { it.copy(selectedTab = index) }
     }
 
     private suspend fun getNotSelectedPlayers(
@@ -210,6 +292,16 @@ class LineupViewModel : ViewModel(), KoinComponent {
         )
     }
 
+    fun onDeletePosition(player: Player) {
+        val lineupMode = lineup?.mode ?: MODE_DISABLED
+        val hitters = lineup?.extraHitters ?: 0
+        viewModelScope.launch {
+            deletePlayerFieldPositionUseCase(_listPlayersWithPosition, player, lineupMode, hitters)
+                .onSuccess { recomputeAndPublish() }
+                .onFailure { Timber.e(it) }
+        }
+    }
+
     suspend fun save(): Result<Unit> {
         return lineup?.let {
             saveBattingOrderAndPositionsUseCase(it, _listPlayersWithPosition)
@@ -220,21 +312,16 @@ class LineupViewModel : ViewModel(), KoinComponent {
         return deleteLineupUseCase(lineupId)
     }
 
-    suspend fun getTeamType(): Result<Int> {
-        return getTeamUseCase().mapCatching { it.type }
-    }
-
     fun onLineupModeChanged(isEnabled: Boolean) {
-        lineup?.let { lineup ->
+        lineup?.let { currentLineup ->
             viewModelScope.launch {
-                setLineupModeUseCase(isEnabled, lineup, _listPlayersWithPosition)
+                setLineupModeUseCase(isEnabled, currentLineup, _listPlayersWithPosition)
                     .onSuccess {
-                        setLineup(lineup)
-                        refreshPlayers(_listPlayersWithPosition)
+                        lineup = currentLineup
+                        _uiState.update { it.copy(lineupMode = currentLineup.mode) }
+                        recomputeAndPublish()
                     }
-                    .onFailure {
-                        Timber.e(it)
-                    }
+                    .onFailure { Timber.e(it) }
             }
         }
     }
@@ -286,122 +373,135 @@ class LineupViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    suspend fun switchPlayersPosition(
-        player1: PlayerWithPosition,
-        player2: PlayerWithPosition
-    ): Result<Unit> {
+    fun switchPlayersPosition(player1: PlayerWithPosition, player2: PlayerWithPosition) {
         val position1 = FieldPosition.getFieldPositionById(player1.position)
             ?: FieldPosition.FIRST_BASE
         val position2 = FieldPosition.getFieldPositionById(player2.position)
             ?: FieldPosition.FIRST_BASE
-        return switchPlayersPosition(position1, position2)
+        switchPlayersPosition(position1, position2)
     }
 
-    suspend fun switchPlayersPosition(
-        player1: PlayerWithPosition,
-        position2: FieldPosition
-    ): Result<Unit> {
+    fun switchPlayersPosition(player1: PlayerWithPosition, position2: FieldPosition) {
         val position1 = FieldPosition.getFieldPositionById(player1.position)
             ?: FieldPosition.FIRST_BASE
-        return switchPlayersPosition(position1, position2)
+        switchPlayersPosition(position1, position2)
     }
 
-    private suspend fun switchPlayersPosition(
-        position1: FieldPosition,
-        position2: FieldPosition
-    ): Result<Unit> {
-        val currentLineup = lineup
-            ?: return Result.failure(IllegalArgumentException("Lineup is not supposed to be null"))
-        return switchPlayersPositionUseCase(
-            _listPlayersWithPosition,
-            position1,
-            position2,
-            currentLineup
-        ).onSuccess { refreshPlayers(_listPlayersWithPosition) }
+    private fun switchPlayersPosition(position1: FieldPosition, position2: FieldPosition) {
+        val currentLineup = lineup ?: return
+        viewModelScope.launch {
+            switchPlayersPositionUseCase(
+                _listPlayersWithPosition,
+                position1,
+                position2,
+                currentLineup
+            )
+                .onSuccess { recomputeAndPublish() }
+                .onFailure { Timber.e("Cannot switch players: ${it.message}") }
+        }
     }
 
     fun onPlayerSelected(player: Player, position: FieldPosition) {
         lineup?.let {
             viewModelScope.launch {
                 assignPlayerFieldPositionUseCase(player, position, it, _listPlayersWithPosition)
-                    .onSuccess { refreshPlayers(_listPlayersWithPosition) }
+                    .onSuccess { recomputeAndPublish() }
                     .onFailure { Timber.e(it) }
             }
         }
+        _uiState.update { it.copy(availablePlayersEvent = null) }
     }
 
-    suspend fun onPlayerClicked(position: FieldPosition): Result<EventCase?> {
+    /**
+     * Returns the failure (if any) so the Route can log the one analytics event that depends
+     * on the exact exception type - every other outcome (sheet to show, empty-list message) is
+     * already reflected in [uiState] by the time this returns.
+     */
+    suspend fun onPositionClicked(position: FieldPosition): Result<Unit> {
         return if (position != FieldPosition.DP_DH) {
-            getNotSelectedPlayers(sortBy = position).map { players ->
-                if (players.isEmpty()) null else ListAvailablePlayers(players, position)
-            }
-        } else {
-            getDpAndFlexFromPlayersInFieldUseCase(_listPlayersWithPosition).map {
-                val title = if (it.teamType == TeamType.SOFTBALL.id) {
-                    R.string.link_dp_and_flex_dialog_title
-                } else {
-                    R.string.link_dh_and_pitcher_dialog_title
-                }
-                LinkDpFlex(Pair(it.dp, it.flex), it.dpLocked, it.flexLocked, it.teamType, title)
-            }
-        }
-    }
-
-    fun observeBatters(): Flow<List<BatterState>> {
-        return _players.flatMapLatest { players ->
-            _lineup.flatMapLatest { lineup ->
-                val batterSize = TeamStrategy.getStrategyById(lineup.strategy).batterSize
-                val extraHitters = lineup.extraHitters
-                flow {
-                    val teamType = getTeamUseCase().getOrThrow().type
-                    getBattersStateUseCase(
-                        players = players,
-                        teamType = teamType,
-                        batterSize = batterSize,
-                        extraHitterSize = extraHitters,
-                        isDebug = BuildConfig.DEBUG,
-                        isEditable = editable
-                    )
-                        .onSuccess { emit(it) }
-                        .onFailure { Timber.e(it) }
-                }
-            }
-        }
-    }
-
-    fun observeDefensePlayers(): Flow<List<PlayerWithPosition>> {
-        return _players
-    }
-
-    private fun getLineupAndPositions(): Flow<List<PlayerWithPosition>> {
-        return getLineup()
-            .flatMapLatest {
-                observeTeamPlayersAndMaybePositionsForLineupUseCase(it.id)
-                    .catch { e -> Timber.e(e) }
-            }
-            .flatMapLatest { positions ->
-                _listPlayersWithPosition.clear()
-                _listPlayersWithPosition.addAll(positions)
-                val playerMap = mutableMapOf(
-                    *positions.map { Pair(it.playerId, it) }.toTypedArray()
-                )
-                val currentLineupId = lineupId ?: 0
-                observePlayerNumberOverlays(currentLineupId).catch { Timber.e(it) }
-                    .map {
-                        it.forEach { overlay ->
-                            playerMap[overlay.playerId]?.shirtNumber = overlay.number
-                        }
-                        positions
+            getNotSelectedPlayers(sortBy = position)
+                .onSuccess { players ->
+                    _uiState.update {
+                        it.copy(
+                            availablePlayersEvent = if (players.isEmpty()) {
+                                null
+                            } else {
+                                ListAvailablePlayers(players, position)
+                            },
+                            infoMessageRes = if (players.isEmpty()) {
+                                R.string.players_list_empty
+                            } else {
+                                null
+                            }
+                        )
                     }
-            }
+                }
+                .onFailure { Timber.e(it) }
+                .map {}
+        } else {
+            getDpAndFlexFromPlayersInFieldUseCase(_listPlayersWithPosition)
+                .onSuccess {
+                    val title = if (it.teamType == TeamType.SOFTBALL.id) {
+                        R.string.link_dp_and_flex_dialog_title
+                    } else {
+                        R.string.link_dh_and_pitcher_dialog_title
+                    }
+                    val event = LinkDpFlex(
+                        Pair(it.dp, it.flex),
+                        it.dpLocked,
+                        it.flexLocked,
+                        it.teamType,
+                        title
+                    )
+                    _uiState.update { state -> state.copy(dpFlexEvent = event) }
+                }
+                .onFailure { throwable ->
+                    if (throwable is NeedAssignPitcherFirstException) {
+                        _uiState.update {
+                            it.copy(infoMessageRes = R.string.error_need_assign_pitcher_first_message)
+                        }
+                    } else {
+                        Timber.e(throwable)
+                    }
+                }
+                .map {}
+        }
     }
 
-    private fun getLineup(): Flow<Lineup> {
-        return observeLineupByIdUseCase(lineupId ?: 0).catch { Timber.e(it) }.map {
-            it.apply {
-                this@LineupViewModel.lineup = this
-            }
-        }
+    fun onAvailablePlayersDismiss() {
+        _uiState.update { it.copy(availablePlayersEvent = null) }
+    }
+
+    fun onDpFlexDismiss() {
+        _uiState.update { it.copy(dpFlexEvent = null) }
+    }
+
+    fun onSubstituteLongClicked(player: Player) {
+        _uiState.update { it.copy(deleteConfirmPlayer = player) }
+    }
+
+    fun onDeleteConfirmDismiss() {
+        _uiState.update { it.copy(deleteConfirmPlayer = null) }
+    }
+
+    fun onInfoMessageDismiss() {
+        _uiState.update { it.copy(infoMessageRes = null) }
+    }
+
+    fun onDiscardSheetRequested() {
+        _uiState.update { it.copy(showDiscardSheet = true) }
+    }
+
+    fun onDiscardSheetDismiss() {
+        _uiState.update { it.copy(showDiscardSheet = false) }
+    }
+
+    fun onDeleteSheetRequested() {
+        _uiState.update { it.copy(showDeleteSheet = true) }
+    }
+
+    fun onDeleteSheetDismiss() {
+        _uiState.update { it.copy(showDeleteSheet = false) }
     }
 
     suspend fun getPlayerSelectionForDp(): Result<List<PlayerWithPosition>> {
@@ -423,14 +523,80 @@ class LineupViewModel : ViewModel(), KoinComponent {
             }
     }
 
+    /** Returns the failure (if any) so the Route can log the exception-specific analytics. */
     suspend fun linkDpAndFlex(dp: Player?, flex: Player?): Result<Unit> {
         val currentLineup = lineup
             ?: return Result.failure(IllegalStateException("Lineup cannot be null"))
         return saveDpAndFlexUseCase(currentLineup, dp, flex, _listPlayersWithPosition)
-            .onSuccess { refreshPlayers(_listPlayersWithPosition) }
+            .onSuccess {
+                recomputeAndPublish()
+                _uiState.update { it.copy(dpFlexEvent = null) }
+            }
+            .onFailure { throwable ->
+                if (throwable is NeedAssignBothPlayersException) {
+                    Timber.w(throwable.message)
+                    _uiState.update {
+                        it.copy(infoMessageRes = R.string.error_need_assign_both_players_message)
+                    }
+                } else {
+                    Timber.e(throwable)
+                }
+            }
     }
 
-    suspend fun onBattersChanged(batters: List<BatterState>): Result<Unit> {
-        return updatePlayersWithBattersUseCase(_listPlayersWithPosition, batters)
+    fun onBattersChanged(batters: List<BatterState>) {
+        viewModelScope.launch {
+            updatePlayersWithBattersUseCase(_listPlayersWithPosition, batters)
+                .onFailure { Timber.e(it) }
+        }
+    }
+
+    fun onRosterEditLoaded(lineup: Lineup, roster: TeamRosterSummary) {
+        _uiState.update {
+            it.copy(
+                rosterEditLineup = lineup,
+                rosterEditSummary = roster,
+                rosterEditOriginalSummary = roster,
+                showRosterEditSheet = true
+            )
+        }
+    }
+
+    fun onRosterEditPlayerToggled(position: Int, checked: Boolean) {
+        _uiState.update {
+            it.copy(rosterEditSummary = it.rosterEditSummary.withToggledPlayer(position, checked))
+        }
+    }
+
+    fun onRosterEditNumberChanged(position: Int, number: Int) {
+        _uiState.update {
+            val lineupId = it.rosterEditLineup?.id ?: 0L
+            it.copy(
+                rosterEditSummary = it.rosterEditSummary.withNumberOverride(position, number, lineupId)
+            )
+        }
+    }
+
+    fun onRosterEditClearAll() {
+        _uiState.update { it.copy(rosterEditSummary = it.rosterEditSummary.withAllCleared()) }
+    }
+
+    fun onRosterEditDiscardSheetDismiss() {
+        _uiState.update { it.copy(showRosterEditDiscardSheet = false) }
+    }
+
+    fun onRosterEditDismissRequested() {
+        val state = _uiState.value
+        if (state.rosterEditSummary != state.rosterEditOriginalSummary) {
+            _uiState.update { it.copy(showRosterEditDiscardSheet = true) }
+        } else {
+            closeRosterEditSheet()
+        }
+    }
+
+    fun closeRosterEditSheet() {
+        _uiState.update {
+            it.copy(showRosterEditSheet = false, showRosterEditDiscardSheet = false)
+        }
     }
 }

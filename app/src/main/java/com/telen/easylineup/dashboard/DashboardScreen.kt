@@ -83,25 +83,13 @@ data class LastLineupUi(
     val tournamentName: String?
 )
 
-data class DashboardState(
-    val teamName: String,
-    val teamImageUri: Uri?,
-    val teamSize: Int?,
-    val teamType: TeamType,
-    val mostUsedPlayer: MostUsedPlayerUi?,
-    val lastLineup: LastLineupUi?,
-    val shirtNumberQuery: String,
-    val shirtNumberResult: String?,
-    val shirtNumberHistory: List<ShirtNumberEntry>
-)
-
 private fun formatLineupDate(eventTimeInMillis: Long, pattern: String): String? =
     eventTimeInMillis.takeIf { it > 0 }
         ?.let { SimpleDateFormat(pattern, Locale.getDefault()).format(Date(it)) }
 
 @Composable
 fun DashboardScreen(
-    state: DashboardState,
+    state: DashboardUiState,
     onSwitchTeamClick: () -> Unit,
     onRosterClick: () -> Unit,
     onLastLineupClick: (Long) -> Unit,
@@ -109,6 +97,11 @@ fun DashboardScreen(
     onShirtNumberSearch: () -> Unit,
     onShirtNumberHistoryClick: () -> Unit
 ) {
+    val shirtNumberResultText = when {
+        !state.shirtNumberHasSearched -> null
+        state.shirtNumberResult != null -> state.shirtNumberResult
+        else -> stringResource(R.string.generic_not_found)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -149,7 +142,7 @@ fun DashboardScreen(
 
         ShirtNumberLookupRow(
             query = state.shirtNumberQuery,
-            result = state.shirtNumberResult,
+            result = shirtNumberResultText,
             history = state.shirtNumberHistory,
             onQueryChanged = onShirtNumberQueryChanged,
             onSearch = onShirtNumberSearch,
@@ -654,7 +647,8 @@ private fun CurrentPillPreview() {
 private fun DashboardScreenPreview() {
     DugoutTheme {
         DashboardScreen(
-            state = DashboardState(
+            state = DashboardUiState(
+                isLoading = false,
                 teamName = "Riverside Hawks",
                 teamImageUri = null,
                 teamSize = 14,
@@ -667,6 +661,7 @@ private fun DashboardScreenPreview() {
                     "Fall Classic"
                 ),
                 shirtNumberQuery = "07",
+                shirtNumberHasSearched = true,
                 shirtNumberResult = "Jonas Alvarez",
                 shirtNumberHistory = emptyList()
             ),
@@ -685,7 +680,8 @@ private fun DashboardScreenPreview() {
 private fun DashboardScreenEmptyPreview() {
     DugoutTheme {
         DashboardScreen(
-            state = DashboardState(
+            state = DashboardUiState(
+                isLoading = false,
                 teamName = "Riverside Storm",
                 teamImageUri = null,
                 teamSize = 3,
@@ -693,7 +689,6 @@ private fun DashboardScreenEmptyPreview() {
                 mostUsedPlayer = null,
                 lastLineup = null,
                 shirtNumberQuery = "",
-                shirtNumberResult = null,
                 shirtNumberHistory = emptyList()
             ),
             onSwitchTeamClick = {},

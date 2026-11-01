@@ -21,13 +21,17 @@ import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.testDispatcherProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -66,9 +70,16 @@ internal class DashboardViewModelTest {
     lateinit var tournamentRepository: TournamentRepository
 
     lateinit var viewModel: DashboardViewModel
+    private val teamsProcessor = MutableSharedFlow<List<Team>>(replay = 1, extraBufferCapacity = 1)
 
     @Before
     fun setup() {
+        // DashboardViewModel now collects its tiles flow eagerly in init{} via
+        // viewModelScope.launch, which needs Dispatchers.Main set up - and observeTeams()
+        // stubbed - before construction.
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+        Mockito.lenient().`when`(teamRepository.observeTeams()).thenReturn(teamsProcessor)
+
         runBlocking {
             // lenient: each test only exercises one of these sub-ports
             Mockito.lenient().`when`(teamRepository.getTeams())
@@ -99,28 +110,27 @@ internal class DashboardViewModelTest {
         )
     }
 
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     @Test
-    fun shouldRegisterTilesFlowAndSwitchToDashboardConfigurationsWhenTeamsChange() = runTest {
-        val teamsProcessor = MutableSharedFlow<List<Team>>(replay = 1, extraBufferCapacity = 1)
-        Mockito.`when`(teamRepository.observeTeams()).thenReturn(teamsProcessor)
+    fun shouldUpdateUiStateWhenTeamsChange() = runTest {
         val tile = DashboardTile(id = 1L, position = 0, type = TileType.TEAM_SIZE.type)
         Mockito.`when`(tilesRepository.getTiles()).thenReturn(listOf(tile))
         Mockito.`when`(playerRepository.getPlayersByTeamId(1L)).thenReturn(emptyList())
 
-        val observedValues = mutableListOf<List<DashboardTile>>()
-        val job = launch { viewModel.registerTilesFlow().toList(observedValues) }
-        advanceUntilIdle()
+        assertTrue(viewModel.uiState.value.isLoading)
 
         teamsProcessor.tryEmit(emptyList())
         advanceUntilIdle()
 
-        assertEquals(1, observedValues.size)
-        assertEquals(1, observedValues.first().size)
-        job.cancel()
+        assertFalse(viewModel.uiState.value.isLoading)
     }
 
     @Test
-    fun shouldGetShirtNumberHistoryDelegateToUseCase() = runTest {
+    fun shouldSearchShirtNumberDelegateToUseCase() = runTest {
         val overlayEntry = ShirtNumberEntry(
             number = 8,
             playerName = "Toto",
@@ -135,9 +145,11 @@ internal class DashboardViewModelTest {
         Mockito.`when`(playerNumberOverlayRepository.getShirtNumberFromNumberOverlays(1L, 8))
             .thenReturn(listOf(overlayEntry))
 
-        val result = viewModel.getShirtNumberHistory(8)
+        viewModel.onShirtNumberQueryChanged("8")
+        viewModel.onShirtNumberSearch()
+        advanceUntilIdle()
 
-        assertTrue(result.isSuccess)
-        assertEquals(listOf(overlayEntry), result.getOrNull())
+        assertEquals(listOf(overlayEntry), viewModel.uiState.value.shirtNumberHistory)
+        assertEquals("Toto", viewModel.uiState.value.shirtNumberResult)
     }
 }

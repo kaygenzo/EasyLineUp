@@ -51,6 +51,7 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.getStrategies
 import com.telen.easylineup.utils.StringResourcesProviderImpl
+import com.telen.easylineup.utils.getStrategiesDisplayName
 
 data class PlayerProfileState(
     val name: String,
@@ -65,7 +66,6 @@ data class PlayerProfileState(
     val positionsData: Map<FieldPosition, Int>,
     val teamType: TeamType,
     val strategy: TeamStrategy,
-    val strategyOptions: List<String>,
     val selectedStrategyIndex: Int
 )
 
@@ -77,6 +77,9 @@ fun PlayerProfileScreen(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val strategyOptions = state.teamType.getStrategiesDisplayName(context)?.toList() ?: emptyList()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -147,10 +150,10 @@ fun PlayerProfileScreen(
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelMedium
                 )
-                if (state.strategyOptions.size > 1) {
+                if (strategyOptions.size > 1) {
                     Spacer(modifier = Modifier.height(10.dp))
                     StrategyPillsRow(
-                        options = state.strategyOptions,
+                        options = strategyOptions,
                         selectedIndex = state.selectedStrategyIndex,
                         onSelected = onStrategySelected
                     )
@@ -242,7 +245,6 @@ private fun ProfileHeaderPreview() {
                 positionsData = mapOf(FieldPosition.SHORT_STOP to 15),
                 teamType = TeamType.BASEBALL,
                 strategy = TeamType.BASEBALL.getStrategies()[0],
-                strategyOptions = listOf("Standard"),
                 selectedStrategyIndex = 0
             )
         )
@@ -367,7 +369,6 @@ private fun PlayerProfileScreenPreview() {
                 ),
                 teamType = TeamType.BASEBALL,
                 strategy = TeamType.BASEBALL.getStrategies()[0],
-                strategyOptions = listOf("Standard"),
                 selectedStrategyIndex = 0
             ),
             onStrategySelected = {},
@@ -396,7 +397,6 @@ private fun PlayerProfileScreenEmptyPreview() {
                 positionsData = emptyMap(),
                 teamType = TeamType.SOFTBALL,
                 strategy = TeamType.SOFTBALL.getStrategies()[0],
-                strategyOptions = listOf("Standard", "Slowpitch"),
                 selectedStrategyIndex = 0
             ),
             onStrategySelected = {},

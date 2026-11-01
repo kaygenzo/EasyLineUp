@@ -24,4 +24,21 @@ object SharedPreferencesUtils {
         val preferences = getSharedPreferences(context)
         return preferences.getInt(context.getString(key), default)
     }
+
+    fun getBooleanSetting(context: Context, @StringRes key: Int, default: Boolean): Boolean {
+        val preferences = getSharedPreferences(context)
+        return preferences.getBoolean(context.getString(key), default)
+    }
+
+    fun putStringSetting(context: Context, @StringRes key: Int, value: String) {
+        getSharedPreferences(context).edit().putString(context.getString(key), value).apply()
+    }
+
+    fun putIntSetting(context: Context, @StringRes key: Int, value: Int) {
+        getSharedPreferences(context).edit().putInt(context.getString(key), value).apply()
+    }
+
+    fun putBooleanSetting(context: Context, @StringRes key: Int, value: Boolean) {
+        getSharedPreferences(context).edit().putBoolean(context.getString(key), value).apply()
+    }
 }

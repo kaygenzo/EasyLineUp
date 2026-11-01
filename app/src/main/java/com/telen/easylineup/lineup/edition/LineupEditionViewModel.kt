@@ -17,15 +17,29 @@ import com.telen.easylineup.domain.usecases.UpdateLineup
 import com.telen.easylineup.domain.usecases.UpdateLineupRoster
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 sealed class LineupEditionEvent
-object LineupUpdated : LineupEditionEvent()
-object InvalidLineupName : LineupEditionEvent()
-object InvalidTournament : LineupEditionEvent()
+data object LineupUpdated : LineupEditionEvent()
+data object InvalidLineupName : LineupEditionEvent()
+data object InvalidTournament : LineupEditionEvent()
+
+/**
+ * Shared "edit an existing lineup's fields/roster" service - hosted by both the Tournaments
+ * list's Edit Lineup sheet and the Lineup screen's Roster Edit sheet. It has no screen of its
+ * own, so [uiState] only carries its one true reactive source (the tournament picker options);
+ * the sheet's own in-progress form fields stay local to whichever Route is hosting it.
+ */
+data class LineupEditionUiState(val tournaments: List<Tournament> = emptyList())
 
 class LineupEditionViewModel(
     private val getLineupById: GetLineupById,
@@ -35,10 +49,17 @@ class LineupEditionViewModel(
     private val savePlayerNumberOverlay: SavePlayerNumberOverlay,
     private val observeTournaments: ObserveTournaments
 ) : ViewModel() {
+    private val _uiState = MutableStateFlow(LineupEditionUiState())
+    val uiState: StateFlow<LineupEditionUiState> = _uiState.asStateFlow()
+
     private val _events = Channel<LineupEditionEvent>(Channel.BUFFERED)
     val events: Flow<LineupEditionEvent> = _events.receiveAsFlow()
 
-    fun getTournaments(): Flow<List<Tournament>> = observeTournaments().catch { Timber.e(it) }
+    init {
+        observeTournaments().catch { Timber.e(it) }
+            .onEach { tournaments -> _uiState.update { it.copy(tournaments = tournaments) } }
+            .launchIn(viewModelScope)
+    }
 
     suspend fun load(lineupId: Long): Result<Pair<Lineup, TeamRosterSummary>> {
         return getLineupById(lineupId).mapCatching { lineup ->

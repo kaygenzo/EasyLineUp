@@ -83,19 +83,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-data class LineupCreationState(
-    val teamType: TeamType,
-    val name: String,
-    val nameError: String?,
-    val tournaments: List<Tournament>,
-    val selectedTournament: Tournament?,
-    val tournamentError: String?,
-    val eventTimeInMillis: Long,
-    val roster: TeamRosterSummary,
-    val strategy: TeamStrategy,
-    val extraHitters: Int
-)
-
 private val LineupCreationPreviewTournament = Tournament(
     id = 1L,
     name = "Fall Classic",
@@ -115,7 +102,7 @@ private val LineupCreationPreviewRoster = TeamRosterSummary(
 
 @Composable
 fun LineupCreationScreen(
-    state: LineupCreationState,
+    state: LineupCreationUiState,
     onBackClick: () -> Unit,
     onNameChanged: (String) -> Unit,
     onTournamentClick: () -> Unit,
@@ -128,6 +115,16 @@ fun LineupCreationScreen(
 ) {
     val context = LocalContext.current
     val strategyNames = state.teamType.getStrategiesDisplayName(context)
+    val nameErrorText = if (state.nameError) {
+        stringResource(R.string.lineup_creation_error_name_empty)
+    } else {
+        null
+    }
+    val tournamentErrorText = if (state.tournamentError) {
+        stringResource(R.string.lineup_creation_error_tournament_empty)
+    } else {
+        null
+    }
 
     Column(
         modifier = Modifier
@@ -160,8 +157,8 @@ fun LineupCreationScreen(
                     .heightIn(min = 64.dp),
                 placeholder = { Text(stringResource(R.string.lineup_creation_name_placeholder)) },
                 singleLine = true,
-                isError = state.nameError != null,
-                supportingText = state.nameError?.let {
+                isError = state.nameError,
+                supportingText = nameErrorText?.let {
                     { Text(it, style = MaterialTheme.typography.bodySmall) }
                 },
                 textStyle = MaterialTheme.typography.bodyLarge,
@@ -181,8 +178,8 @@ fun LineupCreationScreen(
                 value = state.selectedTournament?.name,
                 placeholder = stringResource(R.string.lineup_creation_tournament_placeholder),
                 subLabel = state.selectedTournament?.address,
-                isError = state.tournamentError != null,
-                errorText = state.tournamentError,
+                isError = state.tournamentError,
+                errorText = tournamentErrorText,
                 onClick = onTournamentClick
             )
             Spacer(modifier = Modifier.height(20.dp))
@@ -1041,10 +1038,10 @@ private fun NewTournamentSheetPreview() {
 private fun LineupCreationScreenPreview() {
     DugoutTheme {
         LineupCreationScreen(
-            state = LineupCreationState(
+            state = LineupCreationUiState(
+                isLoading = false,
                 teamType = TeamType.BASEBALL,
                 name = "Game 3 — Starters",
-                nameError = null,
                 tournaments = listOf(
                     Tournament(
                         id = 1L,
@@ -1063,7 +1060,6 @@ private fun LineupCreationScreenPreview() {
                     endTime = 1760003600000L,
                     address = "Riverside Park"
                 ),
-                tournamentError = null,
                 eventTimeInMillis = 1760000000000L,
                 roster = TeamRosterSummary(
                     Constants.STATUS_PARTIAL,
@@ -1101,13 +1097,12 @@ private fun LineupCreationScreenPreview() {
 private fun LineupCreationScreenEmptyPreview() {
     DugoutTheme {
         LineupCreationScreen(
-            state = LineupCreationState(
+            state = LineupCreationUiState(
+                isLoading = false,
                 teamType = TeamType.BASEBALL,
                 name = "",
-                nameError = null,
                 tournaments = emptyList(),
                 selectedTournament = null,
-                tournamentError = null,
                 eventTimeInMillis = System.currentTimeMillis(),
                 roster = TeamRosterSummary(Constants.STATUS_ALL, emptyList()),
                 strategy = TeamStrategy.STANDARD,

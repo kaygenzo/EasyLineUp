@@ -6,9 +6,12 @@ package com.telen.easylineup.settings
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.ui.graphics.Color
+import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.telen.easylineup.R
 import com.telen.easylineup.compose.DataCounts
 import com.telen.easylineup.compose.toDataCounts
 import com.telen.easylineup.domain.model.export.ExportBase
@@ -16,12 +19,18 @@ import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.DeleteAllData
 import com.telen.easylineup.domain.usecases.ExportData
 import com.telen.easylineup.domain.usecases.GetAllTeams
+import com.telen.easylineup.domain.usecases.ImportResult
 import com.telen.easylineup.export.json.exportGson
 import com.telen.easylineup.export.json.toJson
+import com.telen.easylineup.utils.SharedPreferencesUtils
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -29,13 +38,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-sealed class Event
-object DeleteAllDataEventSuccess : Event()
-object DeleteAllDataEventFailure : Event()
-/**
- * @property exportBase the data about to be exported, before the folder picker runs
- */
-data class ExportPreviewReady(val exportBase: ExportBase) : Event()
 /**
  * @property folderName the picked folder's display name, when the SAF provider exposes one
  * @property fileName the written file's own name
@@ -45,13 +47,31 @@ data class ExportDataEventSuccess(
     val folderName: String?,
     val fileName: String,
     val counts: DataCounts
-) : Event()
-object ExportDataEventFailure : Event()
-/**
- * @property count
- */
-data class GetTeamsCountSuccess(val count: Int) : Event()
-object GetTeamsCountFailure : Event()
+)
+
+/** One-shot actions a ViewModel can't do itself (navigate, start an Activity, log analytics). */
+sealed class SettingsEvent
+data object DeleteAllDataDone : SettingsEvent()
+data object ExportSucceeded : SettingsEvent()
+data object ExportFailed : SettingsEvent()
+data object ImportSucceeded : SettingsEvent()
+data object ImportFailed : SettingsEvent()
+data object TeamsCountReady : SettingsEvent()
+
+/** Everything [SettingsScreen] and its export/import sheets need, except the team info card. */
+data class SettingsUiState(
+    val lineupStyleValue: String = "",
+    val themeValue: String = "",
+    val menColor: Color = Color.Unspecified,
+    val womenColor: Color = Color.Unspecified,
+    val showDeleteAllDataSheet: Boolean = false,
+    val exportPreview: ExportBase? = null,
+    val exportSuccess: ExportDataEventSuccess? = null,
+    val importFileName: String = "",
+    val importPreview: ExportBase? = null,
+    val importOverwriteExisting: Boolean = false,
+    val importSuccess: ImportResult? = null
+)
 
 class SettingsViewModel(
     private val deleteAllDataUseCase: DeleteAllData,
@@ -60,22 +80,78 @@ class SettingsViewModel(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
-    private val _events = Channel<Event>(Channel.BUFFERED)
-    val events: Flow<Event> = _events.receiveAsFlow()
+    private val _uiState = MutableStateFlow(loadPreferencesState())
+    val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
-    /**
-     * Used by the Team row to know whether Team Details should show the
-     * edit-only or edit-or-delete menu, same rule as the drawer header today.
-     */
-    fun getTeamsCount() {
-        viewModelScope.launch {
-            getAllTeamsUseCase()
-                .onSuccess { _events.send(GetTeamsCountSuccess(it.size)) }
-                .onFailure {
-                    Timber.e(it)
-                    _events.send(GetTeamsCountFailure)
-                }
-        }
+    private val _events = Channel<SettingsEvent>(Channel.BUFFERED)
+    val events: Flow<SettingsEvent> = _events.receiveAsFlow()
+
+    private fun loadPreferencesState(): SettingsUiState {
+        val menColor = SharedPreferencesUtils.getIntSetting(
+            context,
+            R.string.key_men_style,
+            ContextCompat.getColor(context, R.color.default_men_color)
+        )
+        val womenColor = SharedPreferencesUtils.getIntSetting(
+            context,
+            R.string.key_women_style,
+            ContextCompat.getColor(context, R.color.default_women_color)
+        )
+        return SettingsUiState(
+            lineupStyleValue = SharedPreferencesUtils.getStringSetting(
+                context,
+                R.string.key_lineup_style,
+                context.getString(R.string.lineup_style_default_value)
+            ),
+            themeValue = SharedPreferencesUtils.getStringSetting(
+                context,
+                R.string.key_day_night_theme,
+                context.getString(R.string.lineup_theme_default_value)
+            ),
+            menColor = Color(menColor),
+            womenColor = Color(womenColor),
+            importOverwriteExisting = SharedPreferencesUtils.getBooleanSetting(
+                context,
+                R.string.key_import_data_update_object,
+                false
+            )
+        )
+    }
+
+    fun onLineupStyleSelected(value: String) {
+        putStringPreference(R.string.key_lineup_style, value)
+        _uiState.update { it.copy(lineupStyleValue = value) }
+    }
+
+    fun onThemeSelected(value: String) {
+        putStringPreference(R.string.key_day_night_theme, value)
+        _uiState.update { it.copy(themeValue = value) }
+    }
+
+    fun onMenColorPicked(color: Int) {
+        putIntPreference(R.string.key_men_style, color)
+        _uiState.update { it.copy(menColor = Color(color)) }
+    }
+
+    fun onWomenColorPicked(color: Int) {
+        putIntPreference(R.string.key_women_style, color)
+        _uiState.update { it.copy(womenColor = Color(color)) }
+    }
+
+    private fun putStringPreference(keyRes: Int, value: String) {
+        SharedPreferencesUtils.putStringSetting(context, keyRes, value)
+    }
+
+    private fun putIntPreference(keyRes: Int, value: Int) {
+        SharedPreferencesUtils.putIntSetting(context, keyRes, value)
+    }
+
+    fun onDeleteAllDataClick() {
+        _uiState.update { it.copy(showDeleteAllDataSheet = true) }
+    }
+
+    fun onDeleteAllDataDismiss() {
+        _uiState.update { it.copy(showDeleteAllDataSheet = false) }
     }
 
     fun deleteAllData() {
@@ -83,12 +159,17 @@ class SettingsViewModel(
             deleteAllDataUseCase()
                 .onSuccess {
                     delay(DELAY)
-                    _events.send(DeleteAllDataEventSuccess)
+                    _events.send(DeleteAllDataDone)
                 }
-                .onFailure {
-                    Timber.e(it)
-                    _events.send(DeleteAllDataEventFailure)
-                }
+                .onFailure { Timber.e(it) }
+        }
+    }
+
+    fun getTeamsCount() {
+        viewModelScope.launch {
+            getAllTeamsUseCase()
+                .onSuccess { _events.send(TeamsCountReady) }
+                .onFailure { Timber.e(it) }
         }
     }
 
@@ -99,32 +180,48 @@ class SettingsViewModel(
     fun loadExportPreview() {
         viewModelScope.launch {
             exportDataUseCase()
-                .onSuccess { _events.send(ExportPreviewReady(it)) }
+                .onSuccess { base -> _uiState.update { it.copy(exportPreview = base) } }
                 .onFailure {
                     Timber.e(it)
-                    _events.send(ExportDataEventFailure)
+                    _events.send(ExportFailed)
                 }
         }
     }
 
+    fun onExportPreviewDismiss() {
+        _uiState.update { it.copy(exportPreview = null) }
+    }
+
+    fun onExportSuccessDismiss() {
+        _uiState.update { it.copy(exportSuccess = null) }
+    }
+
     /**
-     * Writes the already-fetched [exportBase] (from [loadExportPreview]) to the chosen folder -
-     * doesn't re-walk the database, so what gets written matches exactly what the confirm sheet
-     * promised.
+     * Writes the already-fetched export preview to the chosen folder - doesn't re-walk the
+     * database, so what gets written matches exactly what the confirm sheet promised.
      */
-    fun exportData(exportBase: ExportBase, dirUri: Uri) {
+    fun exportData(dirUri: Uri) {
+        val exportBase = _uiState.value.exportPreview ?: return
+        _uiState.update { it.copy(exportPreview = null) }
         viewModelScope.launch {
             runCatching {
                 withContext(dispatcherProvider.io()) { writeExportFile(exportBase, dirUri) }
             }
                 .onSuccess { (fileName, folderName) ->
-                    _events.send(
-                        ExportDataEventSuccess(folderName, fileName, exportBase.toDataCounts())
-                    )
+                    _uiState.update {
+                        it.copy(
+                            exportSuccess = ExportDataEventSuccess(
+                                folderName,
+                                fileName,
+                                exportBase.toDataCounts()
+                            )
+                        )
+                    }
+                    _events.send(ExportSucceeded)
                 }
                 .onFailure {
                     Timber.e(it)
-                    _events.send(ExportDataEventFailure)
+                    _events.send(ExportFailed)
                 }
         }
     }
@@ -149,7 +246,33 @@ class SettingsViewModel(
         return filename to dir.name
     }
 
-    companion object {
-        private const val DELAY = 1_000L
+    fun onImportPreviewReady(fileName: String, exportBase: ExportBase) {
+        _uiState.update { it.copy(importFileName = fileName, importPreview = exportBase) }
+    }
+
+    fun onImportOverwriteChanged(checked: Boolean) {
+        SharedPreferencesUtils.putBooleanSetting(context, R.string.key_import_data_update_object, checked)
+        _uiState.update { it.copy(importOverwriteExisting = checked) }
+    }
+
+    fun onImportPreviewDismiss() {
+        _uiState.update { it.copy(importPreview = null) }
+    }
+
+    fun onImportSuccess(result: ImportResult) {
+        _uiState.update { it.copy(importPreview = null, importSuccess = result) }
+        viewModelScope.launch { _events.send(ImportSucceeded) }
+    }
+
+    fun onImportFailure() {
+        viewModelScope.launch { _events.send(ImportFailed) }
+    }
+
+    fun onImportSuccessDismiss() {
+        _uiState.update { it.copy(importSuccess = null) }
+    }
+
+    private companion object {
+        const val DELAY = 1_000L
     }
 }

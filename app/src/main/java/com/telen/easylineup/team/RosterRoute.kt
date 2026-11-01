@@ -12,23 +12,18 @@ import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
@@ -37,36 +32,19 @@ import timber.log.Timber
 fun RosterRoute(navController: NavController) {
     val viewModel = koinViewModel<TeamViewModel>()
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val players = remember(uiState.players) { uiState.players.map { it.toRosterRowState() } }
 
-    var teamName by remember { mutableStateOf("") }
-    var players by remember { mutableStateOf<List<RosterRowState>>(emptyList()) }
-    var sortType by remember { mutableStateOf(TeamViewModel.SortType.ALPHA) }
     var showMessageSheet by remember { mutableStateOf(false) }
-
-    LaunchedEffect(viewModel) {
-        viewModel.observePlayers()
-            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { playerList -> players = playerList.map { it.toRosterRowState() } }
-            .launchIn(this)
-
-        viewModel.observeCurrentTeamName()
-            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { teamName = it }
-            .launchIn(this)
-    }
 
     RosterScreen(
         state = RosterState(
-            teamName = teamName,
+            teamName = uiState.teamName,
             players = players,
-            sortType = sortType
+            sortType = uiState.sortType
         ),
         onBackClick = { navController.navigateUp() },
-        onSortSelected = { newSortType ->
-            sortType = newSortType
-            viewModel.setSortType(newSortType)
-        },
+        onSortSelected = viewModel::setSortType,
         onPlayerClick = { playerId ->
             FirebaseAnalyticsUtils.onClick(context, "click_team_players_selected")
             navController.navigate(Routes.PlayerDetails(playerId))
@@ -83,7 +61,7 @@ fun RosterRoute(navController: NavController) {
 
     if (showMessageSheet) {
         MessageTeamSheet(
-            teamName = teamName,
+            teamName = uiState.teamName,
             players = players,
             onDismiss = { showMessageSheet = false },
             onTextMessageClick = {
@@ -114,7 +92,7 @@ fun RosterRoute(navController: NavController) {
                 }
                 val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE)
                     as ClipboardManager
-                clipboard.setPrimaryClip(ClipData.newPlainText(teamName, text))
+                clipboard.setPrimaryClip(ClipData.newPlainText(uiState.teamName, text))
                 Toast.makeText(context, R.string.roster_message_share_copied, Toast.LENGTH_SHORT)
                     .show()
             }

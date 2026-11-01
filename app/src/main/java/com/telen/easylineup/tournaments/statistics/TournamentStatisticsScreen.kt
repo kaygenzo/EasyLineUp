@@ -73,12 +73,8 @@ data class PlayerStatsRow(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TournamentStatisticsScreen(
-    tournamentName: String,
-    playerStats: List<PlayerStatsRow>,
-    teamType: TeamType,
-    onBackClick: () -> Unit
-) {
+fun TournamentStatisticsScreen(state: TournamentStatisticsUiState, onBackClick: () -> Unit) {
+    val playerStats = state.playerStats
     var selectedPlayerId by remember(playerStats) {
         mutableStateOf(playerStats.maxByOrNull { it.totalGames }?.playerId)
     }
@@ -99,7 +95,7 @@ fun TournamentStatisticsScreen(
             icon = R.drawable.ic_arrow_left_white_24dp,
             onIconClick = onBackClick,
             iconContentDescription = stringResource(R.string.generic_back),
-            eyebrow = tournamentName,
+            eyebrow = state.tournamentName,
             title = stringResource(R.string.title_tournament_statistics),
             modifier = Modifier.padding(16.dp)
         )
@@ -119,7 +115,7 @@ fun TournamentStatisticsScreen(
                 PositionUsageCard(
                     selectedPlayer = playerStats.firstOrNull { it.playerId == selectedPlayerId },
                     positions = playedPositions,
-                    teamType = teamType,
+                    teamType = state.teamType,
                     onPlayerFieldClick = { showPlayerPicker = true }
                 )
             }
@@ -325,9 +321,12 @@ private val PreviewPlayerStats = listOf(
 private fun TournamentStatisticsScreenPreview() {
     DugoutTheme {
         TournamentStatisticsScreen(
-            tournamentName = "Fall Classic",
-            playerStats = PreviewPlayerStats,
-            teamType = TeamType.BASEBALL,
+            state = TournamentStatisticsUiState(
+                isLoading = false,
+                tournamentName = "Fall Classic",
+                playerStats = PreviewPlayerStats,
+                teamType = TeamType.BASEBALL
+            ),
             onBackClick = {}
         )
     }
@@ -338,9 +337,11 @@ private fun TournamentStatisticsScreenPreview() {
 private fun TournamentStatisticsScreenEmptyPreview() {
     DugoutTheme {
         TournamentStatisticsScreen(
-            tournamentName = "Fall Classic",
-            playerStats = emptyList(),
-            teamType = TeamType.BASEBALL,
+            state = TournamentStatisticsUiState(
+                isLoading = false,
+                tournamentName = "Fall Classic",
+                teamType = TeamType.BASEBALL
+            ),
             onBackClick = {}
         )
     }

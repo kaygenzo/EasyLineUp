@@ -14,16 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
-import androidx.preference.PreferenceManager
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.compose.ExportConfirmSheet
@@ -31,9 +28,6 @@ import com.telen.easylineup.compose.ExportSuccessSheet
 import com.telen.easylineup.compose.ImportConfirmSheet
 import com.telen.easylineup.compose.ImportSuccessSheet
 import com.telen.easylineup.compose.toDataCounts
-import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.model.export.ExportBase
-import com.telen.easylineup.domain.usecases.ImportResult
 import com.telen.easylineup.license.LicensesManager
 import com.telen.easylineup.login.ImportFailure
 import com.telen.easylineup.login.ImportPreviewReady
@@ -44,8 +38,6 @@ import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
@@ -57,25 +49,8 @@ fun SettingsRoute(navController: NavController) {
     val teamViewModel = koinViewModel<TeamViewModel>()
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-
-    var teamName by remember { mutableStateOf("") }
-    var teamType by remember { mutableStateOf(TeamType.UNKNOWN) }
-    var teamImageUri by remember { mutableStateOf<Uri?>(null) }
-    var showDeleteAllDataSheet by remember { mutableStateOf(false) }
-
-    var exportPreview by remember { mutableStateOf<ExportBase?>(null) }
-    var exportSuccess by remember { mutableStateOf<ExportDataEventSuccess?>(null) }
-
-    var importFileName by remember { mutableStateOf("") }
-    var importPreview by remember { mutableStateOf<ExportBase?>(null) }
-    var importOverwriteExisting by remember {
-        mutableStateOf(
-            PreferenceManager.getDefaultSharedPreferences(context)
-                .getBoolean(context.getString(R.string.key_import_data_update_object), false)
-        )
-    }
-    var importSuccess by remember { mutableStateOf<ImportResult?>(null) }
-    var prefsVersion by remember { mutableStateOf(0) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val teamUiState by teamViewModel.uiState.collectAsStateWithLifecycle()
 
     val openFile = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -83,27 +58,7 @@ fun SettingsRoute(navController: NavController) {
 
     val createFile = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocumentTree()
-    ) { uri ->
-        val base = exportPreview
-        if (uri != null && base != null) {
-            exportPreview = null
-            viewModel.exportData(base, uri)
-        }
-    }
-
-    fun putStringPreference(keyRes: Int, value: String) {
-        PreferenceManager.getDefaultSharedPreferences(context)
-            .edit()
-            .putString(context.getString(keyRes), value)
-            .apply()
-    }
-
-    fun putIntPreference(keyRes: Int, value: Int) {
-        PreferenceManager.getDefaultSharedPreferences(context)
-            .edit()
-            .putInt(context.getString(keyRes), value)
-            .apply()
-    }
+    ) { uri -> uri?.let(viewModel::exportData) }
 
     fun applyNightMode(value: String) {
         AppCompatDelegate.setDefaultNightMode(
@@ -132,29 +87,12 @@ fun SettingsRoute(navController: NavController) {
         }
     }
 
-    LaunchedEffect(teamViewModel) {
-        teamViewModel.observeCurrentTeamName()
-            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { teamName = it }
-            .launchIn(this)
-
-        teamViewModel.observeCurrentTeamType()
-            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { teamType = it }
-            .launchIn(this)
-
-        teamViewModel.observeCurrentTeamImage()
-            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { teamImageUri = it }
-            .launchIn(this)
-    }
-
     LaunchedEffect(viewModel) {
         viewModel.events
             .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .collect { event ->
                 when (event) {
-                    DeleteAllDataEventSuccess -> {
+                    DeleteAllDataDone -> {
                         FirebaseAnalyticsUtils.deleteData(context)
                         val intent = Intent(context, LoginActivity::class.java).apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -162,50 +100,44 @@ fun SettingsRoute(navController: NavController) {
                         context.startActivity(intent)
                     }
 
-                    is ExportPreviewReady -> exportPreview = event.exportBase
-
-                    is ExportDataEventSuccess -> {
+                    ExportSucceeded -> {
                         FirebaseAnalyticsUtils.exportData(context)
-                        exportSuccess = event
                         Timber.d("Successfully exported data!")
                     }
 
-                    ExportDataEventFailure -> DialogFactory.getErrorDialog(
+                    ExportFailed -> DialogFactory.getErrorDialog(
                         context,
                         title = R.string.settings_export_error_title,
                         message = R.string.settings_export_error_message
                     ).show()
 
-                    is GetTeamsCountSuccess -> navController.navigate(Routes.TeamDetails)
+                    ImportSucceeded -> FirebaseAnalyticsUtils.importData(context)
 
-                    GetTeamsCountFailure -> Timber.e("Failed to get teams count")
+                    ImportFailed -> DialogFactory.getErrorDialog(
+                        context,
+                        title = R.string.settings_import_error_title,
+                        message = R.string.settings_import_error_message
+                    ).show()
 
-                    DeleteAllDataEventFailure -> Timber.e("Failed to delete all data")
+                    TeamsCountReady -> navController.navigate(Routes.TeamDetails)
                 }
             }
     }
 
     // LoginViewModel is shared with the login flow and still RxJava-based; out of scope for
-    // this screen's modernization, so its existing Subject subscription is relocated here as-is.
+    // this screen's modernization, so its existing Subject subscription is relocated here as-is,
+    // forwarding the results it carries into SettingsViewModel's own state.
     DisposableEffect(loginViewModel) {
         val disposable = loginViewModel.observeEvents().subscribe({ event ->
             when (event) {
-                is ImportPreviewReady -> {
-                    importFileName = event.fileName
-                    importPreview = event.exportBase
-                }
+                is ImportPreviewReady -> viewModel.onImportPreviewReady(
+                    event.fileName,
+                    event.exportBase
+                )
 
-                is ImportSuccessfulEvent -> {
-                    FirebaseAnalyticsUtils.importData(context)
-                    importPreview = null
-                    importSuccess = event.result
-                }
+                is ImportSuccessfulEvent -> viewModel.onImportSuccess(event.result)
 
-                ImportFailure -> DialogFactory.getErrorDialog(
-                    context,
-                    title = R.string.settings_import_error_title,
-                    message = R.string.settings_import_error_message
-                ).show()
+                ImportFailure -> viewModel.onImportFailure()
 
                 else -> {}
             }
@@ -213,33 +145,29 @@ fun SettingsRoute(navController: NavController) {
         onDispose { disposable.dispose() }
     }
 
-    val state = remember(teamName, teamType, teamImageUri, prefsVersion) {
-        currentSettingsScreenState(context, teamName, teamType, teamImageUri)
-    }
-
     SettingsScreen(
-        state = state,
+        state = SettingsScreenState(
+            teamName = teamUiState.teamName,
+            teamType = teamUiState.teamType,
+            teamImageUri = teamUiState.teamImageUri,
+            lineupStyleValue = uiState.lineupStyleValue,
+            themeValue = uiState.themeValue,
+            menColor = uiState.menColor,
+            womenColor = uiState.womenColor
+        ),
         onBackClick = { navController.navigateUp() },
         onTeamClick = { viewModel.getTeamsCount() },
         onLineupStyleSelected = { newValue ->
             FirebaseAnalyticsUtils.onClick(context, "click_settings_lineup_style")
-            putStringPreference(R.string.key_lineup_style, newValue)
-            prefsVersion++
+            viewModel.onLineupStyleSelected(newValue)
         },
         onThemeSelected = { newValue ->
             FirebaseAnalyticsUtils.onClick(context, "click_settings_theme")
-            putStringPreference(R.string.key_day_night_theme, newValue)
+            viewModel.onThemeSelected(newValue)
             applyNightMode(newValue)
-            prefsVersion++
         },
-        onMenColorPicked = { color ->
-            putIntPreference(R.string.key_men_style, color)
-            prefsVersion++
-        },
-        onWomenColorPicked = { color ->
-            putIntPreference(R.string.key_women_style, color)
-            prefsVersion++
-        },
+        onMenColorPicked = viewModel::onMenColorPicked,
+        onWomenColorPicked = viewModel::onWomenColorPicked,
         onExportClick = {
             FirebaseAnalyticsUtils.onClick(context, "click_settings_export_data")
             viewModel.loadExportPreview()
@@ -248,7 +176,7 @@ fun SettingsRoute(navController: NavController) {
             FirebaseAnalyticsUtils.onClick(context, "click_settings_import_data")
             openFile.launch(arrayOf("application/octet-stream"))
         },
-        onDeleteAllDataClick = { showDeleteAllDataSheet = true },
+        onDeleteAllDataClick = viewModel::onDeleteAllDataClick,
         onLicensesClick = {
             FirebaseAnalyticsUtils.onClick(context, "click_settings_licenses")
             LicensesManager.getDialog(context).show()
@@ -256,13 +184,13 @@ fun SettingsRoute(navController: NavController) {
         onPlayStoreClick = { openPlayStore() }
     )
 
-    if (showDeleteAllDataSheet) {
+    if (uiState.showDeleteAllDataSheet) {
         ConfirmSheet(
             title = stringResource(R.string.setting_delete_data_description),
             message = stringResource(R.string.dialog_delete_cannot_undo_message),
             confirmLabel = stringResource(R.string.action_delete),
             cancelLabel = stringResource(R.string.cancel_button),
-            onDismiss = { showDeleteAllDataSheet = false },
+            onDismiss = viewModel::onDeleteAllDataDismiss,
             onConfirm = {
                 FirebaseAnalyticsUtils.onClick(context, "click_settings_delete_data")
                 viewModel.deleteAllData()
@@ -270,11 +198,11 @@ fun SettingsRoute(navController: NavController) {
         )
     }
 
-    exportPreview?.let { base ->
+    uiState.exportPreview?.let { base ->
         ExportConfirmSheet(
-            teamName = teamName,
+            teamName = teamUiState.teamName,
             counts = base.toDataCounts(),
-            onDismiss = { exportPreview = null },
+            onDismiss = viewModel::onExportPreviewDismiss,
             onConfirm = {
                 FirebaseAnalyticsUtils.onClick(context, "click_export_confirm")
                 createFile.launch(null)
@@ -282,40 +210,34 @@ fun SettingsRoute(navController: NavController) {
         )
     }
 
-    exportSuccess?.let { success ->
+    uiState.exportSuccess?.let { success ->
         ExportSuccessSheet(
             folderName = success.folderName,
             fileName = success.fileName,
             counts = success.counts,
-            onDismiss = { exportSuccess = null }
+            onDismiss = viewModel::onExportSuccessDismiss
         )
     }
 
-    importPreview?.let { base ->
+    uiState.importPreview?.let { base ->
         ImportConfirmSheet(
-            fileName = importFileName,
+            fileName = uiState.importFileName,
             counts = base.toDataCounts(),
-            overwriteExisting = importOverwriteExisting,
-            onOverwriteChanged = { checked ->
-                importOverwriteExisting = checked
-                PreferenceManager.getDefaultSharedPreferences(context)
-                    .edit()
-                    .putBoolean(context.getString(R.string.key_import_data_update_object), checked)
-                    .apply()
-            },
-            onDismiss = { importPreview = null },
+            overwriteExisting = uiState.importOverwriteExisting,
+            onOverwriteChanged = viewModel::onImportOverwriteChanged,
+            onDismiss = viewModel::onImportPreviewDismiss,
             onConfirm = {
                 FirebaseAnalyticsUtils.onClick(context, "click_import_confirm")
-                loginViewModel.confirmImport(base, importOverwriteExisting)
+                loginViewModel.confirmImport(base, uiState.importOverwriteExisting)
             }
         )
     }
 
-    importSuccess?.let { result ->
+    uiState.importSuccess?.let { result ->
         ImportSuccessSheet(
-            fileName = importFileName,
+            fileName = uiState.importFileName,
             result = result,
-            onDismiss = { importSuccess = null }
+            onDismiss = viewModel::onImportSuccessDismiss
         )
     }
 }

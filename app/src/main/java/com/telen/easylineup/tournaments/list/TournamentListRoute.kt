@@ -18,16 +18,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.domain.Constants
-import com.telen.easylineup.domain.model.GeoLocation
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.TeamRosterSummary
-import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.lineup.create.TournamentPickerSheet
 import com.telen.easylineup.lineup.edition.EditLineupSheet
@@ -39,8 +38,6 @@ import com.telen.easylineup.lineup.edition.LineupUpdated
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -87,21 +84,21 @@ private fun TeamRosterSummary.withNumberOverride(
 /** Replaces `TournamentListFragment` - the `navigation_lineups` root tab. */
 @Composable
 fun TournamentListRoute(navController: NavController) {
-    val viewModel = koinViewModel<LineupViewModel>()
+    val viewModel = koinViewModel<LineupListViewModel>()
     val teamViewModel = koinViewModel<TeamViewModel>()
     val editionViewModel = koinViewModel<LineupEditionViewModel>()
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val teamUiState by teamViewModel.uiState.collectAsStateWithLifecycle()
+    val editionUiState by editionViewModel.uiState.collectAsStateWithLifecycle()
 
-    var teamName by remember { mutableStateOf("") }
-    var teamType by remember { mutableStateOf(TeamType.UNKNOWN) }
-    var tournamentItems by remember { mutableStateOf<List<TournamentItem>>(emptyList()) }
-    var mapsByTournamentId by remember { mutableStateOf<Map<Long, GeoLocation>>(emptyMap()) }
-    var searchQuery by remember { mutableStateOf("") }
     var tournamentPendingDeletion by remember { mutableStateOf<Tournament?>(null) }
 
-    var editionTournaments by remember { mutableStateOf<List<Tournament>>(emptyList()) }
+    // The Edit Lineup sheet's own in-progress scratch fields - local to this Route since
+    // LineupEditionViewModel has no screen of its own, only load()/save() actions (see its
+    // own doc comment).
     var editLineupLineup by remember { mutableStateOf<Lineup?>(null) }
     var editLineupName by remember { mutableStateOf("") }
     var editLineupNameError by remember { mutableStateOf<String?>(null) }
@@ -134,73 +131,38 @@ fun TournamentListRoute(navController: NavController) {
         }
     }
 
-    LaunchedEffect(viewModel, teamViewModel, editionViewModel) {
-        teamViewModel.observeCurrentTeamName()
+    LaunchedEffect(editionViewModel) {
+        editionViewModel.events
             .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { teamName = it }
-            .launchIn(this)
-
-        viewModel.mapsFlow
-            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { (tournament, location) ->
-                mapsByTournamentId = mapsByTournamentId + (tournament.id to location)
-            }
-            .launchIn(this)
-
-        viewModel.observeCategorizedLineups()
-            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { tournamentItems = it }
-            .launchIn(this)
-
-        editionViewModel.getTournaments()
-            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .onEach { editionTournaments = it }
-            .launchIn(this)
-
-        launch {
-            viewModel.getTeamType()
-                .onSuccess { teamType = TeamType.getTypeById(it) }
-                .onFailure { Timber.e(it) }
-        }
-
-        launch {
-            editionViewModel.events
-                .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .collect { event ->
-                    when (event) {
-                        LineupUpdated -> {
-                            closeEditLineupSheet()
-                            viewModel.reloadList()
-                        }
-
-                        InvalidLineupName ->
-                            editLineupNameError =
-                                context.getString(R.string.lineup_creation_error_name_empty)
-
-                        InvalidTournament ->
-                            editLineupTournamentError = context.getString(
-                                R.string.lineup_creation_error_tournament_empty
-                            )
+            .collect { event ->
+                when (event) {
+                    LineupUpdated -> {
+                        closeEditLineupSheet()
+                        viewModel.reloadList()
                     }
-                }
-        }
 
-        viewModel.setFilter("")
+                    InvalidLineupName ->
+                        editLineupNameError =
+                            context.getString(R.string.lineup_creation_error_name_empty)
+
+                    InvalidTournament ->
+                        editLineupTournamentError = context.getString(
+                            R.string.lineup_creation_error_tournament_empty
+                        )
+                }
+            }
     }
 
     TournamentListScreen(
         state = TournamentListState(
-            teamName = teamName,
-            teamType = teamType,
-            items = tournamentItems,
-            mapsByTournamentId = mapsByTournamentId,
-            searchQuery = searchQuery
+            teamName = teamUiState.teamName,
+            teamType = uiState.teamType,
+            items = uiState.tournamentItems,
+            mapsByTournamentId = uiState.mapsByTournamentId,
+            searchQuery = uiState.searchQuery
         ),
         onBackClick = { navController.navigateUp() },
-        onSearchQueryChanged = {
-            searchQuery = it
-            viewModel.setFilter(it)
-        },
+        onSearchQueryChanged = viewModel::onSearchQueryChanged,
         onCreateLineupClick = {
             FirebaseAnalyticsUtils.onClick(context, "click_tournaments_create")
             navController.navigate(Routes.LineupCreation)
@@ -217,7 +179,7 @@ fun TournamentListRoute(navController: NavController) {
                         editLineupName = loadedLineup.name
                         editLineupNameError = null
                         editLineupSelectedTournament =
-                            editionTournaments.find { it.id == loadedLineup.tournamentId }
+                            editionUiState.tournaments.find { it.id == loadedLineup.tournamentId }
                         editLineupTournamentError = null
                         editLineupRoster = roster
                         editLineupStep = EditLineupStep.FIELDS
@@ -234,7 +196,7 @@ fun TournamentListRoute(navController: NavController) {
                 Routes.TournamentStatistics(
                     tournamentId = tournament.id,
                     tournamentName = tournament.name,
-                    teamType = teamType.id
+                    teamType = uiState.teamType.id
                 )
             )
         },
@@ -277,7 +239,7 @@ fun TournamentListRoute(navController: NavController) {
             tournamentError = editLineupTournamentError,
             roster = editLineupRoster,
             step = editLineupStep,
-            teamType = teamType,
+            teamType = uiState.teamType,
             onDismiss = { handleEditLineupCancel() },
             onNameChanged = {
                 editLineupName = it
@@ -313,7 +275,7 @@ fun TournamentListRoute(navController: NavController) {
 
     if (showTournamentSheetForEdit) {
         TournamentPickerSheet(
-            tournaments = editionTournaments,
+            tournaments = editionUiState.tournaments,
             selectedTournamentId = editLineupSelectedTournament?.id,
             onDismiss = { showTournamentSheetForEdit = false },
             onTournamentSelected = { tournament ->
