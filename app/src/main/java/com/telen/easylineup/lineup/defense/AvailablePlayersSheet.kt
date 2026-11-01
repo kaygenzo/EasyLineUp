@@ -41,7 +41,7 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.SubstituteBattingSlots
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.model.isDefensePlayer
+import com.telen.easylineup.domain.model.matches
 import com.telen.easylineup.domain.model.toPlayer
 import com.telen.easylineup.domain.usecases.GetSubstituteBattingSlots
 import com.telen.easylineup.utils.StringResourcesProviderImpl
@@ -179,7 +179,7 @@ fun AvailablePlayersSheet(
                             )
                         } else {
                             val matchingPosition = filterPosition
-                                ?.takeIf { (player.positions and it.mask) > 0 }
+                                ?.takeIf { it.matches(player.positions) }
                             if (matchingPosition != null) {
                                 Box(
                                     modifier = Modifier
@@ -239,8 +239,7 @@ private fun CandidatePill(text: String, emphasized: Boolean) {
 }
 
 private fun primaryPositionShortName(player: Player, shortNames: Array<String>): String? {
-    return FieldPosition.values()
-        .firstOrNull { it.isDefensePlayer() && (player.positions and it.mask) > 0 }
+    return FieldPosition.findPrimaryDefensePosition(player.positions)
         ?.let { shortNames.getOrNull(it.ordinal) }
 }
 

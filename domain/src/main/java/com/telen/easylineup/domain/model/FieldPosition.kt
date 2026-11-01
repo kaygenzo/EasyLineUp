@@ -37,6 +37,14 @@ enum class FieldPosition(val id: Int, val mask: Int, val position: Int) {
         fun getFieldPositionById(id: Int): FieldPosition? {
             return values().firstOrNull { id == it.id }
         }
+
+        /**
+         * The first defense position (substitute/DP-DH excluded) a player's `positions` bitmask
+         * covers - used to show a player's "main" position when only one can be displayed.
+         */
+        fun findPrimaryDefensePosition(positionsMask: Int): FieldPosition? {
+            return values().firstOrNull { it.isDefensePlayer() && it.matches(positionsMask) }
+        }
     }
 }
 
@@ -48,6 +56,11 @@ fun FieldPosition.isSubstitute(): Boolean {
 // TODO move in use case
 fun FieldPosition.isDefensePlayer(): Boolean {
     return !isSubstitute() && id != FieldPosition.DP_DH.id
+}
+
+/** Whether a player's `positions` bitmask includes this position. */
+fun FieldPosition.matches(positionsMask: Int): Boolean {
+    return (positionsMask and mask) != 0
 }
 
 /**

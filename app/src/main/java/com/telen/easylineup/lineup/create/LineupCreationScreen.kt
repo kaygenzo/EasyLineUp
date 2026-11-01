@@ -879,9 +879,7 @@ private fun primaryPositionLabel(positions: Int, teamType: TeamType): String? {
     } else {
         stringArrayResource(R.array.field_positions_baseball_list)
     }
-    val match = FieldPosition.values().firstOrNull {
-        it.id != 0 && it.id != 16 && (positions and it.mask) != 0
-    } ?: return null
+    val match = FieldPosition.findPrimaryDefensePosition(positions) ?: return null
     return names.getOrNull(match.id)
 }
 

@@ -13,6 +13,7 @@ import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.isDefensePlayer
+import com.telen.easylineup.domain.model.matches
 import com.telen.easylineup.domain.usecases.DecodePlayerSideFlag
 import com.telen.easylineup.domain.usecases.DeletePlayer
 import com.telen.easylineup.domain.usecases.EncodePlayerSideFlag
@@ -129,7 +130,7 @@ class PlayerViewModel(
                         pitchingLeft = pitchingSelection.left,
                         pitchingRight = pitchingSelection.right,
                         selectedPositions = availablePositions
-                            .filter { position -> (player.positions and position.mask) != 0 }
+                            .filter { position -> position.matches(player.positions) }
                             .toSet(),
                         email = player.email ?: "",
                         phone = player.phone ?: "",

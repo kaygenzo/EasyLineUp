@@ -7,9 +7,13 @@ package com.telen.easylineup.tournaments.statistics
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.telen.easylineup.domain.model.PlayingTimeSummary
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.usecases.GetPlayingTimeSummary
 import com.telen.easylineup.domain.usecases.GetTournamentPlayerStatsWithProfiles
+import com.telen.easylineup.domain.usecases.IsPlayingTimeUnderused
+import com.telen.easylineup.domain.usecases.SortPlayersByPlayingTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,11 +26,15 @@ data class TournamentStatisticsUiState(
     val isLoading: Boolean = true,
     val tournamentName: String = "",
     val teamType: TeamType = TeamType.UNKNOWN,
-    val playerStats: List<PlayerStatsRow> = emptyList()
+    val playerStats: List<PlayerStatsRow> = emptyList(),
+    val playingTimeSummary: PlayingTimeSummary = PlayingTimeSummary(0f, 0, 0)
 )
 
 class TournamentStatisticsViewModel(
-    private val getTournamentPlayerStatsWithProfiles: GetTournamentPlayerStatsWithProfiles
+    private val getTournamentPlayerStatsWithProfiles: GetTournamentPlayerStatsWithProfiles,
+    private val sortPlayersByPlayingTime: SortPlayersByPlayingTime,
+    private val getPlayingTimeSummary: GetPlayingTimeSummary,
+    private val isPlayingTimeUnderused: IsPlayingTimeUnderused
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TournamentStatisticsUiState())
     val uiState: StateFlow<TournamentStatisticsUiState> = _uiState.asStateFlow()
@@ -47,19 +55,24 @@ class TournamentStatisticsViewModel(
             )
             getTournamentPlayerStatsWithProfiles(tournament)
                 .mapCatching { profiles ->
-                    profiles.map { profile ->
+                    val summary = getPlayingTimeSummary(profiles)
+                    val rows = sortPlayersByPlayingTime(profiles).map { profile ->
                         PlayerStatsRow(
                             playerId = profile.playerId,
                             name = profile.playerName,
                             shirtNumber = profile.shirtNumber,
                             imageUri = profile.image?.let { uri -> Uri.parse(uri) },
                             totalGames = profile.totalGames,
-                            positionCounts = profile.positionCounts
+                            positionCounts = profile.positionCounts,
+                            isUnderused = isPlayingTimeUnderused(profile.totalGames, summary.average)
                         )
                     }
+                    rows to summary
                 }
-                .onSuccess { rows ->
-                    _uiState.update { it.copy(isLoading = false, playerStats = rows) }
+                .onSuccess { (rows, summary) ->
+                    _uiState.update {
+                        it.copy(isLoading = false, playerStats = rows, playingTimeSummary = summary)
+                    }
                 }
                 .onFailure {
                     Timber.e(it)

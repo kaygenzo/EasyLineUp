@@ -30,6 +30,7 @@ import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
 import com.telen.easylineup.domain.usecases.GetOnlyPlayersInField
 import com.telen.easylineup.domain.usecases.GetPlayer
 import com.telen.easylineup.domain.usecases.GetPlayers
+import com.telen.easylineup.domain.usecases.GetPlayingTimeSummary
 import com.telen.easylineup.domain.usecases.GetPositionsSummaryForPlayer
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
@@ -48,6 +49,7 @@ import com.telen.easylineup.domain.usecases.InsertPlayers
 import com.telen.easylineup.domain.usecases.InsertTeam
 import com.telen.easylineup.domain.usecases.InsertTournaments
 import com.telen.easylineup.domain.usecases.IsEmailValid
+import com.telen.easylineup.domain.usecases.IsPlayingTimeUnderused
 import com.telen.easylineup.domain.usecases.IsValidPhoneNumber
 import com.telen.easylineup.domain.usecases.ObserveLineupById
 import com.telen.easylineup.domain.usecases.ObservePlayer
@@ -68,6 +70,7 @@ import com.telen.easylineup.domain.usecases.SaveTeam
 import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.SetLineupMode
 import com.telen.easylineup.domain.usecases.SortPlayers
+import com.telen.easylineup.domain.usecases.SortPlayersByPlayingTime
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.ToggleFavoritePosition
 import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
@@ -150,5 +153,8 @@ object DomainModule {
         single { GetTournamentDisplayStart() }
         single { GetTournamentPlayerStatsWithProfiles(get(), get()) }
         single { GenerateExportFileName() }
+        single { GetPlayingTimeSummary() }
+        single { IsPlayingTimeUnderused() }
+        single { SortPlayersByPlayingTime() }
     }
 }

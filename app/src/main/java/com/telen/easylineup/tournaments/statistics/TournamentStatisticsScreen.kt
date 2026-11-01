@@ -49,13 +49,15 @@ import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.SelectField
 import com.telen.easylineup.compose.StatChip
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.PlayingTimeSummary
 import com.telen.easylineup.domain.model.TeamType
 import kotlin.math.roundToInt
 
 /**
  * One row's worth of UI-ready data - [com.telen.easylineup.domain.model.PlayerTournamentStats]
  * merged with the roster's own [com.telen.easylineup.domain.model.Player] for the photo/shirt
- * number the domain-layer stats alone don't carry.
+ * number the domain-layer stats alone don't carry. Rows arrive from the ViewModel already ranked
+ * by playing time (most-played first) and flagged against the tournament's own average.
  */
 data class PlayerStatsRow(
     val playerId: Long,
@@ -63,7 +65,8 @@ data class PlayerStatsRow(
     val shirtNumber: Int,
     val imageUri: Uri?,
     val totalGames: Int,
-    val positionCounts: Map<FieldPosition, Int>
+    val positionCounts: Map<FieldPosition, Int>,
+    val isUnderused: Boolean = false
 )
 
 /**
@@ -76,7 +79,7 @@ data class PlayerStatsRow(
 fun TournamentStatisticsScreen(state: TournamentStatisticsUiState, onBackClick: () -> Unit) {
     val playerStats = state.playerStats
     var selectedPlayerId by remember(playerStats) {
-        mutableStateOf(playerStats.maxByOrNull { it.totalGames }?.playerId)
+        mutableStateOf(playerStats.firstOrNull()?.playerId)
     }
     var showPlayerPicker by remember { mutableStateOf(false) }
     // The positions actually played anywhere in this tournament, not one strategy's theoretical
@@ -110,7 +113,7 @@ fun TournamentStatisticsScreen(state: TournamentStatisticsUiState, onBackClick: 
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp)
             ) {
-                PlayingTimeCard(playerStats)
+                PlayingTimeCard(playerStats, state.playingTimeSummary)
                 Spacer(modifier = Modifier.height(4.dp))
                 PositionUsageCard(
                     selectedPlayer = playerStats.firstOrNull { it.playerId == selectedPlayerId },
@@ -135,14 +138,7 @@ fun TournamentStatisticsScreen(state: TournamentStatisticsUiState, onBackClick: 
 }
 
 @Composable
-private fun PlayingTimeCard(playerStats: List<PlayerStatsRow>) {
-    val average = playerStats.map { it.totalGames }.average().toFloat()
-    val lowest = playerStats.minOf { it.totalGames }
-    val highest = playerStats.maxOf { it.totalGames }
-    val sortedByGames = remember(playerStats) {
-        playerStats.sortedByDescending { it.totalGames }
-    }
-
+private fun PlayingTimeCard(playerStats: List<PlayerStatsRow>, summary: PlayingTimeSummary) {
     DugoutCard {
         Column(modifier = Modifier.padding(14.dp)) {
             Text(
@@ -154,34 +150,37 @@ private fun PlayingTimeCard(playerStats: List<PlayerStatsRow>) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 StatChip(
                     modifier = Modifier.weight(1f),
-                    value = average.roundToInt(),
+                    value = summary.average.roundToInt(),
                     label = stringResource(R.string.tournament_stats_avg_games_label)
                 )
                 StatChip(
                     modifier = Modifier.weight(1f),
-                    value = lowest,
+                    value = summary.lowest,
                     label = stringResource(R.string.tournament_stats_low_games_label),
                     color = MaterialTheme.colorScheme.error
                 )
                 StatChip(
                     modifier = Modifier.weight(1f),
-                    value = highest,
+                    value = summary.highest,
                     label = stringResource(R.string.tournament_stats_high_games_label),
                     color = MaterialTheme.colorScheme.primary
                 )
             }
             Spacer(modifier = Modifier.height(14.dp))
-            sortedByGames.forEach { player ->
-                PlayingTimeRow(player = player, maxGames = highest, averageGames = average)
+            playerStats.forEach { player ->
+                PlayingTimeRow(player = player, maxGames = summary.highest)
             }
         }
     }
 }
 
 @Composable
-private fun PlayingTimeRow(player: PlayerStatsRow, maxGames: Int, averageGames: Float) {
-    val isLow = averageGames > 0 && player.totalGames < averageGames / 2f
-    val barColor = if (isLow) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+private fun PlayingTimeRow(player: PlayerStatsRow, maxGames: Int) {
+    val barColor = if (player.isUnderused) {
+        MaterialTheme.colorScheme.error
+    } else {
+        MaterialTheme.colorScheme.primary
+    }
     val widthFraction = if (maxGames > 0) player.totalGames / maxGames.toFloat() else 0f
 
     Row(
@@ -205,7 +204,7 @@ private fun PlayingTimeRow(player: PlayerStatsRow, maxGames: Int, averageGames: 
                 )
                 Text(
                     text = player.totalGames.toString(),
-                    color = if (isLow) MaterialTheme.colorScheme.error else barColor,
+                    color = barColor,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -313,8 +312,12 @@ private val PreviewPlayerStats = listOf(
     PlayerStatsRow(2L, "Devon Ruiz", 23, null, 14, mapOf(FieldPosition.CENTER_FIELD to 14)),
     PlayerStatsRow(3L, "Casey Ford", 31, null, 13, mapOf(FieldPosition.CATCHER to 13)),
     PlayerStatsRow(4L, "Marcus Bell", 14, null, 12, mapOf(FieldPosition.FIRST_BASE to 12)),
-    PlayerStatsRow(5L, "Theo Nakamura", 5, null, 4, mapOf(FieldPosition.PITCHER to 4))
+    PlayerStatsRow(
+        5L, "Theo Nakamura", 5, null, 4, mapOf(FieldPosition.PITCHER to 4), isUnderused = true
+    )
 )
+private val PreviewPlayingTimeSummary =
+    PlayingTimeSummary(average = 11.6f, lowest = 4, highest = 15)
 
 @DugoutPreviews
 @Composable
@@ -325,6 +328,7 @@ private fun TournamentStatisticsScreenPreview() {
                 isLoading = false,
                 tournamentName = "Fall Classic",
                 playerStats = PreviewPlayerStats,
+                playingTimeSummary = PreviewPlayingTimeSummary,
                 teamType = TeamType.BASEBALL
             ),
             onBackClick = {}
