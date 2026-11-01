@@ -23,12 +23,12 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.Player
-import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
+import com.telen.easylineup.domain.usecases.ClearRoster
 import com.telen.easylineup.domain.usecases.DeleteLineup
 import com.telen.easylineup.domain.usecases.DeletePlayerFieldPosition
 import com.telen.easylineup.domain.usecases.GetBattersState
@@ -39,10 +39,12 @@ import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObserveLineupById
 import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
 import com.telen.easylineup.domain.usecases.ObserveTeamPlayersAndMaybePositionsForLineup
+import com.telen.easylineup.domain.usecases.OverrideRosterPlayerNumber
 import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
 import com.telen.easylineup.domain.usecases.SaveDpAndFlex
 import com.telen.easylineup.domain.usecases.SetLineupMode
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
+import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
@@ -63,45 +65,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.Calendar
-
-private fun TeamRosterSummary.withToggledPlayer(position: Int, status: Boolean): TeamRosterSummary {
-    val updatedPlayers = players.mapIndexed { index, player ->
-        if (index == position) player.copy(status = status) else player
-    }
-    val allSelected = updatedPlayers.all { it.status }
-    return TeamRosterSummary(
-        status = if (allSelected) Constants.STATUS_ALL else Constants.STATUS_PARTIAL,
-        players = updatedPlayers
-    )
-}
-
-private fun TeamRosterSummary.withAllCleared(): TeamRosterSummary {
-    return TeamRosterSummary(
-        status = Constants.STATUS_PARTIAL,
-        players = players.map { it.copy(status = false) }
-    )
-}
-
-private fun TeamRosterSummary.withNumberOverride(
-    position: Int,
-    number: Int,
-    lineupId: Long
-): TeamRosterSummary {
-    val updatedPlayers = players.mapIndexed { index, rosterPlayer ->
-        if (index == position) {
-            val overlay = rosterPlayer.playerNumberOverlay?.copy(number = number)
-                ?: PlayerNumberOverlay(
-                    lineupId = lineupId,
-                    playerId = rosterPlayer.player.id,
-                    number = number
-                )
-            rosterPlayer.copy(playerNumberOverlay = overlay)
-        } else {
-            rosterPlayer
-        }
-    }
-    return copy(players = updatedPlayers)
-}
 
 sealed class EventCase
 
@@ -174,7 +137,10 @@ class LineupViewModel(
     private val observeLineupByIdUseCase: ObserveLineupById,
     private val getOnlyPlayersInFieldUseCase: GetOnlyPlayersInField,
     private val saveDpAndFlexUseCase: SaveDpAndFlex,
-    private val updatePlayersWithBattersUseCase: UpdatePlayersWithBatters
+    private val updatePlayersWithBattersUseCase: UpdatePlayersWithBatters,
+    private val toggleRosterPlayerUseCase: ToggleRosterPlayer,
+    private val clearRosterUseCase: ClearRoster,
+    private val overrideRosterPlayerNumberUseCase: OverrideRosterPlayerNumber
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LineupUiState())
     val uiState: StateFlow<LineupUiState> = _uiState.asStateFlow()
@@ -564,7 +530,9 @@ class LineupViewModel(
 
     fun onRosterEditPlayerToggled(position: Int, checked: Boolean) {
         _uiState.update {
-            it.copy(rosterEditSummary = it.rosterEditSummary.withToggledPlayer(position, checked))
+            it.copy(
+                rosterEditSummary = toggleRosterPlayerUseCase(it.rosterEditSummary, position, checked)
+            )
         }
     }
 
@@ -572,13 +540,18 @@ class LineupViewModel(
         _uiState.update {
             val lineupId = it.rosterEditLineup?.id ?: 0L
             it.copy(
-                rosterEditSummary = it.rosterEditSummary.withNumberOverride(position, number, lineupId)
+                rosterEditSummary = overrideRosterPlayerNumberUseCase(
+                    it.rosterEditSummary,
+                    position,
+                    number,
+                    lineupId
+                )
             )
         }
     }
 
     fun onRosterEditClearAll() {
-        _uiState.update { it.copy(rosterEditSummary = it.rosterEditSummary.withAllCleared()) }
+        _uiState.update { it.copy(rosterEditSummary = clearRosterUseCase(it.rosterEditSummary)) }
     }
 
     fun onRosterEditDiscardSheetDismiss() {

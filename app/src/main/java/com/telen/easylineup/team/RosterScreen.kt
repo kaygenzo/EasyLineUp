@@ -48,6 +48,7 @@ import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.compose.shortLabel
 import com.telen.easylineup.domain.model.PlayerSide
+import com.telen.easylineup.domain.model.PlayerSortType
 
 data class RosterRowState(
     val id: Long,
@@ -63,14 +64,14 @@ data class RosterRowState(
 data class RosterState(
     val teamName: String,
     val players: List<RosterRowState>,
-    val sortType: TeamViewModel.SortType
+    val sortType: PlayerSortType
 )
 
 @Composable
 fun RosterScreen(
     state: RosterState,
     onBackClick: () -> Unit,
-    onSortSelected: (TeamViewModel.SortType) -> Unit,
+    onSortSelected: (PlayerSortType) -> Unit,
     onPlayerClick: (Long) -> Unit,
     onAddPlayerClick: () -> Unit,
     onMessageTeamClick: () -> Unit
@@ -156,19 +157,19 @@ fun RosterScreen(
 
 @Composable
 private fun SortPillsRow(
-    selected: TeamViewModel.SortType,
-    onSortSelected: (TeamViewModel.SortType) -> Unit
+    selected: PlayerSortType,
+    onSortSelected: (PlayerSortType) -> Unit
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SortPill(
             text = stringResource(R.string.roster_sort_by_name),
-            selected = selected == TeamViewModel.SortType.ALPHA,
-            onClick = { onSortSelected(TeamViewModel.SortType.ALPHA) }
+            selected = selected == PlayerSortType.ALPHA,
+            onClick = { onSortSelected(PlayerSortType.ALPHA) }
         )
         SortPill(
             text = stringResource(R.string.roster_sort_by_number),
-            selected = selected == TeamViewModel.SortType.NUMERIC,
-            onClick = { onSortSelected(TeamViewModel.SortType.NUMERIC) }
+            selected = selected == PlayerSortType.NUMERIC,
+            onClick = { onSortSelected(PlayerSortType.NUMERIC) }
         )
     }
 }
@@ -177,7 +178,7 @@ private fun SortPillsRow(
 @Composable
 private fun SortPillsRowPreview() {
     DugoutTheme {
-        SortPillsRow(selected = TeamViewModel.SortType.ALPHA, onSortSelected = {})
+        SortPillsRow(selected = PlayerSortType.ALPHA, onSortSelected = {})
     }
 }
 
@@ -542,7 +543,7 @@ private fun RosterScreenPreview() {
                         pitchingSide = null
                     )
                 ),
-                sortType = TeamViewModel.SortType.ALPHA
+                sortType = PlayerSortType.ALPHA
             ),
             onBackClick = {},
             onSortSelected = {},
@@ -561,7 +562,7 @@ private fun RosterScreenEmptyPreview() {
             state = RosterState(
                 teamName = "Riverside Hawks",
                 players = emptyList(),
-                sortType = TeamViewModel.SortType.ALPHA
+                sortType = PlayerSortType.ALPHA
             ),
             onBackClick = {},
             onSortSelected = {},

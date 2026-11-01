@@ -7,14 +7,17 @@ package com.telen.easylineup.domain
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.CheckHashData
 import com.telen.easylineup.domain.usecases.CheckTeam
+import com.telen.easylineup.domain.usecases.ClearRoster
 import com.telen.easylineup.domain.usecases.CreateDashboardTiles
 import com.telen.easylineup.domain.usecases.CreateLineup
+import com.telen.easylineup.domain.usecases.DecodePlayerSideFlag
 import com.telen.easylineup.domain.usecases.DeleteAllData
 import com.telen.easylineup.domain.usecases.DeleteLineup
 import com.telen.easylineup.domain.usecases.DeletePlayer
 import com.telen.easylineup.domain.usecases.DeletePlayerFieldPosition
 import com.telen.easylineup.domain.usecases.DeleteTeam
 import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
+import com.telen.easylineup.domain.usecases.EncodePlayerSideFlag
 import com.telen.easylineup.domain.usecases.ExportData
 import com.telen.easylineup.domain.usecases.GetAllTeams
 import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineups
@@ -49,6 +52,8 @@ import com.telen.easylineup.domain.usecases.ObservePlayers
 import com.telen.easylineup.domain.usecases.ObserveTeamPlayersAndMaybePositionsForLineup
 import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.domain.usecases.ObserveTournaments
+import com.telen.easylineup.domain.usecases.OverrideRosterPlayerNumber
+import com.telen.easylineup.domain.usecases.ResolveLineupEventTime
 import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
 import com.telen.easylineup.domain.usecases.SaveDashboardTiles
@@ -58,7 +63,10 @@ import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
 import com.telen.easylineup.domain.usecases.SaveTeam
 import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.SetLineupMode
+import com.telen.easylineup.domain.usecases.SortPlayers
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
+import com.telen.easylineup.domain.usecases.ToggleFavoritePosition
+import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
 import com.telen.easylineup.domain.usecases.UpdateLineup
 import com.telen.easylineup.domain.usecases.UpdateLineupRoster
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
@@ -126,5 +134,13 @@ object DomainModule {
         single { ObserveLineupById(get()) }
         single { GetLineupById(get(), get()) }
         single { ObserveTeamPlayersAndMaybePositionsForLineup(get()) }
+        single { ToggleRosterPlayer() }
+        single { ClearRoster() }
+        single { OverrideRosterPlayerNumber() }
+        single { ResolveLineupEventTime() }
+        single { ToggleFavoritePosition() }
+        single { EncodePlayerSideFlag() }
+        single { DecodePlayerSideFlag() }
+        single { SortPlayers() }
     }
 }

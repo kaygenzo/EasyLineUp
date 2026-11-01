@@ -13,11 +13,14 @@ import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.isDefensePlayer
+import com.telen.easylineup.domain.usecases.DecodePlayerSideFlag
 import com.telen.easylineup.domain.usecases.DeletePlayer
+import com.telen.easylineup.domain.usecases.EncodePlayerSideFlag
 import com.telen.easylineup.domain.usecases.GetPositionsSummaryForPlayer
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObservePlayer
 import com.telen.easylineup.domain.usecases.SavePlayer
+import com.telen.easylineup.domain.usecases.ToggleFavoritePosition
 import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
@@ -61,21 +64,12 @@ data class PlayerUiState(
     val phoneError: Boolean = false,
     val positionsData: Map<FieldPosition, Int> = emptyMap(),
     val teamType: TeamType = TeamType.getTypeById(0),
-    val strategy: TeamStrategy = TeamStrategy.STANDARD
+    val strategy: TeamStrategy = TeamStrategy.STANDARD,
+    val battingSide: PlayerSide? = null,
+    val pitchingSide: PlayerSide? = null
 ) {
     val shirtNumber: Int get() = shirtNumberText.toIntOrNull() ?: 0
     val licenseNumber: Long get() = licenseNumberText.toLongOrNull() ?: 0L
-    val battingSide: PlayerSide?
-        get() = PlayerSide.getSideByValue(sideFlag(battingLeft, battingRight))
-    val pitchingSide: PlayerSide?
-        get() = PlayerSide.getSideByValue(sideFlag(pitchingLeft, pitchingRight))
-}
-
-private fun sideFlag(left: Boolean, right: Boolean): Int {
-    var flag = 0
-    if (left) flag = flag or PlayerSide.LEFT.flag
-    if (right) flag = flag or PlayerSide.RIGHT.flag
-    return flag
 }
 
 class PlayerViewModel(
@@ -83,7 +77,10 @@ class PlayerViewModel(
     private val observePlayer: ObservePlayer,
     private val savePlayerUseCase: SavePlayer,
     private val deletePlayerUseCase: DeletePlayer,
-    private val getPlayerPositionsSummaryUseCase: GetPositionsSummaryForPlayer
+    private val getPlayerPositionsSummaryUseCase: GetPositionsSummaryForPlayer,
+    private val encodePlayerSideFlagUseCase: EncodePlayerSideFlag,
+    private val decodePlayerSideFlagUseCase: DecodePlayerSideFlag,
+    private val toggleFavoritePositionUseCase: ToggleFavoritePosition
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PlayerUiState())
     val uiState: StateFlow<PlayerUiState> = _uiState.asStateFlow()
@@ -116,6 +113,8 @@ class PlayerViewModel(
         observePlayer(id)
             .catch { Timber.e(it) }
             .onEach { player ->
+                val battingSelection = decodePlayerSideFlagUseCase(player.batting)
+                val pitchingSelection = decodePlayerSideFlagUseCase(player.pitching)
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -125,15 +124,17 @@ class PlayerViewModel(
                             ?: "",
                         imageUri = player.image?.let(Uri::parse),
                         sex = Sex.getById(player.sex),
-                        battingLeft = (player.batting and PlayerSide.LEFT.flag) != 0,
-                        battingRight = (player.batting and PlayerSide.RIGHT.flag) != 0,
-                        pitchingLeft = (player.pitching and PlayerSide.LEFT.flag) != 0,
-                        pitchingRight = (player.pitching and PlayerSide.RIGHT.flag) != 0,
+                        battingLeft = battingSelection.left,
+                        battingRight = battingSelection.right,
+                        pitchingLeft = pitchingSelection.left,
+                        pitchingRight = pitchingSelection.right,
                         selectedPositions = availablePositions
                             .filter { position -> (player.positions and position.mask) != 0 }
                             .toSet(),
                         email = player.email ?: "",
-                        phone = player.phone ?: ""
+                        phone = player.phone ?: "",
+                        battingSide = PlayerSide.getSideByValue(player.batting),
+                        pitchingSide = PlayerSide.getSideByValue(player.pitching)
                     )
                 }
             }
@@ -167,30 +168,53 @@ class PlayerViewModel(
     }
 
     fun onBattingLeftToggled() {
-        _uiState.update { it.copy(battingLeft = !it.battingLeft) }
+        _uiState.update {
+            val left = !it.battingLeft
+            it.copy(
+                battingLeft = left,
+                battingSide = encodedSide(left, it.battingRight)
+            )
+        }
     }
 
     fun onBattingRightToggled() {
-        _uiState.update { it.copy(battingRight = !it.battingRight) }
+        _uiState.update {
+            val right = !it.battingRight
+            it.copy(
+                battingRight = right,
+                battingSide = encodedSide(it.battingLeft, right)
+            )
+        }
     }
 
     fun onPitchingLeftToggled() {
-        _uiState.update { it.copy(pitchingLeft = !it.pitchingLeft) }
+        _uiState.update {
+            val left = !it.pitchingLeft
+            it.copy(
+                pitchingLeft = left,
+                pitchingSide = encodedSide(left, it.pitchingRight)
+            )
+        }
     }
 
     fun onPitchingRightToggled() {
-        _uiState.update { it.copy(pitchingRight = !it.pitchingRight) }
+        _uiState.update {
+            val right = !it.pitchingRight
+            it.copy(
+                pitchingRight = right,
+                pitchingSide = encodedSide(it.pitchingLeft, right)
+            )
+        }
     }
+
+    private fun encodedSide(left: Boolean, right: Boolean): PlayerSide? =
+        PlayerSide.getSideByValue(encodePlayerSideFlagUseCase(left, right))
 
     fun onPositionToggled(position: FieldPosition) {
         _uiState.update {
-            val newSelection = it.selectedPositions.toMutableSet()
-            if (position in newSelection) {
-                newSelection.remove(position)
-            } else if (newSelection.size < MAX_FAVORITE_POSITIONS) {
-                newSelection.add(position)
-            }
-            it.copy(selectedPositions = newSelection)
+            it.copy(
+                selectedPositions = toggleFavoritePositionUseCase(it.selectedPositions, position)
+            )
         }
     }
 
@@ -216,8 +240,8 @@ class PlayerViewModel(
             current.licenseNumberText.toLongOrNull(),
             current.imageUri?.toString(),
             current.selectedPositions.fold(0) { acc, position -> acc or position.mask },
-            sideFlag(current.pitchingLeft, current.pitchingRight),
-            sideFlag(current.battingLeft, current.battingRight),
+            encodePlayerSideFlagUseCase(current.pitchingLeft, current.pitchingRight),
+            encodePlayerSideFlagUseCase(current.battingLeft, current.battingRight),
             current.email,
             current.phone,
             current.sex.id
@@ -243,8 +267,4 @@ class PlayerViewModel(
     }
 
     suspend fun deletePlayer(): Result<Unit> = deletePlayerUseCase(playerId)
-
-    private companion object {
-        const val MAX_FAVORITE_POSITIONS = 3
-    }
 }

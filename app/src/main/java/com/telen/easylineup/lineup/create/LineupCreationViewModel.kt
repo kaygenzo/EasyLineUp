@@ -12,11 +12,14 @@ import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.usecases.ClearRoster
 import com.telen.easylineup.domain.usecases.CreateLineup
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObserveTournaments
+import com.telen.easylineup.domain.usecases.ResolveLineupEventTime
 import com.telen.easylineup.domain.usecases.SaveTournament
+import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import kotlinx.coroutines.channels.Channel
@@ -59,30 +62,15 @@ data class LineupCreationUiState(
     val newTournamentAddress: String = ""
 )
 
-private fun TeamRosterSummary.withToggledPlayer(position: Int, status: Boolean): TeamRosterSummary {
-    val updatedPlayers = players.mapIndexed { index, player ->
-        if (index == position) player.copy(status = status) else player
-    }
-    val allSelected = updatedPlayers.all { it.status }
-    return TeamRosterSummary(
-        status = if (allSelected) Constants.STATUS_ALL else Constants.STATUS_PARTIAL,
-        players = updatedPlayers
-    )
-}
-
-private fun TeamRosterSummary.withAllCleared(): TeamRosterSummary {
-    return TeamRosterSummary(
-        status = Constants.STATUS_PARTIAL,
-        players = players.map { it.copy(status = false) }
-    )
-}
-
 class LineupCreationViewModel(
     private val observeTournaments: ObserveTournaments,
     private val getTeam: GetTeam,
     private val getRoster: GetRoster,
     private val createLineup: CreateLineup,
-    private val saveTournament: SaveTournament
+    private val saveTournament: SaveTournament,
+    private val toggleRosterPlayerUseCase: ToggleRosterPlayer,
+    private val clearRosterUseCase: ClearRoster,
+    private val resolveLineupEventTimeUseCase: ResolveLineupEventTime
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LineupCreationUiState())
     val uiState: StateFlow<LineupCreationUiState> = _uiState.asStateFlow()
@@ -112,7 +100,9 @@ class LineupCreationViewModel(
 
         viewModelScope.launch {
             getRoster()
-                .onSuccess { roster -> _uiState.update { it.copy(isLoading = false, roster = roster) } }
+                .onSuccess { roster ->
+                    _uiState.update { it.copy(isLoading = false, roster = roster) }
+                }
                 .onFailure {
                     Timber.e(it)
                     _uiState.update { state -> state.copy(isLoading = false) }
@@ -137,7 +127,7 @@ class LineupCreationViewModel(
             it.copy(
                 selectedTournament = tournament,
                 tournamentError = false,
-                eventTimeInMillis = resolvedEventTime(tournament, it.eventTimeInMillis),
+                eventTimeInMillis = resolveLineupEventTimeUseCase(tournament, it.eventTimeInMillis),
                 showTournamentSheet = false
             )
         }
@@ -156,11 +146,13 @@ class LineupCreationViewModel(
     }
 
     fun onRosterPlayerToggled(position: Int, checked: Boolean) {
-        _uiState.update { it.copy(roster = it.roster.withToggledPlayer(position, checked)) }
+        _uiState.update {
+            it.copy(roster = toggleRosterPlayerUseCase(it.roster, position, checked))
+        }
     }
 
     fun onRosterClearAll() {
-        _uiState.update { it.copy(roster = it.roster.withAllCleared()) }
+        _uiState.update { it.copy(roster = clearRosterUseCase(it.roster)) }
     }
 
     fun onStrategySelected(strategy: TeamStrategy) {
@@ -221,7 +213,10 @@ class LineupCreationViewModel(
                         it.copy(
                             selectedTournament = tournament,
                             tournamentError = false,
-                            eventTimeInMillis = resolvedEventTime(tournament, it.eventTimeInMillis),
+                            eventTimeInMillis = resolveLineupEventTimeUseCase(
+                                tournament,
+                                it.eventTimeInMillis
+                            ),
                             showNewTournamentSheet = false
                         )
                     }
@@ -266,16 +261,6 @@ class LineupCreationViewModel(
                         else -> Timber.e(it)
                     }
                 }
-        }
-    }
-
-    private fun resolvedEventTime(tournament: Tournament, currentEventTime: Long): Long {
-        return if (tournament.startTime > 0 && tournament.endTime > 0) {
-            val outsideRange = tournament.startTime > currentEventTime ||
-                currentEventTime > tournament.endTime
-            if (outsideRange) tournament.startTime else currentEventTime
-        } else {
-            System.currentTimeMillis()
         }
     }
 }

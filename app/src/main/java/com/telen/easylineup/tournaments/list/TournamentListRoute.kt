@@ -25,9 +25,11 @@ import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Lineup
-import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.usecases.ClearRoster
+import com.telen.easylineup.domain.usecases.OverrideRosterPlayerNumber
+import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
 import com.telen.easylineup.lineup.create.TournamentPickerSheet
 import com.telen.easylineup.lineup.edition.EditLineupSheet
 import com.telen.easylineup.lineup.edition.EditLineupStep
@@ -40,46 +42,8 @@ import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import timber.log.Timber
-
-private fun TeamRosterSummary.withToggledPlayer(position: Int, status: Boolean): TeamRosterSummary {
-    val updatedPlayers = players.mapIndexed { index, player ->
-        if (index == position) player.copy(status = status) else player
-    }
-    val allSelected = updatedPlayers.all { it.status }
-    return TeamRosterSummary(
-        status = if (allSelected) Constants.STATUS_ALL else Constants.STATUS_PARTIAL,
-        players = updatedPlayers
-    )
-}
-
-private fun TeamRosterSummary.withAllCleared(): TeamRosterSummary {
-    return TeamRosterSummary(
-        status = Constants.STATUS_PARTIAL,
-        players = players.map { it.copy(status = false) }
-    )
-}
-
-private fun TeamRosterSummary.withNumberOverride(
-    position: Int,
-    number: Int,
-    lineupId: Long
-): TeamRosterSummary {
-    val updatedPlayers = players.mapIndexed { index, rosterPlayer ->
-        if (index == position) {
-            val overlay = rosterPlayer.playerNumberOverlay?.copy(number = number)
-                ?: PlayerNumberOverlay(
-                    lineupId = lineupId,
-                    playerId = rosterPlayer.player.id,
-                    number = number
-                )
-            rosterPlayer.copy(playerNumberOverlay = overlay)
-        } else {
-            rosterPlayer
-        }
-    }
-    return copy(players = updatedPlayers)
-}
 
 /** Replaces `TournamentListFragment` - the `navigation_lineups` root tab. */
 @Composable
@@ -87,6 +51,9 @@ fun TournamentListRoute(navController: NavController) {
     val viewModel = koinViewModel<LineupListViewModel>()
     val teamViewModel = koinViewModel<TeamViewModel>()
     val editionViewModel = koinViewModel<LineupEditionViewModel>()
+    val toggleRosterPlayer = koinInject<ToggleRosterPlayer>()
+    val clearRoster = koinInject<ClearRoster>()
+    val overrideRosterPlayerNumber = koinInject<OverrideRosterPlayerNumber>()
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
@@ -249,16 +216,17 @@ fun TournamentListRoute(navController: NavController) {
             onRosterClick = { editLineupStep = EditLineupStep.ROSTER },
             onRosterBackClick = { editLineupStep = EditLineupStep.FIELDS },
             onPlayerToggled = { position, checked ->
-                editLineupRoster = editLineupRoster.withToggledPlayer(position, checked)
+                editLineupRoster = toggleRosterPlayer(editLineupRoster, position, checked)
             },
             onNumberChanged = { position, number ->
-                editLineupRoster = editLineupRoster.withNumberOverride(
+                editLineupRoster = overrideRosterPlayerNumber(
+                    editLineupRoster,
                     position,
                     number,
                     editLineupLineup?.id ?: 0L
                 )
             },
-            onClearAll = { editLineupRoster = editLineupRoster.withAllCleared() },
+            onClearAll = { editLineupRoster = clearRoster(editLineupRoster) },
             onCancelClick = { handleEditLineupCancel() },
             onSaveClick = {
                 val base = editLineupLineup

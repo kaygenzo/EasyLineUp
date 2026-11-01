@@ -10,11 +10,13 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerSortType
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.DeleteTeam
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObservePlayers
+import com.telen.easylineup.domain.usecases.SortPlayers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,13 +41,14 @@ data class TeamUiState(
     val teamImageUri: Uri? = null,
     val teamCreatedAt: Long = 0L,
     val players: List<Player> = emptyList(),
-    val sortType: TeamViewModel.SortType = TeamViewModel.SortType.ALPHA
+    val sortType: PlayerSortType = PlayerSortType.ALPHA
 )
 
 class TeamViewModel(
     private val getTeamUseCase: GetTeam,
     private val deleteTeamUseCase: DeleteTeam,
-    private val observePlayersUseCase: ObservePlayers
+    private val observePlayersUseCase: ObservePlayers,
+    private val sortPlayersUseCase: SortPlayers
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TeamUiState())
     val uiState: StateFlow<TeamUiState> = _uiState.asStateFlow()
@@ -90,24 +93,15 @@ class TeamViewModel(
         }
     }
 
-    fun setSortType(sortType: SortType) {
+    fun setSortType(sortType: PlayerSortType) {
         _uiState.update { it.copy(sortType = sortType) }
         applySort()
     }
 
     private fun applySort() {
-        val sorted = when (_uiState.value.sortType) {
-            SortType.ALPHA -> rawPlayers.sortedWith(
-                compareBy(String.CASE_INSENSITIVE_ORDER) { it.name }
-            )
-            SortType.NUMERIC -> rawPlayers.sortedBy { it.shirtNumber }
-        }
+        val sorted = sortPlayersUseCase(rawPlayers, _uiState.value.sortType)
         _uiState.update { it.copy(isLoading = false, players = sorted) }
     }
 
     suspend fun deleteTeam(team: Team): Result<Unit> = deleteTeamUseCase(team)
-
-    enum class SortType {
-        ALPHA, NUMERIC
-    }
 }

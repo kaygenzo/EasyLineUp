@@ -46,10 +46,10 @@ val appModules = module {
     viewModelOf(::LineupEditionViewModel)
     viewModelOf(::TournamentStatisticsViewModel)
     viewModelOf(::LineupListViewModel)
+    viewModelOf(::LineupViewModel)
 
     // Still KoinComponent/by-inject() internally (out of scope to rewrite here) - registered
     // only so koinViewModel() can resolve it now that there is no Fragment to scope it via
     // by viewModels().
-    viewModelOf(::LineupViewModel)
     viewModelOf(::LoginViewModel)
 }
