@@ -4,6 +4,8 @@
 
 package com.telen.easylineup.domain.model
 
+import com.telen.easylineup.domain.Constants
+
 /**
  * @property playerName
  * @property playerSex
@@ -62,6 +64,11 @@ fun PlayerWithPosition.toPlayerFieldPosition(): PlayerFieldPosition {
 fun PlayerWithPosition.isSubstitute(): Boolean {
     return position == FieldPosition.SUBSTITUTE.id ||
             (position == FieldPosition.OLD_SUBSTITUTE.id && fieldPositionId > 0)
+}
+
+/** Whether this substitute currently holds a spot in the batting order (as opposed to bench-only). */
+fun PlayerWithPosition.isBattingSubstitute(): Boolean {
+    return isSubstitute() && order in 1 until Constants.SUBSTITUTE_ORDER_VALUE
 }
 
 fun PlayerWithPosition.isAssigned(): Boolean {

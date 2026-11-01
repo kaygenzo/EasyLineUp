@@ -11,9 +11,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.R
-import com.telen.easylineup.compose.DataCounts
-import com.telen.easylineup.compose.toDataCounts
+import com.telen.easylineup.domain.model.export.DataCounts
 import com.telen.easylineup.domain.model.export.ExportBase
+import com.telen.easylineup.domain.model.export.toDataCounts
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.ExportFileWriter
 import com.telen.easylineup.domain.ports.WrittenExportFile

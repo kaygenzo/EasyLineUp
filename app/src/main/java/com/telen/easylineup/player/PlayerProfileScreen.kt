@@ -50,6 +50,7 @@ import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.getStrategies
+import com.telen.easylineup.domain.usecases.GetMostPlayedPosition
 import com.telen.easylineup.utils.StringResourcesProviderImpl
 import com.telen.easylineup.utils.getStrategiesDisplayName
 
@@ -254,13 +255,13 @@ private fun ProfileHeaderPreview() {
 @Composable
 private fun mostPlayedPositionLabel(
     positionsData: Map<FieldPosition, Int>,
-    teamType: TeamType
+    teamType: TeamType,
+    getMostPlayedPosition: GetMostPlayedPosition = GetMostPlayedPosition()
 ): String? {
-    val topEntry = positionsData.maxByOrNull { it.value } ?: return null
-    if (topEntry.value <= 0) return null
+    val position = getMostPlayedPosition(positionsData) ?: return null
     val context = LocalContext.current
     val names = StringResourcesProviderImpl(context).positionShortNames(teamType.id)
-    return names.getOrNull(topEntry.key.id)
+    return names.getOrNull(position.id)
 }
 
 @DugoutPreviews

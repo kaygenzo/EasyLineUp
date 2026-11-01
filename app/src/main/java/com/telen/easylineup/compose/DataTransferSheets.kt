@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.export.ExportBase
+import com.telen.easylineup.domain.model.export.DataCounts
 import com.telen.easylineup.domain.usecases.ImportResult
 
 private val DataTransferPreviewCounts = DataCounts(
@@ -47,20 +47,6 @@ private val DataTransferPreviewImportResult = ImportResult().apply {
     lineups.recordInsert()
     tournaments.recordUpdate()
 }
-
-/**
- * How many teams/players/lineups/tournaments an export/import payload covers - shown before
- * either native file picker takes over, and again after, so the sheet's promise and the actual
- * result can be compared (mockup's `.info-grid`).
- */
-data class DataCounts(val teams: Int, val players: Int, val lineups: Int, val tournaments: Int)
-
-fun ExportBase.toDataCounts(): DataCounts = DataCounts(
-    teams = teams.size,
-    players = teams.sumOf { it.players.size },
-    lineups = teams.sumOf { team -> team.tournaments.sumOf { it.lineups.size } },
-    tournaments = teams.sumOf { it.tournaments.size }
-)
 
 @Composable
 private fun DataCountsGrid(counts: DataCounts, modifier: Modifier = Modifier) {

@@ -62,4 +62,25 @@ internal class FieldPositionTests {
     fun shouldReturnNullWhenNoPositionMatches() {
         assertNull(FieldPosition.findPrimaryDefensePosition(0))
     }
+
+    @Test
+    fun shouldExcludeSubstituteAndDpDhFromAvailablePositions() {
+        val available = FieldPosition.availablePositions
+
+        assertFalse(available.contains(FieldPosition.SUBSTITUTE))
+        assertFalse(available.contains(FieldPosition.OLD_SUBSTITUTE))
+        assertFalse(available.contains(FieldPosition.DP_DH))
+    }
+
+    @Test
+    fun shouldKeepOnlyOnePositionPerMaskGroup() {
+        val available = FieldPosition.availablePositions
+
+        assertEquals(available.size, available.distinctBy { it.mask }.size)
+        // SLOWPITCH_LF shares LEFT_FIELD's mask - only one of the two should survive.
+        assertFalse(
+            available.contains(FieldPosition.LEFT_FIELD) &&
+                available.contains(FieldPosition.SLOWPITCH_LF)
+        )
+    }
 }

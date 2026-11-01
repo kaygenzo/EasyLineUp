@@ -70,6 +70,11 @@ data class Tournament(
     }
 }
 
+/** Whether this tournament has an explicit start/end date window, rather than none at all. */
+fun Tournament.hasDateWindow(): Boolean {
+    return startTime > 0 && endTime > 0
+}
+
 fun Tournament.toTournamentExport(lineups: List<LineupExport>): TournamentExport {
     return TournamentExport(
         hash ?: UUID.randomUUID().toString(),

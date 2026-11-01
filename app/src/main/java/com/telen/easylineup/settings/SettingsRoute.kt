@@ -27,7 +27,8 @@ import com.telen.easylineup.compose.ExportConfirmSheet
 import com.telen.easylineup.compose.ExportSuccessSheet
 import com.telen.easylineup.compose.ImportConfirmSheet
 import com.telen.easylineup.compose.ImportSuccessSheet
-import com.telen.easylineup.compose.toDataCounts
+import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.export.toDataCounts
 import com.telen.easylineup.license.LicensesManager
 import com.telen.easylineup.login.ImportFailure
 import com.telen.easylineup.login.ImportPreviewReady
@@ -63,8 +64,8 @@ fun SettingsRoute(navController: NavController) {
     fun applyNightMode(value: String) {
         AppCompatDelegate.setDefaultNightMode(
             when (value.toIntOrNull()) {
-                1 -> AppCompatDelegate.MODE_NIGHT_NO
-                2 -> AppCompatDelegate.MODE_NIGHT_YES
+                Constants.MODE_NIGHT_NO -> AppCompatDelegate.MODE_NIGHT_NO
+                Constants.MODE_NIGHT_YES -> AppCompatDelegate.MODE_NIGHT_YES
                 else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             }
         )

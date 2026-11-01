@@ -27,6 +27,7 @@ import com.telen.easylineup.domain.usecases.GetDashboardTiles
 import com.telen.easylineup.domain.usecases.GetDpAndFlexFromPlayersInField
 import com.telen.easylineup.domain.usecases.GetLineupById
 import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
+import com.telen.easylineup.domain.usecases.GetMostPlayedPosition
 import com.telen.easylineup.domain.usecases.GetOnlyPlayersInField
 import com.telen.easylineup.domain.usecases.GetPlayer
 import com.telen.easylineup.domain.usecases.GetPlayers
@@ -49,6 +50,7 @@ import com.telen.easylineup.domain.usecases.InsertPlayers
 import com.telen.easylineup.domain.usecases.InsertTeam
 import com.telen.easylineup.domain.usecases.InsertTournaments
 import com.telen.easylineup.domain.usecases.IsEmailValid
+import com.telen.easylineup.domain.usecases.IsExtraHittersUnlimited
 import com.telen.easylineup.domain.usecases.IsPlayingTimeUnderused
 import com.telen.easylineup.domain.usecases.IsValidPhoneNumber
 import com.telen.easylineup.domain.usecases.ObserveLineupById
@@ -71,6 +73,8 @@ import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.SetLineupMode
 import com.telen.easylineup.domain.usecases.SortPlayers
 import com.telen.easylineup.domain.usecases.SortPlayersByPlayingTime
+import com.telen.easylineup.domain.usecases.SortSubstitutesForDisplay
+import com.telen.easylineup.domain.usecases.SwapBattersOrder
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.ToggleFavoritePosition
 import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
@@ -149,12 +153,16 @@ object DomainModule {
         single { EncodePlayerSideFlag() }
         single { DecodePlayerSideFlag() }
         single { SortPlayers() }
-        single { GetSubstituteBattingSlots() }
+        single { IsExtraHittersUnlimited() }
+        single { GetSubstituteBattingSlots(get()) }
         single { GetTournamentDisplayStart() }
         single { GetTournamentPlayerStatsWithProfiles(get(), get()) }
         single { GenerateExportFileName() }
         single { GetPlayingTimeSummary() }
         single { IsPlayingTimeUnderused() }
         single { SortPlayersByPlayingTime() }
+        single { SwapBattersOrder() }
+        single { SortSubstitutesForDisplay() }
+        single { GetMostPlayedPosition() }
     }
 }

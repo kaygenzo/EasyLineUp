@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import kotlinx.coroutines.launch
@@ -85,7 +86,7 @@ fun PlayerEditRoute(navController: NavController, playerId: Long) {
             pitchingLeft = state.pitchingLeft,
             pitchingRight = state.pitchingRight,
             selectedPositions = state.selectedPositions,
-            availablePositions = availablePositions,
+            availablePositions = FieldPosition.availablePositions,
             teamType = state.teamType
         ),
         onNameChanged = viewModel::onNameChanged,

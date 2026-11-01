@@ -45,7 +45,6 @@ import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.model.isDefensePlayer
 import com.telen.easylineup.utils.StringResourcesProviderImpl
 
 data class PlayerFormState(
@@ -463,8 +462,7 @@ private fun FavoritePositions(
 private fun FavoritePositionsPreview() {
     DugoutTheme {
         FavoritePositions(
-            availablePositions = FieldPosition.values().filter { it.isDefensePlayer() }
-                .distinctBy { it.mask },
+            availablePositions = FieldPosition.availablePositions,
             selectedPositions = setOf(FieldPosition.SHORT_STOP, FieldPosition.SECOND_BASE),
             teamType = TeamType.BASEBALL,
             onPositionToggled = {}
@@ -534,8 +532,7 @@ private fun PlayerFormScreenCreatePreview() {
                 pitchingLeft = false,
                 pitchingRight = false,
                 selectedPositions = emptySet(),
-                availablePositions = FieldPosition.values().filter { it.isDefensePlayer() }
-                    .distinctBy { it.mask },
+                availablePositions = FieldPosition.availablePositions,
                 teamType = TeamType.BASEBALL
             ),
             onNameChanged = {},
@@ -583,8 +580,7 @@ private fun PlayerFormScreenEditPreview() {
                     FieldPosition.SECOND_BASE,
                     FieldPosition.THIRD_BASE
                 ),
-                availablePositions = FieldPosition.values().filter { it.isDefensePlayer() }
-                    .distinctBy { it.mask },
+                availablePositions = FieldPosition.availablePositions,
                 teamType = TeamType.BASEBALL
             ),
             onNameChanged = {},

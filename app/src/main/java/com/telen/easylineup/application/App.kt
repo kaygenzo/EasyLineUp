@@ -15,6 +15,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.utils.SharedPreferencesUtils
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -57,8 +58,8 @@ open class App : MultiDexApplication() {
         ).let {
             val styleValue = it.toInt()
             AppCompatDelegate.setDefaultNightMode(when (styleValue) {
-                AppCompatDelegate.MODE_NIGHT_NO -> AppCompatDelegate.MODE_NIGHT_NO
-                AppCompatDelegate.MODE_NIGHT_YES -> AppCompatDelegate.MODE_NIGHT_YES
+                Constants.MODE_NIGHT_NO -> AppCompatDelegate.MODE_NIGHT_NO
+                Constants.MODE_NIGHT_YES -> AppCompatDelegate.MODE_NIGHT_YES
                 else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             })
         }

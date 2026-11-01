@@ -4,27 +4,26 @@
 
 package com.telen.easylineup.domain.usecases
 
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.SubstituteBattingSlots
-import com.telen.easylineup.domain.model.isSubstitute
+import com.telen.easylineup.domain.model.isBattingSubstitute
 
 /**
  * Counts how many of a lineup's extra-hitter batting slots are still free, from the substitutes
  * already batting in it. Used both to show the budget on the "add substitute" entry point and
  * to decide whether the next picked substitute will bat.
  */
-class GetSubstituteBattingSlots {
+class GetSubstituteBattingSlots(
+    private val isExtraHittersUnlimited: IsExtraHittersUnlimited = IsExtraHittersUnlimited()
+) {
     operator fun invoke(
         lineupPlayers: List<PlayerWithPosition>,
         extraHitters: Int
     ): SubstituteBattingSlots {
-        if (extraHitters > Constants.MAX_EXTRA_HITTERS_BEFORE_UNLIMITED) {
+        if (isExtraHittersUnlimited(extraHitters)) {
             return SubstituteBattingSlots.Unlimited
         }
-        val batting = lineupPlayers.count {
-            it.isSubstitute() && it.order in 1 until Constants.SUBSTITUTE_ORDER_VALUE
-        }
+        val batting = lineupPlayers.count { it.isBattingSubstitute() }
         return SubstituteBattingSlots.Limited(
             remaining = (extraHitters - batting).coerceAtLeast(0),
             total = extraHitters

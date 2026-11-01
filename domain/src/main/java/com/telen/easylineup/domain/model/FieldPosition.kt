@@ -45,6 +45,11 @@ enum class FieldPosition(val id: Int, val mask: Int, val position: Int) {
         fun findPrimaryDefensePosition(positionsMask: Int): FieldPosition? {
             return values().firstOrNull { it.isDefensePlayer() && it.matches(positionsMask) }
         }
+
+        /** One representative position per mask group - the handful the position pickers offer. */
+        val availablePositions: List<FieldPosition> by lazy {
+            values().filter { it.isDefensePlayer() }.groupBy { it.mask }.map { it.value.first() }
+        }
     }
 }
 
@@ -61,6 +66,11 @@ fun FieldPosition.isDefensePlayer(): Boolean {
 /** Whether a player's `positions` bitmask includes this position. */
 fun FieldPosition.matches(positionsMask: Int): Boolean {
     return (positionsMask and mask) != 0
+}
+
+/** Packs a set of positions into the single bitmask a player's `positions` field stores. */
+fun Collection<FieldPosition>.toPositionsMask(): Int {
+    return fold(0) { acc, position -> acc or position.mask }
 }
 
 /**

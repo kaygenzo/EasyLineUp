@@ -12,8 +12,8 @@ import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.model.isDefensePlayer
 import com.telen.easylineup.domain.model.matches
+import com.telen.easylineup.domain.model.toPositionsMask
 import com.telen.easylineup.domain.usecases.DecodePlayerSideFlag
 import com.telen.easylineup.domain.usecases.DeletePlayer
 import com.telen.easylineup.domain.usecases.EncodePlayerSideFlag
@@ -34,12 +34,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-
-/** The handful of positions the roster edit/profile position pickers offer, one per mask group. */
-val availablePositions: List<FieldPosition> = FieldPosition.values()
-    .filter { it.isDefensePlayer() }
-    .groupBy { it.mask }
-    .map { it.value.first() }
 
 /**
  * Everything a player's profile view and its edit form need - one ViewModel instance per
@@ -129,7 +123,7 @@ class PlayerViewModel(
                         battingRight = battingSelection.right,
                         pitchingLeft = pitchingSelection.left,
                         pitchingRight = pitchingSelection.right,
-                        selectedPositions = availablePositions
+                        selectedPositions = FieldPosition.availablePositions
                             .filter { position -> position.matches(player.positions) }
                             .toSet(),
                         email = player.email ?: "",
@@ -240,7 +234,7 @@ class PlayerViewModel(
             current.shirtNumberText.toIntOrNull(),
             current.licenseNumberText.toLongOrNull(),
             current.imageUri?.toString(),
-            current.selectedPositions.fold(0) { acc, position -> acc or position.mask },
+            current.selectedPositions.toPositionsMask(),
             encodePlayerSideFlagUseCase(current.pitchingLeft, current.pitchingRight),
             encodePlayerSideFlagUseCase(current.battingLeft, current.battingRight),
             current.email,

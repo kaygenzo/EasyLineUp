@@ -63,7 +63,6 @@ import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ModeBadge
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.FieldPositionCoordinate
 import com.telen.easylineup.domain.model.MODE_DISABLED
@@ -75,12 +74,13 @@ import com.telen.easylineup.domain.model.SubstituteBattingSlots
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.getPositionPercentage
+import com.telen.easylineup.domain.model.isBattingSubstitute
 import com.telen.easylineup.domain.model.isDefensePlayer
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isFlex
-import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.model.toPlayer
 import com.telen.easylineup.domain.usecases.GetSubstituteBattingSlots
+import com.telen.easylineup.domain.usecases.SortSubstitutesForDisplay
 import com.telen.easylineup.utils.StringResourcesProviderImpl
 import com.telen.easylineup.utils.getColor
 import com.telen.easylineup.views.StateDefense
@@ -119,7 +119,8 @@ fun DefenseScreen(
     onPlayerSentToTrash: (Player, FieldPosition) -> Unit,
     onSubstituteLongClicked: (Player) -> Unit,
     onAddSubstitute: () -> Unit,
-    onLineupModeChanged: (Boolean) -> Unit
+    onLineupModeChanged: (Boolean) -> Unit,
+    sortSubstitutesForDisplay: SortSubstitutesForDisplay = SortSubstitutesForDisplay()
 ) {
     var showDisableDhConfirm by remember { mutableStateOf(false) }
 
@@ -179,11 +180,7 @@ fun DefenseScreen(
                     players = players,
                     onClick = onAddSubstitute
                 )
-                val substitutes = players.filter { it.isSubstitute() }
-                    // Batting order first (so the row reads left-to-right in the order they'd
-                    // bat), falling back to alphabetical for substitutes sharing the same
-                    // order - bench-only ones all share SUBSTITUTE_ORDER_VALUE.
-                    .sortedWith(compareBy({ it.order }, { it.playerName.lowercase() }))
+                val substitutes = sortSubstitutesForDisplay(players)
                 if (substitutes.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(10.dp))
                     SubstitutesRow(
@@ -599,7 +596,7 @@ private fun SubstitutesRow(
                 // Same orange/gray coding as the "Will bat"/"Bench only" pill in the add-
                 // substitute sheet, but reflecting this substitute's actual current state
                 // rather than a prediction.
-                val isBatting = substitute.order in 1 until Constants.SUBSTITUTE_ORDER_VALUE
+                val isBatting = substitute.isBattingSubstitute()
                 DefenseMarker(
                     state = StateDefense.PLAYER,
                     imageUri = substitute.image?.let(Uri::parse),

@@ -54,13 +54,13 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.dashedBorder
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.GeoLocation
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.getStrategies
+import com.telen.easylineup.domain.usecases.IsExtraHittersUnlimited
 import com.telen.easylineup.utils.getStrategiesDisplayName
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -444,7 +444,8 @@ private fun LineupRow(
     lineup: Lineup,
     teamType: TeamType,
     onClick: () -> Unit,
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
+    isExtraHittersUnlimited: IsExtraHittersUnlimited = IsExtraHittersUnlimited()
 ) {
     Row(
         modifier = Modifier
@@ -481,10 +482,10 @@ private fun LineupRow(
                 }
                 strategyLabel?.let { LineupBadge(text = it) }
                 lineup.extraHitters.takeIf { it > 0 }?.let { extraHitters ->
-                    val value = if (extraHitters <= Constants.MAX_EXTRA_HITTERS_BEFORE_UNLIMITED) {
-                        extraHitters.toString()
-                    } else {
+                    val value = if (isExtraHittersUnlimited(extraHitters)) {
                         stringResource(R.string.generic_infinite)
+                    } else {
+                        extraHitters.toString()
                     }
                     LineupBadge(text = "+$value")
                 }

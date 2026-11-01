@@ -52,6 +52,7 @@ import com.telen.easylineup.compose.ModeBadge
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.isSubstitute
+import com.telen.easylineup.domain.usecases.SwapBattersOrder
 import com.telen.easylineup.views.LineupTypeface
 
 /**
@@ -65,7 +66,8 @@ fun AttackScreen(
     batters: List<BatterState>,
     editable: Boolean,
     typeface: LineupTypeface,
-    onReorder: (List<BatterState>) -> Unit
+    onReorder: (List<BatterState>) -> Unit,
+    swapBattersOrder: SwapBattersOrder = SwapBattersOrder()
 ) {
     var localBatters by remember { mutableStateOf(batters) }
     var draggedId by remember { mutableStateOf<Long?>(null) }
@@ -155,10 +157,8 @@ fun AttackScreen(
                             val fromBatter = localBatters[fromIndex]
                             val targetBatter = localBatters[targetIndex]
                             if (fromBatter.canMove && targetBatter.canMove) {
-                                val swappedFrom =
-                                    fromBatter.copy(playerOrder = targetBatter.playerOrder)
-                                val swappedTarget =
-                                    targetBatter.copy(playerOrder = fromBatter.playerOrder)
+                                val (swappedFrom, swappedTarget) =
+                                    swapBattersOrder(fromBatter, targetBatter)
                                 localBatters = localBatters.toMutableList().apply {
                                     this[fromIndex] = swappedTarget
                                     this[targetIndex] = swappedFrom

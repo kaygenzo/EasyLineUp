@@ -24,6 +24,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.hasDateWindow
 import com.telen.easylineup.navigation.Routes
 import org.koin.androidx.compose.koinViewModel
 
@@ -48,7 +49,7 @@ fun LineupCreationRoute(navController: NavController) {
     fun showDatePicker(tournament: Tournament) {
         val fragmentManager = (context as FragmentActivity).supportFragmentManager
         var constraints: CalendarConstraints? = null
-        if (tournament.startTime > 0 && tournament.endTime > 0) {
+        if (tournament.hasDateWindow()) {
             val min = DateValidatorPointForward.from(tournament.startTime)
             val max = DateValidatorPointBackward.before(tournament.endTime)
             constraints = CalendarConstraints.Builder()

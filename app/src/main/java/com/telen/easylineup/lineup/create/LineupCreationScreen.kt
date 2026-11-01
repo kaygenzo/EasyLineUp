@@ -77,6 +77,7 @@ import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.hasDateWindow
 import com.telen.easylineup.domain.model.getStrategies
 import com.telen.easylineup.utils.getStrategiesDisplayName
 import java.text.SimpleDateFormat
@@ -194,7 +195,7 @@ fun LineupCreationScreen(
                     null
                 },
                 placeholder = stringResource(R.string.lineup_creation_date_disabled_hint),
-                subLabel = state.selectedTournament?.takeIf { it.startTime > 0 && it.endTime > 0 }
+                subLabel = state.selectedTournament?.takeIf { it.hasDateWindow() }
                     ?.let { stringResource(R.string.lineup_creation_date_sub_within, it.name) },
                 enabled = dateEnabled,
                 onClick = onDateClick
