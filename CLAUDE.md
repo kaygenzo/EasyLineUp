@@ -91,6 +91,25 @@ Rx-wrapped. See the `business-logic-boundary` skill for the full checklist
 (what counts, what doesn't, where new logic/I/O goes, and the audit
 procedure) before writing or reviewing ViewModel/Compose code.
 
+## UiState never carries a string resource id
+
+A ViewModel picks *which* message/label applies (a domain or state decision)
+but never *which `R.string.*` represents it* (a display decision) — those are
+different choices and the second one belongs in Compose. Concretely:
+`UiState`/event classes never have an `Int` field annotated `@StringRes`, or
+an unannotated `Int` that's secretly a resource id either. Where a ViewModel
+needs to pick between more than one possible message, it exposes a sealed
+class with one case per message (e.g. `LineupViewModel`'s `LineupInfoMessage`:
+`NoCandidatesForPosition`, `PitcherAssignmentRequired`,
+`BothDpAndFlexRequired`) instead of an `Int`; the `XRoute.kt` composable is
+the only place that maps a case to its `R.string.*` via `stringResource()`.
+Where the "message" is really just a derived label for data the UiState
+already carries (`LineupViewModel`'s old `LinkDpFlex.title`, computable from
+the event's own `teamType`), don't carry a resource id for it at all — derive
+the label in Compose from the data that's already there instead of
+precomputing and shipping an id for something the UiState didn't need a new
+field to express.
+
 ## Code style: AOSP, 100-column hard limit
 
 All code (Kotlin, Java, XML, Gradle) follows the official AOSP style. Concretely:
