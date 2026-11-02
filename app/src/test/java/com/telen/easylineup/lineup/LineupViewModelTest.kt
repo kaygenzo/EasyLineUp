@@ -352,8 +352,8 @@ internal class LineupViewModelTest {
 
         assertNull(viewModel.uiState.value.availablePlayersEvent)
         assertEquals(
-            com.telen.easylineup.R.string.players_list_empty,
-            viewModel.uiState.value.infoMessageRes
+            LineupInfoMessage.NoCandidatesForPosition,
+            viewModel.uiState.value.infoMessage
         )
     }
 
@@ -394,8 +394,8 @@ internal class LineupViewModelTest {
 
         assertTrue(result.isFailure)
         assertEquals(
-            com.telen.easylineup.R.string.error_need_assign_pitcher_first_message,
-            viewModel.uiState.value.infoMessageRes
+            LineupInfoMessage.PitcherAssignmentRequired,
+            viewModel.uiState.value.infoMessage
         )
     }
 
@@ -446,7 +446,7 @@ internal class LineupViewModelTest {
     @Test
     fun shouldDismissInfoMessage() {
         viewModel.onInfoMessageDismiss()
-        assertNull(viewModel.uiState.value.infoMessageRes)
+        assertNull(viewModel.uiState.value.infoMessage)
     }
 
     @Test
@@ -528,8 +528,8 @@ internal class LineupViewModelTest {
 
         assertTrue(result.isFailure)
         assertEquals(
-            com.telen.easylineup.R.string.error_need_assign_both_players_message,
-            viewModel.uiState.value.infoMessageRes
+            LineupInfoMessage.BothDpAndFlexRequired,
+            viewModel.uiState.value.infoMessage
         )
     }
 

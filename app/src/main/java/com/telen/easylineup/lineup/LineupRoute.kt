@@ -187,6 +187,11 @@ fun LineupRoute(
     }
 
     state.dpFlexEvent?.let { event ->
+        val dpFlexTitle = if (event.teamType == TeamType.SOFTBALL.id) {
+            stringResource(R.string.link_dp_and_flex_dialog_title)
+        } else {
+            stringResource(R.string.link_dh_and_pitcher_dialog_title)
+        }
         DpFlexLinkSheet(
             initialDp = event.initialData.first?.toPlayer(),
             initialFlex = event.initialData.second?.toPlayer(),
@@ -194,7 +199,7 @@ fun LineupRoute(
             dpLocked = event.dpLocked,
             flexLocked = event.flexLocked,
             teamType = event.teamType,
-            title = stringResource(event.title),
+            title = dpFlexTitle,
             onRequestDpPlayers = {
                 viewModel.getPlayerSelectionForDp()
                     .getOrElse { emptyList() }
@@ -230,7 +235,14 @@ fun LineupRoute(
         )
     }
 
-    state.infoMessageRes?.let { messageRes ->
+    state.infoMessage?.let { message ->
+        val messageRes = when (message) {
+            LineupInfoMessage.NoCandidatesForPosition -> R.string.players_list_empty
+            LineupInfoMessage.PitcherAssignmentRequired ->
+                R.string.error_need_assign_pitcher_first_message
+            LineupInfoMessage.BothDpAndFlexRequired ->
+                R.string.error_need_assign_both_players_message
+        }
         AlertDialog(
             onDismissRequest = viewModel::onInfoMessageDismiss,
             text = { Text(stringResource(messageRes)) },

@@ -9,7 +9,6 @@ package com.telen.easylineup.lineup
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
@@ -71,16 +70,22 @@ sealed class EventCase
  * @property initialData
  * @property dpLocked
  * @property flexLocked
- * @property teamType
- * @property title
+ * @property teamType the sheet's own title depends only on this, so it's derived where the
+ * string is actually resolved ([LineupRoute]) rather than carried here as a resource id.
  */
 data class LinkDpFlex(
     val initialData: Pair<PlayerWithPosition?, PlayerWithPosition?>,
     val dpLocked: Boolean,
     val flexLocked: Boolean,
-    val teamType: Int,
-    @StringRes val title: Int
+    val teamType: Int
 ) : EventCase()
+
+/** Which of [LineupScreen]'s info dialogs to show - [LineupRoute] resolves the actual string. */
+sealed class LineupInfoMessage {
+    data object NoCandidatesForPosition : LineupInfoMessage()
+    data object PitcherAssignmentRequired : LineupInfoMessage()
+    data object BothDpAndFlexRequired : LineupInfoMessage()
+}
 
 /**
  * @property players
@@ -109,7 +114,7 @@ data class LineupUiState(
     val availablePlayersEvent: ListAvailablePlayers? = null,
     val dpFlexEvent: LinkDpFlex? = null,
     val deleteConfirmPlayer: Player? = null,
-    val infoMessageRes: Int? = null,
+    val infoMessage: LineupInfoMessage? = null,
     val showDiscardSheet: Boolean = false,
     val showDeleteSheet: Boolean = false,
     val rosterEditLineup: Lineup? = null,
@@ -367,8 +372,8 @@ class LineupViewModel(
                             } else {
                                 ListAvailablePlayers(players, position)
                             },
-                            infoMessageRes = if (players.isEmpty()) {
-                                R.string.players_list_empty
+                            infoMessage = if (players.isEmpty()) {
+                                LineupInfoMessage.NoCandidatesForPosition
                             } else {
                                 null
                             }
@@ -380,24 +385,18 @@ class LineupViewModel(
         } else {
             getDpAndFlexFromPlayersInFieldUseCase(_listPlayersWithPosition)
                 .onSuccess {
-                    val title = if (it.teamType == TeamType.SOFTBALL.id) {
-                        R.string.link_dp_and_flex_dialog_title
-                    } else {
-                        R.string.link_dh_and_pitcher_dialog_title
-                    }
                     val event = LinkDpFlex(
                         Pair(it.dp, it.flex),
                         it.dpLocked,
                         it.flexLocked,
-                        it.teamType,
-                        title
+                        it.teamType
                     )
                     _uiState.update { state -> state.copy(dpFlexEvent = event) }
                 }
                 .onFailure { throwable ->
                     if (throwable is NeedAssignPitcherFirstException) {
                         _uiState.update {
-                            it.copy(infoMessageRes = R.string.error_need_assign_pitcher_first_message)
+                            it.copy(infoMessage = LineupInfoMessage.PitcherAssignmentRequired)
                         }
                     } else {
                         Timber.e(throwable)
@@ -424,7 +423,7 @@ class LineupViewModel(
     }
 
     fun onInfoMessageDismiss() {
-        _uiState.update { it.copy(infoMessageRes = null) }
+        _uiState.update { it.copy(infoMessage = null) }
     }
 
     fun onDiscardSheetRequested() {
@@ -475,7 +474,7 @@ class LineupViewModel(
                 if (throwable is NeedAssignBothPlayersException) {
                     Timber.w(throwable.message)
                     _uiState.update {
-                        it.copy(infoMessageRes = R.string.error_need_assign_both_players_message)
+                        it.copy(infoMessage = LineupInfoMessage.BothDpAndFlexRequired)
                     }
                 } else {
                     Timber.e(throwable)
