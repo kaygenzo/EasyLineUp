@@ -7,12 +7,13 @@ package com.telen.easylineup.tournaments.list
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.usecases.GetTournamentDisplayStart
+import kotlinx.collections.immutable.ImmutableList
 
 /**
  * @property tournament
  * @property lineups
  */
-data class TournamentItem(val tournament: Tournament, val lineups: List<Lineup>)
+data class TournamentItem(val tournament: Tournament, val lineups: ImmutableList<Lineup>)
 
 fun TournamentItem.getStart(
     getTournamentDisplayStart: GetTournamentDisplayStart = GetTournamentDisplayStart()

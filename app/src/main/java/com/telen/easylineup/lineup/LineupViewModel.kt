@@ -49,6 +49,9 @@ import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersExce
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.LineupShareImageWriter
 import com.telen.easylineup.views.LineupTypeface
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -95,12 +98,12 @@ const val FRAGMENT_ATTACK_INDEX = 1
 data class LineupUiState(
     val isLoading: Boolean = true,
     val lineupName: String = "",
-    val defensePlayers: List<PlayerWithPosition> = emptyList(),
+    val defensePlayers: ImmutableList<PlayerWithPosition> = persistentListOf(),
     val defenseStrategy: TeamStrategy = TeamStrategy.STANDARD,
     val lineupMode: Int = MODE_DISABLED,
     val teamType: Int = TeamType.UNKNOWN.id,
     val extraHitters: Int = 0,
-    val batters: List<BatterState> = emptyList(),
+    val batters: ImmutableList<BatterState> = persistentListOf(),
     val typeface: LineupTypeface = LineupTypeface.NORMAL,
     val selectedTab: Int = FRAGMENT_DEFENSE_INDEX,
     val availablePlayersEvent: ListAvailablePlayers? = null,
@@ -215,7 +218,8 @@ class LineupViewModel(
         // structural-equality state check actually sees a change instead of comparing the
         // same mutated objects against themselves.
         _uiState.update {
-            it.copy(isLoading = false, defensePlayers = _listPlayersWithPosition.map { p -> p.copy() })
+            val snapshot = _listPlayersWithPosition.map { p -> p.copy() }.toImmutableList()
+            it.copy(isLoading = false, defensePlayers = snapshot)
         }
         val currentLineup = lineup ?: return
         val batterSize = TeamStrategy.getStrategyById(currentLineup.strategy).batterSize
@@ -227,7 +231,9 @@ class LineupViewModel(
             isDebug = BuildConfig.DEBUG,
             isEditable = editable
         )
-            .onSuccess { batters -> _uiState.update { it.copy(batters = batters) } }
+            .onSuccess { batters ->
+                _uiState.update { it.copy(batters = batters.toImmutableList()) }
+            }
             .onFailure { Timber.e(it) }
     }
 

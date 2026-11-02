@@ -4,16 +4,13 @@
 
 package com.telen.easylineup.login
 
-import android.content.ContentResolver
-import android.content.Context
 import android.net.Uri
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.export.ExportBase
+import com.telen.easylineup.domain.ports.ImportFileReader
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ImportData
 import com.telen.easylineup.domain.usecases.ImportResult
-import com.telen.easylineup.export.json.JsonExportBase
-import com.telen.easylineup.export.json.exportGson
 import com.telen.easylineup.testDispatcherProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,16 +29,11 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
-import java.io.ByteArrayInputStream
 
 /**
- * Unit tests for [LoginViewModel]: [GetTeam]/[ImportData] are mocked directly (each already has
- * its own domain-level test suite). [Context]/[Uri] are mocked too since this ViewModel talks to
- * the content resolver directly for file import - `peekImportFile`'s success path feeds a real
- * serialized [JsonExportBase] through a real [ByteArrayInputStream] rather than mocking the
- * parsing itself, and its display-name lookup falls back to [Uri.getLastPathSegment] (real
- * behavior, not a workaround) since mocking a [android.database.Cursor] just to exercise that
- * one branch would be more fragile than useful here.
+ * Unit tests for [LoginViewModel]: [GetTeam]/[ImportData]/[ImportFileReader] are mocked directly
+ * (each already has its own test suite at its own layer) - this only verifies the ViewModel's own
+ * orchestration.
  */
 @RunWith(MockitoJUnitRunner::class)
 internal class LoginViewModelTest {
@@ -52,10 +44,7 @@ internal class LoginViewModelTest {
     lateinit var importDataUseCase: ImportData
 
     @Mock
-    lateinit var context: Context
-
-    @Mock
-    lateinit var contentResolver: ContentResolver
+    lateinit var importFileReader: ImportFileReader
 
     @Mock
     lateinit var uri: Uri
@@ -65,12 +54,10 @@ internal class LoginViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        Mockito.lenient().`when`(context.contentResolver).thenReturn(contentResolver)
-        Mockito.lenient().`when`(uri.lastPathSegment).thenReturn("export.elu")
         viewModel = LoginViewModel(
             getTeamUseCase,
             importDataUseCase,
-            context,
+            importFileReader,
             testDispatcherProvider()
         )
     }
@@ -82,10 +69,9 @@ internal class LoginViewModelTest {
 
     @Test
     fun shouldSendImportPreviewReadyWhenFileParsesSuccessfully() = runTest {
-        val json = exportGson.toJson(JsonExportBase(teams = emptyList()))
-        Mockito.`when`(contentResolver.openInputStream(uri))
-            .thenReturn(ByteArrayInputStream(json.toByteArray()))
-        Mockito.`when`(contentResolver.query(uri, null, null, null, null)).thenReturn(null)
+        val exportBase = ExportBase(teams = emptyList())
+        Mockito.`when`(importFileReader.read(uri.toString())).thenReturn(exportBase)
+        Mockito.`when`(importFileReader.queryDisplayName(uri.toString())).thenReturn("export.elu")
 
         val events = mutableListOf<LoginEvent>()
         val job = launch { viewModel.events.collect { events.add(it) } }
@@ -96,13 +82,14 @@ internal class LoginViewModelTest {
         assertEquals(1, events.size)
         val event = events[0] as ImportPreviewReady
         assertEquals("export.elu", event.fileName)
-        assertEquals(ExportBase(teams = emptyList()), event.exportBase)
+        assertEquals(exportBase, event.exportBase)
         job.cancel()
     }
 
     @Test
     fun shouldSendImportFailureWhenFileCannotBeOpened() = runTest {
-        Mockito.`when`(contentResolver.openInputStream(uri)).thenReturn(null)
+        Mockito.`when`(importFileReader.read(uri.toString()))
+            .thenThrow(IllegalArgumentException("Cannot open uri"))
 
         val events = mutableListOf<LoginEvent>()
         val job = launch { viewModel.events.collect { events.add(it) } }

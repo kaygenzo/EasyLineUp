@@ -52,6 +52,9 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayingTimeSummary
 import com.telen.easylineup.domain.model.TeamType
 import kotlin.math.roundToInt
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
 
 /**
  * One row's worth of UI-ready data - [com.telen.easylineup.domain.model.PlayerTournamentStats]
@@ -65,7 +68,7 @@ data class PlayerStatsRow(
     val shirtNumber: Int,
     val imageUri: Uri?,
     val totalGames: Int,
-    val positionCounts: Map<FieldPosition, Int>,
+    val positionCounts: ImmutableMap<FieldPosition, Int>,
     val isUnderused: Boolean = false
 )
 
@@ -307,13 +310,22 @@ private fun PlayerPickerSheet(
     }
 }
 
-private val PreviewPlayerStats = listOf(
-    PlayerStatsRow(1L, "Jonas Alvarez", 7, null, 15, mapOf(FieldPosition.SHORT_STOP to 11)),
-    PlayerStatsRow(2L, "Devon Ruiz", 23, null, 14, mapOf(FieldPosition.CENTER_FIELD to 14)),
-    PlayerStatsRow(3L, "Casey Ford", 31, null, 13, mapOf(FieldPosition.CATCHER to 13)),
-    PlayerStatsRow(4L, "Marcus Bell", 14, null, 12, mapOf(FieldPosition.FIRST_BASE to 12)),
+private val PreviewPlayerStats = persistentListOf(
     PlayerStatsRow(
-        5L, "Theo Nakamura", 5, null, 4, mapOf(FieldPosition.PITCHER to 4), isUnderused = true
+        1L, "Jonas Alvarez", 7, null, 15, persistentMapOf(FieldPosition.SHORT_STOP to 11)
+    ),
+    PlayerStatsRow(
+        2L, "Devon Ruiz", 23, null, 14, persistentMapOf(FieldPosition.CENTER_FIELD to 14)
+    ),
+    PlayerStatsRow(
+        3L, "Casey Ford", 31, null, 13, persistentMapOf(FieldPosition.CATCHER to 13)
+    ),
+    PlayerStatsRow(
+        4L, "Marcus Bell", 14, null, 12, persistentMapOf(FieldPosition.FIRST_BASE to 12)
+    ),
+    PlayerStatsRow(
+        5L, "Theo Nakamura", 5, null, 4, persistentMapOf(FieldPosition.PITCHER to 4),
+        isUnderused = true
     )
 )
 private val PreviewPlayingTimeSummary =

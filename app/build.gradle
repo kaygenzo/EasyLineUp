@@ -179,6 +179,7 @@ dependencies {
     // Coroutines
     implementation libs.kotlinx.coroutines.core
     implementation libs.kotlinx.coroutines.android
+    implementation libs.kotlinx.collections.immutable
 
     implementation libs.multidex
     implementation libs.navigation.compose
@@ -205,7 +206,7 @@ dependencies {
     ////////// OTHERS //////////
 
     implementation libs.timber
-    implementation libs.picasso
+    implementation libs.coil.compose
     implementation libs.rounedImage
     implementation libs.koin
     implementation libs.koin.androidx.compose

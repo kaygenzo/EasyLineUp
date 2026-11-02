@@ -17,6 +17,9 @@ import com.telen.easylineup.domain.usecases.UpdateLineup
 import com.telen.easylineup.domain.usecases.UpdateLineupRoster
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +44,7 @@ data object InvalidTournament : LineupEditionEvent()
  * own, so [uiState] only carries its one true reactive source (the tournament picker options);
  * the sheet's own in-progress form fields stay local to whichever Route is hosting it.
  */
-data class LineupEditionUiState(val tournaments: List<Tournament> = emptyList())
+data class LineupEditionUiState(val tournaments: ImmutableList<Tournament> = persistentListOf())
 
 class LineupEditionViewModel(
     private val getLineupById: GetLineupById,
@@ -59,7 +62,9 @@ class LineupEditionViewModel(
 
     init {
         observeTournaments().catch { Timber.e(it) }
-            .onEach { tournaments -> _uiState.update { it.copy(tournaments = tournaments) } }
+            .onEach { tournaments ->
+                _uiState.update { it.copy(tournaments = tournaments.toImmutableList()) }
+            }
             .launchIn(viewModelScope)
     }
 

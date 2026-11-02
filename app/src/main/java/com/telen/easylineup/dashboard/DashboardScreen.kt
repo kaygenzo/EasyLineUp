@@ -662,8 +662,7 @@ private fun DashboardScreenPreview() {
                 ),
                 shirtNumberQuery = "07",
                 shirtNumberHasSearched = true,
-                shirtNumberResult = "Jonas Alvarez",
-                shirtNumberHistory = emptyList()
+                shirtNumberResult = "Jonas Alvarez"
             ),
             onSwitchTeamClick = {},
             onRosterClick = {},
@@ -688,8 +687,7 @@ private fun DashboardScreenEmptyPreview() {
                 teamType = TeamType.SOFTBALL,
                 mostUsedPlayer = null,
                 lastLineup = null,
-                shirtNumberQuery = "",
-                shirtNumberHistory = emptyList()
+                shirtNumberQuery = ""
             ),
             onSwitchTeamClick = {},
             onRosterClick = {},

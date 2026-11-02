@@ -49,6 +49,8 @@ import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.compose.shortLabel
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.PlayerSortType
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 data class RosterRowState(
     val id: Long,
@@ -63,7 +65,7 @@ data class RosterRowState(
 
 data class RosterState(
     val teamName: String,
-    val players: List<RosterRowState>,
+    val players: ImmutableList<RosterRowState>,
     val sortType: PlayerSortType
 )
 
@@ -514,7 +516,7 @@ private fun RosterScreenPreview() {
         RosterScreen(
             state = RosterState(
                 teamName = "Riverside Hawks",
-                players = listOf(
+                players = persistentListOf(
                     RosterRowState(
                         id = 1,
                         name = "Jonas Alvarez",
@@ -561,7 +563,7 @@ private fun RosterScreenEmptyPreview() {
         RosterScreen(
             state = RosterState(
                 teamName = "Riverside Hawks",
-                players = emptyList(),
+                players = persistentListOf(),
                 sortType = PlayerSortType.ALPHA
             ),
             onBackClick = {},

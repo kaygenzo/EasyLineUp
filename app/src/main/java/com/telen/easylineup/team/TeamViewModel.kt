@@ -17,6 +17,9 @@ import com.telen.easylineup.domain.usecases.DeleteTeam
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObservePlayers
 import com.telen.easylineup.domain.usecases.SortPlayers
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +43,7 @@ data class TeamUiState(
     val teamType: TeamType = TeamType.UNKNOWN,
     val teamImageUri: Uri? = null,
     val teamCreatedAt: Long = 0L,
-    val players: List<Player> = emptyList(),
+    val players: ImmutableList<Player> = persistentListOf(),
     val sortType: PlayerSortType = PlayerSortType.ALPHA
 )
 
@@ -100,7 +103,7 @@ class TeamViewModel(
 
     private fun applySort() {
         val sorted = sortPlayersUseCase(rawPlayers, _uiState.value.sortType)
-        _uiState.update { it.copy(isLoading = false, players = sorted) }
+        _uiState.update { it.copy(isLoading = false, players = sorted.toImmutableList()) }
     }
 
     suspend fun deleteTeam(team: Team): Result<Unit> = deleteTeamUseCase(team)

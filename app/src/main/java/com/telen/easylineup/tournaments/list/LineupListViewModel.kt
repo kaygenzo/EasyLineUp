@@ -15,6 +15,12 @@ import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
 import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineups
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.GetTournamentMapLink
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,8 +37,8 @@ import timber.log.Timber
 /** Everything the Tournaments tab (and TeamDetails' own tournament/lineup counts) need. */
 data class LineupListUiState(
     val isLoading: Boolean = true,
-    val tournamentItems: List<TournamentItem> = emptyList(),
-    val mapsByTournamentId: Map<Long, GeoLocation> = emptyMap(),
+    val tournamentItems: ImmutableList<TournamentItem> = persistentListOf(),
+    val mapsByTournamentId: ImmutableMap<Long, GeoLocation> = persistentMapOf(),
     val searchQuery: String = "",
     val teamType: TeamType = TeamType.UNKNOWN
 )
@@ -55,7 +61,10 @@ class LineupListViewModel(
                 flow {
                     getAllTournamentsWithLineups(filter)
                         .onSuccess { pairs ->
-                            emit(pairs.map { TournamentItem(it.first, it.second) })
+                            val items = pairs.map {
+                                TournamentItem(it.first, it.second.toImmutableList())
+                            }
+                            emit(items.toImmutableList())
                         }
                         .onFailure { Timber.e(it) }
                 }
@@ -83,7 +92,8 @@ class LineupListViewModel(
                     .onSuccess { location ->
                         val id = item.tournament.id
                         _uiState.update {
-                            it.copy(mapsByTournamentId = it.mapsByTournamentId + (id to location))
+                            val updated = it.mapsByTournamentId + (id to location)
+                            it.copy(mapsByTournamentId = updated.toImmutableMap())
                         }
                     }
             }

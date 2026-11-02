@@ -44,9 +44,6 @@ internal interface PlayerDao {
     @Query("SELECT * from players WHERE id = :playerId")
     suspend fun getPlayerById(playerId: Long): RoomPlayer
 
-    // @Query("SELECT * FROM players WHERE players.teamID = :teamID")
-    // fun getPlayers(teamID: Long): LiveData<List<Player>>
-
     @Query("SELECT * FROM players WHERE players.teamID = :teamId")
     suspend fun getPlayersByTeamId(teamId: Long): List<RoomPlayer>
 

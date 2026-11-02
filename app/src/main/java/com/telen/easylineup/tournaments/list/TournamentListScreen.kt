@@ -65,12 +65,16 @@ import com.telen.easylineup.utils.getStrategiesDisplayName
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
 
 data class TournamentListState(
     val teamName: String,
     val teamType: TeamType,
-    val items: List<TournamentItem>,
-    val mapsByTournamentId: Map<Long, GeoLocation>,
+    val items: ImmutableList<TournamentItem>,
+    val mapsByTournamentId: ImmutableMap<Long, GeoLocation>,
     val searchQuery: String
 )
 
@@ -355,7 +359,7 @@ private fun TournamentTicketCardPreview() {
                     endTime = 1760003600000L,
                     address = "Riverside Park"
                 ),
-                lineups = listOf(
+                lineups = persistentListOf(
                     Lineup(
                         id = 1L,
                         name = "Game 3 — Starters",
@@ -550,7 +554,7 @@ private fun TournamentListScreenPreview() {
             state = TournamentListState(
                 teamName = "Riverside Hawks",
                 teamType = TeamType.BASEBALL,
-                items = listOf(
+                items = persistentListOf(
                     TournamentItem(
                         tournament = Tournament(
                             id = 1L,
@@ -560,7 +564,7 @@ private fun TournamentListScreenPreview() {
                             endTime = 1760003600000L,
                             address = "Riverside Park"
                         ),
-                        lineups = listOf(
+                        lineups = persistentListOf(
                             Lineup(
                                 id = 1L,
                                 name = "Game 3 — Starters",
@@ -585,10 +589,10 @@ private fun TournamentListScreenPreview() {
                             endTime = 1758003600000L,
                             address = null
                         ),
-                        lineups = emptyList()
+                        lineups = persistentListOf()
                     )
                 ),
-                mapsByTournamentId = mapOf(1L to GeoLocation(41.0, -74.0)),
+                mapsByTournamentId = persistentMapOf(1L to GeoLocation(41.0, -74.0)),
                 searchQuery = ""
             ),
             onBackClick = {},
@@ -611,8 +615,8 @@ private fun TournamentListScreenEmptyPreview() {
             state = TournamentListState(
                 teamName = "Riverside Hawks",
                 teamType = TeamType.BASEBALL,
-                items = emptyList(),
-                mapsByTournamentId = emptyMap(),
+                items = persistentListOf(),
+                mapsByTournamentId = persistentMapOf(),
                 searchQuery = ""
             ),
             onBackClick = {},

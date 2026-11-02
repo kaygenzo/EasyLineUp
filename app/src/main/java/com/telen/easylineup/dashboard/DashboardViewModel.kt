@@ -19,6 +19,9 @@ import com.telen.easylineup.domain.model.tiles.TileType
 import com.telen.easylineup.domain.usecases.GetDashboardTiles
 import com.telen.easylineup.domain.usecases.GetShirtNumberHistory
 import com.telen.easylineup.domain.usecases.ObserveTeams
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,7 +50,7 @@ data class DashboardUiState(
     val shirtNumberQuery: String = "",
     val shirtNumberHasSearched: Boolean = false,
     val shirtNumberResult: String? = null,
-    val shirtNumberHistory: List<ShirtNumberEntry> = emptyList(),
+    val shirtNumberHistory: ImmutableList<ShirtNumberEntry> = persistentListOf(),
     val showShirtNumberHistoryDialog: Boolean = false
 )
 
@@ -117,7 +120,7 @@ class DashboardViewModel(
                         it.copy(
                             shirtNumberHasSearched = true,
                             shirtNumberResult = history.firstOrNull()?.playerName,
-                            shirtNumberHistory = history
+                            shirtNumberHistory = history.toImmutableList()
                         )
                     }
                 }

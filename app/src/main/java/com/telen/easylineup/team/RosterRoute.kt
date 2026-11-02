@@ -24,6 +24,7 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
@@ -33,7 +34,9 @@ fun RosterRoute(navController: NavController) {
     val viewModel = koinViewModel<TeamViewModel>()
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val players = remember(uiState.players) { uiState.players.map { it.toRosterRowState() } }
+    val players = remember(uiState.players) {
+        uiState.players.map { it.toRosterRowState() }.toImmutableList()
+    }
 
     var showMessageSheet by remember { mutableStateOf(false) }
 

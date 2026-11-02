@@ -3,6 +3,7 @@
 kotlinVersion = '2.3.20'
 kspVersion = "2.3.2"
 kotlinxSerializationVersion = "1.7.3"
+kotlinxCollectionsImmutableVersion = "0.3.8"
 androidGradlePluginVersion = "9.1.0"
 # Jetpack
 splashscreenVersion = "1.0.1"
@@ -14,7 +15,6 @@ coreVersion = "1.16.0"
 navigationVersion = "2.9.7"
 lifecycleVersion = "2.9.1"
 roomVersion = "2.7.1"
-roomRxjava3Version = "2.7.1"
 fragmentVersion = "1.8.9"
 activityVersion = "1.10.1"
 composeBomVersion = "2025.09.01"
@@ -37,7 +37,7 @@ roundedImageView = "2.3.0"
 dexterVersion = "6.2.3"
 colorPickerVersion = "2.0.6"
 licenserVersion = "2.0.0"
-picassoVersion = "2.8"
+coilVersion = "2.7.0"
 taptargetviewVersion = "1.13.3"
 koinVersion = "4.1.0"
 annotationVersion = "1.9.1"
@@ -68,7 +68,6 @@ mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "
 tests-archCore = { group = "androidx.arch.core", name = "core-testing", version.ref = "archCoreTestingVersion" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
-room-rxjava3 = { module = "androidx.room:room-rxjava3", version.ref = "roomRxjava3Version" }
 room-testing = { group = "androidx.room", name = "room-testing", version.ref = "roomVersion" }
 tests-runner = { group = "androidx.test", name = "runner", version.ref = "testRunnerVersion" }
 tests-espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCoreVersion" }
@@ -97,7 +96,8 @@ timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "tim
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesVersion" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesVersion" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesVersion" }
-picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picassoVersion" }
+kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutableVersion" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilVersion" }
 rounedImage = { group = "com.makeramen", name = "roundedimageview", version.ref = "roundedImageView" }
 koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koinVersion" }
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koinVersion" }

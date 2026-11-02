@@ -83,6 +83,7 @@ import com.telen.easylineup.utils.getStrategiesDisplayName
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.collections.immutable.persistentListOf
 
 private val LineupCreationPreviewTournament = Tournament(
     id = 1L,
@@ -1041,7 +1042,7 @@ private fun LineupCreationScreenPreview() {
                 isLoading = false,
                 teamType = TeamType.BASEBALL,
                 name = "Game 3 — Starters",
-                tournaments = listOf(
+                tournaments = persistentListOf(
                     Tournament(
                         id = 1L,
                         name = "Fall Classic",
@@ -1100,7 +1101,6 @@ private fun LineupCreationScreenEmptyPreview() {
                 isLoading = false,
                 teamType = TeamType.BASEBALL,
                 name = "",
-                tournaments = emptyList(),
                 selectedTournament = null,
                 eventTimeInMillis = System.currentTimeMillis(),
                 roster = TeamRosterSummary(Constants.STATUS_ALL, emptyList()),

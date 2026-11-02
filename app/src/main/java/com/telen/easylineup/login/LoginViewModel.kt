@@ -4,20 +4,16 @@
 
 package com.telen.easylineup.login
 
-import android.content.Context
 import android.net.Uri
-import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.ports.DispatcherProvider
+import com.telen.easylineup.domain.ports.ImportFileReader
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ImportData
 import com.telen.easylineup.domain.usecases.ImportResult
-import com.telen.easylineup.export.json.JsonExportBase
-import com.telen.easylineup.export.json.exportGson
-import com.telen.easylineup.export.json.toDomain
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -45,7 +41,7 @@ object GetTeamFailed : LoginEvent()
 class LoginViewModel(
     private val getTeamUseCase: GetTeam,
     private val importDataUseCase: ImportData,
-    private val context: Context,
+    private val importFileReader: ImportFileReader,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
     private val _events = Channel<LoginEvent>(Channel.BUFFERED)
@@ -58,18 +54,11 @@ class LoginViewModel(
     fun peekImportFile(uri: Uri) {
         viewModelScope.launch {
             runCatching {
-                withContext(dispatcherProvider.io()) {
-                    val stream = context.contentResolver.openInputStream(uri)
-                        ?: throw IllegalArgumentException("Cannot open uri")
-                    stream.use { s ->
-                        s.bufferedReader().use { reader ->
-                            exportGson.fromJson(reader, JsonExportBase::class.java).toDomain()
-                        }
-                    }
-                }
+                withContext(dispatcherProvider.io()) { importFileReader.read(uri.toString()) }
             }
                 .onSuccess {
-                    _events.send(ImportPreviewReady(queryDisplayName(uri), it))
+                    val displayName = importFileReader.queryDisplayName(uri.toString())
+                    _events.send(ImportPreviewReady(displayName, it))
                 }
                 .onFailure {
                     Timber.e(it)
@@ -87,16 +76,6 @@ class LoginViewModel(
                     _events.send(ImportFailure)
                 }
         }
-    }
-
-    private fun queryDisplayName(uri: Uri): String {
-        context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-            val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            if (index >= 0 && cursor.moveToFirst()) {
-                return cursor.getString(index)
-            }
-        }
-        return uri.lastPathSegment.orEmpty()
     }
 
     fun getMainTeam() {

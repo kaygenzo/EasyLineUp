@@ -22,6 +22,9 @@ import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,7 +48,7 @@ data class LineupCreationUiState(
     val teamType: TeamType = TeamType.UNKNOWN,
     val name: String = "",
     val nameError: Boolean = false,
-    val tournaments: List<Tournament> = emptyList(),
+    val tournaments: ImmutableList<Tournament> = persistentListOf(),
     val selectedTournament: Tournament? = null,
     val tournamentError: Boolean = false,
     val eventTimeInMillis: Long = System.currentTimeMillis(),
@@ -80,7 +83,9 @@ class LineupCreationViewModel(
 
     init {
         observeTournaments().catch { Timber.e(it) }
-            .onEach { tournaments -> _uiState.update { it.copy(tournaments = tournaments) } }
+            .onEach { tournaments ->
+                _uiState.update { it.copy(tournaments = tournaments.toImmutableList()) }
+            }
             .launchIn(viewModelScope)
 
         viewModelScope.launch {

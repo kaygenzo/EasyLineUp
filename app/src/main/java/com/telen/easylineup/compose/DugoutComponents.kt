@@ -4,7 +4,7 @@
 
 package com.telen.easylineup.compose
 
-import android.graphics.drawable.Drawable
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -42,7 +42,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,8 +72,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
+import coil.imageLoader
+import coil.request.ImageRequest
+import coil.size.Scale
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
@@ -195,7 +196,7 @@ private fun DugoutSearchFieldPreview() {
 
 /**
  * Shared avatar for anything identified by a name and an optional photo (teams today, players
- * tomorrow): shows the Picasso-loaded photo when [imageUri] is set, otherwise a rounded tile with
+ * tomorrow): shows the Coil-loaded photo when [imageUri] is set, otherwise a rounded tile with
  * the name's initials - same fallback language as the rest of the Dugout Card system.
  */
 @Composable
@@ -247,7 +248,7 @@ private fun String.avatarInitials(): String =
         .joinToString("")
 
 /**
- * Picasso-backed bitmap loader shared by every Compose screen that displays a user-picked photo
+ * Coil-backed bitmap loader shared by every Compose screen that displays a user-picked photo
  * (team/player avatars today) - not private, so a screen needing a different wrapper than
  * [DugoutAvatar] (e.g. an empty/dashed picker state) can still reuse the same loading logic.
  */
@@ -255,33 +256,21 @@ private fun String.avatarInitials(): String =
 fun rememberDugoutAvatarBitmap(uri: Uri?, size: Dp): ImageBitmap? {
     var bitmap by remember(uri) { mutableStateOf<ImageBitmap?>(null) }
     val sizePx = with(LocalDensity.current) { size.roundToPx() }
+    val context = LocalContext.current
 
-    DisposableEffect(uri) {
+    LaunchedEffect(uri, sizePx) {
         bitmap = null
         if (uri == null) {
-            return@DisposableEffect onDispose {}
+            return@LaunchedEffect
         }
-        val target = object : Target {
-            override fun onBitmapLoaded(
-                loaded: android.graphics.Bitmap,
-                from: Picasso.LoadedFrom
-            ) {
-                bitmap = loaded.asImageBitmap()
-            }
-
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                bitmap = null
-            }
-
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-        }
-        Picasso.get()
-            .load(uri)
-            .resize(sizePx, sizePx)
-            .centerCrop()
-            .into(target)
-
-        onDispose { Picasso.get().cancelRequest(target) }
+        val request = ImageRequest.Builder(context)
+            .data(uri)
+            .size(sizePx, sizePx)
+            .scale(Scale.FILL)
+            .allowHardware(false)
+            .build()
+        val drawable = context.imageLoader.execute(request).drawable
+        bitmap = (drawable as? BitmapDrawable)?.bitmap?.asImageBitmap()
     }
     return bitmap
 }

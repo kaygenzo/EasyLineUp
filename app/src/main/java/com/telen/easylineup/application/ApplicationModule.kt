@@ -9,6 +9,7 @@ import com.telen.easylineup.dashboard.DashboardViewModel
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.ExportFileWriter
 import com.telen.easylineup.domain.ports.GeocodingProvider
+import com.telen.easylineup.domain.ports.ImportFileReader
 import com.telen.easylineup.domain.ports.PhoneNumberValidator
 import com.telen.easylineup.domain.ports.StringResourcesProvider
 import com.telen.easylineup.lineup.LineupViewModel
@@ -25,6 +26,7 @@ import com.telen.easylineup.tournaments.statistics.TournamentStatisticsViewModel
 import com.telen.easylineup.utils.DispatcherProviderImpl
 import com.telen.easylineup.utils.ExportFileWriterImpl
 import com.telen.easylineup.utils.GeocodingProviderImpl
+import com.telen.easylineup.utils.ImportFileReaderImpl
 import com.telen.easylineup.utils.LineupShareImageWriter
 import com.telen.easylineup.utils.LineupShareImageWriterImpl
 import com.telen.easylineup.utils.PhoneNumberValidatorImpl
@@ -39,6 +41,7 @@ val appModules = module {
     single<GeocodingProvider> { GeocodingProviderImpl(get()) }
     single<PhoneNumberValidator> { PhoneNumberValidatorImpl() }
     single<ExportFileWriter> { ExportFileWriterImpl(get()) }
+    single<ImportFileReader> { ImportFileReaderImpl(get()) }
     single<LineupShareImageWriter> { LineupShareImageWriterImpl(get()) }
     single { SharedPreferencesHelper(get()) }
 

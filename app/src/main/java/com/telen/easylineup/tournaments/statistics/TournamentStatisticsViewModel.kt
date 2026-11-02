@@ -14,6 +14,10 @@ import com.telen.easylineup.domain.usecases.GetPlayingTimeSummary
 import com.telen.easylineup.domain.usecases.GetTournamentPlayerStatsWithProfiles
 import com.telen.easylineup.domain.usecases.IsPlayingTimeUnderused
 import com.telen.easylineup.domain.usecases.SortPlayersByPlayingTime
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,7 +30,7 @@ data class TournamentStatisticsUiState(
     val isLoading: Boolean = true,
     val tournamentName: String = "",
     val teamType: TeamType = TeamType.UNKNOWN,
-    val playerStats: List<PlayerStatsRow> = emptyList(),
+    val playerStats: ImmutableList<PlayerStatsRow> = persistentListOf(),
     val playingTimeSummary: PlayingTimeSummary = PlayingTimeSummary(0f, 0, 0)
 )
 
@@ -63,11 +67,11 @@ class TournamentStatisticsViewModel(
                             shirtNumber = profile.shirtNumber,
                             imageUri = profile.image?.let { uri -> Uri.parse(uri) },
                             totalGames = profile.totalGames,
-                            positionCounts = profile.positionCounts,
+                            positionCounts = profile.positionCounts.toImmutableMap(),
                             isUnderused = isPlayingTimeUnderused(profile.totalGames, summary.average)
                         )
                     }
-                    rows to summary
+                    rows.toImmutableList() to summary
                 }
                 .onSuccess { (rows, summary) ->
                     _uiState.update {
