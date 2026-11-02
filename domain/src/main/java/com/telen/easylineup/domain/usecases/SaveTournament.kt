@@ -25,7 +25,7 @@ class SaveTournament(
                 throw AlreadyExistingTournamentException()
             }
 
-            tournament.id = repository.insertTournament(tournament)
+            repository.insertTournament(tournament)
         }
     }
 }

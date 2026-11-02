@@ -18,8 +18,7 @@ class UpdateLineupRoster(
             withContext(dispatcherProvider.io()) {
                 val rosterString = rosterToString(roster)
                 val lineup = lineupRepository.getLineupById(lineupId)
-                lineup.roster = rosterString
-                lineupRepository.updateLineup(lineup)
+                lineupRepository.updateLineup(lineup.copy(roster = rosterString))
             }
         }
 

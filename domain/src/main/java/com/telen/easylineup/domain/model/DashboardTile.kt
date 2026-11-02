@@ -14,9 +14,9 @@ import com.telen.easylineup.domain.model.tiles.TileData
  * @property data
  */
 data class DashboardTile(
-    var id: Long = 0,
-    var position: Int,
+    val id: Long = 0,
+    val position: Int,
     val type: Int,
     val enabled: Boolean = true,
-    var data: TileData? = null
+    val data: TileData? = null
 )

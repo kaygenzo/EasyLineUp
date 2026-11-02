@@ -66,8 +66,7 @@ class SavePlayer(
                 dao.insertPlayer(player)
             } else {
                 val existing = dao.getPlayerById(player.id)
-                player.hash = existing.hash
-                dao.updatePlayer(player)
+                dao.updatePlayer(player.copy(hash = existing.hash))
             }
         }
     }

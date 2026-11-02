@@ -30,7 +30,7 @@ import org.mockito.junit.MockitoJUnitRunner
 internal class GetRosterTests {
     private val extraHitters = 0
     private val team = Team(id = 1L, name = "toto", main = true)
-    private val lineup = Lineup(1L, "A", 1L, 1L,
+    private var lineup = Lineup(1L, "A", 1L, 1L,
         1, TeamStrategy.STANDARD.id, extraHitters, 3L, 1L, 1L, null, "hash")
     private val player1 = Player(1L, 1L, "A", 1,
         1, null, 1, 0, 0, "hash")
@@ -56,7 +56,7 @@ internal class GetRosterTests {
         )
 
         Mockito.`when`(teamDao.getTeams()).thenReturn(listOf(team))
-        Mockito.`when`(lineupDao.getLineupById(1L)).thenReturn(lineup)
+        Mockito.`when`(lineupDao.getLineupById(1L)).thenAnswer { lineup }
         Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(listOf(player1, player2, player3))
 
         val overlays: MutableList<PlayerNumberOverlay> =
@@ -79,7 +79,7 @@ internal class GetRosterTests {
 
     @Test
     fun shouldReturnAllPlayersIfLineupRosterIsNull() = runTest {
-        lineup.roster = null
+        lineup = lineup.copy(roster = null)
         val result = getRoster(1L)
         assertTrue(result.isSuccess)
         Assert.assertEquals(3, result.getOrNull()?.players?.filter { it.status }?.size)
@@ -88,7 +88,7 @@ internal class GetRosterTests {
 
     @Test
     fun shouldReturnNoPlayersIfLineupRosterIsEmpty() = runTest {
-        lineup.roster = ""
+        lineup = lineup.copy(roster = "")
         val result = getRoster(1L)
         assertTrue(result.isSuccess)
         Assert.assertEquals(0, result.getOrNull()?.players?.filter { it.status }?.size)
@@ -97,7 +97,7 @@ internal class GetRosterTests {
 
     @Test
     fun shouldReturnAllPlayersIfLineupRosterIsFull() = runTest {
-        lineup.roster = "1;2;3"
+        lineup = lineup.copy(roster = "1;2;3")
         val result = getRoster(1L)
         assertTrue(result.isSuccess)
         Assert.assertEquals(3, result.getOrNull()?.players?.filter { it.status }?.size)
@@ -106,7 +106,7 @@ internal class GetRosterTests {
 
     @Test
     fun shouldReturn2PlayersInRosterSelection() = runTest {
-        lineup.roster = "1;3"
+        lineup = lineup.copy(roster = "1;3")
         val result = getRoster(1L)
         assertTrue(result.isSuccess)
         val players = result.getOrNull()?.players.orEmpty()
@@ -117,7 +117,7 @@ internal class GetRosterTests {
 
     @Test
     fun shouldReturnOverlaysNumber() = runTest {
-        lineup.roster = "1;2;3"
+        lineup = lineup.copy(roster = "1;2;3")
         val result = getRoster(1L)
         assertTrue(result.isSuccess)
         val players = result.getOrNull()?.players.orEmpty()

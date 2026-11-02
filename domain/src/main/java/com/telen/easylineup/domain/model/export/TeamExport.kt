@@ -7,7 +7,7 @@ package com.telen.easylineup.domain.model.export
 data class TeamExport(
     val id: String,
     val name: String,
-    var image: String?,
+    val image: String?,
     val type: Int,
     val main: Boolean,
     val createdAt: Long = 0L,

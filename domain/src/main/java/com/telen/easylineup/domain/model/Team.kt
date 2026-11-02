@@ -21,13 +21,13 @@ import java.util.UUID
  * field existed, or imported from an `.elu` file exported before it existed.
  */
 data class Team(
-    var id: Long = 0,
-    var name: String = "",
-    var image: String? = null,
-    var type: Int = 0,
-    var main: Boolean = false,
-    var hash: String? = UUID.randomUUID().toString(),
-    var createdAt: Long = 0L
+    val id: Long = 0,
+    val name: String = "",
+    val image: String? = null,
+    val type: Int = 0,
+    val main: Boolean = false,
+    val hash: String? = UUID.randomUUID().toString(),
+    val createdAt: Long = 0L
 ) : Serializable {
     override fun toString(): String {
         val builder = StringBuffer().apply {

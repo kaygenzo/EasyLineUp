@@ -32,12 +32,10 @@ class CreateLineup(
                 } else {
                     rosterToString(roster)
                 }
-                lineup.roster = rosterString
 
                 val team = getTeam().getOrThrow()
-                lineup.teamId = team.id
-                lineup.id = lineupsDao.insertLineup(lineup)
-                lineup
+                val toInsert = lineup.copy(roster = rosterString, teamId = team.id)
+                toInsert.copy(id = lineupsDao.insertLineup(toInsert))
             }
         }
 

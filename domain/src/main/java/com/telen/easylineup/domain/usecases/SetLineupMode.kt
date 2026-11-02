@@ -20,11 +20,12 @@ class SetLineupMode(
         isEnabled: Boolean,
         lineup: Lineup,
         players: List<PlayerWithPosition>
-    ): Result<Unit> = runCatchingCancellable {
+    ): Result<Lineup> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            lineup.mode = if (isEnabled) MODE_ENABLED else MODE_DISABLED
+            val updatedLineup = lineup.copy(mode = if (isEnabled) MODE_ENABLED else MODE_DISABLED)
             val team = getTeam().getOrThrow()
-            updatePlayersWithLineupMode(players, lineup, team.type).getOrThrow()
+            updatePlayersWithLineupMode(players, updatedLineup, team.type).getOrThrow()
+            updatedLineup
         }
     }
 }

@@ -24,7 +24,7 @@ class DeleteTeam(
                 if (teams.isEmpty()) {
                     throw NoTeamsLeftException()
                 }
-                val newMain = teams.first().apply { main = true }
+                val newMain = teams.first().copy(main = true)
                 dao.updateTeam(newMain)
             }
             // the main team was not the one we deleted, no need to designate another one

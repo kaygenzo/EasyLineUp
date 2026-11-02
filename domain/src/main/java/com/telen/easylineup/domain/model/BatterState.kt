@@ -22,7 +22,7 @@ package com.telen.easylineup.domain.model
 data class BatterState(
     val playerId: Long,
     val playerFlag: Int,
-    var playerOrder: Int,
+    val playerOrder: Int,
     val playerName: String,
     val playerNumber: String,
     val playerPosition: FieldPosition,

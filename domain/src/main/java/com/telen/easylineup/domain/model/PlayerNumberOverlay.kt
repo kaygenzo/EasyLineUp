@@ -16,11 +16,11 @@ import java.util.UUID
  * @property hash
  */
 data class PlayerNumberOverlay(
-    var id: Long = 0,
-    var lineupId: Long = 0,
-    var playerId: Long = 0,
-    var number: Int = 0,
-    var hash: String? = UUID.randomUUID().toString()
+    val id: Long = 0,
+    val lineupId: Long = 0,
+    val playerId: Long = 0,
+    val number: Int = 0,
+    val hash: String? = UUID.randomUUID().toString()
 ) : Serializable
 
 fun PlayerNumberOverlay.toPlayerNumberOverlayExport(

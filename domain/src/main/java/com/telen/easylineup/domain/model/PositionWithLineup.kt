@@ -13,10 +13,10 @@ package com.telen.easylineup.domain.model
  * @property tournamentName
  */
 data class PositionWithLineup(
-    var position: Int = 0,
-    var x: Float = 0f,
-    var y: Float = 0f,
-    var order: Int = 0,
-    var lineupName: String = "",
-    var tournamentName: String = ""
+    val position: Int = 0,
+    val x: Float = 0f,
+    val y: Float = 0f,
+    val order: Int = 0,
+    val lineupName: String = "",
+    val tournamentName: String = ""
 )

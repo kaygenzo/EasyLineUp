@@ -30,7 +30,7 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
-    private val lineup = Lineup(id = 1L, mode = MODE_DISABLED)
+    private var lineup = Lineup(id = 1L, mode = MODE_DISABLED)
 
     @Mock
     private lateinit var playerFieldPositionRepository: PlayerFieldPositionRepository
@@ -78,13 +78,13 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
 
     @Test
     fun shouldTriggerAnErrorIfLineupIdEqualsZero() = runTest {
-        lineup.id = 0L
+        lineup = lineup.copy(id = 0L)
         startUseCase(IllegalStateException::class.java)
     }
 
     @Test
     fun shouldTriggerAnErrorIfLineupIdLessThanZero() = runTest {
-        lineup.id = -1L
+        lineup = lineup.copy(id = -1L)
         startUseCase(IllegalStateException::class.java)
     }
 

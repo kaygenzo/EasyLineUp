@@ -54,7 +54,7 @@ internal class SaveTeamTests {
 
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() = runTest {
-        team.name = ""
+        team = team.copy(name = "")
         val result = saveTeam(team)
         assertTrue(result.exceptionOrNull() is NameEmptyException)
         verify(teamDao, never()).insertTeam(any())
@@ -63,7 +63,7 @@ internal class SaveTeamTests {
 
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsOnlyWhitespaces() = runTest {
-        team.name = "\n\t\r       "
+        team = team.copy(name = "\n\t\r       ")
         val result = saveTeam(team)
         assertTrue(result.exceptionOrNull() is NameEmptyException)
     }
@@ -79,7 +79,7 @@ internal class SaveTeamTests {
 
     @Test
     fun shouldInsertTeamIfIdEqualsToZero() = runTest {
-        team.id = 0L
+        team = team.copy(id = 0L)
         val result = saveTeam(team)
         assertTrue(result.isSuccess)
         verify(teamDao).insertTeam(any())
@@ -89,7 +89,7 @@ internal class SaveTeamTests {
 
     @Test
     fun shouldCorrectTeamTypeIfUnknown() = runTest {
-        team.type = TeamType.UNKNOWN.id
+        team = team.copy(type = TeamType.UNKNOWN.id)
         val result = saveTeam(team)
         assertTrue(result.isSuccess)
         assertEquals(TeamType.BASEBALL.id, result.getOrNull()?.type)

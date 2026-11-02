@@ -12,7 +12,7 @@ data class LineupExport(
     val editedAt: Long,
     val mode: Int,
     val strategy: Int,
-    var extraHitters: Int,
+    val extraHitters: Int,
     val roster: List<String>?,
     val playerPositions: List<PlayerPositionExport>,
     val playerNumberOverlays: List<PlayerNumberOverlayExport>

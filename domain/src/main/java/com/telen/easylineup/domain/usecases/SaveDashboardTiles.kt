@@ -15,10 +15,8 @@ class SaveDashboardTiles(
 ) {
     suspend operator fun invoke(tiles: List<DashboardTile>): Result<Unit> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            for (i in tiles.indices) {
-                tiles[i].position = i
-            }
-            dao.updateTiles(tiles)
+            val reordered = tiles.mapIndexed { index, tile -> tile.copy(position = index) }
+            dao.updateTiles(reordered)
         }
     }
 }

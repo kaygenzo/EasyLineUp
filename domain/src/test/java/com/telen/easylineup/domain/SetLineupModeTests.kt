@@ -49,11 +49,11 @@ internal class SetLineupModeTests {
     }
 
     private suspend fun startUseCase(mode: Boolean) {
-        lineup.mode = if (mode) MODE_DISABLED else MODE_ENABLED
+        lineup = lineup.copy(mode = if (mode) MODE_DISABLED else MODE_ENABLED)
         val lineupMode = if (mode) MODE_ENABLED else MODE_DISABLED
         val result = setLineupMode(mode, lineup, emptyList())
         assertTrue(result.isSuccess)
-        Assert.assertEquals(lineupMode, lineup.mode)
+        Assert.assertEquals(lineupMode, result.getOrNull()?.mode)
     }
 
     @Test

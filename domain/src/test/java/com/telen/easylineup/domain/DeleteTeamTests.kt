@@ -44,7 +44,7 @@ internal class DeleteTeamTests {
         teams = mutableListOf(team2, team3)
         Mockito.`when`(teamDao.deleteTeam(team)).thenReturn(Unit)
         Mockito.`when`(teamDao.getTeams()).thenReturn(teams)
-        Mockito.`when`(teamDao.updateTeam(team2)).thenReturn(Unit)
+        Mockito.`when`(teamDao.updateTeam(team2.copy(main = true))).thenReturn(Unit)
     }
     }
 
@@ -68,8 +68,8 @@ internal class DeleteTeamTests {
 
     @Test
     fun shouldNotReassignMainTeam() = runTest {
-        team.main = false
-        team3.main = true
+        team = team.copy(main = false)
+        team3 = team3.copy(main = true)
         val result = deleteTeam(team)
         assertTrue(result.isSuccess)
         verify(teamDao, never()).updateTeam(any())

@@ -159,14 +159,14 @@ internal abstract class CreateLineupTests {
 
     @Test
     fun shouldTriggerAnExceptionIfLineupNameEmpty() = runTest {
-        lineup.name = "      "
+        lineup = lineup.copy(name = "      ")
         val result = createLineup(lineup, roster)
         assertTrue(result.exceptionOrNull() is LineupNameEmptyException)
     }
 
     @Test
     fun shouldTriggerAnExceptionIfTournamentNameEmpty() = runTest {
-        lineup.tournamentId = 0
+        lineup = lineup.copy(tournamentId = 0)
         val result = createLineup(lineup, roster)
         assertTrue(result.exceptionOrNull() is TournamentNameEmptyException)
     }

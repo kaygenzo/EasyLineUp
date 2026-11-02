@@ -28,7 +28,7 @@ import org.mockito.junit.MockitoJUnitRunner
 internal class UpdatePlayersWithLineupModeTests {
     private val extraHitters = 0
     private val strategy = TeamStrategy.STANDARD
-    private val lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitters)
+    private var lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitters)
     lateinit var updatePlayersWithLineupMode: UpdatePlayersWithLineupMode
     lateinit var players: MutableList<PlayerWithPosition>
 
@@ -87,7 +87,7 @@ internal class UpdatePlayersWithLineupModeTests {
         players: List<PlayerWithPosition> = this.players,
         exception: Class<out Throwable>? = null
     ) {
-        lineup.mode = if (lineupMode) MODE_ENABLED else MODE_DISABLED
+        lineup = lineup.copy(mode = if (lineupMode) MODE_ENABLED else MODE_DISABLED)
         val playersSize = players.size
         val result = updatePlayersWithLineupMode(
             players,

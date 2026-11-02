@@ -32,15 +32,13 @@ internal class CheckTeamTests {
 
     @Test
     fun shouldRejectTeamWithNameEmpty() = runTest {
-        team.name = ""
-        val result = checkTeam(team)
+        val result = checkTeam(team.copy(name = ""))
         assertTrue(result.exceptionOrNull() is NameEmptyException)
     }
 
     @Test
     fun shouldRejectTeamWithNameOnlyWhitespaces() = runTest {
-        team.name = "    "
-        val result = checkTeam(team)
+        val result = checkTeam(team.copy(name = "    "))
         assertTrue(result.exceptionOrNull() is NameEmptyException)
     }
 }

@@ -28,18 +28,18 @@ const val MODE_ENABLED = 1
  * @property hash
  */
 data class Lineup(
-    var id: Long = 0,
-    var name: String = "",
-    var teamId: Long = 0,
-    var tournamentId: Long = 0,
-    var mode: Int = 0,
-    var strategy: Int = TeamStrategy.STANDARD.id,
-    var extraHitters: Int = 0,
-    var eventTimeInMillis: Long = 0L,
-    var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
-    var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
-    var roster: String? = null,
-    var hash: String? = UUID.randomUUID().toString()
+    val id: Long = 0,
+    val name: String = "",
+    val teamId: Long = 0,
+    val tournamentId: Long = 0,
+    val mode: Int = 0,
+    val strategy: Int = TeamStrategy.STANDARD.id,
+    val extraHitters: Int = 0,
+    val eventTimeInMillis: Long = 0L,
+    val createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
+    val editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
+    val roster: String? = null,
+    val hash: String? = UUID.randomUUID().toString()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) {

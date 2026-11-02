@@ -55,7 +55,7 @@ class GetDashboardTiles(
                 TileType.LAST_PLAYER_NUMBER.type -> getLastPlayerNumberResearch()
                 else -> null
             }
-            data?.let { tile.apply { this.data = it } }
+            data?.let { tile.copy(data = it) }
         }
     }
 

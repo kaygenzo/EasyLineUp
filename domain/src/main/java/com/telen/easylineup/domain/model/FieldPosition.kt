@@ -53,12 +53,10 @@ enum class FieldPosition(val id: Int, val mask: Int, val position: Int) {
     }
 }
 
-// TODO move in use case
 fun FieldPosition.isSubstitute(): Boolean {
     return id == FieldPosition.OLD_SUBSTITUTE.id || id == FieldPosition.SUBSTITUTE.id
 }
 
-// TODO move in use case
 fun FieldPosition.isDefensePlayer(): Boolean {
     return !isSubstitute() && id != FieldPosition.DP_DH.id
 }

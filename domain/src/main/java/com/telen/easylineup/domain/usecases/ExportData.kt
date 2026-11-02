@@ -51,10 +51,11 @@ class ExportData(
             teamDao.getTeams().forEach { team ->
                 val tournamentsExport: MutableList<TournamentExport> = mutableListOf()
                 val playersExport: MutableList<PlayerExport> = mutableListOf()
-                val teamExport = team.toTeamExport(playersExport, tournamentsExport)
-
-                if (!isNetworkUrl(teamExport.image)) {
-                    teamExport.image = null
+                val rawTeamExport = team.toTeamExport(playersExport, tournamentsExport)
+                val teamExport = if (!isNetworkUrl(rawTeamExport.image)) {
+                    rawTeamExport.copy(image = null)
+                } else {
+                    rawTeamExport
                 }
 
                 teams.add(teamExport)
@@ -62,10 +63,11 @@ class ExportData(
                 val playersUuidMap: MutableMap<Long, String?> = mutableMapOf()
 
                 playerDao.getPlayersByTeamId(team.id).forEach { player ->
-                    val playerExport = player.toPlayerExport()
-
-                    if (!isNetworkUrl(playerExport.image)) {
-                        playerExport.image = null
+                    val rawPlayerExport = player.toPlayerExport()
+                    val playerExport = if (!isNetworkUrl(rawPlayerExport.image)) {
+                        rawPlayerExport.copy(image = null)
+                    } else {
+                        rawPlayerExport
                     }
 
                     playersExport.add(playerExport)

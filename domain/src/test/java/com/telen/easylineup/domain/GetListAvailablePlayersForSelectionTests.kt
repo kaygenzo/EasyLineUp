@@ -77,7 +77,7 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
             Player(id = 5L, teamId = team.id, name = "p5", shirtNumber = 5, licenseNumber = 5L)
         )
 
-        Mockito.`when`(lineupDao.getLineupById(lineup.id)).thenReturn(lineup)
+        Mockito.`when`(lineupDao.getLineupById(lineup.id)).thenAnswer { lineup }
         Mockito.`when`(playerDao.getPlayersByTeamId(team.id)).thenReturn(teamPlayers)
         Mockito.`when`(playerNumberOverlayDao.getPlayersNumberOverlay(lineup.id))
             .thenReturn(emptyList())
@@ -135,14 +135,14 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
 
     @Test
     fun shouldReturnEmptyListWhenRosterIsEmpty() = runTest {
-        lineup.roster = ""
+        lineup = lineup.copy(roster = "")
         val result = startUseCase(position = FieldPosition.SECOND_BASE)
         Assert.assertEquals(emptyList<PlayerWithPosition>(), result.getOrNull())
     }
 
     @Test
     fun shouldReturnSomePlayersWhenRosterIsNotFull() = runTest {
-        lineup.roster = "1;2;3"
+        lineup = lineup.copy(roster = "1;2;3")
         val result = startUseCase(position = FieldPosition.SECOND_BASE)
         Assert.assertEquals(1, result.getOrNull()?.size)
         Assert.assertEquals(2L, result.getOrNull()?.first()?.playerId)

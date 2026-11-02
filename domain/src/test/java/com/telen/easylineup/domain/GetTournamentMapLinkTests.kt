@@ -37,7 +37,7 @@ internal class GetTournamentMapLinkTests {
 
     @Test
     fun shouldTriggerAddressNotFoundExceptionWhenTournamentAddressIsNull() = runTest {
-        tournament.address = null
+        tournament = tournament.copy(address = null)
         val result = getTournamentMapLink(tournament)
         assertTrue(result.exceptionOrNull() is AddressNotFoundException)
     }

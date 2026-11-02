@@ -38,7 +38,6 @@ internal class SaveCurrentTeamTests {
         teams.add(Team(3, "titi", null, 0, true))
 
         Mockito.`when`(teamDao.getTeams()).thenReturn(teams)
-        Mockito.`when`(teamDao.updateTeams(teams)).thenReturn(Unit)
     }
     }
 

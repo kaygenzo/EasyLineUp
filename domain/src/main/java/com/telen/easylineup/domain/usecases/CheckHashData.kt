@@ -39,62 +39,37 @@ class CheckHashData(
     }
 
     private suspend fun updateTeams(): Int {
-        val teams = teamDao.getTeams()
-        val toUpdate: MutableList<Team> = mutableListOf()
-        teams.forEach { team ->
-            if (team.hash.isNullOrBlank()) {
-                team.hash = UUID.randomUUID().toString()
-                toUpdate.add(team)
-            }
-        }
+        val toUpdate = teamDao.getTeams()
+            .filter { it.hash.isNullOrBlank() }
+            .map { it.copy(hash = UUID.randomUUID().toString()) }
         return teamDao.updateTeamsWithRowCount(toUpdate)
     }
 
     private suspend fun updatePlayers(): Int {
-        val players = playerDao.getPlayers()
-        val toUpdate: MutableList<Player> = mutableListOf()
-        players.forEach { player ->
-            if (player.hash.isNullOrBlank()) {
-                player.hash = UUID.randomUUID().toString()
-                toUpdate.add(player)
-            }
-        }
+        val toUpdate = playerDao.getPlayers()
+            .filter { it.hash.isNullOrBlank() }
+            .map { it.copy(hash = UUID.randomUUID().toString()) }
         return playerDao.updatePlayersWithRowCount(toUpdate)
     }
 
     private suspend fun updateTournaments(): Int {
-        val tournaments = tournamentDao.getTournaments()
-        val toUpdate: MutableList<Tournament> = mutableListOf()
-        tournaments.forEach { tournament ->
-            if (tournament.hash.isNullOrBlank()) {
-                tournament.hash = UUID.randomUUID().toString()
-                toUpdate.add(tournament)
-            }
-        }
+        val toUpdate = tournamentDao.getTournaments()
+            .filter { it.hash.isNullOrBlank() }
+            .map { it.copy(hash = UUID.randomUUID().toString()) }
         return tournamentDao.updateTournamentsWithRowCount(toUpdate)
     }
 
     private suspend fun updateLineups(): Int {
-        val lineups = lineupDao.getLineups()
-        val toUpdate: MutableList<Lineup> = mutableListOf()
-        lineups.forEach { lineup ->
-            if (lineup.hash.isNullOrBlank()) {
-                lineup.hash = UUID.randomUUID().toString()
-                toUpdate.add(lineup)
-            }
-        }
+        val toUpdate = lineupDao.getLineups()
+            .filter { it.hash.isNullOrBlank() }
+            .map { it.copy(hash = UUID.randomUUID().toString()) }
         return lineupDao.updateLineupsWithRowCount(toUpdate)
     }
 
     private suspend fun updatePlayerFieldPositions(): Int {
-        val playerFieldPositions = playerFieldPositionsDao.getPlayerFieldPositions()
-        val toUpdate: MutableList<PlayerFieldPosition> = mutableListOf()
-        playerFieldPositions.forEach { playerFieldPosition ->
-            if (playerFieldPosition.hash.isNullOrBlank()) {
-                playerFieldPosition.hash = UUID.randomUUID().toString()
-                toUpdate.add(playerFieldPosition)
-            }
-        }
+        val toUpdate = playerFieldPositionsDao.getPlayerFieldPositions()
+            .filter { it.hash.isNullOrBlank() }
+            .map { it.copy(hash = UUID.randomUUID().toString()) }
         return playerFieldPositionsDao.updatePlayerFieldPositionsWithRowCount(toUpdate)
     }
 }

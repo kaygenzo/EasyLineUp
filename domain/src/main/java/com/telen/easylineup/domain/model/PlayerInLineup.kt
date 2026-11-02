@@ -12,9 +12,9 @@ package com.telen.easylineup.domain.model
  * @property playerId
  */
 data class PlayerInLineup(
-    var lineupName: String = "",
-    var lineupId: Long = 0,
-    var position: Int?,
-    var playerName: String?,
-    var playerId: Long?
+    val lineupName: String = "",
+    val lineupId: Long = 0,
+    val position: Int?,
+    val playerName: String?,
+    val playerId: Long?
 )

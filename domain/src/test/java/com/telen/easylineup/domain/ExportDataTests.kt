@@ -218,10 +218,13 @@ internal class ExportDataTests {
 
     @Test
     fun shouldNotExportNonWebUri() = runTest {
-        team1.image = "file:///test.png"
-        team2.image = ""
-        player1.image = "http://test.com"
-        player2.image = "https://test.com"
+        team1 = team1.copy(image = "file:///test.png")
+        team2 = team2.copy(image = "")
+        player1 = player1.copy(image = "http://test.com")
+        player2 = player2.copy(image = "https://test.com")
+        Mockito.`when`(teamDao.getTeams()).thenReturn(listOf(team1, team2))
+        Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(listOf(player1))
+        Mockito.`when`(playerDao.getPlayersByTeamId(2L)).thenReturn(listOf(player2))
 
         val result = export()
         Assert.assertTrue(result.isSuccess)
@@ -237,7 +240,7 @@ internal class ExportDataTests {
     fun shouldExportAllDataWithMorePlayersOfSameTeamSameLineup() = runTest {
         val player3 = Player(3L, 1L, "A", 3, 3L, null, 1, 0, 0, "p3@test.com", "003", 0, "hash3")
         val player4 = Player(4L, 1L, "B", 4, 4L, null, 1, 0, 0, "p4@test.com", "004", 0, "hash4")
-        lineup1.roster = "1;3;4"
+        lineup1 = lineup1.copy(roster = "1;3;4")
 
         val playerPosition3 = PlayerFieldPosition(3L, 3L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE, "hash3")
         val playerPosition4 = PlayerFieldPosition(4L, 4L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE, "hash4")
@@ -245,6 +248,8 @@ internal class ExportDataTests {
         Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(listOf(player1, player3, player4))
         Mockito.`when`(playerPositionsDao.getAllPlayerFieldPositionsForLineup(1L))
             .thenReturn(listOf(playerPosition1, playerPosition3, playerPosition4))
+        Mockito.`when`(lineupDao.getLineupsForTournament(1L, 1L)).thenReturn(listOf(lineup1))
+        Mockito.`when`(lineupDao.getLineups()).thenReturn(listOf(lineup1, lineup2))
 
         val result = export()
         Assert.assertTrue(result.isSuccess)

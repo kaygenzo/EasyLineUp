@@ -44,17 +44,17 @@ class SetupViewModel(private val saveTeam: SaveTeam) : ViewModel() {
     }
 
     fun setTeamName(name: String) {
-        currentTeam.name = name
+        currentTeam = currentTeam.copy(name = name)
         _team.tryEmit(currentTeam)
     }
 
     fun setTeamImage(image: String?) {
-        currentTeam.image = image
+        currentTeam = currentTeam.copy(image = image)
         _team.tryEmit(currentTeam)
     }
 
     fun setTeamType(teamType: TeamType) {
-        currentTeam.type = teamType.id
+        currentTeam = currentTeam.copy(type = teamType.id)
         _team.tryEmit(currentTeam)
     }
 

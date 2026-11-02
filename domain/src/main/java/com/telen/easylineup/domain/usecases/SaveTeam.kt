@@ -23,19 +23,22 @@ class SaveTeam(
         withContext(dispatcherProvider.io()) {
             checkTeam(team).getOrThrow()
 
-            if (team.type == TeamType.UNKNOWN.id) {
-                team.type = TeamType.BASEBALL.id
-            }
-
-            if (team.id == 0L) {
-                team.createdAt = System.currentTimeMillis()
-                team.id = dao.insertTeam(team)
+            val typedTeam = if (team.type == TeamType.UNKNOWN.id) {
+                team.copy(type = TeamType.BASEBALL.id)
             } else {
-                dao.updateTeam(team)
+                team
             }
 
-            saveCurrentTeam(team).getOrThrow()
-            team
+            val savedTeam = if (typedTeam.id == 0L) {
+                val withCreatedAt = typedTeam.copy(createdAt = System.currentTimeMillis())
+                withCreatedAt.copy(id = dao.insertTeam(withCreatedAt))
+            } else {
+                dao.updateTeam(typedTeam)
+                typedTeam
+            }
+
+            saveCurrentTeam(savedTeam).getOrThrow()
+            savedTeam
         }
     }
 }

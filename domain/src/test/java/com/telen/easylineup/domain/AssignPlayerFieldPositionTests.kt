@@ -83,7 +83,7 @@ internal abstract class AssignPlayerFieldPositionTests(
     @Mock
     lateinit var teamDao: TeamRepository
     private val newPlayer = Player(2_000, 1, "k2000", 2_000, 2_000, null, 0x07)
-    private val lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitterSize)
+    private var lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitterSize)
     private lateinit var savePlayerFieldPosition: AssignPlayerFieldPosition
     private lateinit var players: MutableList<PlayerWithPosition>
 
@@ -126,7 +126,7 @@ internal abstract class AssignPlayerFieldPositionTests(
         teamType: TeamType = this.teamType,
         exception: Class<out Throwable>? = null
     ) {
-        lineup.mode = mode
+        lineup = lineup.copy(mode = mode)
         Mockito.`when`(teamDao.getTeams())
             .thenReturn(listOf(Team(id = 1L, type = teamType.id, main = true)))
         val playersSize = players.size

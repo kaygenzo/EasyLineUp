@@ -280,9 +280,9 @@ class LineupViewModel(
         lineup?.let { currentLineup ->
             viewModelScope.launch {
                 setLineupModeUseCase(isEnabled, currentLineup, _listPlayersWithPosition)
-                    .onSuccess {
-                        lineup = currentLineup
-                        _uiState.update { it.copy(lineupMode = currentLineup.mode) }
+                    .onSuccess { updatedLineup ->
+                        lineup = updatedLineup
+                        _uiState.update { it.copy(lineupMode = updatedLineup.mode) }
                         recomputeAndPublish()
                     }
                     .onFailure { Timber.e(it) }

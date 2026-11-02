@@ -23,19 +23,19 @@ import java.util.UUID
  * @property hash
  */
 data class Player(
-    var id: Long = 0,
-    var teamId: Long,
-    var name: String,
-    var shirtNumber: Int,
-    var licenseNumber: Long,
-    var image: String? = null,
-    var positions: Int = 0,
-    var pitching: Int = 0,
-    var batting: Int = 0,
-    var email: String? = null,
-    var phone: String? = null,
-    var sex: Int = 0,
-    var hash: String? = UUID.randomUUID().toString()
+    val id: Long = 0,
+    val teamId: Long,
+    val name: String,
+    val shirtNumber: Int,
+    val licenseNumber: Long,
+    val image: String? = null,
+    val positions: Int = 0,
+    val pitching: Int = 0,
+    val batting: Int = 0,
+    val email: String? = null,
+    val phone: String? = null,
+    val sex: Int = 0,
+    val hash: String? = UUID.randomUUID().toString()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) {

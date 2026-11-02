@@ -35,7 +35,7 @@ internal class SaveTournamentTests {
 
     @Test
     fun shouldTriggerNameEmptyExceptionIfNameIsEmpty() = runTest {
-        tournament.name = ""
+        tournament = tournament.copy(name = "")
 
         val result = saveTournament(tournament)
 

@@ -154,13 +154,12 @@ class ImportData(
         val teamDb = teamDao.getTeamByHash(teamExport.id)
         return if (teamDb == null) {
             counts.recordInsert()
-            t.id = teamDao.insertTeam(t)
-            t
+            t.copy(id = teamDao.insertTeam(t))
         } else if (updateIfExists) {
             counts.recordUpdate()
-            t.id = teamDb.id
-            teamDao.updateTeam(t)
-            t
+            val updated = t.copy(id = teamDb.id)
+            teamDao.updateTeam(updated)
+            updated
         } else {
             teamDb
         }
@@ -197,13 +196,12 @@ class ImportData(
         val playerDb = playerDao.getPlayerByHash(playerExport.id)
         return if (playerDb == null) {
             counts.recordInsert()
-            p.id = playerDao.insertPlayer(p)
-            p
+            p.copy(id = playerDao.insertPlayer(p))
         } else if (updateIfExists) {
             counts.recordUpdate()
-            p.id = playerDb.id
-            playerDao.updatePlayer(p)
-            p
+            val updated = p.copy(id = playerDb.id)
+            playerDao.updatePlayer(updated)
+            updated
         } else {
             playerDb
         }
@@ -222,13 +220,12 @@ class ImportData(
         val tournamentDb = tournamentDao.getTournamentByHash(export.id)
         return if (tournamentDb == null) {
             counts.recordInsert()
-            t.id = tournamentDao.insertTournament(t)
-            t
+            t.copy(id = tournamentDao.insertTournament(t))
         } else if (updateIfExists) {
             counts.recordUpdate()
-            t.id = tournamentDb.id
-            tournamentDao.updateTournament(t)
-            t
+            val updated = t.copy(id = tournamentDb.id)
+            tournamentDao.updateTournament(updated)
+            updated
         } else {
             tournamentDb
         }
@@ -260,13 +257,12 @@ class ImportData(
         val lineupDb = lineupDao.getLineupByHash(lineup.id)
         return if (lineupDb == null) {
             counts.recordInsert()
-            newLineup.id = lineupDao.insertLineup(newLineup)
-            newLineup
+            newLineup.copy(id = lineupDao.insertLineup(newLineup))
         } else if (updateIfExists) {
             counts.recordUpdate()
-            newLineup.id = lineupDb.id
-            lineupDao.updateLineup(newLineup)
-            newLineup
+            val updated = newLineup.copy(id = lineupDb.id)
+            lineupDao.updateLineup(updated)
+            updated
         } else {
             lineupDb
         }
@@ -303,8 +299,7 @@ class ImportData(
             playerFieldPositionsDao.insertPlayerFieldPosition(p)
         } else if (updateIfExists) {
             counts.recordUpdate()
-            p.id = positionDb.id
-            playerFieldPositionsDao.updatePlayerFieldPosition(p)
+            playerFieldPositionsDao.updatePlayerFieldPosition(p.copy(id = positionDb.id))
         }
     }
 
@@ -323,8 +318,7 @@ class ImportData(
             playerNumberOverlayDao.insertPlayerNumberOverlay(p)
         } else if (updateIfExists) {
             counts.recordUpdate()
-            p.id = overlayDb.id
-            playerNumberOverlayDao.updatePlayerNumberOverlay(p)
+            playerNumberOverlayDao.updatePlayerNumberOverlay(p.copy(id = overlayDb.id))
         }
     }
 }

@@ -262,10 +262,10 @@ internal class LineupViewModelTest {
         val lineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
         loadLineup(lineup)
         advanceUntilIdle()
-        lineup.mode = 1
+        val updatedLineup = lineup.copy(mode = 1)
         runBlocking {
             Mockito.`when`(setLineupModeUseCase(eq(true), eq(lineup), any()))
-                .thenReturn(Result.success(Unit))
+                .thenReturn(Result.success(updatedLineup))
         }
 
         viewModel.onLineupModeChanged(true)

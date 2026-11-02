@@ -19,13 +19,13 @@ import java.util.UUID
  * @property hash
  */
 data class Tournament(
-    var id: Long = 0,
-    var name: String,
-    var createdAt: Long,
-    var startTime: Long,
-    var endTime: Long,
-    var address: String? = null,
-    var hash: String? = UUID.randomUUID().toString()
+    val id: Long = 0,
+    val name: String,
+    val createdAt: Long,
+    val startTime: Long,
+    val endTime: Long,
+    val address: String? = null,
+    val hash: String? = UUID.randomUUID().toString()
 ) : Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) {

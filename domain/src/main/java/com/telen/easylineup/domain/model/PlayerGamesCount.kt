@@ -9,6 +9,6 @@ package com.telen.easylineup.domain.model
  * @property size
  */
 data class PlayerGamesCount(
-    var playerId: Long = 0,
-    var size: Int = 0
+    val playerId: Long = 0,
+    val size: Int = 0
 )
