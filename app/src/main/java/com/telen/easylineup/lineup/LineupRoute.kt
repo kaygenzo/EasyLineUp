@@ -12,7 +12,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,9 +39,7 @@ import com.telen.easylineup.lineup.edition.LineupUpdated
 import com.telen.easylineup.lineup.edition.RosterEditSheet
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -84,22 +81,16 @@ fun LineupRoute(
         }
     }
 
-    // Click-triggered, one-shot Rx subscription (exportLineupToExternalStorage returns a
-    // Single<Intent>) - relocated as-is from BaseFragment.launch(), not rewritten, per the
-    // same accepted-interop-boundary rule as the screen-lifetime subscriptions elsewhere.
-    var shareDisposable by remember { mutableStateOf<Disposable?>(null) }
-    DisposableEffect(Unit) { onDispose { shareDisposable?.dispose() } }
+    var shareJob by remember { mutableStateOf<Job?>(null) }
 
     fun shareLineup(bitmap: Bitmap) {
         val views = mapOf(state.selectedTab to bitmap)
-        shareDisposable?.dispose()
-        shareDisposable = viewModel.exportLineupToExternalStorage(context, views)
-            .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { intent -> context.startActivity(Intent.createChooser(intent, "")) },
-                { Timber.e(it) }
-            )
+        shareJob?.cancel()
+        shareJob = coroutineScope.launch {
+            runCatching { viewModel.exportLineupToExternalStorage(context, views) }
+                .onSuccess { intent -> context.startActivity(Intent.createChooser(intent, "")) }
+                .onFailure { Timber.e(it) }
+        }
     }
 
     fun handlePositionClicked(position: FieldPosition) {

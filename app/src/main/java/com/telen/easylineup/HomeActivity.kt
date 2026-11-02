@@ -12,11 +12,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -29,9 +32,7 @@ import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.team.swap.SwapTeamSheet
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import io.reactivex.rxjava3.disposables.Disposable
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 /**
  * No layout XML and no Fragments back this screen - [AppNavHost] (Jetpack Navigation Compose)
@@ -65,27 +66,29 @@ class HomeActivity : BaseActivity() {
             DugoutTheme {
                 val navController = rememberNavController()
                 popToDashboard = { navController.popBackStack(Routes.Dashboard, false) }
+                val lifecycleOwner = LocalLifecycleOwner.current
 
                 val backStackEntry by navController.currentBackStackEntryAsState()
                 val currentTab = BottomNavTab.values().find { tab ->
                     backStackEntry?.destination?.hasRoute(tab.route::class) == true
                 }
 
-                DisposableEffect(viewModel) {
-                    val disposable: Disposable = viewModel.observeEvents().subscribe({ event ->
-                        when (event) {
-                            UpdateCurrentTeamSuccess ->
-                                navController.popBackStack(Routes.Dashboard, false)
+                LaunchedEffect(viewModel) {
+                    viewModel.events
+                        .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                        .collect { event ->
+                            when (event) {
+                                UpdateCurrentTeamSuccess ->
+                                    navController.popBackStack(Routes.Dashboard, false)
 
-                            is SwapButtonSuccess -> {
-                                swapTeamTeams = event.teams
-                                showSwapTeamSheet = true
+                                is SwapButtonSuccess -> {
+                                    swapTeamTeams = event.teams
+                                    showSwapTeamSheet = true
+                                }
+
+                                else -> {}
                             }
-
-                            else -> {}
                         }
-                    }, { error -> Timber.e(error) })
-                    onDispose { disposable.dispose() }
                 }
 
                 Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
@@ -132,11 +135,6 @@ class HomeActivity : BaseActivity() {
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.clear()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

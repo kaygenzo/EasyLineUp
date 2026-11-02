@@ -12,6 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.PreferenceManager
 import com.telen.easylineup.compose.ImportConfirmSheet
 import com.telen.easylineup.compose.ImportSuccessSheet
@@ -28,8 +31,8 @@ import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.StorageUtils
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 abstract class BaseImportActivity : BaseActivity() {
     protected val viewModel by viewModel<LoginViewModel>()
@@ -45,36 +48,36 @@ abstract class BaseImportActivity : BaseActivity() {
         updateExistingOnImport = PreferenceManager.getDefaultSharedPreferences(this)
             .getBoolean(getString(R.string.key_import_data_update_object), false)
 
-        val disposable = viewModel.observeEvents().subscribe({
-            when (it) {
-                is ImportPreviewReady -> {
-                    pendingFileName = it.fileName
-                    importPreview = it.exportBase
-                }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.events.collect {
+                    when (it) {
+                        is ImportPreviewReady -> {
+                            pendingFileName = it.fileName
+                            importPreview = it.exportBase
+                        }
 
-                is ImportSuccessfulEvent -> {
-                    FirebaseAnalyticsUtils.importData(this)
-                    importPreview = null
-                    importResult = it.result
-                }
+                        is ImportSuccessfulEvent -> {
+                            FirebaseAnalyticsUtils.importData(this@BaseImportActivity)
+                            importPreview = null
+                            importResult = it.result
+                        }
 
-                ImportFailure -> displayImportFailure()
+                        ImportFailure -> displayImportFailure()
 
-                is GetTeamSuccess -> {
-                    // the file contains at least one main team
-                    launchHome()
-                }
+                        is GetTeamSuccess -> {
+                            // the file contains at least one main team
+                            launchHome()
+                        }
 
-                GetTeamFailed -> {
-                    // no main team selected, let's create new one
-                    launchTeamCreation()
+                        GetTeamFailed -> {
+                            // no main team selected, let's create new one
+                            launchTeamCreation()
+                        }
+                    }
                 }
             }
-        }, {
-            Timber.e(it)
-        })
-
-        this.disposables.add(disposable)
+        }
     }
 
     /**
@@ -134,11 +137,6 @@ abstract class BaseImportActivity : BaseActivity() {
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.clear()
     }
 
     protected fun launchTeamCreation() {

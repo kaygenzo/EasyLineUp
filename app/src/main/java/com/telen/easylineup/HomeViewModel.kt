@@ -9,8 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.usecases.GetAllTeams
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
-import io.reactivex.rxjava3.subjects.PublishSubject
-import io.reactivex.rxjava3.subjects.Subject
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -27,22 +28,16 @@ class HomeViewModel(
     private val getAllTeams: GetAllTeams,
     private val saveCurrentTeam: SaveCurrentTeam
 ) : ViewModel() {
-    private val _event: Subject<Event> = PublishSubject.create()
-
-    fun clear() {
-    }
-
-    fun observeEvents(): Subject<Event> {
-        return _event
-    }
+    private val _events = Channel<Event>(Channel.BUFFERED)
+    val events: Flow<Event> = _events.receiveAsFlow()
 
     fun onSwapButtonClicked() {
         viewModelScope.launch {
             getAllTeams()
-                .onSuccess { _event.onNext(SwapButtonSuccess(it)) }
+                .onSuccess { _events.send(SwapButtonSuccess(it)) }
                 .onFailure {
                     Timber.e(it)
-                    _event.onNext(SwapButtonFailure)
+                    _events.send(SwapButtonFailure)
                 }
         }
     }
@@ -51,11 +46,11 @@ class HomeViewModel(
         viewModelScope.launch {
             saveCurrentTeam(currentTeam)
                 .onSuccess {
-                    _event.onNext(UpdateCurrentTeamSuccess)
+                    _events.send(UpdateCurrentTeamSuccess)
                 }
                 .onFailure {
                     Timber.e(it)
-                    _event.onNext(UpdateCurrentTeamFailure)
+                    _events.send(UpdateCurrentTeamFailure)
                 }
         }
     }

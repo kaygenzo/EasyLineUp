@@ -11,7 +11,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -125,25 +124,25 @@ fun SettingsRoute(navController: NavController) {
             }
     }
 
-    // LoginViewModel is shared with the login flow and still RxJava-based; out of scope for
-    // this screen's modernization, so its existing Subject subscription is relocated here as-is,
-    // forwarding the results it carries into SettingsViewModel's own state.
-    DisposableEffect(loginViewModel) {
-        val disposable = loginViewModel.observeEvents().subscribe({ event ->
-            when (event) {
-                is ImportPreviewReady -> viewModel.onImportPreviewReady(
-                    event.fileName,
-                    event.exportBase
-                )
+    // LoginViewModel is shared with the login flow - its events are forwarded here into
+    // SettingsViewModel's own state.
+    LaunchedEffect(loginViewModel) {
+        loginViewModel.events
+            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .collect { event ->
+                when (event) {
+                    is ImportPreviewReady -> viewModel.onImportPreviewReady(
+                        event.fileName,
+                        event.exportBase
+                    )
 
-                is ImportSuccessfulEvent -> viewModel.onImportSuccess(event.result)
+                    is ImportSuccessfulEvent -> viewModel.onImportSuccess(event.result)
 
-                ImportFailure -> viewModel.onImportFailure()
+                    ImportFailure -> viewModel.onImportFailure()
 
-                else -> {}
+                    else -> {}
+                }
             }
-        }, { Timber.e(it) })
-        onDispose { disposable.dispose() }
     }
 
     SettingsScreen(

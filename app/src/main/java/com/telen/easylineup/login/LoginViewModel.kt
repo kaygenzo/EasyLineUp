@@ -18,8 +18,9 @@ import com.telen.easylineup.domain.usecases.ImportResult
 import com.telen.easylineup.export.json.JsonExportBase
 import com.telen.easylineup.export.json.exportGson
 import com.telen.easylineup.export.json.toDomain
-import io.reactivex.rxjava3.subjects.PublishSubject
-import io.reactivex.rxjava3.subjects.Subject
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -47,11 +48,8 @@ class LoginViewModel(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
-    private val _loginEvent: Subject<LoginEvent> = PublishSubject.create()
-
-    fun observeEvents(): Subject<LoginEvent> {
-        return _loginEvent
-    }
+    private val _events = Channel<LoginEvent>(Channel.BUFFERED)
+    val events: Flow<LoginEvent> = _events.receiveAsFlow()
 
     /**
      * Parses the picked file into an [ExportBase] preview - no database writes yet, so the
@@ -71,11 +69,11 @@ class LoginViewModel(
                 }
             }
                 .onSuccess {
-                    _loginEvent.onNext(ImportPreviewReady(queryDisplayName(uri), it))
+                    _events.send(ImportPreviewReady(queryDisplayName(uri), it))
                 }
                 .onFailure {
                     Timber.e(it)
-                    _loginEvent.onNext(ImportFailure)
+                    _events.send(ImportFailure)
                 }
         }
     }
@@ -83,10 +81,10 @@ class LoginViewModel(
     fun confirmImport(exportBase: ExportBase, updateIfExists: Boolean) {
         viewModelScope.launch {
             importDataUseCase(exportBase, updateIfExists)
-                .onSuccess { _loginEvent.onNext(ImportSuccessfulEvent(it)) }
+                .onSuccess { _events.send(ImportSuccessfulEvent(it)) }
                 .onFailure {
                     Timber.e(it)
-                    _loginEvent.onNext(ImportFailure)
+                    _events.send(ImportFailure)
                 }
         }
     }
@@ -101,16 +99,13 @@ class LoginViewModel(
         return uri.lastPathSegment.orEmpty()
     }
 
-    fun clear() {
-    }
-
     fun getMainTeam() {
         viewModelScope.launch {
             getTeamUseCase()
-                .onSuccess { _loginEvent.onNext(GetTeamSuccess(it)) }
+                .onSuccess { _events.send(GetTeamSuccess(it)) }
                 .onFailure {
                     Timber.e(it)
-                    _loginEvent.onNext(GetTeamFailed)
+                    _events.send(GetTeamFailed)
                 }
         }
     }

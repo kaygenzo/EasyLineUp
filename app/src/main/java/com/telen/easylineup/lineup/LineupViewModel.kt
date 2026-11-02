@@ -25,6 +25,7 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.ClearRoster
 import com.telen.easylineup.domain.usecases.DeleteLineup
@@ -48,7 +49,6 @@ import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersExce
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.LineupShareImageWriter
 import com.telen.easylineup.views.LineupTypeface
-import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,6 +59,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 sealed class EventCase
@@ -136,7 +137,8 @@ class LineupViewModel(
     private val toggleRosterPlayerUseCase: ToggleRosterPlayer,
     private val clearRosterUseCase: ClearRoster,
     private val overrideRosterPlayerNumberUseCase: OverrideRosterPlayerNumber,
-    private val lineupShareImageWriter: LineupShareImageWriter
+    private val lineupShareImageWriter: LineupShareImageWriter,
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LineupUiState())
     val uiState: StateFlow<LineupUiState> = _uiState.asStateFlow()
@@ -288,20 +290,19 @@ class LineupViewModel(
         }
     }
 
-    fun exportLineupToExternalStorage(
+    suspend fun exportLineupToExternalStorage(
         context: Context,
         views: Map<Int, Bitmap?>
-    ): Single<Intent> {
-        return Single.defer {
+    ): Intent {
+        return withContext(dispatcherProvider.io()) {
             val uris = ArrayList(lineupShareImageWriter.write(views))
             val title = lineup?.name.toString()
             val message = context.getString(R.string.share_lineup_subject, title)
-            val intent = Intent(Intent.ACTION_SEND_MULTIPLE).run {
+            Intent(Intent.ACTION_SEND_MULTIPLE).apply {
                 putExtra(Intent.EXTRA_SUBJECT, message)
                 type = "image/*"
                 putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
             }
-            Single.just(intent)
         }
     }
 
