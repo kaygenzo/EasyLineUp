@@ -9,7 +9,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -31,6 +30,7 @@ import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.team.swap.SwapTeamSheet
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import io.reactivex.rxjava3.disposables.Disposable
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 /**
@@ -41,7 +41,7 @@ import timber.log.Timber
  * `ScreenHeader`, so it was pure redundant chrome.
  */
 class HomeActivity : BaseActivity() {
-    private val viewModel by viewModels<HomeViewModel>()
+    private val viewModel by viewModel<HomeViewModel>()
     private var popToDashboard: (() -> Unit)? = null
     private var showSwapTeamSheet by mutableStateOf(false)
     private var swapTeamTeams by mutableStateOf<List<Team>>(emptyList())

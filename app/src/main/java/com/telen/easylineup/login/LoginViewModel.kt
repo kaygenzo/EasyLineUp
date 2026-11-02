@@ -22,8 +22,6 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import timber.log.Timber
 
 sealed class LoginEvent
@@ -43,11 +41,12 @@ object ImportFailure : LoginEvent()
 data class GetTeamSuccess(val team: Team) : LoginEvent()
 object GetTeamFailed : LoginEvent()
 
-class LoginViewModel : ViewModel(), KoinComponent {
-    private val getTeamUseCase: GetTeam by inject()
-    private val importDataUseCase: ImportData by inject()
-    private val context: Context by inject()
-    private val dispatcherProvider: DispatcherProvider by inject()
+class LoginViewModel(
+    private val getTeamUseCase: GetTeam,
+    private val importDataUseCase: ImportData,
+    private val context: Context,
+    private val dispatcherProvider: DispatcherProvider
+) : ViewModel() {
     private val _loginEvent: Subject<LoginEvent> = PublishSubject.create()
 
     fun observeEvents(): Subject<LoginEvent> {

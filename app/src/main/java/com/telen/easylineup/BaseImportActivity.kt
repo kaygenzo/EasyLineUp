@@ -8,7 +8,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,10 +28,11 @@ import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.StorageUtils
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 abstract class BaseImportActivity : BaseActivity() {
-    protected val viewModel by viewModels<LoginViewModel>()
+    protected val viewModel by viewModel<LoginViewModel>()
 
     private var pendingFileName by mutableStateOf("")
     private var importPreview by mutableStateOf<ExportBase?>(null)

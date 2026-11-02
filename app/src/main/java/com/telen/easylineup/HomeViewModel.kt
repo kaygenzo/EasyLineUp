@@ -12,8 +12,6 @@ import com.telen.easylineup.domain.usecases.SaveCurrentTeam
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import timber.log.Timber
 
 sealed class Event
@@ -25,9 +23,10 @@ object UpdateCurrentTeamFailure : Event()
 data class SwapButtonSuccess(val teams: List<Team>) : Event()
 object SwapButtonFailure : Event()
 
-class HomeViewModel : ViewModel(), KoinComponent {
-    private val getAllTeams: GetAllTeams by inject()
-    private val saveCurrentTeam: SaveCurrentTeam by inject()
+class HomeViewModel(
+    private val getAllTeams: GetAllTeams,
+    private val saveCurrentTeam: SaveCurrentTeam
+) : ViewModel() {
     private val _event: Subject<Event> = PublishSubject.create()
 
     fun clear() {

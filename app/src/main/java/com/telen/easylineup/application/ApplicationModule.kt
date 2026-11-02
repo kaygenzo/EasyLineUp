@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.application
 
+import com.telen.easylineup.HomeViewModel
 import com.telen.easylineup.dashboard.DashboardViewModel
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.ExportFileWriter
@@ -53,9 +54,6 @@ val appModules = module {
     viewModelOf(::TournamentStatisticsViewModel)
     viewModelOf(::LineupListViewModel)
     viewModelOf(::LineupViewModel)
-
-    // Still KoinComponent/by-inject() internally (out of scope to rewrite here) - registered
-    // only so koinViewModel() can resolve it now that there is no Fragment to scope it via
-    // by viewModels().
+    viewModelOf(::HomeViewModel)
     viewModelOf(::LoginViewModel)
 }
