@@ -13,6 +13,7 @@ import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournamentException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -52,6 +53,8 @@ internal class SaveTournamentTests {
         val result = saveTournament(tournament)
 
         assertTrue(result.isSuccess)
+        assertEquals(42L, result.getOrNull()?.id)
+        assertTrue((result.getOrNull()?.createdAt ?: 0L) > 0L)
         verify(repository).insertTournament(any())
     }
 

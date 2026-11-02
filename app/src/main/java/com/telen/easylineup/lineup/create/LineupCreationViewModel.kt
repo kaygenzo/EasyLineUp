@@ -204,22 +204,23 @@ class LineupCreationViewModel(
 
     fun onAddNewTournament() {
         val current = _uiState.value
+        // createdAt is a placeholder - SaveTournament stamps the real insertion time itself.
         val tournament = Tournament(
             name = current.newTournamentName,
-            createdAt = System.currentTimeMillis(),
+            createdAt = 0L,
             startTime = current.newTournamentStartTime,
             endTime = current.newTournamentEndTime,
             address = current.newTournamentAddress.takeIf { it.isNotBlank() }
         )
         viewModelScope.launch {
             saveTournament(tournament)
-                .onSuccess {
+                .onSuccess { savedTournament ->
                     _uiState.update {
                         it.copy(
-                            selectedTournament = tournament,
+                            selectedTournament = savedTournament,
                             tournamentError = false,
                             eventTimeInMillis = resolveLineupEventTimeUseCase(
-                                tournament,
+                                savedTournament,
                                 it.eventTimeInMillis
                             ),
                             showNewTournamentSheet = false

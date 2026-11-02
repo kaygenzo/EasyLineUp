@@ -15,7 +15,9 @@ class SaveTournament(
     private val repository: TournamentRepository,
     private val dispatcherProvider: DispatcherProvider
 ) {
-    suspend operator fun invoke(tournament: Tournament): Result<Unit> = runCatchingCancellable {
+    suspend operator fun invoke(
+        tournament: Tournament
+    ): Result<Tournament> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
             if (tournament.name.isEmpty()) {
                 throw TournamentNameEmptyException()
@@ -25,7 +27,8 @@ class SaveTournament(
                 throw AlreadyExistingTournamentException()
             }
 
-            repository.insertTournament(tournament)
+            val withCreatedAt = tournament.copy(createdAt = System.currentTimeMillis())
+            withCreatedAt.copy(id = repository.insertTournament(withCreatedAt))
         }
     }
 }

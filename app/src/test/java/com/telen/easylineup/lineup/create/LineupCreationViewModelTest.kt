@@ -180,7 +180,8 @@ internal class LineupCreationViewModelTest {
     @Test
     fun shouldSaveAndSelectNewTournament() = runTest {
         viewModel.onNewTournamentNameChanged("Cup")
-        runBlocking { Mockito.`when`(saveTournament(any())).thenReturn(Result.success(Unit)) }
+        val saved = Tournament(id = 7L, name = "Cup", createdAt = 1L, startTime = 0L, endTime = 0L)
+        runBlocking { Mockito.`when`(saveTournament(any())).thenReturn(Result.success(saved)) }
         Mockito.`when`(resolveLineupEventTimeUseCase(any(), any())).thenReturn(5L)
 
         viewModel.onAddNewTournament()
@@ -188,6 +189,10 @@ internal class LineupCreationViewModelTest {
 
         val state = viewModel.uiState.value
         assertEquals("Cup", state.selectedTournament?.name)
+        // Regression check: the ViewModel must use the SAVED tournament (real DB id) as
+        // selectedTournament, not the pre-insert local one (which would silently default
+        // tournamentId to 0 when the lineup is saved afterward).
+        assertEquals(7L, state.selectedTournament?.id)
         assertFalse(state.tournamentError)
         assertFalse(state.showNewTournamentSheet)
         assertEquals(5L, state.eventTimeInMillis)
