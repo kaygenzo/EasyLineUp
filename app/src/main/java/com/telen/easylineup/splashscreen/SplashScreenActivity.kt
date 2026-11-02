@@ -9,13 +9,12 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.telen.easylineup.BaseImportActivity
-import com.telen.easylineup.domain.usecases.GetTeam
-import com.telen.easylineup.login.LoginActivity
 import androidx.lifecycle.lifecycleScope
+import com.telen.easylineup.BaseImportActivity
+import com.telen.easylineup.login.LoginActivity
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 /**
  * Pure bootstrap/routing - decides between Home, Login or an import flow. The system
@@ -24,8 +23,8 @@ import org.koin.core.component.inject
  * Activity never actually shows its own UI; it used to inflate a custom splashscreen.xml
  * layout that was permanently hidden behind that system splash and has been removed.
  */
-class SplashScreenActivity : BaseImportActivity(), KoinComponent {
-    private val getTeam: GetTeam by inject()
+class SplashScreenActivity : BaseImportActivity() {
+    private val splashViewModel by viewModel<SplashViewModel>()
     private val activityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             finish()
@@ -41,10 +40,10 @@ class SplashScreenActivity : BaseImportActivity(), KoinComponent {
             launchImportActivity(it)
         } ?: run {
             lifecycleScope.launch {
-                getTeam()
+                splashViewModel.getTeam()
                     .onSuccess { launchHome() }
                     .onFailure {
-                        it.printStackTrace()
+                        Timber.e(it)
                         launchLoginScreen()
                     }
             }

@@ -17,6 +17,7 @@ import com.telen.easylineup.lineup.edition.LineupEditionViewModel
 import com.telen.easylineup.login.LoginViewModel
 import com.telen.easylineup.player.PlayerViewModel
 import com.telen.easylineup.settings.SettingsViewModel
+import com.telen.easylineup.splashscreen.SplashViewModel
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.SetupViewModel
 import com.telen.easylineup.tournaments.list.LineupListViewModel
@@ -41,9 +42,8 @@ val appModules = module {
     single<LineupShareImageWriter> { LineupShareImageWriterImpl(get()) }
     single { SharedPreferencesHelper(get()) }
 
-    // Constructor-injected ViewModel — the pattern new/reskinned screens should
-    // follow going forward, replacing the KoinComponent field-injection pattern
-    // still used by every other ViewModel in this codebase.
+    // Every ViewModel in the app is constructor-injected and registered explicitly here -
+    // no ViewModel resolves its own dependencies via KoinComponent/by inject().
     viewModelOf(::SettingsViewModel)
     viewModelOf(::SetupViewModel)
     viewModelOf(::TeamViewModel)
@@ -56,4 +56,5 @@ val appModules = module {
     viewModelOf(::LineupViewModel)
     viewModelOf(::HomeViewModel)
     viewModelOf(::LoginViewModel)
+    viewModelOf(::SplashViewModel)
 }
