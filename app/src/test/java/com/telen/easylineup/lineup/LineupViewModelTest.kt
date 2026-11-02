@@ -6,6 +6,7 @@ package com.telen.easylineup.lineup
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import com.telen.easylineup.domain.model.DpAndFlexConfiguration
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
@@ -38,7 +39,7 @@ import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.testDispatcherProvider
-import com.telen.easylineup.utils.LineupShareImageWriter
+import com.telen.easylineup.utils.LineupPdfWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
@@ -86,7 +87,7 @@ internal class LineupViewModelTest {
     @Mock lateinit var getOnlyPlayersInFieldUseCase: GetOnlyPlayersInField
     @Mock lateinit var saveDpAndFlexUseCase: SaveDpAndFlex
     @Mock lateinit var updatePlayersWithBattersUseCase: UpdatePlayersWithBatters
-    @Mock lateinit var lineupShareImageWriter: LineupShareImageWriter
+    @Mock lateinit var lineupPdfWriter: LineupPdfWriter
     @Mock lateinit var context: Context
 
     private lateinit var viewModel: LineupViewModel
@@ -149,7 +150,7 @@ internal class LineupViewModelTest {
             ToggleRosterPlayer(),
             ClearRoster(),
             OverrideRosterPlayerNumber(),
-            lineupShareImageWriter,
+            lineupPdfWriter,
             testDispatcherProvider()
         )
     }
@@ -279,18 +280,19 @@ internal class LineupViewModelTest {
         val lineup = Lineup(id = 1L, name = "My Lineup", teamId = 1L, tournamentId = 1L)
         loadLineup(lineup)
         advanceUntilIdle()
+        val uri = Mockito.mock(Uri::class.java)
         Mockito.`when`(context.getString(Mockito.anyInt(), any())).thenReturn("Share subject")
-        Mockito.`when`(lineupShareImageWriter.write(any())).thenReturn(emptyList())
+        Mockito.`when`(lineupPdfWriter.write(any())).thenReturn(uri)
 
         // android.content.Intent's own methods aren't implemented on the unit test JVM -
         // mockConstruction swaps the real Intent() for a plain mock so putExtra/setType/etc.
         // don't throw "not mocked".
         Mockito.mockConstruction(Intent::class.java) { mock, _ ->
-            Mockito.`when`(mock.type).thenReturn("image/*")
+            Mockito.`when`(mock.type).thenReturn("application/pdf")
         }.use {
-            val intent = viewModel.exportLineupToExternalStorage(context, emptyMap())
+            val intent = viewModel.exportLineupToExternalStorage(context)
 
-            assertEquals("image/*", intent.type)
+            assertEquals("application/pdf", intent.type)
         }
     }
 

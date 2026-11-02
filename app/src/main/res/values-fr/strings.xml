@@ -167,6 +167,13 @@
 
     <string name="share_lineup_subject">Voici le lineup de: %s</string>
 
+    <string name="lineup_pdf_title">Lineup</string>
+    <string name="lineup_pdf_date_label">Date : %s</string>
+    <string name="lineup_pdf_opponent_label">Adversaire : %s</string>
+    <string name="lineup_pdf_batting_order_title">Ordre de batte</string>
+    <string name="lineup_pdf_defense_title">Defense</string>
+    <string name="lineup_pdf_substitutes_title">Remplaçants</string>
+
     <string name="team_list_empty_text">Une fois que vous aurez créé votre équipe, elle sera visible ici</string>
     <string name="switch_team_sheet_title">Changer d\'équipe</string>
     <plurals name="switch_team_sheet_subtitle">

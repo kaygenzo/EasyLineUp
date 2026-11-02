@@ -5,7 +5,6 @@
 package com.telen.easylineup.lineup
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.AlertDialog
@@ -83,11 +82,10 @@ fun LineupRoute(
 
     var shareJob by remember { mutableStateOf<Job?>(null) }
 
-    fun shareLineup(bitmap: Bitmap) {
-        val views = mapOf(state.selectedTab to bitmap)
+    fun shareLineup() {
         shareJob?.cancel()
         shareJob = coroutineScope.launch {
-            runCatching { viewModel.exportLineupToExternalStorage(context, views) }
+            runCatching { viewModel.exportLineupToExternalStorage(context) }
                 .onSuccess { intent -> context.startActivity(Intent.createChooser(intent, "")) }
                 .onFailure { Timber.e(it) }
         }
@@ -139,7 +137,7 @@ fun LineupRoute(
                     .onFailure { Timber.e(it) }
             }
         },
-        onShareCaptured = { bitmap -> shareLineup(bitmap) },
+        onShareLineup = { shareLineup() },
         onDeleteClick = {
             FirebaseAnalyticsUtils.onClick(context, "click_lineup_delete")
             viewModel.onDeleteSheetRequested()

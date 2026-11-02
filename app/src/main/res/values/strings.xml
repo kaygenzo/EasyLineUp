@@ -177,6 +177,13 @@
 
     <string name="share_lineup_subject">Here is the lineup of: %s</string>
 
+    <string name="lineup_pdf_title">Lineup</string>
+    <string name="lineup_pdf_date_label">Date: %s</string>
+    <string name="lineup_pdf_opponent_label">Opponent: %s</string>
+    <string name="lineup_pdf_batting_order_title">Batting Order</string>
+    <string name="lineup_pdf_defense_title">Defense</string>
+    <string name="lineup_pdf_substitutes_title">Substitutes</string>
+
     <string name="team_list_empty_text">Once you create a team, you’ll see it listed here</string>
     <string name="switch_team_sheet_title">Switch team</string>
     <plurals name="switch_team_sheet_subtitle">

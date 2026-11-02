@@ -8,7 +8,6 @@ package com.telen.easylineup.lineup
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
@@ -46,7 +45,8 @@ import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
-import com.telen.easylineup.utils.LineupShareImageWriter
+import com.telen.easylineup.utils.LineupExportData
+import com.telen.easylineup.utils.LineupPdfWriter
 import com.telen.easylineup.views.LineupTypeface
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -145,7 +145,7 @@ class LineupViewModel(
     private val toggleRosterPlayerUseCase: ToggleRosterPlayer,
     private val clearRosterUseCase: ClearRoster,
     private val overrideRosterPlayerNumberUseCase: OverrideRosterPlayerNumber,
-    private val lineupShareImageWriter: LineupShareImageWriter,
+    private val lineupPdfWriter: LineupPdfWriter,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LineupUiState())
@@ -301,18 +301,25 @@ class LineupViewModel(
         }
     }
 
-    suspend fun exportLineupToExternalStorage(
-        context: Context,
-        views: Map<Int, Bitmap?>
-    ): Intent {
+    suspend fun exportLineupToExternalStorage(context: Context): Intent {
         return withContext(dispatcherProvider.io()) {
-            val uris = ArrayList(lineupShareImageWriter.write(views))
-            val title = lineup?.name.toString()
-            val message = context.getString(R.string.share_lineup_subject, title)
-            Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+            val currentLineup = lineup
+            val state = _uiState.value
+            val data = LineupExportData(
+                lineupName = currentLineup?.name.orEmpty(),
+                eventTimeInMillis = currentLineup?.eventTimeInMillis ?: 0L,
+                teamType = state.teamType,
+                strategy = state.defenseStrategy,
+                battingOrder = state.batters,
+                defensePlayers = state.defensePlayers
+            )
+            val uri = lineupPdfWriter.write(data)
+            val message = context.getString(R.string.share_lineup_subject, data.lineupName)
+            Intent(Intent.ACTION_SEND).apply {
                 putExtra(Intent.EXTRA_SUBJECT, message)
-                type = "image/*"
-                putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
+                type = "application/pdf"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
         }
     }

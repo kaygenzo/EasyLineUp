@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.lineup
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,14 +22,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.layer.drawLayer
-import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -50,7 +44,6 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.lineup.attack.AttackScreen
 import com.telen.easylineup.lineup.defense.DefenseScreen
 import com.telen.easylineup.views.LineupTypeface
-import kotlinx.coroutines.launch
 
 /**
  * The Lineup container - app bar, Defense/Offense tabbar and (editable only) Save/Cancel
@@ -69,7 +62,7 @@ fun LineupScreen(
     onBackClick: () -> Unit,
     onCancelClick: () -> Unit,
     onSaveClick: () -> Unit,
-    onShareCaptured: (Bitmap) -> Unit,
+    onShareLineup: () -> Unit,
     onDeleteClick: () -> Unit,
     onEditClick: () -> Unit,
     onEditRosterClick: () -> Unit,
@@ -89,9 +82,6 @@ fun LineupScreen(
     typeface: LineupTypeface,
     onReorder: (List<BatterState>) -> Unit
 ) {
-    val graphicsLayer = rememberGraphicsLayer()
-    val scope = rememberCoroutineScope()
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -123,11 +113,7 @@ fun LineupScreen(
                     HeaderIconChip(
                         icon = R.drawable.ic_share_outline_24dp,
                         contentDescription = stringResource(R.string.action_share),
-                        onClick = {
-                            scope.launch {
-                                onShareCaptured(graphicsLayer.toImageBitmap().asAndroidBitmap())
-                            }
-                        }
+                        onClick = onShareLineup
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     HeaderIconChip(
@@ -145,14 +131,7 @@ fun LineupScreen(
             onTabSelected = onTabSelected,
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
         )
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .drawWithContent {
-                    graphicsLayer.record { this@drawWithContent.drawContent() }
-                    drawLayer(graphicsLayer)
-                }
-        ) {
+        Box(modifier = Modifier.weight(1f)) {
             if (selectedTab == FRAGMENT_DEFENSE_INDEX) {
                 DefenseScreen(
                     strategy = defenseStrategy,
@@ -385,7 +364,7 @@ private fun LineupScreenPreview() {
             onBackClick = {},
             onCancelClick = {},
             onSaveClick = {},
-            onShareCaptured = {},
+            onShareLineup = {},
             onDeleteClick = {},
             onEditClick = {},
             onEditRosterClick = {},

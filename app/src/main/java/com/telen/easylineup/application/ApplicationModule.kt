@@ -27,8 +27,8 @@ import com.telen.easylineup.utils.DispatcherProviderImpl
 import com.telen.easylineup.utils.ExportFileWriterImpl
 import com.telen.easylineup.utils.GeocodingProviderImpl
 import com.telen.easylineup.utils.ImportFileReaderImpl
-import com.telen.easylineup.utils.LineupShareImageWriter
-import com.telen.easylineup.utils.LineupShareImageWriterImpl
+import com.telen.easylineup.utils.LineupPdfWriter
+import com.telen.easylineup.utils.LineupPdfWriterImpl
 import com.telen.easylineup.utils.PhoneNumberValidatorImpl
 import com.telen.easylineup.utils.SharedPreferencesHelper
 import com.telen.easylineup.utils.StringResourcesProviderImpl
@@ -42,7 +42,7 @@ val appModules = module {
     single<PhoneNumberValidator> { PhoneNumberValidatorImpl() }
     single<ExportFileWriter> { ExportFileWriterImpl(get()) }
     single<ImportFileReader> { ImportFileReaderImpl(get()) }
-    single<LineupShareImageWriter> { LineupShareImageWriterImpl(get()) }
+    single<LineupPdfWriter> { LineupPdfWriterImpl(get(), get(), get()) }
     single { SharedPreferencesHelper(get()) }
 
     // Every ViewModel in the app is constructor-injected and registered explicitly here -
