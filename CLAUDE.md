@@ -1,12 +1,15 @@
 # EasyLineUp — conventions for new work
 
-## UI: Compose only for new code
+## UI: Compose only
 
-All new UI code is written in Jetpack Compose, not XML layouts. This does not mean
-retrofitting every existing XML screen — screens get reskinned to Compose one at a
-time, in their own pass (see `REDESIGN.md` for the broader visual revamp roadmap).
-`SettingsFragment`/`SettingsScreen.kt` is the reference pilot: a plain `Fragment`
-hosting a single `ComposeView`, no XML layout, no ViewBinding.
+The Fragment/XML-layout migration is complete: every screen is Jetpack Compose,
+zero `Fragment` subclasses and zero `res/layout` XML files remain. Navigation is
+Jetpack Navigation Compose with typed `@Serializable` routes
+(`navigation/Routes.kt`, `navigation/AppNavHost.kt`) — a destination is an
+`XRoute.kt` composable (obtains its ViewModel via `koinViewModel<X>()`, collects
+`uiState` via `collectAsStateWithLifecycle()`, owns navigation/analytics
+plumbing) wrapping a stateless `XScreen.kt` composable. See `REDESIGN.md` for
+the design rationale behind the visual system.
 
 - Bridge the existing XML Material3 theme into Compose with `DugoutTheme`
   (`app/src/main/java/com/telen/easylineup/compose/DugoutTheme.kt`) instead of
@@ -22,50 +25,71 @@ hosting a single `ComposeView`, no XML layout, no ViewBinding.
   Compose row's `onClick` where no Compose equivalent exists yet — that's a
   normal interop boundary, not a regression.
 
-## No new RxJava — coroutines/Flow only
+## No RxJava — coroutines/Flow only
 
-RxJava3 is still used throughout the app (`BaseFragment`'s `launch(...)`
-overloads for `Flowable`/`Maybe`/`Single`/`Completable`/`Subject`, every
-ViewModel's event bus, `LoginViewModel`, `DialogFactory`'s task dialogs,
-etc). None of that is being migrated proactively — but **no new code
-introduces a new Rx usage**, including new call sites into existing
-Rx-based classes beyond what already exists (e.g. don't add a new
-`BaseFragment.launch(...)` call for a feature that doesn't already need
-one). New code uses coroutines/`Flow` end to end: `suspend` functions,
-`viewModelScope`/`lifecycleScope`, `Channel`/`Flow` for events,
-`repeatOnLifecycle` for collection.
-
-Where new code must call into an existing Rx-based class that is itself
-out of scope to touch (e.g. `LoginViewModel` from `SettingsFragment`),
-subscribing to its Rx `Subject` directly is the accepted interop
-boundary — the rule is about not writing *new* Rx, not about refusing to
-talk to code that has not been migrated yet.
+RxJava3 has been fully migrated away: zero `Disposable`/`CompositeDisposable`/
+`PublishSubject`/`Flowable`/`Completable` usage remains anywhere in the repo.
+Every event bus is a `Channel<Event>` exposed as `Flow<Event>`
+(`receiveAsFlow()`), collected with
+`lifecycleScope.launch { repeatOnLifecycle(STARTED) { ... } }` in the handful
+of plain Activities outside the Compose Navigation graph (`BaseImportActivity`
+and its subclasses), or `flowWithLifecycle(lifecycle, STARTED)` in Compose.
+All platform I/O that used to go through Rx (`LineupViewModel`'s screenshot
+export, `LoginViewModel`'s import flow) is `suspend` end to end. New code
+must not introduce any Rx usage — there is no longer an existing Rx surface
+to interop with, so this is a hard rule, not an exemption boundary.
 
 ## ViewModels: constructor injection + coroutines, no service locator
 
-Every ViewModel in the app today extends `KoinComponent` and pulls its
-dependencies via `by inject()` field injection, with zero Koin module
-registration for the ViewModel itself (`by viewModels<XViewModel>()` works
-because `KoinComponent` resolves its own fields lazily at runtime). Known
-anti-pattern: it hides the real dependency graph and can't be constructor-tested
-without spinning up Koin.
+Every ViewModel is plain constructor injection — no `KoinComponent`, no
+`by inject()` field injection anywhere in the app (that service-locator
+pattern, where `by viewModels<X>()` worked only because `KoinComponent`
+resolved its own fields lazily at runtime, has been fully retired; it hid the
+real dependency graph and couldn't be constructor-tested without spinning up
+Koin). Each ViewModel is registered explicitly via `viewModelOf(::XViewModel)`
+in `ApplicationModule.kt`'s `appModules`, and obtained through Koin's own
+delegates — `koinViewModel<X>()` in an `XRoute.kt` composable
+(`org.koin.androidx.compose.koinViewModel`), or `by viewModel<X>()` in the
+handful of plain Activities outside the Compose Navigation graph
+(`org.koin.androidx.viewmodel.ext.android.viewModel`) — never AndroidX's own
+`by viewModels<X>()`. One-shot events go through a
+`Channel<Event>` exposed as `Flow<Event>` (`receiveAsFlow()`), collected with
+`flowWithLifecycle(lifecycle, STARTED)` in Compose — not an RxJava
+`PublishSubject`/`CompositeDisposable`.
 
-`SettingsViewModel` is the reference modernization:
-- Plain constructor injection — no `KoinComponent`, no `by inject()`.
-- Registered explicitly: `viewModelOf(::SettingsViewModel)` in
-  `ApplicationModule.kt`'s `appModules`.
-- Obtained in the Fragment via Koin's `by viewModel()` delegate
-  (`org.koin.androidx.viewmodel.ext.android.viewModel`), not
-  `by viewModels<X>()`.
-- One-shot events go through a `Channel<Event>` exposed as `Flow<Event>`
-  (`receiveAsFlow()`), collected with
-  `viewLifecycleOwner.lifecycleScope.launch { repeatOnLifecycle(STARTED) { ... } }`
-  — not an RxJava `PublishSubject`/`CompositeDisposable`.
+This is a hard rule for any new ViewModel, not just a template to follow
+eventually — there is no longer an old-pattern ViewModel left to use as an
+excuse.
 
-This pattern is the template for the *next* ViewModel someone touches or
-reskins — it is **not** being retrofitted onto the rest of the app proactively.
-Screens still on the old pattern (every other ViewModel) keep working as-is
-until their own pass.
+## Business logic: domain only, never ViewModel or Compose
+
+Any calculation, validation, sort/filter, bitwise operation, or state
+transition that a product person could describe as a rule independent of a
+specific screen's rendering belongs in `domain` — as a `domain/usecases`
+class (`operator fun invoke`, registered in `DomainModule.kt`) or a pure
+`domain/model` extension function (e.g. `FieldPosition.matches()`,
+`Tournament.hasDateWindow()`). Platform I/O a domain rule needs to trigger
+goes behind a `domain/ports` interface, implemented in `app/utils` and
+registered in `ApplicationModule.kt` (see `ExportFileWriter`); platform I/O
+with no domain-side caller (e.g. writing a shareable screenshot) still goes
+behind an injected `app/utils` interface, just not a `domain/ports` one (see
+`LineupShareImageWriter`) — a ViewModel never calls `FileOutputStream`/
+`FileProvider`/`ContentResolver` directly, **even inside a method already
+accepted as legacy Rx** (the Rx exemption covers not migrating off Rx, not
+skipping a check of what the method's body actually does). ViewModels and
+Compose Screens/Routes/Sheets only shape state, map use-case `Result`s into
+`UiState`, handle navigation/analytics/platform plumbing, and localize
+strings.
+
+This was found to need real enforcement: six rounds of business-logic audits
+in one session each turned up a few more cases reimplemented in the UI layer
+instead of reused from domain (including one real bug from a divergent
+duplicate), and a 7th pass — prompted by a direct question, not the
+checklist — found `LineupViewModel` writing files straight to disk inside an
+Rx method that every prior audit had skipped specifically because it was
+Rx-wrapped. See the `business-logic-boundary` skill for the full checklist
+(what counts, what doesn't, where new logic/I/O goes, and the audit
+procedure) before writing or reviewing ViewModel/Compose code.
 
 ## Code style: AOSP, 100-column hard limit
 
