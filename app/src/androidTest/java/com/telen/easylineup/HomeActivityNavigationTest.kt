@@ -10,8 +10,10 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,6 +36,13 @@ class HomeActivityNavigationTest {
 
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<HomeActivity>()
+
+    @Before
+    fun resetOrientation() {
+        // Another test class's rotation test can leave the device rotated if it ran first in
+        // this suite - orientation is a device-level, not per-test, setting.
+        OrientationTestUtils.rotateToPortrait()
+    }
 
     @Test
     fun bottomNavSwitchesBetweenTopLevelScreens() {

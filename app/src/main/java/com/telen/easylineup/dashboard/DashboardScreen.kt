@@ -38,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -62,6 +63,11 @@ import java.util.Date
 import java.util.Locale
 
 private val dashboardCardShape = RoundedCornerShape(16.dp)
+
+/** Semantics test tags for [DashboardScreen] - only where no stable, unique text exists. */
+internal object DashboardTestTags {
+    const val SHIRT_NUMBER_FIELD = "dashboard_shirt_number_field"
+}
 
 /**
  * The one card look every box on this screen shares (hero, mini-tiles, lookup row) - same
@@ -434,7 +440,7 @@ private fun ShirtNumberInputBox(
                 imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(onDone = { onSearch() }),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().testTag(DashboardTestTags.SHIRT_NUMBER_FIELD)
         )
     }
 }
