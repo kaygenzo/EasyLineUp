@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,6 +47,11 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.StringResourcesProviderImpl
+
+/** Semantics test tags for [PlayerFormScreen] - only where no stable, unique text exists. */
+internal object PlayerFormTestTags {
+    const val NAME_FIELD = "player_form_name_field"
+}
 
 data class PlayerFormState(
     val isEditing: Boolean,
@@ -354,7 +360,7 @@ private fun RequiredField(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChanged,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag(PlayerFormTestTags.NAME_FIELD),
             textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
             singleLine = true,
             isError = error != null,

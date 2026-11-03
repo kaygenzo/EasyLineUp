@@ -22,7 +22,9 @@ import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -112,7 +114,11 @@ fun PlayerEditRoute(navController: NavController, playerId: Long) {
         onSaveClick = {
             coroutineScope.launch {
                 if (viewModel.onSaveClick()) {
-                    navController.navigateUp()
+                    // navigateUp() asserts it's running on the main thread - resuming this
+                    // coroutine after onSaveClick()'s real Room write doesn't always land back
+                    // there under Compose's own test instrumentation, so dispatch explicitly
+                    // rather than rely on the implicit withContext(IO) return-dispatcher.
+                    withContext(Dispatchers.Main) { navController.navigateUp() }
                 } else {
                     val failed = viewModel.uiState.value
                     when {

@@ -25,7 +25,9 @@ import com.telen.easylineup.domain.model.getStrategies
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -76,7 +78,13 @@ fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {
                 FirebaseAnalyticsUtils.onClick(context, "click_player_details_delete")
                 coroutineScope.launch {
                     deleteAction()
-                        .onSuccess { navController.popBackStack(Routes.Roster, false) }
+                        .onSuccess {
+                            // See the matching comment in PlayerEditRoute's save flow - the
+                            // explicit main-thread dispatch is needed for the same reason.
+                            withContext(Dispatchers.Main) {
+                                navController.popBackStack(Routes.Roster, false)
+                            }
+                        }
                         .onFailure {
                             val message = "Something wrong happened: ${it.message}"
                             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
