@@ -27,7 +27,9 @@ import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.tournaments.list.LineupListViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
 
 /** Replaces `TeamDetailsFragment`. */
@@ -89,13 +91,17 @@ fun TeamDetailsRoute(navController: NavController) {
                     coroutineScope.launch {
                         FirebaseAnalyticsUtils.onClick(context, "click_team_details_delete")
                         teamViewModel.deleteTeam(team)
-                            .onSuccess { navController.popBackStack() }
+                            .onSuccess {
+                                // Resuming after this suspend Room write doesn't reliably land
+                                // back on the main thread (see the matching fix in LineupRoute).
+                                withContext(Dispatchers.Main) { navController.popBackStack() }
+                            }
                             .onFailure { throwable ->
                                 // DeleteTeam always deletes before throwing: NoTeamsLeftException
                                 // only means there was no other team left to promote to main, not
                                 // that the delete was refused - same outcome as onSuccess.
                                 if (throwable is NoTeamsLeftException) {
-                                    navController.popBackStack()
+                                    withContext(Dispatchers.Main) { navController.popBackStack() }
                                 } else {
                                     Toast.makeText(
                                         context,

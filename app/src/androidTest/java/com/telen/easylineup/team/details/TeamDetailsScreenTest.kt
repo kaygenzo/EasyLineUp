@@ -1,0 +1,124 @@
+/*
+    Copyright (c) Karim Yarboua. 2010-2024
+*/
+
+package com.telen.easylineup.team.details
+
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.telen.easylineup.HomeActivity
+import com.telen.easylineup.testing.OrientationTestUtils
+import com.telen.easylineup.testing.SeedDatabaseRule
+import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.ThemeTestUtils
+import com.telen.easylineup.testing.waitForAbsence
+import com.telen.easylineup.testing.waitForText
+import org.junit.After
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+
+/**
+ * Covers [TeamDetailsScreen]: render of the fixture's team stats, opening and cancelling the
+ * delete-team confirmation, rotation, and light/dark theme - the full matrix policy for a core
+ * screen (see the test plan).
+ *
+ * Not covered, deliberately: actually confirming the delete. The fixture's team is the only
+ * team seeded, so a real delete leaves the app with none - a different, no-team-left flow
+ * (routing back to Welcome/Login) that belongs with that screen's own (Phase 3, smoke-only)
+ * coverage, not this one. Editing the team is also out of scope here: it launches
+ * `TeamCreationActivity` via an `ActivityResultContract`, the same external-flow boundary
+ * Welcome/team-creation's own Phase 3 coverage owns.
+ */
+@RunWith(AndroidJUnit4::class)
+class TeamDetailsScreenTest {
+    @get:Rule(order = 0)
+    val seedRule = SeedDatabaseRule()
+
+    @get:Rule(order = 1)
+    val composeTestRule = createAndroidComposeRule<HomeActivity>()
+
+    @Before
+    fun openTeamDetails() {
+        OrientationTestUtils.rotateToPortrait()
+        composeTestRule.waitForText(TestFixtures.TEAM_NAME)
+        composeTestRule.onNodeWithText("SETTINGS").performClick()
+        composeTestRule.waitForText("Settings")
+
+        composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).performClick()
+        // ScreenHeader's title isn't uppercased (unlike the "TEAM" section label on Settings
+        // itself) - exact case disambiguates "we navigated" from "the Settings row is still
+        // there".
+        composeTestRule.waitForText("Team")
+    }
+
+    @After
+    fun resetThemeAndOrientation() {
+        ThemeTestUtils.resetNightMode()
+        OrientationTestUtils.rotateToPortrait()
+    }
+
+    @Test
+    fun rendersTeamStatsFromFixture() {
+        composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
+        // STANDARD strategy fixture: 10 starters + 2 substitutes = 12 players, no tournaments.
+        composeTestRule.onNodeWithText("12 players").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Delete team").assertIsDisplayed()
+    }
+
+    @Test
+    fun deleteRowOpensConfirmationAndCancelDismissesIt() {
+        composeTestRule.onNodeWithText("Delete team").performClick()
+        composeTestRule.waitForText("Cancel")
+        composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Cancel").performClick()
+        composeTestRule.waitForAbsence("This action cannot be undo, are you sure ?")
+        // Still on TeamDetails, nothing deleted.
+        composeTestRule.onNodeWithText("Delete team").assertIsDisplayed()
+    }
+
+    @Test
+    fun backIconNavigatesToSettings() {
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.waitForAbsence("Delete team")
+        composeTestRule.onNodeWithText("Settings").assertIsDisplayed()
+    }
+
+    @Test
+    fun rotatingPortraitToLandscapeKeepsContent() {
+        OrientationTestUtils.rotateToLandscape()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.waitForText(TestFixtures.TEAM_NAME)
+        // The root Column only scrolls vertically - in landscape "Delete team" can land below
+        // the fold, not yet in the viewport.
+        composeTestRule.onNodeWithText("Delete team").performScrollTo().assertIsDisplayed()
+
+        OrientationTestUtils.rotateToPortrait()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun rendersInDarkTheme() {
+        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
+    }
+
+    @Test
+    fun rendersInLightTheme() {
+        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
+    }
+}
