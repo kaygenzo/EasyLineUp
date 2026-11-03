@@ -50,6 +50,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -97,6 +98,16 @@ internal data class DefenseMarkerSpec(
     val borderColor: Color,
     val label: String?
 )
+
+/**
+ * Semantics test tags for [DefenseScreen] - a position marker shows only initials or a DP/FLEX
+ * label (see [com.telen.easylineup.lineup.defense.DefenseMarker]), never a player's full name,
+ * so there's no stable text to find a specific position's marker by.
+ */
+object DefenseTestTags {
+    const val DH_TOGGLE = "defense_dh_toggle"
+    fun marker(positionId: Int): String = "defense_marker_$positionId"
+}
 
 /**
  * The Defense (field diagram) screen - single composable for both fixed/view and editable
@@ -262,7 +273,11 @@ private fun DhToggleRow(teamType: Int, checked: Boolean, onCheckedChange: (Boole
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
             )
         }
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            modifier = Modifier.testTag(DefenseTestTags.DH_TOGGLE)
+        )
     }
 }
 
@@ -541,7 +556,8 @@ private fun DefenseField(
                         { onPositionClicked(spec.position) }
                     } else {
                         {}
-                    }
+                    },
+                    modifier = Modifier.testTag(DefenseTestTags.marker(spec.position.id))
                 )
                 if (spec.state == StateDefense.PLAYER && spec.player != null) {
                     val context = LocalContext.current

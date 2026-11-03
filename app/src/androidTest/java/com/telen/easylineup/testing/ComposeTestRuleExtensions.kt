@@ -5,6 +5,7 @@
 package com.telen.easylineup.testing
 
 import androidx.compose.ui.test.junit4.ComposeTestRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 
 /**
@@ -22,6 +23,17 @@ fun ComposeTestRule.waitForText(
     waitUntil(timeoutMillis) {
         onAllNodesWithText(text, useUnmergedTree = useUnmergedTree)
             .fetchSemanticsNodes().isNotEmpty()
+    }
+}
+
+/**
+ * Polls for a node tagged [tag] to exist - a freshly-navigated screen's content (e.g. a
+ * position marker computed from its own ViewModel state) can lag a frame or more behind the
+ * surrounding chrome that a `waitForText` already confirmed is up.
+ */
+fun ComposeTestRule.waitForTag(tag: String, timeoutMillis: Long = 5_000) {
+    waitUntil(timeoutMillis) {
+        onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
     }
 }
 

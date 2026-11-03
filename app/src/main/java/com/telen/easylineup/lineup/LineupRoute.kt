@@ -38,8 +38,10 @@ import com.telen.easylineup.lineup.edition.LineupUpdated
 import com.telen.easylineup.lineup.edition.RosterEditSheet
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
@@ -132,7 +134,10 @@ fun LineupRoute(
                 viewModel.save()
                     .onSuccess {
                         Timber.d("Successfully saved")
-                        goBack()
+                        // navController navigation asserts the main thread - resuming after
+                        // save()'s real Room write doesn't always land back there under Compose
+                        // test instrumentation (see the identical fix in PlayerEditRoute).
+                        withContext(Dispatchers.Main) { goBack() }
                     }
                     .onFailure { Timber.e(it) }
             }
@@ -273,7 +278,10 @@ fun LineupRoute(
             onConfirm = {
                 coroutineScope.launch {
                     viewModel.deleteLineup()
-                        .onSuccess { goBack(showFixedView = false) }
+                        .onSuccess {
+                            // See the matching comment on the save flow above.
+                            withContext(Dispatchers.Main) { goBack(showFixedView = false) }
+                        }
                         .onFailure {
                             Timber.e(it)
                             Toast.makeText(
