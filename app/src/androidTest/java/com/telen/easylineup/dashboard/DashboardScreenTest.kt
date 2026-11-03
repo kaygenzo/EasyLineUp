@@ -7,7 +7,6 @@ package com.telen.easylineup.dashboard
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -21,7 +20,9 @@ import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.ThemeTestUtils
+import com.telen.easylineup.testing.waitForText
 import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,22 +39,18 @@ class DashboardScreenTest {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<HomeActivity>()
 
+    @Before
+    fun waitForInitialLoad() {
+        // DashboardViewModel's first state comes from a Room/Flow collection, which lands a
+        // frame or more after the Activity launches - every test needs this settled before its
+        // own interactions, not just the ones that happen to assert team-dependent content.
+        composeTestRule.waitForText(TestFixtures.TEAM_NAME)
+    }
+
     @After
     fun resetThemeAndOrientation() {
         ThemeTestUtils.resetNightMode()
         OrientationTestUtils.rotateToPortrait()
-    }
-
-    /**
-     * The shirt-number search result and a post-rotation recompose both land asynchronously
-     * (a ViewModel coroutine launch, an Activity recreate) - a plain `waitForIdle()` can return
-     * before that lands, so poll for the expected text instead of asserting immediately.
-     */
-    private fun waitForText(text: String, useUnmergedTree: Boolean = false) {
-        composeTestRule.waitUntil(timeoutMillis = 5_000) {
-            composeTestRule.onAllNodesWithText(text, useUnmergedTree = useUnmergedTree)
-                .fetchSemanticsNodes().isNotEmpty()
-        }
     }
 
     @Test
@@ -89,7 +86,7 @@ class DashboardScreenTest {
         composeTestRule.onNodeWithTag(DashboardTestTags.SHIRT_NUMBER_FIELD).performTextInput("2")
         composeTestRule.onNodeWithTag(DashboardTestTags.SHIRT_NUMBER_FIELD).performImeAction()
 
-        waitForText("Starter 2")
+        composeTestRule.waitForText("Starter 2")
         composeTestRule.onNodeWithText("Starter 2").assertIsDisplayed()
 
         composeTestRule.onNodeWithText("WHO WORE THIS NUMBER?").performClick()
@@ -106,7 +103,7 @@ class DashboardScreenTest {
 
         composeTestRule.onNodeWithTag(DashboardTestTags.SHIRT_NUMBER_FIELD).performTextInput("2")
         composeTestRule.onNodeWithTag(DashboardTestTags.SHIRT_NUMBER_FIELD).performImeAction()
-        waitForText("Starter 2")
+        composeTestRule.waitForText("Starter 2")
 
         OrientationTestUtils.rotateToLandscape()
         composeTestRule.waitForIdle()
@@ -117,8 +114,8 @@ class DashboardScreenTest {
         // lives inside the lookup row's clickable Modifier, which merges it away from the
         // default merged-tree search once scrolling is involved, so look it up in the unmerged
         // tree instead (see the `useUnmergedTree` hint on the real failure this worked around).
-        waitForText(TestFixtures.TEAM_NAME)
-        waitForText("Starter 2", useUnmergedTree = true)
+        composeTestRule.waitForText(TestFixtures.TEAM_NAME)
+        composeTestRule.waitForText("Starter 2", useUnmergedTree = true)
         composeTestRule.onNodeWithText("Starter 2", useUnmergedTree = true)
             .performScrollTo()
             .assertIsDisplayed()

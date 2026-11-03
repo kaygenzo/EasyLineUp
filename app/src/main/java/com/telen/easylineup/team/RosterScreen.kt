@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -51,6 +52,11 @@ import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.PlayerSortType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+
+/** Semantics test tags for [RosterScreen] - only where no stable, unique text exists. */
+internal object RosterTestTags {
+    const val PLAYER_LIST = "roster_player_list"
+}
 
 data class RosterRowState(
     val id: Long,
@@ -123,6 +129,7 @@ fun RosterScreen(
                         .weight(1f)
                         .clip(RoundedCornerShape(16.dp))
                         .background(MaterialTheme.colorScheme.surface)
+                        .testTag(RosterTestTags.PLAYER_LIST)
                 ) {
                     itemsIndexed(
                         items = state.players,
