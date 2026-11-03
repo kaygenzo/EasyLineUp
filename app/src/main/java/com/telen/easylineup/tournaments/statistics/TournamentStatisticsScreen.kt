@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -62,6 +63,16 @@ import kotlinx.collections.immutable.persistentMapOf
  * number the domain-layer stats alone don't carry. Rows arrive from the ViewModel already ranked
  * by playing time (most-played first) and flagged against the tournament's own average.
  */
+/**
+ * The selected-player field shows whichever name the playing-time ranking puts first -
+ * unpredictable at test-time since ties in
+ * [com.telen.easylineup.domain.usecases.SortPlayersByPlayingTime] preserve raw query order - so
+ * it needs a stable tag rather than relying on its displayed text.
+ */
+object TournamentStatisticsTestTags {
+    const val PLAYER_SELECT_FIELD = "tournament_stats_player_select_field"
+}
+
 data class PlayerStatsRow(
     val playerId: Long,
     val name: String,
@@ -255,7 +266,8 @@ private fun PositionUsageCard(
                 value = selectedPlayer?.name,
                 placeholder = stringResource(R.string.tournament_stats_select_player_placeholder),
                 subLabel = null,
-                onClick = onPlayerFieldClick
+                onClick = onPlayerFieldClick,
+                modifier = Modifier.testTag(TournamentStatisticsTestTags.PLAYER_SELECT_FIELD)
             )
             Spacer(modifier = Modifier.height(14.dp))
             if (selectedPlayer == null || selectedPlayer.positionCounts.values.sum() == 0) {
