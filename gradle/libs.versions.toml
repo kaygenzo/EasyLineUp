@@ -22,10 +22,7 @@ composeBomVersion = "2025.09.01"
 espressoCoreVersion = "3.7.0"
 extJUnitVersion = "1.3.0"
 testRunnerVersion = "1.6.2"
-baristaVersion = "4.3.0"
-fastlaneVersion = "2.1.1"
 uiAutomatorVersion = "2.3.0"
-rxIdlerVersion = "0.11.0"
 mockitoCoreVersion = "5.14.2"
 mockitoKotlinVersion = "5.4.0"
 archCoreTestingVersion = "2.2.0"
@@ -71,10 +68,7 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVer
 room-testing = { group = "androidx.room", name = "room-testing", version.ref = "roomVersion" }
 tests-runner = { group = "androidx.test", name = "runner", version.ref = "testRunnerVersion" }
 tests-espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCoreVersion" }
-tests-rxIdler = { group = "com.squareup.rx.idler", name = "rx2-idler", version.ref = "rxIdlerVersion" }
 tests-uiAutomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiAutomatorVersion" }
-tests-screengrab = { group = "tools.fastlane", name = "screengrab", version.ref = "fastlaneVersion" }
-tests-barista = { group = "com.adevinta.android", name = "barista", version.ref = "baristaVersion" }
 tests-junit = { group = "androidx.test.ext", name = "junit", version.ref = "extJUnitVersion" }
 junit4 = { group = "junit", name = "junit", version.ref = "junit4Version" }
 activity = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityVersion" }
@@ -115,6 +109,8 @@ compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 compose-activity = { group = "androidx.activity", name = "activity-compose" }
 lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleVersion" }
+compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePluginVersion" }

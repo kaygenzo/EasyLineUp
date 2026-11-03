@@ -33,7 +33,7 @@ android {
         targetSdkVersion targetVersion
         versionCode appVersionCode
         versionName appVersionName
-        testInstrumentationRunner "com.telen.easylineup.EasylineupAndroidTestRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary true
         buildConfigField "Boolean", "UseBetaTool", "true"
         firebaseAppDistribution {
@@ -142,13 +142,11 @@ dependencies {
     androidTestImplementation(libs.tests.espresso) {
         exclude group: "com.google.protobuf"
     }
-    androidTestImplementation files('libs/cloudtestingscreenshotter_lib.aar')
-    androidTestImplementation libs.tests.rxIdler
     androidTestImplementation libs.tests.uiAutomator
-    androidTestImplementation libs.tests.screengrab
-    androidTestImplementation(libs.tests.barista) {
-        exclude group: 'org.jetbrains.kotlin' // Only if you already use Kotlin in your project
-    }
+    androidTestImplementation libs.tests.junit
+    androidTestImplementation platform(libs.compose.bom)
+    androidTestImplementation libs.compose.ui.test.junit4
+    debugImplementation libs.compose.ui.test.manifest
 
     testImplementation libs.tests.junit
     testImplementation libs.mockito.core
@@ -217,6 +215,18 @@ dependencies {
 
     // only debug libraries
 //    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanaryVersion"
+}
+
+// espresso-core (androidTestImplementation) pulls androidx.test:core 1.7.0, which wants
+// androidx.concurrent:concurrent-futures 1.2.0, while firebase-common strictly pins it to
+// 1.1.0 - AGP's cross-classpath "consistent resolution" then fails the androidTest compile
+// classpath instead of picking one. Force the higher version for the androidTest configs only,
+// since it's a strict-superset-compatible bump confined to test code, not the shipped app.
+configurations.matching { it.name.contains("AndroidTest") }.configureEach {
+    resolutionStrategy {
+        force 'androidx.concurrent:concurrent-futures:1.2.0'
+        force 'androidx.concurrent:concurrent-futures-ktx:1.2.0'
+    }
 }
 
 apply from: '../jacoco.gradle'
