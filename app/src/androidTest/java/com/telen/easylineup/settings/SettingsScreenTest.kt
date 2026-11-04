@@ -99,6 +99,23 @@ class SettingsScreenTest {
     }
 
     @Test
+    fun exportDataOpensConfirmSheetWithCountsAndCancelDismissesIt() {
+        // loadExportPreview() is pure domain (just counts the current data) - the real system
+        // folder picker only launches after tapping "Choose folder", which this test never
+        // does, so this is reachable without touching that external-flow boundary.
+        composeTestRule.onNodeWithText("Export data to file").performScrollTo().performClick()
+
+        composeTestRule.waitForText("Export all data")
+        // InfoCell always renders its label uppercased.
+        composeTestRule.onNodeWithText("PLAYERS").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Choose folder").performScrollTo().assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Cancel").performClick()
+        composeTestRule.waitForAbsence("Export all data")
+        composeTestRule.onNodeWithText("Export data to file").assertIsDisplayed()
+    }
+
+    @Test
     fun deleteAllDataOpensConfirmationAndCancelDismissesIt() {
         composeTestRule.onNodeWithText("Delete all data").performClick()
         composeTestRule.waitForText("Cancel")
