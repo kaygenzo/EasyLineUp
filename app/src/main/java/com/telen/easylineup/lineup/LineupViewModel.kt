@@ -10,7 +10,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
@@ -47,6 +46,7 @@ import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersExce
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.LineupExportData
 import com.telen.easylineup.utils.LineupPdfWriter
+import com.telen.easylineup.utils.LineupStylePreference
 import com.telen.easylineup.views.LineupTypeface
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -146,10 +146,15 @@ class LineupViewModel(
     private val clearRosterUseCase: ClearRoster,
     private val overrideRosterPlayerNumberUseCase: OverrideRosterPlayerNumber,
     private val lineupPdfWriter: LineupPdfWriter,
+    private val lineupStylePreference: LineupStylePreference,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LineupUiState())
     val uiState: StateFlow<LineupUiState> = _uiState.asStateFlow()
+
+    init {
+        loadTypeface()
+    }
 
     private val _listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
     private var teamTypeId: Int = TeamType.UNKNOWN.id
@@ -242,13 +247,10 @@ class LineupViewModel(
             .onFailure { Timber.e(it) }
     }
 
-    fun loadTypeface(context: Context) {
-        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val lineupValue = preferences.getString(
-            context.getString(R.string.key_lineup_style),
-            context.getString(R.string.lineup_style_default_value)
-        )
-        _uiState.update { it.copy(typeface = LineupTypeface.getByValue(lineupValue)) }
+    private fun loadTypeface() {
+        _uiState.update {
+            it.copy(typeface = LineupTypeface.getByValue(lineupStylePreference.read()))
+        }
     }
 
     fun onTabSelected(index: Int) {

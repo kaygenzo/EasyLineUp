@@ -104,10 +104,6 @@ fun LineupRoute(
         }
     }
 
-    LaunchedEffect(viewModel) {
-        viewModel.loadTypeface(context)
-    }
-
     LaunchedEffect(editionViewModel) {
         editionViewModel.events
             .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
