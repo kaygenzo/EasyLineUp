@@ -24,6 +24,7 @@ import com.telen.easylineup.domain.model.getPositionPercentage
  */
 object TestFixtures {
     const val TEAM_NAME = "Test Team"
+    const val SECOND_TEAM_NAME = "Second Team"
     const val TOURNAMENT_NAME = "Test Tournament"
     const val LINEUP_NAME = "Test Lineup"
 
@@ -33,6 +34,14 @@ object TestFixtures {
         name = TEAM_NAME,
         type = TeamType.BASEBALL.id,
         main = true,
+        createdAt = System.currentTimeMillis()
+    )
+
+    /** A second, roster-less team - for tests covering switching between teams. */
+    fun secondTeam(): Team = Team(
+        name = SECOND_TEAM_NAME,
+        type = TeamType.BASEBALL.id,
+        main = false,
         createdAt = System.currentTimeMillis()
     )
 

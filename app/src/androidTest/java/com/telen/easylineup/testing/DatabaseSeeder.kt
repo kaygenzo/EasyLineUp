@@ -70,4 +70,15 @@ class DatabaseSeeder : KoinComponent {
         val playerIds = TestFixtures.players(teamId).map { playerRepository.insertPlayer(it) }
         return SeededFixture(teamId, playerIds, tournamentId = 0L, lineupId = 0L)
     }
+
+    /**
+     * [seedCoreFixture] plus a second, roster-less, non-main team - for tests covering actually
+     * switching teams via [com.telen.easylineup.team.swap.SwapTeamSheet], which needs more than
+     * one team to even open.
+     */
+    suspend fun seedCoreFixtureWithSecondTeam(): SeededFixture {
+        val fixture = seedCoreFixture()
+        teamRepository.insertTeam(TestFixtures.secondTeam())
+        return fixture
+    }
 }

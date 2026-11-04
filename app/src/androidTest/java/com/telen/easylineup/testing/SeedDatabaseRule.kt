@@ -18,7 +18,7 @@ import org.junit.runner.Description
  * ```
  */
 class SeedDatabaseRule(private val mode: Mode = Mode.CORE_FIXTURE) : TestWatcher() {
-    enum class Mode { CORE_FIXTURE, EMPTY, TEAM_WITHOUT_LINEUP }
+    enum class Mode { CORE_FIXTURE, EMPTY, TEAM_WITHOUT_LINEUP, CORE_FIXTURE_WITH_SECOND_TEAM }
 
     lateinit var fixture: SeededFixture
         private set
@@ -30,6 +30,8 @@ class SeedDatabaseRule(private val mode: Mode = Mode.CORE_FIXTURE) : TestWatcher
                 Mode.CORE_FIXTURE -> fixture = seeder.seedCoreFixture()
                 Mode.EMPTY -> seeder.clear()
                 Mode.TEAM_WITHOUT_LINEUP -> fixture = seeder.seedTeamWithoutLineup()
+                Mode.CORE_FIXTURE_WITH_SECOND_TEAM ->
+                    fixture = seeder.seedCoreFixtureWithSecondTeam()
             }
         }
     }
