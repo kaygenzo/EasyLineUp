@@ -152,4 +152,52 @@ internal class DashboardViewModelTest {
         assertEquals(listOf(overlayEntry), viewModel.uiState.value.shirtNumberHistory)
         assertEquals("Toto", viewModel.uiState.value.shirtNumberResult)
     }
+
+    @Test
+    fun shouldNotOpenHistoryDialogWhenThereIsNoHistoryYet() {
+        val opened = viewModel.onShirtNumberHistoryClick()
+
+        assertFalse(opened)
+        assertFalse(viewModel.uiState.value.showShirtNumberHistoryDialog)
+    }
+
+    @Test
+    fun shouldOpenHistoryDialogWhenHistoryExists() = runTest {
+        val overlayEntry = ShirtNumberEntry(
+            number = 8,
+            playerName = "Toto",
+            playerId = 1L,
+            eventTime = 0L,
+            createdAt = 0L,
+            lineupId = 1L,
+            lineupName = "Game 1"
+        )
+        Mockito.`when`(playerRepository.getShirtNumberFromPlayers(1L, 8))
+            .thenReturn(emptyList())
+        Mockito.`when`(playerNumberOverlayRepository.getShirtNumberFromNumberOverlays(1L, 8))
+            .thenReturn(listOf(overlayEntry))
+        viewModel.onShirtNumberQueryChanged("8")
+        viewModel.onShirtNumberSearch()
+        advanceUntilIdle()
+
+        val opened = viewModel.onShirtNumberHistoryClick()
+
+        assertTrue(opened)
+        assertTrue(viewModel.uiState.value.showShirtNumberHistoryDialog)
+    }
+
+    @Test
+    fun shouldLeaveStateUnchangedWhenShirtNumberSearchFails() = runTest {
+        Mockito.`when`(playerRepository.getShirtNumberFromPlayers(1L, 8))
+            .thenThrow(RuntimeException("db error"))
+
+        viewModel.onShirtNumberQueryChanged("8")
+        viewModel.onShirtNumberSearch()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.shirtNumberHasSearched)
+        assertTrue(state.shirtNumberHistory.isEmpty())
+        assertEquals(null, state.shirtNumberResult)
+    }
 }
