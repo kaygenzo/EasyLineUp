@@ -7,6 +7,8 @@ package com.telen.easylineup.tournaments.list
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -87,6 +89,30 @@ class TournamentListScreenTest {
 
         pressBack()
         composeTestRule.waitForText("Tournaments")
+    }
+
+    @Test
+    fun editLineupIconOpensEditLineupSheetWithPreFilledFieldsAndRosterStep() {
+        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).performClick()
+        composeTestRule.waitForText(TestFixtures.LINEUP_NAME)
+
+        composeTestRule.onNodeWithContentDescription("Edit").performClick()
+        composeTestRule.waitForText("Edit lineup")
+
+        // The roster-selection step is reached from here but shares its own toggle logic with
+        // LineupCreationScreenTest - only confirming it actually opens, not re-testing toggling.
+        composeTestRule.onNodeWithText("12 of 12 selected").performClick()
+        composeTestRule.waitForText("Starter 1")
+
+        // The sheet's own roster-step back arrow shares its content description with the
+        // screen's header back icon underneath it - it is the sheet's, since it is added to
+        // the composition after (and thus matched last).
+        composeTestRule.onAllNodesWithContentDescription("Back").onLast().performClick()
+        composeTestRule.waitForText("Edit lineup")
+
+        // Nothing was actually changed, so Cancel closes directly without a discard prompt.
+        composeTestRule.onNodeWithText("Cancel").performClick()
+        composeTestRule.waitForAbsence("Edit lineup")
     }
 
     @Test
