@@ -59,6 +59,14 @@ class TeamCreationActivityTest {
     }
 
     @Test
+    fun savingWithAnEmptyNameShowsValidationErrorAndStaysOnForm() {
+        composeTestRule.onNodeWithText("Save").performClick()
+
+        composeTestRule.waitForText("Team name cannot be empty")
+        composeTestRule.onNodeWithText("Create team").assertIsDisplayed()
+    }
+
+    @Test
     fun closeIconShowsDiscardConfirmationAndKeepEditingDismissesIt() {
         composeTestRule.onNodeWithContentDescription("Close").performClick()
         composeTestRule.waitForText("Keep editing")

@@ -124,6 +124,24 @@ class LineupCreationScreenTest {
     }
 
     @Test
+    fun savingWithEmptyNameShowsValidationError() {
+        composeTestRule.onNodeWithText("Create lineup").performClick()
+
+        composeTestRule.waitForText("Lineup name cannot be empty")
+        composeTestRule.onNodeWithText("New lineup").assertIsDisplayed()
+    }
+
+    @Test
+    fun savingWithNameButNoTournamentShowsValidationError() {
+        composeTestRule.onNodeWithText("e.g. Game 3 — Starters").performTextInput("Scrimmage")
+
+        composeTestRule.onNodeWithText("Create lineup").performClick()
+
+        composeTestRule.waitForText("Tournament name cannot be empty")
+        composeTestRule.onNodeWithText("New lineup").assertIsDisplayed()
+    }
+
+    @Test
     fun rotatingPortraitToLandscapeKeepsContent() {
         OrientationTestUtils.rotateToLandscape()
         composeTestRule.waitForIdle()
