@@ -4,12 +4,14 @@
 
 package com.telen.easylineup.player
 
+import android.net.Uri
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.PlayerSideSelection
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.usecases.DecodePlayerSideFlag
 import com.telen.easylineup.domain.usecases.DeletePlayer
 import com.telen.easylineup.domain.usecases.EncodePlayerSideFlag
@@ -218,6 +220,75 @@ internal class PlayerViewModelTest {
         viewModel.onShirtNumberChanged("1a2b3")
 
         assertEquals("123", viewModel.uiState.value.shirtNumberText)
+    }
+
+    // onLicenseNumberChanged duplicates onShirtNumberChanged's digit-filtering logic (two
+    // separate hand-written copies) - the same divergent-duplicate risk as the L/R toggle
+    // pairs above.
+    @Test
+    fun shouldFilterNonDigitsFromLicenseNumberInput() {
+        viewModel.onLicenseNumberChanged("1a2b3")
+
+        assertEquals("123", viewModel.uiState.value.licenseNumberText)
+    }
+
+    @Test
+    fun shouldUpdateNameAndClearNameError() {
+        viewModel.onNameChanged("Jonas")
+
+        val state = viewModel.uiState.value
+        assertEquals("Jonas", state.name)
+        assertFalse(state.nameError)
+    }
+
+    @Test
+    fun shouldUpdateImageUri() {
+        val uri = Mockito.mock(Uri::class.java)
+
+        viewModel.onImageSelected(uri)
+
+        assertEquals(uri, viewModel.uiState.value.imageUri)
+    }
+
+    @Test
+    fun shouldClearImageUriWhenSelectedIsNull() {
+        viewModel.onImageSelected(Mockito.mock(Uri::class.java))
+
+        viewModel.onImageSelected(null)
+
+        assertEquals(null, viewModel.uiState.value.imageUri)
+    }
+
+    @Test
+    fun shouldUpdateSex() {
+        viewModel.onSexSelected(Sex.FEMALE)
+
+        assertEquals(Sex.FEMALE, viewModel.uiState.value.sex)
+    }
+
+    @Test
+    fun shouldUpdateEmailAndClearEmailError() {
+        viewModel.onEmailChanged("jonas@easylineup.com")
+
+        val state = viewModel.uiState.value
+        assertEquals("jonas@easylineup.com", state.email)
+        assertFalse(state.emailError)
+    }
+
+    @Test
+    fun shouldUpdatePhoneAndClearPhoneError() {
+        viewModel.onPhoneChanged("0601020304")
+
+        val state = viewModel.uiState.value
+        assertEquals("0601020304", state.phone)
+        assertFalse(state.phoneError)
+    }
+
+    @Test
+    fun shouldUpdateStrategy() {
+        viewModel.onStrategySelected(TeamStrategy.B5_DEFAULT)
+
+        assertEquals(TeamStrategy.B5_DEFAULT, viewModel.uiState.value.strategy)
     }
 
     @Test
