@@ -58,4 +58,16 @@ class DatabaseSeeder : KoinComponent {
         )
         return SeededFixture(teamId, playerIds, tournamentId, lineupId)
     }
+
+    /**
+     * Clears existing data, then inserts only [TestFixtures]' team/roster - no tournament, no
+     * lineup. For screens that need to render their own "nothing built yet" empty state, which
+     * [seedCoreFixture]'s always-populated lineup never exercises.
+     */
+    suspend fun seedTeamWithoutLineup(): SeededFixture {
+        clear()
+        val teamId = teamRepository.insertTeam(TestFixtures.team())
+        val playerIds = TestFixtures.players(teamId).map { playerRepository.insertPlayer(it) }
+        return SeededFixture(teamId, playerIds, tournamentId = 0L, lineupId = 0L)
+    }
 }
