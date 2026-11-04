@@ -111,6 +111,36 @@ class LineupScreenTest {
     }
 
     @Test
+    fun savingAfterReassigningPositionPersistsAndNavigatesToTournaments() {
+        // This is the exact flow whose post-save navigation had a real main-thread-crash bug
+        // fixed this session (see LineupRoute's onSaveClick - withContext(Dispatchers.Main))
+        // - nothing previously locked it against a regression.
+        composeTestRule.onNodeWithText("Edit").performClick()
+        composeTestRule.waitForText("Save lineup")
+
+        composeTestRule.waitForTag(FieldPosition.PITCHER.markerTag)
+        composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).performClick()
+        composeTestRule.waitForText("Select a player")
+        composeTestRule.onNodeWithText("Substitute 1").performClick()
+        composeTestRule.waitForAbsence("Select a player")
+
+        composeTestRule.onNodeWithText("Save lineup").performClick()
+
+        // Edit mode is a separate pushed destination (see LineupRoute's onEditClick ->
+        // navController.navigate(Routes.Lineup(..., editable = true))) - a successful save
+        // pops back to the view-mode entry underneath it, not all the way to Tournaments
+        // (goBack()'s default showFixedView = true short-circuits the deeper pop; see
+        // LineupRoute.goBack()). That entry's own LineupViewModel is Flow/Room-backed, so it
+        // re-collects the just-written change live rather than needing a fresh navigation.
+        composeTestRule.waitForAbsence("Save lineup")
+        composeTestRule.waitForText("Defense")
+
+        composeTestRule.onNodeWithText("OFFENSE").performClick()
+        composeTestRule.waitForText("Offense")
+        composeTestRule.onNodeWithText("Substitute 1").assertIsDisplayed()
+    }
+
+    @Test
     fun tappingDpDhInEditModeOpensLinkSheet() {
         composeTestRule.onNodeWithText("Edit").performClick()
         composeTestRule.waitForText("Save lineup")
