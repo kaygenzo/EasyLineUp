@@ -95,6 +95,18 @@ class DashboardScreenTest {
     }
 
     @Test
+    fun shirtNumberLookupShowsNotFoundForAnUnusedNumber() {
+        composeTestRule.onNodeWithTag(DashboardTestTags.SHIRT_NUMBER_FIELD).performTextInput("77")
+        composeTestRule.onNodeWithTag(DashboardTestTags.SHIRT_NUMBER_FIELD).performImeAction()
+
+        composeTestRule.waitForText("Not found")
+
+        // No history exists for a number nobody ever wore - the row must not open anything.
+        composeTestRule.onNodeWithText("WHO WORE THIS NUMBER?").performClick()
+        composeTestRule.onNodeWithText("Not found").assertIsDisplayed()
+    }
+
+    @Test
     fun rotatingPortraitToLandscapeKeepsContent() {
         // Device rotation is a system-level, not per-test, setting - don't assume the emulator
         // already starts in its natural orientation.
