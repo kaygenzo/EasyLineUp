@@ -88,6 +88,19 @@ class LineupScreenTest {
     }
 
     @Test
+    fun attackLegendDialogOpensAndDismisses() {
+        composeTestRule.onNodeWithText("OFFENSE").performClick()
+        composeTestRule.waitForText("Offense")
+
+        composeTestRule.onNodeWithContentDescription("How to read this list").performClick()
+        composeTestRule.waitForText("OK")
+        composeTestRule.onNodeWithText("How to read this list").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("OK").performClick()
+        composeTestRule.waitForAbsence("OK")
+    }
+
+    @Test
     fun editPillEntersEditModeWithFormBar() {
         composeTestRule.onNodeWithText("Edit").performClick()
         composeTestRule.waitForText("Save lineup")
