@@ -13,9 +13,11 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
+import com.telen.easylineup.player.PlayerFormTestTags
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
@@ -111,6 +113,23 @@ class RosterScreenTest {
 
         composeTestRule.waitForText("Roster")
         composeTestRule.onNodeWithText("Roster").assertIsDisplayed()
+    }
+
+    @Test
+    fun creatingNewPlayerAddsThemToTheRoster() {
+        composeTestRule.onNodeWithContentDescription("Add player").performClick()
+        composeTestRule.waitForText("New player")
+
+        composeTestRule.onNodeWithTag(PlayerFormTestTags.NAME_FIELD)
+            .performTextInput("Brand New Player")
+        composeTestRule.onNodeWithText("Save").performClick()
+
+        // A successful save navigates back to Roster - re-finding the new name there (not just
+        // asserting the form closed) proves the player was actually written to the database,
+        // not just reflected in the form's own in-memory state.
+        composeTestRule.waitForAbsence("New player")
+        composeTestRule.waitForText("Brand New Player")
+        composeTestRule.onNodeWithText("Brand New Player").assertIsDisplayed()
     }
 
     @Test
