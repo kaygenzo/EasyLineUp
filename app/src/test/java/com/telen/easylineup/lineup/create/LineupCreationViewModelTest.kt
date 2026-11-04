@@ -10,6 +10,7 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamRosterSummary
+import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.usecases.ClearRoster
@@ -281,5 +282,89 @@ internal class LineupCreationViewModelTest {
         viewModel.onNewTournamentSheetDismiss()
 
         assertFalse(viewModel.uiState.value.showNewTournamentSheet)
+    }
+
+    @Test
+    fun shouldOpenTournamentSheet() = runTest {
+        viewModel.onTournamentSheetOpen()
+
+        assertTrue(viewModel.uiState.value.showTournamentSheet)
+    }
+
+    @Test
+    fun shouldDismissTournamentSheet() = runTest {
+        viewModel.onTournamentSheetOpen()
+
+        viewModel.onTournamentSheetDismiss()
+
+        assertFalse(viewModel.uiState.value.showTournamentSheet)
+    }
+
+    @Test
+    fun shouldUpdateEventTime() = runTest {
+        viewModel.onEventTimeSelected(1_700_000_000_000L)
+
+        assertEquals(1_700_000_000_000L, viewModel.uiState.value.eventTimeInMillis)
+    }
+
+    @Test
+    fun shouldOpenRosterSheet() = runTest {
+        viewModel.onRosterSheetOpen()
+
+        assertTrue(viewModel.uiState.value.showRosterSheet)
+    }
+
+    @Test
+    fun shouldDismissRosterSheet() = runTest {
+        viewModel.onRosterSheetOpen()
+
+        viewModel.onRosterSheetDismiss()
+
+        assertFalse(viewModel.uiState.value.showRosterSheet)
+    }
+
+    @Test
+    fun shouldUpdateStrategy() = runTest {
+        viewModel.onStrategySelected(TeamStrategy.FIVE_MAN_STANDARD)
+
+        assertEquals(TeamStrategy.FIVE_MAN_STANDARD, viewModel.uiState.value.strategy)
+    }
+
+    @Test
+    fun shouldUpdateExtraHitters() = runTest {
+        viewModel.onExtraHittersSelected(2)
+
+        assertEquals(2, viewModel.uiState.value.extraHitters)
+    }
+
+    @Test
+    fun shouldUpdateNewTournamentAddress() = runTest {
+        viewModel.onNewTournamentAddressChanged("12 Diamond Way")
+
+        assertEquals("12 Diamond Way", viewModel.uiState.value.newTournamentAddress)
+    }
+
+    @Test
+    fun shouldUpdateNewTournamentStartTime() = runTest {
+        viewModel.onNewTournamentStartTimeSelected(1_700_000_000_000L)
+
+        assertEquals(1_700_000_000_000L, viewModel.uiState.value.newTournamentStartTime)
+    }
+
+    @Test
+    fun shouldUpdateNewTournamentEndTime() = runTest {
+        viewModel.onNewTournamentEndTimeSelected(1_700_100_000_000L)
+
+        assertEquals(1_700_100_000_000L, viewModel.uiState.value.newTournamentEndTime)
+    }
+
+    @Test
+    fun shouldDismissDiscardSheet() = runTest {
+        viewModel.onNameChanged("My lineup")
+        viewModel.onCancelRequested()
+
+        viewModel.onDiscardDismiss()
+
+        assertFalse(viewModel.uiState.value.showDiscardSheet)
     }
 }
