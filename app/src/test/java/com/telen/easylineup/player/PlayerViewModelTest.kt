@@ -173,6 +173,35 @@ internal class PlayerViewModelTest {
         assertEquals(PlayerSide.RIGHT, state.pitchingSide)
     }
 
+    // onBattingRightToggled/onPitchingLeftToggled are hand-written near-duplicates of
+    // onBattingLeftToggled/onPitchingRightToggled above (each reads its OWN field's current
+    // value to flip and the OTHER field's current value to pass through unchanged) - a
+    // copy-paste that swapped which side reads which field would pass the two tests above
+    // silently without these.
+    @Test
+    fun shouldDelegateBattingRightToggleToEncodeUseCase() {
+        Mockito.`when`(encodePlayerSideFlagUseCase(false, true)).thenReturn(PlayerSide.RIGHT.flag)
+
+        viewModel.onBattingRightToggled()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.battingLeft)
+        assertTrue(state.battingRight)
+        assertEquals(PlayerSide.RIGHT, state.battingSide)
+    }
+
+    @Test
+    fun shouldDelegatePitchingLeftToggleToEncodeUseCase() {
+        Mockito.`when`(encodePlayerSideFlagUseCase(true, false)).thenReturn(PlayerSide.LEFT.flag)
+
+        viewModel.onPitchingLeftToggled()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.pitchingLeft)
+        assertFalse(state.pitchingRight)
+        assertEquals(PlayerSide.LEFT, state.pitchingSide)
+    }
+
     @Test
     fun shouldDelegatePositionToggleToUseCase() {
         val expected = setOf(FieldPosition.PITCHER)
