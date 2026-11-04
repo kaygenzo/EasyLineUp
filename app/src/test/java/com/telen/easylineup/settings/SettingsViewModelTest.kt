@@ -217,6 +217,22 @@ internal class SettingsViewModelTest {
     }
 
     @Test
+    fun shouldSendNoEventWhenGetTeamsCountFails() = runTest(testDispatcher) {
+        runBlocking {
+            Mockito.`when`(getAllTeamsUseCase()).thenReturn(Result.failure(RuntimeException("db")))
+        }
+
+        val events = mutableListOf<SettingsEvent>()
+        val job = launch { viewModel.events.collect { events.add(it) } }
+
+        viewModel.getTeamsCount()
+        advanceUntilIdle()
+
+        assertTrue(events.isEmpty())
+        job.cancel()
+    }
+
+    @Test
     fun shouldUpdateExportPreviewOnLoadExportPreviewSuccess() = runTest(testDispatcher) {
         val exportBase = ExportBase(emptyList())
         runBlocking { Mockito.`when`(exportDataUseCase()).thenReturn(Result.success(exportBase)) }
