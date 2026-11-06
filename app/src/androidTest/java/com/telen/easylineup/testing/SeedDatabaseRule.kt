@@ -4,6 +4,8 @@
 
 package com.telen.easylineup.testing
 
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
 import kotlinx.coroutines.runBlocking
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
@@ -17,8 +19,18 @@ import org.junit.runner.Description
  * @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<HomeActivity>()
  * ```
  */
-class SeedDatabaseRule(private val mode: Mode = Mode.CORE_FIXTURE) : TestWatcher() {
-    enum class Mode { CORE_FIXTURE, EMPTY, TEAM_WITHOUT_LINEUP, CORE_FIXTURE_WITH_SECOND_TEAM }
+class SeedDatabaseRule(
+    private val mode: Mode = Mode.CORE_FIXTURE,
+    private val teamType: TeamType = TeamType.BASEBALL,
+    private val strategy: TeamStrategy = TeamStrategy.STANDARD
+) : TestWatcher() {
+    enum class Mode {
+        CORE_FIXTURE,
+        EMPTY,
+        TEAM_WITHOUT_LINEUP,
+        CORE_FIXTURE_WITH_SECOND_TEAM,
+        LINEUP_VARIANT
+    }
 
     lateinit var fixture: SeededFixture
         private set
@@ -32,6 +44,7 @@ class SeedDatabaseRule(private val mode: Mode = Mode.CORE_FIXTURE) : TestWatcher
                 Mode.TEAM_WITHOUT_LINEUP -> fixture = seeder.seedTeamWithoutLineup()
                 Mode.CORE_FIXTURE_WITH_SECOND_TEAM ->
                     fixture = seeder.seedCoreFixtureWithSecondTeam()
+                Mode.LINEUP_VARIANT -> fixture = seeder.seedLineup(teamType, strategy)
             }
         }
     }

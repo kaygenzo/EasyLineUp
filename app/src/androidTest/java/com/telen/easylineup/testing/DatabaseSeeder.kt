@@ -4,6 +4,8 @@
 
 package com.telen.easylineup.testing
 
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
@@ -47,14 +49,21 @@ class DatabaseSeeder : KoinComponent {
      * Clears existing data, then inserts [TestFixtures]' team/roster/tournament/lineup with
      * the defense diagram + batting order already assigned.
      */
-    suspend fun seedCoreFixture(): SeededFixture {
+    suspend fun seedCoreFixture(): SeededFixture =
+        seedLineup(TeamType.BASEBALL, TeamStrategy.STANDARD)
+
+    /** [seedCoreFixture] for any team type and strategy, not just baseball's standard one. */
+    suspend fun seedLineup(teamType: TeamType, strategy: TeamStrategy): SeededFixture {
         clear()
-        val teamId = teamRepository.insertTeam(TestFixtures.team())
-        val playerIds = TestFixtures.players(teamId).map { playerRepository.insertPlayer(it) }
+        val teamId = teamRepository.insertTeam(TestFixtures.team(teamType))
+        val playerIds = TestFixtures.players(teamId, strategy)
+            .map { playerRepository.insertPlayer(it) }
         val tournamentId = tournamentRepository.insertTournament(TestFixtures.tournament())
-        val lineupId = lineupRepository.insertLineup(TestFixtures.lineup(teamId, tournamentId))
+        val lineupId = lineupRepository.insertLineup(
+            TestFixtures.lineup(teamId, tournamentId, strategy)
+        )
         playerFieldPositionRepository.insertPlayerFieldPositions(
-            TestFixtures.playerFieldPositions(lineupId, playerIds)
+            TestFixtures.playerFieldPositions(lineupId, playerIds, strategy)
         )
         return SeededFixture(teamId, playerIds, tournamentId, lineupId)
     }

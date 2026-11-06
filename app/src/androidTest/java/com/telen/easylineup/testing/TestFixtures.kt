@@ -45,9 +45,14 @@ object TestFixtures {
         createdAt = System.currentTimeMillis()
     )
 
-    /** 9 field starters + 1 DP (matching [STRATEGY]'s 10 position slots) + 2 bench subs. */
-    fun players(teamId: Long): List<Player> {
-        val starters = STRATEGY.positions.mapIndexed { index, _ ->
+    /** The first team, for a variant other than [team]'s baseball default. */
+    fun team(type: TeamType): Team = team().copy(type = type.id)
+
+    /**
+     * One player per [strategy] position slot (by default 9 field starters + 1 DP) + 2 bench subs.
+     */
+    fun players(teamId: Long, strategy: TeamStrategy = STRATEGY): List<Player> {
+        val starters = strategy.positions.mapIndexed { index, _ ->
             Player(
                 teamId = teamId,
                 name = "Starter ${index + 1}",
@@ -73,11 +78,15 @@ object TestFixtures {
         endTime = 0L
     )
 
-    fun lineup(teamId: Long, tournamentId: Long): Lineup = Lineup(
+    fun lineup(
+        teamId: Long,
+        tournamentId: Long,
+        strategy: TeamStrategy = STRATEGY
+    ): Lineup = Lineup(
         name = LINEUP_NAME,
         teamId = teamId,
         tournamentId = tournamentId,
-        strategy = STRATEGY.id,
+        strategy = strategy.id,
         extraHitters = 0,
         eventTimeInMillis = System.currentTimeMillis()
     )
@@ -88,13 +97,17 @@ object TestFixtures {
      * diamond coordinate (the same math [getPositionPercentage] uses in production), the rest
      * become bench substitutes.
      */
-    fun playerFieldPositions(lineupId: Long, playerIds: List<Long>): List<PlayerFieldPosition> {
-        val starterIds = playerIds.take(STRATEGY.positions.size)
-        val substituteIds = playerIds.drop(STRATEGY.positions.size)
+    fun playerFieldPositions(
+        lineupId: Long,
+        playerIds: List<Long>,
+        strategy: TeamStrategy = STRATEGY
+    ): List<PlayerFieldPosition> {
+        val starterIds = playerIds.take(strategy.positions.size)
+        val substituteIds = playerIds.drop(strategy.positions.size)
 
         val starterPositions = starterIds.mapIndexed { index, playerId ->
-            val position = STRATEGY.positions[index]
-            val coordinate = position.getPositionPercentage(STRATEGY)
+            val position = strategy.positions[index]
+            val coordinate = position.getPositionPercentage(strategy)
             PlayerFieldPosition(
                 playerId = playerId,
                 lineupId = lineupId,
