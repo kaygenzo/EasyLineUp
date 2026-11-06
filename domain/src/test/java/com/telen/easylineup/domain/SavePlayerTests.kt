@@ -4,9 +4,6 @@
 
 package com.telen.easylineup.domain
 
-import org.mockito.kotlin.any
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.ports.PhoneNumberValidator
@@ -16,9 +13,12 @@ import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.IsEmailValid
 import com.telen.easylineup.domain.usecases.IsValidPhoneNumber
 import com.telen.easylineup.domain.usecases.SavePlayer
+import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
+import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -26,6 +26,10 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 
 @RunWith(MockitoJUnitRunner::class)
 internal class SavePlayerTests {
@@ -183,5 +187,84 @@ internal class SavePlayerTests {
         assertTrue(result.isSuccess)
         verify(playerDao).updatePlayer(any())
         verify(playerDao, never()).insertPlayer(any())
+    }
+
+    private suspend fun save(
+        useCase: SavePlayer = savePlayer,
+        email: String? = null,
+        phone: String? = null
+    ) = useCase(
+        playerId = 0L,
+        name = "  Test  ",
+        shirtNumber = null,
+        image = null,
+        positions = 1,
+        pitching = 0,
+        batting = 0,
+        email = email,
+        phone = phone,
+        sex = 0
+    )
+
+    @Test
+    fun shouldRefuseAnInvalidEmailWithoutSaving() = runTest {
+        val result = save(email = "not an email")
+
+        assertTrue(result.exceptionOrNull() is InvalidEmailException)
+        verify(playerDao, never()).insertPlayer(any())
+    }
+
+    @Test
+    fun shouldRefuseAnInvalidPhoneWithoutSaving() = runTest {
+        val rejectingPhones = SavePlayer(
+            playerDao,
+            GetTeam(teamDao, testDispatcherProvider()),
+            IsEmailValid(),
+            IsValidPhoneNumber(
+                object : PhoneNumberValidator {
+                    override fun isGlobalPhoneNumber(phone: String) = false
+                }
+            ),
+            testDispatcherProvider()
+        )
+
+        val result = save(useCase = rejectingPhones, phone = "abc")
+
+        assertTrue(result.exceptionOrNull() is InvalidPhoneException)
+        verify(playerDao, never()).insertPlayer(any())
+    }
+
+    @Test
+    fun shouldDefaultMissingNumbersToZeroAndTrimTheName() = runTest {
+        val captor = argumentCaptor<Player>()
+
+        save()
+
+        verify(playerDao).insertPlayer(captor.capture())
+        assertEquals("Test", captor.firstValue.name)
+        assertEquals(0, captor.firstValue.shirtNumber)
+        assertEquals(0L, captor.firstValue.licenseNumber)
+    }
+
+    @Test
+    fun shouldStoreANullLicenseNumberAsZero() = runTest {
+        val captor = argumentCaptor<Player>()
+
+        savePlayer(
+            playerId = 0L,
+            name = "Test",
+            shirtNumber = 1,
+            licenseNumber = null,
+            image = null,
+            positions = 1,
+            pitching = 0,
+            batting = 0,
+            email = null,
+            phone = null,
+            sex = 0
+        )
+
+        verify(playerDao).insertPlayer(captor.capture())
+        assertEquals(0L, captor.firstValue.licenseNumber)
     }
 }

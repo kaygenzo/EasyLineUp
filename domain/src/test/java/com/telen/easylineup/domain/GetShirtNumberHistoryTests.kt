@@ -15,6 +15,8 @@ import com.telen.easylineup.domain.usecases.GetTeam
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -106,5 +108,75 @@ internal class GetShirtNumberHistoryTests {
         Assert.assertTrue(result.isSuccess)
         val expected: List<ShirtNumberEntry> = listOf()
         Assert.assertEquals(expected, result.getOrNull())
+    }
+
+    private fun overlayEntry(playerId: Long, lineupId: Long, time: Long = 1L) =
+        ShirtNumberEntry(1, "overlay", playerId, time, 1L, lineupId, "lineup$lineupId")
+
+    @Test
+    fun shouldAddAnOverlayFromALineupWhereTheNumberIsNotThePlayersOwn() = runTest {
+        val overlay = overlayEntry(playerId = 9L, lineupId = 9L)
+        Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 1)).thenReturn(emptyList())
+        Mockito.`when`(playerNumberOverlayRepo.getShirtNumberFromNumberOverlays(1L, 1))
+            .thenReturn(listOf(overlay))
+
+        assertEquals(listOf(overlay), getShirtNumberEntry(1).getOrThrow())
+    }
+
+    @Test
+    fun shouldNotListTheSameOverlayTwice() = runTest {
+        Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 1)).thenReturn(listOf(entry2))
+        Mockito.`when`(playerNumberOverlayRepo.getShirtNumberOverlay(1L, 2L))
+            .thenReturn(PlayerNumberOverlay(1L, 2L, 1L, 1, "hash"))
+        Mockito.`when`(playerNumberOverlayRepo.getShirtNumberFromNumberOverlays(1L, 1))
+            .thenReturn(listOf(overlayEntry(playerId = 1L, lineupId = 2L)))
+
+        val result = getShirtNumberEntry(1).getOrThrow()
+
+        assertEquals(1, result.size)
+        assertEquals("toto", result.single().playerName)
+    }
+
+    @Test
+    fun shouldKeepOverlaysOfTheSamePlayerInAnotherLineup() = runTest {
+        val otherLineup = overlayEntry(playerId = 1L, lineupId = 9L)
+        Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 1)).thenReturn(listOf(entry2))
+        Mockito.`when`(playerNumberOverlayRepo.getShirtNumberOverlay(1L, 2L))
+            .thenReturn(PlayerNumberOverlay(1L, 2L, 1L, 1, "hash"))
+        Mockito.`when`(playerNumberOverlayRepo.getShirtNumberFromNumberOverlays(1L, 1))
+            .thenReturn(listOf(otherLineup))
+
+        assertEquals(2, getShirtNumberEntry(1).getOrThrow().size)
+    }
+
+    @Test
+    fun shouldKeepOverlaysOfAnotherPlayerInTheSameLineup() = runTest {
+        val otherPlayer = overlayEntry(playerId = 9L, lineupId = 2L)
+        Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 1)).thenReturn(listOf(entry2))
+        Mockito.`when`(playerNumberOverlayRepo.getShirtNumberOverlay(1L, 2L))
+            .thenReturn(PlayerNumberOverlay(1L, 2L, 1L, 1, "hash"))
+        Mockito.`when`(playerNumberOverlayRepo.getShirtNumberFromNumberOverlays(1L, 1))
+            .thenReturn(listOf(otherPlayer))
+
+        assertEquals(2, getShirtNumberEntry(1).getOrThrow().size)
+    }
+
+    @Test
+    fun shouldDropAPlayerWearingAnotherNumberInThatLineup() = runTest {
+        Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 1)).thenReturn(listOf(entry2))
+        Mockito.`when`(playerNumberOverlayRepo.getShirtNumberOverlay(1L, 2L))
+            .thenReturn(PlayerNumberOverlay(1L, 2L, 1L, 42, "hash"))
+
+        assertTrue(getShirtNumberEntry(1).getOrThrow().isEmpty())
+    }
+
+    @Test
+    fun shouldSortByCreationDateWhenALineupHasNoEventTime() = runTest {
+        val noEventTime = ShirtNumberEntry(1, "new", 1L, 0L, 9L, 1L, "lineup1")
+        val withEventTime = ShirtNumberEntry(1, "old", 2L, 5L, 1L, 2L, "lineup2")
+        Mockito.`when`(playerRepo.getShirtNumberFromPlayers(1L, 1))
+            .thenReturn(listOf(withEventTime, noEventTime))
+
+        assertEquals(listOf(noEventTime, withEventTime), getShirtNumberEntry(1).getOrThrow())
     }
 }
