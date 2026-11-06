@@ -13,10 +13,13 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
+import com.telen.easylineup.R
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.ThemeTestUtils
+import com.telen.easylineup.testing.pluralString
+import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
 import org.junit.After
@@ -49,14 +52,14 @@ class TeamDetailsScreenTest {
     fun openTeamDetails() {
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
-        composeTestRule.onNodeWithText("SETTINGS").performClick()
-        composeTestRule.waitForText("Settings")
+        composeTestRule.onNodeWithText(string(R.string.title_settings).uppercase()).performClick()
+        composeTestRule.waitForText(string(R.string.title_settings))
 
         composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).performClick()
         // ScreenHeader's title isn't uppercased (unlike the "TEAM" section label on Settings
         // itself) - exact case disambiguates "we navigated" from "the Settings row is still
         // there".
-        composeTestRule.waitForText("Team")
+        composeTestRule.waitForText(string(R.string.team_details_header_title))
     }
 
     @After
@@ -69,27 +72,33 @@ class TeamDetailsScreenTest {
     fun rendersTeamStatsFromFixture() {
         composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
         // STANDARD strategy fixture: 10 starters + 2 substitutes = 12 players, no tournaments.
-        composeTestRule.onNodeWithText("12 players").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Delete team").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(pluralString(R.plurals.team_details_roster_count, 12, 12))
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.team_details_delete_title))
+            .assertIsDisplayed()
     }
 
     @Test
     fun deleteRowOpensConfirmationAndCancelDismissesIt() {
-        composeTestRule.onNodeWithText("Delete team").performClick()
-        composeTestRule.waitForText("Cancel")
+        composeTestRule.onNodeWithText(string(R.string.team_details_delete_title)).performClick()
+        composeTestRule.waitForText(string(R.string.cancel_button))
         composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("Cancel").performClick()
-        composeTestRule.waitForAbsence("This action cannot be undo, are you sure ?")
+        composeTestRule.onNodeWithText(string(R.string.cancel_button)).performClick()
+        composeTestRule.waitForAbsence(string(R.string.dialog_delete_cannot_undo_message))
         // Still on TeamDetails, nothing deleted.
-        composeTestRule.onNodeWithText("Delete team").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.team_details_delete_title))
+            .assertIsDisplayed()
     }
 
     @Test
     fun backIconNavigatesToSettings() {
-        composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForAbsence("Delete team")
-        composeTestRule.onNodeWithText("Settings").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription(string(R.string.generic_back)).performClick()
+        composeTestRule.waitForAbsence(string(R.string.team_details_delete_title))
+        composeTestRule.onNodeWithText(string(R.string.title_settings)).assertIsDisplayed()
     }
 
     @Test
@@ -100,7 +109,10 @@ class TeamDetailsScreenTest {
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
         // The root Column only scrolls vertically - in landscape "Delete team" can land below
         // the fold, not yet in the viewport.
-        composeTestRule.onNodeWithText("Delete team").performScrollTo().assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.team_details_delete_title))
+            .performScrollTo()
+            .assertIsDisplayed()
 
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForIdle()

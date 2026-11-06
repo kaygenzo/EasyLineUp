@@ -22,10 +22,12 @@ import androidx.test.espresso.Espresso.closeSoftKeyboard
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
+import com.telen.easylineup.R
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.ThemeTestUtils
+import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
 import org.junit.After
@@ -57,7 +59,7 @@ class PlayerProfileScreenTest {
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
         composeTestRule.onNodeWithText("12").performClick()
-        composeTestRule.waitForText("Roster")
+        composeTestRule.waitForText(string(R.string.title_team))
         composeTestRule.waitForText("Starter 1")
         composeTestRule.onNodeWithText("Starter 1").performClick()
         // PlayerViewModel's own state (license/positions) lands a frame or more after
@@ -89,13 +91,13 @@ class PlayerProfileScreenTest {
 
     @Test
     fun editNameAndSaveUpdatesProfile() {
-        composeTestRule.onNodeWithContentDescription("Edit").performClick()
-        composeTestRule.waitForText("Edit details")
+        composeTestRule.onNodeWithContentDescription(string(R.string.action_edit)).performClick()
+        composeTestRule.waitForText(string(R.string.player_form_title_edit))
 
         composeTestRule.onNodeWithTag(PlayerFormTestTags.NAME_FIELD).performTextClearance()
         composeTestRule.onNodeWithTag(PlayerFormTestTags.NAME_FIELD)
             .performTextInput("Starter 1 Edited")
-        composeTestRule.onNodeWithText("Save").performClick()
+        composeTestRule.onNodeWithText(string(R.string.save_button)).performClick()
 
         composeTestRule.waitForText("Starter 1 Edited")
         composeTestRule.onNodeWithText("Starter 1 Edited").assertIsDisplayed()
@@ -103,20 +105,20 @@ class PlayerProfileScreenTest {
 
     @Test
     fun validationBlocksEmptyName() {
-        composeTestRule.onNodeWithContentDescription("Edit").performClick()
-        composeTestRule.waitForText("Edit details")
+        composeTestRule.onNodeWithContentDescription(string(R.string.action_edit)).performClick()
+        composeTestRule.waitForText(string(R.string.player_form_title_edit))
 
         composeTestRule.onNodeWithTag(PlayerFormTestTags.NAME_FIELD).performTextClearance()
-        composeTestRule.onNodeWithText("Save").performClick()
+        composeTestRule.onNodeWithText(string(R.string.save_button)).performClick()
 
-        composeTestRule.waitForText("Player name cannot be empty")
-        composeTestRule.onNodeWithText("Edit details").assertIsDisplayed()
+        composeTestRule.waitForText(string(R.string.player_creation_error_name_empty))
+        composeTestRule.onNodeWithText(string(R.string.player_form_title_edit)).assertIsDisplayed()
     }
 
     @Test
     fun discardDialogKeepEditingPreservesFormDiscardLeavesUnsaved() {
-        composeTestRule.onNodeWithContentDescription("Edit").performClick()
-        composeTestRule.waitForText("Edit details")
+        composeTestRule.onNodeWithContentDescription(string(R.string.action_edit)).performClick()
+        composeTestRule.waitForText(string(R.string.player_form_title_edit))
         composeTestRule.onNodeWithTag(PlayerFormTestTags.NAME_FIELD).performTextClearance()
         composeTestRule.onNodeWithTag(PlayerFormTestTags.NAME_FIELD)
             .performTextInput("Unsaved Name")
@@ -126,17 +128,17 @@ class PlayerProfileScreenTest {
         // one the Compose BackHandler actually sees.
         closeSoftKeyboard()
         pressBack()
-        composeTestRule.waitForText("Keep editing")
-        composeTestRule.onNodeWithText("Keep editing").performClick()
+        composeTestRule.waitForText(string(R.string.action_keep_editing))
+        composeTestRule.onNodeWithText(string(R.string.action_keep_editing)).performClick()
 
         // Dismissing the confirm sheet must not have discarded the in-progress edit.
-        composeTestRule.waitForAbsence("Keep editing")
+        composeTestRule.waitForAbsence(string(R.string.action_keep_editing))
         composeTestRule.onNodeWithText("Unsaved Name").assertIsDisplayed()
 
         closeSoftKeyboard()
         pressBack()
-        composeTestRule.waitForText("Discard")
-        composeTestRule.onNodeWithText("Discard").performClick()
+        composeTestRule.waitForText(string(R.string.generic_discard))
+        composeTestRule.onNodeWithText(string(R.string.generic_discard)).performClick()
 
         composeTestRule.waitForText("Starter 1")
         composeTestRule.onNodeWithText("Starter 1").assertIsDisplayed()
@@ -144,12 +146,12 @@ class PlayerProfileScreenTest {
 
     @Test
     fun deletePlayerRemovesFromRoster() {
-        composeTestRule.onNodeWithContentDescription("Delete").performClick()
-        composeTestRule.waitForText("Delete player ?")
+        composeTestRule.onNodeWithContentDescription(string(R.string.action_delete)).performClick()
+        composeTestRule.waitForText(string(R.string.dialog_delete_player_title))
 
-        composeTestRule.onNodeWithText("Delete").performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_delete)).performClick()
 
-        composeTestRule.waitForText("BY NAME")
+        composeTestRule.waitForText(string(R.string.roster_sort_by_name).uppercase())
         composeTestRule.waitForAbsence("Starter 1")
     }
 

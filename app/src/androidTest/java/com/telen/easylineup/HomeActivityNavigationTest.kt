@@ -13,6 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.string
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -48,16 +49,20 @@ class HomeActivityNavigationTest {
     fun bottomNavSwitchesBetweenTopLevelScreens() {
         composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("ROSTER").performClick()
-        composeTestRule.onNodeWithText("Roster").assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.title_team).uppercase()).performClick()
+        composeTestRule.onNodeWithText(string(R.string.title_team)).assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("MY LINEUPS").performClick()
-        composeTestRule.onNodeWithText("Tournaments").assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.title_lineups).uppercase()).performClick()
+        composeTestRule
+            .onNodeWithText(string(R.string.tournaments_list_header_title))
+            .assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("SETTINGS").performClick()
-        composeTestRule.onNodeWithText("Settings").assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.title_settings).uppercase()).performClick()
+        composeTestRule.onNodeWithText(string(R.string.title_settings)).assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("DASHBOARD").performClick()
+        composeTestRule
+            .onNodeWithText(string(R.string.title_last_lineup).uppercase())
+            .performClick()
         composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
     }
 
@@ -68,11 +73,13 @@ class HomeActivityNavigationTest {
         // The Dashboard header behind the sheet still carries the team name too, so there are
         // two matching nodes once the sheet is open - the sheet's own title is enough to prove
         // it opened.
-        composeTestRule.onNodeWithText("Switch team").assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.switch_team_sheet_title)).assertIsDisplayed()
 
         pressBack()
 
-        composeTestRule.onNodeWithText("Switch team").assertDoesNotExist()
+        composeTestRule
+            .onNodeWithText(string(R.string.switch_team_sheet_title))
+            .assertDoesNotExist()
         composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
     }
 }

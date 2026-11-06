@@ -12,9 +12,11 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.testing.string
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,7 +56,7 @@ class TeamEditActivityTest {
 
     @Test
     fun rendersEditTitleWithThePassedTeamPreFilled() {
-        composeTestRule.onNodeWithText("Edit details").assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.team_form_title_edit)).assertIsDisplayed()
         composeTestRule.onNodeWithText("Riverside Hawks").assertIsDisplayed()
     }
 }

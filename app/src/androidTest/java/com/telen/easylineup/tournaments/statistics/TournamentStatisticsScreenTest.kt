@@ -16,10 +16,12 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
+import com.telen.easylineup.R
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.ThemeTestUtils
+import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
 import org.junit.After
@@ -45,14 +47,18 @@ class TournamentStatisticsScreenTest {
     fun openTournamentStatistics() {
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
-        composeTestRule.onNodeWithText("MY LINEUPS").performClick()
-        composeTestRule.waitForText("Tournaments")
+        composeTestRule.onNodeWithText(string(R.string.title_lineups).uppercase()).performClick()
+        composeTestRule.waitForText(string(R.string.tournaments_list_header_title))
         composeTestRule.waitForText(TestFixtures.TOURNAMENT_NAME)
 
         // The stats icon has no text of its own (only a content description) and sits on the
         // ticket's always-visible header row, not gated behind expanding it.
-        composeTestRule.onNodeWithContentDescription("View tournament stats").performClick()
-        composeTestRule.waitForText("Statistics")
+        composeTestRule
+            .onNodeWithContentDescription(
+                string(R.string.tournaments_list_stats_content_description)
+            )
+            .performClick()
+        composeTestRule.waitForText(string(R.string.title_tournament_statistics))
     }
 
     @After
@@ -67,7 +73,9 @@ class TournamentStatisticsScreenTest {
         // gotcha).
         composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME.uppercase())
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText("Statistics").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.title_tournament_statistics))
+            .assertIsDisplayed()
         // The fixture's single lineup gives every starter exactly one game played - all tie,
         // so their row order isn't guaranteed, hence the scroll-to instead of a cold assert.
         // "Starter 1" also happens to be the position-usage field's default selection, so two
@@ -86,15 +94,15 @@ class TournamentStatisticsScreenTest {
         composeTestRule.waitForText("Starter 2")
 
         composeTestRule.onNodeWithText("Starter 2").performClick()
-        composeTestRule.waitForAbsence("Select a player")
+        composeTestRule.waitForAbsence(string(R.string.defense_select_player_sheet_title))
         composeTestRule.onNodeWithText("Starter 2").assertIsDisplayed()
     }
 
     @Test
     fun backIconNavigatesToTournaments() {
-        composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForAbsence("Statistics")
-        composeTestRule.waitForText("Tournaments")
+        composeTestRule.onNodeWithContentDescription(string(R.string.generic_back)).performClick()
+        composeTestRule.waitForAbsence(string(R.string.title_tournament_statistics))
+        composeTestRule.waitForText(string(R.string.tournaments_list_header_title))
     }
 
     @Test
@@ -102,7 +110,7 @@ class TournamentStatisticsScreenTest {
         OrientationTestUtils.rotateToLandscape()
         composeTestRule.waitForIdle()
 
-        composeTestRule.waitForText("Statistics")
+        composeTestRule.waitForText(string(R.string.title_tournament_statistics))
         composeTestRule.onAllNodesWithText("Starter 1").onFirst().assertIsDisplayed()
 
         OrientationTestUtils.rotateToPortrait()
@@ -114,7 +122,9 @@ class TournamentStatisticsScreenTest {
         ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("Statistics").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.title_tournament_statistics))
+            .assertIsDisplayed()
     }
 
     @Test
@@ -122,6 +132,8 @@ class TournamentStatisticsScreenTest {
         ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("Statistics").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.title_tournament_statistics))
+            .assertIsDisplayed()
     }
 }

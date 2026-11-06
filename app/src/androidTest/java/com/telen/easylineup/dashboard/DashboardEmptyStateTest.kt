@@ -9,8 +9,10 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
+import com.telen.easylineup.R
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForText
 import org.junit.Rule
 import org.junit.Test
@@ -35,6 +37,8 @@ class DashboardEmptyStateTest {
     fun rendersNoLineupsYetMessageInsteadOfACard() {
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
 
-        composeTestRule.onNodeWithText("No lineups built yet.").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.dashboard_hero_empty_title))
+            .assertIsDisplayed()
     }
 }

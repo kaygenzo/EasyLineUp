@@ -6,8 +6,8 @@ package com.telen.easylineup.team
 
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -17,11 +17,13 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
+import com.telen.easylineup.R
 import com.telen.easylineup.player.PlayerFormTestTags
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.ThemeTestUtils
+import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
 import org.junit.After
@@ -51,7 +53,7 @@ class RosterScreenTest {
         // TeamViewModel's own Room/Flow-backed state lands a frame or more after navigating -
         // wait for the roster list itself, not just the static header title, before any test
         // body starts interacting.
-        composeTestRule.waitForText("Roster")
+        composeTestRule.waitForText(string(R.string.title_team))
         composeTestRule.waitForText("Starter 1")
     }
 
@@ -67,8 +69,12 @@ class RosterScreenTest {
         // Dashboard's un-uppercased header - using the wrong case here would silently match a
         // stale, not-yet-disposed Dashboard node instead of this screen's own.
         composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME.uppercase()).assertIsDisplayed()
-        composeTestRule.onNodeWithText("BY NAME").assertIsDisplayed()
-        composeTestRule.onNodeWithText("BY NUMBER").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.roster_sort_by_name).uppercase())
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.roster_sort_by_number).uppercase())
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText("Starter 1").assertIsDisplayed()
         // Last row in the LazyColumn - not yet composed at all at the initial scroll position
         // (virtualization), so a plain performScrollTo() has nothing to scroll to yet;
@@ -80,10 +86,14 @@ class RosterScreenTest {
 
     @Test
     fun sortPillsSwitchWithoutLosingContent() {
-        composeTestRule.onNodeWithText("BY NUMBER").performClick()
+        composeTestRule
+            .onNodeWithText(string(R.string.roster_sort_by_number).uppercase())
+            .performClick()
         composeTestRule.onNodeWithText("Starter 1").assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("BY NAME").performClick()
+        composeTestRule
+            .onNodeWithText(string(R.string.roster_sort_by_name).uppercase())
+            .performClick()
         composeTestRule.onNodeWithText("Starter 1").assertIsDisplayed()
     }
 
@@ -92,68 +102,82 @@ class RosterScreenTest {
         composeTestRule.onNodeWithText("Starter 1").performClick()
         // PlayerProfileScreen reuses the exact same "Roster" title text (both are R.string.
         // title_team) - its own sort pills are what's actually unique to RosterScreen.
-        composeTestRule.waitForAbsence("BY NAME")
+        composeTestRule.waitForAbsence(string(R.string.roster_sort_by_name).uppercase())
 
         pressBack()
 
-        composeTestRule.waitForText("BY NAME")
-        composeTestRule.onNodeWithText("Roster").assertIsDisplayed()
+        composeTestRule.waitForText(string(R.string.roster_sort_by_name).uppercase())
+        composeTestRule.onNodeWithText(string(R.string.title_team)).assertIsDisplayed()
     }
 
     @Test
     fun addPlayerFabNavigatesToPlayerEditAndBack() {
-        composeTestRule.onNodeWithContentDescription("Add player").performClick()
-        composeTestRule.waitForAbsence("Roster")
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.roster_add_player_content_description))
+            .performClick()
+        composeTestRule.waitForAbsence(string(R.string.title_team))
 
         // The form's BackHandler always shows a discard-changes confirmation first, even with
         // nothing typed yet - confirm it to actually leave the screen.
         pressBack()
-        composeTestRule.waitForText("Discard")
-        composeTestRule.onNodeWithText("Discard").performClick()
+        composeTestRule.waitForText(string(R.string.generic_discard))
+        composeTestRule.onNodeWithText(string(R.string.generic_discard)).performClick()
 
-        composeTestRule.waitForText("Roster")
-        composeTestRule.onNodeWithText("Roster").assertIsDisplayed()
+        composeTestRule.waitForText(string(R.string.title_team))
+        composeTestRule.onNodeWithText(string(R.string.title_team)).assertIsDisplayed()
     }
 
     @Test
     fun creatingNewPlayerAddsThemToTheRoster() {
-        composeTestRule.onNodeWithContentDescription("Add player").performClick()
-        composeTestRule.waitForText("New player")
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.roster_add_player_content_description))
+            .performClick()
+        composeTestRule.waitForText(string(R.string.player_form_title_create))
 
         composeTestRule.onNodeWithTag(PlayerFormTestTags.NAME_FIELD)
             .performTextInput("Brand New Player")
-        composeTestRule.onNodeWithText("Save").performClick()
+        composeTestRule.onNodeWithText(string(R.string.save_button)).performClick()
 
         // A successful save navigates back to Roster - re-finding the new name there (not just
         // asserting the form closed) proves the player was actually written to the database,
         // not just reflected in the form's own in-memory state.
-        composeTestRule.waitForAbsence("New player")
+        composeTestRule.waitForAbsence(string(R.string.player_form_title_create))
         composeTestRule.waitForText("Brand New Player")
         composeTestRule.onNodeWithText("Brand New Player").assertIsDisplayed()
     }
 
     @Test
     fun messageTeamSheetShowsCountsAndEachActionIsSafeToTap() {
-        composeTestRule.onNodeWithContentDescription("Message the team").performClick()
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.roster_message_team_content_description))
+            .performClick()
 
-        composeTestRule.onNodeWithText("0 of 12 have a number on file").assertIsDisplayed()
-        composeTestRule.onNodeWithText("0 of 12 have an email on file").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.roster_message_phone_count, 0, 12))
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.roster_message_email_count, 0, 12))
+            .assertIsDisplayed()
 
         // Both counts are 0 in the fixture, so these are no-ops in RosterRoute (no intent is
         // launched) - safe to tap without leaving the app.
-        composeTestRule.onNodeWithText("Text message").performClick()
-        composeTestRule.onNodeWithText("Roster").assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.roster_message_text_label)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.title_team)).assertIsDisplayed()
 
-        composeTestRule.onNodeWithContentDescription("Message the team").performClick()
-        composeTestRule.onNodeWithText("Email").performClick()
-        composeTestRule.onNodeWithText("Roster").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.roster_message_team_content_description))
+            .performClick()
+        composeTestRule.onNodeWithText(string(R.string.roster_message_email_label)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.title_team)).assertIsDisplayed()
 
-        composeTestRule.onNodeWithContentDescription("Message the team").performClick()
-        composeTestRule.onNodeWithText("Share another way").performClick()
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.roster_message_team_content_description))
+            .performClick()
+        composeTestRule.onNodeWithText(string(R.string.roster_message_share_label)).performClick()
         // The resulting Toast is a separate system window, outside Compose's own semantics
         // tree - not asserted here; the sheet dismissing (back to the Roster header) is what's
         // actually under test.
-        composeTestRule.onNodeWithText("Roster").assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.title_team)).assertIsDisplayed()
     }
 
     @Test
@@ -162,7 +186,7 @@ class RosterScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.waitForText(TestFixtures.TEAM_NAME.uppercase())
-        composeTestRule.onNodeWithText("Roster").assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.title_team)).assertIsDisplayed()
 
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForIdle()

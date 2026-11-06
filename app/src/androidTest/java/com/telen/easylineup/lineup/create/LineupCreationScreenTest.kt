@@ -13,10 +13,12 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
+import com.telen.easylineup.R
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.ThemeTestUtils
+import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
 import org.junit.After
@@ -44,12 +46,16 @@ class LineupCreationScreenTest {
     fun openLineupCreation() {
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
-        composeTestRule.onNodeWithText("MY LINEUPS").performClick()
-        composeTestRule.waitForText("Tournaments")
+        composeTestRule.onNodeWithText(string(R.string.title_lineups).uppercase()).performClick()
+        composeTestRule.waitForText(string(R.string.tournaments_list_header_title))
         composeTestRule.waitForText(TestFixtures.TOURNAMENT_NAME)
 
-        composeTestRule.onNodeWithContentDescription("Create lineup").performClick()
-        composeTestRule.waitForText("New lineup")
+        composeTestRule
+            .onNodeWithContentDescription(
+                string(R.string.tournaments_list_create_lineup_content_description)
+            )
+            .performClick()
+        composeTestRule.waitForText(string(R.string.lineup_creation_header_title))
     }
 
     @After
@@ -60,38 +66,56 @@ class LineupCreationScreenTest {
 
     @Test
     fun rendersDefaultsFromFixture() {
-        composeTestRule.onNodeWithText("New lineup").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Choose a tournament").assertIsDisplayed()
-        composeTestRule.onNodeWithText("12 of 12 selected").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_header_title))
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_tournament_placeholder))
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_roster_selected_format, 12, 12))
+            .assertIsDisplayed()
     }
 
     @Test
     fun enteringNameShowsTypedValue() {
-        composeTestRule.onNodeWithText("e.g. Game 3 — Starters").performTextInput("Scrimmage")
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_name_placeholder))
+            .performTextInput("Scrimmage")
         composeTestRule.onNodeWithText("Scrimmage").assertIsDisplayed()
     }
 
     @Test
     fun selectingExistingTournamentShowsItInField() {
-        composeTestRule.onNodeWithText("Choose a tournament").performClick()
-        composeTestRule.waitForText("Pick a tournament")
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_tournament_placeholder))
+            .performClick()
+        composeTestRule.waitForText(string(R.string.lineup_creation_tournament_sheet_title))
 
         composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).performClick()
 
-        composeTestRule.waitForAbsence("Pick a tournament")
+        composeTestRule.waitForAbsence(string(R.string.lineup_creation_tournament_sheet_title))
         composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).assertIsDisplayed()
     }
 
     @Test
     fun creatingNewTournamentInlineSelectsIt() {
-        composeTestRule.onNodeWithText("Choose a tournament").performClick()
-        composeTestRule.waitForText("Pick a tournament")
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_tournament_placeholder))
+            .performClick()
+        composeTestRule.waitForText(string(R.string.lineup_creation_tournament_sheet_title))
 
-        composeTestRule.onNodeWithText("Create a new tournament").performClick()
-        composeTestRule.waitForText("New tournament")
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_tournament_create_row))
+            .performClick()
+        composeTestRule.waitForText(string(R.string.lineup_creation_new_tournament_title))
 
-        composeTestRule.onNodeWithText("e.g. Winter League").performTextInput("Winter Cup")
-        composeTestRule.onNodeWithText("Add tournament").performClick()
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_new_tournament_name_placeholder))
+            .performTextInput("Winter Cup")
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_new_tournament_save))
+            .performClick()
 
         composeTestRule.waitForText("Winter Cup")
         composeTestRule.onNodeWithText("Winter Cup").assertIsDisplayed()
@@ -99,46 +123,63 @@ class LineupCreationScreenTest {
 
     @Test
     fun togglingRosterPlayerUpdatesSummary() {
-        composeTestRule.onNodeWithText("12 of 12 selected").performClick()
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_roster_selected_format, 12, 12))
+            .performClick()
         composeTestRule.waitForText("Starter 1")
 
         composeTestRule.onNodeWithText("Starter 1").performClick()
 
-        composeTestRule.waitForText("11 of 12 selected")
-        composeTestRule.onNodeWithText("Done · 11 of 12 selected").performClick()
+        composeTestRule.waitForText(string(R.string.lineup_creation_roster_selected_format, 11, 12))
+        composeTestRule
+            .onNodeWithText(
+                string(R.string.lineup_creation_roster_done) + " · " +
+                    string(R.string.lineup_creation_roster_selected_format, 11, 12)
+            )
+            .performClick()
 
-        composeTestRule.waitForText("11 of 12 selected")
+        composeTestRule.waitForText(string(R.string.lineup_creation_roster_selected_format, 11, 12))
     }
 
     @Test
     fun savingWithValidFieldsNavigatesAway() {
-        composeTestRule.onNodeWithText("e.g. Game 3 — Starters").performTextInput("Scrimmage")
-        composeTestRule.onNodeWithText("Choose a tournament").performClick()
-        composeTestRule.waitForText("Pick a tournament")
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_name_placeholder))
+            .performTextInput("Scrimmage")
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_tournament_placeholder))
+            .performClick()
+        composeTestRule.waitForText(string(R.string.lineup_creation_tournament_sheet_title))
         composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).performClick()
-        composeTestRule.waitForAbsence("Pick a tournament")
+        composeTestRule.waitForAbsence(string(R.string.lineup_creation_tournament_sheet_title))
 
-        composeTestRule.onNodeWithText("Create lineup").performClick()
+        composeTestRule.onNodeWithText(string(R.string.lineup_creation_save)).performClick()
 
-        composeTestRule.waitForAbsence("New lineup")
+        composeTestRule.waitForAbsence(string(R.string.lineup_creation_header_title))
     }
 
     @Test
     fun savingWithEmptyNameShowsValidationError() {
-        composeTestRule.onNodeWithText("Create lineup").performClick()
+        composeTestRule.onNodeWithText(string(R.string.lineup_creation_save)).performClick()
 
-        composeTestRule.waitForText("Lineup name cannot be empty")
-        composeTestRule.onNodeWithText("New lineup").assertIsDisplayed()
+        composeTestRule.waitForText(string(R.string.lineup_creation_error_name_empty))
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_header_title))
+            .assertIsDisplayed()
     }
 
     @Test
     fun savingWithNameButNoTournamentShowsValidationError() {
-        composeTestRule.onNodeWithText("e.g. Game 3 — Starters").performTextInput("Scrimmage")
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_name_placeholder))
+            .performTextInput("Scrimmage")
 
-        composeTestRule.onNodeWithText("Create lineup").performClick()
+        composeTestRule.onNodeWithText(string(R.string.lineup_creation_save)).performClick()
 
-        composeTestRule.waitForText("Tournament name cannot be empty")
-        composeTestRule.onNodeWithText("New lineup").assertIsDisplayed()
+        composeTestRule.waitForText(string(R.string.lineup_creation_error_tournament_empty))
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_header_title))
+            .assertIsDisplayed()
     }
 
     @Test
@@ -146,8 +187,10 @@ class LineupCreationScreenTest {
         OrientationTestUtils.rotateToLandscape()
         composeTestRule.waitForIdle()
 
-        composeTestRule.waitForText("New lineup")
-        composeTestRule.onNodeWithText("New lineup").assertIsDisplayed()
+        composeTestRule.waitForText(string(R.string.lineup_creation_header_title))
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_header_title))
+            .assertIsDisplayed()
 
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForIdle()
@@ -158,7 +201,9 @@ class LineupCreationScreenTest {
         ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("New lineup").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_header_title))
+            .assertIsDisplayed()
     }
 
     @Test
@@ -166,6 +211,8 @@ class LineupCreationScreenTest {
         ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("New lineup").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_header_title))
+            .assertIsDisplayed()
     }
 }

@@ -10,7 +10,9 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.telen.easylineup.R
 import com.telen.easylineup.testing.SeedDatabaseRule
+import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
 import org.junit.Rule
@@ -35,22 +37,24 @@ class WelcomeScreenTest {
 
     @Test
     fun rendersWelcomeActions() {
-        composeTestRule.onNodeWithText("Create your first team").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Import an existing team").assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.login_create)).assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.login_import)).assertIsDisplayed()
     }
 
     @Test
     fun createTeamOpensTeamCreationScreen() {
-        composeTestRule.onNodeWithText("Create your first team").performClick()
-        composeTestRule.waitForText("Create team")
+        composeTestRule.onNodeWithText(string(R.string.login_create)).performClick()
+        composeTestRule.waitForText(string(R.string.team_form_title_create))
 
         // Close without saving - the discard confirmation is unconditional (same pattern as
         // PlayerEditRoute's back-press), so it fires even on this untouched form.
-        composeTestRule.onNodeWithContentDescription("Close").performClick()
-        composeTestRule.waitForText("Discard")
-        composeTestRule.onNodeWithText("Discard").performClick()
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.team_form_close_content_description))
+            .performClick()
+        composeTestRule.waitForText(string(R.string.generic_discard))
+        composeTestRule.onNodeWithText(string(R.string.generic_discard)).performClick()
 
-        composeTestRule.waitForAbsence("Create team")
-        composeTestRule.onNodeWithText("Create your first team").assertIsDisplayed()
+        composeTestRule.waitForAbsence(string(R.string.team_form_title_create))
+        composeTestRule.onNodeWithText(string(R.string.login_create)).assertIsDisplayed()
     }
 }

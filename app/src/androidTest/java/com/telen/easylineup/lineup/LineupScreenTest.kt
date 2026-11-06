@@ -14,12 +14,14 @@ import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
+import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.lineup.defense.DefenseTestTags
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.ThemeTestUtils
+import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForTag
 import com.telen.easylineup.testing.waitForText
@@ -52,14 +54,14 @@ class LineupScreenTest {
     fun openLineup() {
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
-        composeTestRule.onNodeWithText("MY LINEUPS").performClick()
-        composeTestRule.waitForText("Tournaments")
+        composeTestRule.onNodeWithText(string(R.string.title_lineups).uppercase()).performClick()
+        composeTestRule.waitForText(string(R.string.tournaments_list_header_title))
         composeTestRule.waitForText(TestFixtures.TOURNAMENT_NAME)
 
         composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).performClick()
         composeTestRule.waitForText(TestFixtures.LINEUP_NAME)
         composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME).performClick()
-        composeTestRule.waitForText("Defense")
+        composeTestRule.waitForText(string(R.string.new_lineup_tab_field_defense))
     }
 
     @After
@@ -73,54 +75,62 @@ class LineupScreenTest {
         // ScreenHeader's eyebrow always renders uppercased (see RosterScreenTest for the same
         // gotcha) - the lineup name shown in the Tournaments list beforehand is exact-case.
         composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME.uppercase()).assertIsDisplayed()
-        composeTestRule.onNodeWithText("Defense").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.new_lineup_tab_field_defense))
+            .assertIsDisplayed()
         composeTestRule.onNodeWithTag(DefenseTestTags.marker(FieldPosition.PITCHER.id))
             .assertIsDisplayed()
         // View mode: no Save/Cancel form bar.
-        composeTestRule.onNodeWithText("Save lineup").assertDoesNotExist()
+        composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).assertDoesNotExist()
     }
 
     @Test
     fun switchingToOffenseTabShowsBattingOrder() {
-        composeTestRule.onNodeWithText("OFFENSE").performClick()
-        composeTestRule.waitForText("Offense")
+        composeTestRule
+            .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
+            .performClick()
+        composeTestRule.waitForText(string(R.string.new_lineup_tab_field_offense))
         composeTestRule.onNodeWithText("Starter 1").assertIsDisplayed()
     }
 
     @Test
     fun attackLegendDialogOpensAndDismisses() {
-        composeTestRule.onNodeWithText("OFFENSE").performClick()
-        composeTestRule.waitForText("Offense")
+        composeTestRule
+            .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
+            .performClick()
+        composeTestRule.waitForText(string(R.string.new_lineup_tab_field_offense))
 
-        composeTestRule.onNodeWithContentDescription("How to read this list").performClick()
-        composeTestRule.waitForText("OK")
-        composeTestRule.onNodeWithText("How to read this list").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.attack_legend_content_description))
+            .performClick()
+        composeTestRule.waitForText(string(android.R.string.ok))
+        composeTestRule.onNodeWithText(string(R.string.attack_legend_title)).assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("OK").performClick()
-        composeTestRule.waitForAbsence("OK")
+        composeTestRule.onNodeWithText(string(android.R.string.ok)).performClick()
+        composeTestRule.waitForAbsence(string(android.R.string.ok))
     }
 
     @Test
     fun editPillEntersEditModeWithFormBar() {
-        composeTestRule.onNodeWithText("Edit").performClick()
-        composeTestRule.waitForText("Save lineup")
-        composeTestRule.onNodeWithText("Save lineup").assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.waitForText(string(R.string.action_save_lineup))
+        composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).assertIsDisplayed()
     }
 
     @Test
     fun tappingPositionInEditModeOpensAvailablePlayersSheet() {
-        composeTestRule.onNodeWithText("Edit").performClick()
-        composeTestRule.waitForText("Save lineup")
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.waitForText(string(R.string.action_save_lineup))
 
         composeTestRule.waitForTag(FieldPosition.PITCHER.markerTag)
         composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).performClick()
-        composeTestRule.waitForText("Select a player")
+        composeTestRule.waitForText(string(R.string.defense_select_player_sheet_title))
 
         composeTestRule.onNodeWithText("Substitute 1").assertIsDisplayed()
         composeTestRule.onNodeWithText("Substitute 2").assertIsDisplayed()
 
         composeTestRule.onNodeWithText("Substitute 1").performClick()
-        composeTestRule.waitForAbsence("Select a player")
+        composeTestRule.waitForAbsence(string(R.string.defense_select_player_sheet_title))
     }
 
     @Test
@@ -128,16 +138,16 @@ class LineupScreenTest {
         // This is the exact flow whose post-save navigation had a real main-thread-crash bug
         // fixed this session (see LineupRoute's onSaveClick - withContext(Dispatchers.Main))
         // - nothing previously locked it against a regression.
-        composeTestRule.onNodeWithText("Edit").performClick()
-        composeTestRule.waitForText("Save lineup")
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.waitForText(string(R.string.action_save_lineup))
 
         composeTestRule.waitForTag(FieldPosition.PITCHER.markerTag)
         composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).performClick()
-        composeTestRule.waitForText("Select a player")
+        composeTestRule.waitForText(string(R.string.defense_select_player_sheet_title))
         composeTestRule.onNodeWithText("Substitute 1").performClick()
-        composeTestRule.waitForAbsence("Select a player")
+        composeTestRule.waitForAbsence(string(R.string.defense_select_player_sheet_title))
 
-        composeTestRule.onNodeWithText("Save lineup").performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).performClick()
 
         // Edit mode is a separate pushed destination (see LineupRoute's onEditClick ->
         // navController.navigate(Routes.Lineup(..., editable = true))) - a successful save
@@ -145,18 +155,20 @@ class LineupScreenTest {
         // (goBack()'s default showFixedView = true short-circuits the deeper pop; see
         // LineupRoute.goBack()). That entry's own LineupViewModel is Flow/Room-backed, so it
         // re-collects the just-written change live rather than needing a fresh navigation.
-        composeTestRule.waitForAbsence("Save lineup")
-        composeTestRule.waitForText("Defense")
+        composeTestRule.waitForAbsence(string(R.string.action_save_lineup))
+        composeTestRule.waitForText(string(R.string.new_lineup_tab_field_defense))
 
-        composeTestRule.onNodeWithText("OFFENSE").performClick()
-        composeTestRule.waitForText("Offense")
+        composeTestRule
+            .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
+            .performClick()
+        composeTestRule.waitForText(string(R.string.new_lineup_tab_field_offense))
         composeTestRule.onNodeWithText("Substitute 1").assertIsDisplayed()
     }
 
     @Test
     fun tappingDpDhInEditModeOpensLinkSheet() {
-        composeTestRule.onNodeWithText("Edit").performClick()
-        composeTestRule.waitForText("Save lineup")
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.waitForText(string(R.string.action_save_lineup))
 
         // The fixture's lineup starts with DH/DP mode off, which forces the DP_DH marker to
         // a disabled NONE state regardless of its assigned player - the "Use DH" toggle must
@@ -168,33 +180,33 @@ class LineupScreenTest {
         composeTestRule.waitForText("Starter 10")
         composeTestRule.onNodeWithText("Starter 10").performClick()
 
-        composeTestRule.waitForText("Link your DH and your Pitcher")
+        composeTestRule.waitForText(string(R.string.link_dh_and_pitcher_dialog_title))
     }
 
     @Test
     fun cancelInEditModeShowsDiscardConfirmation() {
-        composeTestRule.onNodeWithText("Edit").performClick()
-        composeTestRule.waitForText("Save lineup")
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.waitForText(string(R.string.action_save_lineup))
 
         pressBack()
 
-        composeTestRule.waitForText("Keep editing")
-        composeTestRule.onNodeWithText("Discard").performClick()
+        composeTestRule.waitForText(string(R.string.action_keep_editing))
+        composeTestRule.onNodeWithText(string(R.string.action_discard)).performClick()
 
-        composeTestRule.waitForText("Defense")
-        composeTestRule.onNodeWithText("Save lineup").assertDoesNotExist()
+        composeTestRule.waitForText(string(R.string.new_lineup_tab_field_defense))
+        composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).assertDoesNotExist()
     }
 
     @Test
     fun deletingLineupNavigatesToTournaments() {
-        composeTestRule.onNodeWithContentDescription("Delete").performClick()
-        composeTestRule.waitForText("Delete lineup ?")
+        composeTestRule.onNodeWithContentDescription(string(R.string.action_delete)).performClick()
+        composeTestRule.waitForText(string(R.string.dialog_delete_lineup_title))
 
-        composeTestRule.onNodeWithText("Delete").performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_delete)).performClick()
 
         // Deleting the lineup doesn't delete its tournament - back on Tournaments, still with
         // the fixture's one tournament, just none of its lineups left to expand.
-        composeTestRule.waitForText("Tournaments")
+        composeTestRule.waitForText(string(R.string.tournaments_list_header_title))
         composeTestRule.waitForText(TestFixtures.TOURNAMENT_NAME)
     }
 
@@ -204,7 +216,9 @@ class LineupScreenTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.waitForText(TestFixtures.LINEUP_NAME.uppercase())
-        composeTestRule.onNodeWithText("Defense").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.new_lineup_tab_field_defense))
+            .assertIsDisplayed()
 
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForIdle()

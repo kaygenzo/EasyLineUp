@@ -16,10 +16,12 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
+import com.telen.easylineup.R
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.ThemeTestUtils
+import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForText
 import org.junit.After
 import org.junit.Before
@@ -58,13 +60,13 @@ class DashboardScreenTest {
         composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
         composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME).assertIsDisplayed()
         composeTestRule.onNodeWithText("12").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Baseball").assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.title_baseball)).assertIsDisplayed()
     }
 
     @Test
     fun rosterSizeStatNavigatesToRoster() {
         composeTestRule.onNodeWithText("12").performClick()
-        composeTestRule.onNodeWithText("Roster").assertIsDisplayed()
+        composeTestRule.onNodeWithText(string(R.string.title_team)).assertIsDisplayed()
     }
 
     @Test
@@ -89,9 +91,13 @@ class DashboardScreenTest {
         composeTestRule.waitForText("Starter 2")
         composeTestRule.onNodeWithText("Starter 2").assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("WHO WORE THIS NUMBER?").performClick()
+        composeTestRule
+            .onNodeWithText(string(R.string.dashboard_lookup_hint).uppercase())
+            .performClick()
 
-        composeTestRule.onNodeWithText("Number 02 — history").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.shirt_number_history_title, "02"))
+            .assertIsDisplayed()
     }
 
     @Test
@@ -99,11 +105,13 @@ class DashboardScreenTest {
         composeTestRule.onNodeWithTag(DashboardTestTags.SHIRT_NUMBER_FIELD).performTextInput("77")
         composeTestRule.onNodeWithTag(DashboardTestTags.SHIRT_NUMBER_FIELD).performImeAction()
 
-        composeTestRule.waitForText("Not found")
+        composeTestRule.waitForText(string(R.string.generic_not_found))
 
         // No history exists for a number nobody ever wore - the row must not open anything.
-        composeTestRule.onNodeWithText("WHO WORE THIS NUMBER?").performClick()
-        composeTestRule.onNodeWithText("Not found").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(string(R.string.dashboard_lookup_hint).uppercase())
+            .performClick()
+        composeTestRule.onNodeWithText(string(R.string.generic_not_found)).assertIsDisplayed()
     }
 
     @Test
