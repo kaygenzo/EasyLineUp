@@ -253,6 +253,18 @@ internal class ImportDataTests {
     }
 
     @Test
+    fun shouldKeepTheExportedHashWhenInsertingAPlayerNumberOverlay() = runTest {
+        mockAllNotFound()
+        mockAllInsertsSucceed()
+        val captor = argumentCaptor<PlayerNumberOverlay>()
+
+        importData(exportBase, updateIfExists = false)
+
+        Mockito.verify(playerNumberOverlayDao).insertPlayerNumberOverlay(captor.capture())
+        assertEquals(overlayHash, captor.firstValue.hash)
+    }
+
+    @Test
     fun shouldMapEmailAndPhoneWhenInsertingPlayer() = runTest {
         mockAllNotFound()
         mockAllInsertsSucceed()

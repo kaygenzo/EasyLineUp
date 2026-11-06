@@ -310,7 +310,13 @@ class ImportData(
         counts: ImportCounts,
         updateIfExists: Boolean
     ) {
-        val p = PlayerNumberOverlay(0L, lineupId, players[export.playerId] ?: 0L, export.number)
+        val p = PlayerNumberOverlay(
+            0L,
+            lineupId,
+            players[export.playerId] ?: 0L,
+            export.number,
+            export.id
+        )
 
         val overlayDb = playerNumberOverlayDao.getPlayerNumberOverlayByHash(export.id)
         if (overlayDb == null) {
