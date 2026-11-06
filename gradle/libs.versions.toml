@@ -50,7 +50,6 @@ sonarqubePluginVersion = "3.3"
 appDistributionPluginVersion = "5.2.1"
 crashlyticsPluginVersion = "3.0.6"
 dependencyCheckPluginVerison = "6.5.3"
-spotlessPluginVersion = "6.23.3"
 
 [libraries]
 firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBOMVersion" }
@@ -125,5 +124,4 @@ dependencyCheck = { id = "org.owasp.dependencycheck", version.ref = "dependencyC
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektPluginVersion" }
 appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "appDistributionPluginVersion" }
 crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsPluginVersion" }
-spotless = { id = "com.diffplug.spotless", version.ref = "spotlessPluginVersion" }
 room = { id = "androidx.room", version.ref = "roomVersion" }

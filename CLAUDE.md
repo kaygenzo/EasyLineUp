@@ -114,9 +114,8 @@ field to express.
 
 All code (Kotlin, Java, XML, Gradle) follows the official AOSP style. Concretely:
 100 characters per line, **including comments** — a standalone URL is the only
-accepted exception, since wrapping it would make it unusable. This is enforced
-for Kotlin via `LONG_LINE` in `Formatting.yml` (diktat, run through `spotless`),
-set to `100` (was `120`).
+accepted exception, since wrapping it would make it unusable. No tool enforces
+this: it is a convention to follow by hand.
 
 This applies to all new code going forward, and was applied retroactively to
 every line added across the Settings and Welcome/Login Compose pilots. It does
