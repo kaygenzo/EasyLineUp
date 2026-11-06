@@ -4,10 +4,22 @@
 
 package com.telen.easylineup.domain
 
-import org.mockito.kotlin.any
 import com.telen.easylineup.domain.model.DashboardTile
+import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerGamesCount
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.tiles.KEY_DATA_MATCH_PLAYED
+import com.telen.easylineup.domain.model.tiles.KEY_DATA_NAME
+import com.telen.easylineup.domain.model.tiles.KEY_DATA_SHIRT_NUMBER
+import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_EVENT_TIME
+import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_EXTRA_HITTERS
+import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_ID
+import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_NAME
+import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_STRATEGY
+import com.telen.easylineup.domain.model.tiles.KEY_LINEUP_TOURNAMENT_NAME
 import com.telen.easylineup.domain.model.tiles.TileType
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
@@ -21,6 +33,8 @@ import com.telen.easylineup.domain.usecases.GetTeam
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -28,6 +42,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
 
 @RunWith(MockitoJUnitRunner::class)
 internal class GetDashboardTilesTests {
@@ -85,5 +100,114 @@ internal class GetDashboardTilesTests {
         assertTrue(result.isSuccess)
         Mockito.verify(tilesRepo).insertTiles(any())
         assertEquals(1, result.getOrNull()?.size)
+    }
+
+    private fun tournament(id: Long, name: String) =
+        Tournament(id = id, name = name, createdAt = 0L, startTime = 0L, endTime = 0L)
+
+    private fun tile(type: TileType) = DashboardTile(id = 1L, position = 0, type = type.type)
+
+    private suspend fun singleTileData(type: TileType): Map<Int, Any>? {
+        Mockito.`when`(tilesRepo.getTiles()).thenReturn(listOf(tile(type)))
+        return getDashboardTiles().getOrThrow().singleOrNull()?.data?.getData()
+    }
+
+    @Test
+    fun shouldResolveMostUsedPlayerTileFromTheFirstRankedPlayer() = runTest {
+        Mockito.`when`(playerFieldPositionDao.getMostUsedPlayers(team.id)).thenReturn(
+            listOf(PlayerGamesCount(playerId = 2L, size = 7), PlayerGamesCount(3L, 1))
+        )
+        Mockito.`when`(playerDao.getPlayerById(2L)).thenReturn(
+            Player(id = 2L, teamId = 1L, name = "Ace", shirtNumber = 12, licenseNumber = 1L)
+        )
+
+        val data = singleTileData(TileType.MOST_USED_PLAYER)
+
+        assertEquals("Ace", data?.get(KEY_DATA_NAME))
+        assertEquals(12, data?.get(KEY_DATA_SHIRT_NUMBER))
+        assertEquals(7, data?.get(KEY_DATA_MATCH_PLAYED))
+    }
+
+    @Test
+    fun shouldDropMostUsedPlayerTileWhenNobodyPlayedYet() = runTest {
+        Mockito.`when`(playerFieldPositionDao.getMostUsedPlayers(team.id)).thenReturn(emptyList())
+
+        assertNull(singleTileData(TileType.MOST_USED_PLAYER))
+    }
+
+    @Test
+    fun shouldResolveLastLineupTileWithItsTournamentName() = runTest {
+        Mockito.`when`(lineupDao.getLastLineup(team.id)).thenReturn(
+            Lineup(
+                id = 5L,
+                name = "Game 1",
+                teamId = 1L,
+                tournamentId = 9L,
+                strategy = TeamStrategy.SLOWPITCH.id,
+                extraHitters = 2,
+                eventTimeInMillis = 1_000L
+            )
+        )
+        Mockito.`when`(tournamentDao.getTournaments()).thenReturn(
+            listOf(tournament(8L, "Other"), tournament(9L, "Fall Classic"))
+        )
+
+        val data = singleTileData(TileType.LAST_LINEUP)
+
+        assertEquals(5L, data?.get(KEY_LINEUP_ID))
+        assertEquals("Game 1", data?.get(KEY_LINEUP_NAME))
+        assertEquals(TeamStrategy.SLOWPITCH, data?.get(KEY_LINEUP_STRATEGY))
+        assertEquals(2, data?.get(KEY_LINEUP_EXTRA_HITTERS))
+        assertEquals(1_000L, data?.get(KEY_LINEUP_EVENT_TIME))
+        assertEquals("Fall Classic", data?.get(KEY_LINEUP_TOURNAMENT_NAME))
+    }
+
+    @Test
+    fun shouldNotLookUpATournamentForALineupWithoutOne() = runTest {
+        Mockito.`when`(lineupDao.getLastLineup(team.id)).thenReturn(
+            Lineup(id = 5L, name = "Game 1", teamId = 1L, tournamentId = 0L)
+        )
+
+        val data = singleTileData(TileType.LAST_LINEUP)
+
+        assertFalse(data.orEmpty().containsKey(KEY_LINEUP_TOURNAMENT_NAME))
+        Mockito.verify(tournamentDao, Mockito.never()).getTournaments()
+    }
+
+    @Test
+    fun shouldOmitTheTournamentNameWhenItsTournamentNoLongerExists() = runTest {
+        Mockito.`when`(lineupDao.getLastLineup(team.id)).thenReturn(
+            Lineup(id = 5L, name = "Game 1", teamId = 1L, tournamentId = 9L)
+        )
+        Mockito.`when`(tournamentDao.getTournaments()).thenReturn(emptyList())
+
+        val data = singleTileData(TileType.LAST_LINEUP)
+
+        assertEquals("Game 1", data?.get(KEY_LINEUP_NAME))
+        assertFalse(data.orEmpty().containsKey(KEY_LINEUP_TOURNAMENT_NAME))
+    }
+
+    @Test
+    fun shouldDropLastLineupTileWhenTheTeamHasNoLineup() = runTest {
+        Mockito.`when`(lineupDao.getLastLineup(team.id)).thenReturn(null)
+
+        assertNull(singleTileData(TileType.LAST_LINEUP))
+    }
+
+    @Test
+    fun shouldKeepLastPlayerNumberTileWithoutAnyLookup() = runTest {
+        assertEquals(emptyMap<Int, Any>(), singleTileData(TileType.LAST_PLAYER_NUMBER))
+    }
+
+    @Test
+    fun shouldDropATileOfAnUnknownType() = runTest {
+        assertNull(singleTileData(TileType.BETA))
+    }
+
+    @Test
+    fun shouldFailWhenThereIsNoTeam() = runTest {
+        Mockito.`when`(teamDao.getTeams()).thenReturn(emptyList())
+
+        assertTrue(getDashboardTiles().isFailure)
     }
 }

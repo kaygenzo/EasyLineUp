@@ -649,4 +649,110 @@ internal class LineupViewModelTest {
         assertFalse(state.showRosterEditSheet)
         assertFalse(state.showRosterEditDiscardSheet)
     }
+
+    @Test
+    fun shouldSelectTab() {
+        viewModel.onTabSelected(1)
+
+        assertEquals(1, viewModel.uiState.value.selectedTab)
+    }
+
+    @Test
+    fun shouldSwitchTwoPlayersPositionsAndRecompute() = runTest {
+        val lineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
+        val first = player(1L, position = FieldPosition.PITCHER.id)
+        val second = player(2L, position = FieldPosition.CATCHER.id)
+        Mockito.`when`(switchPlayersPositionUseCase(any(), any(), any(), any()))
+            .thenReturn(Result.success(Unit))
+        loadLineup(lineup, listOf(first, second))
+
+        viewModel.switchPlayersPosition(first, second)
+        advanceUntilIdle()
+
+        Mockito.verify(switchPlayersPositionUseCase)(
+            any(),
+            eq(FieldPosition.PITCHER),
+            eq(FieldPosition.CATCHER),
+            eq(lineup)
+        )
+    }
+
+    @Test
+    fun shouldSwitchAPlayerToAnEmptyPosition() = runTest {
+        val lineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
+        val first = player(1L, position = FieldPosition.PITCHER.id)
+        Mockito.`when`(switchPlayersPositionUseCase(any(), any(), any(), any()))
+            .thenReturn(Result.success(Unit))
+        loadLineup(lineup, listOf(first))
+
+        viewModel.switchPlayersPosition(first, FieldPosition.LEFT_FIELD)
+        advanceUntilIdle()
+
+        Mockito.verify(switchPlayersPositionUseCase)(
+            any(),
+            eq(FieldPosition.PITCHER),
+            eq(FieldPosition.LEFT_FIELD),
+            eq(lineup)
+        )
+    }
+
+    @Test
+    fun shouldDoNothingWhenSwitchingBeforeTheLineupIsLoaded() = runTest {
+        val first = player(1L, position = FieldPosition.PITCHER.id)
+
+        viewModel.switchPlayersPosition(first, FieldPosition.LEFT_FIELD)
+        advanceUntilIdle()
+
+        Mockito.verifyNoInteractions(switchPlayersPositionUseCase)
+    }
+
+    private fun rosterOfOnePlayer() = TeamRosterSummary(
+        status = com.telen.easylineup.domain.Constants.STATUS_ALL,
+        players = listOf(
+            com.telen.easylineup.domain.model.RosterPlayerStatus(
+                player = Player(
+                    id = 1L, teamId = 1L, name = "p1", shirtNumber = 1, licenseNumber = 1L
+                ),
+                status = true,
+                playerNumberOverlay = null
+            )
+        )
+    )
+
+    @Test
+    fun shouldOverrideARosterPlayerNumberForTheEditedLineup() {
+        val lineup = Lineup(id = 7L, name = "L", teamId = 1L, tournamentId = 1L)
+        viewModel.onRosterEditLoaded(lineup, rosterOfOnePlayer())
+
+        viewModel.onRosterEditNumberChanged(0, 42)
+
+        val overlay = viewModel.uiState.value.rosterEditSummary.players.single()
+            .playerNumberOverlay
+        assertEquals(42, overlay?.number)
+        assertEquals(7L, overlay?.lineupId)
+    }
+
+    @Test
+    fun shouldDeselectEveryPlayerWhenClearingTheRoster() {
+        val lineup = Lineup(id = 7L, name = "L", teamId = 1L, tournamentId = 1L)
+        viewModel.onRosterEditLoaded(lineup, rosterOfOnePlayer())
+
+        viewModel.onRosterEditClearAll()
+
+        assertFalse(viewModel.uiState.value.rosterEditSummary.players.single().status)
+    }
+
+    @Test
+    fun shouldKeepEditingWhenDismissingTheDiscardSheet() {
+        val lineup = Lineup(id = 7L, name = "L", teamId = 1L, tournamentId = 1L)
+        viewModel.onRosterEditLoaded(lineup, rosterOfOnePlayer())
+        viewModel.onRosterEditPlayerToggled(0, false)
+        viewModel.onRosterEditDismissRequested()
+
+        viewModel.onRosterEditDiscardSheetDismiss()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.showRosterEditDiscardSheet)
+        assertTrue(state.showRosterEditSheet)
+    }
 }
