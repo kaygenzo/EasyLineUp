@@ -31,32 +31,3 @@ dependencies {
 
 apply plugin: 'jacoco'
 apply from: '../detekt.gradle'
-
-// Pure data holders in domain.model (no logic beyond constructor properties) - excluded so
-// coverage reflects tested behavior rather than compiler-generated equals/hashCode/copy/toString.
-def pureModelDataClasses = [
-    'BatterState',
-    'DashboardTile',
-    'DpAndFlexConfiguration',
-    'GeoLocation',
-    'PlayerFieldPosition',
-    'PlayerGamesCount',
-    'PlayerInLineup',
-    'PlayerNumberOverlay',
-    'PlayerTournamentStats',
-    'PlayerWithPosition',
-    'PositionWithLineup',
-    'RosterItem',
-    'RosterPlayerStatus',
-    'ShirtNumberEntry',
-    'TeamRosterSummary',
-    'TournamentWithLineup',
-].collect { "**/domain/model/${it}.class" }
-
-jacocoTestReport {
-    classDirectories.setFrom(
-        files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: pureModelDataClasses)
-        })
-    )
-}

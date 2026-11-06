@@ -37,7 +37,12 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: ./gradlew testProdDebugUnitTest $GRADLE_OPTS
+      # Depends on every module's unit tests. domain is a plain JVM module with no
+      # testProdDebugUnitTest task, so that name alone would skip it.
+      - run: ./gradlew jacocoFullReport $GRADLE_OPTS
+      - store_artifacts:
+          path: build/reports/jacoco/jacocoFullReport
+          destination: coverage
 
   android-tests-build:
     executor: easylineup-executor

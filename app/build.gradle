@@ -128,6 +128,9 @@ android {
         buildConfig true
         compose true
     }
+    testCoverage {
+        jacocoVersion = rootProject.ext.jacocoVersion
+    }
     lint {
         abortOnError false
     }
@@ -229,6 +232,5 @@ configurations.matching { it.name.contains("AndroidTest") }.configureEach {
     }
 }
 
-apply from: '../jacoco.gradle'
 apply from: '../dependency-check.gradle'
 apply from: '../detekt.gradle'

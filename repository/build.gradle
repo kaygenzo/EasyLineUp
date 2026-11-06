@@ -28,6 +28,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            enableUnitTestCoverage true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -50,6 +53,9 @@ android {
     }
     testOptions {
         targetSdk { version = release(targetVersion) }
+    }
+    testCoverage {
+        jacocoVersion = rootProject.ext.jacocoVersion
     }
 }
 

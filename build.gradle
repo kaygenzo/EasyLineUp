@@ -9,6 +9,8 @@ buildscript {
         minVersion = 21
         targetVersion = 36
         compileVersion = 36
+        // 0.8.8 is the first release that reads Java 17 class files.
+        jacocoVersion = "0.8.14"
     }
 }
 
@@ -29,6 +31,7 @@ plugins {
     alias(libs.plugins.compose.compiler) apply false
 }
 
+apply from: 'jacoco.gradle'
 apply from: 'sonar.gradle'
 
 spotless {

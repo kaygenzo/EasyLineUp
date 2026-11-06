@@ -151,15 +151,17 @@ Clean Architecture split):
 
 ### CI & quality gates
 
-- GitLab CI (`.gitlab-ci.yml`, `develop` branch): lint, `testProdDebugUnitTest`,
-  OWASP `dependencyCheckAnalyze`, `androidTest` APK assembly, Fastlane-driven
-  alpha deploys to Firebase App Distribution.
+- CircleCI (`.circleci/config.yml`): `jacocoFullReport` (every module's unit tests
+  plus coverage), `androidTest` APK assembly, Fastlane-driven alpha deploys,
+  Firebase App Distribution. Instrumented tests are built but not run in CI yet.
 - `detekt` (`detekt.gradle`, rules in `Formatting.yml`) enforces AOSP Kotlin
   style — 100-column `LONG_LINE`, run through Spotless — on every module;
-  Jacoco (`jacoco.gradle`, per-module `jacocoTestReport`) tracks coverage, with
-  `domain`'s pure data classes explicitly excluded so the number reflects tested
-  behavior rather than generated `equals`/`hashCode`/`copy`. Codacy and the
-  GitLab pipeline badges at the top of this file track both on `develop`.
+  Jacoco (`jacoco.gradle`, root `jacocoFullReport` task) reports unit test coverage
+  of all three modules in one place. Generated code, DI wiring, `domain`'s pure
+  data classes and Compose UI/Activities are excluded, so the number reflects what
+  unit tests are responsible for: Compose UI is covered by instrumented tests,
+  which this report doesn't include yet. Codacy and the GitLab pipeline badges at
+  the top of this file track both on `develop`.
 
 ## Libraries
 

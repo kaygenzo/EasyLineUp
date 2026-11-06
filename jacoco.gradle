@@ -1,82 +1,110 @@
+// Single unit-test coverage report across app, domain and repository, applied from the root
+// build.gradle. Run `./gradlew jacocoFullReport`: it runs every module's unit tests, then writes
+// build/reports/jacoco/jacocoFullReport/{html/index.html,jacocoFullReport.xml}.
 apply plugin: 'jacoco'
+
 jacoco {
-    toolVersion = "0.8.3"
+    toolVersion = jacocoVersion
 }
 
-project.afterEvaluate {
-    def productFlavorName = "prod"
-    def buildTypeName = "debug"
-    def sourceName = "${productFlavorName}${buildTypeName.capitalize()}"
-    def sourcePath = "${productFlavorName}/${buildTypeName}"
-
-    def testTaskName = "test${sourceName.capitalize()}UnitTest"
-
-    task "${testTaskName}Coverage" (type:JacocoReport, dependsOn: "$testTaskName") {
-        group = "Reporting"
-        description = "Generate Jacoco coverage reports on the ${sourceName.capitalize()} build."
-
-        def excludes = [
-                '**/R.class',
-                '**/R$*.class',
-                '**/BuildConfig.*',
-                '**/Manifest*.*',
-                '**/*Test*.*',
-                '**/com/example/databinding/*',
-                '**/com/example/generated/callback/*',
-                '**/android/databinding/*',
-                '**/androidx/databinding/*',
-                '**/di/module/*',
-                '**/*MapperImpl*.*',
-                '**/*$ViewInjector*.*',
-                '**/*$ViewBinder*.*',
-                '**/BuildConfig.*',
-                '**/*Component*.*',
-                '**/*BR*.*',
-                '**/Manifest*.*',
-                '**/*$Lambda$*.*',
-                '**/*Companion*.*',
-                '**/*Module.*',
-                '**/*Dagger*.*',
-                '**/*MembersInjector*.*',
-                '**/*_Factory*.*',
-                '**/*_Provide*Factory*.*',
-                '**/*Extensions*.*',
-                '**/*$Result.*', /* filtering `sealed` and `data` classes */
-                '**/*$Result$*.*'/* filtering `sealed` and `data` classes */
-        ]
-
-        def javaDebugTree = fileTree(
-                // Java generated classes on Android project (debug build)
-                dir: "${project.buildDir}/intermediates/javac/${sourceName}/classes",
-                excludes: excludes
-        )
-
-        def kotlinDebugTree = fileTree(
-                // Kotlin generated classes on Android project (debug build)
-                dir: "${project.buildDir}/tmp/kotlin-classes/${sourceName}",
-                excludes: excludes
-        )
-
-        classDirectories.setFrom(files([javaDebugTree], [kotlinDebugTree]))
-
-        def coverageSourceDirs = [
-                "${project.projectDir}/src/main/java",
-                "${project.projectDir}/src/main/kotlin",
-                "${project.projectDir}/src/$productFlavorName/java",
-                "${project.projectDir}/src/$buildTypeName/java",
-                "${project.projectDir}/src/$productFlavorName/kotlin",
-                "${project.projectDir}/src/$buildTypeName/kotlin"
-        ]
-
-        additionalSourceDirs.setFrom(files(coverageSourceDirs))
-        sourceDirectories.setFrom(files(coverageSourceDirs))
-        executionData(files([
-                "$project.buildDir/jacoco/${testTaskName}.exec"
-        ]))
-
-        reports {
-            xml.required = true
-            html.required = true
+subprojects {
+    plugins.withId('jacoco') {
+        jacoco {
+            toolVersion = rootProject.ext.jacocoVersion
         }
+    }
+}
+
+def generatedCode = [
+    '**/R.class',
+    '**/R$*.class',
+    '**/BuildConfig.*',
+    '**/Manifest*.*',
+    // Room-generated code. The SQL behind it is exercised by repository/androidTest instead.
+    '**/*_Impl*.*',
+]
+
+// Dependency wiring only, plus RepositoryModule's migrations, covered by MigrationTest.
+def dependencyInjection = [
+    '**/application/**',
+    '**/domain/DomainModule*.*',
+    '**/repository/RepositoryModule*.*',
+]
+
+// Rendering and Android entry points: these need a device and are covered by app/androidTest,
+// which this report does not include. Counting them here would only report "not unit tested"
+// for ~70% of app and bury the signal on the code unit tests are actually responsible for.
+// ViewModels, utils and export/json stay in on purpose. Once instrumented tests run in CI, merge
+// their coverage data into this report and drop this list.
+def composeUi = [
+    '**/*Activity*.*',
+    '**/ComposableSingletons*.*',
+    '**/*ScreenKt*.*',
+    '**/*RouteKt*.*',
+    '**/*SheetKt*.*',
+    '**/*SheetsKt*.*',
+    '**/compose/**',
+    '**/navigation/**',
+    '**/lineup/defense/**',
+    '**/lineup/attack/**',
+]
+
+// Pure data holders in domain.model (no logic beyond constructor properties) - excluded so
+// coverage reflects tested behavior rather than compiler-generated equals/hashCode/copy/toString.
+def pureModelDataClasses = [
+    'BatterState',
+    'DashboardTile',
+    'DpAndFlexConfiguration',
+    'GeoLocation',
+    'PlayerFieldPosition',
+    'PlayerGamesCount',
+    'PlayerInLineup',
+    'PlayerNumberOverlay',
+    'PlayerTournamentStats',
+    'PlayerWithPosition',
+    'PositionWithLineup',
+    'RosterItem',
+    'RosterPlayerStatus',
+    'ShirtNumberEntry',
+    'TeamRosterSummary',
+    'TournamentWithLineup',
+].collect { "**/domain/model/${it}.class" }
+
+def excludedClasses = generatedCode + dependencyInjection + composeUi + pureModelDataClasses
+
+def androidClasses = { String module ->
+    def classes = "$module/build/intermediates/built_in_kotlinc/prodDebug/compileProdDebugKotlin"
+    fileTree(dir: "$classes/classes", excludes: excludedClasses)
+}
+
+def androidExecutionData = { String module ->
+    "$module/build/outputs/unit_test_code_coverage/prodDebugUnitTest/testProdDebugUnitTest.exec"
+}
+
+tasks.register('jacocoFullReport', JacocoReport) {
+    group = 'Reporting'
+    description = 'Unit test coverage of app, domain and repository in a single report.'
+
+    dependsOn ':app:testProdDebugUnitTest', ':repository:testProdDebugUnitTest', ':domain:test'
+
+    executionData.from(
+        androidExecutionData('app'),
+        androidExecutionData('repository'),
+        'domain/build/jacoco/test.exec'
+    )
+    classDirectories.from(
+        androidClasses('app'),
+        androidClasses('repository'),
+        fileTree(dir: 'domain/build/classes/kotlin/main', excludes: excludedClasses)
+    )
+    sourceDirectories.from(
+        'app/src/main/java',
+        'repository/src/main/java',
+        'domain/src/main/java'
+    )
+
+    reports {
+        xml.required = true
+        html.required = true
     }
 }

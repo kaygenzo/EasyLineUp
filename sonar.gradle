@@ -28,7 +28,7 @@ sonarqube {
         property "sonar.coverage.exclusions", "**/test/**,**/androidTest/**,**/R.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*,**/com/example/databinding/*,**/com/example/generated/callback/*,**/*Dto*.*,**/android/databinding/*,**/androidx/databinding/*,**/di/module/*,**/*MapperImpl*.*,**/BuildConfig.*,**/*Component*.*,**/*BR*.*,**/Manifest*.*,**/*Companion*.*,**/*Module.*,**/*Dagger*.*,**/*MembersInjector*.*,**/*Extensions*.*,**/InputMethodManagerLeaks.*,**/*_Factory*.*,**/*_Provide*Factory*.*"
         property "sonar.androidLint.reportPaths", "build/reports/lint-results-prodDebug.xml"
         property "sonar.kotlin.detekt.reportPaths", "build/reports/detekt/detekt.xml"
-        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/testProdDebugUnitTestCoverage/testProdDebugUnitTestCoverage.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${rootProject.projectDir}/build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
         property "sonar.dependencyCheck.xmlReportPath", "build/reports/dependency-check-report.xml"
         property "sonar.dependencyCheck.jsonReportPath", "build/reports/dependency-check-report.json"
         property "sonar.dependencyCheck.htmlReportPath", "build/reports/dependency-check-report.html"
@@ -36,7 +36,7 @@ sonarqube {
 }
 
 //app
-project.tasks["sonarqube"].dependsOn ':app:testProdDebugUnitTestCoverage'
+project.tasks["sonarqube"].dependsOn ':jacocoFullReport'
 project.tasks["sonarqube"].dependsOn ':app:lintProdDebug'
 project.tasks["sonarqube"].dependsOn ':app:dependencyCheckAnalyze'
 project.tasks["sonarqube"].dependsOn ':app:detekt'
