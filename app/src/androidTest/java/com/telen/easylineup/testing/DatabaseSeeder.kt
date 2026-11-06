@@ -53,14 +53,18 @@ class DatabaseSeeder : KoinComponent {
         seedLineup(TeamType.BASEBALL, TeamStrategy.STANDARD)
 
     /** [seedCoreFixture] for any team type and strategy, not just baseball's standard one. */
-    suspend fun seedLineup(teamType: TeamType, strategy: TeamStrategy): SeededFixture {
+    suspend fun seedLineup(
+        teamType: TeamType,
+        strategy: TeamStrategy,
+        extraHitters: Int = 0
+    ): SeededFixture {
         clear()
         val teamId = teamRepository.insertTeam(TestFixtures.team(teamType))
         val playerIds = TestFixtures.players(teamId, strategy)
             .map { playerRepository.insertPlayer(it) }
         val tournamentId = tournamentRepository.insertTournament(TestFixtures.tournament())
         val lineupId = lineupRepository.insertLineup(
-            TestFixtures.lineup(teamId, tournamentId, strategy)
+            TestFixtures.lineup(teamId, tournamentId, strategy, extraHitters)
         )
         playerFieldPositionRepository.insertPlayerFieldPositions(
             TestFixtures.playerFieldPositions(lineupId, playerIds, strategy)

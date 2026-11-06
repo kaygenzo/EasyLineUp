@@ -22,7 +22,8 @@ import org.junit.runner.Description
 class SeedDatabaseRule(
     private val mode: Mode = Mode.CORE_FIXTURE,
     private val teamType: TeamType = TeamType.BASEBALL,
-    private val strategy: TeamStrategy = TeamStrategy.STANDARD
+    private val strategy: TeamStrategy = TeamStrategy.STANDARD,
+    private val extraHitters: Int = 0
 ) : TestWatcher() {
     enum class Mode {
         CORE_FIXTURE,
@@ -44,7 +45,8 @@ class SeedDatabaseRule(
                 Mode.TEAM_WITHOUT_LINEUP -> fixture = seeder.seedTeamWithoutLineup()
                 Mode.CORE_FIXTURE_WITH_SECOND_TEAM ->
                     fixture = seeder.seedCoreFixtureWithSecondTeam()
-                Mode.LINEUP_VARIANT -> fixture = seeder.seedLineup(teamType, strategy)
+                Mode.LINEUP_VARIANT ->
+                    fixture = seeder.seedLineup(teamType, strategy, extraHitters)
             }
         }
     }

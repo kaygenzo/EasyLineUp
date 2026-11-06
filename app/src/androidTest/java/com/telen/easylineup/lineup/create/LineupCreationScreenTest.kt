@@ -13,17 +13,22 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
+import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 /**
  * Covers [LineupCreationScreen]: render, name entry, picking an existing tournament, creating
@@ -33,12 +38,14 @@ import org.junit.runner.RunWith
  * test plan).
  */
 @RunWith(AndroidJUnit4::class)
-class LineupCreationScreenTest {
+class LineupCreationScreenTest : KoinComponent {
     @get:Rule(order = 0)
     val seedRule = SeedDatabaseRule()
 
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<HomeActivity>()
+
+    private val lineups: LineupRepository by inject()
 
     @Before
     fun openLineupCreation() {
@@ -153,6 +160,26 @@ class LineupCreationScreenTest {
         composeTestRule.onNodeWithText(string(R.string.lineup_creation_save)).performClick()
 
         composeTestRule.waitForAbsence(string(R.string.lineup_creation_header_title))
+    }
+
+    @Test
+    fun selectedExtraHittersAreSaved() {
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_name_placeholder))
+            .performTextInput("Scrimmage")
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_tournament_placeholder))
+            .performClick()
+        composeTestRule.waitForText(string(R.string.lineup_creation_tournament_sheet_title))
+        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).performClick()
+        composeTestRule.waitForAbsence(string(R.string.lineup_creation_tournament_sheet_title))
+        composeTestRule.onNodeWithText("2").performClick()
+
+        composeTestRule.onNodeWithText(string(R.string.lineup_creation_save)).performClick()
+        composeTestRule.waitForAbsence(string(R.string.lineup_creation_header_title))
+
+        val created = runBlocking { lineups.getLineups() }.single { it.name == "Scrimmage" }
+        assertEquals(2, created.extraHitters)
     }
 
     @Test

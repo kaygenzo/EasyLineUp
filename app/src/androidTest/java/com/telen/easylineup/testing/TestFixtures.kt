@@ -81,13 +81,14 @@ object TestFixtures {
     fun lineup(
         teamId: Long,
         tournamentId: Long,
-        strategy: TeamStrategy = STRATEGY
+        strategy: TeamStrategy = STRATEGY,
+        extraHitters: Int = 0
     ): Lineup = Lineup(
         name = LINEUP_NAME,
         teamId = teamId,
         tournamentId = tournamentId,
         strategy = strategy.id,
-        extraHitters = 0,
+        extraHitters = extraHitters,
         eventTimeInMillis = System.currentTimeMillis()
     )
 
