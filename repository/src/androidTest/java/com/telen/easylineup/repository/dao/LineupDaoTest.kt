@@ -163,4 +163,45 @@ class LineupDaoTest {
         assertEquals(1, rows.size)
         assertEquals("Fall Lineup", rows.single().lineupName)
     }
+
+    @Test
+    fun getLastLineupReturnsTheMostRecentlyEditedLineupOfTheTeam() = runBlocking {
+        val teamId = insertTeam("Riverside Hawks")
+        val tournamentId = insertTournament("Fall Classic", createdAt = 1_000L)
+        lineupDao.insertLineup(editedLineup("Older", teamId, tournamentId, editedAt = 1_000L))
+        lineupDao.insertLineup(editedLineup("Latest", teamId, tournamentId, editedAt = 3_000L))
+        lineupDao.insertLineup(editedLineup("Middle", teamId, tournamentId, editedAt = 2_000L))
+
+        assertEquals("Latest", lineupDao.getLastLineup(teamId)?.name)
+    }
+
+    @Test
+    fun getLastLineupIgnoresAMoreRecentLineupFromAnotherTeam() = runBlocking {
+        val teamId = insertTeam("Riverside Hawks")
+        val otherTeamId = insertTeam("Lakeside Bears")
+        val tournamentId = insertTournament("Fall Classic", createdAt = 1_000L)
+        lineupDao.insertLineup(editedLineup("Mine", teamId, tournamentId, editedAt = 1_000L))
+        lineupDao.insertLineup(editedLineup("Theirs", otherTeamId, tournamentId, editedAt = 2_000L))
+
+        assertEquals("Mine", lineupDao.getLastLineup(teamId)?.name)
+    }
+
+    @Test
+    fun getLastLineupReturnsNullForATeamWithoutLineups() = runBlocking {
+        val teamId = insertTeam("Riverside Hawks")
+
+        assertNull(lineupDao.getLastLineup(teamId))
+    }
+
+    private fun editedLineup(
+        name: String,
+        teamId: Long,
+        tournamentId: Long,
+        editedAt: Long
+    ) = RoomLineup(
+        name = name,
+        teamId = teamId,
+        tournamentId = tournamentId,
+        editedTimeInMillis = editedAt
+    )
 }

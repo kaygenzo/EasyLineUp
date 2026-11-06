@@ -15,6 +15,7 @@ import com.telen.easylineup.repository.model.RoomTournament
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -118,5 +119,110 @@ class PlayerFieldPositionsDaoTest {
         val result = dao.getMostUsedPlayers(teamId)
 
         assertEquals(listOf(firstInsertedId, secondInsertedId), result.map { it.playerId })
+    }
+
+    @Test
+    fun getAllPlayersWithPositionsForLineupJoinsPlayersAndSortsByBattingOrder() = runBlocking {
+        val teamId = insertTeam("Riverside Hawks")
+        val tournamentId = insertTournament("Fall Classic")
+        val lineupId = insertLineup(teamId, tournamentId, "Game 1")
+        val secondBatter = insertPlayer(teamId, "Second Batter")
+        val firstBatter = insertPlayer(teamId, "First Batter")
+        dao.insertPlayerFieldPositions(
+            listOf(
+                RoomPlayerFieldPosition(
+                    playerId = secondBatter,
+                    lineupId = lineupId,
+                    position = 2,
+                    order = 2
+                ),
+                RoomPlayerFieldPosition(
+                    playerId = firstBatter,
+                    lineupId = lineupId,
+                    position = 1,
+                    order = 1
+                )
+            )
+        )
+
+        val rows = dao.getAllPlayersWithPositionsForLineup(lineupId)
+
+        assertEquals(listOf("First Batter", "Second Batter"), rows.map { it.playerName })
+        assertEquals(listOf(1, 2), rows.map { it.position })
+        assertEquals(listOf(lineupId, lineupId), rows.map { it.lineupId })
+    }
+
+    @Test
+    fun getAllPlayersWithPositionsForLineupExcludesOtherLineups() = runBlocking {
+        val teamId = insertTeam("Riverside Hawks")
+        val tournamentId = insertTournament("Fall Classic")
+        val lineupId = insertLineup(teamId, tournamentId, "Game 1")
+        val otherLineupId = insertLineup(teamId, tournamentId, "Game 2")
+        val playerId = insertPlayer(teamId, "Player")
+        dao.insertPlayerFieldPositions(
+            listOf(RoomPlayerFieldPosition(playerId = playerId, lineupId = otherLineupId))
+        )
+
+        assertTrue(dao.getAllPlayersWithPositionsForLineup(lineupId).isEmpty())
+    }
+
+    @Test
+    fun getAllPositionsForPlayerJoinsNamesAndSortsByMostRecentlyEditedLineup() = runBlocking {
+        val teamId = insertTeam("Riverside Hawks")
+        val tournamentId = insertTournament("Fall Classic")
+        val playerId = insertPlayer(teamId, "Player")
+        val olderLineupId = db.lineupDao().insertLineup(
+            RoomLineup(
+                name = "Older",
+                teamId = teamId,
+                tournamentId = tournamentId,
+                editedTimeInMillis = 1_000L
+            )
+        )
+        val latestLineupId = db.lineupDao().insertLineup(
+            RoomLineup(
+                name = "Latest",
+                teamId = teamId,
+                tournamentId = tournamentId,
+                editedTimeInMillis = 2_000L
+            )
+        )
+        dao.insertPlayerFieldPositions(
+            listOf(
+                RoomPlayerFieldPosition(
+                    playerId = playerId,
+                    lineupId = olderLineupId,
+                    position = 1
+                ),
+                RoomPlayerFieldPosition(
+                    playerId = playerId,
+                    lineupId = latestLineupId,
+                    position = 2
+                )
+            )
+        )
+
+        val rows = dao.getAllPositionsForPlayer(playerId)
+
+        assertEquals(listOf("Latest", "Older"), rows.map { it.lineupName })
+        assertEquals(listOf(2, 1), rows.map { it.position })
+        assertEquals(
+            listOf("Fall Classic", "Fall Classic"),
+            rows.map { it.tournamentName }
+        )
+    }
+
+    @Test
+    fun getAllPositionsForPlayerExcludesOtherPlayers() = runBlocking {
+        val teamId = insertTeam("Riverside Hawks")
+        val tournamentId = insertTournament("Fall Classic")
+        val lineupId = insertLineup(teamId, tournamentId, "Game 1")
+        val playerId = insertPlayer(teamId, "Player")
+        val otherPlayerId = insertPlayer(teamId, "Other Player")
+        dao.insertPlayerFieldPositions(
+            listOf(RoomPlayerFieldPosition(playerId = otherPlayerId, lineupId = lineupId))
+        )
+
+        assertTrue(dao.getAllPositionsForPlayer(playerId).isEmpty())
     }
 }
