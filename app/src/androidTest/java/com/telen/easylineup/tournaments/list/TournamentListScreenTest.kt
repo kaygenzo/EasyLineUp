@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.tournaments.list
 
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
@@ -20,7 +19,6 @@ import com.telen.easylineup.R
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
-import com.telen.easylineup.testing.ThemeTestUtils
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -32,7 +30,7 @@ import org.junit.runner.RunWith
 
 /**
  * Covers [TournamentListScreen]: render, every interaction (search, expand/collapse, navigate
- * to a lineup, create-lineup FAB, delete), rotation, and light/dark theme - the full matrix
+ * to a lineup, create-lineup FAB, delete), and rotation - the full matrix
  * policy for a core screen (see the test plan). The nested edit-lineup/roster sheet reachable
  * from here shares its roster-toggling logic with LineupCreation's own test, so it isn't
  * re-exercised in depth here.
@@ -55,8 +53,7 @@ class TournamentListScreenTest {
     }
 
     @After
-    fun resetThemeAndOrientation() {
-        ThemeTestUtils.resetNightMode()
+    fun resetOrientation() {
         OrientationTestUtils.rotateToPortrait()
     }
 
@@ -160,21 +157,5 @@ class TournamentListScreenTest {
 
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForIdle()
-    }
-
-    @Test
-    fun rendersInDarkTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).assertIsDisplayed()
-    }
-
-    @Test
-    fun rendersInLightTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).assertIsDisplayed()
     }
 }

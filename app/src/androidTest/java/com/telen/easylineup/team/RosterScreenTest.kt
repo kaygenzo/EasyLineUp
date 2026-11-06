@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.team
 
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -22,7 +21,6 @@ import com.telen.easylineup.player.PlayerFormTestTags
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
-import com.telen.easylineup.testing.ThemeTestUtils
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -33,7 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Covers [RosterScreen]: render, every interaction, rotation, and light/dark theme - the full
+ * Covers [RosterScreen]: render, every interaction, and rotation - the full
  * matrix policy for a core screen (see the test plan). Reached by navigating from Dashboard's
  * roster-size stat, same as a real user would, rather than deep-linking the route directly.
  */
@@ -58,8 +56,7 @@ class RosterScreenTest {
     }
 
     @After
-    fun resetThemeAndOrientation() {
-        ThemeTestUtils.resetNightMode()
+    fun resetOrientation() {
         OrientationTestUtils.rotateToPortrait()
     }
 
@@ -142,7 +139,14 @@ class RosterScreenTest {
         // asserting the form closed) proves the player was actually written to the database,
         // not just reflected in the form's own in-memory state.
         composeTestRule.waitForAbsence(string(R.string.player_form_title_create))
-        composeTestRule.waitForText("Brand New Player")
+        // Scrolls first: the new name sorts above the rest, and the list can stay anchored on
+        // the row it was showing, which leaves the new row just out of view.
+        composeTestRule.waitUntil(5_000) {
+            runCatching {
+                composeTestRule.onNodeWithTag(RosterTestTags.PLAYER_LIST)
+                    .performScrollToNode(hasText("Brand New Player"))
+            }.isSuccess
+        }
         composeTestRule.onNodeWithText("Brand New Player").assertIsDisplayed()
     }
 
@@ -190,21 +194,5 @@ class RosterScreenTest {
 
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForIdle()
-    }
-
-    @Test
-    fun rendersInDarkTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText("Starter 1").assertIsDisplayed()
-    }
-
-    @Test
-    fun rendersInLightTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText("Starter 1").assertIsDisplayed()
     }
 }

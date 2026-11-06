@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.player
 
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -26,7 +25,6 @@ import com.telen.easylineup.R
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
-import com.telen.easylineup.testing.ThemeTestUtils
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -39,8 +37,8 @@ import org.junit.runner.RunWith
 /**
  * Covers [PlayerProfileScreen] (view) and [PlayerFormScreen] (edit), reached together via the
  * roster's "Starter 1" row - render, every interaction across both screens (edit/save,
- * validation, discard confirmation, delete, the profile pager's swipe), rotation, and
- * light/dark theme, the full matrix policy for a core screen (see the test plan).
+ * validation, discard confirmation, delete, the profile pager's swipe) and rotation, the full
+ * matrix policy for a core screen (see the test plan).
  *
  * Roster is sorted alphabetically by default (case-insensitive): "Starter 1" is immediately
  * followed by "Starter 10" (a string-prefix, not "Starter 2" - "Starter 10" < "Starter 2"
@@ -68,8 +66,7 @@ class PlayerProfileScreenTest {
     }
 
     @After
-    fun resetThemeAndOrientation() {
-        ThemeTestUtils.resetNightMode()
+    fun resetOrientation() {
         OrientationTestUtils.rotateToPortrait()
     }
 
@@ -165,21 +162,5 @@ class PlayerProfileScreenTest {
 
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForIdle()
-    }
-
-    @Test
-    fun rendersInDarkTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText("Starter 1").assertIsDisplayed()
-    }
-
-    @Test
-    fun rendersInLightTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText("Starter 1").assertIsDisplayed()
     }
 }

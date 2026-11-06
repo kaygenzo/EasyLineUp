@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.settings
 
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
@@ -35,8 +34,8 @@ import org.junit.runner.RunWith
  * Covers [SettingsScreen]: render of the fixture's preference defaults, picking a lineup font
  * style, picking a day/night theme (a real [SharedPreferencesUtils]-backed, process-wide
  * setting - reset in [resetPreferencesAndTheme] so it can't leak into another test), opening
- * and cancelling the delete-all-data confirmation, back navigation, rotation, and light/dark
- * theme - the full matrix policy for a core screen (see the test plan).
+ * and cancelling the delete-all-data confirmation, back navigation and rotation - the full
+ * matrix policy for a core screen (see the test plan).
  *
  * Not covered, deliberately: export/import (launch real `ActivityResultContract` file pickers,
  * the same external-flow boundary the import-flow's own Phase 3 coverage owns), the men/women
@@ -185,21 +184,5 @@ class SettingsScreenTest {
 
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForIdle()
-    }
-
-    @Test
-    fun rendersInDarkTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText(string(R.string.title_settings)).assertIsDisplayed()
-    }
-
-    @Test
-    fun rendersInLightTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText(string(R.string.title_settings)).assertIsDisplayed()
     }
 }

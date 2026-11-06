@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.lineup.create
 
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -17,7 +16,6 @@ import com.telen.easylineup.R
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
-import com.telen.easylineup.testing.ThemeTestUtils
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -31,7 +29,7 @@ import org.junit.runner.RunWith
  * Covers [LineupCreationScreen]: render, name entry, picking an existing tournament, creating
  * a new one inline (the exact flow that regressed the SaveTournament id-propagation bug fixed
  * earlier this session - this keeps it covered), toggling the roster, strategy/extra-hitters,
- * save, rotation, and light/dark theme - the full matrix policy for a core screen (see the
+ * save, and rotation - the full matrix policy for a core screen (see the
  * test plan).
  */
 @RunWith(AndroidJUnit4::class)
@@ -59,8 +57,7 @@ class LineupCreationScreenTest {
     }
 
     @After
-    fun resetThemeAndOrientation() {
-        ThemeTestUtils.resetNightMode()
+    fun resetOrientation() {
         OrientationTestUtils.rotateToPortrait()
     }
 
@@ -194,25 +191,5 @@ class LineupCreationScreenTest {
 
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForIdle()
-    }
-
-    @Test
-    fun rendersInDarkTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        composeTestRule.waitForIdle()
-
-        composeTestRule
-            .onNodeWithText(string(R.string.lineup_creation_header_title))
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun rendersInLightTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        composeTestRule.waitForIdle()
-
-        composeTestRule
-            .onNodeWithText(string(R.string.lineup_creation_header_title))
-            .assertIsDisplayed()
     }
 }

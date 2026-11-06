@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.dashboard
 
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -20,7 +19,6 @@ import com.telen.easylineup.R
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
-import com.telen.easylineup.testing.ThemeTestUtils
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForText
 import org.junit.After
@@ -30,7 +28,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Covers [DashboardScreen]: render, every interaction, rotation, and light/dark theme - the
+ * Covers [DashboardScreen]: render, every interaction, and rotation - the
  * full matrix policy for a core screen (see the test plan).
  */
 @RunWith(AndroidJUnit4::class)
@@ -50,8 +48,7 @@ class DashboardScreenTest {
     }
 
     @After
-    fun resetThemeAndOrientation() {
-        ThemeTestUtils.resetNightMode()
+    fun resetOrientation() {
         OrientationTestUtils.rotateToPortrait()
     }
 
@@ -142,23 +139,5 @@ class DashboardScreenTest {
 
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForIdle()
-    }
-
-    @Test
-    fun rendersInDarkTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
-        composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME).assertIsDisplayed()
-    }
-
-    @Test
-    fun rendersInLightTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
-        composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME).assertIsDisplayed()
     }
 }

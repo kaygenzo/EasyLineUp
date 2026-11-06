@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.tournaments.statistics
 
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -20,7 +19,6 @@ import com.telen.easylineup.R
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
-import com.telen.easylineup.testing.ThemeTestUtils
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -32,8 +30,8 @@ import org.junit.runner.RunWith
 
 /**
  * Covers [TournamentStatisticsScreen]: render of the fixture's playing-time ranking, opening
- * the per-player position-usage drill-down picker, back navigation, rotation, and light/dark
- * theme - the full matrix policy for a core screen (see the test plan).
+ * the per-player position-usage drill-down picker, back navigation and rotation - the full
+ * matrix policy for a core screen (see the test plan).
  */
 @RunWith(AndroidJUnit4::class)
 class TournamentStatisticsScreenTest {
@@ -62,8 +60,7 @@ class TournamentStatisticsScreenTest {
     }
 
     @After
-    fun resetThemeAndOrientation() {
-        ThemeTestUtils.resetNightMode()
+    fun resetOrientation() {
         OrientationTestUtils.rotateToPortrait()
     }
 
@@ -115,25 +112,5 @@ class TournamentStatisticsScreenTest {
 
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForIdle()
-    }
-
-    @Test
-    fun rendersInDarkTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        composeTestRule.waitForIdle()
-
-        composeTestRule
-            .onNodeWithText(string(R.string.title_tournament_statistics))
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun rendersInLightTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        composeTestRule.waitForIdle()
-
-        composeTestRule
-            .onNodeWithText(string(R.string.title_tournament_statistics))
-            .assertIsDisplayed()
     }
 }

@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.lineup
 
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -20,7 +19,6 @@ import com.telen.easylineup.lineup.defense.DefenseTestTags
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
-import com.telen.easylineup.testing.ThemeTestUtils
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForTag
@@ -34,7 +32,7 @@ import org.junit.runner.RunWith
 /**
  * Covers [LineupScreen]: render, Defense/Offense tab switching, entering edit mode, assigning a
  * substitute to a position, the DP/Flex linking sheet, the discard confirmation, delete,
- * rotation, and light/dark theme - the full matrix policy for a core screen (see the test plan).
+ * and rotation - the full matrix policy for a core screen (see the test plan).
  *
  * Not covered, deliberately: the share action (tapping it launches a real system chooser Intent
  * - intercepting it without actually leaving the app would need the `espresso-intents`
@@ -65,8 +63,7 @@ class LineupScreenTest {
     }
 
     @After
-    fun resetThemeAndOrientation() {
-        ThemeTestUtils.resetNightMode()
+    fun resetOrientation() {
         OrientationTestUtils.rotateToPortrait()
     }
 
@@ -224,21 +221,6 @@ class LineupScreenTest {
         composeTestRule.waitForIdle()
     }
 
-    @Test
-    fun rendersInDarkTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME.uppercase()).assertIsDisplayed()
-    }
-
-    @Test
-    fun rendersInLightTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME.uppercase()).assertIsDisplayed()
-    }
 }
 
 private val FieldPosition.markerTag: String

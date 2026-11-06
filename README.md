@@ -149,6 +149,15 @@ Clean Architecture split):
   `cloudtestingscreenshotter`/Screengrab, run with a custom
   `EasylineupAndroidTestRunner`, against the `demo` flavor's seeded data.
 
+### Screenshot tests
+
+`ScreenPreviewsScreenshotTest` renders every full-screen `@DugoutPreviews` preview
+on the JVM (Roborazzi + Robolectric) in light, dark and large landscape, against
+the reference images in `app/src/test/screenshots`. Plain unit test runs skip the
+rendering, so these run only on demand and not in CI yet:
+`./gradlew verifyRoborazziProdDebug` checks them, and
+`./gradlew recordRoborazziProdDebug` regenerates them after an intended change.
+
 ### CI & quality gates
 
 - CircleCI (`.circleci/config.yml`): `jacocoFullReport` (every module's unit tests

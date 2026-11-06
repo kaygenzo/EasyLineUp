@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.team.details
 
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -17,7 +16,6 @@ import com.telen.easylineup.R
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
-import com.telen.easylineup.testing.ThemeTestUtils
 import com.telen.easylineup.testing.pluralString
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
@@ -30,7 +28,7 @@ import org.junit.runner.RunWith
 
 /**
  * Covers [TeamDetailsScreen]: render of the fixture's team stats, opening and cancelling the
- * delete-team confirmation, rotation, and light/dark theme - the full matrix policy for a core
+ * delete-team confirmation, and rotation - the full matrix policy for a core
  * screen (see the test plan).
  *
  * Not covered, deliberately: actually confirming the delete. The fixture's team is the only
@@ -63,8 +61,7 @@ class TeamDetailsScreenTest {
     }
 
     @After
-    fun resetThemeAndOrientation() {
-        ThemeTestUtils.resetNightMode()
+    fun resetOrientation() {
         OrientationTestUtils.rotateToPortrait()
     }
 
@@ -116,21 +113,5 @@ class TeamDetailsScreenTest {
 
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForIdle()
-    }
-
-    @Test
-    fun rendersInDarkTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
-    }
-
-    @Test
-    fun rendersInLightTheme() {
-        ThemeTestUtils.applyNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
     }
 }
