@@ -35,6 +35,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -43,6 +44,7 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 
 /**
  * Unit tests for [LineupCreationViewModel]. Every use case is mocked directly (each already has
@@ -366,5 +368,127 @@ internal class LineupCreationViewModelTest {
         viewModel.onDiscardDismiss()
 
         assertFalse(viewModel.uiState.value.showDiscardSheet)
+    }
+
+    private fun buildViewModel() = LineupCreationViewModel(
+        observeTournaments,
+        getTeam,
+        getRoster,
+        createLineup,
+        saveTournament,
+        toggleRosterPlayerUseCase,
+        clearRosterUseCase,
+        resolveLineupEventTimeUseCase
+    )
+
+    @Test
+    fun shouldStopLoadingWhenTheRosterCannotBeRead() = runTest {
+        runBlocking {
+            Mockito.`when`(getRoster()).thenReturn(Result.failure(Exception("boom")))
+        }
+
+        val state = buildViewModel().uiState.value
+
+        assertFalse(state.isLoading)
+        assertTrue(state.roster.players.isEmpty())
+    }
+
+    @Test
+    fun shouldKeepTheDefaultStrategyWhenTheTeamCannotBeRead() = runTest {
+        runBlocking {
+            Mockito.`when`(getTeam()).thenReturn(Result.failure(Exception("boom")))
+        }
+
+        assertEquals(TeamStrategy.STANDARD, buildViewModel().uiState.value.strategy)
+    }
+
+    @Test
+    fun shouldSaveANewTournamentWithItsAddress() = runTest {
+        val captor = argumentCaptor<Tournament>()
+        val saved = Tournament(id = 7L, name = "Cup", createdAt = 1L, startTime = 0L, endTime = 0L)
+        runBlocking { Mockito.`when`(saveTournament(any())).thenReturn(Result.success(saved)) }
+        Mockito.`when`(resolveLineupEventTimeUseCase(any(), any())).thenReturn(5L)
+        viewModel.onNewTournamentNameChanged("Cup")
+        viewModel.onNewTournamentAddressChanged("Stadium")
+
+        viewModel.onAddNewTournament()
+        advanceUntilIdle()
+
+        runBlocking { Mockito.verify(saveTournament)(captor.capture()) }
+        assertEquals("Stadium", captor.firstValue.address)
+    }
+
+    @Test
+    fun shouldSaveABlankAddressAsNoAddress() = runTest {
+        val captor = argumentCaptor<Tournament>()
+        val saved = Tournament(id = 7L, name = "Cup", createdAt = 1L, startTime = 0L, endTime = 0L)
+        runBlocking { Mockito.`when`(saveTournament(any())).thenReturn(Result.success(saved)) }
+        Mockito.`when`(resolveLineupEventTimeUseCase(any(), any())).thenReturn(5L)
+        viewModel.onNewTournamentAddressChanged("   ")
+
+        viewModel.onAddNewTournament()
+        advanceUntilIdle()
+
+        runBlocking { Mockito.verify(saveTournament)(captor.capture()) }
+        assertNull(captor.firstValue.address)
+    }
+
+    @Test
+    fun shouldKeepTheSheetOpenWhenSavingANewTournamentFails() = runTest {
+        runBlocking {
+            Mockito.`when`(saveTournament(any())).thenReturn(Result.failure(Exception("boom")))
+        }
+        viewModel.onNewTournamentSheetOpen()
+        viewModel.onNewTournamentNameChanged("Cup")
+
+        viewModel.onAddNewTournament()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.showNewTournamentSheet)
+        assertNull(state.selectedTournament)
+    }
+
+    @Test
+    fun shouldRequestDiscardConfirmationWhenATournamentWasPicked() = runTest {
+        Mockito.`when`(resolveLineupEventTimeUseCase(any(), any())).thenReturn(5L)
+        viewModel.onTournamentSelected(
+            Tournament(id = 7L, name = "Cup", createdAt = 1L, startTime = 0L, endTime = 0L)
+        )
+
+        assertFalse(viewModel.onCancelRequested())
+        assertTrue(viewModel.uiState.value.showDiscardSheet)
+    }
+
+    @Test
+    fun shouldSaveTheLineupUnderTheSelectedTournament() = runTest {
+        val captor = argumentCaptor<Lineup>()
+        Mockito.`when`(resolveLineupEventTimeUseCase(any(), any())).thenReturn(5L)
+        runBlocking {
+            Mockito.`when`(createLineup(any(), any())).thenReturn(Result.success(Lineup(id = 3L)))
+        }
+        viewModel.onTournamentSelected(
+            Tournament(id = 7L, name = "Cup", createdAt = 1L, startTime = 0L, endTime = 0L)
+        )
+
+        viewModel.onSaveClick()
+        advanceUntilIdle()
+
+        runBlocking { Mockito.verify(createLineup)(captor.capture(), any()) }
+        assertEquals(7L, captor.firstValue.tournamentId)
+    }
+
+    @Test
+    fun shouldFlagNoFieldWhenSavingFailsForAnotherReason() = runTest {
+        runBlocking {
+            Mockito.`when`(createLineup(any(), any()))
+                .thenReturn(Result.failure(IllegalStateException("db error")))
+        }
+
+        viewModel.onSaveClick()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.nameError)
+        assertFalse(viewModel.uiState.value.tournamentError)
     }
 }

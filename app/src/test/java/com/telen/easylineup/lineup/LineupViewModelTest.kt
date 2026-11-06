@@ -13,10 +13,10 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.ClearRoster
 import com.telen.easylineup.domain.usecases.DeleteLineup
@@ -39,6 +39,7 @@ import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.testDispatcherProvider
+import com.telen.easylineup.utils.LineupExportData
 import com.telen.easylineup.utils.LineupPdfWriter
 import com.telen.easylineup.utils.LineupStylePreference
 import com.telen.easylineup.views.LineupTypeface
@@ -62,6 +63,7 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 
 /**
@@ -754,5 +756,269 @@ internal class LineupViewModelTest {
         val state = viewModel.uiState.value
         assertFalse(state.showRosterEditDiscardSheet)
         assertTrue(state.showRosterEditSheet)
+    }
+
+    private val loadedLineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
+    private val aPlayer =
+        Player(id = 1L, teamId = 1L, name = "p1", shirtNumber = 1, licenseNumber = 1L)
+
+    @Test
+    fun shouldNotObserveAnythingWithoutALineupId() {
+        viewModel.lineupId = null
+
+        Mockito.verifyNoInteractions(observeLineupByIdUseCase)
+    }
+
+    @Test
+    fun shouldStillLoadTheLineupWhenTheTeamCannotBeRead() = runTest {
+        Mockito.`when`(getTeamUseCase()).thenReturn(Result.failure(Exception("boom")))
+
+        loadLineup(loadedLineup, listOf(player(1L)))
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.uiState.value.defensePlayers.size)
+    }
+
+    @Test
+    fun shouldKeepPreviousBattersWhenRecomputingFails() = runTest {
+        Mockito.`when`(getBattersStateUseCase(any(), any(), any(), any(), any(), any()))
+            .thenReturn(Result.failure(Exception("boom")))
+
+        loadLineup(loadedLineup, listOf(player(1L)))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.batters.isEmpty())
+    }
+
+    @Test
+    fun shouldComputeBattersForEditModeWhenEditable() = runTest {
+        viewModel.editable = true
+
+        loadLineup(loadedLineup, listOf(player(1L)))
+        advanceUntilIdle()
+
+        Mockito.verify(getBattersStateUseCase, Mockito.atLeastOnce())(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            eq(true)
+        )
+    }
+
+    @Test
+    fun shouldDeleteAPositionWithDefaultsBeforeTheLineupIsLoaded() = runTest {
+        Mockito.`when`(deletePlayerFieldPositionUseCase(any(), any(), any(), any()))
+            .thenReturn(Result.success(Unit))
+
+        viewModel.onDeletePosition(aPlayer)
+        advanceUntilIdle()
+
+        Mockito.verify(deletePlayerFieldPositionUseCase)(any(), eq(aPlayer), eq(0), eq(0))
+        Mockito.verify(getBattersStateUseCase, Mockito.never())(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any()
+        )
+    }
+
+    @Test
+    fun shouldNotRecomputeWhenDeletingAPositionFails() = runTest {
+        loadLineup(loadedLineup)
+        advanceUntilIdle()
+        Mockito.clearInvocations(getBattersStateUseCase)
+        Mockito.`when`(deletePlayerFieldPositionUseCase(any(), any(), any(), any()))
+            .thenReturn(Result.failure(Exception("boom")))
+
+        viewModel.onDeletePosition(aPlayer)
+        advanceUntilIdle()
+
+        Mockito.verifyNoInteractions(getBattersStateUseCase)
+    }
+
+    @Test
+    fun shouldIgnoreLineupModeChangesBeforeTheLineupIsLoaded() = runTest {
+        viewModel.onLineupModeChanged(true)
+        advanceUntilIdle()
+
+        Mockito.verifyNoInteractions(setLineupModeUseCase)
+    }
+
+    @Test
+    fun shouldKeepTheLineupModeWhenChangingItFails() = runTest {
+        loadLineup(loadedLineup)
+        advanceUntilIdle()
+        Mockito.`when`(setLineupModeUseCase(any(), any(), any()))
+            .thenReturn(Result.failure(Exception("boom")))
+
+        viewModel.onLineupModeChanged(true)
+        advanceUntilIdle()
+
+        assertEquals(0, viewModel.uiState.value.lineupMode)
+    }
+
+    @Test
+    fun shouldExportAnEmptyCardBeforeTheLineupIsLoaded() = runTest {
+        val captor = argumentCaptor<LineupExportData>()
+        Mockito.`when`(context.getString(Mockito.anyInt(), any())).thenReturn("Share subject")
+        Mockito.`when`(lineupPdfWriter.write(any())).thenReturn(Mockito.mock(Uri::class.java))
+
+        Mockito.mockConstruction(Intent::class.java).use {
+            viewModel.exportLineupToExternalStorage(context)
+        }
+
+        Mockito.verify(lineupPdfWriter).write(captor.capture())
+        assertEquals("", captor.firstValue.lineupName)
+        assertEquals(0L, captor.firstValue.eventTimeInMillis)
+    }
+
+    @Test
+    fun shouldFallBackToFirstBaseForAPlayerWithoutAValidPosition() = runTest {
+        Mockito.`when`(switchPlayersPositionUseCase(any(), any(), any(), any()))
+            .thenReturn(Result.success(Unit))
+        loadLineup(loadedLineup)
+        advanceUntilIdle()
+
+        viewModel.switchPlayersPosition(player(1L), player(2L))
+        viewModel.switchPlayersPosition(player(1L), FieldPosition.PITCHER)
+        advanceUntilIdle()
+
+        Mockito.verify(switchPlayersPositionUseCase)(
+            any(),
+            eq(FieldPosition.FIRST_BASE),
+            eq(FieldPosition.FIRST_BASE),
+            eq(loadedLineup)
+        )
+        Mockito.verify(switchPlayersPositionUseCase)(
+            any(),
+            eq(FieldPosition.FIRST_BASE),
+            eq(FieldPosition.PITCHER),
+            eq(loadedLineup)
+        )
+    }
+
+    @Test
+    fun shouldNotRecomputeWhenSwitchingPlayersFails() = runTest {
+        Mockito.`when`(switchPlayersPositionUseCase(any(), any(), any(), any()))
+            .thenReturn(Result.failure(Exception("boom")))
+        loadLineup(loadedLineup)
+        advanceUntilIdle()
+        Mockito.clearInvocations(getBattersStateUseCase)
+
+        viewModel.switchPlayersPosition(player(1L), FieldPosition.PITCHER)
+        advanceUntilIdle()
+
+        Mockito.verifyNoInteractions(getBattersStateUseCase)
+    }
+
+    @Test
+    fun shouldCloseThePlayerPickerEvenBeforeTheLineupIsLoaded() = runTest {
+        viewModel.onPlayerSelected(aPlayer, FieldPosition.PITCHER)
+        advanceUntilIdle()
+
+        Mockito.verifyNoInteractions(assignPlayerFieldPositionUseCase)
+        assertNull(viewModel.uiState.value.availablePlayersEvent)
+    }
+
+    @Test
+    fun shouldNotRecomputeWhenAssigningAPlayerFails() = runTest {
+        loadLineup(loadedLineup)
+        advanceUntilIdle()
+        Mockito.clearInvocations(getBattersStateUseCase)
+        Mockito.`when`(assignPlayerFieldPositionUseCase(any(), any(), any(), any()))
+            .thenReturn(Result.failure(Exception("boom")))
+
+        viewModel.onPlayerSelected(aPlayer, FieldPosition.PITCHER)
+        advanceUntilIdle()
+
+        Mockito.verifyNoInteractions(getBattersStateUseCase)
+    }
+
+    @Test
+    fun shouldShowNothingWhenAvailablePlayersCannotBeRead() = runTest {
+        loadLineup(loadedLineup)
+        advanceUntilIdle()
+        Mockito.`when`(getListAvailablePlayersForSelectionUseCase(any(), any(), any()))
+            .thenReturn(Result.failure(Exception("boom")))
+
+        val result = viewModel.onPositionClicked(FieldPosition.PITCHER)
+
+        assertTrue(result.isFailure)
+        assertNull(viewModel.uiState.value.availablePlayersEvent)
+        assertNull(viewModel.uiState.value.infoMessage)
+    }
+
+    @Test
+    fun shouldShowNoMessageWhenTheDpFlexSheetFailsForAnotherReason() = runTest {
+        loadLineup(loadedLineup)
+        advanceUntilIdle()
+        Mockito.`when`(getDpAndFlexFromPlayersInFieldUseCase(any()))
+            .thenReturn(Result.failure(Exception("boom")))
+
+        val result = viewModel.onPositionClicked(FieldPosition.DP_DH)
+
+        assertTrue(result.isFailure)
+        assertNull(viewModel.uiState.value.infoMessage)
+        assertNull(viewModel.uiState.value.dpFlexEvent)
+    }
+
+    @Test
+    fun shouldOfferNoDpCandidatesBeforeTheLineupIsLoaded() = runTest {
+        assertEquals(
+            emptyList<PlayerWithPosition>(),
+            viewModel.getPlayerSelectionForDp().getOrThrow()
+        )
+    }
+
+    @Test
+    fun shouldReturnDpAndFlexCandidates() = runTest {
+        val candidates = listOf(player(1L))
+        loadLineup(loadedLineup)
+        advanceUntilIdle()
+        Mockito.`when`(getListAvailablePlayersForSelectionUseCase(any(), eq(null), any()))
+            .thenReturn(Result.success(candidates))
+        Mockito.`when`(getOnlyPlayersInFieldUseCase(any())).thenReturn(Result.success(candidates))
+
+        assertEquals(candidates, viewModel.getPlayerSelectionForDp().getOrThrow())
+        assertEquals(candidates, viewModel.getPlayerSelectionForFlex().getOrThrow())
+    }
+
+    @Test
+    fun shouldOfferNoFlexCandidatesOnAnyOtherFailure() = runTest {
+        Mockito.`when`(getOnlyPlayersInFieldUseCase(any()))
+            .thenReturn(Result.failure(IllegalStateException("boom")))
+
+        assertEquals(
+            emptyList<PlayerWithPosition>(),
+            viewModel.getPlayerSelectionForFlex().getOrThrow()
+        )
+    }
+
+    @Test
+    fun shouldShowNoMessageWhenLinkingFailsForAnotherReason() = runTest {
+        loadLineup(loadedLineup)
+        advanceUntilIdle()
+        Mockito.`when`(saveDpAndFlexUseCase(any(), any(), any(), any()))
+            .thenReturn(Result.failure(IllegalStateException("boom")))
+
+        val result = viewModel.linkDpAndFlex(aPlayer, aPlayer)
+
+        assertTrue(result.isFailure)
+        assertNull(viewModel.uiState.value.infoMessage)
+    }
+
+    @Test
+    fun shouldSurviveAFailureWhenUpdatingBatters() = runTest {
+        Mockito.`when`(updatePlayersWithBattersUseCase(any(), any()))
+            .thenReturn(Result.failure(Exception("boom")))
+
+        viewModel.onBattersChanged(emptyList())
+        advanceUntilIdle()
+
+        Mockito.verify(updatePlayersWithBattersUseCase)(any(), any())
     }
 }

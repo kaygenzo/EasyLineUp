@@ -5,8 +5,12 @@
 package com.telen.easylineup.dashboard
 
 import com.telen.easylineup.domain.model.DashboardTile
+import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerGamesCount
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.tiles.TileType
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
@@ -32,6 +36,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -199,5 +204,126 @@ internal class DashboardViewModelTest {
         assertFalse(state.shirtNumberHasSearched)
         assertTrue(state.shirtNumberHistory.isEmpty())
         assertEquals(null, state.shirtNumberResult)
+    }
+
+    private fun tile(type: TileType) = DashboardTile(id = 1L, position = 0, type = type.type)
+
+    @Test
+    fun shouldExposeEveryTileOfTheTeam() = runTest {
+        Mockito.`when`(tilesRepository.getTiles()).thenReturn(
+            listOf(
+                tile(TileType.TEAM_SIZE),
+                tile(TileType.MOST_USED_PLAYER),
+                tile(TileType.LAST_LINEUP)
+            )
+        )
+        val ace = Player(id = 2L, teamId = 1L, name = " Ace ", shirtNumber = 12, licenseNumber = 1L)
+        Mockito.`when`(playerRepository.getPlayersByTeamId(1L)).thenReturn(listOf(ace))
+        Mockito.`when`(playerFieldPositionRepository.getMostUsedPlayers(1L))
+            .thenReturn(listOf(PlayerGamesCount(playerId = 2L, size = 7)))
+        Mockito.`when`(playerRepository.getPlayerById(2L)).thenReturn(ace)
+        Mockito.`when`(lineupRepository.getLastLineup(1L)).thenReturn(
+            Lineup(id = 5L, name = "Game 1", teamId = 1L, eventTimeInMillis = 1_000L)
+        )
+
+        teamsProcessor.emit(emptyList())
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isLoading)
+        assertEquals("Panthers", state.teamName)
+        assertEquals(1, state.teamSize)
+        assertEquals(MostUsedPlayerUi("Ace", 12, 7), state.mostUsedPlayer)
+        assertEquals(LastLineupUi(5L, "Game 1", 1_000L, null), state.lastLineup)
+    }
+
+    @Test
+    fun shouldFallBackToDefaultsWhenATeamHasNoDataTiles() = runTest {
+        Mockito.`when`(tilesRepository.getTiles())
+            .thenReturn(listOf(tile(TileType.LAST_PLAYER_NUMBER)))
+
+        teamsProcessor.emit(emptyList())
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isLoading)
+        assertEquals("", state.teamName)
+        assertNull(state.teamSize)
+        assertEquals(TeamType.UNKNOWN, state.teamType)
+        assertNull(state.mostUsedPlayer)
+        assertNull(state.lastLineup)
+    }
+
+    @Test
+    fun shouldKeepLoadingWhenTilesCannotBeRead() = runTest {
+        Mockito.`when`(tilesRepository.getTiles()).thenThrow(RuntimeException("db error"))
+
+        teamsProcessor.emit(emptyList())
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.isLoading)
+    }
+
+    @Test
+    fun shouldResetTheSearchWhenTheTeamChanges() = runTest {
+        Mockito.`when`(tilesRepository.getTiles())
+            .thenReturn(listOf(tile(TileType.LAST_PLAYER_NUMBER)))
+        viewModel.onShirtNumberQueryChanged("8")
+
+        teamsProcessor.emit(emptyList())
+        advanceUntilIdle()
+
+        assertEquals("", viewModel.uiState.value.shirtNumberQuery)
+    }
+
+    @Test
+    fun shouldKeepOnlyDigitsInTheShirtNumberQuery() {
+        viewModel.onShirtNumberQueryChanged("1a2")
+
+        assertEquals("12", viewModel.uiState.value.shirtNumberQuery)
+    }
+
+    @Test
+    fun shouldNotSearchWithoutANumber() {
+        assertFalse(viewModel.onShirtNumberSearch())
+        assertFalse(viewModel.uiState.value.shirtNumberHasSearched)
+    }
+
+    @Test
+    fun shouldReportNoResultForAnUnusedNumber() = runTest {
+        Mockito.`when`(playerRepository.getShirtNumberFromPlayers(1L, 8)).thenReturn(emptyList())
+        Mockito.`when`(playerNumberOverlayRepository.getShirtNumberFromNumberOverlays(1L, 8))
+            .thenReturn(emptyList())
+
+        viewModel.onShirtNumberQueryChanged("8")
+        assertTrue(viewModel.onShirtNumberSearch())
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.shirtNumberHasSearched)
+        assertNull(viewModel.uiState.value.shirtNumberResult)
+    }
+
+    @Test
+    fun shouldCloseTheHistoryDialog() = runTest {
+        val entry = ShirtNumberEntry(
+            number = 8,
+            playerName = "Toto",
+            playerId = 1L,
+            eventTime = 0L,
+            createdAt = 0L,
+            lineupId = 1L,
+            lineupName = "Game 1"
+        )
+        Mockito.`when`(playerRepository.getShirtNumberFromPlayers(1L, 8)).thenReturn(listOf(entry))
+        Mockito.`when`(playerNumberOverlayRepository.getShirtNumberFromNumberOverlays(1L, 8))
+            .thenReturn(emptyList())
+        viewModel.onShirtNumberQueryChanged("8")
+        viewModel.onShirtNumberSearch()
+        advanceUntilIdle()
+        viewModel.onShirtNumberHistoryClick()
+
+        viewModel.onShirtNumberHistoryDismiss()
+
+        assertFalse(viewModel.uiState.value.showShirtNumberHistoryDialog)
     }
 }

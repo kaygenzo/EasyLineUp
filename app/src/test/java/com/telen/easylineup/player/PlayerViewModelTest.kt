@@ -12,6 +12,7 @@ import com.telen.easylineup.domain.model.PlayerSideSelection
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.DecodePlayerSideFlag
 import com.telen.easylineup.domain.usecases.DeletePlayer
 import com.telen.easylineup.domain.usecases.EncodePlayerSideFlag
@@ -387,5 +388,135 @@ internal class PlayerViewModelTest {
                 Mockito.anyInt()
             )
         ).thenReturn(Result.failure(throwable))
+    }
+
+    private fun buildViewModel() = PlayerViewModel(
+        getTeamUseCase,
+        observePlayer,
+        savePlayerUseCase,
+        deletePlayerUseCase,
+        getPlayerPositionsSummaryUseCase,
+        encodePlayerSideFlagUseCase,
+        decodePlayerSideFlagUseCase,
+        toggleFavoritePositionUseCase
+    )
+
+    @Test
+    fun shouldResolveTheStrategyFromTheTeamType() = runTest {
+        runBlocking {
+            Mockito.`when`(getTeamUseCase()).thenReturn(
+                Result.success(Team(id = 1L, name = "B5", type = TeamType.BASEBALL_5.id))
+            )
+        }
+
+        val state = buildViewModel().uiState.value
+
+        assertEquals(TeamType.BASEBALL_5, state.teamType)
+        assertEquals(TeamStrategy.B5_DEFAULT, state.strategy)
+    }
+
+    @Test
+    fun shouldKeepDefaultsWhenTheTeamCannotBeRead() = runTest {
+        runBlocking {
+            Mockito.`when`(getTeamUseCase()).thenReturn(Result.failure(Exception("boom")))
+        }
+
+        assertEquals(TeamStrategy.STANDARD, buildViewModel().uiState.value.strategy)
+    }
+
+    @Test
+    fun shouldShowEmptyFieldsForUnsetNumbersAndContacts() = runTest {
+        val existing = player(5L).copy(
+            shirtNumber = 0,
+            licenseNumber = 0L,
+            email = null,
+            phone = null
+        )
+        Mockito.`when`(observePlayer(5L)).thenReturn(flowOf(existing))
+        runBlocking {
+            Mockito.`when`(getPlayerPositionsSummaryUseCase(5L))
+                .thenReturn(Result.success(emptyMap()))
+        }
+
+        viewModel.playerId = 5L
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals("", state.shirtNumberText)
+        assertEquals("", state.licenseNumberText)
+        assertEquals("", state.email)
+        assertEquals("", state.phone)
+    }
+
+    @Test
+    fun shouldExposeNumbersAsTextAndAsValues() = runTest {
+        Mockito.`when`(observePlayer(5L)).thenReturn(flowOf(player(5L)))
+        runBlocking {
+            Mockito.`when`(getPlayerPositionsSummaryUseCase(5L))
+                .thenReturn(Result.success(emptyMap()))
+        }
+
+        viewModel.playerId = 5L
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals("7", state.shirtNumberText)
+        assertEquals(7, state.shirtNumber)
+        assertEquals("100", state.licenseNumberText)
+        assertEquals(100L, state.licenseNumber)
+    }
+
+    @Test
+    fun shouldReadUnsetNumbersAsZero() {
+        val state = viewModel.uiState.value
+
+        assertEquals(0, state.shirtNumber)
+        assertEquals(0L, state.licenseNumber)
+    }
+
+    @Test
+    fun shouldKeepThePlayerWhenThePositionsSummaryFails() = runTest {
+        Mockito.`when`(observePlayer(5L)).thenReturn(flowOf(player(5L)))
+        runBlocking {
+            Mockito.`when`(getPlayerPositionsSummaryUseCase(5L))
+                .thenReturn(Result.failure(Exception("boom")))
+        }
+
+        viewModel.playerId = 5L
+        advanceUntilIdle()
+
+        assertEquals("Jonas", viewModel.uiState.value.name)
+        assertTrue(viewModel.uiState.value.positionsData.isEmpty())
+    }
+
+    @Test
+    fun shouldTurnEverySideBackOffOnASecondToggle() {
+        viewModel.onBattingLeftToggled()
+        viewModel.onBattingRightToggled()
+        viewModel.onPitchingLeftToggled()
+        viewModel.onPitchingRightToggled()
+        viewModel.onBattingLeftToggled()
+        viewModel.onBattingRightToggled()
+        viewModel.onPitchingLeftToggled()
+        viewModel.onPitchingRightToggled()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.battingLeft)
+        assertFalse(state.battingRight)
+        assertFalse(state.pitchingLeft)
+        assertFalse(state.pitchingRight)
+    }
+
+    @Test
+    fun shouldFlagNoFieldWhenSaveFailsForAnotherReason() = runTest {
+        stubSaveFailure(IllegalStateException("db error"))
+
+        val result = viewModel.onSaveClick()
+
+        assertFalse(result)
+        val state = viewModel.uiState.value
+        assertFalse(state.nameError)
+        assertFalse(state.emailError)
+        assertFalse(state.phoneError)
     }
 }
