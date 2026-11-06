@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.crashlytics)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.roborazzi)
 }
 
 def keystorePropertiesFile = rootProject.file("keystore-upload.properties")
@@ -155,6 +156,13 @@ dependencies {
     testImplementation libs.mockito.core
     testImplementation libs.mockito.kotlin
     testImplementation libs.kotlinx.coroutines.test
+    testImplementation libs.koin.test
+    testImplementation libs.robolectric
+    testImplementation libs.roborazzi
+    testImplementation libs.roborazzi.compose
+    testImplementation libs.preview.scanner
+    testImplementation platform(libs.compose.bom)
+    testImplementation libs.compose.ui.test.junit4
 
     ////////// ANDROID X //////////
 
