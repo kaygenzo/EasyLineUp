@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -54,6 +55,11 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.usecases.SwapBattersOrder
 import com.telen.easylineup.views.LineupTypeface
+
+/** The drag handle has no text or content description of its own to find it by. */
+internal object AttackTestTags {
+    fun dragHandle(playerId: Long): String = "attack_drag_handle_$playerId"
+}
 
 /**
  * The batting-order list - single composable for both fixed/view and editable modes (mirrors
@@ -256,17 +262,19 @@ private fun BatterRow(
                     .size(28.dp)
                     .then(
                         if (batter.canMove) {
-                            Modifier.pointerInput(batter.playerId) {
-                                detectDragGesturesAfterLongPress(
-                                    onDragStart = { onDragStart() },
-                                    onDrag = { change, dragAmount ->
-                                        change.consume()
-                                        onDrag(dragAmount.y)
-                                    },
-                                    onDragEnd = { onDragEnd() },
-                                    onDragCancel = { onDragEnd() }
-                                )
-                            }
+                            Modifier
+                                .testTag(AttackTestTags.dragHandle(batter.playerId))
+                                .pointerInput(batter.playerId) {
+                                    detectDragGesturesAfterLongPress(
+                                        onDragStart = { onDragStart() },
+                                        onDrag = { change, dragAmount ->
+                                            change.consume()
+                                            onDrag(dragAmount.y)
+                                        },
+                                        onDragEnd = { onDragEnd() },
+                                        onDragCancel = { onDragEnd() }
+                                    )
+                                }
                         } else {
                             Modifier
                         }
