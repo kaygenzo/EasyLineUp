@@ -158,6 +158,17 @@ rendering, so these run only on demand and not in CI yet:
 `./gradlew verifyRoborazziProdDebug` checks them, and
 `./gradlew recordRoborazziProdDebug` regenerates them after an intended change.
 
+### Screen gallery
+
+`ScreenGalleryTest` walks through every screen on the device in each combination of
+screen size, orientation and day/night theme. It takes several minutes, so it is
+skipped unless asked for: `./gradlew connectedDemoDebugAndroidTest -PscreenGallery`.
+The screenshots stay on the device until you run
+`./gradlew generateScreenGallery`, which writes a single self-contained page with
+filters to `app/build/reports/screen-gallery/index.html` and clears them from the
+device. With several devices connected, set `ANDROID_SERIAL` to the one to read
+screenshots from.
+
 ### CI & quality gates
 
 - CircleCI (`.circleci/config.yml`): `jacocoFullReport` (every module's unit tests

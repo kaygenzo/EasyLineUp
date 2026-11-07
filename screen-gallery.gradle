@@ -1,0 +1,82 @@
+// Turns the screenshots ScreenGalleryTest leaves on the device into one self-contained page:
+// build/reports/screen-gallery/index.html (app module), images embedded, nothing else needed.
+// Run by hand once the instrumented tests are done: ./gradlew generateScreenGallery
+import groovy.json.JsonOutput
+import java.awt.RenderingHints
+import java.awt.image.BufferedImage
+import javax.imageio.IIOImage
+import javax.imageio.ImageIO
+import javax.imageio.ImageWriteParam
+
+def deviceDirectory = '/data/local/tmp/easylineup_screens'
+def maxImageSide = 1000
+def jpegQuality = 0.8f
+def adbPath = androidComponents.sdkComponents.adb
+
+def adb = { String... arguments ->
+    def process = new ProcessBuilder([adbPath.get().asFile.path] + arguments.toList())
+        .redirectErrorStream(true)
+        .start()
+    def output = process.inputStream.text
+    [code: process.waitFor(), output: output]
+}
+
+def toJpegDataUri = { File png ->
+    def source = ImageIO.read(png)
+    def scale = Math.min(1d, maxImageSide / Math.max(source.width, source.height))
+    def width = (int) (source.width * scale)
+    def height = (int) (source.height * scale)
+    def scaled = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+    def graphics = scaled.createGraphics()
+    graphics.setRenderingHint(
+        RenderingHints.KEY_INTERPOLATION,
+        RenderingHints.VALUE_INTERPOLATION_BICUBIC
+    )
+    graphics.drawImage(source, 0, 0, width, height, null)
+    graphics.dispose()
+
+    def writer = ImageIO.getImageWritersByFormatName('jpeg').next()
+    def parameters = writer.defaultWriteParam
+    parameters.compressionMode = ImageWriteParam.MODE_EXPLICIT
+    parameters.compressionQuality = jpegQuality
+    def bytes = new ByteArrayOutputStream()
+    writer.output = ImageIO.createImageOutputStream(bytes)
+    writer.write(null, new IIOImage(scaled, null, null), parameters)
+    writer.dispose()
+    def encoded = bytes.toByteArray().encodeBase64()
+    [src: "data:image/jpeg;base64,$encoded", width: width, height: height]
+}
+
+tasks.register('generateScreenGallery') {
+    group = 'Reporting'
+    description = 'Builds the HTML screen gallery from the screenshots left by ScreenGalleryTest.'
+
+    doLast {
+        System.setProperty('java.awt.headless', 'true')
+        def pulled = layout.buildDirectory.dir('tmp/screen-gallery').get().asFile
+        project.delete(pulled)
+        pulled.mkdirs()
+
+        def pull = adb('pull', "$deviceDirectory/.", pulled.path)
+        def screenshots = pulled.listFiles()?.findAll { it.name.endsWith('.png') } ?: []
+        if (pull.code != 0 || screenshots.isEmpty()) {
+            logger.lifecycle("No screenshot on the device, screen gallery not generated.")
+            return
+        }
+        adb('shell', 'rm', '-rf', deviceDirectory)
+
+        def screens = screenshots.sort { it.name }.collect { file ->
+            def (size, orientation, theme, screen) = (file.name - '.png').split('__')
+            def configuration = [size: size, orientation: orientation, theme: theme]
+            configuration + [screen: screen] + toJpegDataUri(file)
+        }
+
+        def template = rootProject.file('config/screen-gallery/template.html').text
+        def report = layout.buildDirectory.file('reports/screen-gallery/index.html').get().asFile
+        report.parentFile.mkdirs()
+        report.text = template
+            .replace('"__SCREENS__"', JsonOutput.toJson(screens))
+            .replace('__GENERATED_AT__', new Date().format('yyyy-MM-dd HH:mm'))
+        logger.lifecycle("Screen gallery: ${report.toURI()}")
+    }
+}
