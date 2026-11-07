@@ -71,6 +71,7 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVer
 room-testing = { group = "androidx.room", name = "room-testing", version.ref = "roomVersion" }
 tests-runner = { group = "androidx.test", name = "runner", version.ref = "testRunnerVersion" }
 tests-espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCoreVersion" }
+tests-espressoIntents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoCoreVersion" }
 tests-uiAutomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiAutomatorVersion" }
 tests-junit = { group = "androidx.test.ext", name = "junit", version.ref = "extJUnitVersion" }
 junit4 = { group = "junit", name = "junit", version.ref = "junit4Version" }

@@ -151,6 +151,7 @@ dependencies {
     androidTestImplementation(libs.tests.espresso) {
         exclude group: "com.google.protobuf"
     }
+    androidTestImplementation libs.tests.espressoIntents
     androidTestImplementation libs.tests.uiAutomator
     androidTestImplementation libs.tests.junit
     androidTestImplementation platform(libs.compose.bom)
