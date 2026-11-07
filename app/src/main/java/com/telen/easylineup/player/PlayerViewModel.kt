@@ -5,6 +5,7 @@
 package com.telen.easylineup.player
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.domain.model.FieldPosition
@@ -25,10 +26,12 @@ import com.telen.easylineup.domain.usecases.ToggleFavoritePosition
 import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
+import java.io.Serializable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -67,7 +70,27 @@ data class PlayerUiState(
     val licenseNumber: Long get() = licenseNumberText.toLongOrNull() ?: 0L
 }
 
+/**
+ * The form fields a user may have typed, kept in [SavedStateHandle] so they survive Android
+ * killing the app in the background. Only plain serializable values, unlike [PlayerUiState].
+ */
+private data class PlayerFormDraft(
+    val name: String,
+    val shirtNumberText: String,
+    val licenseNumberText: String,
+    val image: String?,
+    val sex: Int,
+    val battingLeft: Boolean,
+    val battingRight: Boolean,
+    val pitchingLeft: Boolean,
+    val pitchingRight: Boolean,
+    val positions: List<Int>,
+    val email: String,
+    val phone: String
+) : Serializable
+
 class PlayerViewModel(
+    private val savedStateHandle: SavedStateHandle,
     private val getTeamUseCase: GetTeam,
     private val observePlayer: ObservePlayer,
     private val savePlayerUseCase: SavePlayer,
@@ -87,7 +110,17 @@ class PlayerViewModel(
             loadPlayer(value)
         }
 
+    /** What the form held when the process was killed, applied once instead of the database. */
+    private var restoredDraft: PlayerFormDraft? = savedStateHandle[KEY_DRAFT]
+
     init {
+        restoredDraft?.let { draft -> _uiState.update { it.withDraft(draft) } }
+        // Not before the first load, which would save an empty form over the database.
+        _uiState
+            .filterNot { it.isLoading }
+            .onEach { savedStateHandle[KEY_DRAFT] = it.toDraft() }
+            .launchIn(viewModelScope)
+
         viewModelScope.launch {
             getTeamUseCase()
                 .onSuccess { team ->
@@ -102,19 +135,26 @@ class PlayerViewModel(
 
     private fun loadPlayer(id: Long) {
         if (id <= 0) {
+            restoredDraft = null
             _uiState.update { it.copy(isLoading = false) }
             return
         }
         observePlayer(id)
             .catch { Timber.e(it) }
             .onEach { player ->
+                restoredDraft?.let { draft ->
+                    restoredDraft = null
+                    _uiState.update { it.withDraft(draft).copy(isLoading = false) }
+                    return@onEach
+                }
                 val battingSelection = decodePlayerSideFlagUseCase(player.batting)
                 val pitchingSelection = decodePlayerSideFlagUseCase(player.pitching)
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         name = player.name,
-                        shirtNumberText = player.shirtNumber.takeIf { n -> n > 0 }?.toString() ?: "",
+                        shirtNumberText = player.shirtNumber.takeIf { n -> n > 0 }?.toString()
+                            ?: "",
                         licenseNumberText = player.licenseNumber.takeIf { n -> n > 0 }?.toString()
                             ?: "",
                         imageUri = player.image?.let(Uri::parse),
@@ -262,4 +302,40 @@ class PlayerViewModel(
     }
 
     suspend fun deletePlayer(): Result<Unit> = deletePlayerUseCase(playerId)
+
+    private fun PlayerUiState.toDraft() = PlayerFormDraft(
+        name = name,
+        shirtNumberText = shirtNumberText,
+        licenseNumberText = licenseNumberText,
+        image = imageUri?.toString(),
+        sex = sex.id,
+        battingLeft = battingLeft,
+        battingRight = battingRight,
+        pitchingLeft = pitchingLeft,
+        pitchingRight = pitchingRight,
+        positions = selectedPositions.map { it.id },
+        email = email,
+        phone = phone
+    )
+
+    private fun PlayerUiState.withDraft(draft: PlayerFormDraft) = copy(
+        name = draft.name,
+        shirtNumberText = draft.shirtNumberText,
+        licenseNumberText = draft.licenseNumberText,
+        imageUri = draft.image?.let(Uri::parse),
+        sex = Sex.getById(draft.sex),
+        battingLeft = draft.battingLeft,
+        battingRight = draft.battingRight,
+        pitchingLeft = draft.pitchingLeft,
+        pitchingRight = draft.pitchingRight,
+        battingSide = encodedSide(draft.battingLeft, draft.battingRight),
+        pitchingSide = encodedSide(draft.pitchingLeft, draft.pitchingRight),
+        selectedPositions = draft.positions.mapNotNull(FieldPosition::getFieldPositionById).toSet(),
+        email = draft.email,
+        phone = draft.phone
+    )
+
+    private companion object {
+        const val KEY_DRAFT = "player_form_draft"
+    }
 }

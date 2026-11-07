@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.lineup.create
 
+import androidx.lifecycle.SavedStateHandle
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Player
@@ -87,6 +88,7 @@ internal class LineupCreationViewModelTest {
         }
 
         viewModel = LineupCreationViewModel(
+            SavedStateHandle(),
             observeTournaments,
             getTeam,
             getRoster,
@@ -117,6 +119,7 @@ internal class LineupCreationViewModelTest {
         runBlocking { Mockito.`when`(getRoster()).thenReturn(Result.success(roster)) }
 
         viewModel = LineupCreationViewModel(
+            SavedStateHandle(),
             observeTournaments,
             getTeam,
             getRoster,
@@ -371,6 +374,7 @@ internal class LineupCreationViewModelTest {
     }
 
     private fun buildViewModel() = LineupCreationViewModel(
+        SavedStateHandle(),
         observeTournaments,
         getTeam,
         getRoster,
@@ -490,5 +494,57 @@ internal class LineupCreationViewModelTest {
 
         assertFalse(viewModel.uiState.value.nameError)
         assertFalse(viewModel.uiState.value.tournamentError)
+    }
+
+    private fun viewModelWith(handle: SavedStateHandle) = LineupCreationViewModel(
+        handle,
+        observeTournaments,
+        getTeam,
+        getRoster,
+        createLineup,
+        saveTournament,
+        ToggleRosterPlayer(),
+        clearRosterUseCase,
+        resolveLineupEventTimeUseCase
+    )
+
+    @Test
+    fun shouldRestoreEveryChoiceAfterTheProcessWasKilled() = runTest {
+        val handle = SavedStateHandle()
+        val tournament =
+            Tournament(id = 7L, name = "Cup", createdAt = 1L, startTime = 0L, endTime = 0L)
+        val roster = TeamRosterSummary(Constants.STATUS_ALL, listOf(player(1L), player(2L)))
+        runBlocking { Mockito.`when`(getRoster()).thenReturn(Result.success(roster)) }
+        Mockito.`when`(resolveLineupEventTimeUseCase(any(), any())).thenReturn(5L)
+        viewModelWith(handle).apply {
+            onNameChanged("Scrimmage")
+            onTournamentSelected(tournament)
+            onStrategySelected(TeamStrategy.SLOWPITCH)
+            onExtraHittersSelected(2)
+            onRosterPlayerToggled(1, false)
+        }
+
+        val state = viewModelWith(handle).uiState.value
+
+        assertEquals("Scrimmage", state.name)
+        assertEquals(7L, state.selectedTournament?.id)
+        assertEquals(5L, state.eventTimeInMillis)
+        assertEquals(TeamStrategy.SLOWPITCH, state.strategy)
+        assertEquals(2, state.extraHitters)
+        assertEquals(listOf(true, false), state.roster.players.map { it.status })
+        assertEquals(Constants.STATUS_PARTIAL, state.roster.status)
+    }
+
+    @Test
+    fun shouldUseTheTeamsDefaultStrategyWithoutASavedForm() = runTest {
+        runBlocking {
+            val team = Team(id = 1L, name = "B5", type = TeamType.BASEBALL_5.id)
+            Mockito.`when`(getTeam()).thenReturn(Result.success(team))
+        }
+
+        assertEquals(
+            TeamStrategy.B5_DEFAULT,
+            viewModelWith(SavedStateHandle()).uiState.value.strategy
+        )
     }
 }

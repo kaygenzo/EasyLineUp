@@ -4,16 +4,25 @@
 
 package com.telen.easylineup.state
 
+import android.app.Activity
+import android.app.Application
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
+import com.telen.easylineup.player.PlayerFormTestTags
+import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
@@ -30,9 +39,6 @@ import org.junit.runner.RunWith
  * A test can't kill its own process, so this reproduces what such a return relies on: the
  * Activity is recreated from its saved state while every ViewModel is gone. The database and
  * Koin's singletons survive here, unlike a real kill; both are rebuilt from disk anyway.
- *
- * Unsaved input in a form is not kept: every form's state lives in its ViewModel, without a
- * SavedStateHandle, so the form comes back empty.
  */
 @RunWith(AndroidJUnit4::class)
 class ProcessDeathRestorationTest {
@@ -45,9 +51,30 @@ class ProcessDeathRestorationTest {
     /** Only on the Roster list: its absence tells the profile on top of it is showing. */
     private val sortPill get() = string(R.string.roster_sort_by_name).uppercase()
 
-    private fun ActivityScenario<HomeActivity>.simulateProcessDeath() {
-        onActivity { it.viewModelStore.clear() }
-        recreate()
+    /**
+     * Recreates the Activity, emptying its ViewModels once its state is saved: by then Android
+     * has the Bundle it would restore from after a real kill, ViewModels included.
+     */
+    private fun <T : ComponentActivity> ActivityScenario<T>.simulateProcessDeath() {
+        val application = ApplicationProvider.getApplicationContext<Application>()
+        val dropViewModels = object : Application.ActivityLifecycleCallbacks {
+            override fun onActivityDestroyed(activity: Activity) {
+                (activity as? ComponentActivity)?.viewModelStore?.clear()
+            }
+
+            override fun onActivityCreated(activity: Activity, state: Bundle?) = Unit
+            override fun onActivityStarted(activity: Activity) = Unit
+            override fun onActivityResumed(activity: Activity) = Unit
+            override fun onActivityPaused(activity: Activity) = Unit
+            override fun onActivityStopped(activity: Activity) = Unit
+            override fun onActivitySaveInstanceState(activity: Activity, state: Bundle) = Unit
+        }
+        application.registerActivityLifecycleCallbacks(dropViewModels)
+        try {
+            recreate()
+        } finally {
+            application.unregisterActivityLifecycleCallbacks(dropViewModels)
+        }
     }
 
     private fun launchHome() = ActivityScenario.launch(HomeActivity::class.java).also {
@@ -97,7 +124,7 @@ class ProcessDeathRestorationTest {
     }
 
     @Test
-    fun theLineupCreationFormComesBack() {
+    fun aLineupBeingCreatedKeepsWhatWasTyped() {
         launchHome().use { scenario ->
             composeTestRule.onNodeWithText(string(R.string.title_lineups).uppercase())
                 .performClick()
@@ -115,6 +142,41 @@ class ProcessDeathRestorationTest {
             scenario.simulateProcessDeath()
 
             composeTestRule.waitForText(string(R.string.lineup_creation_header_title))
+            composeTestRule.waitForText("Scrimmage")
+        }
+    }
+
+    @Test
+    fun aPlayerBeingCreatedKeepsWhatWasTyped() {
+        launchHome().use { scenario ->
+            composeTestRule.onNodeWithText(string(R.string.title_team).uppercase()).performClick()
+            composeTestRule.waitForText("Starter 1")
+            composeTestRule
+                .onNodeWithContentDescription(
+                    string(R.string.roster_add_player_content_description)
+                )
+                .performClick()
+            composeTestRule.waitForText(string(R.string.player_form_title_create))
+            composeTestRule.onNodeWithTag(PlayerFormTestTags.NAME_FIELD)
+                .performTextInput("Rookie")
+
+            scenario.simulateProcessDeath()
+
+            composeTestRule.waitForText(string(R.string.player_form_title_create))
+            composeTestRule.waitForText("Rookie")
+        }
+    }
+
+    @Test
+    fun aTeamBeingCreatedKeepsWhatWasTyped() {
+        ActivityScenario.launch(TeamCreationActivity::class.java).use { scenario ->
+            composeTestRule.waitForText(string(R.string.team_form_title_create))
+            composeTestRule.onNode(hasSetTextAction()).performTextInput("Riverside Hawks")
+
+            scenario.simulateProcessDeath()
+
+            composeTestRule.waitForText(string(R.string.team_form_title_create))
+            composeTestRule.waitForText("Riverside Hawks")
         }
     }
 }

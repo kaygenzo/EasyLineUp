@@ -5,6 +5,7 @@
 package com.telen.easylineup.team.createTeam
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
@@ -23,13 +24,21 @@ import kotlinx.coroutines.flow.map
  * (unlike the old View-based form, whose widgets held their own visual state locally), so a
  * mutation that isn't re-emitted never becomes visible.
  */
-class SetupViewModel(private val saveTeam: SaveTeam) : ViewModel() {
+class SetupViewModel(
+    private val savedStateHandle: SavedStateHandle,
+    private val saveTeam: SaveTeam
+) : ViewModel() {
     private val _team: MutableSharedFlow<Team> =
         MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
     // Defaults to BASEBALL, not UNKNOWN, so a new team's type picker shows a selection
     // from the start - SaveTeam falls back to BASEBALL anyway when type is left UNKNOWN,
     // this just makes that same default visible instead of implicit.
-    private var currentTeam = Team(0, "", null, TeamType.BASEBALL.id, true)
+    // Kept in SavedStateHandle so the form survives Android killing the app in the background.
+    private var currentTeam: Team
+        get() = savedStateHandle[KEY_TEAM] ?: Team(0, "", null, TeamType.BASEBALL.id, true)
+        set(value) {
+            savedStateHandle[KEY_TEAM] = value
+        }
 
     fun observeTeamName(): Flow<String> {
         return _team.map { it.name }
@@ -62,8 +71,18 @@ class SetupViewModel(private val saveTeam: SaveTeam) : ViewModel() {
         return saveTeam(currentTeam)
     }
 
+    /**
+     * Called on every Activity creation: ignored once the form has started, so neither a
+     * rotation nor a return after the process was killed resets what the user typed.
+     */
     fun setTeam(team: Team?) {
-        team?.let { currentTeam = it }
+        if (!savedStateHandle.contains(KEY_TEAM)) {
+            team?.let { currentTeam = it }
+        }
         _team.tryEmit(currentTeam)
+    }
+
+    private companion object {
+        const val KEY_TEAM = "team"
     }
 }

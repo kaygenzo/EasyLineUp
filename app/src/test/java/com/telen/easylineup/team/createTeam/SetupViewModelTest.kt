@@ -5,6 +5,7 @@
 package com.telen.easylineup.team.createTeam
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.SaveTeam
@@ -40,7 +41,7 @@ internal class SetupViewModelTest {
 
     @Before
     fun setup() {
-        viewModel = SetupViewModel(saveTeam)
+        viewModel = SetupViewModel(SavedStateHandle(), saveTeam)
     }
 
     @Test
@@ -116,5 +117,32 @@ internal class SetupViewModelTest {
 
         assertFalse(result.isSuccess)
         assertEquals(exception, result.exceptionOrNull())
+    }
+
+    @Test
+    fun shouldRestoreTheTypedTeamAfterTheProcessWasKilled() = runTest {
+        val handle = SavedStateHandle()
+        SetupViewModel(handle, saveTeam).apply {
+            setTeam(null)
+            setTeamName("Panthers")
+            setTeamType(TeamType.SOFTBALL)
+        }
+
+        val restored = SetupViewModel(handle, saveTeam)
+        restored.setTeam(null)
+
+        assertEquals("Panthers", restored.observeTeamName().first())
+        assertEquals(TeamType.SOFTBALL, restored.observeTeamType().first())
+    }
+
+    @Test
+    fun shouldNotResetAnEditInProgressWhenTheScreenIsRecreated() = runTest {
+        val edited = Team(id = 3L, name = "Original", type = TeamType.BASEBALL.id)
+        viewModel.setTeam(edited)
+        viewModel.setTeamName("Renamed")
+
+        viewModel.setTeam(edited)
+
+        assertEquals("Renamed", viewModel.observeTeamName().first())
     }
 }

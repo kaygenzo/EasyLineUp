@@ -5,6 +5,7 @@
 package com.telen.easylineup.player
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerSide
@@ -25,6 +26,7 @@ import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -104,6 +106,7 @@ internal class PlayerViewModelTest {
             .thenReturn(PlayerSideSelection(left = false, right = true))
 
         viewModel = PlayerViewModel(
+            SavedStateHandle(),
             getTeamUseCase,
             observePlayer,
             savePlayerUseCase,
@@ -391,6 +394,7 @@ internal class PlayerViewModelTest {
     }
 
     private fun buildViewModel() = PlayerViewModel(
+        SavedStateHandle(),
         getTeamUseCase,
         observePlayer,
         savePlayerUseCase,
@@ -518,5 +522,84 @@ internal class PlayerViewModelTest {
         assertFalse(state.nameError)
         assertFalse(state.emailError)
         assertFalse(state.phoneError)
+    }
+
+    private fun viewModelWith(handle: SavedStateHandle) = PlayerViewModel(
+        handle,
+        getTeamUseCase,
+        observePlayer,
+        savePlayerUseCase,
+        deletePlayerUseCase,
+        getPlayerPositionsSummaryUseCase,
+        encodePlayerSideFlagUseCase,
+        decodePlayerSideFlagUseCase,
+        toggleFavoritePositionUseCase
+    )
+
+    @Test
+    fun shouldRestoreTypedInputOverTheDatabaseAfterTheProcessWasKilled() = runTest {
+        val handle = SavedStateHandle()
+        val dbUpdates = MutableSharedFlow<Player>(replay = 1)
+        Mockito.`when`(observePlayer(5L)).thenReturn(dbUpdates)
+        runBlocking {
+            Mockito.`when`(getPlayerPositionsSummaryUseCase(5L))
+                .thenReturn(Result.success(emptyMap()))
+        }
+        dbUpdates.emit(player(5L))
+        val beforeKill = viewModelWith(handle)
+        beforeKill.playerId = 5L
+        beforeKill.onNameChanged("Typed name")
+        beforeKill.onEmailChanged("typed@easylineup.com")
+
+        val restored = viewModelWith(handle)
+        restored.playerId = 5L
+        advanceUntilIdle()
+
+        assertEquals("Typed name", restored.uiState.value.name)
+        assertEquals("typed@easylineup.com", restored.uiState.value.email)
+        assertFalse(restored.uiState.value.isLoading)
+    }
+
+    @Test
+    fun shouldFollowTheDatabaseAgainAfterTheRestoredInput() = runTest {
+        val handle = SavedStateHandle()
+        val dbUpdates = MutableSharedFlow<Player>(replay = 1)
+        Mockito.`when`(observePlayer(5L)).thenReturn(dbUpdates)
+        runBlocking {
+            Mockito.`when`(getPlayerPositionsSummaryUseCase(5L))
+                .thenReturn(Result.success(emptyMap()))
+        }
+        dbUpdates.emit(player(5L))
+        viewModelWith(handle).apply {
+            playerId = 5L
+            onNameChanged("Typed name")
+        }
+        val restored = viewModelWith(handle)
+        restored.playerId = 5L
+
+        dbUpdates.emit(player(5L).copy(name = "Saved elsewhere"))
+        advanceUntilIdle()
+
+        assertEquals("Saved elsewhere", restored.uiState.value.name)
+    }
+
+    @Test
+    fun shouldRestoreANewPlayersForm() = runTest {
+        val handle = SavedStateHandle()
+        Mockito.`when`(toggleFavoritePositionUseCase(any(), any()))
+            .thenReturn(setOf(FieldPosition.PITCHER))
+        viewModelWith(handle).apply {
+            playerId = 0L
+            onNameChanged("Rookie")
+            onShirtNumberChanged("42")
+            onPositionToggled(FieldPosition.PITCHER)
+        }
+
+        val restored = viewModelWith(handle)
+        restored.playerId = 0L
+
+        assertEquals("Rookie", restored.uiState.value.name)
+        assertEquals("42", restored.uiState.value.shirtNumberText)
+        assertEquals(setOf(FieldPosition.PITCHER), restored.uiState.value.selectedPositions)
     }
 }

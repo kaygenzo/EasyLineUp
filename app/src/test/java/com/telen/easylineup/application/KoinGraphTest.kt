@@ -6,6 +6,7 @@ package com.telen.easylineup.application
 
 import android.app.Application
 import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import org.junit.Test
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.module
@@ -20,7 +21,7 @@ class KoinGraphTest {
     @Test
     fun everyDefinitionFindsItsDependencies() {
         module { includes(ModuleProvider.modules) }.verify(
-            extraTypes = listOf(Context::class, Application::class)
+            extraTypes = listOf(Context::class, Application::class, SavedStateHandle::class)
         )
     }
 }

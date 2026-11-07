@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.lineup.create
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.domain.Constants
@@ -22,6 +23,7 @@ import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
+import java.io.Serializable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -31,6 +33,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -65,7 +68,22 @@ data class LineupCreationUiState(
     val newTournamentAddress: String = ""
 )
 
+/**
+ * The choices a user may have made, kept in [SavedStateHandle] so they survive Android killing
+ * the app in the background. The roster is kept as the players left out, since the roster
+ * itself is reloaded from the database.
+ */
+private data class LineupCreationDraft(
+    val name: String,
+    val tournament: Tournament?,
+    val eventTimeInMillis: Long,
+    val strategy: Int,
+    val extraHitters: Int,
+    val playersLeftOut: List<Long>
+) : Serializable
+
 class LineupCreationViewModel(
+    private val savedStateHandle: SavedStateHandle,
     private val observeTournaments: ObserveTournaments,
     private val getTeam: GetTeam,
     private val getRoster: GetRoster,
@@ -81,7 +99,26 @@ class LineupCreationViewModel(
     private val _events = Channel<LineupCreationEvent>(Channel.BUFFERED)
     val events: Flow<LineupCreationEvent> = _events.receiveAsFlow()
 
+    /** Read once: saving below overwrites it before the team and roster finish loading. */
+    private val restoredDraft: LineupCreationDraft? = savedStateHandle[KEY_DRAFT]
+
     init {
+        restoredDraft?.let { draft ->
+            _uiState.update {
+                it.copy(
+                    name = draft.name,
+                    selectedTournament = draft.tournament,
+                    eventTimeInMillis = draft.eventTimeInMillis,
+                    extraHitters = draft.extraHitters
+                )
+            }
+        }
+        // Not before the first load, which would save an empty form over the database.
+        _uiState
+            .filterNot { it.isLoading }
+            .onEach { savedStateHandle[KEY_DRAFT] = it.toDraft() }
+            .launchIn(viewModelScope)
+
         observeTournaments().catch { Timber.e(it) }
             .onEach { tournaments ->
                 _uiState.update { it.copy(tournaments = tournaments.toImmutableList()) }
@@ -96,9 +133,10 @@ class LineupCreationViewModel(
                     // strategy (getStrategiesDisplayName() returns null otherwise, e.g.
                     // BASEBALL_5) - for those, this default is never offered to the user to
                     // confirm or change, so it must already be correct for the team's type.
-                    _uiState.update {
-                        it.copy(teamType = resolvedType, strategy = resolvedType.defaultStrategy)
-                    }
+                    val strategy = restoredDraft
+                        ?.let { draft -> TeamStrategy.getStrategyById(draft.strategy) }
+                        ?: resolvedType.defaultStrategy
+                    _uiState.update { it.copy(teamType = resolvedType, strategy = strategy) }
                 }
                 .onFailure { Timber.e(it) }
         }
@@ -106,7 +144,10 @@ class LineupCreationViewModel(
         viewModelScope.launch {
             getRoster()
                 .onSuccess { roster ->
-                    _uiState.update { it.copy(isLoading = false, roster = roster) }
+                    val restoredRoster = restoredDraft?.let { roster.withPlayersLeftOut(it) }
+                    _uiState.update {
+                        it.copy(isLoading = false, roster = restoredRoster ?: roster)
+                    }
                 }
                 .onFailure {
                     Timber.e(it)
@@ -268,5 +309,27 @@ class LineupCreationViewModel(
                     }
                 }
         }
+    }
+
+    private fun TeamRosterSummary.withPlayersLeftOut(draft: LineupCreationDraft) =
+        players.foldIndexed(this) { index, roster, status ->
+            if (status.player.id in draft.playersLeftOut) {
+                toggleRosterPlayerUseCase(roster, index, false)
+            } else {
+                roster
+            }
+        }
+
+    private fun LineupCreationUiState.toDraft() = LineupCreationDraft(
+        name = name,
+        tournament = selectedTournament,
+        eventTimeInMillis = eventTimeInMillis,
+        strategy = strategy.id,
+        extraHitters = extraHitters,
+        playersLeftOut = roster.players.filterNot { it.status }.map { it.player.id }
+    )
+
+    private companion object {
+        const val KEY_DRAFT = "lineup_creation_draft"
     }
 }
