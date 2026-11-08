@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_edit">Editează</string>
+    <string name="action_edit_roster">Editează lotul</string>
+    <string name="action_delete">Șterge</string>
+    <string name="action_share">Distribuie</string>
+    <string name="generic_back">Înapoi</string>
+    <string name="generic_close">Închide</string>
+    <string name="generic_done">Gata</string>
+    <string name="screen_header_eyebrow_app">EasyLineUp</string>
+    <string name="new_lineup_tab_field_defense">Apărare</string>
+    <string name="new_lineup_tab_field_offense">Atac</string>
+    <string name="save_button">Salvează</string>
+    <string name="cancel_button">Anulează</string>
+    <string name="action_save_lineup">Salvează formația</string>
+    <string name="dialog_create_lineup_name">Numele formației</string>
+    <string name="dialog_create_lineup_tournament">Turneu</string>
+    <string name="player_hint_name">Nume</string>
+    <string name="player_hint_shirt_number">Număr pe tricou</string>
+    <string name="player_hint_license_number_short">Nr. legitimație</string>
+    <string name="player_hint_email">E-mail</string>
+    <string name="player_hint_phone">Număr de telefon</string>
+    <string name="title_last_lineup">Acasă</string>
+    <string name="title_team">Lot</string>
+    <string name="title_lineups">Formațiile mele</string>
+    <string name="title_settings">Setări</string>
+    <string name="team_details_header_title">Echipă</string>
+    <string name="team_creation_error_name_empty">Numele echipei nu poate fi gol</string>
+    <string name="team_form_eyebrow">Echipă</string>
+    <string name="team_form_title_create">Creează echipa</string>
+    <string name="team_form_title_edit">Editează detaliile</string>
+    <string name="team_form_name_label">Numele echipei</string>
+    <string name="team_form_type_label">Tipul echipei</string>
+    <string name="team_form_close_content_description">Închide</string>
+    <string name="player_creation_error_name_empty">Numele jucătorului nu poate fi gol</string>
+    <string name="player_creation_error_invalid_email_format">Format de e-mail nevalid</string>
+    <string name="player_creation_error_invalid_phone_format">Format de telefon nevalid</string>
+    <string name="lineup_creation_error_name_empty">Numele formației nu poate fi gol</string>
+    <string name="lineup_creation_error_tournament_empty">Numele turneului nu poate fi gol</string>
+    <string name="dialog_delete_team_title">Ștergi echipa %s?</string>
+    <string name="dialog_delete_lineup_title">Ștergi formația?</string>
+    <string name="dialog_delete_player_title">Ștergi jucătorul?</string>
+    <string name="dialog_delete_tournament_title">Ștergi turneul %s?</string>
+    <string name="dialog_delete_substitute_title">Elimini pe %1$s?</string>
+    <string name="dialog_delete_cannot_undo_message">Această acțiune nu poate fi anulată. Ești
+        sigur?</string>
+    <string name="tile_most_used_player_games_played">Meciuri jucate</string>
+    <string name="tile_last_lineup_header">Ultima formație</string>
+    <string name="dashboard_mini_roster_size_label">Mărimea lotului</string>
+    <string name="dashboard_mini_most_used_label">Cel mai folosit</string>
+    <string name="dashboard_hero_empty_title">Încă nicio formație.</string>
+    <string name="dashboard_lookup_hint">Cine a purtat acest număr?</string>
+    <string name="attack_extra_hitter_suffix">batător suplimentar</string>
+    <string name="attack_editing_order_badge">Se editează ordinea</string>
+    <string name="attack_legend_content_description">Cum citești această listă</string>
+    <string name="attack_legend_title">Cum citești această listă</string>
+    <string name="attack_legend_body">Numărul din stânga este ordinea la bătaie. Sub numele fiecărui
+        jucător apare poziția sa în apărare: numărul clasic din foaia de scor (1-9) urmat de
+        abrevierea sa. Numărul din dreapta este numărul de pe tricou.</string>
+    <string name="attack_legend_body_editable_suffix"> În timpul editării, ține apăsat mânerul din
+        stânga pentru a trage un jucător pe alt loc.</string>
+    <string name="form_lineup_creation_date_label">Data</string>
+    <string name="form_lineup_creation_roster_label">Lotul pentru această formație</string>
+    <string name="lineup_creation_header_eyebrow">Formații</string>
+    <string name="lineup_creation_header_title">Formație nouă</string>
+    <string name="lineup_creation_name_placeholder">ex. Meciul 3 — Titulari</string>
+    <string name="lineup_creation_tournament_placeholder">Alege un turneu</string>
+    <string name="lineup_creation_date_sub_within">În perioada turneului %1$s</string>
+    <string name="lineup_creation_date_disabled_hint">Alege mai întâi un turneu</string>
+    <string name="lineup_creation_tournament_sheet_title">Alege un turneu</string>
+    <string name="lineup_creation_tournament_search_placeholder">Caută turnee…</string>
+    <string name="lineup_creation_tournament_create_row">Creează un turneu nou</string>
+    <string name="lineup_creation_tournament_selected_pill">Selectat</string>
+    <string name="lineup_creation_roster_search_placeholder">Găsește un jucător…</string>
+    <string name="lineup_creation_roster_clear_all">Deselectează tot</string>
+    <string name="lineup_creation_roster_selected_format">%1$d din %2$d selectați</string>
+    <string name="lineup_creation_roster_status_default">de obicei #%1$d</string>
+    <string name="lineup_creation_roster_status_override">astă-seară cu #%1$d</string>
+    <string name="lineup_creation_roster_status_sitting_out">Nu joacă</string>
+    <string name="lineup_creation_roster_done">Gata</string>
+    <string name="lineup_creation_save">Creează formația</string>
+    <string name="action_keep_editing">Continuă editarea</string>
+    <string name="action_discard">Renunță</string>
+    <string name="edit_lineup_title">Editează formația</string>
+    <string name="edit_lineup_footnote">Data, strategia și batătorii suplimentari sunt blocați după
+        crearea formației — schimbarea lor după atribuirea pozițiilor ar invalida ordinea la bătaie
+        și schema terenului.</string>
+    <string name="edit_lineup_save_changes">Salvează modificările</string>
+    <string name="lineup_creation_new_tournament_title">Turneu nou</string>
+    <string name="lineup_creation_new_tournament_subtitle">Dacă îl alegi aici, este adăugat și în
+        lista de turnee</string>
+    <string name="lineup_creation_new_tournament_name_label">Nume</string>
+    <string name="lineup_creation_new_tournament_name_placeholder">ex. Liga de iarnă</string>
+    <string name="lineup_creation_new_tournament_starts_label">Început</string>
+    <string name="lineup_creation_new_tournament_ends_label">Sfârșit</string>
+    <string name="lineup_creation_new_tournament_pick_date">Alege data</string>
+    <string name="lineup_creation_new_tournament_location_label">Locație</string>
+    <string name="lineup_creation_new_tournament_location_placeholder">Adresă — pentru marcajul de
+        pe hartă</string>
+    <string name="lineup_creation_new_tournament_save">Adaugă turneul</string>
+    <string name="tournaments_list_header_title">Turnee</string>
+    <string name="tournaments_list_search_placeholder">Caută turnee sau formații…</string>
+    <plurals name="tournaments_list_lineups_count">
+        <item quantity="one">%d formație</item>
+        <item quantity="few">%d formații</item>
+        <item quantity="other">%d de formații</item>
+    </plurals>
+    <plurals name="tournaments_list_show_more">
+        <item quantity="one">Arată încă %d</item>
+        <item quantity="few">Arată încă %d</item>
+        <item quantity="other">Arată încă %d</item>
+    </plurals>
+    <string name="tournaments_list_empty_title">Încă niciun turneu</string>
+    <string name="tournaments_list_empty_subtitle">Creează o formație pentru a adăuga primul
+        turneu</string>
+    <string name="tournaments_list_empty_search_title">Niciun rezultat</string>
+    <string name="tournaments_list_empty_search_subtitle">Încearcă alt nume de turneu sau de
+        formație</string>
+    <string name="tournaments_list_stats_content_description">Vezi statisticile turneului</string>
+    <string name="tournaments_list_create_lineup_content_description">Creează formația</string>
+    <string name="action_add_dp_flex">Folosește DP/Flex</string>
+    <string name="action_add_dh">Folosește DH</string>
+    <string name="action_confirm">Confirmă</string>
+    <string name="action_back">Înapoi</string>
+    <plurals name="lineups_quantity">
+        <item quantity="one">%d formație</item>
+        <item quantity="few">%d formații</item>
+        <item quantity="other">%d de formații</item>
+    </plurals>
+    <string name="players_list_empty">Niciun jucător disponibil</string>
+    <string name="share_lineup_subject">Iată formația pentru: %s</string>
+    <string name="lineup_pdf_title">Formație</string>
+    <string name="lineup_pdf_date_label">Data: %s</string>
+    <string name="lineup_pdf_opponent_label">Adversar: %s</string>
+    <string name="lineup_pdf_batting_order_title">Ordinea la bătaie</string>
+    <string name="lineup_pdf_defense_title">Apărare</string>
+    <string name="lineup_pdf_substitutes_title">Rezerve</string>
+    <string name="team_list_empty_text">După ce creezi o echipă, o vei vedea aici</string>
+    <string name="switch_team_sheet_title">Schimbă echipa</string>
+    <plurals name="switch_team_sheet_subtitle">
+        <item quantity="one">%d echipă în acest cont</item>
+        <item quantity="few">%d echipe în acest cont</item>
+        <item quantity="other">%d de echipe în acest cont</item>
+    </plurals>
+    <string name="switch_team_sheet_create_row">Creează o echipă nouă</string>
+    <string name="switch_team_sheet_current">Actuală</string>
+    <plurals name="team_details_roster_count">
+        <item quantity="one">%d jucător</item>
+        <item quantity="few">%d jucători</item>
+        <item quantity="other">%d de jucători</item>
+    </plurals>
+    <string name="team_details_roster_label">Lot</string>
+    <string name="team_details_lineups_label">Formații create</string>
+    <string name="team_details_tournaments_label">Turnee</string>
+    <string name="team_details_created_label">Creată</string>
+    <string name="team_details_roster_by_gender">Lotul pe sexe</string>
+    <string name="team_details_stat_label_unset">Nespecificat</string>
+    <string name="team_details_delete_title">Șterge echipa</string>
+    <string name="team_details_delete_subtitle">Elimină toți jucătorii, formațiile și
+        istoricul</string>
+    <string name="setting_lineup_style_description">Fontul formației</string>
+    <string name="setting_men_style_description">Bărbați</string>
+    <string name="setting_women_style_description">Femei</string>
+    <string name="setting_day_night_style_description">Temă</string>
+    <string name="setting_category_about_title">Despre</string>
+    <string name="setting_import_data_description">Importă date din fișier</string>
+    <string name="setting_import_data_subtitle">Dintr-un fișier .elu</string>
+    <string name="setting_export_data_description">Exportă datele într-un fișier</string>
+    <string name="setting_export_data_subtitle">Salvează toate echipele într-un fișier .elu</string>
+    <string name="setting_delete_data_description">Șterge toate datele</string>
+    <string name="setting_delete_data_subtitle">Toate echipele de pe acest dispozitiv</string>
+    <string name="setting_version_title">Versiune</string>
+    <string name="setting_licenses_title">Licențe</string>
+    <string name="setting_play_store_title">Pagina oficială din Google Play Store</string>
+    <string name="data_transfer_count_teams">Echipe</string>
+    <string name="data_transfer_count_players">Jucători</string>
+    <string name="data_transfer_count_lineups">Formații</string>
+    <string name="data_transfer_count_tournaments">Turnee</string>
+    <string name="data_transfer_added_updated">%1$d adăugate · %2$d actualizate</string>
+    <string name="export_confirm_title">Exportă toate datele</string>
+    <string name="export_confirm_message">Toate echipele de pe acest dispozitiv — nu doar %1$s —
+        salvate într-un singur fișier .elu</string>
+    <string name="export_confirm_footnote">Apoi vei alege un dosar — cu selectorul Android, care nu
+        face parte din această aplicație.</string>
+    <string name="export_confirm_action">Alege dosarul</string>
+    <string name="export_success_title">Export finalizat</string>
+    <string name="export_success_message">Salvat în %1$s ca %2$s</string>
+    <string name="export_success_message_no_folder">Salvat ca %1$s</string>
+    <string name="import_confirm_title">Imporți acest fișier?</string>
+    <string name="import_confirm_overwrite_label">Suprascrie datele existente</string>
+    <string name="import_confirm_overwrite_sub">Echipele și jucătorii aflați deja pe acest
+        dispozitiv sunt înlocuiți în loc să fie ignorați</string>
+    <string name="import_confirm_footnote">Această confirmare apare indiferent cum ai ajuns aici —
+        atingând \"Importă date\" în Setări sau deschizând direct un fișier .elu —, așa că această
+        alegere nu se face niciodată pe tăcute în locul tău.</string>
+    <string name="import_confirm_action">Importă</string>
+    <string name="import_success_title">Import finalizat</string>
+    <string name="welcome_headline">Conduci\nbanca de rezerve\ndin buzunar.</string>
+    <string name="welcome_body">Creează formații, atribuie poziții și urmărește ordinea la bătaie la
+        fiecare meci — fără foi de hârtie, fără să ghicești cine a purtat ce număr.</string>
+    <string name="welcome_value_lineups">Formație și ordine la bătaie în câteva minute</string>
+    <string name="welcome_value_defense">Schemă vizuală a apărării, trage pentru a atribui</string>
+    <string name="welcome_value_message">Scrie întregii echipe dintr-o atingere</string>
+    <string name="login_create">Creează prima ta echipă</string>
+    <string name="login_import">Importă o echipă existentă</string>
+    <string name="settings_category_team">Echipă</string>
+    <string name="settings_team_row_subtitle">Nume, siglă, mărimea lotului</string>
+    <string name="settings_category_style">Stil</string>
+    <string name="settings_category_data">Date</string>
+    <string name="link_dp_and_flex_dialog_title">Leagă DP-ul și Flex-ul</string>
+    <string name="link_dh_and_pitcher_dialog_title">Leagă DH-ul și aruncătorul</string>
+    <string name="generic_discard">Renunță</string>
+    <string name="settings_export_error_title">Exportul nu a reușit</string>
+    <string name="settings_import_error_title">Importul nu a reușit</string>
+    <string name="settings_export_error_message">A apărut o problemă la export. Încearcă din nou și
+        verifică dacă aplicația are acces la spațiul de stocare extern.</string>
+    <string name="settings_import_error_message">A apărut o problemă la import. Încearcă din nou și
+        verifică dacă aplicația are acces la spațiul de stocare extern.</string>
+    <string name="error_need_assign_pitcher_first_message">Alege mai întâi aruncătorul</string>
+    <string name="error_need_assign_both_players_message">Alege atât DP-ul, cât și Flex-ul</string>
+    <string name="error_when_deleting_lineup">A apărut o problemă la ștergerea formației</string>
+    <string name="error_when_deleting_team">A apărut o problemă la ștergerea echipei</string>
+    <string name="create_player_favorite_positions">Poziții preferate: (max. 3)</string>
+    <string name="create_player_pitching_side">Aruncă</string>
+    <string name="create_player_batting_side">Bate</string>
+    <string name="create_player_sex">Sex</string>
+    <string name="generic_left">Stânga</string>
+    <string name="generic_right">Dreapta</string>
+    <string name="generic_optional">Opțional</string>
+    <string name="player_form_title_create">Jucător nou</string>
+    <string name="player_form_title_edit">Editează detaliile</string>
+    <string name="shirt_number_history_title">Numărul %1$s — istoric</string>
+    <string name="shirt_number_history_footnote">Cele mai recente primele — din toate formațiile
+        anterioare, nu doar din lotul actual.</string>
+    <string name="lineup_style_normal_label">Normal</string>
+    <string name="lineup_style_hand_writing_label">Scris de mână</string>
+    <string name="lineup_theme_system_value">Sistem</string>
+    <string name="lineup_theme_day_value">Luminoasă</string>
+    <string name="lineup_theme_night_value">Întunecată</string>
+    <string name="generic_not_found">Negăsit</string>
+    <string name="generic_error_with_detail">A apărut o problemă: %1$s</string>
+    <string name="form_lineup_creation_extra_hitters_label">Batători suplimentari</string>
+    <string name="form_lineup_creation_strategy_label">Strategie</string>
+    <string name="roster_sort_by_name">După nume</string>
+    <string name="roster_sort_by_number">După număr</string>
+    <string name="roster_empty_title">Încă niciun jucător</string>
+    <string name="roster_empty_message">Adaugă primul jucător pentru a forma lotul.</string>
+    <string name="roster_add_player_content_description">Adaugă jucător</string>
+    <string name="roster_message_team_content_description">Trimite mesaj echipei</string>
+    <string name="roster_message_sheet_title">Trimite mesaj echipei</string>
+    <string name="roster_message_text_label">SMS</string>
+    <string name="roster_message_phone_count">%1$d din %2$d au un număr înregistrat</string>
+    <string name="roster_message_email_label">E-mail</string>
+    <string name="roster_message_email_count">%1$d din %2$d au un e-mail înregistrat</string>
+    <string name="roster_message_share_label">Distribuie altfel</string>
+    <string name="roster_message_share_caption">Copiază contactele ca text</string>
+    <string name="roster_message_share_copied">Copiat în clipboard</string>
+    <string name="roster_message_footnote">Jucătorii care lipsesc din numărătorile de mai sus nu vor
+        primi mesajul — adaugă-le datele din lot ca să-i incluzi data viitoare.</string>
+    <string name="roster_message_no_app">Nicio aplicație nu poate face asta</string>
+    <string name="player_side_abbr_left">S</string>
+    <string name="player_side_abbr_right">D</string>
+    <string name="player_side_abbr_both">A</string>
+    <string name="roster_player_bats">Bate %1$s</string>
+    <string name="roster_player_throws">Aruncă %1$s</string>
+    <string name="player_profile_position_usage_label">Folosire pe poziții</string>
+    <string name="player_profile_empty_title">Încă niciun meci</string>
+    <string name="player_profile_empty_message">Apare după ce intră într-o formație</string>
+    <string name="defense_trash_content_description">Scoate de pe teren</string>
+    <string name="defense_add_substitute_content_description">Adaugă rezervă</string>
+    <string name="defense_empty_position_content_description">Adaugă un jucător pe această
+        poziție</string>
+    <string name="defense_mode_badge_editing">Se editează pozițiile</string>
+    <string name="defense_dh_toggle_sub_baseball">Aruncătorul nu bate — alt batător îi ia
+        rândul</string>
+    <string name="defense_dh_toggle_sub_softball">Flex-ul nu bate — DP-ul îi ia rândul</string>
+    <string name="defense_dh_slot_batting_format">Bate pentru %1$s (%2$s) · locul #%3$d</string>
+    <string name="defense_dh_slot_unassigned">Atinge pentru a atribui</string>
+    <string name="defense_substitute_slots_free">%1$d din %2$d locuri de batător suplimentar
+        libere</string>
+    <string name="defense_substitute_slots_unlimited">Batători suplimentari nelimitați</string>
+    <string name="defense_turn_off_dh_title_baseball">Dezactivezi DH-ul?</string>
+    <string name="defense_turn_off_dh_title_softball">Dezactivezi DP/Flex?</string>
+    <string name="defense_turn_off_dh_message">%1$s și %2$s vor fi eliminați complet din această
+        formație — nu doar dezlegați. Va trebui să-i adaugi din nou ca să bată sau să
+        apere.</string>
+    <string name="defense_turn_off_dh_confirm">Dezactivează</string>
+    <string name="defense_keep_dh_on">Păstrează DH-ul</string>
+    <string name="defense_keep_dp_flex_on">Păstrează DP/Flex</string>
+    <string name="defense_add_substitute_sheet_title">Adaugă rezervă</string>
+    <string name="defense_select_player_sheet_title">Alege un jucător</string>
+    <string name="defense_add_substitute_budget_free">%1$d din %2$d locuri de batător suplimentar
+        libere — următorul ales bate</string>
+    <string name="defense_add_substitute_budget_none">Niciun loc de batător suplimentar liber —
+        următorul ales stă pe bancă</string>
+    <string name="defense_add_substitute_budget_unlimited">Batători suplimentari nelimitați —
+        fiecare ales bate</string>
+    <string name="defense_add_substitute_will_bat">Va bate</string>
+    <string name="defense_add_substitute_bench_only">Doar bancă</string>
+    <string name="defense_add_substitute_candidate_position_format">%1$s · Bancă</string>
+    <string name="defense_add_substitute_bench_label">Bancă</string>
+    <string name="defense_add_substitute_footnote">După ce locul liber de mai sus e ocupat, fiecare
+        rezervă adăugată stă pe bancă fără rând la bătaie — până o schimbi cu cineva deja în
+        ordine.</string>
+    <string name="link_dp_flex_locked_footnote">Locul blocat ține de cel care aruncă pe teren —
+        schimbă acolo aruncătorul ca să schimbi legătura.</string>
+    <string name="link_dp_flex_batting_role_format">%1$s · locul #%2$d</string>
+    <string name="link_dp_flex_wont_bat_role_format">%1$s · nu bate</string>
+    <string name="libraries_title">Mențiuni pentru biblioteci</string>
+    <string name="discard_change_title">Ești pe cale să anulezi modificările</string>
+    <string name="discard_change_message">Modificările se vor pierde. Ești sigur?</string>
+    <string name="discard_keep_editing">Continuă editarea</string>
+    <string name="tournament_stats_unknown_player_name">Necunoscut</string>
+    <string name="title_tournament_statistics">Statistici</string>
+    <string name="tournament_stats_playing_time_label">Timp de joc</string>
+    <string name="tournament_stats_avg_games_label">Medie meciuri</string>
+    <string name="tournament_stats_low_games_label">Min.</string>
+    <string name="tournament_stats_high_games_label">Max.</string>
+    <string name="tournament_stats_select_player_placeholder">Alege un jucător</string>
+</resources>

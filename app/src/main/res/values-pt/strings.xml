@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_edit">Editar</string>
+    <string name="action_edit_roster">Editar elenco</string>
+    <string name="action_delete">Excluir</string>
+    <string name="action_share">Compartilhar</string>
+    <string name="generic_back">Voltar</string>
+    <string name="generic_close">Fechar</string>
+    <string name="generic_done">Concluído</string>
+    <string name="screen_header_eyebrow_app">EasyLineUp</string>
+    <string name="new_lineup_tab_field_defense">Defesa</string>
+    <string name="new_lineup_tab_field_offense">Ataque</string>
+    <string name="save_button">Salvar</string>
+    <string name="cancel_button">Cancelar</string>
+    <string name="action_save_lineup">Salvar escalação</string>
+    <string name="dialog_create_lineup_name">Nome da escalação</string>
+    <string name="dialog_create_lineup_tournament">Torneio</string>
+    <string name="player_hint_name">Nome</string>
+    <string name="player_hint_shirt_number">Número da camisa</string>
+    <string name="player_hint_license_number_short">N.º de registro</string>
+    <string name="player_hint_email">E-mail</string>
+    <string name="player_hint_phone">Telefone</string>
+    <string name="title_last_lineup">Início</string>
+    <string name="title_team">Elenco</string>
+    <string name="title_lineups">Minhas escalações</string>
+    <string name="title_settings">Configurações</string>
+    <string name="team_details_header_title">Time</string>
+    <string name="team_creation_error_name_empty">O nome do time não pode ficar vazio</string>
+    <string name="team_form_eyebrow">Time</string>
+    <string name="team_form_title_create">Criar time</string>
+    <string name="team_form_title_edit">Editar dados</string>
+    <string name="team_form_name_label">Nome do time</string>
+    <string name="team_form_type_label">Tipo de time</string>
+    <string name="team_form_close_content_description">Fechar</string>
+    <string name="player_creation_error_name_empty">O nome do jogador não pode ficar vazio</string>
+    <string name="player_creation_error_invalid_email_format">Formato de e-mail inválido</string>
+    <string name="player_creation_error_invalid_phone_format">Formato de telefone inválido</string>
+    <string name="lineup_creation_error_name_empty">O nome da escalação não pode ficar
+        vazio</string>
+    <string name="lineup_creation_error_tournament_empty">O nome do torneio não pode ficar
+        vazio</string>
+    <string name="dialog_delete_team_title">Excluir o time %s?</string>
+    <string name="dialog_delete_lineup_title">Excluir a escalação?</string>
+    <string name="dialog_delete_player_title">Excluir o jogador?</string>
+    <string name="dialog_delete_tournament_title">Excluir o torneio %s?</string>
+    <string name="dialog_delete_substitute_title">Remover %1$s?</string>
+    <string name="dialog_delete_cannot_undo_message">Esta ação não pode ser desfeita. Tem
+        certeza?</string>
+    <string name="tile_most_used_player_games_played">Jogos disputados</string>
+    <string name="tile_last_lineup_header">Última escalação</string>
+    <string name="dashboard_mini_roster_size_label">Tamanho do elenco</string>
+    <string name="dashboard_mini_most_used_label">Mais escalado</string>
+    <string name="dashboard_hero_empty_title">Nenhuma escalação ainda.</string>
+    <string name="dashboard_lookup_hint">Quem usou este número?</string>
+    <string name="attack_extra_hitter_suffix">rebatedor extra</string>
+    <string name="attack_editing_order_badge">Editando a ordem</string>
+    <string name="attack_legend_content_description">Como ler esta lista</string>
+    <string name="attack_legend_title">Como ler esta lista</string>
+    <string name="attack_legend_body">O número à esquerda é a ordem de rebatida. Abaixo do nome de
+        cada jogador está a posição defensiva: o número clássico da súmula (1-9) seguido da
+        abreviação. O número à direita é o número da camisa.</string>
+    <string name="attack_legend_body_editable_suffix"> Durante a edição, mantenha pressionada a alça
+        à esquerda para arrastar um jogador para outra posição.</string>
+    <string name="form_lineup_creation_date_label">Data</string>
+    <string name="form_lineup_creation_roster_label">Elenco desta escalação</string>
+    <string name="lineup_creation_header_eyebrow">Escalações</string>
+    <string name="lineup_creation_header_title">Nova escalação</string>
+    <string name="lineup_creation_name_placeholder">ex.: Jogo 3 — Titulares</string>
+    <string name="lineup_creation_tournament_placeholder">Escolha um torneio</string>
+    <string name="lineup_creation_date_sub_within">Dentro das datas de %1$s</string>
+    <string name="lineup_creation_date_disabled_hint">Escolha um torneio primeiro</string>
+    <string name="lineup_creation_tournament_sheet_title">Escolha um torneio</string>
+    <string name="lineup_creation_tournament_search_placeholder">Buscar torneios…</string>
+    <string name="lineup_creation_tournament_create_row">Criar um novo torneio</string>
+    <string name="lineup_creation_tournament_selected_pill">Selecionado</string>
+    <string name="lineup_creation_roster_search_placeholder">Buscar um jogador…</string>
+    <string name="lineup_creation_roster_clear_all">Desmarcar todos</string>
+    <string name="lineup_creation_roster_selected_format">%1$d de %2$d selecionados</string>
+    <string name="lineup_creation_roster_status_default">padrão #%1$d</string>
+    <string name="lineup_creation_roster_status_override">hoje com o #%1$d</string>
+    <string name="lineup_creation_roster_status_sitting_out">Fora do jogo</string>
+    <string name="lineup_creation_roster_done">Concluído</string>
+    <string name="lineup_creation_save">Criar escalação</string>
+    <string name="action_keep_editing">Continuar editando</string>
+    <string name="action_discard">Descartar</string>
+    <string name="edit_lineup_title">Editar escalação</string>
+    <string name="edit_lineup_footnote">Data, estratégia e rebatedores extras ficam travados depois
+        que a escalação existe — mudá-los com as posições já atribuídas invalidaria a ordem de
+        rebatida e o diagrama do campo.</string>
+    <string name="edit_lineup_save_changes">Salvar alterações</string>
+    <string name="lineup_creation_new_tournament_title">Novo torneio</string>
+    <string name="lineup_creation_new_tournament_subtitle">Ao selecioná-lo aqui, ele também é
+        adicionado à lista de torneios</string>
+    <string name="lineup_creation_new_tournament_name_label">Nome</string>
+    <string name="lineup_creation_new_tournament_name_placeholder">ex.: Liga de inverno</string>
+    <string name="lineup_creation_new_tournament_starts_label">Início</string>
+    <string name="lineup_creation_new_tournament_ends_label">Fim</string>
+    <string name="lineup_creation_new_tournament_pick_date">Escolher data</string>
+    <string name="lineup_creation_new_tournament_location_label">Local</string>
+    <string name="lineup_creation_new_tournament_location_placeholder">Endereço — posiciona o
+        marcador no mapa</string>
+    <string name="lineup_creation_new_tournament_save">Adicionar torneio</string>
+    <string name="tournaments_list_header_title">Torneios</string>
+    <string name="tournaments_list_search_placeholder">Buscar torneios ou escalações…</string>
+    <plurals name="tournaments_list_lineups_count">
+        <item quantity="one">%d escalação</item>
+        <item quantity="many">%d escalações</item>
+        <item quantity="other">%d escalações</item>
+    </plurals>
+    <plurals name="tournaments_list_show_more">
+        <item quantity="one">Ver mais %d</item>
+        <item quantity="many">Ver mais %d</item>
+        <item quantity="other">Ver mais %d</item>
+    </plurals>
+    <string name="tournaments_list_empty_title">Nenhum torneio ainda</string>
+    <string name="tournaments_list_empty_subtitle">Crie uma escalação para adicionar o
+        primeiro</string>
+    <string name="tournaments_list_empty_search_title">Nenhum resultado</string>
+    <string name="tournaments_list_empty_search_subtitle">Tente outro nome de torneio ou de
+        escalação</string>
+    <string name="tournaments_list_stats_content_description">Ver estatísticas do torneio</string>
+    <string name="tournaments_list_create_lineup_content_description">Criar escalação</string>
+    <string name="action_add_dp_flex">Usar DP/Flex</string>
+    <string name="action_add_dh">Usar DH</string>
+    <string name="action_confirm">Confirmar</string>
+    <string name="action_back">Voltar</string>
+    <plurals name="lineups_quantity">
+        <item quantity="one">%d escalação</item>
+        <item quantity="many">%d escalações</item>
+        <item quantity="other">%d escalações</item>
+    </plurals>
+    <string name="players_list_empty">Nenhum jogador disponível</string>
+    <string name="share_lineup_subject">Esta é a escalação de: %s</string>
+    <string name="lineup_pdf_title">Escalação</string>
+    <string name="lineup_pdf_date_label">Data: %s</string>
+    <string name="lineup_pdf_opponent_label">Adversário: %s</string>
+    <string name="lineup_pdf_batting_order_title">Ordem de rebatida</string>
+    <string name="lineup_pdf_defense_title">Defesa</string>
+    <string name="lineup_pdf_substitutes_title">Reservas</string>
+    <string name="team_list_empty_text">Quando você criar um time, ele aparecerá aqui</string>
+    <string name="switch_team_sheet_title">Trocar de time</string>
+    <plurals name="switch_team_sheet_subtitle">
+        <item quantity="one">%d time nesta conta</item>
+        <item quantity="many">%d times nesta conta</item>
+        <item quantity="other">%d times nesta conta</item>
+    </plurals>
+    <string name="switch_team_sheet_create_row">Criar um novo time</string>
+    <string name="switch_team_sheet_current">Atual</string>
+    <plurals name="team_details_roster_count">
+        <item quantity="one">%d jogador</item>
+        <item quantity="many">%d jogadores</item>
+        <item quantity="other">%d jogadores</item>
+    </plurals>
+    <string name="team_details_roster_label">Elenco</string>
+    <string name="team_details_lineups_label">Escalações criadas</string>
+    <string name="team_details_tournaments_label">Torneios</string>
+    <string name="team_details_created_label">Criado</string>
+    <string name="team_details_roster_by_gender">Elenco por sexo</string>
+    <string name="team_details_stat_label_unset">Não informado</string>
+    <string name="team_details_delete_title">Excluir time</string>
+    <string name="team_details_delete_subtitle">Remove todos os jogadores, escalações e
+        histórico</string>
+    <string name="setting_lineup_style_description">Fonte da escalação</string>
+    <string name="setting_men_style_description">Homens</string>
+    <string name="setting_women_style_description">Mulheres</string>
+    <string name="setting_day_night_style_description">Tema</string>
+    <string name="setting_category_about_title">Sobre</string>
+    <string name="setting_import_data_description">Importar dados de um arquivo</string>
+    <string name="setting_import_data_subtitle">De um arquivo .elu</string>
+    <string name="setting_export_data_description">Exportar dados para um arquivo</string>
+    <string name="setting_export_data_subtitle">Salva todos os times em um arquivo .elu</string>
+    <string name="setting_delete_data_description">Excluir todos os dados</string>
+    <string name="setting_delete_data_subtitle">Todos os times deste dispositivo</string>
+    <string name="setting_version_title">Versão</string>
+    <string name="setting_licenses_title">Licenças</string>
+    <string name="setting_play_store_title">Página oficial na Google Play Store</string>
+    <string name="data_transfer_count_teams">Times</string>
+    <string name="data_transfer_count_players">Jogadores</string>
+    <string name="data_transfer_count_lineups">Escalações</string>
+    <string name="data_transfer_count_tournaments">Torneios</string>
+    <string name="data_transfer_added_updated">%1$d adicionados · %2$d atualizados</string>
+    <string name="export_confirm_title">Exportar todos os dados</string>
+    <string name="export_confirm_message">Todos os times deste dispositivo — não só %1$s — salvos em
+        um único arquivo .elu</string>
+    <string name="export_confirm_footnote">Em seguida, você vai escolher uma pasta com o seletor do
+        Android, que não faz parte deste app.</string>
+    <string name="export_confirm_action">Escolher pasta</string>
+    <string name="export_success_title">Exportação concluída</string>
+    <string name="export_success_message">Salvo em %1$s como %2$s</string>
+    <string name="export_success_message_no_folder">Salvo como %1$s</string>
+    <string name="import_confirm_title">Importar este arquivo?</string>
+    <string name="import_confirm_overwrite_label">Substituir existentes</string>
+    <string name="import_confirm_overwrite_sub">Times e jogadores que já estão neste dispositivo são
+        substituídos em vez de ignorados</string>
+    <string name="import_confirm_footnote">Esta confirmação aparece seja qual for o caminho —
+        tocando em \"Importar dados\" nas Configurações ou abrindo um arquivo .elu diretamente —,
+        para que essa escolha nunca seja feita por você sem aviso.</string>
+    <string name="import_confirm_action">Importar</string>
+    <string name="import_success_title">Importação concluída</string>
+    <string name="welcome_headline">Comande o\ndugout pelo\nseu bolso.</string>
+    <string name="welcome_body">Monte escalações, defina posições e acompanhe a ordem de rebatida de
+        cada jogo — sem papel, sem dúvida sobre quem usou qual número.</string>
+    <string name="welcome_value_lineups">Escalação e ordem de rebatida em minutos</string>
+    <string name="welcome_value_defense">Diagrama visual da defesa, arraste para atribuir</string>
+    <string name="welcome_value_message">Mande mensagem ao time todo com um toque</string>
+    <string name="login_create">Crie seu primeiro time</string>
+    <string name="login_import">Importar um time existente</string>
+    <string name="settings_category_team">Time</string>
+    <string name="settings_team_row_subtitle">Nome, logo, tamanho do elenco</string>
+    <string name="settings_category_style">Estilo</string>
+    <string name="settings_category_data">Dados</string>
+    <string name="link_dp_and_flex_dialog_title">Vincule seu DP e seu Flex</string>
+    <string name="link_dh_and_pitcher_dialog_title">Vincule seu DH e seu arremessador</string>
+    <string name="generic_discard">Descartar</string>
+    <string name="settings_export_error_title">Não foi possível exportar</string>
+    <string name="settings_import_error_title">Não foi possível importar</string>
+    <string name="settings_export_error_message">Algo deu errado durante a exportação. Tente
+        novamente e verifique se o app tem acesso ao armazenamento externo.</string>
+    <string name="settings_import_error_message">Algo deu errado durante a importação. Tente
+        novamente e verifique se o app tem acesso ao armazenamento externo.</string>
+    <string name="error_need_assign_pitcher_first_message">Selecione primeiro o seu
+        arremessador</string>
+    <string name="error_need_assign_both_players_message">Selecione o DP e o Flex</string>
+    <string name="error_when_deleting_lineup">Algo deu errado ao excluir a escalação</string>
+    <string name="error_when_deleting_team">Algo deu errado ao excluir o time</string>
+    <string name="create_player_favorite_positions">Posições favoritas: (máx. 3)</string>
+    <string name="create_player_pitching_side">Arremessa</string>
+    <string name="create_player_batting_side">Rebate</string>
+    <string name="create_player_sex">Sexo</string>
+    <string name="generic_left">Esquerda</string>
+    <string name="generic_right">Direita</string>
+    <string name="generic_optional">Opcional</string>
+    <string name="player_form_title_create">Novo jogador</string>
+    <string name="player_form_title_edit">Editar dados</string>
+    <string name="shirt_number_history_title">Número %1$s — histórico</string>
+    <string name="shirt_number_history_footnote">Do mais recente ao mais antigo — a partir de todas
+        as escalações anteriores, não só do elenco atual.</string>
+    <string name="lineup_style_normal_label">Normal</string>
+    <string name="lineup_style_hand_writing_label">Manuscrita</string>
+    <string name="lineup_theme_system_value">Sistema</string>
+    <string name="lineup_theme_day_value">Claro</string>
+    <string name="lineup_theme_night_value">Escuro</string>
+    <string name="generic_not_found">Não encontrado</string>
+    <string name="generic_error_with_detail">Algo deu errado: %1$s</string>
+    <string name="form_lineup_creation_extra_hitters_label">Rebatedores extras</string>
+    <string name="form_lineup_creation_strategy_label">Estratégia</string>
+    <string name="roster_sort_by_name">Por nome</string>
+    <string name="roster_sort_by_number">Por número</string>
+    <string name="roster_empty_title">Nenhum jogador ainda</string>
+    <string name="roster_empty_message">Adicione seu primeiro jogador para montar o elenco.</string>
+    <string name="roster_add_player_content_description">Adicionar jogador</string>
+    <string name="roster_message_team_content_description">Mandar mensagem ao time</string>
+    <string name="roster_message_sheet_title">Mandar mensagem ao time</string>
+    <string name="roster_message_text_label">SMS</string>
+    <string name="roster_message_phone_count">%1$d de %2$d têm um número cadastrado</string>
+    <string name="roster_message_email_label">E-mail</string>
+    <string name="roster_message_email_count">%1$d de %2$d têm um e-mail cadastrado</string>
+    <string name="roster_message_share_label">Compartilhar de outra forma</string>
+    <string name="roster_message_share_caption">Copia os contatos como texto</string>
+    <string name="roster_message_share_copied">Copiado para a área de transferência</string>
+    <string name="roster_message_footnote">Jogadores que faltam nas contagens acima não vão receber
+        essa mensagem — adicione os dados deles no elenco para incluí-los da próxima vez.</string>
+    <string name="roster_message_no_app">Nenhum app disponível para isso</string>
+    <string name="player_side_abbr_left">E</string>
+    <string name="player_side_abbr_right">D</string>
+    <string name="player_side_abbr_both">A</string>
+    <string name="roster_player_bats">Rebate %1$s</string>
+    <string name="roster_player_throws">Arremessa %1$s</string>
+    <string name="player_profile_position_usage_label">Uso por posição</string>
+    <string name="player_profile_empty_title">Nenhum jogo ainda</string>
+    <string name="player_profile_empty_message">Aparece assim que estiver em uma escalação</string>
+    <string name="defense_trash_content_description">Tirar do campo</string>
+    <string name="defense_add_substitute_content_description">Adicionar reserva</string>
+    <string name="defense_empty_position_content_description">Adicionar um jogador nesta
+        posição</string>
+    <string name="defense_mode_badge_editing">Editando posições</string>
+    <string name="defense_dh_toggle_sub_baseball">O arremessador não rebate — outro rebatedor ocupa
+        a vez dele</string>
+    <string name="defense_dh_toggle_sub_softball">O Flex não rebate — o DP ocupa a vez dele</string>
+    <string name="defense_dh_slot_batting_format">Rebate por %1$s (%2$s) · vez #%3$d</string>
+    <string name="defense_dh_slot_unassigned">Toque para atribuir</string>
+    <string name="defense_substitute_slots_free">%1$d de %2$d vagas de rebatedor extra
+        livres</string>
+    <string name="defense_substitute_slots_unlimited">Rebatedores extras ilimitados</string>
+    <string name="defense_turn_off_dh_title_baseball">Desativar o DH?</string>
+    <string name="defense_turn_off_dh_title_softball">Desativar DP/Flex?</string>
+    <string name="defense_turn_off_dh_message">%1$s e %2$s serão removidos totalmente desta
+        escalação — não só desvinculados. Você terá de adicioná-los de novo para rebater ou
+        defender.</string>
+    <string name="defense_turn_off_dh_confirm">Desativar</string>
+    <string name="defense_keep_dh_on">Manter o DH</string>
+    <string name="defense_keep_dp_flex_on">Manter DP/Flex</string>
+    <string name="defense_add_substitute_sheet_title">Adicionar reserva</string>
+    <string name="defense_select_player_sheet_title">Selecione um jogador</string>
+    <string name="defense_add_substitute_budget_free">%1$d de %2$d vagas de rebatedor extra livres —
+        o próximo escolhido rebate</string>
+    <string name="defense_add_substitute_budget_none">Nenhuma vaga de rebatedor extra livre — o
+        próximo escolhido fica no banco</string>
+    <string name="defense_add_substitute_budget_unlimited">Rebatedores extras ilimitados — todo
+        escolhido rebate</string>
+    <string name="defense_add_substitute_will_bat">Vai rebater</string>
+    <string name="defense_add_substitute_bench_only">Só banco</string>
+    <string name="defense_add_substitute_candidate_position_format">%1$s · Banco</string>
+    <string name="defense_add_substitute_bench_label">Banco</string>
+    <string name="defense_add_substitute_footnote">Depois que a vaga livre acima for usada, todo
+        reserva que você adicionar fica no banco sem vez de rebater — até você trocá-lo por alguém
+        que já está na ordem.</string>
+    <string name="link_dp_flex_locked_footnote">A vaga travada está ligada a quem arremessa no campo
+        — troque o arremessador lá para mudar o vínculo.</string>
+    <string name="link_dp_flex_batting_role_format">%1$s · vez #%2$d</string>
+    <string name="link_dp_flex_wont_bat_role_format">%1$s · não rebate</string>
+    <string name="libraries_title">Avisos das bibliotecas</string>
+    <string name="discard_change_title">Você vai cancelar suas alterações</string>
+    <string name="discard_change_message">As alterações serão perdidas. Tem certeza?</string>
+    <string name="discard_keep_editing">Continuar editando</string>
+    <string name="tournament_stats_unknown_player_name">Desconhecido</string>
+    <string name="title_tournament_statistics">Estatísticas</string>
+    <string name="tournament_stats_playing_time_label">Tempo de jogo</string>
+    <string name="tournament_stats_avg_games_label">Média de jogos</string>
+    <string name="tournament_stats_low_games_label">Mín.</string>
+    <string name="tournament_stats_high_games_label">Máx.</string>
+    <string name="tournament_stats_select_player_placeholder">Selecione um jogador</string>
+</resources>

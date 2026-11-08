@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_edit">I-edit</string>
+    <string name="action_edit_roster">I-edit ang roster</string>
+    <string name="action_delete">Burahin</string>
+    <string name="action_share">Ibahagi</string>
+    <string name="generic_back">Bumalik</string>
+    <string name="generic_close">Isara</string>
+    <string name="generic_done">Tapos na</string>
+    <string name="screen_header_eyebrow_app">EasyLineUp</string>
+    <string name="new_lineup_tab_field_defense">Depensa</string>
+    <string name="new_lineup_tab_field_offense">Opensa</string>
+    <string name="save_button">I-save</string>
+    <string name="cancel_button">Kanselahin</string>
+    <string name="action_save_lineup">I-save ang lineup</string>
+    <string name="dialog_create_lineup_name">Pangalan ng lineup</string>
+    <string name="dialog_create_lineup_tournament">Torneo</string>
+    <string name="player_hint_name">Pangalan</string>
+    <string name="player_hint_shirt_number">Numero ng jersey</string>
+    <string name="player_hint_license_number_short">Blg. ng lisensya</string>
+    <string name="player_hint_email">Email</string>
+    <string name="player_hint_phone">Numero ng telepono</string>
+    <string name="title_last_lineup">Home</string>
+    <string name="title_team">Roster</string>
+    <string name="title_lineups">Mga lineup ko</string>
+    <string name="title_settings">Mga setting</string>
+    <string name="team_details_header_title">Koponan</string>
+    <string name="team_creation_error_name_empty">Hindi puwedeng walang laman ang pangalan ng
+        koponan</string>
+    <string name="team_form_eyebrow">Koponan</string>
+    <string name="team_form_title_create">Gumawa ng koponan</string>
+    <string name="team_form_title_edit">I-edit ang detalye</string>
+    <string name="team_form_name_label">Pangalan ng koponan</string>
+    <string name="team_form_type_label">Uri ng koponan</string>
+    <string name="team_form_close_content_description">Isara</string>
+    <string name="player_creation_error_name_empty">Hindi puwedeng walang laman ang pangalan ng
+        manlalaro</string>
+    <string name="player_creation_error_invalid_email_format">Mali ang format ng email</string>
+    <string name="player_creation_error_invalid_phone_format">Mali ang format ng numero ng
+        telepono</string>
+    <string name="lineup_creation_error_name_empty">Hindi puwedeng walang laman ang pangalan ng
+        lineup</string>
+    <string name="lineup_creation_error_tournament_empty">Hindi puwedeng walang laman ang pangalan
+        ng torneo</string>
+    <string name="dialog_delete_team_title">Burahin ang koponang %s?</string>
+    <string name="dialog_delete_lineup_title">Burahin ang lineup?</string>
+    <string name="dialog_delete_player_title">Burahin ang manlalaro?</string>
+    <string name="dialog_delete_tournament_title">Burahin ang torneong %s?</string>
+    <string name="dialog_delete_substitute_title">Alisin si %1$s?</string>
+    <string name="dialog_delete_cannot_undo_message">Hindi na ito maibabalik. Sigurado ka
+        ba?</string>
+    <string name="tile_most_used_player_games_played">Mga larong nilaro</string>
+    <string name="tile_last_lineup_header">Huling lineup</string>
+    <string name="dashboard_mini_roster_size_label">Laki ng roster</string>
+    <string name="dashboard_mini_most_used_label">Pinakamadalas gamitin</string>
+    <string name="dashboard_hero_empty_title">Wala pang lineup.</string>
+    <string name="dashboard_lookup_hint">Sino ang nagsuot ng numerong ito?</string>
+    <string name="attack_extra_hitter_suffix">dagdag na hitter</string>
+    <string name="attack_editing_order_badge">Ine-edit ang pagkakasunod</string>
+    <string name="attack_legend_content_description">Paano basahin ang listahang ito</string>
+    <string name="attack_legend_title">Paano basahin ang listahang ito</string>
+    <string name="attack_legend_body">Ang numero sa kaliwa ay ang batting order. Sa ilalim ng
+        pangalan ng bawat manlalaro ay ang posisyon niya sa depensa: ang klasikong numero sa
+        scorebook (1-9) at ang daglat nito. Ang numero sa kanan ay ang numero ng jersey.</string>
+    <string name="attack_legend_body_editable_suffix"> Habang nag-e-edit, pindutin nang matagal ang
+        hawakan sa kaliwa para i-drag ang manlalaro sa ibang puwesto.</string>
+    <string name="form_lineup_creation_date_label">Petsa</string>
+    <string name="form_lineup_creation_roster_label">Roster para sa lineup na ito</string>
+    <string name="lineup_creation_header_eyebrow">Mga lineup</string>
+    <string name="lineup_creation_header_title">Bagong lineup</string>
+    <string name="lineup_creation_name_placeholder">hal. Laro 3 — Mga starter</string>
+    <string name="lineup_creation_tournament_placeholder">Pumili ng torneo</string>
+    <string name="lineup_creation_date_sub_within">Sa loob ng mga petsa ng %1$s</string>
+    <string name="lineup_creation_date_disabled_hint">Pumili muna ng torneo</string>
+    <string name="lineup_creation_tournament_sheet_title">Pumili ng torneo</string>
+    <string name="lineup_creation_tournament_search_placeholder">Maghanap ng torneo…</string>
+    <string name="lineup_creation_tournament_create_row">Gumawa ng bagong torneo</string>
+    <string name="lineup_creation_tournament_selected_pill">Napili</string>
+    <string name="lineup_creation_roster_search_placeholder">Maghanap ng manlalaro…</string>
+    <string name="lineup_creation_roster_clear_all">Alisin lahat</string>
+    <string name="lineup_creation_roster_selected_format">%1$d sa %2$d ang napili</string>
+    <string name="lineup_creation_roster_status_default">karaniwan #%1$d</string>
+    <string name="lineup_creation_roster_status_override">suot ang #%1$d ngayong gabi</string>
+    <string name="lineup_creation_roster_status_sitting_out">Hindi maglalaro</string>
+    <string name="lineup_creation_roster_done">Tapos na</string>
+    <string name="lineup_creation_save">Gumawa ng lineup</string>
+    <string name="action_keep_editing">Ituloy ang pag-edit</string>
+    <string name="action_discard">Itapon</string>
+    <string name="edit_lineup_title">I-edit ang lineup</string>
+    <string name="edit_lineup_footnote">Naka-lock na ang petsa, estratehiya at dagdag na hitter
+        kapag nagawa na ang lineup — kapag binago ang mga ito matapos italaga ang mga posisyon,
+        masisira ang batting order at ang diagram ng field.</string>
+    <string name="edit_lineup_save_changes">I-save ang mga pagbabago</string>
+    <string name="lineup_creation_new_tournament_title">Bagong torneo</string>
+    <string name="lineup_creation_new_tournament_subtitle">Kapag pinili mo ito rito, maidaragdag din
+        ito sa listahan ng mga torneo</string>
+    <string name="lineup_creation_new_tournament_name_label">Pangalan</string>
+    <string name="lineup_creation_new_tournament_name_placeholder">hal. Winter League</string>
+    <string name="lineup_creation_new_tournament_starts_label">Simula</string>
+    <string name="lineup_creation_new_tournament_ends_label">Wakas</string>
+    <string name="lineup_creation_new_tournament_pick_date">Pumili ng petsa</string>
+    <string name="lineup_creation_new_tournament_location_label">Lokasyon</string>
+    <string name="lineup_creation_new_tournament_location_placeholder">Address — para sa pin sa
+        mapa</string>
+    <string name="lineup_creation_new_tournament_save">Idagdag ang torneo</string>
+    <string name="tournaments_list_header_title">Mga torneo</string>
+    <string name="tournaments_list_search_placeholder">Maghanap ng torneo o lineup…</string>
+    <plurals name="tournaments_list_lineups_count">
+        <item quantity="one">%d lineup</item>
+        <item quantity="other">%d na lineup</item>
+    </plurals>
+    <plurals name="tournaments_list_show_more">
+        <item quantity="one">Ipakita ang %d pa</item>
+        <item quantity="other">Ipakita ang %d pa</item>
+    </plurals>
+    <string name="tournaments_list_empty_title">Wala pang torneo</string>
+    <string name="tournaments_list_empty_subtitle">Gumawa ng lineup para maidagdag ang una</string>
+    <string name="tournaments_list_empty_search_title">Walang tugma</string>
+    <string name="tournaments_list_empty_search_subtitle">Subukan ang ibang pangalan ng torneo o
+        lineup</string>
+    <string name="tournaments_list_stats_content_description">Tingnan ang stats ng torneo</string>
+    <string name="tournaments_list_create_lineup_content_description">Gumawa ng lineup</string>
+    <string name="action_add_dp_flex">Gamitin ang DP/Flex</string>
+    <string name="action_add_dh">Gamitin ang DH</string>
+    <string name="action_confirm">Kumpirmahin</string>
+    <string name="action_back">Bumalik</string>
+    <plurals name="lineups_quantity">
+        <item quantity="one">%d lineup</item>
+        <item quantity="other">%d na lineup</item>
+    </plurals>
+    <string name="players_list_empty">Walang available na manlalaro</string>
+    <string name="share_lineup_subject">Narito ang lineup ng: %s</string>
+    <string name="lineup_pdf_title">Lineup</string>
+    <string name="lineup_pdf_date_label">Petsa: %s</string>
+    <string name="lineup_pdf_opponent_label">Kalaban: %s</string>
+    <string name="lineup_pdf_batting_order_title">Batting order</string>
+    <string name="lineup_pdf_defense_title">Depensa</string>
+    <string name="lineup_pdf_substitutes_title">Mga reserba</string>
+    <string name="team_list_empty_text">Kapag gumawa ka ng koponan, makikita mo ito rito</string>
+    <string name="switch_team_sheet_title">Lumipat ng koponan</string>
+    <plurals name="switch_team_sheet_subtitle">
+        <item quantity="one">%d koponan sa account na ito</item>
+        <item quantity="other">%d na koponan sa account na ito</item>
+    </plurals>
+    <string name="switch_team_sheet_create_row">Gumawa ng bagong koponan</string>
+    <string name="switch_team_sheet_current">Kasalukuyan</string>
+    <plurals name="team_details_roster_count">
+        <item quantity="one">%d manlalaro</item>
+        <item quantity="other">%d na manlalaro</item>
+    </plurals>
+    <string name="team_details_roster_label">Roster</string>
+    <string name="team_details_lineups_label">Mga nagawang lineup</string>
+    <string name="team_details_tournaments_label">Mga torneo</string>
+    <string name="team_details_created_label">Ginawa</string>
+    <string name="team_details_roster_by_gender">Roster ayon sa kasarian</string>
+    <string name="team_details_stat_label_unset">Hindi nakatakda</string>
+    <string name="team_details_delete_title">Burahin ang koponan</string>
+    <string name="team_details_delete_subtitle">Binubura ang lahat ng manlalaro, lineup at
+        kasaysayan</string>
+    <string name="setting_lineup_style_description">Font ng lineup</string>
+    <string name="setting_men_style_description">Kalalakihan</string>
+    <string name="setting_women_style_description">Kababaihan</string>
+    <string name="setting_day_night_style_description">Tema</string>
+    <string name="setting_category_about_title">Tungkol dito</string>
+    <string name="setting_import_data_description">Mag-import ng data mula sa file</string>
+    <string name="setting_import_data_subtitle">Mula sa isang .elu file</string>
+    <string name="setting_export_data_description">Mag-export ng data sa file</string>
+    <string name="setting_export_data_subtitle">Sine-save ang bawat koponan bilang .elu
+        file</string>
+    <string name="setting_delete_data_description">Burahin ang lahat ng data</string>
+    <string name="setting_delete_data_subtitle">Bawat koponan sa device na ito</string>
+    <string name="setting_version_title">Bersyon</string>
+    <string name="setting_licenses_title">Mga lisensya</string>
+    <string name="setting_play_store_title">Opisyal na page sa Google Play Store</string>
+    <string name="data_transfer_count_teams">Mga koponan</string>
+    <string name="data_transfer_count_players">Mga manlalaro</string>
+    <string name="data_transfer_count_lineups">Mga lineup</string>
+    <string name="data_transfer_count_tournaments">Mga torneo</string>
+    <string name="data_transfer_added_updated">%1$d naidagdag · %2$d na-update</string>
+    <string name="export_confirm_title">I-export ang lahat ng data</string>
+    <string name="export_confirm_message">Bawat koponan sa device na ito — hindi lang ang %1$s —
+        naka-save bilang isang .elu file</string>
+    <string name="export_confirm_footnote">Susunod, hihilingin sa iyong pumili ng folder — sa
+        sariling picker ng Android, hindi bahagi ng app na ito.</string>
+    <string name="export_confirm_action">Pumili ng folder</string>
+    <string name="export_success_title">Tapos na ang export</string>
+    <string name="export_success_message">Na-save sa %1$s bilang %2$s</string>
+    <string name="export_success_message_no_folder">Na-save bilang %1$s</string>
+    <string name="import_confirm_title">I-import ang file na ito?</string>
+    <string name="import_confirm_overwrite_label">Palitan ang mayroon na</string>
+    <string name="import_confirm_overwrite_sub">Papalitan sa halip na lalaktawan ang mga koponan at
+        manlalarong nasa device na ito</string>
+    <string name="import_confirm_footnote">Lumalabas ang kumpirmasyong ito paano ka man nakarating
+        dito — sa pag-tap ng \"Mag-import ng data\" sa Mga setting o sa direktang pagbukas ng .elu
+        file — kaya hindi kailanman ito pinipili para sa iyo nang palihim.</string>
+    <string name="import_confirm_action">I-import</string>
+    <string name="import_success_title">Tapos na ang import</string>
+    <string name="welcome_headline">Hawakan ang\ndugout mula sa\niyong bulsa.</string>
+    <string name="welcome_body">Gumawa ng lineup, magtalaga ng posisyon at subaybayan ang batting
+        order sa bawat laro — walang papel na card, walang hula kung sino ang nagsuot ng anong
+        numero.</string>
+    <string name="welcome_value_lineups">Lineup at batting order sa ilang minuto</string>
+    <string name="welcome_value_defense">Malinaw na diagram ng depensa, i-drag para italaga</string>
+    <string name="welcome_value_message">I-message ang buong koponan sa isang tap</string>
+    <string name="login_create">Gawin ang una mong koponan</string>
+    <string name="login_import">Mag-import ng dati nang koponan</string>
+    <string name="settings_category_team">Koponan</string>
+    <string name="settings_team_row_subtitle">Pangalan, logo, laki ng roster</string>
+    <string name="settings_category_style">Istilo</string>
+    <string name="settings_category_data">Data</string>
+    <string name="link_dp_and_flex_dialog_title">Iugnay ang iyong DP at Flex</string>
+    <string name="link_dh_and_pitcher_dialog_title">Iugnay ang iyong DH at pitcher</string>
+    <string name="generic_discard">Itapon</string>
+    <string name="settings_export_error_title">Hindi ma-export</string>
+    <string name="settings_import_error_title">Hindi ma-import</string>
+    <string name="settings_export_error_message">May nangyaring mali habang nag-e-export. Subukan
+        ulit at tingnan kung may access ang app sa external storage.</string>
+    <string name="settings_import_error_message">May nangyaring mali habang nag-i-import. Subukan
+        ulit at tingnan kung may access ang app sa external storage.</string>
+    <string name="error_need_assign_pitcher_first_message">Piliin muna ang iyong pitcher</string>
+    <string name="error_need_assign_both_players_message">Piliin ang iyong DP at Flex</string>
+    <string name="error_when_deleting_lineup">May nangyaring mali habang binubura ang
+        lineup</string>
+    <string name="error_when_deleting_team">May nangyaring mali habang binubura ang koponan</string>
+    <string name="create_player_favorite_positions">Mga paboritong posisyon: (Hanggang 3)</string>
+    <string name="create_player_pitching_side">Pagbato</string>
+    <string name="create_player_batting_side">Pagpalo</string>
+    <string name="create_player_sex">Kasarian</string>
+    <string name="generic_left">Kaliwa</string>
+    <string name="generic_right">Kanan</string>
+    <string name="generic_optional">Opsyonal</string>
+    <string name="player_form_title_create">Bagong manlalaro</string>
+    <string name="player_form_title_edit">I-edit ang detalye</string>
+    <string name="shirt_number_history_title">Numero %1$s — kasaysayan</string>
+    <string name="shirt_number_history_footnote">Pinakabago muna — mula sa lahat ng nakaraang
+        lineup, hindi lang sa kasalukuyang roster.</string>
+    <string name="lineup_style_normal_label">Normal</string>
+    <string name="lineup_style_hand_writing_label">Sulat-kamay</string>
+    <string name="lineup_theme_system_value">System</string>
+    <string name="lineup_theme_day_value">Maliwanag</string>
+    <string name="lineup_theme_night_value">Madilim</string>
+    <string name="generic_not_found">Hindi nakita</string>
+    <string name="generic_error_with_detail">May nangyaring mali: %1$s</string>
+    <string name="form_lineup_creation_extra_hitters_label">Dagdag na hitter</string>
+    <string name="form_lineup_creation_strategy_label">Estratehiya</string>
+    <string name="roster_sort_by_name">Ayon sa pangalan</string>
+    <string name="roster_sort_by_number">Ayon sa numero</string>
+    <string name="roster_empty_title">Wala pang manlalaro</string>
+    <string name="roster_empty_message">Idagdag ang una mong manlalaro para makabuo ng
+        roster.</string>
+    <string name="roster_add_player_content_description">Magdagdag ng manlalaro</string>
+    <string name="roster_message_team_content_description">Mag-message sa koponan</string>
+    <string name="roster_message_sheet_title">Mag-message sa koponan</string>
+    <string name="roster_message_text_label">Text message</string>
+    <string name="roster_message_phone_count">%1$d sa %2$d ang may numerong nakatala</string>
+    <string name="roster_message_email_label">Email</string>
+    <string name="roster_message_email_count">%1$d sa %2$d ang may email na nakatala</string>
+    <string name="roster_message_share_label">Ibahagi sa ibang paraan</string>
+    <string name="roster_message_share_caption">Kinokopya ang mga contact bilang text</string>
+    <string name="roster_message_share_copied">Nakopya sa clipboard</string>
+    <string name="roster_message_footnote">Hindi matatanggap ng mga manlalarong wala sa bilang sa
+        itaas ang mensaheng iyon — idagdag ang kanilang impormasyon mula sa roster para maisama sila
+        sa susunod.</string>
+    <string name="roster_message_no_app">Walang app na makakagawa nito</string>
+    <string name="player_side_abbr_left">K</string>
+    <string name="player_side_abbr_right">Kn</string>
+    <string name="player_side_abbr_both">P</string>
+    <string name="roster_player_bats">Pumapalo %1$s</string>
+    <string name="roster_player_throws">Bumabato %1$s</string>
+    <string name="player_profile_position_usage_label">Paggamit ayon sa posisyon</string>
+    <string name="player_profile_empty_title">Wala pang nilarong laro</string>
+    <string name="player_profile_empty_message">Lalabas kapag nasa isang lineup na</string>
+    <string name="defense_trash_content_description">Alisin sa field</string>
+    <string name="defense_add_substitute_content_description">Magdagdag ng reserba</string>
+    <string name="defense_empty_position_content_description">Magdagdag ng manlalaro sa posisyong
+        ito</string>
+    <string name="defense_mode_badge_editing">Ine-edit ang mga posisyon</string>
+    <string name="defense_dh_toggle_sub_baseball">Hindi papalo ang pitcher — ibang hitter ang
+        papalit sa turno niya</string>
+    <string name="defense_dh_toggle_sub_softball">Hindi papalo ang Flex — ang DP ang papalit sa
+        turno</string>
+    <string name="defense_dh_slot_batting_format">Pumapalo para kay %1$s (%2$s) · turno
+        #%3$d</string>
+    <string name="defense_dh_slot_unassigned">I-tap para italaga</string>
+    <string name="defense_substitute_slots_free">%1$d sa %2$d puwesto ng dagdag na hitter ang
+        bakante</string>
+    <string name="defense_substitute_slots_unlimited">Walang limitasyon ang dagdag na
+        hitter</string>
+    <string name="defense_turn_off_dh_title_baseball">I-off ang DH?</string>
+    <string name="defense_turn_off_dh_title_softball">I-off ang DP/Flex?</string>
+    <string name="defense_turn_off_dh_message">Tuluyang aalisin sina %1$s at %2$s sa lineup na ito —
+        hindi lang ihihiwalay. Kailangan mo silang idagdag ulit para pumalo o dumepensa.</string>
+    <string name="defense_turn_off_dh_confirm">I-off</string>
+    <string name="defense_keep_dh_on">Panatilihin ang DH</string>
+    <string name="defense_keep_dp_flex_on">Panatilihin ang DP/Flex</string>
+    <string name="defense_add_substitute_sheet_title">Magdagdag ng reserba</string>
+    <string name="defense_select_player_sheet_title">Pumili ng manlalaro</string>
+    <string name="defense_add_substitute_budget_free">%1$d sa %2$d puwesto ng dagdag na hitter ang
+        bakante — papalo ang susunod na pipiliin</string>
+    <string name="defense_add_substitute_budget_none">Walang bakanteng puwesto ng dagdag na hitter —
+        sa bench uupo ang susunod na pipiliin</string>
+    <string name="defense_add_substitute_budget_unlimited">Walang limitasyon ang dagdag na hitter —
+        papalo ang bawat pipiliin</string>
+    <string name="defense_add_substitute_will_bat">Papalo</string>
+    <string name="defense_add_substitute_bench_only">Bench lang</string>
+    <string name="defense_add_substitute_candidate_position_format">%1$s · Bench</string>
+    <string name="defense_add_substitute_bench_label">Bench</string>
+    <string name="defense_add_substitute_footnote">Kapag nagamit na ang bakanteng puwesto sa itaas,
+        uupo sa bench nang walang turno sa pagpalo ang bawat idaragdag mong reserba — hanggang
+        ipalit mo sila sa isang nasa order na.</string>
+    <string name="link_dp_flex_locked_footnote">Nakatali ang naka-lock na puwesto sa kung sino ang
+        pitcher sa field — palitan doon ang pitcher para baguhin kung kanino ito nakaugnay.</string>
+    <string name="link_dp_flex_batting_role_format">%1$s · turno #%2$d</string>
+    <string name="link_dp_flex_wont_bat_role_format">%1$s · hindi papalo</string>
+    <string name="libraries_title">Mga abiso para sa mga library</string>
+    <string name="discard_change_title">Kakanselahin mo na ang iyong mga pagbabago</string>
+    <string name="discard_change_message">Mawawala ang mga pagbabago. Sigurado ka ba?</string>
+    <string name="discard_keep_editing">Ituloy ang pag-edit</string>
+    <string name="tournament_stats_unknown_player_name">Hindi kilala</string>
+    <string name="title_tournament_statistics">Stats</string>
+    <string name="tournament_stats_playing_time_label">Oras ng paglalaro</string>
+    <string name="tournament_stats_avg_games_label">Average na laro</string>
+    <string name="tournament_stats_low_games_label">Pinakamababa</string>
+    <string name="tournament_stats_high_games_label">Pinakamataas</string>
+    <string name="tournament_stats_select_player_placeholder">Pumili ng manlalaro</string>
+</resources>

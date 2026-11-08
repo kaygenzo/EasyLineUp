@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_edit">Bearbeiten</string>
+    <string name="action_edit_roster">Kader bearbeiten</string>
+    <string name="action_delete">Löschen</string>
+    <string name="action_share">Teilen</string>
+    <string name="generic_back">Zurück</string>
+    <string name="generic_close">Schließen</string>
+    <string name="generic_done">Fertig</string>
+    <string name="screen_header_eyebrow_app">EasyLineUp</string>
+    <string name="new_lineup_tab_field_defense">Defensive</string>
+    <string name="new_lineup_tab_field_offense">Offensive</string>
+    <string name="save_button">Speichern</string>
+    <string name="cancel_button">Abbrechen</string>
+    <string name="action_save_lineup">Aufstellung speichern</string>
+    <string name="dialog_create_lineup_name">Name der Aufstellung</string>
+    <string name="dialog_create_lineup_tournament">Turnier</string>
+    <string name="player_hint_name">Name</string>
+    <string name="player_hint_shirt_number">Trikotnummer</string>
+    <string name="player_hint_license_number_short">Lizenz-Nr.</string>
+    <string name="player_hint_email">E-Mail</string>
+    <string name="player_hint_phone">Telefonnummer</string>
+    <string name="title_last_lineup">Übersicht</string>
+    <string name="title_team">Kader</string>
+    <string name="title_lineups">Aufstellungen</string>
+    <string name="title_settings">Einstellungen</string>
+    <string name="team_details_header_title">Team</string>
+    <string name="team_creation_error_name_empty">Der Teamname darf nicht leer sein</string>
+    <string name="team_form_eyebrow">Team</string>
+    <string name="team_form_title_create">Team erstellen</string>
+    <string name="team_form_title_edit">Details bearbeiten</string>
+    <string name="team_form_name_label">Teamname</string>
+    <string name="team_form_type_label">Teamart</string>
+    <string name="team_form_close_content_description">Schließen</string>
+    <string name="player_creation_error_name_empty">Der Spielername darf nicht leer sein</string>
+    <string name="player_creation_error_invalid_email_format">Ungültiges E-Mail-Format</string>
+    <string name="player_creation_error_invalid_phone_format">Ungültiges
+        Telefonnummernformat</string>
+    <string name="lineup_creation_error_name_empty">Der Name der Aufstellung darf nicht leer
+        sein</string>
+    <string name="lineup_creation_error_tournament_empty">Der Turniername darf nicht leer
+        sein</string>
+    <string name="dialog_delete_team_title">Team %s löschen?</string>
+    <string name="dialog_delete_lineup_title">Aufstellung löschen?</string>
+    <string name="dialog_delete_player_title">Spieler löschen?</string>
+    <string name="dialog_delete_tournament_title">Turnier %s löschen?</string>
+    <string name="dialog_delete_substitute_title">%1$s entfernen?</string>
+    <string name="dialog_delete_cannot_undo_message">Das kann nicht rückgängig gemacht werden. Bist
+        du sicher?</string>
+    <string name="tile_most_used_player_games_played">Gespielte Spiele</string>
+    <string name="tile_last_lineup_header">Letzte Aufstellung</string>
+    <string name="dashboard_mini_roster_size_label">Kadergröße</string>
+    <string name="dashboard_mini_most_used_label">Meiste Einsätze</string>
+    <string name="dashboard_hero_empty_title">Noch keine Aufstellung erstellt.</string>
+    <string name="dashboard_lookup_hint">Wer trug diese Nummer?</string>
+    <string name="attack_extra_hitter_suffix">Extra-Hitter</string>
+    <string name="attack_editing_order_badge">Reihenfolge bearbeiten</string>
+    <string name="attack_legend_content_description">So liest du diese Liste</string>
+    <string name="attack_legend_title">So liest du diese Liste</string>
+    <string name="attack_legend_body">Die Zahl links ist die Schlagreihenfolge. Unter dem Namen
+        jedes Spielers steht seine Defensivposition: die klassische Scorebook-Nummer (1-9) und ihr
+        Kürzel. Die Zahl rechts ist die Trikotnummer.</string>
+    <string name="attack_legend_body_editable_suffix"> Halte beim Bearbeiten den Griff links
+        gedrückt, um einen Spieler an eine andere Stelle zu ziehen.</string>
+    <string name="form_lineup_creation_date_label">Datum</string>
+    <string name="form_lineup_creation_roster_label">Kader für diese Aufstellung</string>
+    <string name="lineup_creation_header_eyebrow">Aufstellungen</string>
+    <string name="lineup_creation_header_title">Neue Aufstellung</string>
+    <string name="lineup_creation_name_placeholder">z. B. Spiel 3 — Startformation</string>
+    <string name="lineup_creation_tournament_placeholder">Turnier auswählen</string>
+    <string name="lineup_creation_date_sub_within">Innerhalb der Termine von %1$s</string>
+    <string name="lineup_creation_date_disabled_hint">Wähle zuerst ein Turnier</string>
+    <string name="lineup_creation_tournament_sheet_title">Turnier wählen</string>
+    <string name="lineup_creation_tournament_search_placeholder">Turniere suchen…</string>
+    <string name="lineup_creation_tournament_create_row">Neues Turnier erstellen</string>
+    <string name="lineup_creation_tournament_selected_pill">Ausgewählt</string>
+    <string name="lineup_creation_roster_search_placeholder">Spieler suchen…</string>
+    <string name="lineup_creation_roster_clear_all">Alle abwählen</string>
+    <string name="lineup_creation_roster_selected_format">%1$d von %2$d ausgewählt</string>
+    <string name="lineup_creation_roster_status_default">Standard #%1$d</string>
+    <string name="lineup_creation_roster_status_override">heute mit #%1$d</string>
+    <string name="lineup_creation_roster_status_sitting_out">Setzt aus</string>
+    <string name="lineup_creation_roster_done">Fertig</string>
+    <string name="lineup_creation_save">Aufstellung erstellen</string>
+    <string name="action_keep_editing">Weiter bearbeiten</string>
+    <string name="action_discard">Verwerfen</string>
+    <string name="edit_lineup_title">Aufstellung bearbeiten</string>
+    <string name="edit_lineup_footnote">Datum, Strategie und Extra-Hitter sind fest, sobald die
+        Aufstellung existiert — eine Änderung nach der Positionsvergabe würde Schlagreihenfolge und
+        Feldplan ungültig machen.</string>
+    <string name="edit_lineup_save_changes">Änderungen speichern</string>
+    <string name="lineup_creation_new_tournament_title">Neues Turnier</string>
+    <string name="lineup_creation_new_tournament_subtitle">Wenn du es hier auswählst, wird es auch
+        zur Turnierliste hinzugefügt</string>
+    <string name="lineup_creation_new_tournament_name_label">Name</string>
+    <string name="lineup_creation_new_tournament_name_placeholder">z. B. Winterliga</string>
+    <string name="lineup_creation_new_tournament_starts_label">Beginn</string>
+    <string name="lineup_creation_new_tournament_ends_label">Ende</string>
+    <string name="lineup_creation_new_tournament_pick_date">Datum wählen</string>
+    <string name="lineup_creation_new_tournament_location_label">Ort</string>
+    <string name="lineup_creation_new_tournament_location_placeholder">Adresse — für die
+        Kartenmarkierung</string>
+    <string name="lineup_creation_new_tournament_save">Turnier hinzufügen</string>
+    <string name="tournaments_list_header_title">Turniere</string>
+    <string name="tournaments_list_search_placeholder">Turniere oder Aufstellungen suchen…</string>
+    <plurals name="tournaments_list_lineups_count">
+        <item quantity="one">%d Aufstellung</item>
+        <item quantity="other">%d Aufstellungen</item>
+    </plurals>
+    <plurals name="tournaments_list_show_more">
+        <item quantity="one">%d weitere anzeigen</item>
+        <item quantity="other">%d weitere anzeigen</item>
+    </plurals>
+    <string name="tournaments_list_empty_title">Noch keine Turniere</string>
+    <string name="tournaments_list_empty_subtitle">Erstelle eine Aufstellung, um das erste
+        anzulegen</string>
+    <string name="tournaments_list_empty_search_title">Keine Treffer</string>
+    <string name="tournaments_list_empty_search_subtitle">Versuche einen anderen Turnier- oder
+        Aufstellungsnamen</string>
+    <string name="tournaments_list_stats_content_description">Turnierstatistik anzeigen</string>
+    <string name="tournaments_list_create_lineup_content_description">Aufstellung erstellen</string>
+    <string name="action_add_dp_flex">DP/Flex nutzen</string>
+    <string name="action_add_dh">DH nutzen</string>
+    <string name="action_confirm">Bestätigen</string>
+    <string name="action_back">Zurück</string>
+    <plurals name="lineups_quantity">
+        <item quantity="one">%d Aufstellung</item>
+        <item quantity="other">%d Aufstellungen</item>
+    </plurals>
+    <string name="players_list_empty">Kein Spieler verfügbar</string>
+    <string name="share_lineup_subject">Hier ist die Aufstellung von: %s</string>
+    <string name="lineup_pdf_title">Aufstellung</string>
+    <string name="lineup_pdf_date_label">Datum: %s</string>
+    <string name="lineup_pdf_opponent_label">Gegner: %s</string>
+    <string name="lineup_pdf_batting_order_title">Schlagreihenfolge</string>
+    <string name="lineup_pdf_defense_title">Defensive</string>
+    <string name="lineup_pdf_substitutes_title">Ersatzspieler</string>
+    <string name="team_list_empty_text">Sobald du ein Team erstellst, erscheint es hier</string>
+    <string name="switch_team_sheet_title">Team wechseln</string>
+    <plurals name="switch_team_sheet_subtitle">
+        <item quantity="one">%d Team in diesem Konto</item>
+        <item quantity="other">%d Teams in diesem Konto</item>
+    </plurals>
+    <string name="switch_team_sheet_create_row">Neues Team erstellen</string>
+    <string name="switch_team_sheet_current">Aktuell</string>
+    <plurals name="team_details_roster_count">
+        <item quantity="one">%d Spieler</item>
+        <item quantity="other">%d Spieler</item>
+    </plurals>
+    <string name="team_details_roster_label">Kader</string>
+    <string name="team_details_lineups_label">Erstellte Aufstellungen</string>
+    <string name="team_details_tournaments_label">Turniere</string>
+    <string name="team_details_created_label">Erstellt</string>
+    <string name="team_details_roster_by_gender">Kader nach Geschlecht</string>
+    <string name="team_details_stat_label_unset">Ohne Angabe</string>
+    <string name="team_details_delete_title">Team löschen</string>
+    <string name="team_details_delete_subtitle">Entfernt alle Spieler, Aufstellungen und den
+        Verlauf</string>
+    <string name="setting_lineup_style_description">Schrift der Aufstellung</string>
+    <string name="setting_men_style_description">Männer</string>
+    <string name="setting_women_style_description">Frauen</string>
+    <string name="setting_day_night_style_description">Design</string>
+    <string name="setting_category_about_title">Über</string>
+    <string name="setting_import_data_description">Daten aus Datei importieren</string>
+    <string name="setting_import_data_subtitle">Aus einer .elu-Datei</string>
+    <string name="setting_export_data_description">Daten in Datei exportieren</string>
+    <string name="setting_export_data_subtitle">Speichert alle Teams in einer .elu-Datei</string>
+    <string name="setting_delete_data_description">Alle Daten löschen</string>
+    <string name="setting_delete_data_subtitle">Alle Teams auf diesem Gerät</string>
+    <string name="setting_version_title">Version</string>
+    <string name="setting_licenses_title">Lizenzen</string>
+    <string name="setting_play_store_title">Offizielle Seite im Google Play Store</string>
+    <string name="data_transfer_count_teams">Teams</string>
+    <string name="data_transfer_count_players">Spieler</string>
+    <string name="data_transfer_count_lineups">Aufstellungen</string>
+    <string name="data_transfer_count_tournaments">Turniere</string>
+    <string name="data_transfer_added_updated">%1$d hinzugefügt · %2$d aktualisiert</string>
+    <string name="export_confirm_title">Alle Daten exportieren</string>
+    <string name="export_confirm_message">Alle Teams auf diesem Gerät — nicht nur %1$s — in einer
+        .elu-Datei gespeichert</string>
+    <string name="export_confirm_footnote">Als Nächstes wählst du einen Ordner — mit der
+        Ordnerauswahl von Android, nicht dieser App.</string>
+    <string name="export_confirm_action">Ordner wählen</string>
+    <string name="export_success_title">Export abgeschlossen</string>
+    <string name="export_success_message">In %1$s als %2$s gespeichert</string>
+    <string name="export_success_message_no_folder">Als %1$s gespeichert</string>
+    <string name="import_confirm_title">Diese Datei importieren?</string>
+    <string name="import_confirm_overwrite_label">Vorhandenes überschreiben</string>
+    <string name="import_confirm_overwrite_sub">Teams und Spieler, die schon auf diesem Gerät sind,
+        werden ersetzt statt übersprungen</string>
+    <string name="import_confirm_footnote">Diese Bestätigung erscheint, egal wie du hierher gelangt
+        bist — über \"Daten importieren\" in den Einstellungen oder durch direktes Öffnen einer
+        .elu-Datei —, damit diese Wahl nie stillschweigend für dich getroffen wird.</string>
+    <string name="import_confirm_action">Importieren</string>
+    <string name="import_success_title">Import abgeschlossen</string>
+    <string name="welcome_headline">Führe den\nDugout aus\nder Tasche.</string>
+    <string name="welcome_body">Erstelle Aufstellungen, verteile Positionen und behalte die
+        Schlagreihenfolge jedes Spiels im Blick — ohne Papierkarte, ohne Rätselraten, wer welche
+        Nummer trug.</string>
+    <string name="welcome_value_lineups">Aufstellung und Schlagreihenfolge in Minuten</string>
+    <string name="welcome_value_defense">Visueller Defensivplan, per Ziehen zuweisen</string>
+    <string name="welcome_value_message">Das ganze Team mit einem Tipp erreichen</string>
+    <string name="login_create">Erstelle dein erstes Team</string>
+    <string name="login_import">Vorhandenes Team importieren</string>
+    <string name="settings_category_team">Team</string>
+    <string name="settings_team_row_subtitle">Name, Logo, Kadergröße</string>
+    <string name="settings_category_style">Stil</string>
+    <string name="settings_category_data">Daten</string>
+    <string name="link_dp_and_flex_dialog_title">DP und Flex verknüpfen</string>
+    <string name="link_dh_and_pitcher_dialog_title">DH und Pitcher verknüpfen</string>
+    <string name="generic_discard">Verwerfen</string>
+    <string name="settings_export_error_title">Export nicht möglich</string>
+    <string name="settings_import_error_title">Import nicht möglich</string>
+    <string name="settings_export_error_message">Beim Export ist ein Fehler aufgetreten. Bitte
+        versuche es erneut und prüfe, ob die App Zugriff auf den externen Speicher hat.</string>
+    <string name="settings_import_error_message">Beim Import ist ein Fehler aufgetreten. Bitte
+        versuche es erneut und prüfe, ob die App Zugriff auf den externen Speicher hat.</string>
+    <string name="error_need_assign_pitcher_first_message">Wähle zuerst deinen Pitcher</string>
+    <string name="error_need_assign_both_players_message">Wähle deinen DP und deinen Flex</string>
+    <string name="error_when_deleting_lineup">Beim Löschen der Aufstellung ist ein Fehler
+        aufgetreten</string>
+    <string name="error_when_deleting_team">Beim Löschen des Teams ist ein Fehler
+        aufgetreten</string>
+    <string name="create_player_favorite_positions">Lieblingspositionen: (max. 3)</string>
+    <string name="create_player_pitching_side">Wirft</string>
+    <string name="create_player_batting_side">Schlägt</string>
+    <string name="create_player_sex">Geschlecht</string>
+    <string name="generic_left">Links</string>
+    <string name="generic_right">Rechts</string>
+    <string name="generic_optional">Optional</string>
+    <string name="player_form_title_create">Neuer Spieler</string>
+    <string name="player_form_title_edit">Details bearbeiten</string>
+    <string name="shirt_number_history_title">Nummer %1$s — Verlauf</string>
+    <string name="shirt_number_history_footnote">Neueste zuerst — aus allen bisherigen
+        Aufstellungen, nicht nur aus dem aktuellen Kader.</string>
+    <string name="lineup_style_normal_label">Normal</string>
+    <string name="lineup_style_hand_writing_label">Handschrift</string>
+    <string name="lineup_theme_system_value">System</string>
+    <string name="lineup_theme_day_value">Hell</string>
+    <string name="lineup_theme_night_value">Dunkel</string>
+    <string name="generic_not_found">Nicht gefunden</string>
+    <string name="generic_error_with_detail">Etwas ist schiefgelaufen: %1$s</string>
+    <string name="form_lineup_creation_extra_hitters_label">Extra-Hitter</string>
+    <string name="form_lineup_creation_strategy_label">Strategie</string>
+    <string name="roster_sort_by_name">Nach Name</string>
+    <string name="roster_sort_by_number">Nach Nummer</string>
+    <string name="roster_empty_title">Noch keine Spieler</string>
+    <string name="roster_empty_message">Füge deinen ersten Spieler hinzu, um einen Kader
+        aufzubauen.</string>
+    <string name="roster_add_player_content_description">Spieler hinzufügen</string>
+    <string name="roster_message_team_content_description">Team benachrichtigen</string>
+    <string name="roster_message_sheet_title">Team benachrichtigen</string>
+    <string name="roster_message_text_label">SMS</string>
+    <string name="roster_message_phone_count">%1$d von %2$d haben eine Nummer hinterlegt</string>
+    <string name="roster_message_email_label">E-Mail</string>
+    <string name="roster_message_email_count">%1$d von %2$d haben eine E-Mail hinterlegt</string>
+    <string name="roster_message_share_label">Anders teilen</string>
+    <string name="roster_message_share_caption">Kopiert die Kontakte als Text</string>
+    <string name="roster_message_share_copied">In die Zwischenablage kopiert</string>
+    <string name="roster_message_footnote">Spieler, die oben in einer Zählung fehlen, erhalten diese
+        Nachricht nicht — ergänze ihre Daten im Kader, um sie beim nächsten Mal
+        einzubeziehen.</string>
+    <string name="roster_message_no_app">Keine App kann diese Aktion ausführen</string>
+    <string name="player_side_abbr_left">L</string>
+    <string name="player_side_abbr_right">R</string>
+    <string name="player_side_abbr_both">B</string>
+    <string name="roster_player_bats">Schlägt %1$s</string>
+    <string name="roster_player_throws">Wirft %1$s</string>
+    <string name="player_profile_position_usage_label">Einsatz nach Position</string>
+    <string name="player_profile_empty_title">Noch keine Spiele</string>
+    <string name="player_profile_empty_message">Erscheint, sobald der Spieler in einer Aufstellung
+        steht</string>
+    <string name="defense_trash_content_description">Vom Feld nehmen</string>
+    <string name="defense_add_substitute_content_description">Ersatzspieler hinzufügen</string>
+    <string name="defense_empty_position_content_description">Spieler auf diese Position
+        setzen</string>
+    <string name="defense_mode_badge_editing">Positionen bearbeiten</string>
+    <string name="defense_dh_toggle_sub_baseball">Der Pitcher schlägt nicht — ein eigener Schlagmann
+        übernimmt</string>
+    <string name="defense_dh_toggle_sub_softball">Der Flex schlägt nicht — der DP übernimmt</string>
+    <string name="defense_dh_slot_batting_format">Schlägt für %1$s (%2$s) · Platz #%3$d</string>
+    <string name="defense_dh_slot_unassigned">Zum Zuweisen tippen</string>
+    <string name="defense_substitute_slots_free">%1$d von %2$d Extra-Hitter-Plätzen frei</string>
+    <string name="defense_substitute_slots_unlimited">Unbegrenzte Extra-Hitter</string>
+    <string name="defense_turn_off_dh_title_baseball">DH ausschalten?</string>
+    <string name="defense_turn_off_dh_title_softball">DP/Flex ausschalten?</string>
+    <string name="defense_turn_off_dh_message">%1$s und %2$s werden komplett aus dieser Aufstellung
+        entfernt — nicht nur getrennt. Du musst sie neu hinzufügen, damit sie wieder schlagen oder
+        verteidigen.</string>
+    <string name="defense_turn_off_dh_confirm">Ausschalten</string>
+    <string name="defense_keep_dh_on">DH behalten</string>
+    <string name="defense_keep_dp_flex_on">DP/Flex behalten</string>
+    <string name="defense_add_substitute_sheet_title">Ersatzspieler hinzufügen</string>
+    <string name="defense_select_player_sheet_title">Spieler auswählen</string>
+    <string name="defense_add_substitute_budget_free">%1$d von %2$d Extra-Hitter-Plätzen frei — die
+        nächste Wahl schlägt</string>
+    <string name="defense_add_substitute_budget_none">Kein Extra-Hitter-Platz frei — die nächste
+        Wahl sitzt auf der Bank</string>
+    <string name="defense_add_substitute_budget_unlimited">Unbegrenzte Extra-Hitter — jede Wahl
+        schlägt</string>
+    <string name="defense_add_substitute_will_bat">Schlägt</string>
+    <string name="defense_add_substitute_bench_only">Nur Bank</string>
+    <string name="defense_add_substitute_candidate_position_format">%1$s · Bank</string>
+    <string name="defense_add_substitute_bench_label">Bank</string>
+    <string name="defense_add_substitute_footnote">Sobald der freie Platz oben vergeben ist, sitzt
+        jeder weitere Ersatzspieler ohne Schlagrecht auf der Bank — bis du ihn gegen jemanden in der
+        Reihenfolge tauschst.</string>
+    <string name="link_dp_flex_locked_footnote">Der gesperrte Platz gehört zu dem, der auf dem Feld
+        pitcht — ändere dort den Pitcher, um die Verknüpfung zu ändern.</string>
+    <string name="link_dp_flex_batting_role_format">%1$s · Platz #%2$d</string>
+    <string name="link_dp_flex_wont_bat_role_format">%1$s · schlägt nicht</string>
+    <string name="libraries_title">Hinweise zu Bibliotheken</string>
+    <string name="discard_change_title">Du verwirfst gleich deine Änderungen</string>
+    <string name="discard_change_message">Die Änderungen gehen verloren. Bist du sicher?</string>
+    <string name="discard_keep_editing">Weiter bearbeiten</string>
+    <string name="tournament_stats_unknown_player_name">Unbekannt</string>
+    <string name="title_tournament_statistics">Statistik</string>
+    <string name="tournament_stats_playing_time_label">Spielzeit</string>
+    <string name="tournament_stats_avg_games_label">Ø Spiele</string>
+    <string name="tournament_stats_low_games_label">Min.</string>
+    <string name="tournament_stats_high_games_label">Max.</string>
+    <string name="tournament_stats_select_player_placeholder">Spieler auswählen</string>
+</resources>

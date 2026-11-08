@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_edit">แก้ไข</string>
+    <string name="action_edit_roster">แก้ไขรายชื่อ</string>
+    <string name="action_delete">ลบ</string>
+    <string name="action_share">แชร์</string>
+    <string name="generic_back">กลับ</string>
+    <string name="generic_close">ปิด</string>
+    <string name="generic_done">เสร็จ</string>
+    <string name="screen_header_eyebrow_app">EasyLineUp</string>
+    <string name="new_lineup_tab_field_defense">รับ</string>
+    <string name="new_lineup_tab_field_offense">รุก</string>
+    <string name="save_button">บันทึก</string>
+    <string name="cancel_button">ยกเลิก</string>
+    <string name="action_save_lineup">บันทึกไลน์อัป</string>
+    <string name="dialog_create_lineup_name">ชื่อไลน์อัป</string>
+    <string name="dialog_create_lineup_tournament">ทัวร์นาเมนต์</string>
+    <string name="player_hint_name">ชื่อ</string>
+    <string name="player_hint_shirt_number">หมายเลขเสื้อ</string>
+    <string name="player_hint_license_number_short">เลขทะเบียน</string>
+    <string name="player_hint_email">อีเมล</string>
+    <string name="player_hint_phone">หมายเลขโทรศัพท์</string>
+    <string name="title_last_lineup">หน้าแรก</string>
+    <string name="title_team">รายชื่อ</string>
+    <string name="title_lineups">ไลน์อัปของฉัน</string>
+    <string name="title_settings">การตั้งค่า</string>
+    <string name="team_details_header_title">ทีม</string>
+    <string name="team_creation_error_name_empty">ต้องระบุชื่อทีม</string>
+    <string name="team_form_eyebrow">ทีม</string>
+    <string name="team_form_title_create">สร้างทีม</string>
+    <string name="team_form_title_edit">แก้ไขรายละเอียด</string>
+    <string name="team_form_name_label">ชื่อทีม</string>
+    <string name="team_form_type_label">ประเภททีม</string>
+    <string name="team_form_close_content_description">ปิด</string>
+    <string name="player_creation_error_name_empty">ต้องระบุชื่อผู้เล่น</string>
+    <string name="player_creation_error_invalid_email_format">รูปแบบอีเมลไม่ถูกต้อง</string>
+    <string name="player_creation_error_invalid_phone_format">รูปแบบหมายเลขโทรศัพท์ไม่ถูกต้อง</string>
+    <string name="lineup_creation_error_name_empty">ต้องระบุชื่อไลน์อัป</string>
+    <string name="lineup_creation_error_tournament_empty">ต้องระบุชื่อทัวร์นาเมนต์</string>
+    <string name="dialog_delete_team_title">ลบทีม %s ใช่ไหม</string>
+    <string name="dialog_delete_lineup_title">ลบไลน์อัปใช่ไหม</string>
+    <string name="dialog_delete_player_title">ลบผู้เล่นใช่ไหม</string>
+    <string name="dialog_delete_tournament_title">ลบทัวร์นาเมนต์ %s ใช่ไหม</string>
+    <string name="dialog_delete_substitute_title">นำ %1$s ออกใช่ไหม</string>
+    <string name="dialog_delete_cannot_undo_message">การดำเนินการนี้ย้อนกลับไม่ได้ แน่ใจไหม</string>
+    <string name="tile_most_used_player_games_played">เกมที่ลงเล่น</string>
+    <string name="tile_last_lineup_header">ไลน์อัปล่าสุด</string>
+    <string name="dashboard_mini_roster_size_label">จำนวนในรายชื่อ</string>
+    <string name="dashboard_mini_most_used_label">ลงเล่นมากที่สุด</string>
+    <string name="dashboard_hero_empty_title">ยังไม่มีไลน์อัป</string>
+    <string name="dashboard_lookup_hint">ใครเคยใส่หมายเลขนี้</string>
+    <string name="attack_extra_hitter_suffix">ผู้ตีเพิ่มเติม</string>
+    <string name="attack_editing_order_badge">กำลังแก้ไขลำดับ</string>
+    <string name="attack_legend_content_description">วิธีอ่านรายการนี้</string>
+    <string name="attack_legend_title">วิธีอ่านรายการนี้</string>
+    <string name="attack_legend_body">ตัวเลขทางซ้ายคือลำดับการตี ใต้ชื่อผู้เล่นแต่ละคนคือตำแหน่งรับ:
+        หมายเลขแบบดั้งเดิมในสมุดบันทึกคะแนน (1-9) ตามด้วยชื่อย่อ
+        ตัวเลขทางขวาคือหมายเลขเสื้อ</string>
+    <string name="attack_legend_body_editable_suffix"> ระหว่างแก้ไข
+        กดค้างที่ที่จับด้านซ้ายเพื่อลากผู้เล่นไปยังลำดับใหม่</string>
+    <string name="form_lineup_creation_date_label">วันที่</string>
+    <string name="form_lineup_creation_roster_label">รายชื่อสำหรับไลน์อัปนี้</string>
+    <string name="lineup_creation_header_eyebrow">ไลน์อัป</string>
+    <string name="lineup_creation_header_title">ไลน์อัปใหม่</string>
+    <string name="lineup_creation_name_placeholder">เช่น เกมที่ 3 — ตัวจริง</string>
+    <string name="lineup_creation_tournament_placeholder">เลือกทัวร์นาเมนต์</string>
+    <string name="lineup_creation_date_sub_within">ภายในช่วงวันที่ของ %1$s</string>
+    <string name="lineup_creation_date_disabled_hint">เลือกทัวร์นาเมนต์ก่อน</string>
+    <string name="lineup_creation_tournament_sheet_title">เลือกทัวร์นาเมนต์</string>
+    <string name="lineup_creation_tournament_search_placeholder">ค้นหาทัวร์นาเมนต์…</string>
+    <string name="lineup_creation_tournament_create_row">สร้างทัวร์นาเมนต์ใหม่</string>
+    <string name="lineup_creation_tournament_selected_pill">เลือกแล้ว</string>
+    <string name="lineup_creation_roster_search_placeholder">ค้นหาผู้เล่น…</string>
+    <string name="lineup_creation_roster_clear_all">ยกเลิกทั้งหมด</string>
+    <string name="lineup_creation_roster_selected_format">เลือก %1$d จาก %2$d</string>
+    <string name="lineup_creation_roster_status_default">ปกติ #%1$d</string>
+    <string name="lineup_creation_roster_status_override">คืนนี้ใส่ #%1$d</string>
+    <string name="lineup_creation_roster_status_sitting_out">ไม่ลงเล่น</string>
+    <string name="lineup_creation_roster_done">เสร็จ</string>
+    <string name="lineup_creation_save">สร้างไลน์อัป</string>
+    <string name="action_keep_editing">แก้ไขต่อ</string>
+    <string name="action_discard">ทิ้ง</string>
+    <string name="edit_lineup_title">แก้ไขไลน์อัป</string>
+    <string name="edit_lineup_footnote">เมื่อสร้างไลน์อัปแล้ว วันที่ กลยุทธ์
+        และผู้ตีเพิ่มเติมจะถูกล็อก — หากเปลี่ยนหลังจากกำหนดตำแหน่งแล้ว
+        ลำดับการตีและแผนผังสนามจะใช้ไม่ได้</string>
+    <string name="edit_lineup_save_changes">บันทึกการเปลี่ยนแปลง</string>
+    <string name="lineup_creation_new_tournament_title">ทัวร์นาเมนต์ใหม่</string>
+    <string name="lineup_creation_new_tournament_subtitle">เมื่อเลือกที่นี่
+        ทัวร์นาเมนต์จะถูกเพิ่มในรายการทัวร์นาเมนต์ด้วย</string>
+    <string name="lineup_creation_new_tournament_name_label">ชื่อ</string>
+    <string name="lineup_creation_new_tournament_name_placeholder">เช่น วินเทอร์ลีก</string>
+    <string name="lineup_creation_new_tournament_starts_label">เริ่ม</string>
+    <string name="lineup_creation_new_tournament_ends_label">สิ้นสุด</string>
+    <string name="lineup_creation_new_tournament_pick_date">เลือกวันที่</string>
+    <string name="lineup_creation_new_tournament_location_label">สถานที่</string>
+    <string name="lineup_creation_new_tournament_location_placeholder">ที่อยู่ —
+        ใช้ปักหมุดบนแผนที่</string>
+    <string name="lineup_creation_new_tournament_save">เพิ่มทัวร์นาเมนต์</string>
+    <string name="tournaments_list_header_title">ทัวร์นาเมนต์</string>
+    <string name="tournaments_list_search_placeholder">ค้นหาทัวร์นาเมนต์หรือไลน์อัป…</string>
+    <plurals name="tournaments_list_lineups_count">
+        <item quantity="other">%d ไลน์อัป</item>
+    </plurals>
+    <plurals name="tournaments_list_show_more">
+        <item quantity="other">แสดงอีก %d รายการ</item>
+    </plurals>
+    <string name="tournaments_list_empty_title">ยังไม่มีทัวร์นาเมนต์</string>
+    <string name="tournaments_list_empty_subtitle">สร้างไลน์อัปเพื่อเพิ่มทัวร์นาเมนต์แรก</string>
+    <string name="tournaments_list_empty_search_title">ไม่พบผลลัพธ์</string>
+    <string name="tournaments_list_empty_search_subtitle">ลองใช้ชื่อทัวร์นาเมนต์หรือไลน์อัปอื่น</string>
+    <string name="tournaments_list_stats_content_description">ดูสถิติทัวร์นาเมนต์</string>
+    <string name="tournaments_list_create_lineup_content_description">สร้างไลน์อัป</string>
+    <string name="action_add_dp_flex">ใช้ DP/Flex</string>
+    <string name="action_add_dh">ใช้ DH</string>
+    <string name="action_confirm">ยืนยัน</string>
+    <string name="action_back">กลับ</string>
+    <plurals name="lineups_quantity">
+        <item quantity="other">%d ไลน์อัป</item>
+    </plurals>
+    <string name="players_list_empty">ไม่มีผู้เล่นที่เลือกได้</string>
+    <string name="share_lineup_subject">ไลน์อัป: %s</string>
+    <string name="lineup_pdf_title">ไลน์อัป</string>
+    <string name="lineup_pdf_date_label">วันที่: %s</string>
+    <string name="lineup_pdf_opponent_label">คู่แข่ง: %s</string>
+    <string name="lineup_pdf_batting_order_title">ลำดับการตี</string>
+    <string name="lineup_pdf_defense_title">รับ</string>
+    <string name="lineup_pdf_substitutes_title">ตัวสำรอง</string>
+    <string name="team_list_empty_text">เมื่อสร้างทีมแล้ว ทีมจะแสดงที่นี่</string>
+    <string name="switch_team_sheet_title">สลับทีม</string>
+    <plurals name="switch_team_sheet_subtitle">
+        <item quantity="other">%d ทีมในบัญชีนี้</item>
+    </plurals>
+    <string name="switch_team_sheet_create_row">สร้างทีมใหม่</string>
+    <string name="switch_team_sheet_current">ปัจจุบัน</string>
+    <plurals name="team_details_roster_count">
+        <item quantity="other">ผู้เล่น %d คน</item>
+    </plurals>
+    <string name="team_details_roster_label">รายชื่อ</string>
+    <string name="team_details_lineups_label">ไลน์อัปที่สร้าง</string>
+    <string name="team_details_tournaments_label">ทัวร์นาเมนต์</string>
+    <string name="team_details_created_label">สร้างเมื่อ</string>
+    <string name="team_details_roster_by_gender">รายชื่อตามเพศ</string>
+    <string name="team_details_stat_label_unset">ไม่ระบุ</string>
+    <string name="team_details_delete_title">ลบทีม</string>
+    <string name="team_details_delete_subtitle">ลบผู้เล่น ไลน์อัป และประวัติทั้งหมด</string>
+    <string name="setting_lineup_style_description">แบบอักษรไลน์อัป</string>
+    <string name="setting_men_style_description">ชาย</string>
+    <string name="setting_women_style_description">หญิง</string>
+    <string name="setting_day_night_style_description">ธีม</string>
+    <string name="setting_category_about_title">เกี่ยวกับ</string>
+    <string name="setting_import_data_description">นำเข้าข้อมูลจากไฟล์</string>
+    <string name="setting_import_data_subtitle">จากไฟล์ .elu</string>
+    <string name="setting_export_data_description">ส่งออกข้อมูลเป็นไฟล์</string>
+    <string name="setting_export_data_subtitle">บันทึกทุกทีมเป็นไฟล์ .elu</string>
+    <string name="setting_delete_data_description">ลบข้อมูลทั้งหมด</string>
+    <string name="setting_delete_data_subtitle">ทุกทีมในอุปกรณ์นี้</string>
+    <string name="setting_version_title">เวอร์ชัน</string>
+    <string name="setting_licenses_title">สัญญาอนุญาต</string>
+    <string name="setting_play_store_title">หน้าอย่างเป็นทางการใน Google Play Store</string>
+    <string name="data_transfer_count_teams">ทีม</string>
+    <string name="data_transfer_count_players">ผู้เล่น</string>
+    <string name="data_transfer_count_lineups">ไลน์อัป</string>
+    <string name="data_transfer_count_tournaments">ทัวร์นาเมนต์</string>
+    <string name="data_transfer_added_updated">เพิ่ม %1$d · อัปเดต %2$d</string>
+    <string name="export_confirm_title">ส่งออกข้อมูลทั้งหมด</string>
+    <string name="export_confirm_message">ทุกทีมในอุปกรณ์นี้ — ไม่ใช่แค่ %1$s — บันทึกเป็นไฟล์ .elu
+        ไฟล์เดียว</string>
+    <string name="export_confirm_footnote">ขั้นต่อไปคุณจะต้องเลือกโฟลเดอร์ — ด้วยตัวเลือกของ Android
+        ซึ่งไม่ใช่ส่วนหนึ่งของแอปนี้</string>
+    <string name="export_confirm_action">เลือกโฟลเดอร์</string>
+    <string name="export_success_title">ส่งออกเสร็จแล้ว</string>
+    <string name="export_success_message">บันทึกใน %1$s เป็น %2$s แล้ว</string>
+    <string name="export_success_message_no_folder">บันทึกเป็น %1$s แล้ว</string>
+    <string name="import_confirm_title">นำเข้าไฟล์นี้ไหม</string>
+    <string name="import_confirm_overwrite_label">เขียนทับข้อมูลเดิม</string>
+    <string name="import_confirm_overwrite_sub">ทีมและผู้เล่นที่มีอยู่แล้วในอุปกรณ์นี้จะถูกแทนที่แทนการข้าม</string>
+    <string name="import_confirm_footnote">การยืนยันนี้จะแสดงไม่ว่าคุณมาถึงที่นี่ทางใด — แตะ
+        \"นำเข้าข้อมูล\" ในการตั้งค่า หรือเปิดไฟล์ .elu โดยตรง —
+        จึงไม่มีการเลือกแทนคุณโดยไม่บอก</string>
+    <string name="import_confirm_action">นำเข้า</string>
+    <string name="import_success_title">นำเข้าเสร็จแล้ว</string>
+    <string name="welcome_headline">คุมม้านั่ง\nได้จากใน\nกระเป๋า</string>
+    <string name="welcome_body">สร้างไลน์อัป กำหนดตำแหน่ง และติดตามลำดับการตีของทุกเกม —
+        ไม่ต้องใช้กระดาษ ไม่ต้องเดาว่าใครใส่หมายเลขอะไร</string>
+    <string name="welcome_value_lineups">ไลน์อัปและลำดับการตีในไม่กี่นาที</string>
+    <string name="welcome_value_defense">แผนผังการรับที่เห็นภาพชัด ลากเพื่อกำหนด</string>
+    <string name="welcome_value_message">ส่งข้อความถึงทั้งทีมในแตะเดียว</string>
+    <string name="login_create">สร้างทีมแรกของคุณ</string>
+    <string name="login_import">นำเข้าทีมที่มีอยู่</string>
+    <string name="settings_category_team">ทีม</string>
+    <string name="settings_team_row_subtitle">ชื่อ โลโก้ จำนวนในรายชื่อ</string>
+    <string name="settings_category_style">สไตล์</string>
+    <string name="settings_category_data">ข้อมูล</string>
+    <string name="link_dp_and_flex_dialog_title">เชื่อม DP กับ Flex</string>
+    <string name="link_dh_and_pitcher_dialog_title">เชื่อม DH กับพิตเชอร์</string>
+    <string name="generic_discard">ทิ้ง</string>
+    <string name="settings_export_error_title">ส่งออกไม่ได้</string>
+    <string name="settings_import_error_title">นำเข้าไม่ได้</string>
+    <string name="settings_export_error_message">เกิดปัญหาระหว่างการส่งออก
+        โปรดลองอีกครั้งและตรวจสอบว่าแอปเข้าถึงพื้นที่เก็บข้อมูลภายนอกได้</string>
+    <string name="settings_import_error_message">เกิดปัญหาระหว่างการนำเข้า
+        โปรดลองอีกครั้งและตรวจสอบว่าแอปเข้าถึงพื้นที่เก็บข้อมูลภายนอกได้</string>
+    <string name="error_need_assign_pitcher_first_message">โปรดเลือกพิตเชอร์ก่อน</string>
+    <string name="error_need_assign_both_players_message">โปรดเลือกทั้ง DP และ Flex</string>
+    <string name="error_when_deleting_lineup">เกิดปัญหาขณะลบไลน์อัป</string>
+    <string name="error_when_deleting_team">เกิดปัญหาขณะลบทีม</string>
+    <string name="create_player_favorite_positions">ตำแหน่งที่ถนัด: (สูงสุด 3)</string>
+    <string name="create_player_pitching_side">ขว้าง</string>
+    <string name="create_player_batting_side">ตี</string>
+    <string name="create_player_sex">เพศ</string>
+    <string name="generic_left">ซ้าย</string>
+    <string name="generic_right">ขวา</string>
+    <string name="generic_optional">ไม่บังคับ</string>
+    <string name="player_form_title_create">ผู้เล่นใหม่</string>
+    <string name="player_form_title_edit">แก้ไขรายละเอียด</string>
+    <string name="shirt_number_history_title">หมายเลข %1$s — ประวัติ</string>
+    <string name="shirt_number_history_footnote">เรียงจากล่าสุด — รวบรวมจากทุกไลน์อัปที่ผ่านมา
+        ไม่ใช่แค่รายชื่อปัจจุบัน</string>
+    <string name="lineup_style_normal_label">ปกติ</string>
+    <string name="lineup_style_hand_writing_label">ลายมือ</string>
+    <string name="lineup_theme_system_value">ตามระบบ</string>
+    <string name="lineup_theme_day_value">สว่าง</string>
+    <string name="lineup_theme_night_value">มืด</string>
+    <string name="generic_not_found">ไม่พบ</string>
+    <string name="generic_error_with_detail">เกิดข้อผิดพลาด: %1$s</string>
+    <string name="form_lineup_creation_extra_hitters_label">ผู้ตีเพิ่มเติม</string>
+    <string name="form_lineup_creation_strategy_label">กลยุทธ์</string>
+    <string name="roster_sort_by_name">ตามชื่อ</string>
+    <string name="roster_sort_by_number">ตามหมายเลข</string>
+    <string name="roster_empty_title">ยังไม่มีผู้เล่น</string>
+    <string name="roster_empty_message">เพิ่มผู้เล่นคนแรกเพื่อสร้างรายชื่อ</string>
+    <string name="roster_add_player_content_description">เพิ่มผู้เล่น</string>
+    <string name="roster_message_team_content_description">ส่งข้อความถึงทีม</string>
+    <string name="roster_message_sheet_title">ส่งข้อความถึงทีม</string>
+    <string name="roster_message_text_label">SMS</string>
+    <string name="roster_message_phone_count">%1$d จาก %2$d คนมีหมายเลขโทรศัพท์</string>
+    <string name="roster_message_email_label">อีเมล</string>
+    <string name="roster_message_email_count">%1$d จาก %2$d คนมีอีเมล</string>
+    <string name="roster_message_share_label">แชร์ด้วยวิธีอื่น</string>
+    <string name="roster_message_share_caption">คัดลอกรายชื่อติดต่อเป็นข้อความ</string>
+    <string name="roster_message_share_copied">คัดลอกไปยังคลิปบอร์ดแล้ว</string>
+    <string name="roster_message_footnote">ผู้เล่นที่ไม่อยู่ในจำนวนด้านบนจะไม่ได้รับข้อความนั้น —
+        เพิ่มข้อมูลของพวกเขาในรายชื่อเพื่อให้รวมอยู่ในครั้งหน้า</string>
+    <string name="roster_message_no_app">ไม่มีแอปที่ทำสิ่งนี้ได้</string>
+    <string name="player_side_abbr_left">ซ</string>
+    <string name="player_side_abbr_right">ข</string>
+    <string name="player_side_abbr_both">สองมือ</string>
+    <string name="roster_player_bats">ตี %1$s</string>
+    <string name="roster_player_throws">ขว้าง %1$s</string>
+    <string name="player_profile_position_usage_label">การลงเล่นแต่ละตำแหน่ง</string>
+    <string name="player_profile_empty_title">ยังไม่เคยลงเล่น</string>
+    <string name="player_profile_empty_message">จะแสดงเมื่ออยู่ในไลน์อัป</string>
+    <string name="defense_trash_content_description">นำออกจากสนาม</string>
+    <string name="defense_add_substitute_content_description">เพิ่มตัวสำรอง</string>
+    <string name="defense_empty_position_content_description">เพิ่มผู้เล่นในตำแหน่งนี้</string>
+    <string name="defense_mode_badge_editing">กำลังแก้ไขตำแหน่ง</string>
+    <string name="defense_dh_toggle_sub_baseball">พิตเชอร์ไม่ตี — มีผู้ตีอีกคนตีแทน</string>
+    <string name="defense_dh_toggle_sub_softball">Flex ไม่ตี — DP ตีแทน</string>
+    <string name="defense_dh_slot_batting_format">ตีแทน %1$s (%2$s) · ลำดับ #%3$d</string>
+    <string name="defense_dh_slot_unassigned">แตะเพื่อกำหนด</string>
+    <string name="defense_substitute_slots_free">ที่ว่างสำหรับผู้ตีเพิ่มเติม %1$d จาก %2$d</string>
+    <string name="defense_substitute_slots_unlimited">ผู้ตีเพิ่มเติมไม่จำกัด</string>
+    <string name="defense_turn_off_dh_title_baseball">ปิด DH ใช่ไหม</string>
+    <string name="defense_turn_off_dh_title_softball">ปิด DP/Flex ใช่ไหม</string>
+    <string name="defense_turn_off_dh_message">%1$s และ %2$s จะถูกนำออกจากไลน์อัปนี้ทั้งหมด
+        ไม่ใช่แค่ยกเลิกการเชื่อม คุณต้องเพิ่มพวกเขาอีกครั้งเพื่อให้ตีหรือรับได้</string>
+    <string name="defense_turn_off_dh_confirm">ปิด</string>
+    <string name="defense_keep_dh_on">ใช้ DH ต่อ</string>
+    <string name="defense_keep_dp_flex_on">ใช้ DP/Flex ต่อ</string>
+    <string name="defense_add_substitute_sheet_title">เพิ่มตัวสำรอง</string>
+    <string name="defense_select_player_sheet_title">เลือกผู้เล่น</string>
+    <string name="defense_add_substitute_budget_free">ที่ว่างสำหรับผู้ตีเพิ่มเติม %1$d จาก %2$d —
+        คนถัดไปที่เลือกจะได้ตี</string>
+    <string name="defense_add_substitute_budget_none">ไม่มีที่ว่างสำหรับผู้ตีเพิ่มเติม —
+        คนถัดไปที่เลือกจะนั่งม้านั่ง</string>
+    <string name="defense_add_substitute_budget_unlimited">ผู้ตีเพิ่มเติมไม่จำกัด —
+        ทุกคนที่เลือกได้ตี</string>
+    <string name="defense_add_substitute_will_bat">จะได้ตี</string>
+    <string name="defense_add_substitute_bench_only">ม้านั่งเท่านั้น</string>
+    <string name="defense_add_substitute_candidate_position_format">%1$s · ม้านั่ง</string>
+    <string name="defense_add_substitute_bench_label">ม้านั่ง</string>
+    <string name="defense_add_substitute_footnote">เมื่อใช้ที่ว่างด้านบนแล้ว
+        ตัวสำรองทุกคนที่เพิ่มหลังจากนั้นจะนั่งม้านั่งโดยไม่มีลำดับตี —
+        จนกว่าคุณจะสลับกับคนที่อยู่ในลำดับแล้ว</string>
+    <string name="link_dp_flex_locked_footnote">ช่องที่ล็อกผูกกับคนที่เป็นพิตเชอร์ในสนาม —
+        เปลี่ยนพิตเชอร์ที่นั่นเพื่อเปลี่ยนการเชื่อม</string>
+    <string name="link_dp_flex_batting_role_format">%1$s · ลำดับ #%2$d</string>
+    <string name="link_dp_flex_wont_bat_role_format">%1$s · ไม่ตี</string>
+    <string name="libraries_title">ประกาศเกี่ยวกับไลบรารี</string>
+    <string name="discard_change_title">คุณกำลังจะยกเลิกการเปลี่ยนแปลง</string>
+    <string name="discard_change_message">การเปลี่ยนแปลงจะหายไป แน่ใจไหม</string>
+    <string name="discard_keep_editing">แก้ไขต่อ</string>
+    <string name="tournament_stats_unknown_player_name">ไม่ทราบ</string>
+    <string name="title_tournament_statistics">สถิติ</string>
+    <string name="tournament_stats_playing_time_label">เวลาลงเล่น</string>
+    <string name="tournament_stats_avg_games_label">เกมเฉลี่ย</string>
+    <string name="tournament_stats_low_games_label">ต่ำสุด</string>
+    <string name="tournament_stats_high_games_label">สูงสุด</string>
+    <string name="tournament_stats_select_player_placeholder">เลือกผู้เล่น</string>
+</resources>
