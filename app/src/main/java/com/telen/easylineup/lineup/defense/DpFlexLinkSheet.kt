@@ -46,12 +46,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.NARROW_BUTTON_PADDING
 import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.TeamType
@@ -231,12 +233,15 @@ fun DpFlexLinkSheet(
                         if (selecting != null) selecting = null else onDismiss()
                     },
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    contentPadding = NARROW_BUTTON_PADDING
                 ) {
                     Text(
                         text = stringResource(android.R.string.cancel),
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
                 Button(

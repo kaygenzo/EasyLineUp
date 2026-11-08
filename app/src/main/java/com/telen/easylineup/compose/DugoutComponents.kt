@@ -16,6 +16,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -28,6 +29,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -69,6 +72,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -776,10 +780,18 @@ fun ScreenHeader(
                     style = MaterialTheme.typography.labelMedium
                 )
             }
-            Text(
+            // One line, shrunk to fit: a long translation would otherwise break mid-word next
+            // to the header's action chips on a small screen.
+            val titleStyle = MaterialTheme.typography.titleMedium
+            BasicText(
                 text = title,
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleMedium
+                style = titleStyle.copy(color = MaterialTheme.colorScheme.onBackground),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                autoSize = TextAutoSize.StepBased(
+                    minFontSize = HEADER_TITLE_MIN_FONT_SIZE,
+                    maxFontSize = titleStyle.fontSize
+                )
             )
         }
         actions?.invoke(this)
@@ -1142,6 +1154,13 @@ private fun SelectFieldPreview() {
     }
 }
 
+/**
+ * For the narrow third-width button of a form bar: the default 24dp side padding leaves too
+ * little room for a translated "Cancel", which then breaks mid-word.
+ */
+val NARROW_BUTTON_PADDING = PaddingValues(horizontal = 8.dp, vertical = 8.dp)
+private val HEADER_TITLE_MIN_FONT_SIZE = 12.sp
+
 @Composable
 fun FormBar(
     cancelLabel: String,
@@ -1164,12 +1183,15 @@ fun FormBar(
             OutlinedButton(
                 onClick = onCancel,
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = NARROW_BUTTON_PADDING
             ) {
                 Text(
                     text = cancelLabel,
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             Button(
