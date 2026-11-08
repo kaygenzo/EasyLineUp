@@ -4,6 +4,8 @@
 
 package com.telen.easylineup.login
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,12 +40,12 @@ import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 
-private data class ValueProp(val iconRes: Int, val text: String)
+private data class ValueProp(@DrawableRes val iconRes: Int, @StringRes val textRes: Int)
 
 private val valueProps = listOf(
-    ValueProp(R.drawable.ic_welcome_lineup, "Lineups & batting order in minutes"),
-    ValueProp(R.drawable.ic_welcome_defense, "Visual defense diagram, drag to assign"),
-    ValueProp(R.drawable.ic_welcome_message, "Message the whole team in one tap")
+    ValueProp(R.drawable.ic_welcome_lineup, R.string.welcome_value_lineups),
+    ValueProp(R.drawable.ic_welcome_defense, R.string.welcome_value_defense),
+    ValueProp(R.drawable.ic_welcome_message, R.string.welcome_value_message)
 )
 
 @Composable
@@ -77,15 +79,14 @@ fun WelcomeScreen(
         }
 
         Text(
-            text = "Run the\ndugout from\nyour pocket.",
+            text = stringResource(R.string.welcome_headline),
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.displaySmall,
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
         Text(
-            text = "Build lineups, assign positions and track batting order for every " +
-                "game — no paper card, no guessing who wore what.",
+            text = stringResource(R.string.welcome_body),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium,
             lineHeight = 21.sp,
@@ -165,7 +166,7 @@ private fun ValuePropRow(prop: ValueProp) {
             )
         }
         Text(
-            text = prop.text,
+            text = stringResource(prop.textRes),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.SemiBold
@@ -178,7 +179,7 @@ private fun ValuePropRow(prop: ValueProp) {
 private fun ValuePropRowPreview() {
     DugoutTheme {
         ValuePropRow(
-            ValueProp(R.drawable.ic_welcome_lineup, "Lineups & batting order in minutes")
+            ValueProp(R.drawable.ic_welcome_lineup, R.string.welcome_value_lineups)
         )
     }
 }

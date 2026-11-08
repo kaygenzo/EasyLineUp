@@ -86,7 +86,10 @@ fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {
                             }
                         }
                         .onFailure {
-                            val message = "Something wrong happened: ${it.message}"
+                            val message = context.getString(
+                                R.string.generic_error_with_detail,
+                                it.message.orEmpty()
+                            )
                             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                         }
                 }

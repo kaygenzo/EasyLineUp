@@ -273,6 +273,12 @@
     <string name="key_app_licenses" translatable="false">key_app_licenses</string>
     <string name="key_play_store" translatable="false">key_play_store</string>
 
+    <string name="welcome_headline">Run the\ndugout from\nyour pocket.</string>
+    <string name="welcome_body">Build lineups, assign positions and track batting order for every
+        game — no paper card, no guessing who wore what.</string>
+    <string name="welcome_value_lineups">Lineups &amp; batting order in minutes</string>
+    <string name="welcome_value_defense">Visual defense diagram, drag to assign</string>
+    <string name="welcome_value_message">Message the whole team in one tap</string>
     <string name="login_create">Create your first team</string>
     <string name="login_import">Import an existing team</string>
 
@@ -335,6 +341,7 @@
     <string name="lineup_theme_night_value">Night</string>
 
     <string name="generic_not_found">Not found</string>
+    <string name="generic_error_with_detail">Something went wrong: %1$s</string>
 
     <string name="lineup_list_strategy_type" translatable="false">  &#8212;  %s</string>
     <string name="lineup_list_extra_hitters" translatable="false">  &#8212;  EH: %s</string>

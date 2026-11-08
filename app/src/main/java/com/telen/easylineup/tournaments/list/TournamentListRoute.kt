@@ -189,7 +189,10 @@ fun TournamentListRoute(navController: NavController) {
                             Timber.e(throwable)
                             Toast.makeText(
                                 context,
-                                "Something wrong happened: ${throwable.message}",
+                                context.getString(
+                                    R.string.generic_error_with_detail,
+                                    throwable.message.orEmpty()
+                                ),
                                 Toast.LENGTH_LONG
                             ).show()
                         }

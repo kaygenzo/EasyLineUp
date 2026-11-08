@@ -428,4 +428,13 @@
     <string name="tournament_stats_low_games_label">Minimum</string>
     <string name="tournament_stats_high_games_label">Maximum</string>
     <string name="tournament_stats_select_player_placeholder">Choisir un joueur</string>
+    <string name="welcome_headline">Gérez le\ndugout depuis\nvotre poche.</string>
+    <string name="welcome_body">Composez vos lineups, placez vos joueurs et suivez l\'ordre des
+        frappeurs à chaque match — sans feuille papier, sans chercher qui portait quel
+        numéro.</string>
+    <string name="welcome_value_lineups">Lineups et ordre de frappe en quelques minutes</string>
+    <string name="welcome_value_defense">Schéma défensif visuel, placement par
+        glisser-déposer</string>
+    <string name="welcome_value_message">Écrivez à toute l\'équipe en un geste</string>
+    <string name="generic_error_with_detail">Une erreur est survenue : %1$s</string>
 </resources>
