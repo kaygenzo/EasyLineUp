@@ -4,7 +4,6 @@
     <string name="action_edit_roster">Modifier le roster</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_share">Partager</string>
-    <string name="action_report_issue">Reporter un problème</string>
 
     <string name="generic_back">Retour</string>
     <string name="generic_close">Fermer</string>
@@ -13,28 +12,20 @@
 
     <string name="new_lineup_tab_field_defense">Defense</string>
     <string name="new_lineup_tab_field_offense">Attaque</string>
-    <string name="new_lineup_substitute_label">Remplaçants</string>
     <string name="save_button">Sauvegarder</string>
     <string name="cancel_button">Annuler</string>
     <string name="action_save_lineup">Enregistrer le lineup</string>
 
-    <string name="dialog_create_lineup_title">Creation&#8230;</string>
     <string name="dialog_create_lineup_name">Nom du lineup</string>
     <string name="dialog_create_lineup_tournament">Tournoi</string>
-    <string name="dialog_error_select_tournament_first_message">Selectionnez un tournoi d\'abord.</string>
     <string name="player_hint_name">Nom</string>
     <string name="player_hint_shirt_number">Numéro de maillot</string>
-    <string name="player_hint_license_number">Numéro de Licence</string>
     <string name="player_hint_license_number_short">Licence N°</string>
 
     <string name="title_last_lineup">Accueil</string>
     <string name="title_team">Joueurs</string>
     <string name="title_lineups">Mes Lineups</string>
     <string name="title_settings">Paramètres</string>
-    <string name="title_tournament_summary">Résumé</string>
-    <string name="title_player_details">Statistiques</string>
-    <string name="title_player_edition">Modification de joueur</string>
-    <string name="title_team_details">Infos d\'équipe</string>
     <string name="team_details_header_title">Équipe</string>
 
     <string name="team_creation_error_name_empty">Le nom de l\'équipe ne peut pas être vide</string>
@@ -50,7 +41,6 @@
     <string name="lineup_creation_error_name_empty">Le nom du lineup ne peut pas être vide</string>
     <string name="lineup_creation_error_tournament_empty">Le nom du tournoi ne peut pas être vide</string>
 
-    <string name="nav_header_desc">En-tête de navigation</string>
 
     <string name="dialog_delete_team_title">Supprimer l\'équipe %s ?</string>
     <string name="dialog_delete_lineup_title">Supprimer le lineup ?</string>
@@ -58,9 +48,7 @@
     <string name="dialog_delete_tournament_title">Supprimer le tournoi %s ?</string>
     <string name="dialog_delete_substitute_title">Retirer %1$s ?</string>
     <string name="dialog_delete_cannot_undo_message">Cette action ne peut pas être annulée, êtes-vous sûr ?</string>
-    <string name="dialog_delete_progress_message">Suppression&#8230;</string>
 
-    <string name="tile_most_used_player_header">Joueur le plus utilisé</string>
     <string name="tile_most_used_player_games_played">Matchs joués</string>
     <string name="dashboard_mini_roster_size_label">Effectif</string>
     <string name="dashboard_mini_most_used_label">Plus utilisé</string>
@@ -121,7 +109,6 @@
         repère sur la carte</string>
     <string name="lineup_creation_new_tournament_save">Ajouter le tournoi</string>
 
-    <string name="lineup_list_filter_unfocused_hint">Filtrer par nom</string>
 
     <string name="tournaments_list_header_title">Tournois</string>
     <string name="tournaments_list_search_placeholder">Rechercher des tournois ou des
@@ -145,18 +132,12 @@
     <string name="tournaments_list_create_lineup_content_description">Créer une
         composition</string>
 
-    <string name="shake_beta_title">Un problème ? </string>
-    <string name="shake_beta_description">Secouez votre périphérique ou cliquez ici pour envoyez un rapport</string>
 
     <string name="action_add_dp_flex">Utiliser un DP/Flex</string>
     <string name="action_add_dh">Utiliser un DH</string>
     <string name="action_confirm">Confirmer</string>
     <string name="action_back">Retour</string>
 
-    <plurals name="tournaments_quantity">
-        <item quantity="one">%d tournoi</item>
-        <item quantity="other">%d tournois</item>
-    </plurals>
 
     <plurals name="lineups_quantity">
         <item quantity="one">%d lineup</item>
@@ -184,15 +165,8 @@
     <string name="switch_team_sheet_current">Actuelle</string>
 
 
-    <string name="feature_roster_title">Gérez votre composition initiale</string>
-    <string name="feature_roster_description">Vous pouvez changer les joueurs qui participeront au match</string>
 
-    <string name="roster_list_player_dialog_title">Liste des joueurs de l\'équipe</string>
 
-    <plurals name="team_details_team_size">
-        <item quantity="one">Votre équipe est composée de %d membre</item>
-        <item quantity="other">Votre équipe est composée de %d membres</item>
-    </plurals>
 
     <plurals name="team_details_roster_count">
         <item quantity="one">%d joueur</item>
@@ -248,47 +222,32 @@
 
     <string name="setting_import_data_description">Importer les données à partir d\'un fichier</string>
     <string name="setting_import_data_subtitle">Depuis un fichier .elu</string>
-    <string name="setting_import_data_update_object_description">Mettre à jour les données si elles existent ?</string>
     <string name="setting_export_data_description">Exporter les données vers un fichier</string>
     <string name="setting_export_data_subtitle">Sauvegarde chaque équipe dans un fichier .elu</string>
 
     <string name="settings_category_team">Équipe</string>
     <string name="settings_team_row_subtitle">Nom, logo, taille du roster</string>
     <string name="settings_category_style">Style</string>
-    <string name="bug_report_trigger_shake">Secouer</string>
-    <string name="bug_report_trigger_floating_button">Bouton flottant</string>
-    <string name="bug_report_trigger_manual">Manuel</string>
 
     <string name="settings_category_data">Données</string>
-    <string name="settings_category_support">Assistance</string>
 
     <string name="link_dp_and_flex_dialog_title">Associez votre DP et votre Flex</string>
     <string name="link_dh_and_pitcher_dialog_title">Associez votre DH et votre Pitcher</string>
-    <string name="settings_export_success_message">"Données exportées avec succès vers le stockage externe dans le dossier %s "</string>
-    <string name="settings_import_success_message">Données importées avec succès dans l\'application</string>
     <string name="settings_export_error_message">Un problème est survenu durant l\'export. Veuillez réessayer et vérifiez si l\'application a bien accès à la mémoire externe.</string>
     <string name="settings_import_error_message">Un problème est survenu durant l\'import. Veuillez réessayer et vérifiez si l\'application a bien accès à la mémoire externe.</string>
     <string name="error_need_assign_pitcher_first_message">Selectionnez un Pitcher avant.</string>
     <string name="error_need_assign_both_players_message">Non sauvergardé! Selectionnez à la fois le DP et le Flex</string>
-    <string name="discard_message">Jeter toutes les modifications ?</string>
-    <string name="discard_title">Annulation</string>
     <string name="generic_discard">Jeter</string>
     <string name="settings_export_error_title">Impossible d\'exporter</string>
     <string name="settings_import_error_title">Impossible d\'importer</string>
-    <string name="error_need_assign_pitcher_first_title">Non sauvergardé</string>
-    <string name="error_need_assign_both_players_title">Non sauvergardé</string>
     <string name="create_player_favorite_positions">Positions préférées: (Max 3)</string>
     <string name="create_player_pitching_side">Lancer</string>
     <string name="create_player_batting_side">Batting</string>
     <string name="generic_left">Gaucher</string>
     <string name="generic_right">Droitier</string>
-    <string name="generic_both">Les deux</string>
-    <string name="generic_unknown">Inconnu</string>
     <string name="generic_optional">Facultatif</string>
     <string name="player_form_title_create">Nouveau joueur</string>
     <string name="player_form_title_edit">Modifier</string>
-    <string name="settings_export_success_title">Succès</string>
-    <string name="settings_import_success_title">Succès</string>
     <string name="error_when_deleting_lineup">Une erreur s\'est produite pendant la suppression du lineup</string>
     <string name="error_when_deleting_team">Une erreur s\'est produite pendant la suppression de l\'équipe</string>
 
@@ -300,7 +259,6 @@
     <string name="shirt_number_history_title">Numéro %1$s — historique</string>
     <string name="shirt_number_history_footnote">Trié du plus récent au plus ancien — tous les
         anciens line-up, pas seulement l\'effectif actuel.</string>
-    <string name="tile_last_player_number_label_last">Dernier:</string>
     <string name="lineup_theme_system_value">Système</string>
     <string name="lineup_theme_day_value">Clair</string>
     <string name="lineup_theme_night_value">Sombre</string>
@@ -314,9 +272,6 @@
     <string name="form_lineup_creation_extra_hitters_label">Batteurs supplém.</string>
     <string name="form_lineup_creation_strategy_label">Stratégie</string>
 
-    <string name="report_sending_message">Le rapport de bug est en cours d\'envoi, veuillez patienter&#8230;</string>
-    <string name="report_sending_message_success">Envoyé avec succès! Merci!</string>
-    <string name="report_sending_message_failure">Une erreur est survenue, veuillez réessayer</string>
 
     <string name="roster_sort_by_name">Par nom</string>
     <string name="roster_sort_by_number">Par numéro</string>
@@ -387,35 +342,17 @@
     <string name="link_dp_flex_batting_role_format">%1$s · frappe n°%2$d</string>
     <string name="link_dp_flex_wont_bat_role_format">%1$s · ne frappe pas</string>
 
-    <string name="permission_request_read_external_storage">"L\'accès aux media est requis pour afficher les images"</string>
-    <string name="permission_request_settings_action">"Paramètres"</string>
 
     <string name="create_player_sex">Sexe</string>
 
-    <plurals name="women_count">
-        <item quantity="one">%d femme</item>
-        <item quantity="other">%d femmes</item>
-    </plurals>
 
-    <plurals name="men_count">
-        <item quantity="one">%d homme</item>
-        <item quantity="other">%d hommes</item>
-    </plurals>
 
-    <plurals name="unset_sex_count">
-        <item quantity="one">%d joueur sans sexe</item>
-        <item quantity="other">%d joueurs sans sexe</item>
-    </plurals>
 
     <string name="libraries_title">Licence pour les librairies</string>
 
     <string name="setting_men_style_description">Hommes</string>
     <string name="setting_women_style_description">Femmes</string>
-    <string name="picker_men_summary">Changer la couleur des hommes sur le terrain</string>
-    <string name="picker_women_summary">Changer la couleur des femmes sur le terrain</string>
 
-    <string name="lineup_name_hint">Nom du lineup</string>
-    <string name="file_explorer_not_found">Impossible de trouver d\'explorateur de fichier sur ce terminal</string>
 
     <string name="discard_change_title">Vous êtes sur le point de perdre vos modifications</string>
     <string name="discard_change_message">Vous perdrez vos changements, êtes-vous vraiment sûr ?</string>

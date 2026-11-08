@@ -40,17 +40,7 @@
         <item>2</item>
     </string-array>
 
-    <string-array name="bug_report_trigger" translatable="false">
-        <item>@string/bug_report_trigger_manual</item>
-        <item>@string/bug_report_trigger_shake</item>
-        <item>@string/bug_report_trigger_floating_button</item>
-    </string-array>
 
-    <string-array name="bug_report_trigger_values" translatable="false">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
 
     <string-array name="field_positions_baseball_list" translatable="false">
         <item>SUB</item>
