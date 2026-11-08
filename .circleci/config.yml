@@ -39,7 +39,7 @@ jobs:
           at: .
       # Depends on every module's unit tests. domain is a plain JVM module with no
       # testProdDebugUnitTest task, so that name alone would skip it.
-      - run: ./gradlew jacocoFullReport $GRADLE_OPTS
+      - run: ./gradlew jacocoFullReport
       - store_artifacts:
           path: build/reports/jacoco/jacocoFullReport
           destination: coverage
@@ -51,7 +51,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: ./gradlew assembleDemoDebug assembleDemoDebugAndroidTest $GRADLE_OPTS
+      - run: ./gradlew assembleDemoDebug assembleDemoDebugAndroidTest
       - store_artifacts:
           path: app/build/outputs/apk/demo/debug
           destination: androidTestBinaries
@@ -66,7 +66,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: ./gradlew assembleProdRelease $GRADLE_OPTS
+      - run: ./gradlew assembleProdRelease
       - store_artifacts:
           path: app/build/outputs/apk/prod/release
           destination: release
@@ -88,7 +88,7 @@ jobs:
           command: |
               git rev-parse --abbrev-ref HEAD > releasenotes.txt
               git log -1 --pretty="%B %ad" >> releasenotes.txt
-              ./gradlew assembleRelease appDistributionUploadProdRelease appDistributionUploadDemoRelease appDistributionUploadDevRelease $GRADLE_OPTS
+              ./gradlew assembleRelease appDistributionUploadProdRelease appDistributionUploadDemoRelease appDistributionUploadDevRelease
   deploy-alpha:
     executor: easylineup-executor
     description: "Build alpha version artifacts"
@@ -98,7 +98,7 @@ jobs:
           at: .
       - run:
           command: |
-            ./gradlew bundleProdRelease $GRADLE_OPTS
+            ./gradlew bundleProdRelease
             bundle install
             bundle exec fastlane deploy_to_alpha
       - store_artifacts:
