@@ -12,7 +12,16 @@ executors:
       # in AndroidLintWorkAction's static initializer, and build-prod failed only on CircleCI
       # with "Could not initialize class AndroidLintWorkAction". Gradle sets its heaps
       # explicitly in gradle.properties, so the JVM doesn't need container detection for them.
-      JAVA_TOOL_OPTIONS: -XX:-UseContainerSupport
+      # Without it the JVM also sees every CPU of the host, not the executor's 4, so pin that
+      # back: it sizes GC, JIT, R8 and Gradle worker threads.
+      JAVA_TOOL_OPTIONS: -XX:-UseContainerSupport -XX:ActiveProcessorCount=4
+      # The Kotlin compile daemon stays resident (~1.5 GB) until the build ends, and next to the
+      # Gradle daemon running R8 (~6.3 GB) that went past the executor's 8 GB: the OOM killer
+      # took the Gradle daemon during minifyProdReleaseWithR8. Compiling in the Gradle daemon
+      # instead peaks at ~7.2 GB in this image capped at 8 GB / 4 CPUs. Setting GRADLE_OPTS here
+      # also overrides the project-level GRADLE_OPTS variable, so the CI JVMs are fully
+      # described by this file and gradle.properties.
+      GRADLE_OPTS: -Dorg.gradle.project.kotlin.compiler.execution.strategy=in-process
 
 jobs:
   pre-build:
