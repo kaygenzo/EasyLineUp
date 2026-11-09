@@ -6,6 +6,13 @@ executors:
       - image: kaygenzo/android-fastlane:36
     resource_class: large
     working_directory: ~/easylineup
+    environment:
+      # The image's JDK 17.0.2 has cgroup bugs (fixed in 17.0.5) that can make
+      # ManagementFactory.getPlatformMBeanServer() throw inside a container. AGP's lint calls it
+      # in AndroidLintWorkAction's static initializer, and build-prod failed only on CircleCI
+      # with "Could not initialize class AndroidLintWorkAction". Gradle sets its heaps
+      # explicitly in gradle.properties, so the JVM doesn't need container detection for them.
+      JAVA_TOOL_OPTIONS: -XX:-UseContainerSupport
 
 jobs:
   pre-build:
@@ -66,7 +73,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: ./gradlew assembleProdRelease
+      - run: ./gradlew assembleProdRelease --stacktrace
       - store_artifacts:
           path: app/build/outputs/apk/prod/release
           destination: release
