@@ -31,8 +31,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Covers [SettingsScreen]: render of the fixture's preference defaults, picking a lineup font
- * style, picking a day/night theme (a real [SharedPreferencesUtils]-backed, process-wide
+ * Covers [SettingsScreen]: render of the fixture's preference defaults, picking a day/night
+ * theme (a real [SharedPreferencesUtils]-backed, process-wide
  * setting - reset in [resetPreferencesAndTheme] so it can't leak into another test), opening
  * and cancelling the delete-all-data confirmation, back navigation and rotation - the full
  * matrix policy for a core screen (see the test plan).
@@ -65,7 +65,6 @@ class SettingsScreenTest {
     @After
     fun resetPreferencesAndTheme() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        SharedPreferencesUtils.putStringSetting(context, R.string.key_lineup_style, "0")
         SharedPreferencesUtils.putStringSetting(context, R.string.key_day_night_theme, "0")
         ThemeTestUtils.resetNightMode()
         OrientationTestUtils.rotateToPortrait()
@@ -75,32 +74,10 @@ class SettingsScreenTest {
     fun rendersSettingsFromFixture() {
         composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
         composeTestRule
-            .onNodeWithText(string(R.string.setting_lineup_style_description))
-            .assertIsDisplayed()
-        composeTestRule
-            .onNodeWithText(string(R.string.lineup_style_normal_label))
-            .assertIsDisplayed()
-        composeTestRule
             .onNodeWithText(string(R.string.setting_day_night_style_description))
             .assertIsDisplayed()
         composeTestRule
             .onNodeWithText(string(R.string.lineup_theme_system_value))
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun selectingLineupStyleUpdatesSubtitle() {
-        composeTestRule
-            .onNodeWithText(string(R.string.setting_lineup_style_description))
-            .performClick()
-        composeTestRule.waitForText(string(R.string.lineup_style_hand_writing_label))
-
-        composeTestRule
-            .onNodeWithText(string(R.string.lineup_style_hand_writing_label))
-            .performClick()
-        composeTestRule.waitForAbsence(string(R.string.lineup_style_normal_label))
-        composeTestRule
-            .onNodeWithText(string(R.string.lineup_style_hand_writing_label))
             .assertIsDisplayed()
     }
 

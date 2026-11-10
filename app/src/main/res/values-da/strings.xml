@@ -155,7 +155,6 @@
     <string name="team_details_delete_title">Slet hold</string>
     <string name="team_details_delete_subtitle">Fjerner alle spillere, opstillinger og
         historik</string>
-    <string name="setting_lineup_style_description">Skrifttype i opstillingen</string>
     <string name="setting_men_style_description">Mænd</string>
     <string name="setting_women_style_description">Kvinder</string>
     <string name="setting_day_night_style_description">Tema</string>
@@ -229,8 +228,6 @@
     <string name="shirt_number_history_title">Nummer %1$s — historik</string>
     <string name="shirt_number_history_footnote">Nyeste først — hentet fra alle tidligere
         opstillinger, ikke kun den nuværende trup.</string>
-    <string name="lineup_style_normal_label">Normal</string>
-    <string name="lineup_style_hand_writing_label">Håndskrift</string>
     <string name="lineup_theme_system_value">System</string>
     <string name="lineup_theme_day_value">Lyst</string>
     <string name="lineup_theme_night_value">Mørkt</string>

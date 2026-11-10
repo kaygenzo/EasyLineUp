@@ -59,7 +59,6 @@ data object TeamsCountReady : SettingsEvent()
 
 /** Everything [SettingsScreen] and its export/import sheets need, except the team info card. */
 data class SettingsUiState(
-    val lineupStyleValue: String = "",
     val themeValue: String = "",
     val menColor: Color = Color.Unspecified,
     val womenColor: Color = Color.Unspecified,
@@ -99,11 +98,6 @@ class SettingsViewModel(
             ContextCompat.getColor(context, R.color.default_women_color)
         )
         return SettingsUiState(
-            lineupStyleValue = SharedPreferencesUtils.getStringSetting(
-                context,
-                R.string.key_lineup_style,
-                context.getString(R.string.lineup_style_default_value)
-            ),
             themeValue = SharedPreferencesUtils.getStringSetting(
                 context,
                 R.string.key_day_night_theme,
@@ -117,11 +111,6 @@ class SettingsViewModel(
                 false
             )
         )
-    }
-
-    fun onLineupStyleSelected(value: String) {
-        putStringPreference(R.string.key_lineup_style, value)
-        _uiState.update { it.copy(lineupStyleValue = value) }
     }
 
     fun onThemeSelected(value: String) {

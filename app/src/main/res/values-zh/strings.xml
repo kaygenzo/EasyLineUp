@@ -137,7 +137,6 @@
     <string name="team_details_stat_label_unset">未设置</string>
     <string name="team_details_delete_title">删除球队</string>
     <string name="team_details_delete_subtitle">删除所有球员、阵容和历史记录</string>
-    <string name="setting_lineup_style_description">阵容字体</string>
     <string name="setting_men_style_description">男子</string>
     <string name="setting_women_style_description">女子</string>
     <string name="setting_day_night_style_description">主题</string>
@@ -203,8 +202,6 @@
     <string name="player_form_title_edit">编辑资料</string>
     <string name="shirt_number_history_title">%1$s 号 — 历史</string>
     <string name="shirt_number_history_footnote">按时间从新到旧排列——取自所有过往阵容,而不只是当前名单。</string>
-    <string name="lineup_style_normal_label">标准</string>
-    <string name="lineup_style_hand_writing_label">手写</string>
     <string name="lineup_theme_system_value">跟随系统</string>
     <string name="lineup_theme_day_value">浅色</string>
     <string name="lineup_theme_night_value">深色</string>

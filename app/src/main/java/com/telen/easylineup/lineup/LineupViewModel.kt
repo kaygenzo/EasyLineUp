@@ -46,8 +46,6 @@ import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersExce
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.utils.LineupExportData
 import com.telen.easylineup.utils.LineupPdfWriter
-import com.telen.easylineup.utils.LineupStylePreference
-import com.telen.easylineup.views.LineupTypeface
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -109,7 +107,6 @@ data class LineupUiState(
     val teamType: Int = TeamType.UNKNOWN.id,
     val extraHitters: Int = 0,
     val batters: ImmutableList<BatterState> = persistentListOf(),
-    val typeface: LineupTypeface = LineupTypeface.NORMAL,
     val selectedTab: Int = FRAGMENT_DEFENSE_INDEX,
     val availablePlayersEvent: ListAvailablePlayers? = null,
     val dpFlexEvent: LinkDpFlex? = null,
@@ -146,15 +143,10 @@ class LineupViewModel(
     private val clearRosterUseCase: ClearRoster,
     private val overrideRosterPlayerNumberUseCase: OverrideRosterPlayerNumber,
     private val lineupPdfWriter: LineupPdfWriter,
-    private val lineupStylePreference: LineupStylePreference,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LineupUiState())
     val uiState: StateFlow<LineupUiState> = _uiState.asStateFlow()
-
-    init {
-        loadTypeface()
-    }
 
     private val _listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
     private var teamTypeId: Int = TeamType.UNKNOWN.id
@@ -245,12 +237,6 @@ class LineupViewModel(
                 _uiState.update { it.copy(batters = batters.toImmutableList()) }
             }
             .onFailure { Timber.e(it) }
-    }
-
-    private fun loadTypeface() {
-        _uiState.update {
-            it.copy(typeface = LineupTypeface.getByValue(lineupStylePreference.read()))
-        }
     }
 
     fun onTabSelected(index: Int) {

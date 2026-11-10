@@ -158,7 +158,6 @@
     <string name="team_details_delete_title">Șterge echipa</string>
     <string name="team_details_delete_subtitle">Elimină toți jucătorii, formațiile și
         istoricul</string>
-    <string name="setting_lineup_style_description">Fontul formației</string>
     <string name="setting_men_style_description">Bărbați</string>
     <string name="setting_women_style_description">Femei</string>
     <string name="setting_day_night_style_description">Temă</string>
@@ -232,8 +231,6 @@
     <string name="shirt_number_history_title">Numărul %1$s — istoric</string>
     <string name="shirt_number_history_footnote">Cele mai recente primele — din toate formațiile
         anterioare, nu doar din lotul actual.</string>
-    <string name="lineup_style_normal_label">Normal</string>
-    <string name="lineup_style_hand_writing_label">Scris de mână</string>
     <string name="lineup_theme_system_value">Sistem</string>
     <string name="lineup_theme_day_value">Luminoasă</string>
     <string name="lineup_theme_night_value">Întunecată</string>

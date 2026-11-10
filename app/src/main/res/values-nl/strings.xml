@@ -155,7 +155,6 @@
     <string name="team_details_delete_title">Team verwijderen</string>
     <string name="team_details_delete_subtitle">Verwijdert alle spelers, opstellingen en
         geschiedenis</string>
-    <string name="setting_lineup_style_description">Lettertype opstelling</string>
     <string name="setting_men_style_description">Mannen</string>
     <string name="setting_women_style_description">Vrouwen</string>
     <string name="setting_day_night_style_description">Thema</string>
@@ -232,8 +231,6 @@
     <string name="shirt_number_history_title">Nummer %1$s — geschiedenis</string>
     <string name="shirt_number_history_footnote">Nieuwste eerst — uit alle eerdere opstellingen,
         niet alleen uit de huidige selectie.</string>
-    <string name="lineup_style_normal_label">Normaal</string>
-    <string name="lineup_style_hand_writing_label">Handschrift</string>
     <string name="lineup_theme_system_value">Systeem</string>
     <string name="lineup_theme_day_value">Licht</string>
     <string name="lineup_theme_night_value">Donker</string>

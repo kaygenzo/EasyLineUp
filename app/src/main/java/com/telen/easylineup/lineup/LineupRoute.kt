@@ -169,7 +169,6 @@ fun LineupRoute(
         onAddSubstitute = { handlePositionClicked(FieldPosition.SUBSTITUTE) },
         onLineupModeChanged = viewModel::onLineupModeChanged,
         batters = state.batters,
-        typeface = state.typeface,
         onReorder = viewModel::onBattersChanged
     )
 

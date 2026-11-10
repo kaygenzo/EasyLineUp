@@ -131,13 +131,6 @@ internal class SettingsViewModelTest {
     }
 
     @Test
-    fun shouldUpdateLineupStyleValueWhenSelected() = runTest(testDispatcher) {
-        viewModel.onLineupStyleSelected("compact")
-
-        assertEquals("compact", viewModel.uiState.value.lineupStyleValue)
-    }
-
-    @Test
     fun shouldUpdateThemeValueWhenSelected() = runTest(testDispatcher) {
         viewModel.onThemeSelected("2")
 

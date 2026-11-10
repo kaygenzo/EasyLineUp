@@ -140,7 +140,6 @@
     <string name="team_details_stat_label_unset">미설정</string>
     <string name="team_details_delete_title">팀 삭제</string>
     <string name="team_details_delete_subtitle">모든 선수, 라인업, 기록이 삭제됩니다</string>
-    <string name="setting_lineup_style_description">라인업 글꼴</string>
     <string name="setting_men_style_description">남성</string>
     <string name="setting_women_style_description">여성</string>
     <string name="setting_day_night_style_description">테마</string>
@@ -209,8 +208,6 @@
     <string name="player_form_title_edit">정보 편집</string>
     <string name="shirt_number_history_title">등번호 %1$s — 기록</string>
     <string name="shirt_number_history_footnote">최신순 정렬. 현재 명단뿐 아니라 지난 모든 라인업에서 가져왔습니다.</string>
-    <string name="lineup_style_normal_label">기본</string>
-    <string name="lineup_style_hand_writing_label">손글씨</string>
     <string name="lineup_theme_system_value">시스템</string>
     <string name="lineup_theme_day_value">라이트</string>
     <string name="lineup_theme_night_value">다크</string>

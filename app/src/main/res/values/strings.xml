@@ -190,7 +190,6 @@
     <string name="team_details_delete_title">Delete team</string>
     <string name="team_details_delete_subtitle">Removes all players, lineups and history</string>
 
-    <string name="setting_lineup_style_description">Lineup font</string>
     <string name="setting_men_style_description">Men</string>
     <string name="setting_women_style_description">Women</string>
     <string name="setting_day_night_style_description">Theme</string>
@@ -232,7 +231,6 @@
     <string name="import_confirm_action">Import</string>
     <string name="import_success_title">Import complete</string>
 
-    <string name="key_lineup_style" translatable="false">key_lineup_style</string>
     <string name="key_men_style" translatable="false">key_men_style</string>
     <string name="key_women_style" translatable="false">key_women_style</string>
     <string name="key_day_night_theme" translatable="false">key_day_night_theme</string>
@@ -285,9 +283,6 @@
     <string name="shirt_number_history_footnote">Sorted most recent first — pulled from every past
         lineup, not just the current roster.</string>
 
-    <string name="lineup_style_normal_label">Normal</string>
-    <string name="lineup_style_hand_writing_label">Hand writing</string>
-    <string name="lineup_style_default_value" translatable="false">0</string>
 
     <string name="lineup_theme_default_value" translatable="false">0</string>
     <string name="lineup_theme_system_value">System</string>

@@ -162,7 +162,6 @@
     <string name="team_details_stat_label_unset">Neuvedeno</string>
     <string name="team_details_delete_title">Smazat tým</string>
     <string name="team_details_delete_subtitle">Odstraní všechny hráče, sestavy a historii</string>
-    <string name="setting_lineup_style_description">Písmo sestavy</string>
     <string name="setting_men_style_description">Muži</string>
     <string name="setting_women_style_description">Ženy</string>
     <string name="setting_day_night_style_description">Motiv</string>
@@ -236,8 +235,6 @@
     <string name="shirt_number_history_title">Číslo %1$s — historie</string>
     <string name="shirt_number_history_footnote">Od nejnovějších — ze všech minulých sestav, nejen z
         aktuální soupisky.</string>
-    <string name="lineup_style_normal_label">Běžné</string>
-    <string name="lineup_style_hand_writing_label">Ručně psané</string>
     <string name="lineup_theme_system_value">Systém</string>
     <string name="lineup_theme_day_value">Světlý</string>
     <string name="lineup_theme_night_value">Tmavý</string>

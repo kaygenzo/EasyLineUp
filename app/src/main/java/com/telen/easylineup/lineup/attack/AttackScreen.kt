@@ -54,7 +54,6 @@ import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.usecases.SwapBattersOrder
-import com.telen.easylineup.views.LineupTypeface
 
 /** The drag handle has no text or content description of its own to find it by. */
 internal object AttackTestTags {
@@ -71,7 +70,6 @@ internal object AttackTestTags {
 fun AttackScreen(
     batters: List<BatterState>,
     editable: Boolean,
-    typeface: LineupTypeface,
     onReorder: (List<BatterState>) -> Unit,
     swapBattersOrder: SwapBattersOrder = SwapBattersOrder()
 ) {
@@ -86,7 +84,6 @@ fun AttackScreen(
         }
     }
 
-    val fontFamily = lineupTypefaceFontFamily(typeface)
     var showLegend by remember { mutableStateOf(false) }
 
     if (showLegend) {
@@ -128,7 +125,6 @@ fun AttackScreen(
                 BatterRow(
                     batter = batter,
                     editable = editable,
-                    fontFamily = fontFamily,
                     modifier = Modifier
                         .onGloballyPositioned { coordinates ->
                             if (rowHeightPx == 0f) {
@@ -201,19 +197,9 @@ private fun PositionLegendDialog(editable: Boolean, onDismiss: () -> Unit) {
 }
 
 @Composable
-private fun lineupTypefaceFontFamily(typeface: LineupTypeface): FontFamily? {
-    if (typeface != LineupTypeface.HAND_WRITING) return null
-    val context = LocalContext.current
-    return remember(typeface) {
-        FontFamily(Font("HomemadeApple-Regular.ttf", context.assets))
-    }
-}
-
-@Composable
 private fun BatterRow(
     batter: BatterState,
     editable: Boolean,
-    fontFamily: FontFamily?,
     modifier: Modifier = Modifier,
     onDragStart: () -> Unit,
     onDrag: (Float) -> Unit,
@@ -315,7 +301,6 @@ private fun BatterRow(
                 text = batter.playerName,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
-                fontFamily = fontFamily,
                 style = MaterialTheme.typography.titleMedium
             )
             subtitle?.let {
@@ -343,7 +328,7 @@ private fun BatterRow(
                 text = batter.playerNumber,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
-                fontFamily = fontFamily ?: FontFamily.Monospace,
+                fontFamily = FontFamily.Monospace,
                 style = MaterialTheme.typography.titleSmall
             )
         }
@@ -405,7 +390,6 @@ private fun AttackScreenPreview() {
         AttackScreen(
             batters = AttackScreenPreviewBatters,
             editable = true,
-            typeface = LineupTypeface.NORMAL,
             onReorder = {}
         )
     }
@@ -416,14 +400,6 @@ private fun AttackScreenPreview() {
 private fun PositionLegendDialogPreview() {
     DugoutTheme {
         PositionLegendDialog(editable = true, onDismiss = {})
-    }
-}
-
-@DugoutPreviews
-@Composable
-private fun LineupTypefaceFontFamilyPreview() {
-    DugoutTheme {
-        lineupTypefaceFontFamily(LineupTypeface.HAND_WRITING)
     }
 }
 
@@ -448,7 +424,6 @@ private fun BatterRowPreview() {
                 isEditable = true
             ),
             editable = true,
-            fontFamily = null,
             onDragStart = {},
             onDrag = {},
             onDragEnd = {}

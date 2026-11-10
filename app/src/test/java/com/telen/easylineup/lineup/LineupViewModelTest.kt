@@ -41,8 +41,6 @@ import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstExc
 import com.telen.easylineup.testDispatcherProvider
 import com.telen.easylineup.utils.LineupExportData
 import com.telen.easylineup.utils.LineupPdfWriter
-import com.telen.easylineup.utils.LineupStylePreference
-import com.telen.easylineup.views.LineupTypeface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
@@ -92,7 +90,6 @@ internal class LineupViewModelTest {
     @Mock lateinit var saveDpAndFlexUseCase: SaveDpAndFlex
     @Mock lateinit var updatePlayersWithBattersUseCase: UpdatePlayersWithBatters
     @Mock lateinit var lineupPdfWriter: LineupPdfWriter
-    @Mock lateinit var lineupStylePreference: LineupStylePreference
     @Mock lateinit var context: Context
 
     private lateinit var viewModel: LineupViewModel
@@ -124,7 +121,6 @@ internal class LineupViewModelTest {
         Mockito.lenient().`when`(observeLineupByIdUseCase(any())).thenReturn(lineupFlow)
         Mockito.lenient().`when`(observeTeamPlayersUseCase(any())).thenReturn(playersFlow)
         Mockito.lenient().`when`(observePlayerNumberOverlays(any())).thenReturn(overlaysFlow)
-        Mockito.lenient().`when`(lineupStylePreference.read()).thenReturn("0")
         runBlocking {
             Mockito.lenient().`when`(getTeamUseCase()).thenReturn(
                 Result.success(
@@ -160,28 +156,12 @@ internal class LineupViewModelTest {
         ClearRoster(),
         OverrideRosterPlayerNumber(),
         lineupPdfWriter,
-        lineupStylePreference,
         testDispatcherProvider()
     )
 
     @After
     fun tearDown() {
         Dispatchers.resetMain()
-    }
-
-    @Test
-    fun shouldDefaultToNormalTypefaceWhenPreferenceIsUnset() {
-        // The @Before instance already stubs "0" (normal) at construction time.
-        assertEquals(LineupTypeface.NORMAL, viewModel.uiState.value.typeface)
-    }
-
-    @Test
-    fun shouldLoadHandWritingTypefaceFromPreferenceOnConstruction() {
-        Mockito.`when`(lineupStylePreference.read()).thenReturn("1")
-
-        val freshViewModel = buildViewModel()
-
-        assertEquals(LineupTypeface.HAND_WRITING, freshViewModel.uiState.value.typeface)
     }
 
     private suspend fun loadLineup(

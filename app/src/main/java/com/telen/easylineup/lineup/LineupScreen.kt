@@ -45,7 +45,6 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.lineup.attack.AttackScreen
 import com.telen.easylineup.lineup.defense.DefenseScreen
-import com.telen.easylineup.views.LineupTypeface
 
 /**
  * The Lineup container - app bar, Defense/Offense tabbar and (editable only) Save/Cancel
@@ -81,7 +80,6 @@ fun LineupScreen(
     onAddSubstitute: () -> Unit,
     onLineupModeChanged: (Boolean) -> Unit,
     batters: List<BatterState>,
-    typeface: LineupTypeface,
     onReorder: (List<BatterState>) -> Unit
 ) {
     Column(
@@ -154,7 +152,6 @@ fun LineupScreen(
                 AttackScreen(
                     batters = batters,
                     editable = editable,
-                    typeface = typeface,
                     onReorder = onReorder
                 )
             }
@@ -386,7 +383,6 @@ private fun LineupScreenPreview() {
             onAddSubstitute = {},
             onLineupModeChanged = {},
             batters = LineupScreenPreviewBatters,
-            typeface = LineupTypeface.NORMAL,
             onReorder = {}
         )
     }

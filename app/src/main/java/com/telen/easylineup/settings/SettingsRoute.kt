@@ -150,17 +150,12 @@ fun SettingsRoute(navController: NavController) {
             teamName = teamUiState.teamName,
             teamType = teamUiState.teamType,
             teamImageUri = teamUiState.teamImageUri,
-            lineupStyleValue = uiState.lineupStyleValue,
             themeValue = uiState.themeValue,
             menColor = uiState.menColor,
             womenColor = uiState.womenColor
         ),
         onBackClick = { navController.navigateUp() },
         onTeamClick = { viewModel.getTeamsCount() },
-        onLineupStyleSelected = { newValue ->
-            FirebaseAnalyticsUtils.onClick(context, "click_settings_lineup_style")
-            viewModel.onLineupStyleSelected(newValue)
-        },
         onThemeSelected = { newValue ->
             FirebaseAnalyticsUtils.onClick(context, "click_settings_theme")
             viewModel.onThemeSelected(newValue)

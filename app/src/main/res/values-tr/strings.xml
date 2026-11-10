@@ -153,7 +153,6 @@
     <string name="team_details_delete_title">Takımı sil</string>
     <string name="team_details_delete_subtitle">Tüm oyuncuları, dizilişleri ve geçmişi
         kaldırır</string>
-    <string name="setting_lineup_style_description">Diziliş yazı tipi</string>
     <string name="setting_men_style_description">Erkekler</string>
     <string name="setting_women_style_description">Kadınlar</string>
     <string name="setting_day_night_style_description">Tema</string>
@@ -229,8 +228,6 @@
     <string name="shirt_number_history_title">%1$s numara — geçmiş</string>
     <string name="shirt_number_history_footnote">En yeniden eskiye — yalnızca mevcut kadrodan değil,
         geçmişteki tüm dizilişlerden alınır.</string>
-    <string name="lineup_style_normal_label">Normal</string>
-    <string name="lineup_style_hand_writing_label">El yazısı</string>
     <string name="lineup_theme_system_value">Sistem</string>
     <string name="lineup_theme_day_value">Açık</string>
     <string name="lineup_theme_night_value">Koyu</string>

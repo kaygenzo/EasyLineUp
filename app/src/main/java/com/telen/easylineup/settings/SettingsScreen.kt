@@ -58,7 +58,6 @@ data class SettingsScreenState(
     val teamName: String,
     val teamType: TeamType,
     val teamImageUri: Uri?,
-    val lineupStyleValue: String,
     val themeValue: String,
     val menColor: Color,
     val womenColor: Color
@@ -69,7 +68,6 @@ fun SettingsScreen(
     state: SettingsScreenState,
     onBackClick: () -> Unit,
     onTeamClick: () -> Unit,
-    onLineupStyleSelected: (String) -> Unit,
     onThemeSelected: (String) -> Unit,
     onMenColorPicked: (Int) -> Unit,
     onWomenColorPicked: (Int) -> Unit,
@@ -79,7 +77,6 @@ fun SettingsScreen(
     onLicensesClick: () -> Unit,
     onPlayStoreClick: () -> Unit
 ) {
-    var showLineupStyleDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -122,18 +119,6 @@ fun SettingsScreen(
 
         SectionLabel(stringResource(R.string.settings_category_style))
         DugoutCard {
-            SettingsRow(
-                leading = { RowIconChip(R.drawable.ic_settings_font) },
-                title = stringResource(R.string.setting_lineup_style_description),
-                subtitle = arrayLabel(
-                    R.array.pref_lineup_font_style_labels,
-                    R.array.pref_lineup_font_style_values,
-                    state.lineupStyleValue
-                ),
-                onClick = { showLineupStyleDialog = true },
-                trailing = { ChevronIcon() }
-            )
-            RowDivider()
             ColorSwatchRow(
                 title = stringResource(R.string.setting_men_style_description),
                 color = state.menColor,
@@ -225,20 +210,6 @@ fun SettingsScreen(
         }
     }
 
-    if (showLineupStyleDialog) {
-        SingleChoiceDialog(
-            titleRes = R.string.setting_lineup_style_description,
-            labelsRes = R.array.pref_lineup_font_style_labels,
-            valuesRes = R.array.pref_lineup_font_style_values,
-            currentValue = state.lineupStyleValue,
-            onSelected = {
-                onLineupStyleSelected(it)
-                showLineupStyleDialog = false
-            },
-            onDismiss = { showLineupStyleDialog = false }
-        )
-    }
-
     if (showThemeDialog) {
         SingleChoiceDialog(
             titleRes = R.string.setting_day_night_style_description,
@@ -268,8 +239,8 @@ private fun arrayLabelPreview() {
     DugoutTheme {
         Text(
             text = arrayLabel(
-                labelsRes = R.array.pref_lineup_font_style_labels,
-                valuesRes = R.array.pref_lineup_font_style_values,
+                labelsRes = R.array.pref_theme_style_labels,
+                valuesRes = R.array.pref_theme_style_values,
                 value = "0"
             )
         )
@@ -323,9 +294,9 @@ private fun SingleChoiceDialog(
 private fun SingleChoiceDialogPreview() {
     DugoutTheme {
         SingleChoiceDialog(
-            titleRes = R.string.setting_lineup_style_description,
-            labelsRes = R.array.pref_lineup_font_style_labels,
-            valuesRes = R.array.pref_lineup_font_style_values,
+            titleRes = R.string.setting_day_night_style_description,
+            labelsRes = R.array.pref_theme_style_labels,
+            valuesRes = R.array.pref_theme_style_values,
             currentValue = "0",
             onSelected = {},
             onDismiss = {}
@@ -535,14 +506,12 @@ private fun SettingsScreenPreview() {
                 teamName = "Riverside Hawks",
                 teamType = TeamType.BASEBALL,
                 teamImageUri = null,
-                lineupStyleValue = "0",
                 themeValue = "0",
                 menColor = Color(0xFFD8324A),
                 womenColor = Color(0xFFE8B93F)
             ),
             onBackClick = {},
             onTeamClick = {},
-            onLineupStyleSelected = {},
             onThemeSelected = {},
             onMenColorPicked = {},
             onWomenColorPicked = {},
