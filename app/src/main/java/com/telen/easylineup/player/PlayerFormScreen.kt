@@ -10,8 +10,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +24,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -37,6 +39,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.AvatarPicker
@@ -450,15 +453,70 @@ private fun FavoritePositions(
             style = MaterialTheme.typography.labelSmall
         )
         Spacer(modifier = Modifier.height(8.dp))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            availablePositions.forEach { position ->
-                val selected = position in selectedPositions
-                FormPill(
-                    text = names.getOrNull(position.id) ?: "",
-                    selected = selected,
-                    onClick = { onPositionToggled(position) }
-                )
+        // A grid of same-width Material 3 filter chips: as many columns as fit, every cell the
+        // same width whatever its label ("C" vs "LCF"), a short last row padded with empty cells.
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val spacing = 8.dp
+            val columns = ((maxWidth + spacing) / (POSITION_CHIP_MIN_WIDTH + spacing))
+                .toInt()
+                .coerceAtLeast(1)
+            // No vertical spacing: each chip already reserves a 48dp touch target around itself.
+            Column {
+                availablePositions.chunked(columns).forEach { row ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(spacing)) {
+                        row.forEach { position ->
+                            PositionFilterChip(
+                                label = names.getOrNull(position.id) ?: "",
+                                selected = position in selectedPositions,
+                                onClick = { onPositionToggled(position) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        repeat(columns - row.size) { Spacer(modifier = Modifier.weight(1f)) }
+                    }
+                }
             }
+        }
+    }
+}
+
+private val POSITION_CHIP_MIN_WIDTH = 64.dp
+
+@Composable
+private fun PositionFilterChip(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = {
+            Text(
+                text = label,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        // Same selected look as the form's other pills (pitching/batting side), not M3's
+        // default secondary container.
+        colors = FilterChipDefaults.filterChipColors(
+            selectedContainerColor = MaterialTheme.colorScheme.primary,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+        ),
+        modifier = modifier
+    )
+}
+
+@DugoutPreviews
+@Composable
+private fun PositionFilterChipPreview() {
+    DugoutTheme {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            PositionFilterChip(label = "SS", selected = true, onClick = {})
+            PositionFilterChip(label = "LCF", selected = false, onClick = {})
         }
     }
 }
