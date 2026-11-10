@@ -39,6 +39,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -776,8 +777,17 @@ private fun RosterPickerRow(
             contentAlignment = Alignment.Center
         ) {
             if (onNumberChange != null) {
-                var text by remember(overrideNumber, player.id) {
-                    mutableStateOf("%02d".format(overrideNumber ?: player.shirtNumber))
+                val shownNumber = overrideNumber ?: player.shirtNumber
+                // Keyed on the player only: every keystroke reports a new override, and keying
+                // on it too would rebuild this state mid-typing ("1" reformatted to "01", cursor
+                // moved), which made the field nearly impossible to type into.
+                var text by remember(player.id) { mutableStateOf("%02d".format(shownNumber)) }
+                // Still follow a number changed from outside the field (e.g. the roster being
+                // reset), but never fight what the user is typing.
+                LaunchedEffect(shownNumber) {
+                    if (text.toIntOrNull() != shownNumber) {
+                        text = "%02d".format(shownNumber)
+                    }
                 }
                 BasicTextField(
                     value = text,
