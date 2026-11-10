@@ -102,8 +102,14 @@ class HomeActivity : BaseActivity() {
                             selected = tab,
                             onSelect = { selected ->
                                 if (selected != currentTab) {
+                                    // Standard bottom-nav behavior: switching tabs never stacks a
+                                    // tab on top of another (Dashboard > Roster > Dashboard used
+                                    // to leave two Dashboards, so Back landed on the second one),
+                                    // and each tab keeps its own depth, restored on reselect.
                                     navController.navigate(selected.route) {
-                                        popUpTo<Routes.Dashboard> { inclusive = false }
+                                        popUpTo<Routes.Dashboard> { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
                                 }
                             }
