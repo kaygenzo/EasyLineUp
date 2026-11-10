@@ -201,10 +201,11 @@ class LineupScreenTest {
 
         composeTestRule.onNodeWithText(string(R.string.action_delete)).performClick()
 
-        // Deleting the lineup doesn't delete its tournament - back on Tournaments, still with
-        // the fixture's one tournament, just none of its lineups left to expand.
+        // Back on Tournaments, and the list already reflects the deletion: the fixture's
+        // tournament had only this lineup, and the list only shows tournaments that have at
+        // least one (the tournament itself is kept, e.g. for the lineup creation picker).
         composeTestRule.waitForText(string(R.string.tournaments_list_header_title))
-        composeTestRule.waitForText(TestFixtures.TOURNAMENT_NAME)
+        composeTestRule.waitForAbsence(TestFixtures.TOURNAMENT_NAME)
     }
 
     @Test

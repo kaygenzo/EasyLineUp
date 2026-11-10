@@ -86,10 +86,10 @@ internal interface LineupDao {
         ORDER BY tournaments.createdAt DESC
     """
     )
-    suspend fun getAllTournamentsWithLineups(
+    fun observeAllTournamentsWithLineups(
         filter: String,
         teamId: Long
-    ): List<RoomTournamentWithLineup>
+    ): Flow<List<RoomTournamentWithLineup>>
 
     @Query(
         """

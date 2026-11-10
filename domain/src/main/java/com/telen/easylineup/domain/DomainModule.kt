@@ -21,7 +21,6 @@ import com.telen.easylineup.domain.usecases.EncodePlayerSideFlag
 import com.telen.easylineup.domain.usecases.ExportData
 import com.telen.easylineup.domain.usecases.GenerateExportFileName
 import com.telen.easylineup.domain.usecases.GetAllTeams
-import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineups
 import com.telen.easylineup.domain.usecases.GetBattersState
 import com.telen.easylineup.domain.usecases.GetDashboardTiles
 import com.telen.easylineup.domain.usecases.GetDpAndFlexFromPlayersInField
@@ -53,6 +52,7 @@ import com.telen.easylineup.domain.usecases.IsEmailValid
 import com.telen.easylineup.domain.usecases.IsExtraHittersUnlimited
 import com.telen.easylineup.domain.usecases.IsPlayingTimeUnderused
 import com.telen.easylineup.domain.usecases.IsValidPhoneNumber
+import com.telen.easylineup.domain.usecases.ObserveAllTournamentsWithLineups
 import com.telen.easylineup.domain.usecases.ObserveLineupById
 import com.telen.easylineup.domain.usecases.ObservePlayer
 import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
@@ -94,7 +94,7 @@ object DomainModule {
         single { CreateDashboardTiles(get(), get()) }
         single { CreateLineup(get(), get(), get()) }
         single { GetTournaments(get(), get()) }
-        single { GetAllTournamentsWithLineups(get(), get(), get()) }
+        single { ObserveAllTournamentsWithLineups(get(), get(), get()) }
         single { DeleteTournamentLineups(get(), get(), get()) }
         single { GetPlayer(get(), get()) }
         single { DeletePlayer(get(), get(), get()) }

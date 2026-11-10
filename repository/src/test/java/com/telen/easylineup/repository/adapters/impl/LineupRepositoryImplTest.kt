@@ -9,6 +9,7 @@ import com.telen.easylineup.repository.dao.LineupDao
 import com.telen.easylineup.repository.model.RoomLineup
 import com.telen.easylineup.repository.model.RoomPlayerInLineup
 import com.telen.easylineup.repository.model.RoomTournamentWithLineup
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -191,11 +192,12 @@ internal class LineupRepositoryImplTest {
     }
 
     @Test
-    fun shouldGetAllTournamentsWithLineupsMappedToDomain() = runTest {
+    fun shouldObserveAllTournamentsWithLineupsMappedToDomain() = runTest {
         val rooms = listOf(RoomTournamentWithLineup(tournamentId = 1L, tournamentName = "Cup"))
-        Mockito.`when`(lineupDao.getAllTournamentsWithLineups("filter", 1L)).thenReturn(rooms)
+        Mockito.`when`(lineupDao.observeAllTournamentsWithLineups("filter", 1L))
+            .thenReturn(flowOf(rooms))
 
-        val result = repository.getAllTournamentsWithLineups("filter", 1L)
+        val result = repository.observeAllTournamentsWithLineups("filter", 1L).first()
 
         assertEquals(listOf("Cup"), result.map { it.tournamentName })
     }

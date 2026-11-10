@@ -9,8 +9,10 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TournamentWithLineup
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
-import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineups
+import com.telen.easylineup.domain.usecases.ObserveAllTournamentsWithLineups
 import com.telen.easylineup.domain.usecases.GetTeam
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -24,17 +26,17 @@ import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-internal class GetAllTournamentsWithLineupsTests {
+internal class ObserveAllTournamentsWithLineupsTests {
     @Mock lateinit var lineupDao: LineupRepository
     @Mock lateinit var teamDao: TeamRepository
-    lateinit var getAllTournamentsWithLineups: GetAllTournamentsWithLineups
+    lateinit var observeAllTournamentsWithLineups: ObserveAllTournamentsWithLineups
     lateinit var team: Team
 
     @Before
     fun init() {
         runBlocking {
         team = Team(id = 1L, name = "toto", main = true)
-        getAllTournamentsWithLineups = GetAllTournamentsWithLineups(
+        observeAllTournamentsWithLineups = ObserveAllTournamentsWithLineups(
             lineupDao,
             GetTeam(teamDao, testDispatcherProvider()),
             testDispatcherProvider()
@@ -46,14 +48,13 @@ internal class GetAllTournamentsWithLineupsTests {
 
     @Test
     fun shouldReturnEmptyListWhenNoTournamentsForCurrentTeam() = runTest {
-        Mockito.`when`(lineupDao.getAllTournamentsWithLineups("summer", team.id))
-            .thenReturn(emptyList())
+        Mockito.`when`(lineupDao.observeAllTournamentsWithLineups("summer", team.id))
+            .thenReturn(flowOf(emptyList()))
 
-        val result = getAllTournamentsWithLineups("summer")
+        val result = observeAllTournamentsWithLineups("summer").first()
 
-        assertTrue(result.isSuccess)
-        Assert.assertTrue(result.getOrNull()?.isEmpty() ?: false)
-        Mockito.verify(lineupDao).getAllTournamentsWithLineups("summer", team.id)
+        Assert.assertTrue(result.isEmpty())
+        Mockito.verify(lineupDao).observeAllTournamentsWithLineups("summer", team.id)
     }
 
     private fun row(
@@ -72,9 +73,9 @@ internal class GetAllTournamentsWithLineupsTests {
     )
 
     private suspend fun resultFor(vararg rows: TournamentWithLineup) = run {
-        Mockito.`when`(lineupDao.getAllTournamentsWithLineups("", team.id))
-            .thenReturn(rows.toList())
-        getAllTournamentsWithLineups("").getOrThrow()
+        Mockito.`when`(lineupDao.observeAllTournamentsWithLineups("", team.id))
+            .thenReturn(flowOf(rows.toList()))
+        observeAllTournamentsWithLineups("").first()
     }
 
     @Test

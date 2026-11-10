@@ -10,10 +10,12 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
-import com.telen.easylineup.domain.usecases.GetAllTournamentsWithLineups
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.GetTournamentMapLink
+import com.telen.easylineup.domain.usecases.ObserveAllTournamentsWithLineups
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -42,7 +44,7 @@ internal class LineupListViewModelTest {
     lateinit var getTeamUseCase: GetTeam
 
     @Mock
-    lateinit var getAllTournamentsWithLineups: GetAllTournamentsWithLineups
+    lateinit var observeAllTournamentsWithLineups: ObserveAllTournamentsWithLineups
 
     @Mock
     lateinit var getTournamentMapLink: GetTournamentMapLink
@@ -65,14 +67,14 @@ internal class LineupListViewModelTest {
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         runBlocking {
-            Mockito.lenient().`when`(getAllTournamentsWithLineups(""))
-                .thenReturn(Result.success(emptyList()))
+            Mockito.lenient().`when`(observeAllTournamentsWithLineups(""))
+                .thenReturn(flowOf(emptyList()))
             Mockito.lenient().`when`(getTeamUseCase())
                 .thenReturn(Result.success(Team(id = 1L, name = "Panthers", type = 0)))
         }
         viewModel = LineupListViewModel(
             getTeamUseCase,
-            getAllTournamentsWithLineups,
+            observeAllTournamentsWithLineups,
             getTournamentMapLink,
             deleteTournamentLineups
         )
@@ -88,13 +90,13 @@ internal class LineupListViewModelTest {
         val tournament = tournament(id = 1L)
         val lineups = listOf(Lineup(id = 1L))
         runBlocking {
-            Mockito.`when`(getAllTournamentsWithLineups(""))
-                .thenReturn(Result.success(listOf(tournament to lineups)))
+            Mockito.`when`(observeAllTournamentsWithLineups(""))
+                .thenReturn(flowOf(listOf(tournament to lineups)))
         }
 
         viewModel = LineupListViewModel(
             getTeamUseCase,
-            getAllTournamentsWithLineups,
+            observeAllTournamentsWithLineups,
             getTournamentMapLink,
             deleteTournamentLineups
         )
@@ -115,7 +117,7 @@ internal class LineupListViewModelTest {
 
         viewModel = LineupListViewModel(
             getTeamUseCase,
-            getAllTournamentsWithLineups,
+            observeAllTournamentsWithLineups,
             getTournamentMapLink,
             deleteTournamentLineups
         )
@@ -128,25 +130,59 @@ internal class LineupListViewModelTest {
     fun shouldUpdateSearchQueryAndReloadWithFilter() = runTest {
         advanceUntilIdle()
         runBlocking {
-            Mockito.`when`(getAllTournamentsWithLineups("abc"))
-                .thenReturn(Result.success(emptyList()))
+            Mockito.`when`(observeAllTournamentsWithLineups("abc"))
+                .thenReturn(flowOf(emptyList()))
         }
 
         viewModel.onSearchQueryChanged("abc")
         advanceUntilIdle()
 
         assertEquals("abc", viewModel.uiState.value.searchQuery)
-        runBlocking { Mockito.verify(getAllTournamentsWithLineups)("abc") }
+        Mockito.verify(observeAllTournamentsWithLineups)("abc")
     }
 
     @Test
-    fun shouldReloadListWhenReloadListIsCalled() = runTest {
+    fun shouldFollowEveryEmissionOfTheObservedList() = runTest {
+        val source = MutableStateFlow<List<Pair<Tournament, List<Lineup>>>>(emptyList())
+        Mockito.`when`(observeAllTournamentsWithLineups("")).thenReturn(source)
+        viewModel = LineupListViewModel(
+            getTeamUseCase,
+            observeAllTournamentsWithLineups,
+            getTournamentMapLink,
+            deleteTournamentLineups
+        )
+        advanceUntilIdle()
+        assertEquals(0, viewModel.uiState.value.tournamentItems.size)
+
+        // e.g. a lineup saved on the creation screen, with no reload asked for
+        source.value = listOf(tournament(id = 1L) to listOf(Lineup(id = 7L)))
         advanceUntilIdle()
 
-        viewModel.reloadList()
+        assertEquals(1, viewModel.uiState.value.tournamentItems.size)
+        assertEquals(7L, viewModel.uiState.value.tournamentItems[0].lineups.single().id)
+    }
+
+    @Test
+    fun shouldNotLookUpTheSameAddressAgainOnLaterEmissions() = runTest {
+        val tournament = tournament(id = 1L, address = "1 Main St")
+        val location = GeoLocation(latitude = 1.0, longitude = 2.0)
+        val source = MutableStateFlow(listOf(tournament to emptyList<Lineup>()))
+        runBlocking {
+            Mockito.`when`(observeAllTournamentsWithLineups("")).thenReturn(source)
+            Mockito.`when`(getTournamentMapLink(tournament)).thenReturn(Result.success(location))
+        }
+        viewModel = LineupListViewModel(
+            getTeamUseCase,
+            observeAllTournamentsWithLineups,
+            getTournamentMapLink,
+            deleteTournamentLineups
+        )
         advanceUntilIdle()
 
-        runBlocking { Mockito.verify(getAllTournamentsWithLineups, Mockito.times(2))("") }
+        source.value = listOf(tournament to listOf(Lineup(id = 3L)))
+        advanceUntilIdle()
+
+        runBlocking { Mockito.verify(getTournamentMapLink, Mockito.times(1))(tournament) }
     }
 
     @Test
@@ -154,14 +190,14 @@ internal class LineupListViewModelTest {
         val tournament = tournament(id = 1L, address = "1 Main St")
         val location = GeoLocation(latitude = 1.0, longitude = 2.0)
         runBlocking {
-            Mockito.`when`(getAllTournamentsWithLineups(""))
-                .thenReturn(Result.success(listOf(tournament to emptyList())))
+            Mockito.`when`(observeAllTournamentsWithLineups(""))
+                .thenReturn(flowOf(listOf(tournament to emptyList())))
             Mockito.`when`(getTournamentMapLink(tournament)).thenReturn(Result.success(location))
         }
 
         viewModel = LineupListViewModel(
             getTeamUseCase,
-            getAllTournamentsWithLineups,
+            observeAllTournamentsWithLineups,
             getTournamentMapLink,
             deleteTournamentLineups
         )
@@ -171,7 +207,7 @@ internal class LineupListViewModelTest {
     }
 
     @Test
-    fun shouldDeleteTournamentAndReloadOnSuccess() = runTest {
+    fun shouldDeleteTournament() = runTest {
         advanceUntilIdle()
         val tournament = tournament(id = 5L)
         runBlocking {
@@ -182,7 +218,7 @@ internal class LineupListViewModelTest {
         advanceUntilIdle()
 
         assertTrue(result.isSuccess)
-        runBlocking { Mockito.verify(getAllTournamentsWithLineups, Mockito.times(2))("") }
+        runBlocking { Mockito.verify(deleteTournamentLineups)(tournament) }
     }
 
     @Test

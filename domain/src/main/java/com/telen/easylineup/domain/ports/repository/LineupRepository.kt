@@ -22,10 +22,10 @@ interface LineupRepository {
     suspend fun getLineupById(lineupId: Long): Lineup
     suspend fun getLineupsForTournament(tournamentId: Long, teamId: Long): List<Lineup>
     suspend fun getLastLineup(teamId: Long): Lineup?
-    suspend fun getAllTournamentsWithLineups(
+    fun observeAllTournamentsWithLineups(
         filter: String,
         teamId: Long
-    ): List<TournamentWithLineup>
+    ): Flow<List<TournamentWithLineup>>
 
     suspend fun getAllPlayerPositionsForTournament(
         tournamentId: Long,

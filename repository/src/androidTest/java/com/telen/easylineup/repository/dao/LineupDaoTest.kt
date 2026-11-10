@@ -12,6 +12,7 @@ import com.telen.easylineup.repository.model.RoomPlayer
 import com.telen.easylineup.repository.model.RoomPlayerFieldPosition
 import com.telen.easylineup.repository.model.RoomTeam
 import com.telen.easylineup.repository.model.RoomTournament
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -60,7 +61,7 @@ class LineupDaoTest {
     )
 
     @Test
-    fun getAllTournamentsWithLineupsOnlyReturnsTheRequestedTeam() = runBlocking {
+    fun observeAllTournamentsWithLineupsOnlyReturnsTheRequestedTeam() = runBlocking {
         val teamAId = insertTeam("Riverside Hawks")
         val teamBId = insertTeam("Lakeside Tigers")
         val tournamentAId = insertTournament("Fall Classic", createdAt = 1_000L)
@@ -68,7 +69,7 @@ class LineupDaoTest {
         insertLineup("Hawks Opener", teamAId, tournamentAId)
         insertLineup("Tigers Opener", teamBId, tournamentBId)
 
-        val rows = lineupDao.getAllTournamentsWithLineups(filter = "", teamId = teamAId)
+        val rows = lineupDao.observeAllTournamentsWithLineups(filter = "", teamId = teamAId).first()
 
         assertEquals(1, rows.size)
         assertEquals("Fall Classic", rows.single().tournamentName)
@@ -76,27 +77,28 @@ class LineupDaoTest {
     }
 
     @Test
-    fun getAllTournamentsWithLineupsOrdersByTournamentCreatedAtDescending() = runBlocking {
+    fun observeAllTournamentsWithLineupsOrdersByTournamentCreatedAtDescending() = runBlocking {
         val teamId = insertTeam("Riverside Hawks")
         val olderTournamentId = insertTournament("Early Spring", createdAt = 1_000L)
         val newerTournamentId = insertTournament("Late Fall", createdAt = 5_000L)
         insertLineup("Lineup A", teamId, olderTournamentId)
         insertLineup("Lineup B", teamId, newerTournamentId)
 
-        val rows = lineupDao.getAllTournamentsWithLineups(filter = "", teamId = teamId)
+        val rows = lineupDao.observeAllTournamentsWithLineups(filter = "", teamId = teamId).first()
 
         assertEquals(listOf("Late Fall", "Early Spring"), rows.map { it.tournamentName })
     }
 
     @Test
-    fun getAllTournamentsWithLineupsFilterMatchesEitherTournamentOrLineupName() = runBlocking {
+    fun observeAllTournamentsWithLineupsFilterMatchesEitherTournamentOrLineupName() = runBlocking {
         val teamId = insertTeam("Riverside Hawks")
         val tournamentId = insertTournament("Fall Classic", createdAt = 1_000L)
         insertLineup("Championship Game", teamId, tournamentId)
 
-        val byTournamentName = lineupDao.getAllTournamentsWithLineups("Fall", teamId)
-        val byLineupName = lineupDao.getAllTournamentsWithLineups("Championship", teamId)
-        val noMatch = lineupDao.getAllTournamentsWithLineups("Nonexistent", teamId)
+        val byTournamentName = lineupDao.observeAllTournamentsWithLineups("Fall", teamId).first()
+        val byLineupName =
+            lineupDao.observeAllTournamentsWithLineups("Championship", teamId).first()
+        val noMatch = lineupDao.observeAllTournamentsWithLineups("Nonexistent", teamId).first()
 
         assertEquals(1, byTournamentName.size)
         assertEquals(1, byLineupName.size)
@@ -104,14 +106,14 @@ class LineupDaoTest {
     }
 
     @Test
-    fun getAllTournamentsWithLineupsExcludesATournamentWithNoLineupYet() = runBlocking {
+    fun observeAllTournamentsWithLineupsExcludesATournamentWithNoLineupYet() = runBlocking {
         val teamId = insertTeam("Riverside Hawks")
         insertTournament("Empty Tournament", createdAt = 1_000L)
 
         // A tournament with zero lineups never matches `teamID = :teamId` (that column only
         // exists on the `lineups` side of the LEFT JOIN) - locking this in because it's easy to
         // assume the LEFT JOIN alone would be enough to surface it.
-        val rows = lineupDao.getAllTournamentsWithLineups(filter = "", teamId = teamId)
+        val rows = lineupDao.observeAllTournamentsWithLineups(filter = "", teamId = teamId).first()
 
         assertTrue(rows.isEmpty())
     }

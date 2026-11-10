@@ -71,12 +71,12 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
         return lineupDao.getLastLineup(teamId)?.toDomain()
     }
 
-    override suspend fun getAllTournamentsWithLineups(
+    override fun observeAllTournamentsWithLineups(
         filter: String,
         teamId: Long
-    ): List<TournamentWithLineup> {
-        return lineupDao.getAllTournamentsWithLineups(filter, teamId)
-            .map { it.toDomain() }
+    ): Flow<List<TournamentWithLineup>> {
+        return lineupDao.observeAllTournamentsWithLineups(filter, teamId)
+            .map { rows -> rows.map { it.toDomain() } }
     }
 
     override suspend fun getAllPlayerPositionsForTournament(

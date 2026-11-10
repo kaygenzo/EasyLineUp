@@ -103,10 +103,7 @@ fun TournamentListRoute(navController: NavController) {
             .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .collect { event ->
                 when (event) {
-                    LineupUpdated -> {
-                        closeEditLineupSheet()
-                        viewModel.reloadList()
-                    }
+                    LineupUpdated -> closeEditLineupSheet()
 
                     InvalidLineupName ->
                         editLineupNameError =
