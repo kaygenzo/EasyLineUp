@@ -38,25 +38,25 @@ internal class UpdatePlayersWithLineupModeTests {
         players = mutableListOf()
         players.add(
             PlayerWithPosition(
-                "toto", 0, 1, 1, 1, null,
+                "toto", 0, 1, "1", 1, null,
                 FieldPosition.SECOND_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, 0, 1, 1, 1, 1
             )
         )
         players.add(
             PlayerWithPosition(
-                "tata", 0, 2, 2, 1, null,
+                "tata", 0, 2, "2", 1, null,
                 FieldPosition.CATCHER.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, 2, 2, 2, 1, 2
             )
         )
         players.add(
             PlayerWithPosition(
-                "titi", 0, 3, 3, 1, null,
+                "titi", 0, 3, "3", 1, null,
                 FieldPosition.CENTER_FIELD.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, 4, 3, 3, 1, 4
             )
         )
         players.add(
             PlayerWithPosition(
-                "tutu", 0, 4, 4, 1, null,
+                "tutu", 0, 4, "4", 1, null,
                 FieldPosition.FIRST_BASE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, 6, 4, 4, 1, 8
             )
         )
@@ -65,7 +65,7 @@ internal class UpdatePlayersWithLineupModeTests {
                 "tete",
                 0,
                 5,
-                5,
+                "5",
                 1,
                 null,
                 FieldPosition.SUBSTITUTE.id,

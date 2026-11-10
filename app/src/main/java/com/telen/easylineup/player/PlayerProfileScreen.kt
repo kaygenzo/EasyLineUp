@@ -61,7 +61,7 @@ data class PlayerProfileState(
     val sex: Sex,
     val battingSide: PlayerSide?,
     val pitchingSide: PlayerSide?,
-    val licenseNumber: Long,
+    val licenseNumber: String,
     val email: String,
     val phoneNumber: String,
     val positionsData: Map<FieldPosition, Int>,
@@ -118,7 +118,7 @@ fun PlayerProfileScreen(
             InfoCell(
                 modifier = Modifier.weight(1f),
                 label = stringResource(R.string.player_hint_license_number_short),
-                value = state.licenseNumber.takeIf { it > 0 }?.toString() ?: EMPTY_MARKER
+                value = state.licenseNumber.ifBlank { EMPTY_MARKER }
             )
             InfoCell(
                 modifier = Modifier.weight(1f),
@@ -240,7 +240,7 @@ private fun ProfileHeaderPreview() {
                 sex = Sex.MALE,
                 battingSide = PlayerSide.RIGHT,
                 pitchingSide = PlayerSide.RIGHT,
-                licenseNumber = 22841,
+                licenseNumber = "FR-22841",
                 email = "jonas.a@mail.com",
                 phoneNumber = "(555) 019-2231",
                 positionsData = mapOf(FieldPosition.SHORT_STOP to 15),
@@ -358,7 +358,7 @@ private fun PlayerProfileScreenPreview() {
                 sex = Sex.MALE,
                 battingSide = PlayerSide.RIGHT,
                 pitchingSide = PlayerSide.RIGHT,
-                licenseNumber = 22841,
+                licenseNumber = "FR-22841",
                 email = "jonas.a@mail.com",
                 phoneNumber = "(555) 019-2231",
                 positionsData = mapOf(
@@ -392,7 +392,7 @@ private fun PlayerProfileScreenEmptyPreview() {
                 sex = Sex.UNKNOWN,
                 battingSide = null,
                 pitchingSide = null,
-                licenseNumber = 0,
+                licenseNumber = "",
                 email = "",
                 phoneNumber = "",
                 positionsData = emptyMap(),

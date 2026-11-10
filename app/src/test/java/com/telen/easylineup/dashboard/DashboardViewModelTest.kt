@@ -217,7 +217,13 @@ internal class DashboardViewModelTest {
                 tile(TileType.LAST_LINEUP)
             )
         )
-        val ace = Player(id = 2L, teamId = 1L, name = " Ace ", shirtNumber = 12, licenseNumber = 1L)
+        val ace = Player(
+            id = 2L,
+            teamId = 1L,
+            name = " Ace ",
+            shirtNumber = 12,
+            licenseNumber = "1"
+        )
         Mockito.`when`(playerRepository.getPlayersByTeamId(1L)).thenReturn(listOf(ace))
         Mockito.`when`(playerFieldPositionRepository.getMostUsedPlayers(1L))
             .thenReturn(listOf(PlayerGamesCount(playerId = 2L, size = 7)))

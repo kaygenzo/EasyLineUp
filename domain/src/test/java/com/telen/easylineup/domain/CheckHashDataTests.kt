@@ -58,8 +58,8 @@ internal class CheckHashDataTests {
             )
 
             val players = mutableListOf(
-                Player(1L, 1L, "A", 1, 1L, null, 1, 0, 0, null),
-                Player(2L, 2L, "B", 2, 2L, null, 1, 0, 0, null)
+                Player(1L, 1L, "A", 1, "1", null, 1, 0, 0, null),
+                Player(2L, 2L, "B", 2, "2", null, 1, 0, 0, null)
             )
 
             val tournaments = mutableListOf(

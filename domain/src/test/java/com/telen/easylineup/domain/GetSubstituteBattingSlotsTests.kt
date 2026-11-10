@@ -19,7 +19,7 @@ internal class GetSubstituteBattingSlotsTests {
         playerName = "p$id",
         playerSex = 0,
         shirtNumber = id.toInt(),
-        licenseNumber = id,
+        licenseNumber = id.toString(),
         teamId = 1L,
         image = null,
         position = FieldPosition.SUBSTITUTE.id,

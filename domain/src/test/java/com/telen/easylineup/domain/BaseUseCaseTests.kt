@@ -29,7 +29,7 @@ open class BaseUseCaseTests {
         return PlayerWithPosition(
             playerName = "player${id.toInt()}",
             shirtNumber = id.toInt(),
-            licenseNumber = id,
+            licenseNumber = id.toString(),
             teamId = teamId,
             image = null,
             position = position?.id ?: -1,
@@ -67,7 +67,7 @@ open class BaseUseCaseTests {
                 teamId = teamId,
                 name = "player${id.toInt()}",
                 shirtNumber = id.toInt(),
-                licenseNumber = id,
+                licenseNumber = id.toString(),
                 image = null,
                 positions = positions
             ), status, playerNumberOverlay

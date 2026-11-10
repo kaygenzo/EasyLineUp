@@ -104,7 +104,7 @@ internal class LineupViewModelTest {
         playerName = "p$id",
         playerSex = 0,
         shirtNumber = id.toInt(),
-        licenseNumber = id,
+        licenseNumber = id.toString(),
         teamId = 1L,
         image = null,
         position = position,
@@ -219,7 +219,7 @@ internal class LineupViewModelTest {
         }
 
         viewModel.onDeletePosition(
-            Player(id = 1L, teamId = 1L, name = "p1", shirtNumber = 1, licenseNumber = 1L)
+            Player(id = 1L, teamId = 1L, name = "p1", shirtNumber = 1, licenseNumber = "1")
         )
         advanceUntilIdle()
 
@@ -311,7 +311,7 @@ internal class LineupViewModelTest {
         }
 
         viewModel.onPlayerSelected(
-            Player(id = 2L, teamId = 1L, name = "p2", shirtNumber = 2, licenseNumber = 2L),
+            Player(id = 2L, teamId = 1L, name = "p2", shirtNumber = 2, licenseNumber = "2"),
             FieldPosition.PITCHER
         )
         advanceUntilIdle()
@@ -441,7 +441,7 @@ internal class LineupViewModelTest {
 
     @Test
     fun shouldSetAndClearDeleteConfirmPlayer() {
-        val target = Player(id = 1L, teamId = 1L, name = "p1", shirtNumber = 1, licenseNumber = 1L)
+        val target = Player(id = 1L, teamId = 1L, name = "p1", shirtNumber = 1, licenseNumber = "1")
         viewModel.onSubstituteLongClicked(target)
         assertEquals(target, viewModel.uiState.value.deleteConfirmPlayer)
 
@@ -507,7 +507,7 @@ internal class LineupViewModelTest {
         val lineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
         loadLineup(lineup)
         advanceUntilIdle()
-        val dp = Player(id = 1L, teamId = 1L, name = "dp", shirtNumber = 1, licenseNumber = 1L)
+        val dp = Player(id = 1L, teamId = 1L, name = "dp", shirtNumber = 1, licenseNumber = "1")
         runBlocking {
             Mockito.`when`(saveDpAndFlexUseCase(eq(lineup), eq(dp), eq(null), any()))
                 .thenReturn(Result.success(Unit))
@@ -601,7 +601,7 @@ internal class LineupViewModelTest {
             players = listOf(
                 com.telen.easylineup.domain.model.RosterPlayerStatus(
                     player = Player(
-                        id = 1L, teamId = 1L, name = "p1", shirtNumber = 1, licenseNumber = 1L
+                        id = 1L, teamId = 1L, name = "p1", shirtNumber = 1, licenseNumber = "1"
                     ),
                     status = true,
                     playerNumberOverlay = null
@@ -693,7 +693,7 @@ internal class LineupViewModelTest {
         players = listOf(
             com.telen.easylineup.domain.model.RosterPlayerStatus(
                 player = Player(
-                    id = 1L, teamId = 1L, name = "p1", shirtNumber = 1, licenseNumber = 1L
+                    id = 1L, teamId = 1L, name = "p1", shirtNumber = 1, licenseNumber = "1"
                 ),
                 status = true,
                 playerNumberOverlay = null
@@ -740,7 +740,7 @@ internal class LineupViewModelTest {
 
     private val loadedLineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
     private val aPlayer =
-        Player(id = 1L, teamId = 1L, name = "p1", shirtNumber = 1, licenseNumber = 1L)
+        Player(id = 1L, teamId = 1L, name = "p1", shirtNumber = 1, licenseNumber = "1")
 
     @Test
     fun shouldNotObserveAnythingWithoutALineupId() {

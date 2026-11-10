@@ -27,7 +27,7 @@ data class PlayerWithPosition(
     val playerName: String,
     val playerSex: Int,
     var shirtNumber: Int,
-    val licenseNumber: Long,
+    val licenseNumber: String,
     val teamId: Long,
     val image: String?,
     var position: Int = -1,

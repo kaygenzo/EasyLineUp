@@ -5,6 +5,7 @@
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.normalizeLicenseNumber
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
@@ -26,7 +27,7 @@ class SavePlayer(
         playerId: Long,
         name: String?,
         shirtNumber: Int?,
-        licenseNumber: Long? = 0,
+        licenseNumber: String? = "",
         image: String?,
         positions: Int,
         pitching: Int,
@@ -52,7 +53,7 @@ class SavePlayer(
                 teamId = team.id,
                 name = name.trim(),
                 shirtNumber = shirtNumber ?: 0,
-                licenseNumber = licenseNumber ?: 0L,
+                licenseNumber = normalizeLicenseNumber(licenseNumber),
                 image = image,
                 positions = positions,
                 pitching = pitching,

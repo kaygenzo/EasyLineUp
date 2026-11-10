@@ -41,7 +41,7 @@ internal class PlayerRepositoryImplTest {
     }
 
     private fun player(id: Long = 0, name: String = "Player", teamId: Long = 1L) =
-        Player(id = id, teamId = teamId, name = name, shirtNumber = 1, licenseNumber = 1L)
+        Player(id = id, teamId = teamId, name = name, shirtNumber = 1, licenseNumber = "1")
 
     @Test
     fun shouldInsertPlayerMappedToRoom() = runTest {
@@ -177,7 +177,7 @@ internal class PlayerRepositoryImplTest {
             playerName = "Alice",
             playerSex = 0,
             shirtNumber = 1,
-            licenseNumber = 1L,
+            licenseNumber = "1",
             teamId = 1L,
             image = null,
             playerId = 1L,

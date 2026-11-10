@@ -137,7 +137,57 @@ class MigrationTest {
      * what the others can't - a step breaking the next one, or rows lost along the way.
      */
     @Test
-    fun migrate16To19_keepsEveryRowAndStaysReadableThroughTheDaos() {
+    fun migrate19To20_turnsLicenseNumbersIntoTextAndKeepsTheirLineups() {
+        helper.createDatabase(TEST_DB_NAME, 19).apply {
+            execSQL(
+                "INSERT INTO teams (id, name, type, main, hash, createdAt) " +
+                    "VALUES (1, 'T', 1, 1, 'h', 0)"
+            )
+            execSQL(
+                "INSERT INTO players (id, teamID, name, shirtNumber, licenseNumber, positions, " +
+                    "pitching, batting, sex, hash) VALUES " +
+                    "(1, 1, 'Licensed', 7, 22841, 0, 0, 0, 0, 'p1'), " +
+                    "(2, 1, 'Unlicensed', 8, 0, 0, 0, 0, 0, 'p2')"
+            )
+            execSQL(
+                "INSERT INTO tournaments (id, name, createdAt, startTime, endTime, hash) " +
+                    "VALUES (1, 'Cup', 1, 0, 0, 'th')"
+            )
+            execSQL(
+                "INSERT INTO lineups (id, name, teamID, tournamentID, mode, strategy, " +
+                    "extraHitters, eventTime, createdAt, editedAt, roaster, hash) VALUES " +
+                    "(1, 'L', 1, 1, 0, 0, 0, 0, 1, 1, NULL, 'lh')"
+            )
+            // A player's field positions reference the players table: rebuilding that table
+            // must not cascade-delete them.
+            execSQL(
+                "INSERT INTO playerFieldPosition (id, playerID, lineupID, position, x, y, " +
+                    "`order`, flags, hash) VALUES (1, 1, 1, 3, 0.5, 0.5, 1, 0, 'fp')"
+            )
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(
+            TEST_DB_NAME,
+            20,
+            true,
+            RepositoryModule.migration19To20()
+        )
+
+        db.query("SELECT id, licenseNumber FROM players ORDER BY id").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("22841", cursor.getString(1))
+            assertTrue(cursor.moveToNext())
+            assertEquals("", cursor.getString(1))
+        }
+        db.query("SELECT COUNT(*) FROM playerFieldPosition").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1, cursor.getInt(0))
+        }
+    }
+
+    @Test
+    fun migrate16To20_keepsEveryRowAndStaysReadableThroughTheDaos() {
         helper.createDatabase(TEST_DB_NAME, 16).apply {
             insertVersion16Rows()
             close()
@@ -145,11 +195,12 @@ class MigrationTest {
 
         helper.runMigrationsAndValidate(
             TEST_DB_NAME,
-            19,
+            20,
             true,
             RepositoryModule.migration16To17(),
             RepositoryModule.migration17To18(),
-            RepositoryModule.migration18To19()
+            RepositoryModule.migration18To19(),
+            RepositoryModule.migration19To20()
         ).close()
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -176,6 +227,7 @@ class MigrationTest {
                 val player = database.playerDao().getPlayerById(1L)
                 assertEquals("Player", player.name)
                 assertEquals(7, player.shirtNumber)
+                assertEquals("1000", player.licenseNumber)
 
                 val position = database.playerFieldPositionsDao()
                     .getAllPlayersWithPositionsForLineup(1L)

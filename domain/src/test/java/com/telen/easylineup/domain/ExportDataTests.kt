@@ -83,7 +83,7 @@ internal class ExportDataTests {
 
         // team 1
         team1 = Team(1L, "A", null, 0, true, "I")
-        player1 = Player(1L, 1L, "A", 1, 1L, null, 1, 0, 0, "p1@test.com", "001", 0, "A")
+        player1 = Player(1L, 1L, "A", 1, "1", null, 1, 0, 0, "p1@test.com", "001", 0, "A")
         lineup1 = Lineup(1L, "A", 1L, 1L, 0, TeamStrategy.STANDARD.id, extraHitters, 3L, 1L, 1L, "1", "E")
         tournament1 = Tournament(1L, "A", 1L, 2L, 3L, null, "C")
         playerPosition1 = PlayerFieldPosition(1L, 1L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE, "G")
@@ -91,7 +91,7 @@ internal class ExportDataTests {
 
         // team 2
         team2 = Team(2L, "B", null, 0, false, "J")
-        player2 = Player(2L, 2L, "B", 2, 2L, null, 1, 0, 0, "p2@test.com", "002", 0, "B")
+        player2 = Player(2L, 2L, "B", 2, "2", null, 1, 0, 0, "p2@test.com", "002", 0, "B")
         lineup2 = Lineup(2L, "B", 2L, 2L, 0, TeamStrategy.STANDARD.id, extraHitters, 3L, 1L, 1L, "2", "F")
         tournament2 = Tournament(2L, "B", 2L, 3L, 4L, null, "D")
         playerPosition2 = PlayerFieldPosition(2L, 2L, 2L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE, "H")
@@ -238,8 +238,8 @@ internal class ExportDataTests {
 
     @Test
     fun shouldExportAllDataWithMorePlayersOfSameTeamSameLineup() = runTest {
-        val player3 = Player(3L, 1L, "A", 3, 3L, null, 1, 0, 0, "p3@test.com", "003", 0, "hash3")
-        val player4 = Player(4L, 1L, "B", 4, 4L, null, 1, 0, 0, "p4@test.com", "004", 0, "hash4")
+        val player3 = Player(3L, 1L, "A", 3, "3", null, 1, 0, 0, "p3@test.com", "003", 0, "hash3")
+        val player4 = Player(4L, 1L, "B", 4, "4", null, 1, 0, 0, "p4@test.com", "004", 0, "hash4")
         lineup1 = lineup1.copy(roster = "1;3;4")
 
         val playerPosition3 = PlayerFieldPosition(3L, 3L, 1L, 0, 0f, 0f, 1, PlayerFieldPosition.FLAG_NONE, "hash3")

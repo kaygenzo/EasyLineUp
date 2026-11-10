@@ -57,7 +57,7 @@ class RosterNumberOverrideTest {
                                 status = Constants.STATUS_ALL,
                                 players = listOf(
                                     RosterPlayerStatus(
-                                        Player(1L, 1L, "Alex Rivera", PLAYER_NUMBER, 0L),
+                                        Player(1L, 1L, "Alex Rivera", PLAYER_NUMBER, "0"),
                                         true,
                                         null
                                     )

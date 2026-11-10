@@ -53,7 +53,7 @@ internal class PlayerRepositoryImpl(
                 teamId = 0,
                 name = "",
                 shirtNumber = 0,
-                licenseNumber = 0
+                licenseNumber = ""
             )
         }
     }

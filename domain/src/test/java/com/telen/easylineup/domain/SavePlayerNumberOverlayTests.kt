@@ -28,7 +28,13 @@ internal class SavePlayerNumberOverlayTests {
     lateinit var savePlayerNumberOverlay: SavePlayerNumberOverlay
 
     private fun player(id: Long, shirtNumber: Int) =
-        Player(id = id, teamId = 1L, name = "p$id", shirtNumber = shirtNumber, licenseNumber = id)
+        Player(
+            id = id,
+            teamId = 1L,
+            name = "p$id",
+            shirtNumber = shirtNumber,
+            licenseNumber = id.toString()
+        )
 
     @Before
     fun init() {

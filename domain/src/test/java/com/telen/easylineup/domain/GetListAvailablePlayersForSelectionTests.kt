@@ -70,11 +70,11 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
         )
 
         val teamPlayers = mutableListOf(
-            Player(id = 1L, teamId = team.id, name = "p1", shirtNumber = 1, licenseNumber = 1L),
-            Player(id = 2L, teamId = team.id, name = "p2", shirtNumber = 2, licenseNumber = 2L),
-            Player(id = 3L, teamId = team.id, name = "p3", shirtNumber = 3, licenseNumber = 3L),
-            Player(id = 4L, teamId = team.id, name = "p4", shirtNumber = 4, licenseNumber = 4L),
-            Player(id = 5L, teamId = team.id, name = "p5", shirtNumber = 5, licenseNumber = 5L)
+            Player(id = 1L, teamId = team.id, name = "p1", shirtNumber = 1, licenseNumber = "1"),
+            Player(id = 2L, teamId = team.id, name = "p2", shirtNumber = 2, licenseNumber = "2"),
+            Player(id = 3L, teamId = team.id, name = "p3", shirtNumber = 3, licenseNumber = "3"),
+            Player(id = 4L, teamId = team.id, name = "p4", shirtNumber = 4, licenseNumber = "4"),
+            Player(id = 5L, teamId = team.id, name = "p5", shirtNumber = 5, licenseNumber = "5")
         )
 
         Mockito.`when`(lineupDao.getLineupById(lineup.id)).thenAnswer { lineup }

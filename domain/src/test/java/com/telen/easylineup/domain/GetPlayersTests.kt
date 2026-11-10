@@ -32,10 +32,24 @@ internal class GetPlayersTests {
         runBlocking {
         getPlayers = GetPlayers(playerDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
 
-        val player1 = Player(id = 1L, teamId = 1L, name = "toto", shirtNumber = 1, licenseNumber = 1, image = null,
-            positions = 1)
-        val player2 = Player(id = 2L, teamId = 1L, name = "tata", shirtNumber = 2, licenseNumber = 2, image = null,
-            positions = 1)
+        val player1 = Player(
+            id = 1L,
+            teamId = 1L,
+            name = "toto",
+            shirtNumber = 1,
+            licenseNumber = "1",
+            image = null,
+            positions = 1
+        )
+        val player2 = Player(
+            id = 2L,
+            teamId = 1L,
+            name = "tata",
+            shirtNumber = 2,
+            licenseNumber = "2",
+            image = null,
+            positions = 1
+        )
 
         players = arrayListOf(player1, player2)
 

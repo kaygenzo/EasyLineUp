@@ -60,7 +60,7 @@ internal class SavePlayerTests {
             name = "Test",
             image = null,
             shirtNumber = 1,
-            licenseNumber = 1L,
+            licenseNumber = "1",
             positions = 1,
             pitching = 1,
             batting = 3,
@@ -82,7 +82,7 @@ internal class SavePlayerTests {
             playerId = 1L,
             name = "",
             positions = 1,
-            licenseNumber = 1,
+            licenseNumber = "1",
             shirtNumber = 1,
             image = null,
             pitching = 0,
@@ -100,7 +100,7 @@ internal class SavePlayerTests {
             playerId = 1L,
             name = "     ",
             positions = 1,
-            licenseNumber = 1,
+            licenseNumber = "1",
             shirtNumber = 1,
             image = null,
             pitching = 0,
@@ -118,7 +118,7 @@ internal class SavePlayerTests {
             playerId = 1L,
             name = null,
             positions = 1,
-            licenseNumber = 1,
+            licenseNumber = "1",
             shirtNumber = 1,
             image = null,
             pitching = 0,
@@ -136,7 +136,7 @@ internal class SavePlayerTests {
             playerId = 0L,
             name = "Test",
             positions = 1,
-            licenseNumber = 1,
+            licenseNumber = "1",
             shirtNumber = null,
             image = null,
             pitching = 0,
@@ -155,7 +155,7 @@ internal class SavePlayerTests {
             playerId = 0L,
             name = "Test",
             positions = 1,
-            licenseNumber = 1,
+            licenseNumber = "1",
             shirtNumber = 1,
             image = null,
             pitching = 0,
@@ -175,7 +175,7 @@ internal class SavePlayerTests {
             playerId = 1L,
             name = "Test",
             positions = 1,
-            licenseNumber = 1,
+            licenseNumber = "1",
             shirtNumber = 1,
             image = null,
             pitching = 0,
@@ -235,7 +235,7 @@ internal class SavePlayerTests {
     }
 
     @Test
-    fun shouldDefaultMissingNumbersToZeroAndTrimTheName() = runTest {
+    fun shouldDefaultMissingNumbersAndTrimTheName() = runTest {
         val captor = argumentCaptor<Player>()
 
         save()
@@ -243,11 +243,11 @@ internal class SavePlayerTests {
         verify(playerDao).insertPlayer(captor.capture())
         assertEquals("Test", captor.firstValue.name)
         assertEquals(0, captor.firstValue.shirtNumber)
-        assertEquals(0L, captor.firstValue.licenseNumber)
+        assertEquals("", captor.firstValue.licenseNumber)
     }
 
     @Test
-    fun shouldStoreANullLicenseNumberAsZero() = runTest {
+    fun shouldStoreANullLicenseNumberAsEmpty() = runTest {
         val captor = argumentCaptor<Player>()
 
         savePlayer(
@@ -265,6 +265,28 @@ internal class SavePlayerTests {
         )
 
         verify(playerDao).insertPlayer(captor.capture())
-        assertEquals(0L, captor.firstValue.licenseNumber)
+        assertEquals("", captor.firstValue.licenseNumber)
+    }
+
+    @Test
+    fun shouldKeepAnAlphanumericLicenseNumberTrimmed() = runTest {
+        val captor = argumentCaptor<Player>()
+
+        savePlayer(
+            playerId = 0L,
+            name = "Test",
+            shirtNumber = 1,
+            licenseNumber = "  FR-22841A ",
+            image = null,
+            positions = 1,
+            pitching = 0,
+            batting = 0,
+            email = null,
+            phone = null,
+            sex = 0
+        )
+
+        verify(playerDao).insertPlayer(captor.capture())
+        assertEquals("FR-22841A", captor.firstValue.licenseNumber)
     }
 }

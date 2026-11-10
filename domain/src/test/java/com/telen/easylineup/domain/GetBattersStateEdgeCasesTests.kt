@@ -31,7 +31,7 @@ internal class GetBattersStateEdgeCasesTests {
         playerName = " Player ",
         playerSex = 0,
         shirtNumber = 7,
-        licenseNumber = 1L,
+        licenseNumber = "1",
         teamId = 1L,
         image = null,
         position = position,

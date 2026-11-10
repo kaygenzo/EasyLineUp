@@ -84,7 +84,7 @@ internal class PlayerViewModelTest {
         teamId = 1L,
         name = "Jonas",
         shirtNumber = 7,
-        licenseNumber = 100L,
+        licenseNumber = "100",
         batting = PlayerSide.LEFT.flag,
         pitching = PlayerSide.RIGHT.flag,
         email = "jonas@easylineup.com",
@@ -226,14 +226,13 @@ internal class PlayerViewModelTest {
         assertEquals("123", viewModel.uiState.value.shirtNumberText)
     }
 
-    // onLicenseNumberChanged duplicates onShirtNumberChanged's digit-filtering logic (two
-    // separate hand-written copies) - the same divergent-duplicate risk as the L/R toggle
-    // pairs above.
+    // Unlike the shirt number, a license number is free text: federations issue
+    // alphanumeric ones.
     @Test
-    fun shouldFilterNonDigitsFromLicenseNumberInput() {
-        viewModel.onLicenseNumberChanged("1a2b3")
+    fun shouldKeepLettersInLicenseNumberInput() {
+        viewModel.onLicenseNumberChanged("FR-22841A")
 
-        assertEquals("123", viewModel.uiState.value.licenseNumberText)
+        assertEquals("FR-22841A", viewModel.uiState.value.licenseNumberText)
     }
 
     @Test
@@ -432,7 +431,7 @@ internal class PlayerViewModelTest {
     fun shouldShowEmptyFieldsForUnsetNumbersAndContacts() = runTest {
         val existing = player(5L).copy(
             shirtNumber = 0,
-            licenseNumber = 0L,
+            licenseNumber = "",
             email = null,
             phone = null
         )
@@ -467,7 +466,6 @@ internal class PlayerViewModelTest {
         assertEquals("7", state.shirtNumberText)
         assertEquals(7, state.shirtNumber)
         assertEquals("100", state.licenseNumberText)
-        assertEquals(100L, state.licenseNumber)
     }
 
     @Test
@@ -475,7 +473,7 @@ internal class PlayerViewModelTest {
         val state = viewModel.uiState.value
 
         assertEquals(0, state.shirtNumber)
-        assertEquals(0L, state.licenseNumber)
+        assertEquals("", state.licenseNumberText)
     }
 
     @Test

@@ -100,8 +100,8 @@ private val LineupCreationPreviewTournament = Tournament(
 private val LineupCreationPreviewRoster = TeamRosterSummary(
     status = Constants.STATUS_PARTIAL,
     players = listOf(
-        RosterPlayerStatus(Player(1L, 1L, "Alex Rivera", 12, 0L), true, null),
-        RosterPlayerStatus(Player(2L, 1L, "Sam Cole", 7, 0L), false, null)
+        RosterPlayerStatus(Player(1L, 1L, "Alex Rivera", 12, ""), true, null),
+        RosterPlayerStatus(Player(2L, 1L, "Sam Cole", 7, ""), false, null)
     )
 )
 
@@ -839,7 +839,7 @@ private fun RosterPickerRow(
 private fun RosterPickerRowPreview() {
     DugoutTheme {
         RosterPickerRow(
-            player = Player(1L, 1L, "Alex Rivera", 12, 0L),
+            player = Player(1L, 1L, "Alex Rivera", 12, ""),
             teamType = TeamType.BASEBALL,
             checked = true,
             onCheckedChange = {},
@@ -1076,12 +1076,12 @@ private fun LineupCreationScreenPreview() {
                     Constants.STATUS_PARTIAL,
                     listOf(
                         RosterPlayerStatus(
-                            Player(1L, 1L, "Alex Rivera", 12, 0L),
+                            Player(1L, 1L, "Alex Rivera", 12, ""),
                             true,
                             null
                         ),
                         RosterPlayerStatus(
-                            Player(2L, 1L, "Sam Cole", 7, 0L),
+                            Player(2L, 1L, "Sam Cole", 7, ""),
                             false,
                             null
                         )

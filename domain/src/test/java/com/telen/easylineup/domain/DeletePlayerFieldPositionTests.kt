@@ -105,7 +105,7 @@ internal abstract class DeletePlayerFieldPositionTests(
             players.add(generate(id.toLong(), pos, PlayerFieldPosition.FLAG_NONE, id))
         }
         substitute = generate(42, FieldPosition.SUBSTITUTE, PlayerFieldPosition.FLAG_NONE, 42)
-        player = Player(69, 1, "69", 69, 69L)
+        player = Player(69, 1, "69", 69, "69")
         players.add(substitute)
     }
 
@@ -241,7 +241,7 @@ internal abstract class DeletePlayerFieldPositionTests(
             )
         }
 
-        val player = Player((strategy.batterSize - 1).toLong(), 1, "", 9, 9L, null, 1)
+        val player = Player((strategy.batterSize - 1).toLong(), 1, "", 9, "9", null, 1)
         val playerOrder = players.first { it.playerId == player.id }.order
         startUseCase(players, player)
 

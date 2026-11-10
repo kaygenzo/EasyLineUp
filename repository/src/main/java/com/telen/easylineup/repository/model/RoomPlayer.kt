@@ -42,7 +42,7 @@ internal data class RoomPlayer(
     @ColumnInfo(name = "teamID") var teamId: Long = 0,
     @ColumnInfo(name = "name") var name: String = "",
     @ColumnInfo(name = "shirtNumber") var shirtNumber: Int = 0,
-    @ColumnInfo(name = "licenseNumber") var licenseNumber: Long = 0L,
+    @ColumnInfo(name = "licenseNumber") var licenseNumber: String = "",
     @ColumnInfo(name = "image") var image: String? = null,
     @ColumnInfo(name = "positions") var positions: Int = 0,
     @ColumnInfo(name = "pitching") var pitching: Int = 0,

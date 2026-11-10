@@ -29,7 +29,7 @@ internal class InsertPlayersTests {
     @Test
     fun shouldDelegateToRepository() = runTest {
         val players = listOf(
-            Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L)
+            Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = "1")
         )
         Mockito.`when`(playerDao.insertPlayers(players)).thenReturn(Unit)
 

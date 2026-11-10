@@ -67,8 +67,8 @@ fun RosterEditSheet(
 private val RosterEditSheetPreviewRoster = TeamRosterSummary(
     status = 1,
     players = listOf(
-        RosterPlayerStatus(Player(1L, 1L, "Alex Rivera", 12, 0L), true, null),
-        RosterPlayerStatus(Player(2L, 1L, "Sam Cole", 7, 0L), false, null)
+        RosterPlayerStatus(Player(1L, 1L, "Alex Rivera", 12, ""), true, null),
+        RosterPlayerStatus(Player(2L, 1L, "Sam Cole", 7, ""), false, null)
     )
 )
 

@@ -370,15 +370,15 @@ private fun DpFlexSlotRow(
 private fun DpFlexLinkSheetPreview() {
     DugoutTheme {
         DpFlexLinkSheet(
-            initialDp = Player(1L, 1L, "Alex Rivera", 12, 0L),
+            initialDp = Player(1L, 1L, "Alex Rivera", 12, ""),
             initialFlex = null,
             dpBattingOrder = 4,
             dpLocked = false,
             flexLocked = false,
             teamType = TeamType.SOFTBALL.id,
             title = "Link DP / Flex",
-            onRequestDpPlayers = { listOf(Player(1L, 1L, "Alex Rivera", 12, 0L)) },
-            onRequestFlexPlayers = { listOf(Player(2L, 1L, "Sam Cole", 7, 0L)) },
+            onRequestDpPlayers = { listOf(Player(1L, 1L, "Alex Rivera", 12, "")) },
+            onRequestFlexPlayers = { listOf(Player(2L, 1L, "Sam Cole", 7, "")) },
             onConfirm = { _, _ -> },
             onDismiss = {}
         )
@@ -399,7 +399,7 @@ private fun DpFlexSlotRowPreview() {
     DugoutTheme {
         DpFlexSlotRow(
             role = "Designated Player",
-            player = Player(1L, 1L, "Alex Rivera", 12, 0L),
+            player = Player(1L, 1L, "Alex Rivera", 12, ""),
             locked = false,
             onClick = {}
         )

@@ -40,13 +40,13 @@ internal class UpdateLineupRosterTests {
     lateinit var lineup: Lineup
 
     private fun player(id: Long) =
-        Player(id = id, teamId = 1L, name = "p$id", shirtNumber = id.toInt(), licenseNumber = id)
+        Player(id = id, teamId = 1L, name = "p$id", shirtNumber = id.toInt(), licenseNumber = id.toString())
 
     private fun positioned(id: Long, position: FieldPosition, order: Int) = PlayerWithPosition(
         playerName = "p$id",
         playerSex = 0,
         shirtNumber = id.toInt(),
-        licenseNumber = id,
+        licenseNumber = id.toString(),
         teamId = 1L,
         image = null,
         position = position.id,

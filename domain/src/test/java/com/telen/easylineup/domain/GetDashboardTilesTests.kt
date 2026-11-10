@@ -78,7 +78,13 @@ internal class GetDashboardTilesTests {
         val tile = DashboardTile(id = 1L, position = 0, type = TileType.TEAM_SIZE.type)
         Mockito.`when`(tilesRepo.getTiles()).thenReturn(listOf(tile))
         Mockito.`when`(playerDao.getPlayersByTeamId(team.id))
-            .thenReturn(listOf(Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L)))
+            .thenReturn(listOf(Player(
+                id = 1L,
+                teamId = 1L,
+                name = "Toto",
+                shirtNumber = 1,
+                licenseNumber = "1"
+            )))
 
         val result = getDashboardTiles()
 
@@ -93,7 +99,13 @@ internal class GetDashboardTilesTests {
             .thenReturn(emptyList(), listOf(defaultTile))
         Mockito.`when`(tilesRepo.insertTiles(any())).thenReturn(Unit)
         Mockito.`when`(playerDao.getPlayersByTeamId(team.id))
-            .thenReturn(listOf(Player(id = 1L, teamId = 1L, name = "Toto", shirtNumber = 1, licenseNumber = 1L)))
+            .thenReturn(listOf(Player(
+                id = 1L,
+                teamId = 1L,
+                name = "Toto",
+                shirtNumber = 1,
+                licenseNumber = "1"
+            )))
 
         val result = getDashboardTiles()
 
@@ -118,7 +130,7 @@ internal class GetDashboardTilesTests {
             listOf(PlayerGamesCount(playerId = 2L, size = 7), PlayerGamesCount(3L, 1))
         )
         Mockito.`when`(playerDao.getPlayerById(2L)).thenReturn(
-            Player(id = 2L, teamId = 1L, name = "Ace", shirtNumber = 12, licenseNumber = 1L)
+            Player(id = 2L, teamId = 1L, name = "Ace", shirtNumber = 12, licenseNumber = "1")
         )
 
         val data = singleTileData(TileType.MOST_USED_PLAYER)

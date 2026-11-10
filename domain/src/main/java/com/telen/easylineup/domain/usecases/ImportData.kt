@@ -17,6 +17,7 @@ import com.telen.easylineup.domain.model.export.PlayerNumberOverlayExport
 import com.telen.easylineup.domain.model.export.PlayerPositionExport
 import com.telen.easylineup.domain.model.export.TeamExport
 import com.telen.easylineup.domain.model.export.TournamentExport
+import com.telen.easylineup.domain.model.normalizeLicenseNumber
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
@@ -24,8 +25,8 @@ import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepositor
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.ports.repository.TournamentRepository
-import kotlinx.coroutines.withContext
 import java.util.UUID
+import kotlinx.coroutines.withContext
 
 /**
  * How many rows of one entity type were inserted vs. updated by an import.
@@ -171,11 +172,7 @@ class ImportData(
         counts: ImportCounts,
         updateIfExists: Boolean
     ): Player {
-        val licenseNumber = try {
-            playerExport.licenseNumber.toLong()
-        } catch (e: Exception) {
-            0L
-        }
+        val licenseNumber = normalizeLicenseNumber(playerExport.licenseNumber)
 
         val p = Player(
             id = 0L,

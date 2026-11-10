@@ -18,7 +18,13 @@ internal class ToggleRosterPlayerTests {
     private lateinit var toggleRosterPlayer: ToggleRosterPlayer
 
     private fun player(id: Long) =
-        Player(id = id, teamId = 1L, name = "p$id", shirtNumber = id.toInt(), licenseNumber = id)
+        Player(
+            id = id,
+            teamId = 1L,
+            name = "p$id",
+            shirtNumber = id.toInt(),
+            licenseNumber = id.toString()
+        )
 
     private fun roster(vararg selected: Boolean) = TeamRosterSummary(
         status = Constants.STATUS_ALL,

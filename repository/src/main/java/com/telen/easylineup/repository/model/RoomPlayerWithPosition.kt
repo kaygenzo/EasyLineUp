@@ -28,7 +28,7 @@ internal data class RoomPlayerWithPosition(
     @ColumnInfo(name = "playerName") val playerName: String,
     @ColumnInfo(name = "playerSex") val playerSex: Int,
     @ColumnInfo(name = "shirtNumber") val shirtNumber: Int,
-    @ColumnInfo(name = "licenseNumber") val licenseNumber: Long,
+    @ColumnInfo(name = "licenseNumber") val licenseNumber: String,
     @ColumnInfo(name = "teamID") val teamId: Long,
     @ColumnInfo(name = "image") val image: String?,
     @ColumnInfo(name = "position") var position: Int = -1,

@@ -118,7 +118,7 @@ private fun PlayerProfilePage(
             sex = state.sex,
             battingSide = state.battingSide,
             pitchingSide = state.pitchingSide,
-            licenseNumber = state.licenseNumber,
+            licenseNumber = state.licenseNumberText,
             email = state.email,
             phoneNumber = state.phone,
             positionsData = state.positionsData,

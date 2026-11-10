@@ -69,7 +69,13 @@ internal class LineupCreationViewModelTest {
     lateinit var viewModel: LineupCreationViewModel
 
     private fun player(id: Long) = RosterPlayerStatus(
-        Player(id = id, teamId = 1L, name = "p$id", shirtNumber = id.toInt(), licenseNumber = id),
+        Player(
+            id = id,
+            teamId = 1L,
+            name = "p$id",
+            shirtNumber = id.toInt(),
+            licenseNumber = id.toString()
+        ),
         status = true,
         playerNumberOverlay = null
     )

@@ -155,7 +155,7 @@ internal class PlayerFieldPositionRepositoryImplTest {
             playerName = "Alice",
             playerSex = 0,
             shirtNumber = 1,
-            licenseNumber = 1L,
+            licenseNumber = "1",
             teamId = 1L,
             image = null,
             playerId = 1L,

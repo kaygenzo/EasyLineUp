@@ -171,7 +171,7 @@ internal class ImportDataTests {
                         teamId = 1L,
                         name = "toto",
                         shirtNumber = 42,
-                        licenseNumber = 123L,
+                        licenseNumber = "123",
                         hash = playerHash
                     )
                 
@@ -341,9 +341,9 @@ internal class ImportDataTests {
     }
 
     @Test
-    fun shouldDefaultLicenseNumberToZeroWhenNotParsable() = runTest {
+    fun shouldKeepAnAlphanumericLicenseNumber() = runTest {
         val teamExport = exportBase.teams.first()
-        val brokenPlayer = teamExport.players.first().copy(licenseNumber = "not-a-number")
+        val brokenPlayer = teamExport.players.first().copy(licenseNumber = "FR-22841A")
         val brokenExport = ExportBase(
             teams = listOf(teamExport.copy(players = listOf(brokenPlayer)))
         )
@@ -361,7 +361,32 @@ internal class ImportDataTests {
         assertTrue(importResult.isSuccess)
         val captor = argumentCaptor<Player>()
         Mockito.verify(playerDao).insertPlayer(captor.capture())
-        assertEquals(0L, captor.firstValue.licenseNumber)
+        assertEquals("FR-22841A", captor.firstValue.licenseNumber)
+    }
+
+    @Test
+    fun shouldReadALegacyZeroLicenseNumberAsNone() = runTest {
+        val teamExport = exportBase.teams.first()
+        val brokenPlayer = teamExport.players.first().copy(licenseNumber = "0")
+        val brokenExport = ExportBase(
+            teams = listOf(teamExport.copy(players = listOf(brokenPlayer)))
+        )
+
+        Mockito.`when`(teamDao.getTeamByHash(teamHash)).thenReturn(null)
+        Mockito.`when`(playerDao.getPlayerByHash(playerHash)).thenReturn(null)
+        Mockito.`when`(tournamentDao.getTournamentByHash(any())).thenReturn(null)
+        Mockito.`when`(lineupDao.getLineupByHash(any())).thenReturn(null)
+        Mockito.`when`(playerFieldPositionsDao.getPlayerFieldPositionByHash(any())).thenReturn(null)
+        Mockito.`when`(playerNumberOverlayDao.getPlayerNumberOverlayByHash(any())).thenReturn(null)
+        mockAllInsertsSucceed()
+
+        val importResult = importData(brokenExport, updateIfExists = false)
+
+        assertTrue(importResult.isSuccess)
+        val captor = argumentCaptor<Player>()
+        Mockito.verify(playerDao).insertPlayer(captor.capture())
+        // numeric-only versions of the app exported "0" for a player without a license
+        assertEquals("", captor.firstValue.licenseNumber)
     }
 
     @Test

@@ -53,7 +53,7 @@ class LineupPdfWriterImplTest : KoinComponent {
         playerName = "Player $id",
         playerSex = 0,
         shirtNumber = id.toInt(),
-        licenseNumber = id,
+        licenseNumber = id.toString(),
         teamId = 1L,
         image = null,
         position = position.id,

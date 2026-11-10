@@ -17,7 +17,13 @@ internal class OverrideRosterPlayerNumberTests {
     private lateinit var overrideRosterPlayerNumber: OverrideRosterPlayerNumber
 
     private fun player(id: Long) =
-        Player(id = id, teamId = 1L, name = "p$id", shirtNumber = id.toInt(), licenseNumber = id)
+        Player(
+            id = id,
+            teamId = 1L,
+            name = "p$id",
+            shirtNumber = id.toInt(),
+            licenseNumber = id.toString()
+        )
 
     @Before
     fun init() {

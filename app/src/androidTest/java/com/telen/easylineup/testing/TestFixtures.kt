@@ -57,7 +57,7 @@ object TestFixtures {
                 teamId = teamId,
                 name = "Starter ${index + 1}",
                 shirtNumber = index + 1,
-                licenseNumber = 1000L + index
+                licenseNumber = (1000L + index).toString()
             )
         }
         val substitutes = (1..2).map { index ->
@@ -65,7 +65,7 @@ object TestFixtures {
                 teamId = teamId,
                 name = "Substitute $index",
                 shirtNumber = 90 + index,
-                licenseNumber = 2000L + index
+                licenseNumber = (2000L + index).toString()
             )
         }
         return starters + substitutes

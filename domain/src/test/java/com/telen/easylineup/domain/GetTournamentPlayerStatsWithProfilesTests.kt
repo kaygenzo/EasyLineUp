@@ -83,7 +83,7 @@ internal class GetTournamentPlayerStatsWithProfilesTests {
                     teamId = team.id,
                     name = "Jonas Alvarez",
                     shirtNumber = 7,
-                    licenseNumber = 0,
+                    licenseNumber = "0",
                     image = "content://photo"
                 )
             )

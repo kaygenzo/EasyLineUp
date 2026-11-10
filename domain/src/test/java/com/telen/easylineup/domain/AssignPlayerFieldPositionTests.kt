@@ -82,7 +82,7 @@ internal abstract class AssignPlayerFieldPositionTests(
 ) : BaseUseCaseTests() {
     @Mock
     lateinit var teamDao: TeamRepository
-    private val newPlayer = Player(2_000, 1, "k2000", 2_000, 2_000, null, 0x07)
+    private val newPlayer = Player(2_000, 1, "k2000", 2_000, "2000", null, 0x07)
     private var lineup = Lineup(strategy = this.strategy.id, extraHitters = extraHitterSize)
     private lateinit var savePlayerFieldPosition: AssignPlayerFieldPosition
     private lateinit var players: MutableList<PlayerWithPosition>
@@ -195,7 +195,7 @@ internal abstract class AssignPlayerFieldPositionTests(
         for (i in (strategy.batterSize + 1)..(strategy.batterSize + extraHitterSize + 1)) {
             players.add(
                 PlayerWithPosition(
-                    "t$i", 0, i, i.toLong(), 1L, null,
+                    "t$i", 0, i, i.toString(), 1L, null,
                     FieldPosition.SUBSTITUTE.id, 0f, 0f, PlayerFieldPosition.FLAG_NONE, i,
                     i.toLong(), i.toLong(), 1L, i
                 )
@@ -241,7 +241,7 @@ internal abstract class AssignPlayerFieldPositionTests(
         startUseCase(
             FieldPosition.SHORT_STOP,
             MODE_DISABLED,
-            player = Player(42, 1L, "player42", 42, 42),
+            player = Player(42, 1L, "player42", 42, "42"),
             exception = IllegalArgumentException::class.java
         )
     }

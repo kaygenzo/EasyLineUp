@@ -122,9 +122,9 @@ internal abstract class CreateLineupTests {
         )
 
         roster = mutableListOf(
-            RosterPlayerStatus(Player(1, 1, "toto", 1, 1), true, null),
-            RosterPlayerStatus(Player(2, 1, "tata", 1, 1), true, null),
-            RosterPlayerStatus(Player(3, 1, "titi", 1, 1), true, null)
+            RosterPlayerStatus(Player(1, 1, "toto", 1, "1"), true, null),
+            RosterPlayerStatus(Player(2, 1, "tata", 1, "1"), true, null),
+            RosterPlayerStatus(Player(3, 1, "titi", 1, "1"), true, null)
         )
     }
 
@@ -144,7 +144,7 @@ internal abstract class CreateLineupTests {
 
     @Test
     fun shouldLineupSavedWithRosterNotNullForSelection() = runTest {
-        roster.add(RosterPlayerStatus(Player(4, 1, "tutu", 1, 1), false, null))
+        roster.add(RosterPlayerStatus(Player(4, 1, "tutu", 1, "1"), false, null))
         startUseCase(roster)
         verify(lineupDao).insertLineup(check {
             Assert.assertEquals("1;2;3", it.roster)

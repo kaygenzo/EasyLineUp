@@ -15,7 +15,7 @@ internal class SortPlayersTests {
     private lateinit var sortPlayers: SortPlayers
 
     private fun player(name: String, shirtNumber: Int) =
-        Player(teamId = 1L, name = name, shirtNumber = shirtNumber, licenseNumber = 0)
+        Player(teamId = 1L, name = name, shirtNumber = shirtNumber, licenseNumber = "0")
 
     @Before
     fun init() {

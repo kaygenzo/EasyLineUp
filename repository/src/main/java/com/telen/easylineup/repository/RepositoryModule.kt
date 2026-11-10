@@ -51,6 +51,7 @@ object RepositoryModule {
                 .addMigrations(migration16To17())
                 .addMigrations(migration17To18())
                 .addMigrations(migration18To19())
+                .addMigrations(migration19To20())
             if (BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
                     .fallbackToDestructiveMigration()
@@ -374,6 +375,56 @@ object RepositoryModule {
                         select id from teams where type = ${TeamType.BASEBALL_5.id}
                     )
                     """
+                )
+            }
+        }
+    }
+
+    /**
+     * License numbers become free text (federations issue alphanumeric ones). SQLite can't change
+     * a column's type, so the players table is rebuilt: copied into a new table, then swapped in
+     * by rename, so the old table is never dropped while still referenced. An old 0 meant "no
+     * license" and becomes an empty string; every other number keeps its digits.
+     */
+    fun migration19To20(): Migration {
+        return object : Migration(19, 20) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `players_new` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `teamID` INTEGER NOT NULL,
+                        `name` TEXT NOT NULL,
+                        `shirtNumber` INTEGER NOT NULL,
+                        `licenseNumber` TEXT NOT NULL,
+                        `image` TEXT,
+                        `positions` INTEGER NOT NULL,
+                        `pitching` INTEGER NOT NULL,
+                        `batting` INTEGER NOT NULL,
+                        `email` TEXT,
+                        `phone` TEXT,
+                        `sex` INTEGER NOT NULL,
+                        `hash` TEXT,
+                        FOREIGN KEY(`teamID`) REFERENCES `teams`(`id`)
+                            ON UPDATE NO ACTION ON DELETE CASCADE
+                    )
+                    """
+                )
+                database.execSQL(
+                    """
+                    INSERT INTO `players_new` (id, teamID, name, shirtNumber, licenseNumber, image,
+                        positions, pitching, batting, email, phone, sex, hash)
+                    SELECT id, teamID, name, shirtNumber,
+                        CASE WHEN licenseNumber = 0 THEN '' ELSE CAST(licenseNumber AS TEXT) END,
+                        image, positions, pitching, batting, email, phone, sex, hash
+                    FROM `players`
+                    """
+                )
+                database.execSQL("DROP TABLE `players`")
+                database.execSQL("ALTER TABLE `players_new` RENAME TO `players`")
+                database.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_players_name_licenseNumber_teamID` " +
+                        "ON `players` (`name`, `licenseNumber`, `teamID`)"
                 )
             }
         }

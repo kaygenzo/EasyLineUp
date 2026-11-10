@@ -94,8 +94,8 @@ internal class TeamViewModelTest {
     @Test
     fun shouldUpdatePlayersWhenObservedFlowEmits() = runTest {
         val players = listOf(
-            Player(id = 1L, teamId = 1L, name = "Alice", shirtNumber = 1, licenseNumber = 1L),
-            Player(id = 2L, teamId = 1L, name = "Bob", shirtNumber = 2, licenseNumber = 2L)
+            Player(id = 1L, teamId = 1L, name = "Alice", shirtNumber = 1, licenseNumber = "1"),
+            Player(id = 2L, teamId = 1L, name = "Bob", shirtNumber = 2, licenseNumber = "2")
         )
 
         playersProcessor.tryEmit(players)
@@ -108,8 +108,8 @@ internal class TeamViewModelTest {
     @Test
     fun shouldApplySortTypeWhenChanged() = runTest {
         val alice =
-            Player(id = 1L, teamId = 1L, name = "Alice", shirtNumber = 2, licenseNumber = 1L)
-        val bob = Player(id = 2L, teamId = 1L, name = "Bob", shirtNumber = 1, licenseNumber = 2L)
+            Player(id = 1L, teamId = 1L, name = "Alice", shirtNumber = 2, licenseNumber = "1")
+        val bob = Player(id = 2L, teamId = 1L, name = "Bob", shirtNumber = 1, licenseNumber = "2")
         playersProcessor.tryEmit(listOf(alice, bob))
         advanceUntilIdle()
         Mockito.`when`(sortPlayersUseCase(listOf(alice, bob), PlayerSortType.NUMERIC))

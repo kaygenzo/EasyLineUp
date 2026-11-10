@@ -67,7 +67,6 @@ data class PlayerUiState(
     val pitchingSide: PlayerSide? = null
 ) {
     val shirtNumber: Int get() = shirtNumberText.toIntOrNull() ?: 0
-    val licenseNumber: Long get() = licenseNumberText.toLongOrNull() ?: 0L
 }
 
 /**
@@ -155,8 +154,7 @@ class PlayerViewModel(
                         name = player.name,
                         shirtNumberText = player.shirtNumber.takeIf { n -> n > 0 }?.toString()
                             ?: "",
-                        licenseNumberText = player.licenseNumber.takeIf { n -> n > 0 }?.toString()
-                            ?: "",
+                        licenseNumberText = player.licenseNumber,
                         imageUri = player.image?.let(Uri::parse),
                         sex = Sex.getById(player.sex),
                         battingLeft = battingSelection.left,
@@ -191,7 +189,8 @@ class PlayerViewModel(
     }
 
     fun onLicenseNumberChanged(text: String) {
-        _uiState.update { it.copy(licenseNumberText = text.filter(Char::isDigit)) }
+        // Free text: federations issue alphanumeric license numbers.
+        _uiState.update { it.copy(licenseNumberText = text) }
     }
 
     fun onImageSelected(uri: Uri?) {
@@ -272,7 +271,7 @@ class PlayerViewModel(
             playerId,
             current.name,
             current.shirtNumberText.toIntOrNull(),
-            current.licenseNumberText.toLongOrNull(),
+            current.licenseNumberText,
             current.imageUri?.toString(),
             current.selectedPositions.toPositionsMask(),
             encodePlayerSideFlagUseCase(current.pitchingLeft, current.pitchingRight),

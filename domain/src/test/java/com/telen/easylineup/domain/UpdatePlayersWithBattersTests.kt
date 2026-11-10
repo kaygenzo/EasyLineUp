@@ -24,7 +24,7 @@ internal class UpdatePlayersWithBattersTests {
         playerName = "player$playerId",
         playerSex = 0,
         shirtNumber = playerId.toInt(),
-        licenseNumber = playerId,
+        licenseNumber = playerId.toString(),
         teamId = 1L,
         image = null,
         position = FieldPosition.PITCHER.id,

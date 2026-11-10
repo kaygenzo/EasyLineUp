@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -156,7 +157,9 @@ fun PlayerFormScreen(
                     label = stringResource(R.string.player_hint_license_number_short),
                     value = state.licenseNumberText,
                     onValueChanged = onLicenseNumberChanged,
-                    keyboardType = KeyboardType.Number
+                    // Letters and digits: license numbers can be alphanumeric.
+                    keyboardType = KeyboardType.Ascii,
+                    capitalization = KeyboardCapitalization.Characters
                 )
             }
 
@@ -397,7 +400,8 @@ private fun OptionalField(
     value: String,
     error: String? = null,
     onValueChanged: (String) -> Unit,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    capitalization: KeyboardCapitalization = KeyboardCapitalization.None
 ) {
     Column(modifier = modifier) {
         Text(
@@ -415,7 +419,10 @@ private fun OptionalField(
             isError = error != null,
             supportingText = error?.let { { Text(it) } },
             placeholder = { Text(stringResource(R.string.generic_optional)) },
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            keyboardOptions = KeyboardOptions(
+                capitalization = capitalization,
+                keyboardType = keyboardType
+            ),
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface,

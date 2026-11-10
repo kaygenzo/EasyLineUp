@@ -36,7 +36,7 @@ internal class GetPlayerTests {
             teamId = 1L,
             name = "toto",
             shirtNumber = 1,
-            licenseNumber = 1,
+            licenseNumber = "1",
             image = null,
             positions = 1
         )

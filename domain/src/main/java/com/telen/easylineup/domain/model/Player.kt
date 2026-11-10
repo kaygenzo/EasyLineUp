@@ -27,7 +27,7 @@ data class Player(
     val teamId: Long,
     val name: String,
     val shirtNumber: Int,
-    val licenseNumber: Long,
+    val licenseNumber: String,
     val image: String? = null,
     val positions: Int = 0,
     val pitching: Int = 0,
@@ -110,7 +110,7 @@ fun Player.toPlayerExport(): PlayerExport {
         name,
         image,
         shirtNumber,
-        licenseNumber.toString(),
+        licenseNumber,
         positions,
         pitching,
         batting,
@@ -119,3 +119,15 @@ fun Player.toPlayerExport(): PlayerExport {
         sex
     )
 }
+
+/**
+ * A license number as stored: free text (federations issue alphanumeric ones), trimmed, empty
+ * when there is none. A bare "0" is how numeric-only versions of the app wrote "no license",
+ * in their database and in their export files, so it is read as none too.
+ */
+fun normalizeLicenseNumber(raw: String?): String {
+    val trimmed = raw?.trim().orEmpty()
+    return if (trimmed == LEGACY_NO_LICENSE) "" else trimmed
+}
+
+private const val LEGACY_NO_LICENSE = "0"

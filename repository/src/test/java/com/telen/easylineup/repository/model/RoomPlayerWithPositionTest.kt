@@ -14,7 +14,7 @@ internal class RoomPlayerWithPositionTest {
             playerName = "Player",
             playerSex = 1,
             shirtNumber = 7,
-            licenseNumber = 12345L,
+            licenseNumber = "12345",
             teamId = 1L,
             image = "image.png",
             position = 4,
