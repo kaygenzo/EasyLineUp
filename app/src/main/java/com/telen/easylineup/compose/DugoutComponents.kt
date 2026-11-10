@@ -595,10 +595,13 @@ private fun PositionUsageChartPreview() {
 
 /**
  * Dashed-outline "nothing to show yet" state for [PositionUsageChart], same empty-state language
- * as every other "nothing here yet" surface in this system.
+ * as every other "nothing here yet" surface in this system. [message] defaults to the one about
+ * a single player; a screen about the whole team passes its own.
  */
 @Composable
-fun PositionUsageEmptyState() {
+fun PositionUsageEmptyState(
+    message: String = stringResource(R.string.player_profile_empty_message)
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -614,7 +617,7 @@ fun PositionUsageEmptyState() {
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = stringResource(R.string.player_profile_empty_message),
+            text = message,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall
         )

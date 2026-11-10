@@ -327,6 +327,8 @@
     <string name="player_profile_position_usage_label">Position usage</string>
     <string name="player_profile_empty_title">No games played yet</string>
     <string name="player_profile_empty_message">Shows up once they\'re in a lineup</string>
+    <string name="tournament_stats_empty_message">Shows up once at least one player is in a
+        lineup</string>
 
     <string name="defense_trash_content_description">Remove from field</string>
     <string name="defense_add_substitute_content_description">Add substitute</string>

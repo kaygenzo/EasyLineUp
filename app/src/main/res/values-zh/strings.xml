@@ -236,6 +236,7 @@
     <string name="player_profile_position_usage_label">各位置出场</string>
     <string name="player_profile_empty_title">还没有出场</string>
     <string name="player_profile_empty_message">进入阵容后即会显示</string>
+    <string name="tournament_stats_empty_message">至少有一名球员进入阵容后即会显示</string>
     <string name="defense_trash_content_description">移出场上</string>
     <string name="defense_add_substitute_content_description">添加替补</string>
     <string name="defense_empty_position_content_description">为此位置添加球员</string>

@@ -236,6 +236,7 @@
     <string name="player_profile_position_usage_label">各位置出賽</string>
     <string name="player_profile_empty_title">還沒有出賽</string>
     <string name="player_profile_empty_message">加入陣容後就會顯示</string>
+    <string name="tournament_stats_empty_message">至少有一名球員加入陣容後就會顯示</string>
     <string name="defense_trash_content_description">移出場上</string>
     <string name="defense_add_substitute_content_description">新增替補</string>
     <string name="defense_empty_position_content_description">為此位置新增球員</string>

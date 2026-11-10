@@ -235,6 +235,7 @@
     <string name="player_profile_position_usage_label">ポジション別出場</string>
     <string name="player_profile_empty_title">まだ出場がありません</string>
     <string name="player_profile_empty_message">オーダーに入ると表示されます</string>
+    <string name="tournament_stats_empty_message">少なくとも1人がオーダーに入ると表示されます</string>
     <string name="defense_trash_content_description">守備から外す</string>
     <string name="defense_add_substitute_content_description">控えを追加</string>
     <string name="defense_empty_position_content_description">このポジションに選手を追加</string>

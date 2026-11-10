@@ -270,6 +270,8 @@
     <string name="player_profile_position_usage_label">Uso de posiciones</string>
     <string name="player_profile_empty_title">Aún no ha jugado</string>
     <string name="player_profile_empty_message">Aparece en cuanto esté en una alineación</string>
+    <string name="tournament_stats_empty_message">Aparece en cuanto haya al menos un jugador en una
+        alineación</string>
     <string name="defense_trash_content_description">Quitar del campo</string>
     <string name="defense_add_substitute_content_description">Añadir suplente</string>
     <string name="defense_empty_position_content_description">Añadir un jugador a esta

@@ -251,6 +251,7 @@
     <string name="player_profile_position_usage_label">การลงเล่นแต่ละตำแหน่ง</string>
     <string name="player_profile_empty_title">ยังไม่เคยลงเล่น</string>
     <string name="player_profile_empty_message">จะแสดงเมื่ออยู่ในไลน์อัป</string>
+    <string name="tournament_stats_empty_message">จะแสดงเมื่อมีผู้เล่นอย่างน้อยหนึ่งคนอยู่ในไลน์อัป</string>
     <string name="defense_trash_content_description">นำออกจากสนาม</string>
     <string name="defense_add_substitute_content_description">เพิ่มตัวสำรอง</string>
     <string name="defense_empty_position_content_description">เพิ่มผู้เล่นในตำแหน่งนี้</string>

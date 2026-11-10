@@ -276,6 +276,8 @@
     <string name="player_profile_position_usage_label">Žaidimas pozicijose</string>
     <string name="player_profile_empty_title">Rungtynių dar nėra</string>
     <string name="player_profile_empty_message">Atsiras, kai žaidėjas pateks į rikiuotę</string>
+    <string name="tournament_stats_empty_message">Atsiras, kai bent vienas žaidėjas pateks į
+        rikiuotę</string>
     <string name="defense_trash_content_description">Pašalinti iš aikštės</string>
     <string name="defense_add_substitute_content_description">Pridėti atsarginį</string>
     <string name="defense_empty_position_content_description">Pridėti žaidėją į šią

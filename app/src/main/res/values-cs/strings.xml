@@ -270,6 +270,8 @@
     <string name="player_profile_position_usage_label">Nasazení podle pozic</string>
     <string name="player_profile_empty_title">Zatím žádné zápasy</string>
     <string name="player_profile_empty_message">Zobrazí se, jakmile bude v sestavě</string>
+    <string name="tournament_stats_empty_message">Zobrazí se, jakmile bude v sestavě alespoň jeden
+        hráč</string>
     <string name="defense_trash_content_description">Stáhnout z hřiště</string>
     <string name="defense_add_substitute_content_description">Přidat náhradníka</string>
     <string name="defense_empty_position_content_description">Přidat hráče na tuto pozici</string>

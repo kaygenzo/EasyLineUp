@@ -265,6 +265,7 @@
     <string name="player_profile_position_usage_label">Pozisyona göre oynama</string>
     <string name="player_profile_empty_title">Henüz maç yok</string>
     <string name="player_profile_empty_message">Bir dizilişe girince görünür</string>
+    <string name="tournament_stats_empty_message">En az bir oyuncu dizilişe girince görünür</string>
     <string name="defense_trash_content_description">Sahadan çıkar</string>
     <string name="defense_add_substitute_content_description">Yedek ekle</string>
     <string name="defense_empty_position_content_description">Bu pozisyona oyuncu ekle</string>

@@ -119,7 +119,11 @@ fun TournamentStatisticsScreen(state: TournamentStatisticsUiState, onBackClick: 
 
         if (playerStats.isEmpty()) {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                PositionUsageEmptyState()
+                // No player is in any of this tournament's lineups yet, so the single-player
+                // wording ("once this player is in a lineup") would point at nobody.
+                PositionUsageEmptyState(
+                    message = stringResource(R.string.tournament_stats_empty_message)
+                )
             }
         } else {
             Column(

@@ -277,6 +277,8 @@
     <string name="player_profile_position_usage_label">Impiego per ruolo</string>
     <string name="player_profile_empty_title">Ancora nessuna partita</string>
     <string name="player_profile_empty_message">Compare appena è in una formazione</string>
+    <string name="tournament_stats_empty_message">Compare appena almeno un giocatore è in una
+        formazione</string>
     <string name="defense_trash_content_description">Togli dal campo</string>
     <string name="defense_add_substitute_content_description">Aggiungi riserva</string>
     <string name="defense_empty_position_content_description">Aggiungi un giocatore in questo

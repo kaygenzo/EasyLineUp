@@ -243,6 +243,7 @@
     <string name="player_profile_position_usage_label">포지션별 출전</string>
     <string name="player_profile_empty_title">아직 출전 기록이 없습니다</string>
     <string name="player_profile_empty_message">라인업에 들어가면 표시됩니다</string>
+    <string name="tournament_stats_empty_message">라인업에 선수가 한 명 이상 들어가면 표시됩니다</string>
     <string name="defense_trash_content_description">수비에서 빼기</string>
     <string name="defense_add_substitute_content_description">후보 추가</string>
     <string name="defense_empty_position_content_description">이 포지션에 선수 추가</string>

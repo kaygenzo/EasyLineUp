@@ -264,6 +264,8 @@
     <string name="player_profile_empty_title">Ingen kampe endnu</string>
     <string name="player_profile_empty_message">Vises, så snart spilleren er med i en
         opstilling</string>
+    <string name="tournament_stats_empty_message">Vises, så snart mindst én spiller er med i en
+        opstilling</string>
     <string name="defense_trash_content_description">Fjern fra banen</string>
     <string name="defense_add_substitute_content_description">Tilføj udskifter</string>
     <string name="defense_empty_position_content_description">Tilføj en spiller på denne

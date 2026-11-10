@@ -270,6 +270,8 @@
     <string name="player_profile_position_usage_label">Paggamit ayon sa posisyon</string>
     <string name="player_profile_empty_title">Wala pang nilarong laro</string>
     <string name="player_profile_empty_message">Lalabas kapag nasa isang lineup na</string>
+    <string name="tournament_stats_empty_message">Lalabas kapag may kahit isang manlalaro na sa
+        lineup</string>
     <string name="defense_trash_content_description">Alisin sa field</string>
     <string name="defense_add_substitute_content_description">Magdagdag ng reserba</string>
     <string name="defense_empty_position_content_description">Magdagdag ng manlalaro sa posisyong

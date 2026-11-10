@@ -270,6 +270,8 @@
     <string name="player_profile_empty_title">Nog geen wedstrijden</string>
     <string name="player_profile_empty_message">Verschijnt zodra de speler in een opstelling
         staat</string>
+    <string name="tournament_stats_empty_message">Verschijnt zodra minstens één speler in een
+        opstelling staat</string>
     <string name="defense_trash_content_description">Van het veld halen</string>
     <string name="defense_add_substitute_content_description">Wissel toevoegen</string>
     <string name="defense_empty_position_content_description">Speler op deze positie zetten</string>

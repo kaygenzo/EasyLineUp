@@ -269,6 +269,8 @@
     <string name="player_profile_position_usage_label">Uso por posição</string>
     <string name="player_profile_empty_title">Nenhum jogo ainda</string>
     <string name="player_profile_empty_message">Aparece assim que estiver em uma escalação</string>
+    <string name="tournament_stats_empty_message">Aparece assim que pelo menos um jogador estiver
+        em uma escalação</string>
     <string name="defense_trash_content_description">Tirar do campo</string>
     <string name="defense_add_substitute_content_description">Adicionar reserva</string>
     <string name="defense_empty_position_content_description">Adicionar um jogador nesta

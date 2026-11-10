@@ -266,6 +266,8 @@
     <string name="player_profile_position_usage_label">Folosire pe poziții</string>
     <string name="player_profile_empty_title">Încă niciun meci</string>
     <string name="player_profile_empty_message">Apare după ce intră într-o formație</string>
+    <string name="tournament_stats_empty_message">Apare după ce cel puțin un jucător intră într-o
+        formație</string>
     <string name="defense_trash_content_description">Scoate de pe teren</string>
     <string name="defense_add_substitute_content_description">Adaugă rezervă</string>
     <string name="defense_empty_position_content_description">Adaugă un jucător pe această

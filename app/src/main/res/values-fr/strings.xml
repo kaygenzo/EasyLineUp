@@ -299,6 +299,8 @@
     <string name="player_profile_position_usage_label">Postes joués</string>
     <string name="player_profile_empty_title">Aucun match joué</string>
     <string name="player_profile_empty_message">Apparaît une fois ce joueur aligné.</string>
+    <string name="tournament_stats_empty_message">Apparaît une fois au moins un joueur
+        aligné.</string>
 
     <string name="defense_trash_content_description">Retirer du terrain</string>
     <string name="defense_add_substitute_content_description">Ajouter un remplaçant</string>

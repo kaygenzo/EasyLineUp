@@ -270,6 +270,8 @@
     <string name="player_profile_empty_title">Noch keine Spiele</string>
     <string name="player_profile_empty_message">Erscheint, sobald der Spieler in einer Aufstellung
         steht</string>
+    <string name="tournament_stats_empty_message">Erscheint, sobald mindestens ein Spieler in einer
+        Aufstellung steht</string>
     <string name="defense_trash_content_description">Vom Feld nehmen</string>
     <string name="defense_add_substitute_content_description">Ersatzspieler hinzufügen</string>
     <string name="defense_empty_position_content_description">Spieler auf diese Position
