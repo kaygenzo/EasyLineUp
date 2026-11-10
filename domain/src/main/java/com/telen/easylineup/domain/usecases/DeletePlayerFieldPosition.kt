@@ -8,6 +8,7 @@ import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerWithPosition
+import com.telen.easylineup.domain.model.isBattingSubstitute
 import com.telen.easylineup.domain.model.isDpDhOrFlex
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.model.reset
@@ -35,7 +36,15 @@ class DeletePlayerFieldPosition(private val dispatcherProvider: DispatcherProvid
                 // entirely, rather than resetting them back to the same substitute state
                 player.unassign()
             } else {
+                // Back to the bench, but as a batter if an extra-hitter slot is still free,
+                // keeping their spot in the order - the same "will bat"/"bench only" rule as
+                // adding a substitute. A plain reset() left order 0, which matches neither and
+                // always showed as bench-only.
+                val previousOrder = player.order
+                val keepsBatting = previousOrder in 1 until Constants.SUBSTITUTE_ORDER_VALUE &&
+                    players.count { it.isBattingSubstitute() } < extraHitterSize
                 player.reset()
+                player.order = if (keepsBatting) previousOrder else Constants.SUBSTITUTE_ORDER_VALUE
             }
 
             // check if substitutes was a batter, update the next substitutes order to replace

@@ -5,12 +5,15 @@
 package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.isBattingSubstitute
+import com.telen.easylineup.domain.model.isDpDhOrFlex
 import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.model.isShortStop
 import com.telen.easylineup.domain.model.isSubstitute
@@ -112,8 +115,11 @@ internal abstract class DeletePlayerFieldPositionTests(
         exception: Class<out Throwable>? = null
     ) {
         val playersSize = players.size
-        val wasSubstitute = players.firstOrNull { it.playerId == player.id }?.isSubstitute()
-            ?: false
+        val target = players.firstOrNull { it.playerId == player.id }
+        val wasSubstitute = target?.isSubstitute() ?: false
+        val wasDpOrFlex = target?.isDpDhOrFlex() ?: false
+        val previousOrder = target?.order ?: 0
+        val battingSubstitutes = players.count { it.isBattingSubstitute() }
         val result = deletePlayerFieldPosition(players, player, lineupMode, extraHitterSize)
         exception?.let {
             Assert.assertTrue(result.isFailure)
@@ -122,7 +128,15 @@ internal abstract class DeletePlayerFieldPositionTests(
             Assert.assertTrue(result.isSuccess)
             Assert.assertEquals("Size of player list must not change", playersSize, players.size)
             players.first { it.playerId == player.id }.let {
-                Assert.assertEquals("The player batting order is reset", 0, it.order)
+                // A field player goes back to the bench as a batter when an extra-hitter slot
+                // is free (keeping their spot), bench-only otherwise.
+                val expectedOrder = when {
+                    wasSubstitute || wasDpOrFlex -> 0
+                    previousOrder in 1 until Constants.SUBSTITUTE_ORDER_VALUE &&
+                        battingSubstitutes < extraHitterSize -> previousOrder
+                    else -> Constants.SUBSTITUTE_ORDER_VALUE
+                }
+                Assert.assertEquals("The player batting order", expectedOrder, it.order)
                 Assert.assertEquals(
                     "The player position is reset",
                     // a substitute being deleted is fully unassigned (-1), a field player
@@ -243,5 +257,30 @@ internal abstract class DeletePlayerFieldPositionTests(
         } else {
             Assert.assertEquals(0, players.filter { it.order == playerOrder }.size)
         }
+    }
+    @Test
+    fun shouldKeepRemovedFieldPlayerBattingWhenAnExtraHitterSlotIsFree() = runTest {
+        substitute.order = Constants.SUBSTITUTE_ORDER_VALUE // bench-only: the slot is free
+        val shortStop = players.first { it.isShortStop() }
+        val order = shortStop.order
+        val result = deletePlayerFieldPosition(players, shortStop.toPlayer(), MODE_DISABLED, 1)
+
+        Assert.assertTrue(result.isSuccess)
+        Assert.assertEquals(FieldPosition.SUBSTITUTE.id, shortStop.position)
+        Assert.assertEquals(order, shortStop.order)
+        Assert.assertTrue(shortStop.isBattingSubstitute())
+    }
+
+    @Test
+    fun shouldBenchRemovedFieldPlayerWhenNoExtraHitterSlotIsFree() = runTest {
+        // the only extra-hitter slot is already taken by a batting substitute
+        substitute.order = strategy.batterSize + 1
+        val shortStop = players.first { it.isShortStop() }
+        val result = deletePlayerFieldPosition(players, shortStop.toPlayer(), MODE_DISABLED, 1)
+
+        Assert.assertTrue(result.isSuccess)
+        Assert.assertEquals(FieldPosition.SUBSTITUTE.id, shortStop.position)
+        Assert.assertEquals(Constants.SUBSTITUTE_ORDER_VALUE, shortStop.order)
+        Assert.assertFalse(shortStop.isBattingSubstitute())
     }
 }
