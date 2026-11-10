@@ -75,3 +75,11 @@ enum class TeamStrategy(val id: Int, val batterSize: Int, vararg val positions: 
 fun TeamStrategy.getDesignatedPlayerOrder(extraHitterSize: Int): Int {
     return batterSize + extraHitterSize + 1
 }
+
+/**
+ * Whether a lineup with this strategy can use a DP/DH (baseball) or DP/Flex (softball): only
+ * strategies that have a DP_DH slot. Baseball 5 has none, so it never offers the toggle.
+ */
+fun TeamStrategy.supportsDesignatedPlayer(): Boolean {
+    return FieldPosition.DP_DH in positions
+}

@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -79,6 +80,7 @@ import com.telen.easylineup.domain.model.isBattingSubstitute
 import com.telen.easylineup.domain.model.isDefensePlayer
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isFlex
+import com.telen.easylineup.domain.model.supportsDesignatedPlayer
 import com.telen.easylineup.domain.model.toPlayer
 import com.telen.easylineup.domain.usecases.GetSubstituteBattingSlots
 import com.telen.easylineup.domain.usecases.SortSubstitutesForDisplay
@@ -149,14 +151,17 @@ fun DefenseScreen(
             if (editable) {
                 ModeBadge(stringResource(R.string.defense_mode_badge_editing))
                 Spacer(modifier = Modifier.height(12.dp))
-                DhToggleRow(
-                    teamType = teamType,
-                    checked = lineupMode == MODE_ENABLED,
-                    onCheckedChange = { checked ->
-                        if (checked) onLineupModeChanged(true) else showDisableDhConfirm = true
-                    }
-                )
-                Spacer(modifier = Modifier.height(12.dp))
+                // Hidden, not just disabled, where the strategy has no DP/DH (Baseball 5).
+                if (strategy.supportsDesignatedPlayer()) {
+                    DhToggleRow(
+                        teamType = teamType,
+                        checked = lineupMode == MODE_ENABLED,
+                        onCheckedChange = { checked ->
+                            if (checked) onLineupModeChanged(true) else showDisableDhConfirm = true
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
             }
 
             DugoutCard {
@@ -250,7 +255,9 @@ private fun DhToggleRow(teamType: Int, checked: Boolean, onCheckedChange: (Boole
             )
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        // A real gap between the explanation and the switch: with SpaceBetween alone the
+        // wrapped text ran right up against the switch on small screens.
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -387,7 +394,8 @@ private fun SubstituteAddRow(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        // Same as the DP toggle: keep the slots hint off the button's label on small screens.
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -416,7 +424,9 @@ private fun SubstituteAddRow(
         Text(
             text = hint,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f)
         )
     }
 }
