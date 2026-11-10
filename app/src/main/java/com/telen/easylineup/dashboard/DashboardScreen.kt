@@ -36,8 +36,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -56,11 +56,11 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.utils.DATE_SKELETON_DAY_MONTH_YEAR
+import com.telen.easylineup.utils.formatLocalizedDate
 import com.telen.easylineup.utils.titleRes
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 private val dashboardCardShape = RoundedCornerShape(16.dp)
 
@@ -89,9 +89,8 @@ data class LastLineupUi(
     val tournamentName: String?
 )
 
-private fun formatLineupDate(eventTimeInMillis: Long, pattern: String): String? =
-    eventTimeInMillis.takeIf { it > 0 }
-        ?.let { SimpleDateFormat(pattern, Locale.getDefault()).format(Date(it)) }
+private fun formatLineupDate(eventTimeInMillis: Long, skeleton: String): String? =
+    eventTimeInMillis.takeIf { it > 0 }?.let { formatLocalizedDate(it, skeleton) }
 
 @Composable
 fun DashboardScreen(
@@ -221,7 +220,7 @@ private fun HeroLastLineupCard(lastLineup: LastLineupUi?, onClick: (Long) -> Uni
         return
     }
 
-    val date = formatLineupDate(lastLineup.eventTimeInMillis, "MMM d, yyyy")
+    val date = formatLineupDate(lastLineup.eventTimeInMillis, DATE_SKELETON_DAY_MONTH_YEAR)
     val subtitle = listOfNotNull(date, lastLineup.tournamentName).joinToString(" · ")
 
     Column(

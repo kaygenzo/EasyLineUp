@@ -61,6 +61,8 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.getStrategies
 import com.telen.easylineup.domain.usecases.IsExtraHittersUnlimited
+import com.telen.easylineup.utils.DATE_SKELETON_DAY_MONTH
+import com.telen.easylineup.utils.formatLocalizedDate
 import com.telen.easylineup.utils.getStrategiesDisplayName
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -473,8 +475,7 @@ private fun LineupRow(
                 val eventDate = lineup.eventTimeInMillis.takeIf { it > 0L }
                     ?: lineup.createdTimeInMillis
                 Text(
-                    text = SimpleDateFormat("MMM d", Locale.getDefault())
-                        .format(Date(eventDate)),
+                    text = formatLocalizedDate(eventDate, DATE_SKELETON_DAY_MONTH),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     style = MaterialTheme.typography.bodySmall
                 )

@@ -21,7 +21,7 @@ import com.telen.easylineup.domain.ports.StringResourcesProvider
 import com.telen.easylineup.domain.usecases.SortSubstitutesForDisplay
 import java.io.File
 import java.io.FileOutputStream
-import java.text.SimpleDateFormat
+import java.text.DateFormat
 import java.util.Date
 import java.util.Locale
 
@@ -191,7 +191,9 @@ class LineupPdfWriterImpl(
         }
     }
 
-    private fun dateFormatter() = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    // The language's own short date ("11/10/26" in English, "10/11/2026" in French), not a
+    // fixed day-first pattern.
+    private fun dateFormatter() = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault())
 
     private fun backgroundPaint() = Paint().apply { color = Color.WHITE }
 

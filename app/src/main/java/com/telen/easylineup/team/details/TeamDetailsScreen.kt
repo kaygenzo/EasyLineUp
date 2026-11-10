@@ -44,10 +44,9 @@ import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.InfoCell
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.utils.DATE_SKELETON_MONTH_YEAR
+import com.telen.easylineup.utils.formatLocalizedDate
 import com.telen.easylineup.utils.titleRes
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 data class TeamDetailsState(
     val teamName: String,
@@ -63,8 +62,7 @@ data class TeamDetailsState(
 )
 
 private fun formatCreatedAt(createdAt: Long): String =
-    if (createdAt <= 0L) "—" else SimpleDateFormat("MMM yyyy", Locale.getDefault())
-        .format(Date(createdAt))
+    if (createdAt <= 0L) "—" else formatLocalizedDate(createdAt, DATE_SKELETON_MONTH_YEAR)
 
 @Composable
 fun TeamDetailsScreen(

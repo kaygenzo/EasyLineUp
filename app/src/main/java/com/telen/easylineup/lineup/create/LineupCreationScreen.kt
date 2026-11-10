@@ -78,8 +78,10 @@ import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
-import com.telen.easylineup.domain.model.hasDateWindow
 import com.telen.easylineup.domain.model.getStrategies
+import com.telen.easylineup.domain.model.hasDateWindow
+import com.telen.easylineup.utils.DATE_SKELETON_WEEKDAY_DAY_MONTH
+import com.telen.easylineup.utils.formatLocalizedDate
 import com.telen.easylineup.utils.getStrategiesDisplayName
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -191,8 +193,7 @@ fun LineupCreationScreen(
             SelectField(
                 label = stringResource(R.string.form_lineup_creation_date_label),
                 value = if (dateEnabled) {
-                    SimpleDateFormat("EEE, MMM d", Locale.getDefault())
-                        .format(Date(state.eventTimeInMillis))
+                    formatLocalizedDate(state.eventTimeInMillis, DATE_SKELETON_WEEKDAY_DAY_MONTH)
                 } else {
                     null
                 },
@@ -958,7 +959,7 @@ fun NewTournamentSheet(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 val dateText = { millis: Long ->
-                    SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(Date(millis))
+                    formatLocalizedDate(millis, DATE_SKELETON_WEEKDAY_DAY_MONTH)
                 }
                 val pickDatePlaceholder =
                     stringResource(R.string.lineup_creation_new_tournament_pick_date)
