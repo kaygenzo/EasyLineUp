@@ -9,6 +9,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
@@ -173,7 +174,9 @@ class LineupCreationScreenTest : KoinComponent {
         composeTestRule.waitForText(string(R.string.lineup_creation_tournament_sheet_title))
         composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).performClick()
         composeTestRule.waitForAbsence(string(R.string.lineup_creation_tournament_sheet_title))
-        composeTestRule.onNodeWithText("2").performClick()
+        // The extra-hitters row sits below the fold on small screens (and further once the
+        // keyboard is up): scroll the form to it, as a user would, before tapping.
+        composeTestRule.onNodeWithText("2").performScrollTo().performClick()
 
         composeTestRule.onNodeWithText(string(R.string.lineup_creation_save)).performClick()
         composeTestRule.waitForAbsence(string(R.string.lineup_creation_header_title))

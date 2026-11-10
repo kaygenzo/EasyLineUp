@@ -915,7 +915,15 @@ fun NewTournamentSheet(
         containerColor = MaterialTheme.colorScheme.surface
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(horizontal = 18.dp)) {
+            // The fields scroll and take only the height left over once the action bar is
+            // measured: on a small screen with the keyboard up, a plain Column squeezed the
+            // FormBar to 0 px, leaving "Add" unreachable.
+            Column(
+                modifier = Modifier
+                    .weight(1f, fill = false)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 18.dp)
+            ) {
                 Text(
                     text = stringResource(R.string.lineup_creation_new_tournament_title),
                     color = MaterialTheme.colorScheme.onSurface,
