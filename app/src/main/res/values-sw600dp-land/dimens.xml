@@ -1,6 +1,0 @@
-<resources>
-    <dimen name="image_circle_size">250dp</dimen>
-
-    <dimen name="item_attack_height">30dp</dimen>
-    <dimen name="item_attack_width">40dp</dimen>
-</resources>

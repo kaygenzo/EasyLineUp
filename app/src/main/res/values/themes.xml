@@ -36,16 +36,9 @@
 
     <style name="Widget.App.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox"/>
 
-    <style name="MaterialAlertDialog.App.Body.Text" parent="TextAppearance.MaterialComponents.Subtitle1"/>
 
-    <style name="TextSmall" parent="TextAppearance.MaterialComponents.Body2"/>
-    <style name="TextMiddle" parent="TextAppearance.MaterialComponents.Body1"/>
-    <style name="TextBig" parent="TextAppearance.MaterialComponents.Headline6"/>
-    <style name="TextBiggest" parent="TextAppearance.MaterialComponents.Headline4"/>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>

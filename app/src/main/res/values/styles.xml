@@ -6,19 +6,6 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.Transparent" parent="AppTheme.NoActionBar">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:backgroundDimEnabled">true</item>
-        <item name="android:windowTranslucentStatus">false</item>
-        <item name="android:windowTranslucentNavigation">false</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">false</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="colorControlActivated">?attr/colorControlHighlight</item>
-        <item name="listPreferredItemPaddingStart">?attr/dialogPreferredPadding</item>
-        <item name="listPreferredItemPaddingEnd">?attr/dialogPreferredPadding</item>
-    </style>
 
     <style name="AppTheme.NoActionBar.FullScreen" parent="AppTheme.NoActionBar">
         <item name="android:windowNoTitle">true</item>
@@ -27,206 +14,62 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="Tile" parent="Widget.Material3.CardView.Outlined">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/dashboard_tile_height</item>
-        <item name="cardUseCompatPadding">true</item>
-    </style>
 
-    <style name="TileTeamSize" parent="Tile">
-        <item name="android:background">@color/tile_team_size_background_color</item>
-    </style>
 
-    <style name="TilePlayerMostUsed" parent="Tile">
-        <item name="android:background">@color/white</item>
-    </style>
 
     <!-- FIELD -->
 
-    <style name="Field">
-        <item name="android:gravity">center</item>
-        <item name="android:padding">10dp</item>
-        <item name="android:textColor">?attr/colorControlNormal</item>
-    </style>
 
     <!-- DARK -->
 
-    <style name="Field.Green.Dark" parent="Field">
-        <item name="android:background">@color/tile_player_most_used_background_color_dark</item>
-    </style>
 
     <!-- NORMAL -->
 
-    <style name="Field.Green" parent="Field">
-        <item name="android:background">@color/tile_player_most_used_background_color</item>
-    </style>
 
-    <style name="Field.Green.Biggest" parent="Field.Green">
-        <item name="android:textAppearance">@style/TextBiggest</item>
-    </style>
 
-    <style name="Field.Green.Biggest.Auto" parent="Field.Green.Biggest">
-        <item name="autoSizeMaxTextSize">@dimen/app_max_text_size_biggest</item>
-        <item name="autoSizeTextType">uniform</item>
-    </style>
 
-    <style name="Field.Green.Middle" parent="Field.Green">
-        <item name="android:textAppearance">@style/TextMiddle</item>
-    </style>
 
     <!-- LIGHT -->
 
-    <style name="Field.Green.Light" parent="Field">
-        <item name="android:background">@color/tile_player_most_used_background_color_light</item>
-    </style>
 
-    <style name="Field.Green.Light.Auto" parent="Field">
-        <item name="android:background">@color/tile_player_most_used_background_color_light</item>
-        <item name="autoSizeTextType">uniform</item>
-    </style>
 
-    <style name="Field.Green.Light.Biggest" parent="Field.Green.Light">
-        <item name="android:textAppearance">@style/TextBiggest</item>
-    </style>
 
-    <style name="Field.Green.Light.Biggest.Auto" parent="Field.Green.Light.Biggest">
-        <item name="autoSizeMaxTextSize">@dimen/app_max_text_size_biggest</item>
-        <item name="autoSizeTextType">uniform</item>
-    </style>
 
-    <style name="Field.Green.Light.Big" parent="Field.Green.Light">
-        <item name="android:textAppearance">@style/TextBig</item>
-    </style>
 
-    <style name="Field.Green.Light.Big.Auto" parent="Field.Green.Light.Big">
-        <item name="autoSizeMaxTextSize">@dimen/app_max_text_size_big</item>
-        <item name="autoSizeTextType">uniform</item>
-    </style>
 
     <!-- LIGHTER -->
 
-    <style name="Field.Green.Lighter" parent="Field">
-        <item name="android:background">@color/tile_player_most_used_background_color_lighter</item>
-    </style>
 
-    <style name="Field.Green.Lighter.Middle" parent="Field.Green.Lighter">
-        <item name="android:textAppearance">@style/TextMiddle</item>
-    </style>
 
-    <style name="Field.Green.Lighter.Middle.Auto" parent="Field.Green.Lighter.Middle">
-        <item name="autoSizeMaxTextSize">@dimen/app_max_text_size_middle</item>
-        <item name="autoSizeTextType">uniform</item>
-    </style>
 
-    <style name="Field.Green.Lighter.Small" parent="Field.Green.Lighter">
-        <item name="android:textAppearance">@style/TextSmall</item>
-    </style>
 
-    <style name="Field.Green.Lighter.Small.Auto" parent="Field.Green.Lighter.Small">
-        <item name="autoSizeMaxTextSize">@dimen/app_max_text_size_small</item>
-        <item name="autoSizeTextType">uniform</item>
-    </style>
 
     <!-- HEADER -->
 
-    <style name="Field.Header" parent="Field">
-        <item name="android:background">?attr/colorTertiaryContainer</item>
-    </style>
 
-    <style name="Field.Header.Rounded" parent="Field.Header">
-        <item name="android:background">@drawable/shape_header_round_corner_black_border</item>
-    </style>
 
     <!-- Swap team dialog begin-->
 
-    <style name="ListEmptyText">
-        <item name="android:textColor">@color/grey</item>
-    </style>
 
-    <style name="ContactListItemLinearLayoutStyle">
-        <item name="android:paddingLeft">20dp</item>
-        <item name="android:paddingRight">24dp</item>
-    </style>
 
-    <style name="ParticipantListItem">
-        <item name="android:textColor">?attr/colorControlNormal</item>
-        <item name="android:background">@null</item>
-        <item name="android:layout_gravity">left|center_vertical</item>
-    </style>
 
-    <style name="PeopleListItemViewStyle">
-        <item name="android:paddingLeft">24dp</item>
-    </style>
 
     <!-- Swap team dialog end-->
 
-    <style name="ButtonConfirm">
-        <item name="android:textColor">?attr/colorOnPrimary</item>
-        <item name="android:maxLines">1</item>
-        <item name="android:ellipsize">end</item>
-    </style>
 
-    <style name="ButtonCancel">
-        <item name="android:backgroundTint">@color/white</item>
-        <item name="android:textColor">?attr/colorPrimary</item>
-        <item name="strokeColor">?attr/colorPrimary</item>
-        <item name="strokeWidth">1dp</item>
-        <item name="android:maxLines">1</item>
-        <item name="android:ellipsize">end</item>
-    </style>
 
     <!-- Material components theming -->
 
-    <style name="LineupName">
-        <item name="android:textAppearance">@style/TextMiddle</item>
-        <item name="autoSizeTextType">none</item>
-        <item name="autoSizeMaxTextSize">@dimen/app_max_text_size_middle</item>
-        <item name="android:maxLines">2</item>
-        <item name="android:ellipsize">end</item>
-    </style>
 
-    <style name="TournamentName">
-        <item name="android:textAppearance">@style/TextSmall</item>
-        <item name="autoSizeTextType">none</item>
-        <item name="autoSizeMaxTextSize">@dimen/app_max_text_size_small</item>
-        <item name="android:lines">1</item>
-        <item name="android:ellipsize">end</item>
-    </style>
 
-    <style name="FavouriteFieldPositionStyle" parent="TextSmall"/>
 
-    <style name="TeamTypeCardStyle" parent="TextBiggest">
-        <item name="android:gravity">center</item>
-        <item name="android:textColor">@color/white</item>
-    </style>
 
-    <style name="TilePlayerMostUsed.Number">
-        <item name="android:layout_width">30dp</item>
-        <item name="android:layout_height">30dp</item>
-        <item name="android:background">#00FFFFFF</item>
-        <item name="android:gravity">end</item>
-        <item name="autoSizeTextType">uniform</item>
-        <item name="android:layout_marginEnd">5dp</item>
-        <item name="android:layout_marginTop">5dp</item>
-    </style>
 
-    <style name="ActivityLoadingView" parent="Widget.Material3.CardView.Outlined">
-        <item name="android:layout_width">280dp</item>
-        <item name="android:layout_height">120dp</item>
-        <item name="cardUseCompatPadding">true</item>
-        <item name="android:background">@color/white</item>
-    </style>
 
     <!-- Dugout Card design system — reused across every reskinned screen -->
 
     <!-- Every number that matters — jersey number, batting order, stat, date —
          should use this so digits align in a column and never jiggle. -->
-    <style name="TextAppearance.Dugout.Tabular" parent="TextAppearance.Material3.BodyLarge">
-        <item name="android:fontFamily">monospace</item>
-        <item name="fontFamily">monospace</item>
-        <item name="android:fontFeatureSettings">tnum</item>
-        <item name="android:letterSpacing">0.01</item>
-    </style>
 
     <!-- Base shape/style for every BottomSheetDialogFragment going forward —
          replaces ad-hoc AlertDialogs and the previously-unstyled default sheet. -->
