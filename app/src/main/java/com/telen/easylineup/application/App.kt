@@ -8,11 +8,11 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.firebase.appcheck.ktx.appCheck
+import com.google.firebase.Firebase
+import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.ktx.initialize
+import com.google.firebase.initialize
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
