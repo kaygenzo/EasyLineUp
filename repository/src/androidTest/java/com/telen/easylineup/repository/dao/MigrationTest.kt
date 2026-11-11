@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.repository.dao
 
+import android.database.sqlite.SQLiteConstraintException
 import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -218,7 +219,52 @@ class MigrationTest {
     }
 
     @Test
-    fun migrate16To21_keepsEveryRowAndStaysReadableThroughTheDaos() {
+    fun migrate21To22_mergesTournamentsSharingANameAndMakesNamesUnique() {
+        helper.createDatabase(TEST_DB_NAME, 21).apply {
+            execSQL("INSERT INTO teams (id, name, type, main, createdAt) VALUES (1, 'T', 0, 1, 0)")
+            listOf(1 to "Cup", 2 to "Cup", 3 to "Open").forEach { (id, name) ->
+                execSQL(
+                    "INSERT INTO tournaments (id, name, createdAt, startTime, endTime) " +
+                        "VALUES ($id, '$name', 0, 0, 0)"
+                )
+            }
+            listOf(1 to 1, 2 to 2, 3 to 3).forEach { (id, tournamentId) ->
+                execSQL(
+                    "INSERT INTO lineups (id, name, teamID, tournamentID, mode, strategy, " +
+                        "extraHitters, eventTime, createdAt, editedAt) " +
+                        "VALUES ($id, 'L$id', 1, $tournamentId, 0, 0, 0, 0, 0, 0)"
+                )
+            }
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(
+            TEST_DB_NAME,
+            22,
+            true,
+            RepositoryModule.migration21To22()
+        )
+
+        db.query("SELECT id FROM tournaments ORDER BY id").use { cursor ->
+            val ids = generateSequence { if (cursor.moveToNext()) cursor.getLong(0) else null }
+            assertEquals(listOf(1L, 3L), ids.toList())
+        }
+        db.query("SELECT tournamentID FROM lineups ORDER BY id").use { cursor ->
+            val ids = generateSequence { if (cursor.moveToNext()) cursor.getLong(0) else null }
+            // Both "Cup" lineups now sit in the kept "Cup"; "Open" is untouched.
+            assertEquals(listOf(1L, 1L, 3L), ids.toList())
+        }
+        val duplicate = runCatching {
+            db.execSQL(
+                "INSERT INTO tournaments (name, createdAt, startTime, endTime) " +
+                    "VALUES ('Cup', 0, 0, 0)"
+            )
+        }
+        assertTrue(duplicate.exceptionOrNull() is SQLiteConstraintException)
+    }
+
+    @Test
+    fun migrate16ToLatest_keepsEveryRowAndStaysReadableThroughTheDaos() {
         helper.createDatabase(TEST_DB_NAME, 16).apply {
             insertVersion16Rows()
             close()
@@ -226,13 +272,14 @@ class MigrationTest {
 
         helper.runMigrationsAndValidate(
             TEST_DB_NAME,
-            21,
+            22,
             true,
             RepositoryModule.migration16To17(),
             RepositoryModule.migration17To18(),
             RepositoryModule.migration18To19(),
             RepositoryModule.migration19To20(),
-            RepositoryModule.migration20To21()
+            RepositoryModule.migration20To21(),
+            RepositoryModule.migration21To22()
         ).close()
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext

@@ -5,12 +5,19 @@
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.hasDateWindow
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournamentException
+import com.telen.easylineup.domain.usecases.exceptions.TournamentEndBeforeStartException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import kotlinx.coroutines.withContext
 
+/**
+ * Creates a tournament. Its name is trimmed, must not be blank and must not already be taken
+ * (a unique index backs this up in the database), and when it has a date window its end must
+ * not be before its start.
+ */
 class SaveTournament(
     private val repository: TournamentRepository,
     private val dispatcherProvider: DispatcherProvider
@@ -19,15 +26,23 @@ class SaveTournament(
         tournament: Tournament
     ): Result<Tournament> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            if (tournament.name.isEmpty()) {
+            val name = tournament.name.trim()
+            if (name.isEmpty()) {
                 throw TournamentNameEmptyException()
             }
 
-            if (repository.getTournamentByName(tournament.name) != null) {
+            if (tournament.hasDateWindow() && tournament.endTime < tournament.startTime) {
+                throw TournamentEndBeforeStartException()
+            }
+
+            if (repository.getTournamentByName(name) != null) {
                 throw AlreadyExistingTournamentException()
             }
 
-            val withCreatedAt = tournament.copy(createdAt = System.currentTimeMillis())
+            val withCreatedAt = tournament.copy(
+                name = name,
+                createdAt = System.currentTimeMillis()
+            )
             withCreatedAt.copy(id = repository.insertTournament(withCreatedAt))
         }
     }

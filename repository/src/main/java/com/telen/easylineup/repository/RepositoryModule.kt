@@ -55,6 +55,7 @@ object RepositoryModule {
                 .addMigrations(migration18To19())
                 .addMigrations(migration19To20())
                 .addMigrations(migration20To21())
+                .addMigrations(migration21To22())
             if (BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
                     .fallbackToDestructiveMigration()
@@ -457,6 +458,32 @@ object RepositoryModule {
                 ).forEach { (name, target) ->
                     database.execSQL("CREATE INDEX IF NOT EXISTS `$name` ON $target")
                 }
+            }
+        }
+    }
+
+    /**
+     * Makes tournament names unique in the database, not just checked by `SaveTournament`. Two
+     * tournaments could share a name until now (an import from another device, a race between
+     * two saves): the lineups of each duplicate move to the oldest one of that name, then the
+     * emptied duplicates go, before the unique index can be created.
+     */
+    fun migration21To22(): Migration {
+        return object : Migration(21, 22) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "UPDATE lineups SET tournamentID = (SELECT MIN(kept.id) FROM tournaments " +
+                        "AS kept JOIN tournaments AS current ON kept.name = current.name " +
+                        "WHERE current.id = lineups.tournamentID)"
+                )
+                database.execSQL(
+                    "DELETE FROM tournaments WHERE id NOT IN " +
+                        "(SELECT MIN(id) FROM tournaments GROUP BY name)"
+                )
+                database.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_tournaments_name` " +
+                        "ON `tournaments` (`name`)"
+                )
             }
         }
     }

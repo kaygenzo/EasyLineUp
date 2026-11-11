@@ -218,13 +218,22 @@ class ImportData(
             export.address, export.id
         )
 
-        val tournamentDb = tournamentDao.getTournamentByHash(export.id)
+        // Tournament names are unique and shared by every team: one exported from another
+        // device under a name already used here is the same tournament, not a second one.
+        val sameName = tournamentDao.getTournamentByName(export.name)
+        val tournamentDb = tournamentDao.getTournamentByHash(export.id) ?: sameName
         return if (tournamentDb == null) {
             counts.recordInsert()
             t.copy(id = tournamentDao.insertTournament(t))
         } else if (updateIfExists) {
             counts.recordUpdate()
-            val updated = t.copy(id = tournamentDb.id)
+            // A rename in the file to a name another tournament already has here keeps the
+            // local name instead: renaming would break the uniqueness of tournament names.
+            val nameTaken = sameName != null && sameName.id != tournamentDb.id
+            val updated = t.copy(
+                id = tournamentDb.id,
+                name = if (nameTaken) tournamentDb.name else t.name
+            )
             tournamentDao.updateTournament(updated)
             updated
         } else {

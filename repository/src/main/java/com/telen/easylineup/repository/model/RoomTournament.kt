@@ -6,6 +6,7 @@ package com.telen.easylineup.repository.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.telen.easylineup.domain.model.Tournament
 import java.io.Serializable
@@ -21,7 +22,8 @@ import java.util.UUID
  * @property hash
  */
 @Entity(
-    tableName = "tournaments"
+    tableName = "tournaments",
+    indices = [Index(value = ["name"], unique = true)]
 )
 internal data class RoomTournament(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,

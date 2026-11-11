@@ -7,7 +7,6 @@ package com.telen.easylineup.repository.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.telen.easylineup.repository.model.RoomTournament
@@ -30,10 +29,12 @@ internal interface TournamentDao {
     @Query("SELECT * from tournaments where name = :name")
     suspend fun getTournamentByName(name: String): RoomTournament?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    // Not REPLACE: with the unique name index, REPLACE would delete the tournament already
+    // using that name, and every lineup in it through the cascade, instead of failing.
+    @Insert
     suspend fun insertTournament(tournament: RoomTournament): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertTournaments(tournaments: List<RoomTournament>)
 
     @Update

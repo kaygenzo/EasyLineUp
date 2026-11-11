@@ -319,6 +319,53 @@ internal class ImportDataTests {
     }
 
     @Test
+    fun shouldReuseALocalTournamentWithTheSameNameInsteadOfAddingASecondOne() = runTest {
+        mockAllNotFound()
+        mockAllInsertsSucceed()
+        val local = Tournament(
+            id = 9L,
+            name = "champs",
+            createdAt = 0L,
+            startTime = 0L,
+            endTime = 0L,
+            hash = "local-hash"
+        )
+        Mockito.`when`(tournamentDao.getTournamentByName("champs")).thenReturn(local)
+
+        importData(exportBase, updateIfExists = false)
+
+        Mockito.verify(tournamentDao, Mockito.never()).insertTournament(any())
+        val captor = argumentCaptor<Lineup>()
+        Mockito.verify(lineupDao).insertLineup(captor.capture())
+        assertEquals(9L, captor.firstValue.tournamentId)
+    }
+
+    @Test
+    fun shouldKeepTheLocalNameWhenTheFileRenamesATournamentToATakenName() = runTest {
+        mockAllFound()
+        mockAllUpdatesSucceed()
+        val other = Tournament(
+            id = 8L,
+            name = "champs",
+            createdAt = 0L,
+            startTime = 0L,
+            endTime = 0L,
+            hash = "other-hash"
+        )
+        Mockito.`when`(tournamentDao.getTournamentByHash(tournamentHash)).thenReturn(
+            other.copy(id = 3L, name = "local name", hash = tournamentHash)
+        )
+        Mockito.`when`(tournamentDao.getTournamentByName("champs")).thenReturn(other)
+
+        importData(exportBase, updateIfExists = true)
+
+        val captor = argumentCaptor<Tournament>()
+        Mockito.verify(tournamentDao).updateTournament(captor.capture())
+        assertEquals(3L, captor.firstValue.id)
+        assertEquals("local name", captor.firstValue.name)
+    }
+
+    @Test
     fun shouldSkipEverythingWhenAllExistAndUpdateIfExistsFalse() = runTest {
         mockAllFound()
 

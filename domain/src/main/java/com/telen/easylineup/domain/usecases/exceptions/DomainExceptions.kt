@@ -7,6 +7,7 @@ package com.telen.easylineup.domain.usecases.exceptions
 class NameEmptyException : Exception()
 class LineupNameEmptyException : Exception()
 class TournamentNameEmptyException : Exception()
+class TournamentEndBeforeStartException : Exception()
 class NeedAssignPitcherFirstException : Exception()
 class NotExistingPlayerException : Exception()
 class NeedAssignBothPlayersException : Exception()
