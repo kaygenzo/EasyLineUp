@@ -30,7 +30,6 @@ import com.telen.easylineup.utils.ImportFileReaderImpl
 import com.telen.easylineup.utils.LineupPdfWriter
 import com.telen.easylineup.utils.LineupPdfWriterImpl
 import com.telen.easylineup.utils.PhoneNumberValidatorImpl
-import com.telen.easylineup.utils.SharedPreferencesHelper
 import com.telen.easylineup.utils.StringResourcesProviderImpl
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
@@ -43,7 +42,6 @@ val appModules = module {
     single<ExportFileWriter> { ExportFileWriterImpl(get()) }
     single<ImportFileReader> { ImportFileReaderImpl(get()) }
     single<LineupPdfWriter> { LineupPdfWriterImpl(get(), get(), get()) }
-    single { SharedPreferencesHelper(get()) }
 
     // Every ViewModel in the app is constructor-injected and registered explicitly here -
     // no ViewModel resolves its own dependencies via KoinComponent/by inject().

@@ -4,8 +4,6 @@
 
 package com.telen.easylineup.domain.model.tiles
 
-import com.telen.easylineup.domain.Constants
-
 const val KEY_DATA_IMAGE = 0
 const val KEY_DATA_NAME = 1
 const val KEY_DATA_SHIRT_NUMBER = 2
@@ -33,9 +31,5 @@ class MostUsedPlayerData(
         map[KEY_DATA_NAME] = name
 
         return map
-    }
-
-    override fun getType(): Int {
-        return Constants.TYPE_MOST_USED_PLAYER
     }
 }

@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.domain.model.tiles
 
-import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.TeamStrategy
 
 const val KEY_LINEUP_ID = 0
@@ -39,9 +38,5 @@ class LastLineupData(
         map[KEY_LINEUP_EVENT_TIME] = eventTimeInMillis
         tournamentName?.let { map[KEY_LINEUP_TOURNAMENT_NAME] = it }
         return map
-    }
-
-    override fun getType(): Int {
-        return Constants.TYPE_LAST_LINEUP
     }
 }
