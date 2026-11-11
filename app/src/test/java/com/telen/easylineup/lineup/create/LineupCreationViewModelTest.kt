@@ -312,10 +312,36 @@ internal class LineupCreationViewModelTest {
     }
 
     @Test
-    fun shouldUpdateEventTime() = runTest {
-        viewModel.onEventTimeSelected(1_700_000_000_000L)
+    fun shouldUpdateEventTimeFromTheEventDatePicker() = runTest {
+        viewModel.onTournamentSelected(
+            Tournament(id = 1L, name = "Cup", createdAt = 0L, startTime = 0L, endTime = 0L)
+        )
+
+        viewModel.onEventDateClick()
+        assertEquals(LineupDatePicker.EVENT, viewModel.uiState.value.openDatePicker)
+        viewModel.onDatePicked(1_700_000_000_000L)
 
         assertEquals(1_700_000_000_000L, viewModel.uiState.value.eventTimeInMillis)
+        assertNull(viewModel.uiState.value.openDatePicker)
+    }
+
+    @Test
+    fun shouldNotOpenTheEventDatePickerBeforeATournamentIsChosen() = runTest {
+        viewModel.onEventDateClick()
+
+        assertNull(viewModel.uiState.value.openDatePicker)
+    }
+
+    @Test
+    fun shouldKeepTheDatesWhenTheDatePickerIsDismissed() = runTest {
+        val before = viewModel.uiState.value
+        viewModel.onNewTournamentStartDateClick()
+
+        viewModel.onDatePickerDismiss()
+
+        val after = viewModel.uiState.value
+        assertNull(after.openDatePicker)
+        assertEquals(before.newTournamentStartTime, after.newTournamentStartTime)
     }
 
     @Test
@@ -357,14 +383,16 @@ internal class LineupCreationViewModelTest {
 
     @Test
     fun shouldUpdateNewTournamentStartTime() = runTest {
-        viewModel.onNewTournamentStartTimeSelected(1_700_000_000_000L)
+        viewModel.onNewTournamentStartDateClick()
+        viewModel.onDatePicked(1_700_000_000_000L)
 
         assertEquals(1_700_000_000_000L, viewModel.uiState.value.newTournamentStartTime)
     }
 
     @Test
     fun shouldUpdateNewTournamentEndTime() = runTest {
-        viewModel.onNewTournamentEndTimeSelected(1_700_100_000_000L)
+        viewModel.onNewTournamentEndDateClick()
+        viewModel.onDatePicked(1_700_100_000_000L)
 
         assertEquals(1_700_100_000_000L, viewModel.uiState.value.newTournamentEndTime)
     }

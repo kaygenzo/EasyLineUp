@@ -45,6 +45,9 @@ import timber.log.Timber
 sealed class LineupCreationEvent
 data class LineupSaved(val lineupId: Long) : LineupCreationEvent()
 
+/** Which of the screen's dates a date picker is open on. */
+enum class LineupDatePicker { EVENT, NEW_TOURNAMENT_START, NEW_TOURNAMENT_END }
+
 /** Everything [LineupCreationScreen] and its sheets need to render. */
 data class LineupCreationUiState(
     val isLoading: Boolean = true,
@@ -65,7 +68,8 @@ data class LineupCreationUiState(
     val newTournamentName: String = "",
     val newTournamentStartTime: Long = System.currentTimeMillis(),
     val newTournamentEndTime: Long = System.currentTimeMillis(),
-    val newTournamentAddress: String = ""
+    val newTournamentAddress: String = "",
+    val openDatePicker: LineupDatePicker? = null
 )
 
 /**
@@ -179,8 +183,34 @@ class LineupCreationViewModel(
         }
     }
 
-    fun onEventTimeSelected(millis: Long) {
-        _uiState.update { it.copy(eventTimeInMillis = millis) }
+    /** The event date can only be picked once a tournament is chosen: its days bound it. */
+    fun onEventDateClick() {
+        if (_uiState.value.selectedTournament == null) return
+        _uiState.update { it.copy(openDatePicker = LineupDatePicker.EVENT) }
+    }
+
+    fun onNewTournamentStartDateClick() {
+        _uiState.update { it.copy(openDatePicker = LineupDatePicker.NEW_TOURNAMENT_START) }
+    }
+
+    fun onNewTournamentEndDateClick() {
+        _uiState.update { it.copy(openDatePicker = LineupDatePicker.NEW_TOURNAMENT_END) }
+    }
+
+    fun onDatePickerDismiss() {
+        _uiState.update { it.copy(openDatePicker = null) }
+    }
+
+    /** [millis] is a local time, the date the open picker was set to. */
+    fun onDatePicked(millis: Long) {
+        _uiState.update {
+            when (it.openDatePicker) {
+                LineupDatePicker.EVENT -> it.copy(eventTimeInMillis = millis)
+                LineupDatePicker.NEW_TOURNAMENT_START -> it.copy(newTournamentStartTime = millis)
+                LineupDatePicker.NEW_TOURNAMENT_END -> it.copy(newTournamentEndTime = millis)
+                null -> it
+            }.copy(openDatePicker = null)
+        }
     }
 
     fun onRosterSheetOpen() {
@@ -233,14 +263,6 @@ class LineupCreationViewModel(
 
     fun onNewTournamentAddressChanged(address: String) {
         _uiState.update { it.copy(newTournamentAddress = address) }
-    }
-
-    fun onNewTournamentStartTimeSelected(millis: Long) {
-        _uiState.update { it.copy(newTournamentStartTime = millis) }
-    }
-
-    fun onNewTournamentEndTimeSelected(millis: Long) {
-        _uiState.update { it.copy(newTournamentEndTime = millis) }
     }
 
     fun onAddNewTournament() {

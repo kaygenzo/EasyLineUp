@@ -4,12 +4,16 @@
 
 package com.telen.easylineup.lineup.create
 
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
@@ -21,6 +25,9 @@ import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
+import com.telen.easylineup.utils.DATE_SKELETON_WEEKDAY_DAY_MONTH
+import com.telen.easylineup.utils.formatLocalizedDate
+import java.util.Calendar
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -207,6 +214,52 @@ class LineupCreationScreenTest : KoinComponent {
         composeTestRule
             .onNodeWithText(string(R.string.lineup_creation_header_title))
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun aDatePickedBeforeARotationIsStillAppliedAfterIt() {
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_tournament_placeholder))
+            .performClick()
+        composeTestRule.waitForText(string(R.string.lineup_creation_tournament_sheet_title))
+        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).performClick()
+        composeTestRule.waitForAbsence(string(R.string.lineup_creation_tournament_sheet_title))
+
+        // The fixture's tournament has no date window, so any day of this month is selectable.
+        val today = Calendar.getInstance()
+        val otherDay = Calendar.getInstance().apply {
+            val day = today.get(Calendar.DAY_OF_MONTH)
+            set(Calendar.DAY_OF_MONTH, if (day < 28) day + 1 else day - 1)
+        }
+        val todayLabel = formatLocalizedDate(today.timeInMillis, DATE_SKELETON_WEEKDAY_DAY_MONTH)
+        composeTestRule.onNodeWithText(todayLabel).performClick()
+        composeTestRule.waitForText(string(android.R.string.ok))
+        // The picker is a dialog window of its own: its click actions are invoked directly
+        // rather than through injected touches, which can land before that window is ready.
+        // A day cell reads its full date ("Thursday, November 12, 2026"): match its localized
+        // day, month and year so the test runs in any language.
+        val otherDayCell = hasText(
+            formatLocalizedDate(otherDay.timeInMillis, "yMMMMd"),
+            substring = true,
+            ignoreCase = true
+        ) and hasClickAction()
+        composeTestRule.waitUntil(5_000) {
+            composeTestRule.onAllNodes(otherDayCell).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeTestRule.onNode(otherDayCell).performSemanticsAction(SemanticsActions.OnClick)
+
+        // The old View-based picker came back after a rotation without its listener, so OK
+        // closed it without applying anything.
+        OrientationTestUtils.rotateToLandscape()
+        composeTestRule.waitForText(string(android.R.string.ok))
+        composeTestRule
+            .onNodeWithText(string(android.R.string.ok))
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        composeTestRule.waitForAbsence(string(android.R.string.ok))
+        composeTestRule.waitForText(
+            formatLocalizedDate(otherDay.timeInMillis, DATE_SKELETON_WEEKDAY_DAY_MONTH)
+        )
     }
 
     @Test

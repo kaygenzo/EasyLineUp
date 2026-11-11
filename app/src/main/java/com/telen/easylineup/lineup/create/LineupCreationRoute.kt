@@ -8,35 +8,27 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
-import com.google.android.material.datepicker.CalendarConstraints
-import com.google.android.material.datepicker.CompositeDateValidator
-import com.google.android.material.datepicker.DateValidatorPointBackward
-import com.google.android.material.datepicker.DateValidatorPointForward
-import com.google.android.material.datepicker.MaterialDatePicker
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
-import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.compose.DugoutDatePickerDialog
 import com.telen.easylineup.domain.model.hasDateWindow
 import com.telen.easylineup.navigation.Routes
 import org.koin.androidx.compose.koinViewModel
 
 /**
  * Replaces `LineupCreationFragment`. [LineupCreationViewModel.uiState] drives the whole screen
- * and its sheets; the Route only hosts the platform pieces a ViewModel can't own (navigation,
- * the native [MaterialDatePicker]).
+ * and its sheets - date pickers included; the Route only hosts the platform pieces a ViewModel
+ * can't own (navigation).
  */
 @Composable
 fun LineupCreationRoute(navController: NavController) {
     val viewModel = koinViewModel<LineupCreationViewModel>()
-    val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -44,45 +36,6 @@ fun LineupCreationRoute(navController: NavController) {
         if (viewModel.onCancelRequested()) {
             navController.popBackStack()
         }
-    }
-
-    fun showDatePicker(tournament: Tournament) {
-        val fragmentManager = (context as FragmentActivity).supportFragmentManager
-        var constraints: CalendarConstraints? = null
-        if (tournament.hasDateWindow()) {
-            val min = DateValidatorPointForward.from(tournament.startTime)
-            val max = DateValidatorPointBackward.before(tournament.endTime)
-            constraints = CalendarConstraints.Builder()
-                .setValidator(CompositeDateValidator.allOf(listOf(min, max)))
-                .build()
-        }
-        val builder = MaterialDatePicker.Builder.datePicker()
-            .setSelection(uiState.eventTimeInMillis)
-        constraints?.let { builder.setCalendarConstraints(it) }
-        val datePicker = builder.build()
-        datePicker.addOnPositiveButtonClickListener { selection ->
-            viewModel.onEventTimeSelected(selection)
-        }
-        datePicker.show(fragmentManager, "createLineupDatePicker")
-    }
-
-    fun showNewTournamentDatePicker(isStart: Boolean) {
-        val fragmentManager = (context as FragmentActivity).supportFragmentManager
-        val initialTime = if (isStart) {
-            uiState.newTournamentStartTime
-        } else {
-            uiState.newTournamentEndTime
-        }
-        val datePicker = MaterialDatePicker.Builder.datePicker().setSelection(initialTime).build()
-        datePicker.addOnPositiveButtonClickListener { selection ->
-            if (isStart) {
-                viewModel.onNewTournamentStartTimeSelected(selection)
-            } else {
-                viewModel.onNewTournamentEndTimeSelected(selection)
-            }
-        }
-        val tag = if (isStart) "newTournamentStartDatePicker" else "newTournamentEndDatePicker"
-        datePicker.show(fragmentManager, tag)
     }
 
     BackHandler { handleCancel() }
@@ -108,7 +61,7 @@ fun LineupCreationRoute(navController: NavController) {
         onBackClick = { handleCancel() },
         onNameChanged = viewModel::onNameChanged,
         onTournamentClick = viewModel::onTournamentSheetOpen,
-        onDateClick = { uiState.selectedTournament?.let(::showDatePicker) },
+        onDateClick = viewModel::onEventDateClick,
         onRosterClick = viewModel::onRosterSheetOpen,
         onStrategySelected = viewModel::onStrategySelected,
         onExtraHittersSelected = viewModel::onExtraHittersSelected,
@@ -143,12 +96,35 @@ fun LineupCreationRoute(navController: NavController) {
             endTimeInMillis = uiState.newTournamentEndTime,
             address = uiState.newTournamentAddress,
             onNameChanged = viewModel::onNewTournamentNameChanged,
-            onStartDateClick = { showNewTournamentDatePicker(isStart = true) },
-            onEndDateClick = { showNewTournamentDatePicker(isStart = false) },
+            onStartDateClick = viewModel::onNewTournamentStartDateClick,
+            onEndDateClick = viewModel::onNewTournamentEndDateClick,
             onAddressChanged = viewModel::onNewTournamentAddressChanged,
             onDismiss = viewModel::onNewTournamentSheetDismiss,
             onAddClick = viewModel::onAddNewTournament
         )
+    }
+
+    uiState.openDatePicker?.let { picker ->
+        val tournament = uiState.selectedTournament
+        when (picker) {
+            LineupDatePicker.EVENT -> DugoutDatePickerDialog(
+                initialDateMillis = uiState.eventTimeInMillis,
+                onDateSelected = viewModel::onDatePicked,
+                onDismiss = viewModel::onDatePickerDismiss,
+                firstSelectableDateMillis = tournament?.takeIf { it.hasDateWindow() }?.startTime,
+                lastSelectableDateMillis = tournament?.takeIf { it.hasDateWindow() }?.endTime
+            )
+            LineupDatePicker.NEW_TOURNAMENT_START -> DugoutDatePickerDialog(
+                initialDateMillis = uiState.newTournamentStartTime,
+                onDateSelected = viewModel::onDatePicked,
+                onDismiss = viewModel::onDatePickerDismiss
+            )
+            LineupDatePicker.NEW_TOURNAMENT_END -> DugoutDatePickerDialog(
+                initialDateMillis = uiState.newTournamentEndTime,
+                onDateSelected = viewModel::onDatePicked,
+                onDismiss = viewModel::onDatePickerDismiss
+            )
+        }
     }
 
     if (uiState.showDiscardSheet) {
