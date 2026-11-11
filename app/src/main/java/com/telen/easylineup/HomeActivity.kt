@@ -10,6 +10,7 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.LaunchedEffect
@@ -91,7 +92,14 @@ class HomeActivity : BaseActivity() {
                         }
                 }
 
-                Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
+                // Edge to edge: system bars, then whatever of a cutout they don't already cover
+                // (landscape). The keyboard is left to adjustPan - see the manifest.
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .systemBarsPadding()
+                        .displayCutoutPadding()
+                ) {
                     AppNavHost(
                         navController = navController,
                         homeViewModel = viewModel,

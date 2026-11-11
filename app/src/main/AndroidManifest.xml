@@ -30,6 +30,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:allowBackup">
+        <!-- adjustPan, not adjustResize: forms pin a header and a save bar around their scrolling
+             fields, and on a landscape phone resizing above the keyboard leaves those fields no
+             height at all (checked at 360x640dp). Panning slides the window so the focused field
+             stays visible. -->
         <activity
             android:name=".HomeActivity"
             android:theme="@style/AppTheme.NoActionBar"
@@ -75,6 +79,7 @@
         </activity>
         <activity android:name=".team.createTeam.TeamCreationActivity"
             android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false"/>
 
         <activity android:name=".login.LoginActivity"
