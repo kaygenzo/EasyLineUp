@@ -61,6 +61,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -179,7 +181,14 @@ class LineupViewModel(
     val events: Flow<LineupEvent> = _events.receiveAsFlow()
     private var shareJob: Job? = null
 
-    private val _listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
+    /**
+     * The players as edited, replaced as a whole by each change: every editing use case returns
+     * a new list rather than changing the one it is given. [draftMutex] serializes the changes,
+     * so one launched before the previous one is done builds on its result instead of losing it.
+     */
+    private var draft: List<PlayerWithPosition> = emptyList()
+    private val draftMutex = Mutex()
+    private var saveJob: Job? = null
     private var teamTypeId: Int = TeamType.UNKNOWN.id
     private var observeJob: Job? = null
 
@@ -245,11 +254,13 @@ class LineupViewModel(
                     }
                 }
                 .collect { (loadedLineup, positions, overlays) ->
-                    if (editable && hasUnsavedChanges) {
-                        Timber.d("Lineup $id changed in the database, keeping the unsaved edit")
-                        return@collect
+                    draftMutex.withLock {
+                        if (editable && hasUnsavedChanges) {
+                            Timber.d("Lineup $id changed in the database, keeping the edit")
+                        } else {
+                            applyDatabaseSnapshot(loadedLineup, positions, overlays)
+                        }
                     }
-                    applyDatabaseSnapshot(loadedLineup, positions, overlays)
                 }
         }
     }
@@ -268,12 +279,10 @@ class LineupViewModel(
                 extraHitters = loadedLineup.extraHitters
             )
         }
-        // Copies, so the draft never shares instances with what Room handed out.
-        val draft = positions.map { it.copy() }
-        val byPlayerId = draft.associateBy { it.playerId }
-        overlays.forEach { overlay -> byPlayerId[overlay.playerId]?.shirtNumber = overlay.number }
-        _listPlayersWithPosition.clear()
-        _listPlayersWithPosition.addAll(draft)
+        val numbers = overlays.associate { it.playerId to it.number }
+        draft = positions.map { player ->
+            numbers[player.playerId]?.let { player.copy(shirtNumber = it) } ?: player
+        }
         recomputeAndPublish()
     }
 
@@ -283,24 +292,15 @@ class LineupViewModel(
     }
 
     /**
-     * Snapshots [_listPlayersWithPosition] into [LineupUiState.defensePlayers] and recomputes
-     * the batting order from it - called both after a fresh DB load and after every local
-     * mutation below, since those mutate [_listPlayersWithPosition] in place rather than
-     * going through another DB round-trip.
+     * Publishes [draft] as [LineupUiState.defensePlayers] and recomputes the batting order from
+     * it - called both after a fresh DB load and after every change of the draft below.
      */
     private suspend fun recomputeAndPublish() {
-        // PlayerWithPosition instances are mutated in place by the domain use cases and the
-        // same backing list is re-emitted - snapshot each element via .copy() so Compose's
-        // structural-equality state check actually sees a change instead of comparing the
-        // same mutated objects against themselves.
-        _uiState.update {
-            val snapshot = _listPlayersWithPosition.map { p -> p.copy() }.toImmutableList()
-            it.copy(isLoading = false, defensePlayers = snapshot)
-        }
+        _uiState.update { it.copy(isLoading = false, defensePlayers = draft.toImmutableList()) }
         val currentLineup = lineup ?: return
         val batterSize = TeamStrategy.getStrategyById(currentLineup.strategy).batterSize
         getBattersStateUseCase(
-            players = _listPlayersWithPosition,
+            players = draft,
             teamType = teamTypeId,
             batterSize = batterSize,
             extraHitterSize = currentLineup.extraHitters,
@@ -311,6 +311,29 @@ class LineupViewModel(
                 _uiState.update { it.copy(batters = batters.toImmutableList()) }
             }
             .onFailure { Timber.e(it) }
+    }
+
+    /**
+     * Runs one change of the draft: [change] gets the draft as left by the previous change and
+     * returns the new one, which replaces it before [onChanged] runs. Marks the draft unsaved
+     * right away, before the change is even launched.
+     */
+    private fun editDraft(
+        change: suspend (List<PlayerWithPosition>) -> Result<List<PlayerWithPosition>>,
+        onChanged: suspend () -> Unit = {}
+    ) {
+        markUnsaved()
+        viewModelScope.launch {
+            draftMutex.withLock {
+                change(draft)
+                    .onSuccess {
+                        draft = it
+                        recomputeAndPublish()
+                        onChanged()
+                    }
+                    .onFailure { Timber.e(it) }
+            }
+        }
     }
 
     fun onRetryLoad() {
@@ -328,21 +351,16 @@ class LineupViewModel(
         val currentLineup = lineup
             ?: return Result.failure(IllegalArgumentException("Lineup is not expected to be null"))
         return getListAvailablePlayersForSelectionUseCase(
-            _listPlayersWithPosition,
+            draft,
             sortBy,
             currentLineup
         )
     }
 
     fun onDeletePosition(player: Player) {
-        markUnsaved()
         val lineupMode = lineup?.mode ?: MODE_DISABLED
         val hitters = lineup?.extraHitters ?: 0
-        viewModelScope.launch {
-            deletePlayerFieldPositionUseCase(_listPlayersWithPosition, player, lineupMode, hitters)
-                .onSuccess { recomputeAndPublish() }
-                .onFailure { Timber.e(it) }
-        }
+        editDraft({ deletePlayerFieldPositionUseCase(it, player, lineupMode, hitters) })
     }
 
     fun onSaveClick() {
@@ -350,21 +368,23 @@ class LineupViewModel(
             Timber.e(IllegalStateException("Cannot save: the lineup is not loaded"))
             return
         }
-        viewModelScope.launch {
-            saveLineupDraftUseCase(
-                currentLineup,
-                _listPlayersWithPosition,
-                appliedRoster?.players.orEmpty()
-            )
-                .onSuccess {
-                    hasUnsavedChanges = false
-                    appliedRoster = null
-                    _events.send(LineupEvent.Saved)
-                }
-                .onFailure {
-                    Timber.e(it)
-                    _events.send(LineupEvent.SaveFailed)
-                }
+        // A second tap while saving would insert the new positions a second time.
+        if (saveJob?.isActive == true) {
+            return
+        }
+        saveJob = viewModelScope.launch {
+            draftMutex.withLock {
+                saveLineupDraftUseCase(currentLineup, draft, appliedRoster?.players.orEmpty())
+                    .onSuccess {
+                        hasUnsavedChanges = false
+                        appliedRoster = null
+                        _events.send(LineupEvent.Saved)
+                    }
+                    .onFailure {
+                        Timber.e(it)
+                        _events.send(LineupEvent.SaveFailed)
+                    }
+            }
         }
     }
 
@@ -380,18 +400,21 @@ class LineupViewModel(
     }
 
     fun onLineupModeChanged(isEnabled: Boolean) {
-        lineup?.let { currentLineup ->
-            markUnsaved()
-            viewModelScope.launch {
-                setLineupModeUseCase(isEnabled, currentLineup, _listPlayersWithPosition)
-                    .onSuccess { updatedLineup ->
-                        lineup = updatedLineup
-                        _uiState.update { it.copy(lineupMode = updatedLineup.mode) }
-                        recomputeAndPublish()
-                    }
-                    .onFailure { Timber.e(it) }
+        val currentLineup = lineup ?: return
+        var updatedLineup = currentLineup
+        editDraft(
+            change = { players ->
+                setLineupModeUseCase(isEnabled, currentLineup, players).map {
+                    updatedLineup = it.lineup
+                    it.players
+                }
+            },
+            onChanged = {
+                lineup = updatedLineup
+                _uiState.update { it.copy(lineupMode = updatedLineup.mode) }
+                recomputeAndPublish()
             }
-        }
+        )
     }
 
     /** Writes the lineup card as a PDF, then hands it over as [LineupEvent.ShareReady]. */
@@ -435,27 +458,12 @@ class LineupViewModel(
 
     private fun switchPlayersPosition(position1: FieldPosition, position2: FieldPosition) {
         val currentLineup = lineup ?: return
-        markUnsaved()
-        viewModelScope.launch {
-            switchPlayersPositionUseCase(
-                _listPlayersWithPosition,
-                position1,
-                position2,
-                currentLineup
-            )
-                .onSuccess { recomputeAndPublish() }
-                .onFailure { Timber.e("Cannot switch players: ${it.message}") }
-        }
+        editDraft({ switchPlayersPositionUseCase(it, position1, position2, currentLineup) })
     }
 
     fun onPlayerSelected(player: Player, position: FieldPosition) {
-        lineup?.let {
-            markUnsaved()
-            viewModelScope.launch {
-                assignPlayerFieldPositionUseCase(player, position, it, _listPlayersWithPosition)
-                    .onSuccess { recomputeAndPublish() }
-                    .onFailure { Timber.e(it) }
-            }
+        lineup?.let { currentLineup ->
+            editDraft({ assignPlayerFieldPositionUseCase(player, position, currentLineup, it) })
         }
         _uiState.update { it.copy(availablePlayersEvent = null) }
     }
@@ -487,7 +495,7 @@ class LineupViewModel(
                 .onFailure { Timber.e(it) }
                 .map {}
         } else {
-            getDpAndFlexFromPlayersInFieldUseCase(_listPlayersWithPosition)
+            getDpAndFlexFromPlayersInFieldUseCase(draft)
                 .onSuccess {
                     val event = LinkDpFlex(
                         Pair(it.dp, it.flex),
@@ -554,7 +562,7 @@ class LineupViewModel(
     }
 
     suspend fun getPlayerSelectionForFlex(): Result<List<PlayerWithPosition>> {
-        return getOnlyPlayersInFieldUseCase(_listPlayersWithPosition)
+        return getOnlyPlayersInFieldUseCase(draft)
             .recoverCatching {
                 if (it is NoSuchElementException) {
                     Timber.e(it.message.toString())
@@ -570,33 +578,23 @@ class LineupViewModel(
             Timber.e(IllegalStateException("Cannot link DP and Flex: the lineup is not loaded"))
             return
         }
-        markUnsaved()
-        viewModelScope.launch {
-            saveDpAndFlexUseCase(currentLineup, dp, flex, _listPlayersWithPosition)
-                .onSuccess {
-                    recomputeAndPublish()
-                    _uiState.update { it.copy(dpFlexEvent = null) }
-                }
-                .onFailure { throwable ->
+        editDraft(
+            change = { players ->
+                saveDpAndFlexUseCase(currentLineup, dp, flex, players).onFailure { throwable ->
                     if (throwable is NeedAssignBothPlayersException) {
-                        Timber.w(throwable.message)
                         _uiState.update {
                             it.copy(infoMessage = LineupInfoMessage.BothDpAndFlexRequired)
                         }
                         _events.send(LineupEvent.DpFlexIncomplete)
-                    } else {
-                        Timber.e(throwable)
                     }
                 }
-        }
+            },
+            onChanged = { _uiState.update { it.copy(dpFlexEvent = null) } }
+        )
     }
 
     fun onBattersChanged(batters: List<BatterState>) {
-        markUnsaved()
-        viewModelScope.launch {
-            updatePlayersWithBattersUseCase(_listPlayersWithPosition, batters)
-                .onFailure { Timber.e(it) }
-        }
+        editDraft({ updatePlayersWithBattersUseCase(it, batters) })
     }
 
     /**
@@ -637,21 +635,21 @@ class LineupViewModel(
             closeRosterEditSheet()
             return
         }
-        markUnsaved()
-        viewModelScope.launch {
-            rosterUseCases.applyRosterToLineup(
-                currentLineup,
-                _listPlayersWithPosition,
-                roster.players
-            )
-                .onSuccess { updatedLineup ->
-                    lineup = updatedLineup
-                    appliedRoster = roster
-                    recomputeAndPublish()
-                    closeRosterEditSheet()
+        var updatedLineup = currentLineup
+        editDraft(
+            change = { players ->
+                rosterUseCases.applyRosterToLineup(currentLineup, players, roster.players).map {
+                    updatedLineup = it.lineup
+                    it.players
                 }
-                .onFailure { Timber.e(it) }
-        }
+            },
+            onChanged = {
+                lineup = updatedLineup
+                appliedRoster = roster
+                recomputeAndPublish()
+                closeRosterEditSheet()
+            }
+        )
     }
 
     fun onRosterEditPlayerToggled(position: Int, checked: Boolean) {

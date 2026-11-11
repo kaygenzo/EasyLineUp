@@ -55,12 +55,19 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
         exception: Class<out Throwable>? = null
     ) {
         val playersSize = players.size
+        val original = players.toList()
         val result = useCase(lineup, dp, flex, players)
         exception?.let {
             assertTrue(exception.isInstance(result.exceptionOrNull()))
         } ?: let {
             assertTrue(result.isSuccess)
-            Assert.assertEquals("Size of player list must not change", playersSize, players.size)
+            Assert.assertEquals("The input list must not change", original, players)
+            val updated = result.getOrThrow()
+            Assert.assertEquals("Size of player list must not change", playersSize, updated.size)
+            if (players === this.players) {
+                this.players.clear()
+                this.players.addAll(updated)
+            }
         }
     }
 
@@ -90,16 +97,17 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
         val flex = players[1]
         startUseCase(dp = dp.toPlayer(), flex = flex.toPlayer(), players = players)
 
-        Assert.assertEquals(PlayerFieldPosition.FLAG_FLEX, flex.flags)
+        val newFlex = players.first { it.playerId == flex.playerId }
+        Assert.assertEquals(PlayerFieldPosition.FLAG_FLEX, newFlex.flags)
         Assert.assertEquals(
             TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters),
-            flex.order
+            newFlex.order
         )
     }
 
     @Test
     fun shouldChangeFlagAndOrderOfOldFlex() = runTest {
-        players.forEach { it.flags = PlayerFieldPosition.FLAG_FLEX }
+        players.replaceAll { it.copy(flags = PlayerFieldPosition.FLAG_FLEX) }
 
         val dp = players[3]
         val flex = players[1]
@@ -110,7 +118,7 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
         Assert.assertEquals(flex.playerId, players.firstOrNull { it.isFlex() }?.playerId)
         Assert.assertEquals(
             TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters),
-            flex.order
+            players.first { it.playerId == flex.playerId }.order
         )
 
         // others
@@ -159,7 +167,8 @@ internal class SaveDpAndFlexTests : BaseUseCaseTests() {
             players.first { it.isFlex() }.order
         )
         Assert.assertEquals(newFlex.id, players.first { it.isFlex() }.playerId)
-        Assert.assertEquals(PlayerFieldPosition.FLAG_NONE, oldFlex.flags)
-        Assert.assertEquals(oldCatcherOrder, oldFlex.order)
+        val formerFlex = players.first { it.playerId == oldFlex.playerId }
+        Assert.assertEquals(PlayerFieldPosition.FLAG_NONE, formerFlex.flags)
+        Assert.assertEquals(oldCatcherOrder, formerFlex.order)
     }
 }

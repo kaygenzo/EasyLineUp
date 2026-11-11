@@ -93,7 +93,11 @@ internal abstract class DeletePlayerFieldPositionTests(
     private val lineupMode = MODE_ENABLED
     private lateinit var deletePlayerFieldPosition: DeletePlayerFieldPosition
     private lateinit var players: MutableList<PlayerWithPosition>
-    private lateinit var substitute: PlayerWithPosition
+    private val substituteId = 42L
+
+    /** The substitute as the list holds it now: players are immutable, the list changes. */
+    private val substitute: PlayerWithPosition
+        get() = players.first { it.playerId == substituteId }
     private lateinit var player: Player
 
     @Before
@@ -104,9 +108,10 @@ internal abstract class DeletePlayerFieldPositionTests(
             val id = index + 1
             players.add(generate(id.toLong(), pos, PlayerFieldPosition.FLAG_NONE, id))
         }
-        substitute = generate(42, FieldPosition.SUBSTITUTE, PlayerFieldPosition.FLAG_NONE, 42)
         player = Player(69, 1, "69", 69, "69")
-        players.add(substitute)
+        players.add(
+            generate(substituteId, FieldPosition.SUBSTITUTE, PlayerFieldPosition.FLAG_NONE, 42)
+        )
     }
 
     private suspend fun startUseCase(
@@ -120,14 +125,21 @@ internal abstract class DeletePlayerFieldPositionTests(
         val wasDpOrFlex = target?.isDpDhOrFlex() ?: false
         val previousOrder = target?.order ?: 0
         val battingSubstitutes = players.count { it.isBattingSubstitute() }
+        val original = players.toList()
         val result = deletePlayerFieldPosition(players, player, lineupMode, extraHitterSize)
         exception?.let {
             Assert.assertTrue(result.isFailure)
             Assert.assertEquals(it, result.exceptionOrNull()?.javaClass)
         } ?: let {
             Assert.assertTrue(result.isSuccess)
-            Assert.assertEquals("Size of player list must not change", playersSize, players.size)
-            players.first { it.playerId == player.id }.let {
+            Assert.assertEquals("The input list must not change", original, players)
+            val updated = result.getOrThrow()
+            Assert.assertEquals("Size of player list must not change", playersSize, updated.size)
+            if (players === this.players) {
+                this.players.clear()
+                this.players.addAll(updated)
+            }
+            updated.first { it.playerId == player.id }.let {
                 // A field player goes back to the bench as a batter when an extra-hitter slot
                 // is free (keeping their spot), bench-only otherwise.
                 val expectedOrder = when {
@@ -159,10 +171,9 @@ internal abstract class DeletePlayerFieldPositionTests(
     }
 
     private fun setupDpAndFlex() {
-        players.first { it.isPitcher() }.reset()
-        substitute.apply {
-            position = FieldPosition.DP_DH.id
-            order = 2_000
+        players.edit({ it.isPitcher() }) { reset() }
+        players.edit({ it.playerId == substituteId }) {
+            copy(position = FieldPosition.DP_DH.id, order = 2_000)
         }
         players.add(
             generate(
@@ -227,7 +238,7 @@ internal abstract class DeletePlayerFieldPositionTests(
     fun shouldReplaceOldSubstituteByAnewOne() = runTest {
         // added 2 substitutes as batters
         for (i in (strategy.batterSize - 1)..strategy.batterSize) {
-            players[i - 1].position = FieldPosition.SUBSTITUTE.id
+            players.edit(i - 1) { copy(position = FieldPosition.SUBSTITUTE.id) }
         }
         // added 2 substitutes as non batters
         for (i in (strategy.batterSize + 1)..(strategy.batterSize + extraHitterSize + 1)) {
@@ -260,12 +271,16 @@ internal abstract class DeletePlayerFieldPositionTests(
     }
     @Test
     fun shouldKeepRemovedFieldPlayerBattingWhenAnExtraHitterSlotIsFree() = runTest {
-        substitute.order = Constants.SUBSTITUTE_ORDER_VALUE // bench-only: the slot is free
-        val shortStop = players.first { it.isShortStop() }
-        val order = shortStop.order
-        val result = deletePlayerFieldPosition(players, shortStop.toPlayer(), MODE_DISABLED, 1)
+        // bench-only: the slot is free
+        players.edit({ it.playerId == substituteId }) {
+            copy(order = Constants.SUBSTITUTE_ORDER_VALUE)
+        }
+        val removed = players.first { it.isShortStop() }
+        val order = removed.order
+        val result = deletePlayerFieldPosition(players, removed.toPlayer(), MODE_DISABLED, 1)
 
         Assert.assertTrue(result.isSuccess)
+        val shortStop = result.getOrThrow().first { it.playerId == removed.playerId }
         Assert.assertEquals(FieldPosition.SUBSTITUTE.id, shortStop.position)
         Assert.assertEquals(order, shortStop.order)
         Assert.assertTrue(shortStop.isBattingSubstitute())
@@ -274,11 +289,12 @@ internal abstract class DeletePlayerFieldPositionTests(
     @Test
     fun shouldBenchRemovedFieldPlayerWhenNoExtraHitterSlotIsFree() = runTest {
         // the only extra-hitter slot is already taken by a batting substitute
-        substitute.order = strategy.batterSize + 1
-        val shortStop = players.first { it.isShortStop() }
-        val result = deletePlayerFieldPosition(players, shortStop.toPlayer(), MODE_DISABLED, 1)
+        players.edit({ it.playerId == substituteId }) { copy(order = strategy.batterSize + 1) }
+        val removed = players.first { it.isShortStop() }
+        val result = deletePlayerFieldPosition(players, removed.toPlayer(), MODE_DISABLED, 1)
 
         Assert.assertTrue(result.isSuccess)
+        val shortStop = result.getOrThrow().first { it.playerId == removed.playerId }
         Assert.assertEquals(FieldPosition.SUBSTITUTE.id, shortStop.position)
         Assert.assertEquals(Constants.SUBSTITUTE_ORDER_VALUE, shortStop.order)
         Assert.assertFalse(shortStop.isBattingSubstitute())

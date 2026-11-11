@@ -81,17 +81,23 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
             Assert.assertEquals(it, result.exceptionOrNull()?.javaClass)
         } ?: let {
             Assert.assertTrue(result.isSuccess)
-            Assert.assertEquals("Size of player list must not change", playersSize, players.size)
+            val updated = result.getOrThrow()
+            Assert.assertEquals("The input list must not change", originalPlayers, players)
+            Assert.assertEquals("Size of player list must not change", playersSize, updated.size)
             Assert.assertEquals(
                 originalPlayers.first { it.position == fromPosition.id }.playerId,
-                players.first { it.position == toPosition.id }.playerId
+                updated.first { it.position == toPosition.id }.playerId
             )
             // if the destination is not empty, we can check the players are switched
             originalPlayers.firstOrNull { it.position == toPosition.id }?.let {
                 Assert.assertEquals(
                     it.playerId,
-                    players.first { it.position == fromPosition.id }.playerId
+                    updated.first { it.position == fromPosition.id }.playerId
                 )
+            }
+            if (players === this.players) {
+                this.players.clear()
+                this.players.addAll(updated)
             }
         }
     }
@@ -203,14 +209,18 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
 
     @Test
     fun shouldSwitchSoftballFlexWithNormal() = runTest {
-        players.first { it.isPitcher() }.apply {
-            flags = PlayerFieldPosition.FLAG_NONE
-            order = 1
+        players.edit({ it.isPitcher() }) {
+            copy(
+                flags = PlayerFieldPosition.FLAG_NONE,
+                order = 1
+            )
         }
 
-        players.first { it.isCatcher() }.apply {
-            flags = PlayerFieldPosition.FLAG_FLEX
-            order = TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters)
+        players.edit({ it.isCatcher() }) {
+            copy(
+                flags = PlayerFieldPosition.FLAG_FLEX,
+                order = TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters)
+            )
         }
 
         startUseCase(FieldPosition.CATCHER, FieldPosition.CENTER_FIELD, true, TeamType.SOFTBALL)
@@ -233,14 +243,18 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
 
     @Test
     fun shouldSwitchSoftballFlexWithDp() = runTest {
-        players.first { it.isPitcher() }.apply {
-            flags = PlayerFieldPosition.FLAG_NONE
-            order = 1
+        players.edit({ it.isPitcher() }) {
+            copy(
+                flags = PlayerFieldPosition.FLAG_NONE,
+                order = 1
+            )
         }
 
-        players.first { it.isCatcher() }.apply {
-            flags = PlayerFieldPosition.FLAG_FLEX
-            order = TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters)
+        players.edit({ it.isCatcher() }) {
+            copy(
+                flags = PlayerFieldPosition.FLAG_FLEX,
+                order = TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters)
+            )
         }
 
         startUseCase(FieldPosition.CATCHER, FieldPosition.DP_DH, true, TeamType.SOFTBALL)
@@ -256,14 +270,18 @@ internal class SwitchPlayersPositionTests : BaseUseCaseTests() {
 
     @Test
     fun shouldSwitchSoftballDpWithFlex() = runTest {
-        players.first { it.isPitcher() }.apply {
-            flags = PlayerFieldPosition.FLAG_NONE
-            order = 1
+        players.edit({ it.isPitcher() }) {
+            copy(
+                flags = PlayerFieldPosition.FLAG_NONE,
+                order = 1
+            )
         }
 
-        players.first { it.isCatcher() }.apply {
-            flags = PlayerFieldPosition.FLAG_FLEX
-            order = TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters)
+        players.edit({ it.isCatcher() }) {
+            copy(
+                flags = PlayerFieldPosition.FLAG_FLEX,
+                order = TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters)
+            )
         }
 
         startUseCase(FieldPosition.DP_DH, FieldPosition.CATCHER, true, TeamType.SOFTBALL)

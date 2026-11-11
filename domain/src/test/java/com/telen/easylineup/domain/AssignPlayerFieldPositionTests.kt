@@ -130,12 +130,16 @@ internal abstract class AssignPlayerFieldPositionTests(
         Mockito.`when`(teamDao.getTeams())
             .thenReturn(listOf(Team(id = 1L, type = teamType.id, main = true)))
         val playersSize = players.size
+        val original = players.toList()
         val result = savePlayerFieldPosition(player, position, lineup, players)
         exception?.let {
             Assert.assertTrue(result.isFailure)
             Assert.assertEquals(it, result.exceptionOrNull()?.javaClass)
         } ?: let {
             Assert.assertTrue(result.isSuccess)
+            Assert.assertEquals("The input list must not change", original, players)
+            players.clear()
+            players.addAll(result.getOrThrow())
             players.apply {
                 Assert.assertEquals("Size of player list must not change", playersSize, size)
                 Assert.assertEquals(
@@ -169,7 +173,7 @@ internal abstract class AssignPlayerFieldPositionTests(
     @Test
     fun shouldInsertPlayerWithWhenOrderAvailable() = runTest {
         val lastOrder = players.first { it.isShortStop() }.order
-        players.first { it.isShortStop() }.reset()
+        players.edit({ it.isShortStop() }) { reset() }
         startUseCase(FieldPosition.SHORT_STOP, MODE_DISABLED)
         Assert.assertEquals(lastOrder, players.first { it.isShortStop() }.order)
     }
@@ -177,7 +181,7 @@ internal abstract class AssignPlayerFieldPositionTests(
     @Test
     fun shouldInsertSubstituteWithOrderWhenOrderAvailable() = runTest {
         val lastOrder = players.first { it.isShortStop() }.order
-        players.first { it.isShortStop() }.reset()
+        players.edit({ it.isShortStop() }) { reset() }
         startUseCase(FieldPosition.SUBSTITUTE, MODE_DISABLED)
 
         players.first { newPlayer.id == it.playerId }.let {
@@ -220,7 +224,7 @@ internal abstract class AssignPlayerFieldPositionTests(
 
     @Test
     fun shouldInsertPitcherAsDesignatedPitcherOrderInBaseballLineup() = runTest {
-        players.first { it.isPitcher() }.reset()
+        players.edit({ it.isPitcher() }) { reset() }
 
         startUseCase(FieldPosition.PITCHER, MODE_ENABLED, teamType = TeamType.BASEBALL)
 

@@ -9,6 +9,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.telen.easylineup.domain.model.DpAndFlexConfiguration
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.LineupDraft
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
@@ -44,6 +45,7 @@ import com.telen.easylineup.testDispatcherProvider
 import com.telen.easylineup.utils.LineupExportData
 import com.telen.easylineup.utils.LineupPdfWriter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
@@ -67,8 +69,10 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.stubbing.Answer
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 
 /**
@@ -173,6 +177,15 @@ internal class LineupViewModelTest {
         lineupPdfWriter,
         testDispatcherProvider()
     )
+
+    /**
+     * A stub for an editing use case that changes nothing: it returns the players it got. The
+     * answer is the bare list: a suspend function hands its `Result` back unboxed, so a boxed
+     * one returned from an [Answer] would reach the caller as the wrong type.
+     */
+    private fun returnsPlayersArgument(index: Int) = Answer {
+        it.getArgument<List<PlayerWithPosition>>(index)
+    }
 
     @After
     fun tearDown() {
@@ -290,7 +303,7 @@ internal class LineupViewModelTest {
         runBlocking {
             Mockito.`when`(
                 deletePlayerFieldPositionUseCase(any(), any(), any(), any())
-            ).thenReturn(Result.success(Unit))
+            ).thenAnswer(returnsPlayersArgument(0))
         }
 
         viewModel.onDeletePosition(
@@ -393,8 +406,9 @@ internal class LineupViewModelTest {
         advanceUntilIdle()
         val updatedLineup = lineup.copy(mode = 1)
         runBlocking {
-            Mockito.`when`(setLineupModeUseCase(eq(true), eq(lineup), any()))
-                .thenReturn(Result.success(updatedLineup))
+            Mockito.`when`(setLineupModeUseCase(eq(true), eq(lineup), any())).thenAnswer {
+                LineupDraft(updatedLineup, it.getArgument(2))
+            }
         }
 
         viewModel.onLineupModeChanged(true)
@@ -436,7 +450,7 @@ internal class LineupViewModelTest {
         advanceUntilIdle()
         runBlocking {
             Mockito.`when`(assignPlayerFieldPositionUseCase(any(), any(), eq(lineup), any()))
-                .thenReturn(Result.success(Unit))
+                .thenAnswer(returnsPlayersArgument(3))
         }
 
         viewModel.onPlayerSelected(
@@ -542,7 +556,7 @@ internal class LineupViewModelTest {
         runBlocking {
             Mockito.`when`(
                 switchPlayersPositionUseCase(any(), any(), any(), eq(lineup))
-            ).thenReturn(Result.success(Unit))
+            ).thenAnswer(returnsPlayersArgument(0))
         }
 
         viewModel.switchPlayersPosition(
@@ -639,7 +653,7 @@ internal class LineupViewModelTest {
         val dp = Player(id = 1L, teamId = 1L, name = "dp", shirtNumber = 1, licenseNumber = "1")
         runBlocking {
             Mockito.`when`(saveDpAndFlexUseCase(eq(lineup), eq(dp), eq(null), any()))
-                .thenReturn(Result.success(Unit))
+                .thenAnswer(returnsPlayersArgument(3))
         }
 
         viewModel.onDpFlexLinked(dp, null)
@@ -682,7 +696,7 @@ internal class LineupViewModelTest {
     fun shouldUpdateBattersThroughUseCase() = runTest {
         runBlocking {
             Mockito.`when`(updatePlayersWithBattersUseCase(any(), any()))
-                .thenReturn(Result.success(Unit))
+                .thenAnswer(returnsPlayersArgument(0))
         }
 
         viewModel.onBattersChanged(emptyList())
@@ -782,7 +796,7 @@ internal class LineupViewModelTest {
         val first = player(1L, position = FieldPosition.PITCHER.id)
         val second = player(2L, position = FieldPosition.CATCHER.id)
         Mockito.`when`(switchPlayersPositionUseCase(any(), any(), any(), any()))
-            .thenReturn(Result.success(Unit))
+            .thenAnswer(returnsPlayersArgument(0))
         loadLineup(lineup, listOf(first, second))
 
         viewModel.switchPlayersPosition(first, second)
@@ -801,7 +815,7 @@ internal class LineupViewModelTest {
         val lineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
         val first = player(1L, position = FieldPosition.PITCHER.id)
         Mockito.`when`(switchPlayersPositionUseCase(any(), any(), any(), any()))
-            .thenReturn(Result.success(Unit))
+            .thenAnswer(returnsPlayersArgument(0))
         loadLineup(lineup, listOf(first))
 
         viewModel.switchPlayersPosition(first, FieldPosition.LEFT_FIELD)
@@ -921,7 +935,7 @@ internal class LineupViewModelTest {
     @Test
     fun shouldDeleteAPositionWithDefaultsBeforeTheLineupIsLoaded() = runTest {
         Mockito.`when`(deletePlayerFieldPositionUseCase(any(), any(), any(), any()))
-            .thenReturn(Result.success(Unit))
+            .thenAnswer(returnsPlayersArgument(0))
 
         viewModel.onDeletePosition(aPlayer)
         advanceUntilIdle()
@@ -988,7 +1002,7 @@ internal class LineupViewModelTest {
     @Test
     fun shouldFallBackToFirstBaseForAPlayerWithoutAValidPosition() = runTest {
         Mockito.`when`(switchPlayersPositionUseCase(any(), any(), any(), any()))
-            .thenReturn(Result.success(Unit))
+            .thenAnswer(returnsPlayersArgument(0))
         loadLineup(loadedLineup)
         advanceUntilIdle()
 
@@ -1138,7 +1152,7 @@ internal class LineupViewModelTest {
         editable = true
         loadLineup(loadedLineup, listOf(player(1L, FieldPosition.PITCHER.id, 1)))
         Mockito.`when`(deletePlayerFieldPositionUseCase(any(), any(), any(), any()))
-            .thenReturn(Result.success(Unit))
+            .thenAnswer(returnsPlayersArgument(0))
         viewModel.onDeletePosition(aPlayer)
     }
 
@@ -1163,6 +1177,38 @@ internal class LineupViewModelTest {
         advanceUntilIdle()
 
         assertEquals(listOf(9L), viewModel.uiState.value.defensePlayers.map { it.playerId })
+    }
+
+    @Test
+    fun shouldBuildEachChangeOnTheResultOfThePreviousOne() = runTest {
+        editable = true
+        loadLineup(loadedLineup, listOf(player(1L, FieldPosition.PITCHER.id, order = 1)))
+        advanceUntilIdle()
+        Mockito.`when`(updatePlayersWithBattersUseCase(any(), any())).thenAnswer {
+            it.getArgument<List<PlayerWithPosition>>(0).map { p -> p.copy(order = p.order + 1) }
+        }
+
+        viewModel.onBattersChanged(emptyList())
+        viewModel.onBattersChanged(emptyList())
+        advanceUntilIdle()
+
+        assertEquals(3, viewModel.uiState.value.defensePlayers.single().order)
+    }
+
+    @Test
+    fun shouldIgnoreASaveWhileTheFirstOneIsStillRunning() = runTest {
+        startEditingAfterADelete()
+        advanceUntilIdle()
+        Mockito.`when`(saveLineupDraftUseCase(any(), any(), any())).doSuspendableAnswer {
+            delay(1_000)
+            Result.success(Unit)
+        }
+
+        viewModel.onSaveClick()
+        viewModel.onSaveClick()
+        advanceUntilIdle()
+
+        Mockito.verify(saveLineupDraftUseCase, Mockito.times(1)).invoke(any(), any(), any())
     }
 
     @Test

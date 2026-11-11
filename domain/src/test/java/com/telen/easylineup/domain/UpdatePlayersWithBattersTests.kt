@@ -63,8 +63,7 @@ internal class UpdatePlayersWithBattersTests {
         val result = updatePlayersWithBatters(listOf(player1, player2), batters)
 
         assertTrue(result.isSuccess)
-        assertEquals(3, player1.order)
-        assertEquals(1, player2.order)
+        assertEquals(listOf(3, 1), result.getOrThrow().map { it.order })
     }
 
     @Test
@@ -83,7 +82,7 @@ internal class UpdatePlayersWithBattersTests {
         val result = updatePlayersWithBatters(listOf(player1), batters)
 
         assertTrue(result.isSuccess)
-        assertEquals(5, player1.order)
+        assertEquals(listOf(player1), result.getOrThrow())
     }
 
     @Test
@@ -93,6 +92,6 @@ internal class UpdatePlayersWithBattersTests {
         val result = updatePlayersWithBatters(listOf(player1), emptyList())
 
         assertTrue(result.isSuccess)
-        assertEquals(5, player1.order)
+        assertEquals(listOf(player1), result.getOrThrow())
     }
 }

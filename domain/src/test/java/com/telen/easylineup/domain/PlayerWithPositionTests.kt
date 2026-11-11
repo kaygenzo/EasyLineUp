@@ -122,25 +122,21 @@ internal class PlayerWithPositionTests {
 
     @Test
     fun shouldClearPositionOrderAndFlagsOnUnassign() {
-        val assigned = player(position = FieldPosition.PITCHER.id, order = 3).apply {
-            flags = PlayerFieldPosition.FLAG_FLEX
-        }
+        val assigned = player(position = FieldPosition.PITCHER.id, order = 3)
+            .copy(flags = PlayerFieldPosition.FLAG_FLEX)
 
-        assigned.unassign()
+        val unassigned = assigned.unassign()
 
-        assertEquals(-1, assigned.position)
-        assertEquals(0, assigned.order)
-        assertEquals(PlayerFieldPosition.FLAG_NONE, assigned.flags)
+        assertEquals(-1, unassigned.position)
+        assertEquals(0, unassigned.order)
+        assertEquals(PlayerFieldPosition.FLAG_NONE, unassigned.flags)
+        assertEquals("The original player is untouched", 3, assigned.order)
     }
 
     @Test
     fun shouldMapToAMatchingPlayerFieldPosition() {
         val assigned = player(position = FieldPosition.PITCHER.id, order = 2, fieldPositionId = 7L)
-            .apply {
-                x = 12.5f
-                y = 88.25f
-                flags = PlayerFieldPosition.FLAG_FLEX
-            }
+            .copy(x = 12.5f, y = 88.25f, flags = PlayerFieldPosition.FLAG_FLEX)
 
         val fieldPosition = assigned.toPlayerFieldPosition()
 

@@ -110,7 +110,7 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
 
     @Test
     fun shouldReturnDpandFlexRightFieldSoftball() = runTest {
-        players.first { it.isRightField() }.flags = PlayerFieldPosition.FLAG_FLEX
+        players.edit({ it.isRightField() }) { copy(flags = PlayerFieldPosition.FLAG_FLEX) }
         val result = startUseCase(teamType = TeamType.SOFTBALL)
         result.getOrThrow().let {
             Assert.assertEquals(players.first { it.playerId == 3L }, it.dp)
@@ -122,7 +122,7 @@ internal class GetDpAndFlexFromPlayersInFieldTests : BaseUseCaseTests() {
 
     @Test
     fun shouldReturnOnlyFlexRightFieldSoftball() = runTest {
-        players.first { it.isRightField() }.flags = PlayerFieldPosition.FLAG_FLEX
+        players.edit({ it.isRightField() }) { copy(flags = PlayerFieldPosition.FLAG_FLEX) }
         players.removeIf { it.isDpDh() }
         val result = startUseCase(teamType = TeamType.SOFTBALL)
         result.getOrThrow().let {

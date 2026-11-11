@@ -35,15 +35,15 @@ class UpdateLineupRoster(
                     val removedIds = roster.filterNot { it.status }.map { it.player.id }.toSet()
                     val removesAPlayer =
                         players.any { it.playerId in removedIds && it.isAssigned() }
-                    val lineup = applyRosterToLineup(
+                    val draft = applyRosterToLineup(
                         lineupRepository.getLineupById(lineupId),
                         players,
                         roster
                     ).getOrThrow()
                     if (removesAPlayer) {
-                        saveBattingOrderAndPositions(lineup, players).getOrThrow()
+                        saveBattingOrderAndPositions(draft.lineup, draft.players).getOrThrow()
                     } else {
-                        lineupRepository.updateLineup(lineup)
+                        lineupRepository.updateLineup(draft.lineup)
                     }
                 }
             }

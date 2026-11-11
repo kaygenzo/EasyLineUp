@@ -89,6 +89,7 @@ internal class UpdatePlayersWithLineupModeTests {
     ) {
         lineup = lineup.copy(mode = if (lineupMode) MODE_ENABLED else MODE_DISABLED)
         val playersSize = players.size
+        val original = players.toList()
         val result = updatePlayersWithLineupMode(
             players,
             lineup,
@@ -98,7 +99,13 @@ internal class UpdatePlayersWithLineupModeTests {
             assertTrue(exception.isInstance(result.exceptionOrNull()))
         } ?: let {
             assertTrue(result.isSuccess)
-            Assert.assertEquals(playersSize, players.size)
+            Assert.assertEquals("The input list must not change", original, players)
+            val updated = result.getOrThrow()
+            Assert.assertEquals(playersSize, updated.size)
+            if (players === this.players) {
+                this.players.clear()
+                this.players.addAll(updated)
+            }
         }
     }
 
@@ -148,7 +155,7 @@ internal class UpdatePlayersWithLineupModeTests {
 
     @Test
     fun shouldUpdatePitcherOrderTo10IfAssignedAndDpEnabled() = runTest {
-        players.first().position = FieldPosition.PITCHER.id
+        players.edit(0) { copy(position = FieldPosition.PITCHER.id) }
         startUseCase(TeamType.BASEBALL, lineupMode = true)
         val pitcher = players.first { it.isPitcher() }
         val expectedOrder = TeamStrategy.STANDARD.getDesignatedPlayerOrder(extraHitters)
@@ -158,11 +165,13 @@ internal class UpdatePlayersWithLineupModeTests {
 
     @Test
     fun shouldDeletePitcherAndDpifAssignedAndDpDisabled() = runTest {
-        players.first().apply {
-            position = FieldPosition.PITCHER.id
-            flags = PlayerFieldPosition.FLAG_FLEX
+        players.edit(0) {
+            copy(
+                position = FieldPosition.PITCHER.id,
+                flags = PlayerFieldPosition.FLAG_FLEX
+            )
         }
-        players[1].position = FieldPosition.DP_DH.id
+        players.edit(1) { copy(position = FieldPosition.DP_DH.id) }
 
         startUseCase(TeamType.BASEBALL, lineupMode = false)
 

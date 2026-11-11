@@ -38,12 +38,12 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
     fun dpShouldOnlyShowIndexAndShowDescriptionAndCanMoveInExtraHitterWhenLineupEditable() = runTest {
         addPlayers()
         addExtraHitters(extraHittersSize)
-        players[0].position = FieldPosition.DP_DH.id
+        players.edit(0) { copy(position = FieldPosition.DP_DH.id) }
         // switch order to be sure dp will be at the end of the list because it's sorted by order
         val old = players[0].order
         val new = players[players.size - 1].order
-        players[0].order = new
-        players[players.size - 1].order = old
+        players.edit(0) { copy(order = new) }
+        players.edit(players.size - 1) { copy(order = old) }
 
         applyUserCase()
 
@@ -78,10 +78,7 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
         addExtraHitters(extraHittersSize)
 
         val newFlexOrder = batterSize + extraHittersSize + 1
-        players[0].apply {
-            flags = PlayerFieldPosition.FLAG_FLEX
-            order = newFlexOrder
-        }
+        players.edit(0) { copy(flags = PlayerFieldPosition.FLAG_FLEX, order = newFlexOrder) }
 
         applyUserCase()
 
@@ -215,7 +212,7 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
         addPlayers()
         addSubstitutes(Constants.SUBSTITUTE_ORDER_VALUE)
         for (i in batterSize until (batterSize + extraHittersSize)) {
-            players[i].order = i + 1
+            players.edit(i) { copy(order = i + 1) }
         }
         players.removeAt(0)
         applyUserCase()
@@ -358,12 +355,12 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
     fun dpShouldOnlyShowIndexAndShowDescriptionWhenLineupNotEditable() = runTest {
         addPlayers()
         addExtraHitters(extraHittersSize)
-        players[0].position = FieldPosition.DP_DH.id
+        players.edit(0) { copy(position = FieldPosition.DP_DH.id) }
         // switch order to be sure dp will be at the end of the list because it's sorted by order
         val old = players[0].order
         val new = players[players.size - 1].order
-        players[0].order = new
-        players[players.size - 1].order = old
+        players.edit(0) { copy(order = new) }
+        players.edit(players.size - 1) { copy(order = old) }
 
         applyUserCase()
 
@@ -398,10 +395,7 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
         addExtraHitters(extraHittersSize)
 
         val newFlexOrder = batterSize + extraHittersSize + 1
-        players[0].apply {
-            flags = PlayerFieldPosition.FLAG_FLEX
-            order = newFlexOrder
-        }
+        players.edit(0) { copy(flags = PlayerFieldPosition.FLAG_FLEX, order = newFlexOrder) }
 
         applyUserCase()
 
@@ -535,7 +529,7 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
         addPlayers()
         addSubstitutes(Constants.SUBSTITUTE_ORDER_VALUE)
         for (i in batterSize until (batterSize + extraHittersSize)) {
-            players[i].order = i + 1
+            players.edit(i) { copy(order = i + 1) }
         }
         players.removeAt(0)
         applyUserCase()

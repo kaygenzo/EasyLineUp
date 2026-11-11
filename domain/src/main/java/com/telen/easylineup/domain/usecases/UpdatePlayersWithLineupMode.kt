@@ -15,16 +15,19 @@ import com.telen.easylineup.domain.model.getDesignatedPlayerOrder
 import com.telen.easylineup.domain.model.isDpDhOrFlex
 import com.telen.easylineup.domain.model.isPitcher
 import com.telen.easylineup.domain.model.reset
+import com.telen.easylineup.domain.model.update
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import kotlinx.coroutines.withContext
 
 class UpdatePlayersWithLineupMode(private val dispatcherProvider: DispatcherProvider) {
+    /** Returns [players] as [lineup]'s mode wants them; [players] itself is untouched. */
     suspend operator fun invoke(
         players: List<PlayerWithPosition>,
         lineup: Lineup,
         teamType: Int
-    ): Result<Unit> = runCatchingCancellable {
+    ): Result<List<PlayerWithPosition>> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
+            val draft = players.toMutableList()
             when (lineup.mode) {
                 MODE_ENABLED -> when (teamType) {
                     TeamType.SOFTBALL.id -> {
@@ -33,20 +36,28 @@ class UpdatePlayersWithLineupMode(private val dispatcherProvider: DispatcherProv
 
                     TeamType.BASEBALL.id -> {
                         // find the pitcher if exists and set him at position 10 in lineup
-                        players.firstOrNull { it.isPitcher() }?.let {
+                        val pitcher = draft.indexOfFirst { it.isPitcher() }
+                        if (pitcher >= 0) {
                             // here we use directly the standard strategy because we only have
                             // one strategy in baseball
                             val strategy = TeamStrategy.getStrategyById(lineup.strategy)
-                            it.order = strategy.getDesignatedPlayerOrder(lineup.extraHitters)
-                            it.flags = PlayerFieldPosition.FLAG_FLEX
+                            draft.update(pitcher) {
+                                it.copy(
+                                    order = strategy.getDesignatedPlayerOrder(lineup.extraHitters),
+                                    flags = PlayerFieldPosition.FLAG_FLEX
+                                )
+                            }
                         }
                     }
 
                     else -> throw IllegalArgumentException()
                 }
 
-                MODE_DISABLED -> players.filter { it.isDpDhOrFlex() }.forEach { it.reset() }
+                MODE_DISABLED -> draft.indices
+                    .filter { draft[it].isDpDhOrFlex() }
+                    .forEach { draft.update(it) { player -> player.reset() } }
             }
+            draft
         }
     }
 }

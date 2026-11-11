@@ -53,7 +53,7 @@ internal class SetLineupModeTests {
         val lineupMode = if (mode) MODE_ENABLED else MODE_DISABLED
         val result = setLineupMode(mode, lineup, emptyList())
         assertTrue(result.isSuccess)
-        Assert.assertEquals(lineupMode, result.getOrNull()?.mode)
+        Assert.assertEquals(lineupMode, result.getOrNull()?.lineup?.mode)
     }
 
     @Test

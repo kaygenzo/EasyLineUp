@@ -28,24 +28,17 @@ class SaveBattingOrderAndPositions(
 
                     lineupRepository.updateLineup(lineup)
 
-                    // Snapshot before iterating: each suspend write below can trigger a reactive
-                    // DB-observing Flow upstream (ViewModel's shareIn'd _players) to concurrently
-                    // clear()/addAll() this same backing list, which would otherwise throw a
-                    // ConcurrentModificationException mid-loop.
-                    players.toList().forEach {
+                    players.forEach {
                         val playerPosition = it.toPlayerFieldPosition()
                         if (!it.isAssigned() && it.fieldPositionId > 0) {
                             // it is an old position that can be safely removed
                             pfpRepository.deletePosition(playerPosition)
                         } else if (it.isAssigned()) {
                             if (playerPosition.id == 0L) {
-                                // Write the new row id back onto the in-memory player: without
-                                // this, a second save() in the same session (e.g. a Save
-                                // double-tap) would still see fieldPositionId == 0 and insert
-                                // a duplicate row instead of updating the one just created.
-                                it.fieldPositionId = pfpRepository.insertPlayerFieldPosition(
-                                    playerPosition
-                                )
+                                // A second save of the same draft would insert this row again:
+                                // LineupViewModel ignores a save while one is running, and
+                                // reads the draft back from the database once it is done.
+                                pfpRepository.insertPlayerFieldPosition(playerPosition)
                             } else {
                                 pfpRepository.updatePlayerFieldPosition(playerPosition)
                             }

@@ -67,18 +67,20 @@ internal class ApplyRosterToLineupTests {
         )
 
         assertTrue(result.isSuccess)
-        assertTrue(pitcher.isAssigned())
-        assertFalse(catcher.isAssigned())
+        val (newPitcher, newCatcher) = result.getOrThrow().players
+        assertTrue(newPitcher.isAssigned())
+        assertFalse(newCatcher.isAssigned())
+        assertTrue("The given list is untouched", catcher.isAssigned())
     }
 
     @Test
     fun shouldKeepEveryoneStillOnTheRoster() = runTest {
         val pitcher = positioned(1L, FieldPosition.PITCHER, 1)
 
-        applyRosterToLineup(lineup, listOf(pitcher), listOf(status(1L, true)))
+        val players = applyRosterToLineup(lineup, listOf(pitcher), listOf(status(1L, true)))
+            .getOrThrow().players
 
-        assertEquals(FieldPosition.PITCHER.id, pitcher.position)
-        assertEquals(1, pitcher.order)
+        assertEquals(listOf(pitcher), players)
     }
 
     @Test
@@ -89,7 +91,7 @@ internal class ApplyRosterToLineupTests {
             listOf(status(1L, true), status(2L, false), status(3L, true))
         )
 
-        assertEquals("1;3", result.getOrThrow().roster)
+        assertEquals("1;3", result.getOrThrow().lineup.roster)
     }
 
     @Test
@@ -97,14 +99,14 @@ internal class ApplyRosterToLineupTests {
         val pitcher = positioned(1L, FieldPosition.PITCHER, 1)
         val catcher = positioned(2L, FieldPosition.CATCHER, 2)
 
-        applyRosterToLineup(
+        val (newPitcher, newCatcher) = applyRosterToLineup(
             lineup,
             listOf(pitcher, catcher),
             listOf(status(1L, true, number = 42), status(2L, true))
-        )
+        ).getOrThrow().players
 
-        assertEquals(42, pitcher.shirtNumber)
-        assertEquals(2, catcher.shirtNumber)
+        assertEquals(42, newPitcher.shirtNumber)
+        assertEquals(2, newCatcher.shirtNumber)
     }
 
     @Test
@@ -115,6 +117,6 @@ internal class ApplyRosterToLineupTests {
         val result = applyRosterToLineup(lineup, listOf(pitcher), listOf(status(1L, false)))
 
         assertTrue(result.isSuccess)
-        assertFalse(pitcher.isAssigned())
+        assertFalse(result.getOrThrow().players.single().isAssigned())
     }
 }

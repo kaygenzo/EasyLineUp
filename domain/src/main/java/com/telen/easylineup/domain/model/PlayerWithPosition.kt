@@ -26,17 +26,17 @@ import com.telen.easylineup.domain.Constants
 data class PlayerWithPosition(
     val playerName: String,
     val playerSex: Int,
-    var shirtNumber: Int,
+    val shirtNumber: Int,
     val licenseNumber: String,
     val teamId: Long,
     val image: String?,
-    var position: Int = -1,
-    var x: Float = 0f,
-    var y: Float = 0f,
-    var flags: Int = 0,
-    var order: Int = 0,
-    var fieldPositionId: Long = 0,
-    var playerId: Long = 0,
+    val position: Int = -1,
+    val x: Float = 0f,
+    val y: Float = 0f,
+    val flags: Int = 0,
+    val order: Int = 0,
+    val fieldPositionId: Long = 0,
+    val playerId: Long = 0,
     val lineupId: Long,
     val playerPositions: Int
 )
@@ -118,19 +118,31 @@ fun PlayerWithPosition.isDefensePlayer(): Boolean {
     return !isSubstitute() && !isDpDh() && isAssigned()
 }
 
-fun PlayerWithPosition.reset() {
-    this.position = FieldPosition.SUBSTITUTE.id
-    this.order = 0
-    this.flags = PlayerFieldPosition.FLAG_NONE
-}
+/** This player sent back to the bench: a substitute, out of the batting order, no flag. */
+fun PlayerWithPosition.reset(): PlayerWithPosition = copy(
+    position = FieldPosition.SUBSTITUTE.id,
+    order = 0,
+    flags = PlayerFieldPosition.FLAG_NONE
+)
 
 // Unlike reset() (field player -> bench), this fully removes a player who was already a
 // substitute: position goes to the model's own "not assigned" default (-1), which makes
 // SaveBattingOrderAndPositions delete the row instead of writing it back as SUBSTITUTE.
-fun PlayerWithPosition.unassign() {
-    this.position = -1
-    this.order = 0
-    this.flags = PlayerFieldPosition.FLAG_NONE
+fun PlayerWithPosition.unassign(): PlayerWithPosition = copy(
+    position = -1,
+    order = 0,
+    flags = PlayerFieldPosition.FLAG_NONE
+)
+
+/**
+ * Replaces the element at [index] by [transform] applied to it, and returns the new element. The
+ * lineup use cases edit a working copy of the draft through this, one step at a time, so that
+ * what they read from the list between two steps is what the list holds at that point.
+ */
+internal inline fun <T> MutableList<T>.update(index: Int, transform: (T) -> T): T {
+    val updated = transform(this[index])
+    this[index] = updated
+    return updated
 }
 
 // here we exclude the position itself because it's also a candidate for the order.

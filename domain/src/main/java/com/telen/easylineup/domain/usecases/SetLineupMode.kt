@@ -5,6 +5,7 @@
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.LineupDraft
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.domain.model.PlayerWithPosition
@@ -16,16 +17,18 @@ class SetLineupMode(
     private val updatePlayersWithLineupMode: UpdatePlayersWithLineupMode,
     private val dispatcherProvider: DispatcherProvider
 ) {
+    /** Returns [lineup] in its new mode and [players] adjusted to it. [players] is untouched. */
     suspend operator fun invoke(
         isEnabled: Boolean,
         lineup: Lineup,
         players: List<PlayerWithPosition>
-    ): Result<Lineup> = runCatchingCancellable {
+    ): Result<LineupDraft> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
             val updatedLineup = lineup.copy(mode = if (isEnabled) MODE_ENABLED else MODE_DISABLED)
             val team = getTeam().getOrThrow()
-            updatePlayersWithLineupMode(players, updatedLineup, team.type).getOrThrow()
-            updatedLineup
+            val updatedPlayers =
+                updatePlayersWithLineupMode(players, updatedLineup, team.type).getOrThrow()
+            LineupDraft(updatedLineup, updatedPlayers)
         }
     }
 }

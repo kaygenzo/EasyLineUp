@@ -90,11 +90,12 @@ open class BaseUseCaseTests {
             index++
         }
         if (withDpDh) {
-            var oldOrder = 0
-            players.first { it.isPitcher() }.apply {
-                oldOrder = this.order
-                this.flags = PlayerFieldPosition.FLAG_FLEX
-                this.order = strategy.getDesignatedPlayerOrder(lineup.extraHitters)
+            val oldOrder = players.first { it.isPitcher() }.order
+            players.edit({ it.isPitcher() }) {
+                copy(
+                    flags = PlayerFieldPosition.FLAG_FLEX,
+                    order = strategy.getDesignatedPlayerOrder(lineup.extraHitters)
+                )
             }
             players.add(generate(42L, FieldPosition.DP_DH, PlayerFieldPosition.FLAG_NONE, oldOrder))
         }

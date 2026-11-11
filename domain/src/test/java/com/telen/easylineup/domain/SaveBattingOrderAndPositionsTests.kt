@@ -63,7 +63,7 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
             generate(1L, FieldPosition.FIRST_BASE, 0, 1),
             /* new position freshly assigned */
             generate(2L, FieldPosition.SECOND_BASE, 0, 1)
-                .apply { fieldPositionId = 0L },
+                .copy(fieldPositionId = 0L),
             generate(3L, FieldPosition.SUBSTITUTE, 0, 1),
             generate(4L, FieldPosition.OLD_SUBSTITUTE, 0, 1),
             /* old position released */
@@ -123,10 +123,9 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
 
     @Test
     fun shouldInsertOnlyPlayersWithFieldIdZeroAndAssigned() = runTest {
-        players.add(generate(0L, FieldPosition.OLD_SUBSTITUTE, 0, 0).apply {
-            position = 0
-            playerId = 100L
-        })
+        players.add(
+            generate(0L, FieldPosition.OLD_SUBSTITUTE, 0, 0).copy(position = 0, playerId = 100L)
+        )
         startUseCase()
         verify(playerFieldPositionRepository).insertPlayerFieldPosition(argThat { playerId == 2L })
         verify(playerFieldPositionRepository, never())

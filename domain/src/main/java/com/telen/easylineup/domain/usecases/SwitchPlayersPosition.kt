@@ -15,6 +15,7 @@ import com.telen.easylineup.domain.model.getDesignatedPlayerOrder
 import com.telen.easylineup.domain.model.getNextAvailableOrder
 import com.telen.easylineup.domain.model.isDpDh
 import com.telen.easylineup.domain.model.isFlex
+import com.telen.easylineup.domain.model.update
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.exceptions.FirstPositionEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.SamePlayerException
@@ -24,67 +25,65 @@ class SwitchPlayersPosition(
     private val getTeam: GetTeam,
     private val dispatcherProvider: DispatcherProvider
 ) {
+    /** Returns [players] with both positions swapped; [players] itself is untouched. */
     suspend operator fun invoke(
         players: List<PlayerWithPosition>,
         position1: FieldPosition,
         position2: FieldPosition,
         lineup: Lineup
-    ): Result<Unit> = runCatchingCancellable {
+    ): Result<List<PlayerWithPosition>> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
             val team = getTeam().getOrThrow()
-            val mutablePlayers = players.toMutableList()
+            val draft = players.toMutableList()
             val extraHittersSize = lineup.extraHitters
             val lineupMode = lineup.mode
             val strategy = TeamStrategy.getStrategyById(lineup.strategy)
             val teamType = team.type
 
-            val player1 = mutablePlayers.firstOrNull { it.position == position1.id }
-                ?: throw FirstPositionEmptyException()
+            val index1 = draft.indexOfFirst { it.position == position1.id }
+            if (index1 < 0) {
+                throw FirstPositionEmptyException()
+            }
+            val index2 = draft.indexOfFirst { it.position == position2.id }.takeIf { it >= 0 }
 
-            val player2 = mutablePlayers.firstOrNull { it.position == position2.id }
-
-            if (player1 == player2) {
+            if (index1 == index2) {
                 throw SamePlayerException()
             }
 
-            player1.position = position2.id
-            player2?.position = position1.id
+            draft.update(index1) { it.copy(position = position2.id) }
+            index2?.let { draft.update(it) { player -> player.copy(position = position1.id) } }
 
-            val playerPositions = arrayListOf(player1)
-            player2?.let {
-                playerPositions.add(it)
-            }
+            val switched = listOfNotNull(index1, index2)
 
             val orderDesignatedPlayer =
                 strategy.getDesignatedPlayerOrder(extraHittersSize)
 
             // just keep reference of the first order different of 10
-            val tmpOrder = playerPositions.firstOrNull { it.order != orderDesignatedPlayer }?.order
-            val oneIsFlex = playerPositions.any { it.isFlex() }
-            val oneIsDp = playerPositions.any { it.isDpDh() }
+            val tmpOrder = switched.map { draft[it] }
+                .firstOrNull { it.order != orderDesignatedPlayer }?.order
+            val oneIsFlex = switched.any { draft[it].isFlex() }
+            val oneIsDp = switched.any { draft[it].isDpDh() }
 
             // if at least one player has a flag flex and it is a baseball team, the pitcher is
             // always the flex. Otherwise, the flex can be any other player. The only exception is
             // the DP/DH
-            playerPositions.forEach {
+            switched.forEach { index ->
                 if (lineupMode == MODE_ENABLED) {
-                    val newPosition = FieldPosition.getFieldPositionById(it.position)
+                    val newPosition = FieldPosition.getFieldPositionById(draft[index].position)
                     if (teamType == TeamType.BASEBALL.id) {
                         when (newPosition) {
-                            FieldPosition.PITCHER -> {
-                                it.order = orderDesignatedPlayer
-                                it.flags = PlayerFieldPosition.FLAG_FLEX
+                            FieldPosition.PITCHER -> draft.update(index) {
+                                it.copy(
+                                    order = orderDesignatedPlayer,
+                                    flags = PlayerFieldPosition.FLAG_FLEX
+                                )
                             }
 
                             else -> {
-                                it.flags = PlayerFieldPosition.FLAG_NONE
+                                draft.clearFlags(index)
                                 // if possible, just keep order, but in case of a swap with a
                                 // pitcher, exchange orders
-                                if (it.order == orderDesignatedPlayer) {
-                                    // we were a pitcher but not anymore.
-                                    it.order = tmpOrder
-                                        ?: mutablePlayers.getNextAvailableOrder(listOf(it.order))
-                                }
+                                draft.leaveDesignatedOrder(index, orderDesignatedPlayer, tmpOrder)
                             }
                         }
                     } else {
@@ -101,20 +100,39 @@ class SwitchPlayersPosition(
                         */
                         if (oneIsFlex && oneIsDp) {
                             if (newPosition == FieldPosition.DP_DH) {
-                                it.flags = PlayerFieldPosition.FLAG_NONE
-                                if (it.order == orderDesignatedPlayer) {
-                                    // we were a pitcher but not anymore.
-                                    it.order = tmpOrder
-                                        ?: mutablePlayers.getNextAvailableOrder(listOf(it.order))
-                                }
+                                draft.clearFlags(index)
+                                draft.leaveDesignatedOrder(index, orderDesignatedPlayer, tmpOrder)
                             } else {
-                                it.order = orderDesignatedPlayer
-                                it.flags = PlayerFieldPosition.FLAG_FLEX
+                                draft.update(index) {
+                                    it.copy(
+                                        order = orderDesignatedPlayer,
+                                        flags = PlayerFieldPosition.FLAG_FLEX
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
+            draft
+        }
+    }
+
+    private fun MutableList<PlayerWithPosition>.clearFlags(index: Int) {
+        update(index) { it.copy(flags = PlayerFieldPosition.FLAG_NONE) }
+    }
+
+    /** A player who held the designated player's order, but no longer plays that role. */
+    private fun MutableList<PlayerWithPosition>.leaveDesignatedOrder(
+        index: Int,
+        orderDesignatedPlayer: Int,
+        tmpOrder: Int?
+    ) {
+        val order = this[index].order
+        if (order == orderDesignatedPlayer) {
+            // we were a pitcher but not anymore.
+            val newOrder = tmpOrder ?: getNextAvailableOrder(listOf(order))
+            update(index) { it.copy(order = newOrder) }
         }
     }
 }
