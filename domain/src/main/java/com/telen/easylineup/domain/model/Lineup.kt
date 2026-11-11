@@ -7,6 +7,7 @@ package com.telen.easylineup.domain.model
 import com.telen.easylineup.domain.model.export.LineupExport
 import com.telen.easylineup.domain.model.export.PlayerNumberOverlayExport
 import com.telen.easylineup.domain.model.export.PlayerPositionExport
+import java.io.Serializable
 import java.util.Calendar
 import java.util.UUID
 
@@ -40,7 +41,7 @@ data class Lineup(
     val editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
     val roster: String? = null,
     val hash: String? = UUID.randomUUID().toString()
-) {
+) : Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) {
             return true

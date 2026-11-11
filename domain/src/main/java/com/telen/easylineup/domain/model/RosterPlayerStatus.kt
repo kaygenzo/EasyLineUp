@@ -4,6 +4,8 @@
 
 package com.telen.easylineup.domain.model
 
+import java.io.Serializable
+
 /**
  * @property player
  * @property status
@@ -13,4 +15,4 @@ data class RosterPlayerStatus(
     val player: Player,
     val status: Boolean = true,
     val playerNumberOverlay: PlayerNumberOverlay?
-)
+) : Serializable

@@ -5,6 +5,7 @@
 package com.telen.easylineup.domain.model
 
 import com.telen.easylineup.domain.Constants
+import java.io.Serializable
 
 /**
  * @property playerName
@@ -42,7 +43,7 @@ data class PlayerWithPosition(
     val lineupId: Long,
     val playerPositions: Int,
     val fieldPositionHash: String? = null
-)
+) : Serializable
 
 fun PlayerWithPosition.toPlayer(): Player {
     return Player(

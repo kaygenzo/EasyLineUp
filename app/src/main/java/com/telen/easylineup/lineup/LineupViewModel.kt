@@ -45,6 +45,7 @@ import com.telen.easylineup.domain.usecases.runCatchingCancellable
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.utils.LineupExportData
 import com.telen.easylineup.utils.LineupPdfWriter
+import java.io.Serializable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -151,8 +152,20 @@ data class LineupUiState(
     val showRosterEditDiscardSheet: Boolean = false
 )
 
+/**
+ * An edit not saved yet, kept in [SavedStateHandle] so it survives Android killing the app in
+ * the background: the database only has the lineup as it was before the edit.
+ */
+private data class UnsavedLineupEdit(
+    val lineup: Lineup,
+    val players: ArrayList<PlayerWithPosition>,
+    val appliedRoster: TeamRosterSummary?
+) : Serializable
+
+private const val KEY_UNSAVED_EDIT = "unsavedLineupEdit"
+
 class LineupViewModel(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val getTeamUseCase: GetTeam,
     private val observePlayerNumberOverlays: ObservePlayerNumberOverlays,
     private val deletePlayerFieldPositionUseCase: DeletePlayerFieldPosition,
@@ -220,7 +233,27 @@ class LineupViewModel(
     private var appliedRoster: TeamRosterSummary? = null
 
     init {
+        // A fixed view never edits, so it has nothing to restore.
+        savedStateHandle.get<UnsavedLineupEdit>(KEY_UNSAVED_EDIT)
+            ?.takeIf { editable }
+            ?.let(::restoreUnsavedEdit)
         observeLineup()
+    }
+
+    /** Puts back an edit lost with the process: the database emissions are ignored over it. */
+    private fun restoreUnsavedEdit(edit: UnsavedLineupEdit) {
+        hasUnsavedChanges = true
+        lineup = edit.lineup
+        draft = edit.players
+        appliedRoster = edit.appliedRoster
+        _uiState.update { it.withLineup(edit.lineup) }
+        viewModelScope.launch { draftMutex.withLock { recomputeAndPublish() } }
+    }
+
+    private fun persistUnsavedEdit() {
+        val currentLineup = lineup ?: return
+        savedStateHandle[KEY_UNSAVED_EDIT] =
+            UnsavedLineupEdit(currentLineup, ArrayList(draft), appliedRoster)
     }
 
     private fun observeLineup() {
@@ -231,6 +264,13 @@ class LineupViewModel(
                 .onSuccess {
                     teamTypeId = it.type
                     _uiState.update { state -> state.copy(teamType = it.type) }
+                    // The batting order depends on the team type: a draft already shown, such as
+                    // a restored edit, was computed without it.
+                    draftMutex.withLock {
+                        if (lineup != null) {
+                            recomputeAndPublish()
+                        }
+                    }
                 }
                 .onFailure { Timber.e(it) }
         }
@@ -271,14 +311,7 @@ class LineupViewModel(
         overlays: List<PlayerNumberOverlay>
     ) {
         lineup = loadedLineup
-        _uiState.update {
-            it.copy(
-                lineupName = loadedLineup.name,
-                defenseStrategy = TeamStrategy.getStrategyById(loadedLineup.strategy),
-                lineupMode = loadedLineup.mode,
-                extraHitters = loadedLineup.extraHitters
-            )
-        }
+        _uiState.update { it.withLineup(loadedLineup) }
         val numbers = overlays.associate { it.playerId to it.number }
         draft = positions.map { player ->
             numbers[player.playerId]?.let { player.copy(shirtNumber = it) } ?: player
@@ -330,6 +363,7 @@ class LineupViewModel(
                         draft = it
                         recomputeAndPublish()
                         onChanged()
+                        persistUnsavedEdit()
                     }
                     .onFailure { Timber.e(it) }
             }
@@ -378,6 +412,7 @@ class LineupViewModel(
                     .onSuccess {
                         hasUnsavedChanges = false
                         appliedRoster = null
+                        savedStateHandle.remove<UnsavedLineupEdit>(KEY_UNSAVED_EDIT)
                         _events.send(LineupEvent.Saved)
                     }
                     .onFailure {
@@ -703,3 +738,10 @@ class LineupViewModel(
         }
     }
 }
+
+private fun LineupUiState.withLineup(lineup: Lineup): LineupUiState = copy(
+    lineupName = lineup.name,
+    defenseStrategy = TeamStrategy.getStrategyById(lineup.strategy),
+    lineupMode = lineup.mode,
+    extraHitters = lineup.extraHitters
+)

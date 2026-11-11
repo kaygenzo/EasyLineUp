@@ -5,6 +5,7 @@
 package com.telen.easylineup.domain.model
 
 import com.telen.easylineup.domain.model.export.PlayerExport
+import java.io.Serializable
 import java.util.UUID
 
 /**
@@ -36,7 +37,7 @@ data class Player(
     val phone: String? = null,
     val sex: Int = 0,
     val hash: String? = UUID.randomUUID().toString()
-) {
+) : Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) {
             return true

@@ -18,6 +18,7 @@ import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.isAssigned
+import com.telen.easylineup.domain.model.reset
 import com.telen.easylineup.domain.usecases.ApplyRosterToLineup
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.ClearRoster
@@ -44,6 +45,10 @@ import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstExc
 import com.telen.easylineup.testDispatcherProvider
 import com.telen.easylineup.utils.LineupExportData
 import com.telen.easylineup.utils.LineupPdfWriter
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -107,6 +112,11 @@ internal class LineupViewModelTest {
     private var routeLineupId = 1L
     private var editable = false
 
+    /** The screen's saved state: what survives Android killing the app, as it would. */
+    private val savedStateHandle: SavedStateHandle by lazy {
+        SavedStateHandle(mapOf("lineupId" to routeLineupId, "editable" to editable))
+    }
+
     /** Built on first use, so a test can stub the observations and pick [editable] first. */
     private val viewModel: LineupViewModel by lazy { buildViewModel() }
 
@@ -149,8 +159,10 @@ internal class LineupViewModelTest {
         }
     }
 
-    private fun buildViewModel(): LineupViewModel = LineupViewModel(
-        SavedStateHandle(mapOf("lineupId" to routeLineupId, "editable" to editable)),
+    private fun buildViewModel(
+        handle: SavedStateHandle = savedStateHandle
+    ): LineupViewModel = LineupViewModel(
+        handle,
         getTeamUseCase,
         observePlayerNumberOverlays,
         deletePlayerFieldPositionUseCase,
@@ -1209,6 +1221,67 @@ internal class LineupViewModelTest {
         advanceUntilIdle()
 
         Mockito.verify(saveLineupDraftUseCase, Mockito.times(1)).invoke(any(), any(), any())
+    }
+
+    /**
+     * Everything [savedStateHandle] holds, as Android would hand it to a new process: written
+     * out and read back with Java serialization, which is what a Bundle does with these values.
+     */
+    @Suppress("UNCHECKED_CAST")
+    private fun savedState(): Map<String, Any?> {
+        val state = HashMap(
+            savedStateHandle.keys().associateWith { savedStateHandle.get<Any?>(it) }
+        )
+        val bytes = ByteArrayOutputStream().also { out ->
+            ObjectOutputStream(out).use { it.writeObject(state) }
+        }.toByteArray()
+        return ObjectInputStream(ByteArrayInputStream(bytes)).use { it.readObject() }
+            as Map<String, Any?>
+    }
+
+    @Test
+    fun shouldBringAnUnsavedEditBackAfterTheProcessIsKilled() = runTest {
+        startEditingAfterADelete()
+        Mockito.`when`(deletePlayerFieldPositionUseCase(any(), any(), any(), any())).thenAnswer {
+            it.getArgument<List<PlayerWithPosition>>(0).map { p -> p.reset() }
+        }
+        viewModel.onDeletePosition(aPlayer)
+        advanceUntilIdle()
+
+        // A new ViewModel on the same saved state, its database still holding the old lineup.
+        val restored = buildViewModel(SavedStateHandle(savedState()))
+        playersFlow.emit(listOf(player(1L, FieldPosition.PITCHER.id, 1)))
+        advanceUntilIdle()
+
+        val players = restored.uiState.value.defensePlayers
+        assertEquals(FieldPosition.SUBSTITUTE.id, players.single().position)
+        assertEquals("L", restored.uiState.value.lineupName)
+    }
+
+    @Test
+    fun shouldForgetTheKeptEditOnceItIsSaved() = runTest {
+        startEditingAfterADelete()
+        advanceUntilIdle()
+        Mockito.`when`(saveLineupDraftUseCase(eq(loadedLineup), any(), any()))
+            .thenReturn(Result.success(Unit))
+
+        viewModel.onSaveClick()
+        advanceUntilIdle()
+
+        assertFalse(savedStateHandle.keys().any { it != "lineupId" && it != "editable" })
+    }
+
+    @Test
+    fun shouldNotRestoreAnEditIntoAFixedView() = runTest {
+        startEditingAfterADelete()
+        advanceUntilIdle()
+        val kept = savedState() + ("editable" to false)
+
+        val fixed = buildViewModel(SavedStateHandle(kept))
+        playersFlow.emit(listOf(player(9L)))
+        advanceUntilIdle()
+
+        assertEquals(listOf(9L), fixed.uiState.value.defensePlayers.map { it.playerId })
     }
 
     @Test
