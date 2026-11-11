@@ -222,6 +222,18 @@
         aufgetreten</string>
     <string name="error_when_deleting_team">Beim Löschen des Teams ist ein Fehler
         aufgetreten</string>
+    <string name="error_lineup_save_failed">Die Aufstellung konnte nicht gespeichert werden. Bitte
+        versuche es erneut.</string>
+    <string name="error_lineup_share_failed">Die Aufstellung konnte nicht zum Teilen vorbereitet
+        werden. Bitte versuche es erneut.</string>
+    <string name="error_tournament_save_failed">Das Turnier konnte nicht erstellt werden. Bitte
+        versuche es erneut.</string>
+    <string name="error_player_save_failed">Der Spieler konnte nicht gespeichert werden. Bitte
+        versuche es erneut.</string>
+    <string name="error_team_save_failed">Das Team konnte nicht gespeichert werden. Bitte versuche
+        es erneut.</string>
+    <string name="error_delete_all_data_failed">Die Daten konnten nicht gelöscht werden. Es wurde
+        nichts gelöscht, bitte versuche es erneut.</string>
     <string name="create_player_favorite_positions">Lieblingspositionen: (max. 3)</string>
     <string name="create_player_pitching_side">Wirft</string>
     <string name="create_player_batting_side">Schlägt</string>

@@ -181,7 +181,7 @@ internal class SettingsViewModelTest {
     }
 
     @Test
-    fun shouldNotSendAnEventWhenDeleteAllDataFails() = runTest(testDispatcher) {
+    fun shouldReportAFailedDeleteAllData() = runTest(testDispatcher) {
         val exception = Exception("db error")
         runBlocking { Mockito.`when`(deleteAllDataUseCase()).thenReturn(Result.failure(exception)) }
 
@@ -191,7 +191,7 @@ internal class SettingsViewModelTest {
         viewModel.deleteAllData()
         advanceUntilIdle()
 
-        assertTrue(events.isEmpty())
+        assertEquals(listOf(DeleteAllDataFailed), events)
         job.cancel()
     }
 

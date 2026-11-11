@@ -7,6 +7,7 @@ package com.telen.easylineup.settings
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
@@ -99,6 +100,12 @@ fun SettingsRoute(navController: NavController) {
                         }
                         context.startActivity(intent)
                     }
+
+                    DeleteAllDataFailed -> Toast.makeText(
+                        context,
+                        R.string.error_delete_all_data_failed,
+                        Toast.LENGTH_LONG
+                    ).show()
 
                     ExportSucceeded -> {
                         FirebaseAnalyticsUtils.exportData(context)

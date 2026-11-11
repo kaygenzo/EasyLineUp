@@ -479,6 +479,8 @@ internal class LineupCreationViewModelTest {
         }
         viewModel.onNewTournamentSheetOpen()
         viewModel.onNewTournamentNameChanged("Cup")
+        val events = mutableListOf<LineupCreationEvent>()
+        val job = launch { viewModel.events.collect { events.add(it) } }
 
         viewModel.onAddNewTournament()
         advanceUntilIdle()
@@ -486,6 +488,9 @@ internal class LineupCreationViewModelTest {
         val state = viewModel.uiState.value
         assertTrue(state.showNewTournamentSheet)
         assertNull(state.selectedTournament)
+        assertNull(state.newTournamentError)
+        assertEquals(listOf(NewTournamentSaveFailed), events)
+        job.cancel()
     }
 
     @Test
@@ -589,11 +594,16 @@ internal class LineupCreationViewModelTest {
                 .thenReturn(Result.failure(IllegalStateException("db error")))
         }
 
+        val events = mutableListOf<LineupCreationEvent>()
+        val job = launch { viewModel.events.collect { events.add(it) } }
+
         viewModel.onSaveClick()
         advanceUntilIdle()
 
         assertFalse(viewModel.uiState.value.nameError)
         assertFalse(viewModel.uiState.value.tournamentError)
+        assertEquals(listOf(LineupSaveFailed), events)
+        job.cancel()
     }
 
     private fun viewModelWith(handle: SavedStateHandle) = LineupCreationViewModel(

@@ -218,6 +218,15 @@
         seçin</string>
     <string name="error_when_deleting_lineup">Diziliş silinirken bir sorun oluştu</string>
     <string name="error_when_deleting_team">Takım silinirken bir sorun oluştu</string>
+    <string name="error_lineup_save_failed">Diziliş kaydedilemedi. Lütfen tekrar deneyin.</string>
+    <string name="error_lineup_share_failed">Diziliş paylaşım için hazırlanamadı. Lütfen tekrar
+        deneyin.</string>
+    <string name="error_tournament_save_failed">Turnuva oluşturulamadı. Lütfen tekrar
+        deneyin.</string>
+    <string name="error_player_save_failed">Oyuncu kaydedilemedi. Lütfen tekrar deneyin.</string>
+    <string name="error_team_save_failed">Takım kaydedilemedi. Lütfen tekrar deneyin.</string>
+    <string name="error_delete_all_data_failed">Veriler silinemedi. Hiçbir şey silinmedi, lütfen
+        tekrar deneyin.</string>
     <string name="create_player_favorite_positions">Favori pozisyonlar: (en fazla 3)</string>
     <string name="create_player_pitching_side">Atış</string>
     <string name="create_player_batting_side">Vuruş</string>

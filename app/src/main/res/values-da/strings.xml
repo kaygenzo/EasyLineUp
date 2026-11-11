@@ -218,6 +218,14 @@
     <string name="error_need_assign_both_players_message">Vælg både din DP og din Flex</string>
     <string name="error_when_deleting_lineup">Noget gik galt under sletning af opstillingen</string>
     <string name="error_when_deleting_team">Noget gik galt under sletning af holdet</string>
+    <string name="error_lineup_save_failed">Opstillingen kunne ikke gemmes. Prøv igen.</string>
+    <string name="error_lineup_share_failed">Opstillingen kunne ikke gøres klar til deling. Prøv
+        igen.</string>
+    <string name="error_tournament_save_failed">Turneringen kunne ikke oprettes. Prøv igen.</string>
+    <string name="error_player_save_failed">Spilleren kunne ikke gemmes. Prøv igen.</string>
+    <string name="error_team_save_failed">Holdet kunne ikke gemmes. Prøv igen.</string>
+    <string name="error_delete_all_data_failed">Dataene kunne ikke slettes. Intet blev slettet, prøv
+        igen.</string>
     <string name="create_player_favorite_positions">Foretrukne positioner: (maks. 3)</string>
     <string name="create_player_pitching_side">Kaster</string>
     <string name="create_player_batting_side">Slår</string>

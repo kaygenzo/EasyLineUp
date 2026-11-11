@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.player
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -75,6 +76,11 @@ fun PlayerEditRoute(navController: NavController, playerId: Long) {
                                 FirebaseAnalyticsUtils.invalidPlayerPhoneNumber(context)
                         }
                     }
+                    PlayerEvent.SaveFailed -> Toast.makeText(
+                        context,
+                        R.string.error_player_save_failed,
+                        Toast.LENGTH_LONG
+                    ).show()
                     // Deleting happens from the profile screen, not this form.
                     PlayerEvent.Deleted, is PlayerEvent.DeleteFailed -> Unit
                 }

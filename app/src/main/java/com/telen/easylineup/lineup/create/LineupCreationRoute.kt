@@ -4,10 +4,12 @@
 
 package com.telen.easylineup.lineup.create
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -30,6 +32,7 @@ import org.koin.androidx.compose.koinViewModel
 fun LineupCreationRoute(navController: NavController) {
     val viewModel = koinViewModel<LineupCreationViewModel>()
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     fun handleCancel() {
@@ -52,6 +55,16 @@ fun LineupCreationRoute(navController: NavController) {
                             popUpTo<Routes.Tournaments> { inclusive = false }
                         }
                     }
+                    LineupSaveFailed -> Toast.makeText(
+                        context,
+                        R.string.error_lineup_save_failed,
+                        Toast.LENGTH_LONG
+                    ).show()
+                    NewTournamentSaveFailed -> Toast.makeText(
+                        context,
+                        R.string.error_tournament_save_failed,
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
     }

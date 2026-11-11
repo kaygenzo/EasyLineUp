@@ -274,6 +274,23 @@ internal class LineupViewModelTest {
     }
 
     @Test
+    fun shouldReportAFailedSaveAndKeepTheDraftUnsaved() = runTest {
+        val lineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
+        loadLineup(lineup)
+        advanceUntilIdle()
+        runBlocking {
+            Mockito.`when`(saveLineupDraftUseCase(eq(lineup), any(), any()))
+                .thenReturn(Result.failure(IllegalStateException("db error")))
+        }
+        val events = collectEvents(viewModel.events)
+
+        viewModel.onSaveClick()
+        advanceUntilIdle()
+
+        assertEquals(listOf(LineupEvent.SaveFailed), events)
+    }
+
+    @Test
     fun shouldDeleteLineupThroughUseCase() = runTest {
         viewModel.lineupId = 1L
         runBlocking {
@@ -336,14 +353,14 @@ internal class LineupViewModelTest {
     }
 
     @Test
-    fun shouldSendNothingToShareWhenThePdfCannotBeWritten() = runTest {
+    fun shouldReportAShareFailureWhenThePdfCannotBeWritten() = runTest {
         Mockito.`when`(lineupPdfWriter.write(any())).thenThrow(IllegalStateException("disk full"))
         val events = collectEvents(viewModel.events)
 
         viewModel.onShareClick()
         advanceUntilIdle()
 
-        assertTrue(events.isEmpty())
+        assertEquals(listOf(LineupEvent.ShareFailed), events)
     }
 
     @Test

@@ -230,6 +230,17 @@
     <string name="error_need_assign_both_players_message">Pasirinkite ir DP, ir Flex</string>
     <string name="error_when_deleting_lineup">Trinant rikiuotę įvyko klaida</string>
     <string name="error_when_deleting_team">Trinant komandą įvyko klaida</string>
+    <string name="error_lineup_save_failed">Nepavyko išsaugoti rikiuotės. Bandykite dar
+        kartą.</string>
+    <string name="error_lineup_share_failed">Nepavyko paruošti rikiuotės bendrinimui. Bandykite dar
+        kartą.</string>
+    <string name="error_tournament_save_failed">Nepavyko sukurti turnyro. Bandykite dar
+        kartą.</string>
+    <string name="error_player_save_failed">Nepavyko išsaugoti žaidėjo. Bandykite dar
+        kartą.</string>
+    <string name="error_team_save_failed">Nepavyko išsaugoti komandos. Bandykite dar kartą.</string>
+    <string name="error_delete_all_data_failed">Nepavyko ištrinti duomenų. Niekas nebuvo ištrinta,
+        bandykite dar kartą.</string>
     <string name="create_player_favorite_positions">Mėgstamos pozicijos: (daugiausia 3)</string>
     <string name="create_player_pitching_side">Meta</string>
     <string name="create_player_batting_side">Muša</string>

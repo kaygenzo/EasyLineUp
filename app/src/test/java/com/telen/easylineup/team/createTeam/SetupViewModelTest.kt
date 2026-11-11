@@ -133,14 +133,14 @@ internal class SetupViewModelTest {
     }
 
     @Test
-    fun shouldSendNoEventWhenSaveTeamFailsForAnotherReason() = runTest {
+    fun shouldReportASaveTeamFailureForAnotherReason() = runTest {
         val exception = Exception("db error")
         runBlocking { Mockito.`when`(saveTeam(any())).thenReturn(Result.failure(exception)) }
         val events = collectEvents(viewModel.events)
 
         viewModel.onSaveClicked()
 
-        assertTrue(events.isEmpty())
+        assertEquals(listOf(SetupEvent.TeamSaveFailed), events)
     }
 
     @Test

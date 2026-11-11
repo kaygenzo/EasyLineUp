@@ -192,6 +192,12 @@
     <string name="error_need_assign_both_players_message">請同時選擇 DP 和 Flex</string>
     <string name="error_when_deleting_lineup">刪除陣容時發生問題</string>
     <string name="error_when_deleting_team">刪除球隊時發生問題</string>
+    <string name="error_lineup_save_failed">無法儲存陣容，請再試一次。</string>
+    <string name="error_lineup_share_failed">無法準備要分享的陣容，請再試一次。</string>
+    <string name="error_tournament_save_failed">無法建立賽事，請再試一次。</string>
+    <string name="error_player_save_failed">無法儲存球員，請再試一次。</string>
+    <string name="error_team_save_failed">無法儲存球隊，請再試一次。</string>
+    <string name="error_delete_all_data_failed">無法刪除資料。沒有刪除任何內容，請再試一次。</string>
     <string name="create_player_favorite_positions">擅長位置:(最多 3 個)</string>
     <string name="create_player_pitching_side">投球</string>
     <string name="create_player_batting_side">打擊</string>

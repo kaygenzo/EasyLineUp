@@ -108,6 +108,11 @@ fun LineupRoute(
             .collect { event ->
                 when (event) {
                     LineupEvent.Saved -> goBack()
+                    LineupEvent.SaveFailed -> Toast.makeText(
+                        context,
+                        R.string.error_lineup_save_failed,
+                        Toast.LENGTH_LONG
+                    ).show()
                     LineupEvent.Deleted -> goBack(showFixedView = false)
                     LineupEvent.DeleteFailed -> Toast.makeText(
                         context,
@@ -115,6 +120,11 @@ fun LineupRoute(
                         Toast.LENGTH_LONG
                     ).show()
                     is LineupEvent.ShareReady -> shareLineup(event)
+                    LineupEvent.ShareFailed -> Toast.makeText(
+                        context,
+                        R.string.error_lineup_share_failed,
+                        Toast.LENGTH_LONG
+                    ).show()
                     LineupEvent.DpFlexIncomplete -> FirebaseAnalyticsUtils.missingDpFlex(context)
                 }
             }

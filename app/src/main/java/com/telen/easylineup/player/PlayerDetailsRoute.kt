@@ -95,7 +95,9 @@ fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {
                             )
                             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                         }
-                        PlayerEvent.Saved, PlayerEvent.SaveRejected -> Unit
+                        PlayerEvent.Saved,
+                        PlayerEvent.SaveRejected,
+                        PlayerEvent.SaveFailed -> Unit
                     }
                 }
         }

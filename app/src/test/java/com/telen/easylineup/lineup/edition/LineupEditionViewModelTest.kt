@@ -160,7 +160,7 @@ internal class LineupEditionViewModelTest {
     }
 
     @Test
-    fun shouldNotSendAnyEventOnUnrelatedFailure() = runTest {
+    fun shouldReportAnUnrelatedFailure() = runTest {
         runBlocking {
             Mockito.`when`(saveLineupChanges(lineup, roster.players))
                 .thenReturn(Result.failure(Exception("db error")))
@@ -172,7 +172,7 @@ internal class LineupEditionViewModelTest {
         viewModel.save(lineup, roster)
         advanceUntilIdle()
 
-        assertTrue(events.isEmpty())
+        assertEquals(listOf(LineupUpdateFailed), events)
         job.cancel()
     }
 }

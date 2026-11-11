@@ -221,6 +221,17 @@
     <string name="error_need_assign_both_players_message">Alege atât DP-ul, cât și Flex-ul</string>
     <string name="error_when_deleting_lineup">A apărut o problemă la ștergerea formației</string>
     <string name="error_when_deleting_team">A apărut o problemă la ștergerea echipei</string>
+    <string name="error_lineup_save_failed">Formația nu a putut fi salvată. Încearcă din
+        nou.</string>
+    <string name="error_lineup_share_failed">Formația nu a putut fi pregătită pentru distribuire.
+        Încearcă din nou.</string>
+    <string name="error_tournament_save_failed">Turneul nu a putut fi creat. Încearcă din
+        nou.</string>
+    <string name="error_player_save_failed">Jucătorul nu a putut fi salvat. Încearcă din
+        nou.</string>
+    <string name="error_team_save_failed">Echipa nu a putut fi salvată. Încearcă din nou.</string>
+    <string name="error_delete_all_data_failed">Datele nu au putut fi șterse. Nu s-a șters nimic,
+        încearcă din nou.</string>
     <string name="create_player_favorite_positions">Poziții preferate: (max. 3)</string>
     <string name="create_player_pitching_side">Aruncă</string>
     <string name="create_player_batting_side">Bate</string>

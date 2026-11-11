@@ -24,6 +24,9 @@ import timber.log.Timber
 sealed interface SetupEvent {
     data object TeamSaved : SetupEvent
     data object TeamNameEmpty : SetupEvent
+
+    /** Saving failed for a reason the form can't point at: nothing was written. */
+    data object TeamSaveFailed : SetupEvent
 }
 
 /**
@@ -93,6 +96,7 @@ class SetupViewModel(
                         _events.send(SetupEvent.TeamNameEmpty)
                     } else {
                         Timber.e(throwable)
+                        _events.send(SetupEvent.TeamSaveFailed)
                     }
                 }
         }

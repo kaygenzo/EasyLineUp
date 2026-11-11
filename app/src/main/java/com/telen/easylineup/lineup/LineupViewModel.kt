@@ -101,11 +101,15 @@ data class ListAvailablePlayers(
  */
 sealed interface LineupEvent {
     data object Saved : LineupEvent
+
+    /** Nothing was written (one transaction): the draft is still there to save again. */
+    data object SaveFailed : LineupEvent
     data object Deleted : LineupEvent
     data object DeleteFailed : LineupEvent
 
     /** The PDF is written; the Route builds the share Intent with its own Context. */
     data class ShareReady(val pdfUri: Uri, val lineupName: String) : LineupEvent
+    data object ShareFailed : LineupEvent
 
     /** The DP/Flex link was refused for lacking one of the two players. */
     data object DpFlexIncomplete : LineupEvent
@@ -338,7 +342,10 @@ class LineupViewModel(
                     appliedRoster = null
                     _events.send(LineupEvent.Saved)
                 }
-                .onFailure { Timber.e(it) }
+                .onFailure {
+                    Timber.e(it)
+                    _events.send(LineupEvent.SaveFailed)
+                }
         }
     }
 
@@ -386,7 +393,10 @@ class LineupViewModel(
                 withContext(dispatcherProvider.io()) { lineupPdfWriter.write(data) }
             }
                 .onSuccess { uri -> _events.send(LineupEvent.ShareReady(uri, data.lineupName)) }
-                .onFailure { Timber.e(it) }
+                .onFailure {
+                    Timber.e(it)
+                    _events.send(LineupEvent.ShareFailed)
+                }
         }
     }
 

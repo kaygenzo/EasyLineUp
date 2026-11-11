@@ -191,6 +191,12 @@
     <string name="error_need_assign_both_players_message">DPとFlexの両方を選んでください</string>
     <string name="error_when_deleting_lineup">オーダーの削除中に問題が発生しました</string>
     <string name="error_when_deleting_team">チームの削除中に問題が発生しました</string>
+    <string name="error_lineup_save_failed">オーダーを保存できませんでした。もう一度お試しください。</string>
+    <string name="error_lineup_share_failed">共有用のオーダーを準備できませんでした。もう一度お試しください。</string>
+    <string name="error_tournament_save_failed">大会を作成できませんでした。もう一度お試しください。</string>
+    <string name="error_player_save_failed">選手を保存できませんでした。もう一度お試しください。</string>
+    <string name="error_team_save_failed">チームを保存できませんでした。もう一度お試しください。</string>
+    <string name="error_delete_all_data_failed">データを削除できませんでした。何も削除されていません。もう一度お試しください。</string>
     <string name="create_player_favorite_positions">得意なポジション:(最大3)</string>
     <string name="create_player_pitching_side">投</string>
     <string name="create_player_batting_side">打</string>

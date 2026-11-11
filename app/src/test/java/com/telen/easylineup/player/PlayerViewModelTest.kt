@@ -533,14 +533,14 @@ internal class PlayerViewModelTest {
     }
 
     @Test
-    fun shouldFlagNoFieldWhenSaveFailsForAnotherReason() = runTest {
+    fun shouldReportASaveFailureNoFieldCanPointAt() = runTest {
         stubSaveFailure(IllegalStateException("db error"))
 
         val events = collectEvents(viewModel.events)
 
         viewModel.onSaveClick()
 
-        assertTrue(events.isEmpty())
+        assertEquals(listOf(PlayerEvent.SaveFailed), events)
         val state = viewModel.uiState.value
         assertFalse(state.nameError)
         assertFalse(state.emailError)

@@ -223,6 +223,14 @@
     <string name="error_when_deleting_lineup">May nangyaring mali habang binubura ang
         lineup</string>
     <string name="error_when_deleting_team">May nangyaring mali habang binubura ang koponan</string>
+    <string name="error_lineup_save_failed">Hindi na-save ang lineup. Subukan ulit.</string>
+    <string name="error_lineup_share_failed">Hindi naihanda ang lineup para i-share. Subukan
+        ulit.</string>
+    <string name="error_tournament_save_failed">Hindi nagawa ang torneo. Subukan ulit.</string>
+    <string name="error_player_save_failed">Hindi na-save ang manlalaro. Subukan ulit.</string>
+    <string name="error_team_save_failed">Hindi na-save ang koponan. Subukan ulit.</string>
+    <string name="error_delete_all_data_failed">Hindi nabura ang data. Walang nabura, subukan
+        ulit.</string>
     <string name="create_player_favorite_positions">Mga paboritong posisyon: (Hanggang 3)</string>
     <string name="create_player_pitching_side">Pagbato</string>
     <string name="create_player_batting_side">Pagpalo</string>

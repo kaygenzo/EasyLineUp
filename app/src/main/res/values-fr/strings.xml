@@ -250,6 +250,18 @@
     <string name="player_form_title_edit">Modifier</string>
     <string name="error_when_deleting_lineup">Une erreur s\'est produite pendant la suppression du lineup</string>
     <string name="error_when_deleting_team">Une erreur s\'est produite pendant la suppression de l\'équipe</string>
+    <string name="error_lineup_save_failed">Impossible d\'enregistrer le lineup. Veuillez
+        réessayer.</string>
+    <string name="error_lineup_share_failed">Impossible de préparer le lineup pour le partage.
+        Veuillez réessayer.</string>
+    <string name="error_tournament_save_failed">Impossible de créer le tournoi. Veuillez
+        réessayer.</string>
+    <string name="error_player_save_failed">Impossible d\'enregistrer le joueur. Veuillez
+        réessayer.</string>
+    <string name="error_team_save_failed">Impossible d\'enregistrer l\'équipe. Veuillez
+        réessayer.</string>
+    <string name="error_delete_all_data_failed">Impossible de supprimer les données. Rien n\'a été
+        supprimé, veuillez réessayer.</string>
 
     <string name="tile_last_lineup_header">Dern. lineup</string>
 

@@ -37,6 +37,7 @@ import com.telen.easylineup.lineup.edition.EditLineupStep
 import com.telen.easylineup.lineup.edition.InvalidLineupName
 import com.telen.easylineup.lineup.edition.InvalidTournament
 import com.telen.easylineup.lineup.edition.LineupEditionViewModel
+import com.telen.easylineup.lineup.edition.LineupUpdateFailed
 import com.telen.easylineup.lineup.edition.LineupUpdated
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.TeamViewModel
@@ -126,6 +127,12 @@ fun TournamentListRoute(navController: NavController) {
                         editLineupTournamentError = context.getString(
                             R.string.lineup_creation_error_tournament_empty
                         )
+
+                    LineupUpdateFailed -> Toast.makeText(
+                        context,
+                        R.string.error_lineup_save_failed,
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
     }

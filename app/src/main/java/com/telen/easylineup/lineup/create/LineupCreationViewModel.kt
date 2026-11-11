@@ -46,6 +46,12 @@ import timber.log.Timber
 sealed class LineupCreationEvent
 data class LineupSaved(val lineupId: Long) : LineupCreationEvent()
 
+/** Writing the lineup failed for a reason the form can't point at: nothing was saved. */
+data object LineupSaveFailed : LineupCreationEvent()
+
+/** Writing the new tournament failed for a reason its sheet can't point at. */
+data object NewTournamentSaveFailed : LineupCreationEvent()
+
 /** Why the new tournament sheet refused its name - [LineupCreationRoute] resolves the text. */
 sealed interface NewTournamentError {
     data object NameEmpty : NewTournamentError
@@ -307,7 +313,10 @@ class LineupCreationViewModel(
                         is AlreadyExistingTournamentException -> showNewTournamentError(
                             NewTournamentError.NameTaken
                         )
-                        else -> Timber.e(throwable)
+                        else -> {
+                            Timber.e(throwable)
+                            _events.send(NewTournamentSaveFailed)
+                        }
                     }
                 }
         }
@@ -350,7 +359,10 @@ class LineupCreationViewModel(
                             _uiState.update { state -> state.copy(nameError = true) }
                         is TournamentNameEmptyException ->
                             _uiState.update { state -> state.copy(tournamentError = true) }
-                        else -> Timber.e(it)
+                        else -> {
+                            Timber.e(it)
+                            _events.send(LineupSaveFailed)
+                        }
                     }
                 }
         }

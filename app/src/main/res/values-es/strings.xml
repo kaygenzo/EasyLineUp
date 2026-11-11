@@ -224,6 +224,17 @@
     <string name="error_need_assign_both_players_message">Selecciona tu DP y tu Flex</string>
     <string name="error_when_deleting_lineup">Algo salió mal al eliminar la alineación</string>
     <string name="error_when_deleting_team">Algo salió mal al eliminar el equipo</string>
+    <string name="error_lineup_save_failed">No se pudo guardar la alineación. Inténtalo de
+        nuevo.</string>
+    <string name="error_lineup_share_failed">No se pudo preparar la alineación para compartirla.
+        Inténtalo de nuevo.</string>
+    <string name="error_tournament_save_failed">No se pudo crear el torneo. Inténtalo de
+        nuevo.</string>
+    <string name="error_player_save_failed">No se pudo guardar el jugador. Inténtalo de
+        nuevo.</string>
+    <string name="error_team_save_failed">No se pudo guardar el equipo. Inténtalo de nuevo.</string>
+    <string name="error_delete_all_data_failed">No se pudieron eliminar los datos. No se eliminó
+        nada, inténtalo de nuevo.</string>
     <string name="create_player_favorite_positions">Posiciones favoritas: (máx. 3)</string>
     <string name="create_player_pitching_side">Lanza</string>
     <string name="create_player_batting_side">Batea</string>

@@ -36,6 +36,9 @@ data object LineupUpdated : LineupEditionEvent()
 data object InvalidLineupName : LineupEditionEvent()
 data object InvalidTournament : LineupEditionEvent()
 
+/** Saving failed for a reason the sheet can't point at: nothing was written. */
+data object LineupUpdateFailed : LineupEditionEvent()
+
 /**
  * "Edit an existing lineup's fields/roster" service behind the Tournaments list's Edit Lineup
  * sheet, which saves straight to the database. (The Lineup screen's own roster sheet edits the
@@ -79,7 +82,10 @@ class LineupEditionViewModel(
                     when (throwable) {
                         is LineupNameEmptyException -> _events.send(InvalidLineupName)
                         is TournamentNameEmptyException -> _events.send(InvalidTournament)
-                        else -> Timber.e(throwable)
+                        else -> {
+                            Timber.e(throwable)
+                            _events.send(LineupUpdateFailed)
+                        }
                     }
                 }
         }

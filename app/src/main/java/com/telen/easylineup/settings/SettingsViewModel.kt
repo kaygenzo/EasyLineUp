@@ -51,6 +51,9 @@ data class ExportDataEventSuccess(
 /** One-shot actions a ViewModel can't do itself (navigate, start an Activity, log analytics). */
 sealed class SettingsEvent
 data object DeleteAllDataDone : SettingsEvent()
+
+/** Deleting all data failed: it runs in one transaction, so nothing was deleted. */
+data object DeleteAllDataFailed : SettingsEvent()
 data object ExportSucceeded : SettingsEvent()
 data object ExportFailed : SettingsEvent()
 data object ImportSucceeded : SettingsEvent()
@@ -151,7 +154,10 @@ class SettingsViewModel(
                     delay(DELAY)
                     _events.send(DeleteAllDataDone)
                 }
-                .onFailure { Timber.e(it) }
+                .onFailure {
+                    Timber.e(it)
+                    _events.send(DeleteAllDataFailed)
+                }
         }
     }
 

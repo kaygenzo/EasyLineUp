@@ -7,6 +7,7 @@ package com.telen.easylineup.team.createTeam
 import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -79,6 +80,11 @@ class TeamCreationActivity : BaseActivity() {
                         nameError = getString(R.string.team_creation_error_name_empty)
                         FirebaseAnalyticsUtils.emptyTeamName(this@TeamCreationActivity)
                     }
+                    SetupEvent.TeamSaveFailed -> Toast.makeText(
+                        this@TeamCreationActivity,
+                        R.string.error_team_save_failed,
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
             .launchIn(lifecycleScope)

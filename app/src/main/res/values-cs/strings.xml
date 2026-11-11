@@ -225,6 +225,15 @@
     <string name="error_need_assign_both_players_message">Vyberte DP i Flex</string>
     <string name="error_when_deleting_lineup">Při mazání sestavy se něco pokazilo</string>
     <string name="error_when_deleting_team">Při mazání týmu se něco pokazilo</string>
+    <string name="error_lineup_save_failed">Sestavu se nepodařilo uložit. Zkuste to znovu.</string>
+    <string name="error_lineup_share_failed">Sestavu se nepodařilo připravit ke sdílení. Zkuste to
+        znovu.</string>
+    <string name="error_tournament_save_failed">Turnaj se nepodařilo vytvořit. Zkuste to
+        znovu.</string>
+    <string name="error_player_save_failed">Hráče se nepodařilo uložit. Zkuste to znovu.</string>
+    <string name="error_team_save_failed">Tým se nepodařilo uložit. Zkuste to znovu.</string>
+    <string name="error_delete_all_data_failed">Data se nepodařilo smazat. Nic nebylo smazáno,
+        zkuste to znovu.</string>
     <string name="create_player_favorite_positions">Oblíbené pozice: (max. 3)</string>
     <string name="create_player_pitching_side">Hází</string>
     <string name="create_player_batting_side">Pálí</string>

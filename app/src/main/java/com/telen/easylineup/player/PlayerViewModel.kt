@@ -100,6 +100,9 @@ sealed interface PlayerEvent {
 
     /** Validation failed: [PlayerUiState]'s error flags say which field. */
     data object SaveRejected : PlayerEvent
+
+    /** Saving failed for a reason no field can point at: nothing was written. */
+    data object SaveFailed : PlayerEvent
     data object Deleted : PlayerEvent
     data class DeleteFailed(val detail: String) : PlayerEvent
 }
@@ -315,6 +318,7 @@ class PlayerViewModel(
                         _events.send(PlayerEvent.SaveRejected)
                     } else {
                         Timber.e(throwable)
+                        _events.send(PlayerEvent.SaveFailed)
                     }
                 }
         }

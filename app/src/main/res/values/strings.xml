@@ -269,6 +269,15 @@
 
     <string name="error_when_deleting_lineup">"Something wrong happened when deleting lineup"</string>
     <string name="error_when_deleting_team">Something wrong happened when deleting the team</string>
+    <string name="error_lineup_save_failed">Couldn\'t save the lineup. Please try again.</string>
+    <string name="error_lineup_share_failed">Couldn\'t prepare the lineup for sharing. Please try
+        again.</string>
+    <string name="error_tournament_save_failed">Couldn\'t create the tournament. Please try
+        again.</string>
+    <string name="error_player_save_failed">Couldn\'t save the player. Please try again.</string>
+    <string name="error_team_save_failed">Couldn\'t save the team. Please try again.</string>
+    <string name="error_delete_all_data_failed">Couldn\'t delete the data. Nothing was deleted,
+        please try again.</string>
     <string name="create_player_favorite_positions">Favorite positions: (Max 3)</string>
     <string name="create_player_pitching_side">Pitching</string>
     <string name="create_player_batting_side">Batting</string>

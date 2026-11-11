@@ -230,6 +230,14 @@
         della formazione</string>
     <string name="error_when_deleting_team">Si è verificato un problema durante l\'eliminazione
         della squadra</string>
+    <string name="error_lineup_save_failed">Impossibile salvare la formazione. Riprova.</string>
+    <string name="error_lineup_share_failed">Impossibile preparare la formazione da condividere.
+        Riprova.</string>
+    <string name="error_tournament_save_failed">Impossibile creare il torneo. Riprova.</string>
+    <string name="error_player_save_failed">Impossibile salvare il giocatore. Riprova.</string>
+    <string name="error_team_save_failed">Impossibile salvare la squadra. Riprova.</string>
+    <string name="error_delete_all_data_failed">Impossibile eliminare i dati. Non è stato eliminato
+        nulla, riprova.</string>
     <string name="create_player_favorite_positions">Ruoli preferiti: (max 3)</string>
     <string name="create_player_pitching_side">Lancia</string>
     <string name="create_player_batting_side">Batte</string>

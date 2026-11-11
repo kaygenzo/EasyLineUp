@@ -224,6 +224,17 @@
     <string name="error_need_assign_both_players_message">Selecione o DP e o Flex</string>
     <string name="error_when_deleting_lineup">Algo deu errado ao excluir a escalação</string>
     <string name="error_when_deleting_team">Algo deu errado ao excluir o time</string>
+    <string name="error_lineup_save_failed">Não foi possível salvar a escalação. Tente
+        novamente.</string>
+    <string name="error_lineup_share_failed">Não foi possível preparar a escalação para
+        compartilhar. Tente novamente.</string>
+    <string name="error_tournament_save_failed">Não foi possível criar o torneio. Tente
+        novamente.</string>
+    <string name="error_player_save_failed">Não foi possível salvar o jogador. Tente
+        novamente.</string>
+    <string name="error_team_save_failed">Não foi possível salvar o time. Tente novamente.</string>
+    <string name="error_delete_all_data_failed">Não foi possível excluir os dados. Nada foi
+        excluído, tente novamente.</string>
     <string name="create_player_favorite_positions">Posições favoritas: (máx. 3)</string>
     <string name="create_player_pitching_side">Arremessa</string>
     <string name="create_player_batting_side">Rebate</string>
