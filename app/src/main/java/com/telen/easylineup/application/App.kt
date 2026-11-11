@@ -4,10 +4,10 @@
 
 package com.telen.easylineup.application
 
+import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.multidex.MultiDexApplication
 import com.google.firebase.appcheck.ktx.appCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -21,7 +21,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
 
-open class App : MultiDexApplication() {
+open class App : Application() {
     override fun onCreate() {
         super.onCreate()
 

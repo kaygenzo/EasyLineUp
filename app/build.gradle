@@ -57,9 +57,6 @@ android {
         }
     }
 
-    useLibrary 'android.test.runner'
-    useLibrary 'android.test.base'
-    useLibrary 'android.test.mock'
 
     flavorDimensions 'version'
 
@@ -144,7 +141,6 @@ android {
     }
 
     buildFeatures {
-        viewBinding true
         buildConfig true
         compose true
     }
@@ -162,7 +158,6 @@ composeCompiler {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    implementation libs.kotlin
     implementation libs.annotation
 
     // Testing-only dependencies
@@ -191,7 +186,6 @@ dependencies {
     ////////// ANDROID X //////////
 
     implementation libs.activity
-    implementation libs.fragment
 
     // Compose
     implementation platform(libs.compose.bom)
@@ -201,9 +195,7 @@ dependencies {
     implementation libs.compose.activity
     implementation libs.lifecycle.runtime.compose
     debugImplementation libs.compose.ui.tooling
-    implementation libs.recyclerView
     implementation libs.preference
-    implementation libs.constraintlayout
 
     // ViewModel
     implementation libs.viewmodel
@@ -214,7 +206,6 @@ dependencies {
     implementation libs.kotlinx.coroutines.android
     implementation libs.kotlinx.collections.immutable
 
-    implementation libs.multidex
     implementation libs.navigation.compose
     implementation libs.kotlinx.serialization.json
     implementation libs.documentFile
@@ -240,11 +231,8 @@ dependencies {
 
     implementation libs.timber
     implementation libs.coil.compose
-    implementation libs.rounedImage
     implementation libs.koin
     implementation libs.koin.androidx.compose
-    implementation libs.taptaptarget
-    implementation libs.dexter
     implementation libs.licenser
     implementation libs.colorPicker
 

@@ -7,15 +7,12 @@ kotlinxCollectionsImmutableVersion = "0.3.8"
 androidGradlePluginVersion = "9.1.0"
 # Jetpack
 splashscreenVersion = "1.0.1"
-recyclerViewVersion = "1.4.0"
 preferenceVersion = "1.2.1"
-constraintLayoutVersion = "2.2.1"
 documentFileVersion = "1.1.0"
 coreVersion = "1.16.0"
 navigationVersion = "2.9.7"
 lifecycleVersion = "2.9.1"
 roomVersion = "2.7.1"
-fragmentVersion = "1.8.9"
 activityVersion = "1.10.1"
 composeBomVersion = "2025.09.01"
 # Tests
@@ -30,15 +27,11 @@ junit4Version = "4.13.2"
 # Others
 timberVersion = "5.0.1"
 kotlinxCoroutinesVersion = "1.9.0"
-roundedImageView = "2.3.0"
-dexterVersion = "6.2.3"
 colorPickerVersion = "2.0.6"
 licenserVersion = "2.0.0"
 coilVersion = "2.7.0"
-taptargetviewVersion = "1.13.3"
 koinVersion = "4.1.0"
 annotationVersion = "1.9.1"
-multidexVersion = "2.0.1"
 # Google
 firebaseBOMVersion = "32.2.2"
 materialVersion = "1.13.0"
@@ -61,7 +54,6 @@ firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx"
 firebase-appcheck-ktx = { module = "com.google.firebase:firebase-appcheck-ktx" }
 firebase-appcheck-playintegrity = { module = "com.google.firebase:firebase-appcheck-playintegrity" }
 firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx" }
-kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk7", version.ref = "kotlinVersion" }
 annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotationVersion" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlinVersion" }
@@ -76,14 +68,9 @@ tests-uiAutomator = { group = "androidx.test.uiautomator", name = "uiautomator",
 tests-junit = { group = "androidx.test.ext", name = "junit", version.ref = "extJUnitVersion" }
 junit4 = { group = "junit", name = "junit", version.ref = "junit4Version" }
 activity = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityVersion" }
-fragment = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentVersion" }
-recyclerView = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerViewVersion" }
 preference = { group = "androidx.preference", name = "preference-ktx", version.ref = "preferenceVersion" }
-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintLayoutVersion" }
 viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleVersion" }
-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleVersion" }
 lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleVersion" }
-multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidexVersion" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationVersion" }
 documentFile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentFileVersion" }
 splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreenVersion" }
@@ -96,7 +83,6 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesVersion" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutableVersion" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilVersion" }
-rounedImage = { group = "com.makeramen", name = "roundedimageview", version.ref = "roundedImageView" }
 koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koinVersion" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectricVersion" }
 roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazziVersion" }
@@ -106,8 +92,6 @@ koin-test = { group = "io.insert-koin", name = "koin-test-junit4", version.ref =
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koinVersion" }
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koinVersion" }
 detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detektPluginVersion" }
-taptaptarget = { group = "com.getkeepsafe.taptargetview", name = "taptargetview", version.ref = "taptargetviewVersion" }
-dexter = { group = "com.karumi", name = "dexter", version.ref = "dexterVersion" }
 licenser = { group = "com.github.marcoscgdev", name = "Licenser", version.ref = "licenserVersion" }
 colorPicker = { group = "com.github.skydoves", name = "colorpickerpreference", version.ref = "colorPickerVersion" }
 material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }

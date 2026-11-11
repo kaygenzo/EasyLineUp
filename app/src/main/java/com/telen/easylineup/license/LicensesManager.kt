@@ -13,15 +13,9 @@ import com.telen.easylineup.R
 object LicensesManager {
     private val libraries = listOf(
         Library("Timber", "https://github.com/JakeWharton/timber", License.APACHE2),
-        Library("RxJava", "https://github.com/ReactiveX/RxJava", License.APACHE2),
-        Library("RxAndroid", "https://github.com/ReactiveX/RxAndroid", License.APACHE2),
         Library("Coil", "https://github.com/coil-kt/coil", License.APACHE2),
-        Library("RoundedImageView", "https://github.com/vinc3m1/RoundedImageView", License.APACHE2),
         Library("Koin", "https://github.com/InsertKoinIO/koin", License.APACHE2),
-        Library("TapTargetView", "https://github.com/KeepSafe/TapTargetView", License.APACHE2),
-        Library("Dexter", "https://github.com/Karumi/Dexter", License.APACHE2),
         Library("Licenser", "https://github.com/marcoscgdev/Licenser", License.MIT),
-        Library("LeakCanary", "https://github.com/square/leakcanary", License.APACHE2),
         Library(
             "ColorPickerPreference",
             "https://github.com/skydoves/ColorPickerPreference",
@@ -34,29 +28,13 @@ object LicensesManager {
             License.APACHE2
         ),
         Library(
-            "Fragment",
-            "https://developer.android.com/jetpack/androidx/releases/fragment",
-            License.APACHE2
-        ),
-        Library(
             "Core",
             "https://developer.android.com/jetpack/androidx/releases/core",
             License.APACHE2
         ),
-        Library(
-            "RecyclerView",
-            "https://github.com/androidx-releases/Recyclerview",
-            License.APACHE2
-        ),
         Library("Preference", "https://github.com/androidx-releases/Preference", License.APACHE2),
-        Library(
-            "ConstraintLayout",
-            "https://github.com/androidx-releases/ConstraintLayout",
-            License.APACHE2
-        ),
         Library("Appcompat", "https://github.com/androidx-releases/Appcompat", License.APACHE2),
         Library("Lifecycle", "https://github.com/androidx-releases/Lifecycle", License.APACHE2),
-        Library("Multidex", "https://github.com/androidx-releases/Multidex", License.APACHE2),
         Library("Navigation", "https://github.com/androidx-releases/Navigation", License.APACHE2),
         Library(
             "DocumentFile",
@@ -75,9 +53,7 @@ object LicensesManager {
         Library("Firebase", "https://github.com/firebase/firebase-android-sdk", License.APACHE2),
         // test
         Library("AndroidX Test", "https://github.com/androidx-releases/Test", License.APACHE2),
-        Library("Barista", "https://github.com/AdevintaSpain/Barista", License.APACHE2),
         Library("Fastlane", "https://github.com/fastlane/fastlane", License.MIT),
-        Library("RxIdler", "https://github.com/square/RxIdler", License.APACHE2),
         Library("Mockito", "https://github.com/mockito/mockito", License.MIT),
         Library("Mockito Kotlin", "https://github.com/mockito/mockito-kotlin", License.MIT),
         Library("Detekt", "https://github.com/detekt/detekt", License.APACHE2),
