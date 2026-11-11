@@ -35,11 +35,11 @@ def hasReleaseKeystore = releaseStoreFile != null && releaseStoreFile.exists()
 
 android {
     namespace "com.telen.easylineup"
-    compileSdkVersion compileVersion
+    compileSdk compileVersion
     defaultConfig {
         applicationId "com.telen.easylineup"
-        minSdkVersion minVersion
-        targetSdkVersion targetVersion
+        minSdk minVersion
+        targetSdk targetVersion
         versionCode appVersionCode
         versionName appVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -122,7 +122,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    packagingOptions {
+    packaging {
         resources {
             excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE', 'META-INF/LICENSE.txt', 'META-INF/license.txt', 'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'META-INF/notice.txt', 'META-INF/ASL2.0']
         }

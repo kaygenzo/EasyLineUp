@@ -3,16 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
 }
 
-repositories {
-    maven { url 'https://jitpack.io' }
-}
-
-def sonarPropertiesFile = rootProject.file("sonar.properties")
-def sonarProperties = new Properties()
-if (sonarPropertiesFile.exists()) {
-    sonarProperties.load(new FileInputStream(sonarPropertiesFile))
-}
-
 kotlin {
     jvmToolchain(17)
 }

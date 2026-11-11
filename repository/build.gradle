@@ -5,10 +5,10 @@ plugins {
 }
 
 android {
-    compileSdkVersion compileVersion
+    compileSdk compileVersion
 
     defaultConfig {
-        minSdkVersion minVersion
+        minSdk minVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
     }
