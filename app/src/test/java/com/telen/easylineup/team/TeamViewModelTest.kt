@@ -12,9 +12,14 @@ import com.telen.easylineup.domain.usecases.DeleteTeam
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObservePlayers
 import com.telen.easylineup.domain.usecases.SortPlayers
+import com.telen.easylineup.domain.usecases.exceptions.NoTeamsLeftException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -122,13 +127,34 @@ internal class TeamViewModelTest {
         assertEquals(listOf(bob, alice), viewModel.uiState.value.players)
     }
 
+    /** Starts collecting [flow] on the test scheduler, for the rest of the test. */
+    private fun <T> TestScope.collectEvents(flow: Flow<T>): List<T> {
+        val events = mutableListOf<T>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { flow.toList(events) }
+        return events
+    }
+
     @Test
     fun shouldDeleteTeamSuccessfully() = runTest {
         runBlocking { Mockito.`when`(deleteTeamUseCase(team)).thenReturn(Result.success(Unit)) }
+        val events = collectEvents(viewModel.events)
 
-        val result = viewModel.deleteTeam(team)
+        viewModel.onDeleteTeam(team)
 
-        assertTrue(result.isSuccess)
+        assertEquals(listOf(TeamEvent.TeamDeleted), events)
+    }
+
+    @Test
+    fun shouldTreatDeletingTheLastTeamAsADelete() = runTest {
+        runBlocking {
+            Mockito.`when`(deleteTeamUseCase(team))
+                .thenReturn(Result.failure(NoTeamsLeftException()))
+        }
+        val events = collectEvents(viewModel.events)
+
+        viewModel.onDeleteTeam(team)
+
+        assertEquals(listOf(TeamEvent.TeamDeleted), events)
     }
 
     @Test
@@ -138,8 +164,10 @@ internal class TeamViewModelTest {
             Mockito.`when`(deleteTeamUseCase(team)).thenReturn(Result.failure(exception))
         }
 
-        val result = viewModel.deleteTeam(team)
+        val events = collectEvents(viewModel.events)
 
-        assertTrue(result.isFailure)
+        viewModel.onDeleteTeam(team)
+
+        assertEquals(listOf(TeamEvent.TeamDeleteFailed), events)
     }
 }

@@ -9,15 +9,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
@@ -25,9 +29,6 @@ import com.telen.easylineup.domain.model.getStrategies
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -39,10 +40,13 @@ import org.koin.androidx.compose.koinViewModel
 fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {
     val teamViewModel = koinViewModel<TeamViewModel>()
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
     val teamUiState by teamViewModel.uiState.collectAsStateWithLifecycle()
 
-    var showDeleteAction by remember { mutableStateOf<(suspend () -> Result<Unit>)?>(null) }
+    // The player a delete was asked for. It stays set until that delete reports back, since
+    // its pager page - and the collector it could have had - goes away with the player.
+    var pendingDeletePlayerId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var showDeleteSheet by rememberSaveable { mutableStateOf(false) }
 
     val ids = remember(teamUiState.players) { teamUiState.players.map { it.id } }
     if (ids.isNotEmpty()) {
@@ -62,39 +66,61 @@ fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {
                     FirebaseAnalyticsUtils.onClick(context, "click_player_details_edit")
                     navController.navigate(Routes.PlayerEdit(playerId))
                 },
-                onDeleteRequested = { showDeleteAction = it }
+                onDeleteRequested = { playerId ->
+                    pendingDeletePlayerId = playerId
+                    showDeleteSheet = true
+                }
             )
         }
     }
 
-    showDeleteAction?.let { deleteAction ->
-        ConfirmSheet(
-            title = stringResource(R.string.dialog_delete_player_title),
-            message = stringResource(R.string.dialog_delete_cannot_undo_message),
-            confirmLabel = stringResource(R.string.action_delete),
-            cancelLabel = stringResource(R.string.cancel_button),
-            onDismiss = { showDeleteAction = null },
-            onConfirm = {
-                FirebaseAnalyticsUtils.onClick(context, "click_player_details_delete")
-                coroutineScope.launch {
-                    deleteAction()
-                        .onSuccess {
-                            // See the matching comment in PlayerEditRoute's save flow - the
-                            // explicit main-thread dispatch is needed for the same reason.
-                            withContext(Dispatchers.Main) {
-                                navController.popBackStack(Routes.Roster, false)
-                            }
+    pendingDeletePlayerId?.let { playerId ->
+        // Same key as the pager page's own PlayerViewModel: this is that page's instance, so
+        // the delete runs in a scope that outlives both the sheet and the page.
+        val deleteViewModel = koinViewModel<PlayerViewModel>(key = playerId.toString())
+        LaunchedEffect(deleteViewModel) {
+            deleteViewModel.events
+                .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .collect { event ->
+                    when (event) {
+                        PlayerEvent.Deleted -> {
+                            pendingDeletePlayerId = null
+                            navController.popBackStack(Routes.Roster, false)
                         }
-                        .onFailure {
+                        is PlayerEvent.DeleteFailed -> {
+                            pendingDeletePlayerId = null
                             val message = context.getString(
                                 R.string.generic_error_with_detail,
-                                it.message.orEmpty()
+                                event.detail
                             )
                             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                         }
+                        PlayerEvent.Saved, PlayerEvent.SaveRejected -> Unit
+                    }
                 }
-            }
-        )
+        }
+
+        if (showDeleteSheet) {
+            ConfirmSheet(
+                title = stringResource(R.string.dialog_delete_player_title),
+                message = stringResource(R.string.dialog_delete_cannot_undo_message),
+                confirmLabel = stringResource(R.string.action_delete),
+                cancelLabel = stringResource(R.string.cancel_button),
+                onDismiss = {
+                    showDeleteSheet = false
+                    pendingDeletePlayerId = null
+                },
+                onConfirm = {
+                    FirebaseAnalyticsUtils.onClick(context, "click_player_details_delete")
+                    showDeleteSheet = false
+                    // Normally already set by the page; setting it again would reload the player.
+                    if (deleteViewModel.playerId != playerId) {
+                        deleteViewModel.playerId = playerId
+                    }
+                    deleteViewModel.onDeleteConfirmed()
+                }
+            )
+        }
     }
 }
 
@@ -103,7 +129,7 @@ private fun PlayerProfilePage(
     playerId: Long,
     onBackClick: () -> Unit,
     onEditRequested: (Long) -> Unit,
-    onDeleteRequested: (suspend () -> Result<Unit>) -> Unit
+    onDeleteRequested: (Long) -> Unit
 ) {
     val context = LocalContext.current
     val viewModel = koinViewModel<PlayerViewModel>(key = playerId.toString())
@@ -133,6 +159,6 @@ private fun PlayerProfilePage(
         },
         onBackClick = onBackClick,
         onEditClick = { onEditRequested(playerId) },
-        onDeleteClick = { onDeleteRequested(viewModel::deletePlayer) }
+        onDeleteClick = { onDeleteRequested(playerId) }
     )
 }

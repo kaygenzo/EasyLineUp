@@ -14,9 +14,13 @@ import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.ObserveAllTournamentsWithLineups
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -206,6 +210,13 @@ internal class LineupListViewModelTest {
         assertEquals(location, viewModel.uiState.value.mapsByTournamentId[1L])
     }
 
+    /** Starts collecting [flow] on the test scheduler, for the rest of the test. */
+    private fun <T> TestScope.collectEvents(flow: Flow<T>): List<T> {
+        val events = mutableListOf<T>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { flow.toList(events) }
+        return events
+    }
+
     @Test
     fun shouldDeleteTournament() = runTest {
         advanceUntilIdle()
@@ -214,10 +225,12 @@ internal class LineupListViewModelTest {
             Mockito.`when`(deleteTournamentLineups(tournament)).thenReturn(Result.success(Unit))
         }
 
-        val result = viewModel.deleteTournament(tournament)
+        val events = collectEvents(viewModel.events)
+
+        viewModel.onDeleteTournament(tournament)
         advanceUntilIdle()
 
-        assertTrue(result.isSuccess)
+        assertTrue(events.isEmpty())
         runBlocking { Mockito.verify(deleteTournamentLineups)(tournament) }
     }
 
@@ -231,8 +244,11 @@ internal class LineupListViewModelTest {
                 .thenReturn(Result.failure(exception))
         }
 
-        val result = viewModel.deleteTournament(tournament)
+        val events = collectEvents(viewModel.events)
 
-        assertTrue(result.isFailure)
+        viewModel.onDeleteTournament(tournament)
+        advanceUntilIdle()
+
+        assertEquals(listOf(TournamentDeleteFailed("db error")), events)
     }
 }

@@ -6,12 +6,10 @@
 
 package com.telen.easylineup.lineup
 
-import android.content.Context
-import android.content.Intent
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.BuildConfig
-import com.telen.easylineup.R
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
@@ -44,6 +42,7 @@ import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
+import com.telen.easylineup.domain.usecases.runCatchingCancellable
 import com.telen.easylineup.utils.LineupExportData
 import com.telen.easylineup.utils.LineupPdfWriter
 import kotlinx.collections.immutable.ImmutableList
@@ -51,12 +50,15 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -93,6 +95,23 @@ data class ListAvailablePlayers(
     val players: List<PlayerWithPosition>,
     val position: FieldPosition
 ) : EventCase()
+
+/**
+ * One-shot outcomes [LineupRoute] acts on - navigation, the share sheet, a toast, analytics.
+ * The work behind each one runs in [LineupViewModel]'s own scope, so leaving the screen or
+ * rotating it never cancels a save or a delete halfway.
+ */
+sealed interface LineupEvent {
+    data object Saved : LineupEvent
+    data object Deleted : LineupEvent
+    data object DeleteFailed : LineupEvent
+
+    /** The PDF is written; the Route builds the share Intent with its own Context. */
+    data class ShareReady(val pdfUri: Uri, val lineupName: String) : LineupEvent
+
+    /** The DP/Flex link was refused for lacking one of the two players. */
+    data object DpFlexIncomplete : LineupEvent
+}
 
 const val FRAGMENT_DEFENSE_INDEX = 0
 const val FRAGMENT_ATTACK_INDEX = 1
@@ -147,6 +166,10 @@ class LineupViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LineupUiState())
     val uiState: StateFlow<LineupUiState> = _uiState.asStateFlow()
+
+    private val _events = Channel<LineupEvent>(Channel.BUFFERED)
+    val events: Flow<LineupEvent> = _events.receiveAsFlow()
+    private var shareJob: Job? = null
 
     private val _listPlayersWithPosition: MutableList<PlayerWithPosition> = mutableListOf()
     private var teamTypeId: Int = TeamType.UNKNOWN.id
@@ -265,14 +288,27 @@ class LineupViewModel(
         }
     }
 
-    suspend fun save(): Result<Unit> {
-        return lineup?.let {
-            saveBattingOrderAndPositionsUseCase(it, _listPlayersWithPosition)
-        } ?: Result.failure(IllegalArgumentException("Lineup is not supposed to be null"))
+    fun onSaveClick() {
+        val currentLineup = lineup ?: run {
+            Timber.e(IllegalStateException("Cannot save: the lineup is not loaded"))
+            return
+        }
+        viewModelScope.launch {
+            saveBattingOrderAndPositionsUseCase(currentLineup, _listPlayersWithPosition)
+                .onSuccess { _events.send(LineupEvent.Saved) }
+                .onFailure { Timber.e(it) }
+        }
     }
 
-    suspend fun deleteLineup(): Result<Unit> {
-        return deleteLineupUseCase(lineupId)
+    fun onDeleteConfirmed() {
+        viewModelScope.launch {
+            deleteLineupUseCase(lineupId)
+                .onSuccess { _events.send(LineupEvent.Deleted) }
+                .onFailure {
+                    Timber.e(it)
+                    _events.send(LineupEvent.DeleteFailed)
+                }
+        }
     }
 
     fun onLineupModeChanged(isEnabled: Boolean) {
@@ -289,8 +325,10 @@ class LineupViewModel(
         }
     }
 
-    suspend fun exportLineupToExternalStorage(context: Context): Intent {
-        return withContext(dispatcherProvider.io()) {
+    /** Writes the lineup card as a PDF, then hands it over as [LineupEvent.ShareReady]. */
+    fun onShareClick() {
+        shareJob?.cancel()
+        shareJob = viewModelScope.launch {
             val currentLineup = lineup
             val state = _uiState.value
             val data = LineupExportData(
@@ -301,14 +339,11 @@ class LineupViewModel(
                 battingOrder = state.batters,
                 defensePlayers = state.defensePlayers
             )
-            val uri = lineupPdfWriter.write(data)
-            val message = context.getString(R.string.share_lineup_subject, data.lineupName)
-            Intent(Intent.ACTION_SEND).apply {
-                putExtra(Intent.EXTRA_SUBJECT, message)
-                type = "application/pdf"
-                putExtra(Intent.EXTRA_STREAM, uri)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            runCatchingCancellable {
+                withContext(dispatcherProvider.io()) { lineupPdfWriter.write(data) }
             }
+                .onSuccess { uri -> _events.send(LineupEvent.ShareReady(uri, data.lineupName)) }
+                .onFailure { Timber.e(it) }
         }
     }
 
@@ -456,25 +491,29 @@ class LineupViewModel(
             }
     }
 
-    /** Returns the failure (if any) so the Route can log the exception-specific analytics. */
-    suspend fun linkDpAndFlex(dp: Player?, flex: Player?): Result<Unit> {
-        val currentLineup = lineup
-            ?: return Result.failure(IllegalStateException("Lineup cannot be null"))
-        return saveDpAndFlexUseCase(currentLineup, dp, flex, _listPlayersWithPosition)
-            .onSuccess {
-                recomputeAndPublish()
-                _uiState.update { it.copy(dpFlexEvent = null) }
-            }
-            .onFailure { throwable ->
-                if (throwable is NeedAssignBothPlayersException) {
-                    Timber.w(throwable.message)
-                    _uiState.update {
-                        it.copy(infoMessage = LineupInfoMessage.BothDpAndFlexRequired)
-                    }
-                } else {
-                    Timber.e(throwable)
+    fun onDpFlexLinked(dp: Player?, flex: Player?) {
+        val currentLineup = lineup ?: run {
+            Timber.e(IllegalStateException("Cannot link DP and Flex: the lineup is not loaded"))
+            return
+        }
+        viewModelScope.launch {
+            saveDpAndFlexUseCase(currentLineup, dp, flex, _listPlayersWithPosition)
+                .onSuccess {
+                    recomputeAndPublish()
+                    _uiState.update { it.copy(dpFlexEvent = null) }
                 }
-            }
+                .onFailure { throwable ->
+                    if (throwable is NeedAssignBothPlayersException) {
+                        Timber.w(throwable.message)
+                        _uiState.update {
+                            it.copy(infoMessage = LineupInfoMessage.BothDpAndFlexRequired)
+                        }
+                        _events.send(LineupEvent.DpFlexIncomplete)
+                    } else {
+                        Timber.e(throwable)
+                    }
+                }
+        }
     }
 
     fun onBattersChanged(batters: List<BatterState>) {

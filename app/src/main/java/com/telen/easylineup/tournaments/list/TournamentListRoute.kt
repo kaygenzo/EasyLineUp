@@ -99,6 +99,18 @@ fun TournamentListRoute(navController: NavController) {
         }
     }
 
+    LaunchedEffect(viewModel) {
+        viewModel.events
+            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .collect { event ->
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.generic_error_with_detail, event.detail),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+    }
+
     LaunchedEffect(editionViewModel) {
         editionViewModel.events
             .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
@@ -181,20 +193,7 @@ fun TournamentListRoute(navController: NavController) {
             onDismiss = { tournamentPendingDeletion = null },
             onConfirm = {
                 FirebaseAnalyticsUtils.onClick(context, "click_tournaments_delete")
-                coroutineScope.launch {
-                    viewModel.deleteTournament(tournament)
-                        .onFailure { throwable ->
-                            Timber.e(throwable)
-                            Toast.makeText(
-                                context,
-                                context.getString(
-                                    R.string.generic_error_with_detail,
-                                    throwable.message.orEmpty()
-                                ),
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                }
+                viewModel.onDeleteTournament(tournament)
             }
         )
     }

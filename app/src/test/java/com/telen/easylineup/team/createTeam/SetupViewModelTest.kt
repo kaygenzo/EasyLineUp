@@ -9,9 +9,19 @@ import androidx.lifecycle.SavedStateHandle
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.SaveTeam
+import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -41,7 +51,20 @@ internal class SetupViewModelTest {
 
     @Before
     fun setup() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
         viewModel = SetupViewModel(SavedStateHandle(), saveTeam)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    /** Starts collecting [flow] on the test scheduler, for the rest of the test. */
+    private fun <T> TestScope.collectEvents(flow: Flow<T>): List<T> {
+        val events = mutableListOf<T>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { flow.toList(events) }
+        return events
     }
 
     @Test
@@ -102,21 +125,34 @@ internal class SetupViewModelTest {
         val savedTeam = Team(id = 1L, name = "Panthers", type = TeamType.BASEBALL.id, main = true)
         runBlocking { Mockito.`when`(saveTeam(any())).thenReturn(Result.success(savedTeam)) }
 
-        val result = viewModel.onSaveClicked()
+        val events = collectEvents(viewModel.events)
 
-        assertTrue(result.isSuccess)
-        assertEquals(savedTeam, result.getOrNull())
+        viewModel.onSaveClicked()
+
+        assertEquals(listOf(SetupEvent.TeamSaved), events)
     }
 
     @Test
-    fun shouldPropagateFailureFromSaveTeamUseCase() = runTest {
+    fun shouldSendNoEventWhenSaveTeamFailsForAnotherReason() = runTest {
         val exception = Exception("db error")
         runBlocking { Mockito.`when`(saveTeam(any())).thenReturn(Result.failure(exception)) }
+        val events = collectEvents(viewModel.events)
 
-        val result = viewModel.onSaveClicked()
+        viewModel.onSaveClicked()
 
-        assertFalse(result.isSuccess)
-        assertEquals(exception, result.exceptionOrNull())
+        assertTrue(events.isEmpty())
+    }
+
+    @Test
+    fun shouldReportAnEmptyTeamName() = runTest {
+        runBlocking {
+            Mockito.`when`(saveTeam(any())).thenReturn(Result.failure(NameEmptyException()))
+        }
+        val events = collectEvents(viewModel.events)
+
+        viewModel.onSaveClicked()
+
+        assertEquals(listOf(SetupEvent.TeamNameEmpty), events)
     }
 
     @Test

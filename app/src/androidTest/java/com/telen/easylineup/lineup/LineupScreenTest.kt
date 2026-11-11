@@ -132,9 +132,9 @@ class LineupScreenTest {
 
     @Test
     fun savingAfterReassigningPositionPersistsAndNavigatesToTournaments() {
-        // This is the exact flow whose post-save navigation had a real main-thread-crash bug
-        // fixed this session (see LineupRoute's onSaveClick - withContext(Dispatchers.Main))
-        // - nothing previously locked it against a regression.
+        // This flow's post-save navigation once crashed off the main thread, when the save ran
+        // in the screen's own coroutine scope; it now runs in LineupViewModel's scope and
+        // reports back with LineupEvent.Saved, collected on the main thread.
         composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))
 

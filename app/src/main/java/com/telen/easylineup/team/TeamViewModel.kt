@@ -17,10 +17,13 @@ import com.telen.easylineup.domain.usecases.DeleteTeam
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObservePlayers
 import com.telen.easylineup.domain.usecases.SortPlayers
+import com.telen.easylineup.domain.usecases.exceptions.NoTeamsLeftException
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +32,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -47,6 +51,12 @@ data class TeamUiState(
     val sortType: PlayerSortType = PlayerSortType.ALPHA
 )
 
+/** One-shot outcomes of a team deletion, for the Route to navigate or show a toast. */
+sealed interface TeamEvent {
+    data object TeamDeleted : TeamEvent
+    data object TeamDeleteFailed : TeamEvent
+}
+
 class TeamViewModel(
     private val getTeamUseCase: GetTeam,
     private val deleteTeamUseCase: DeleteTeam,
@@ -55,6 +65,9 @@ class TeamViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TeamUiState())
     val uiState: StateFlow<TeamUiState> = _uiState.asStateFlow()
+
+    private val _events = Channel<TeamEvent>(Channel.BUFFERED)
+    val events: Flow<TeamEvent> = _events.receiveAsFlow()
 
     private val _team: MutableSharedFlow<Team> =
         MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
@@ -106,5 +119,21 @@ class TeamViewModel(
         _uiState.update { it.copy(isLoading = false, players = sorted.toImmutableList()) }
     }
 
-    suspend fun deleteTeam(team: Team): Result<Unit> = deleteTeamUseCase(team)
+    /** Deletes [team] in this ViewModel's scope, so leaving the screen can't cancel it. */
+    fun onDeleteTeam(team: Team) {
+        viewModelScope.launch {
+            deleteTeamUseCase(team)
+                .onSuccess { _events.send(TeamEvent.TeamDeleted) }
+                .onFailure { throwable ->
+                    // DeleteTeam still commits the delete when it reports NoTeamsLeftException:
+                    // there was just no other team left to promote to main.
+                    if (throwable is NoTeamsLeftException) {
+                        _events.send(TeamEvent.TeamDeleted)
+                    } else {
+                        Timber.e(throwable)
+                        _events.send(TeamEvent.TeamDeleteFailed)
+                    }
+                }
+        }
+    }
 }

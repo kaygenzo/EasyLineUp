@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.lineup
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -13,10 +14,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -29,7 +28,6 @@ import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.toPlayer
-import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.lineup.defense.AvailablePlayersSheet
 import com.telen.easylineup.lineup.defense.DpFlexLinkSheet
@@ -38,10 +36,7 @@ import com.telen.easylineup.lineup.edition.LineupUpdated
 import com.telen.easylineup.lineup.edition.RosterEditSheet
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
@@ -82,14 +77,20 @@ fun LineupRoute(
         }
     }
 
-    var shareJob by remember { mutableStateOf<Job?>(null) }
-
-    fun shareLineup() {
-        shareJob?.cancel()
-        shareJob = coroutineScope.launch {
-            runCatching { viewModel.exportLineupToExternalStorage(context) }
-                .onSuccess { intent -> context.startActivity(Intent.createChooser(intent, "")) }
-                .onFailure { Timber.e(it) }
+    fun shareLineup(event: LineupEvent.ShareReady) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(
+                Intent.EXTRA_SUBJECT,
+                context.getString(R.string.share_lineup_subject, event.lineupName)
+            )
+            type = "application/pdf"
+            putExtra(Intent.EXTRA_STREAM, event.pdfUri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        try {
+            context.startActivity(Intent.createChooser(intent, null))
+        } catch (e: ActivityNotFoundException) {
+            Timber.e(e)
         }
     }
 
@@ -102,6 +103,24 @@ fun LineupRoute(
                     }
                 }
         }
+    }
+
+    LaunchedEffect(viewModel) {
+        viewModel.events
+            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .collect { event ->
+                when (event) {
+                    LineupEvent.Saved -> goBack()
+                    LineupEvent.Deleted -> goBack(showFixedView = false)
+                    LineupEvent.DeleteFailed -> Toast.makeText(
+                        context,
+                        R.string.error_when_deleting_lineup,
+                        Toast.LENGTH_LONG
+                    ).show()
+                    is LineupEvent.ShareReady -> shareLineup(event)
+                    LineupEvent.DpFlexIncomplete -> FirebaseAnalyticsUtils.missingDpFlex(context)
+                }
+            }
     }
 
     LaunchedEffect(editionViewModel) {
@@ -125,20 +144,8 @@ fun LineupRoute(
             FirebaseAnalyticsUtils.onClick(context, "click_lineup_edit_cancel_cancel")
             viewModel.onDiscardSheetRequested()
         },
-        onSaveClick = {
-            coroutineScope.launch {
-                viewModel.save()
-                    .onSuccess {
-                        Timber.d("Successfully saved")
-                        // navController navigation asserts the main thread - resuming after
-                        // save()'s real Room write doesn't always land back there under Compose
-                        // test instrumentation (see the identical fix in PlayerEditRoute).
-                        withContext(Dispatchers.Main) { goBack() }
-                    }
-                    .onFailure { Timber.e(it) }
-            }
-        },
-        onShareLineup = { shareLineup() },
+        onSaveClick = viewModel::onSaveClick,
+        onShareLineup = viewModel::onShareClick,
         onDeleteClick = {
             FirebaseAnalyticsUtils.onClick(context, "click_lineup_delete")
             viewModel.onDeleteSheetRequested()
@@ -208,16 +215,7 @@ fun LineupRoute(
                     .getOrElse { emptyList() }
                     .map { it.toPlayer() }
             },
-            onConfirm = { dp, flex ->
-                coroutineScope.launch {
-                    viewModel.linkDpAndFlex(dp, flex)
-                        .onFailure { throwable ->
-                            if (throwable is NeedAssignBothPlayersException) {
-                                FirebaseAnalyticsUtils.missingDpFlex(context)
-                            }
-                        }
-                }
-            },
+            onConfirm = viewModel::onDpFlexLinked,
             onDismiss = viewModel::onDpFlexDismiss
         )
     }
@@ -270,23 +268,7 @@ fun LineupRoute(
             confirmLabel = stringResource(R.string.action_delete),
             cancelLabel = stringResource(R.string.cancel_button),
             onDismiss = viewModel::onDeleteSheetDismiss,
-            onConfirm = {
-                coroutineScope.launch {
-                    viewModel.deleteLineup()
-                        .onSuccess {
-                            // See the matching comment on the save flow above.
-                            withContext(Dispatchers.Main) { goBack(showFixedView = false) }
-                        }
-                        .onFailure {
-                            Timber.e(it)
-                            Toast.makeText(
-                                context,
-                                R.string.error_when_deleting_lineup,
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                }
-            }
+            onConfirm = viewModel::onDeleteConfirmed
         )
     }
 

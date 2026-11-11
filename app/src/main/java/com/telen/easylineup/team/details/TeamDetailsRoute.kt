@@ -9,28 +9,28 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Sex
-import com.telen.easylineup.domain.usecases.exceptions.NoTeamsLeftException
+import com.telen.easylineup.team.TeamEvent
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.tournaments.list.LineupListViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
 
 /** Replaces `TeamDetailsFragment`. */
@@ -39,7 +39,7 @@ fun TeamDetailsRoute(navController: NavController) {
     val teamViewModel = koinViewModel<TeamViewModel>()
     val lineupListViewModel = koinViewModel<LineupListViewModel>()
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
     val teamUiState by teamViewModel.uiState.collectAsStateWithLifecycle()
     val lineupListUiState by lineupListViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -48,6 +48,21 @@ fun TeamDetailsRoute(navController: NavController) {
     ) { teamViewModel.loadTeam() }
 
     var showDeleteSheet by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(teamViewModel) {
+        teamViewModel.events
+            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .collect { event ->
+                when (event) {
+                    TeamEvent.TeamDeleted -> navController.popBackStack()
+                    TeamEvent.TeamDeleteFailed -> Toast.makeText(
+                        context,
+                        R.string.error_when_deleting_team,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+    }
 
     val lineupsBuilt = remember(lineupListUiState.tournamentItems) {
         lineupListUiState.tournamentItems.sumOf { it.lineups.count() }
@@ -87,31 +102,9 @@ fun TeamDetailsRoute(navController: NavController) {
             cancelLabel = stringResource(R.string.cancel_button),
             onDismiss = { showDeleteSheet = false },
             onConfirm = {
-                val team = teamViewModel.team
-                if (team != null) {
-                    coroutineScope.launch {
-                        FirebaseAnalyticsUtils.onClick(context, "click_team_details_delete")
-                        teamViewModel.deleteTeam(team)
-                            .onSuccess {
-                                // Resuming after this suspend Room write doesn't reliably land
-                                // back on the main thread (see the matching fix in LineupRoute).
-                                withContext(Dispatchers.Main) { navController.popBackStack() }
-                            }
-                            .onFailure { throwable ->
-                                // DeleteTeam always deletes before throwing: NoTeamsLeftException
-                                // only means there was no other team left to promote to main, not
-                                // that the delete was refused - same outcome as onSuccess.
-                                if (throwable is NoTeamsLeftException) {
-                                    withContext(Dispatchers.Main) { navController.popBackStack() }
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        R.string.error_when_deleting_team,
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                            }
-                    }
+                teamViewModel.team?.let { team ->
+                    FirebaseAnalyticsUtils.onClick(context, "click_team_details_delete")
+                    teamViewModel.onDeleteTeam(team)
                 }
             }
         )

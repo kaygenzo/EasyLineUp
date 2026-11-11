@@ -26,9 +26,13 @@ import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -314,9 +318,11 @@ internal class PlayerViewModelTest {
             ).thenReturn(Result.success(Unit))
         }
 
-        val result = viewModel.onSaveClick()
+        val events = collectEvents(viewModel.events)
 
-        assertTrue(result)
+        viewModel.onSaveClick()
+
+        assertEquals(listOf(PlayerEvent.Saved), events)
         val state = viewModel.uiState.value
         assertFalse(state.nameError)
         assertFalse(state.emailError)
@@ -327,9 +333,11 @@ internal class PlayerViewModelTest {
     fun shouldSetNameErrorWhenSaveFailsWithNameEmpty() = runTest {
         stubSaveFailure(NameEmptyException())
 
-        val result = viewModel.onSaveClick()
+        val events = collectEvents(viewModel.events)
 
-        assertFalse(result)
+        viewModel.onSaveClick()
+
+        assertEquals(listOf(PlayerEvent.SaveRejected), events)
         assertTrue(viewModel.uiState.value.nameError)
     }
 
@@ -337,9 +345,11 @@ internal class PlayerViewModelTest {
     fun shouldSetEmailErrorWhenSaveFailsWithInvalidEmail() = runTest {
         stubSaveFailure(InvalidEmailException())
 
-        val result = viewModel.onSaveClick()
+        val events = collectEvents(viewModel.events)
 
-        assertFalse(result)
+        viewModel.onSaveClick()
+
+        assertEquals(listOf(PlayerEvent.SaveRejected), events)
         assertTrue(viewModel.uiState.value.emailError)
     }
 
@@ -347,31 +357,44 @@ internal class PlayerViewModelTest {
     fun shouldSetPhoneErrorWhenSaveFailsWithInvalidPhone() = runTest {
         stubSaveFailure(InvalidPhoneException())
 
-        val result = viewModel.onSaveClick()
+        val events = collectEvents(viewModel.events)
 
-        assertFalse(result)
+        viewModel.onSaveClick()
+
+        assertEquals(listOf(PlayerEvent.SaveRejected), events)
         assertTrue(viewModel.uiState.value.phoneError)
     }
 
     @Test
-    fun shouldReturnSuccessResultWhenDeletePlayerSucceeds() = runTest {
+    fun shouldReportTheDeleteWhenDeletePlayerSucceeds() = runTest {
         runBlocking { Mockito.`when`(deletePlayerUseCase(0L)).thenReturn(Result.success(Unit)) }
 
-        val result = viewModel.deletePlayer()
+        val events = collectEvents(viewModel.events)
 
-        assertTrue(result.isSuccess)
+        viewModel.onDeleteConfirmed()
+
+        assertEquals(listOf(PlayerEvent.Deleted), events)
     }
 
     @Test
-    fun shouldReturnFailureResultWhenDeletePlayerFails() = runTest {
+    fun shouldReportTheErrorWhenDeletePlayerFails() = runTest {
         val exception = Exception("db error")
         runBlocking {
             Mockito.`when`(deletePlayerUseCase(0L)).thenReturn(Result.failure(exception))
         }
 
-        val result = viewModel.deletePlayer()
+        val events = collectEvents(viewModel.events)
 
-        assertTrue(result.isFailure)
+        viewModel.onDeleteConfirmed()
+
+        assertEquals(listOf(PlayerEvent.DeleteFailed("db error")), events)
+    }
+
+    /** Starts collecting [flow] on the test scheduler, for the rest of the test. */
+    private fun <T> TestScope.collectEvents(flow: Flow<T>): List<T> {
+        val events = mutableListOf<T>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { flow.toList(events) }
+        return events
     }
 
     private fun stubSaveFailure(throwable: Throwable) = runBlocking {
@@ -513,9 +536,11 @@ internal class PlayerViewModelTest {
     fun shouldFlagNoFieldWhenSaveFailsForAnotherReason() = runTest {
         stubSaveFailure(IllegalStateException("db error"))
 
-        val result = viewModel.onSaveClick()
+        val events = collectEvents(viewModel.events)
 
-        assertFalse(result)
+        viewModel.onSaveClick()
+
+        assertTrue(events.isEmpty())
         val state = viewModel.uiState.value
         assertFalse(state.nameError)
         assertFalse(state.emailError)

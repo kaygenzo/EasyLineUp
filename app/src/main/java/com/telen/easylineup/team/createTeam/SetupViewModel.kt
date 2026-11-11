@@ -7,12 +7,24 @@ package com.telen.easylineup.team.createTeam
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.SaveTeam
+import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
+import timber.log.Timber
+
+/** One-shot outcomes of [SetupViewModel.onSaveClicked], for the Activity to finish or warn. */
+sealed interface SetupEvent {
+    data object TeamSaved : SetupEvent
+    data object TeamNameEmpty : SetupEvent
+}
 
 /**
  * Backs both team creation and team edition - [setTeam] receives `null` for a new team, or the
@@ -30,6 +42,9 @@ class SetupViewModel(
 ) : ViewModel() {
     private val _team: MutableSharedFlow<Team> =
         MutableSharedFlow(replay = 1, extraBufferCapacity = 1)
+
+    private val _events = Channel<SetupEvent>(Channel.BUFFERED)
+    val events: Flow<SetupEvent> = _events.receiveAsFlow()
     // Defaults to BASEBALL, not UNKNOWN, so a new team's type picker shows a selection
     // from the start - SaveTeam falls back to BASEBALL anyway when type is left UNKNOWN,
     // this just makes that same default visible instead of implicit.
@@ -67,8 +82,20 @@ class SetupViewModel(
         _team.tryEmit(currentTeam)
     }
 
-    suspend fun onSaveClicked(): Result<Team> {
-        return saveTeam(currentTeam)
+    /** Saves in this ViewModel's scope, so a rotation or leaving can't cancel it halfway. */
+    fun onSaveClicked() {
+        val team = currentTeam
+        viewModelScope.launch {
+            saveTeam(team)
+                .onSuccess { _events.send(SetupEvent.TeamSaved) }
+                .onFailure { throwable ->
+                    if (throwable is NameEmptyException) {
+                        _events.send(SetupEvent.TeamNameEmpty)
+                    } else {
+                        Timber.e(throwable)
+                    }
+                }
+        }
     }
 
     /**

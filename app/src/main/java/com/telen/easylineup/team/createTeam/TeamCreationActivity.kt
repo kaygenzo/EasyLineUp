@@ -23,14 +23,11 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 class TeamCreationActivity : BaseActivity() {
     private val viewModel by viewModel<SetupViewModel>()
@@ -66,6 +63,23 @@ class TeamCreationActivity : BaseActivity() {
         viewModel.observeTeamType()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { teamType = it }
+            .launchIn(lifecycleScope)
+
+        viewModel.events
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { event ->
+                when (event) {
+                    SetupEvent.TeamSaved -> {
+                        FirebaseAnalyticsUtils.endTutorial(this@TeamCreationActivity)
+                        setResult(Activity.RESULT_OK)
+                        finish()
+                    }
+                    SetupEvent.TeamNameEmpty -> {
+                        nameError = getString(R.string.team_creation_error_name_empty)
+                        FirebaseAnalyticsUtils.emptyTeamName(this@TeamCreationActivity)
+                    }
+                }
+            }
             .launchIn(lifecycleScope)
 
         setContent {
@@ -110,22 +124,7 @@ class TeamCreationActivity : BaseActivity() {
     }
 
     private fun onSaveClicked() {
-        lifecycleScope.launch {
-            viewModel.onSaveClicked()
-                .onSuccess {
-                    FirebaseAnalyticsUtils.endTutorial(this@TeamCreationActivity)
-                    setResult(Activity.RESULT_OK)
-                    finish()
-                }
-                .onFailure { throwable ->
-                    if (throwable is NameEmptyException) {
-                        nameError = getString(R.string.team_creation_error_name_empty)
-                        FirebaseAnalyticsUtils.emptyTeamName(this@TeamCreationActivity)
-                    } else {
-                        Timber.e(throwable)
-                    }
-                }
-        }
+        viewModel.onSaveClicked()
     }
 
     override fun onBackPressed() {

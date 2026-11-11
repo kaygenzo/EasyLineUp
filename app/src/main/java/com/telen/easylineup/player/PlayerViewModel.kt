@@ -27,6 +27,8 @@ import com.telen.easylineup.domain.usecases.exceptions.InvalidEmailException
 import com.telen.easylineup.domain.usecases.exceptions.InvalidPhoneException
 import com.telen.easylineup.domain.usecases.exceptions.NameEmptyException
 import java.io.Serializable
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,6 +36,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -88,6 +91,19 @@ private data class PlayerFormDraft(
     val phone: String
 ) : Serializable
 
+/**
+ * One-shot outcomes of saving or deleting a player. The work behind them runs in the
+ * ViewModel's own scope, so leaving the screen or rotating it never cancels it halfway.
+ */
+sealed interface PlayerEvent {
+    data object Saved : PlayerEvent
+
+    /** Validation failed: [PlayerUiState]'s error flags say which field. */
+    data object SaveRejected : PlayerEvent
+    data object Deleted : PlayerEvent
+    data class DeleteFailed(val detail: String) : PlayerEvent
+}
+
 class PlayerViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val getTeamUseCase: GetTeam,
@@ -101,6 +117,9 @@ class PlayerViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PlayerUiState())
     val uiState: StateFlow<PlayerUiState> = _uiState.asStateFlow()
+
+    private val _events = Channel<PlayerEvent>(Channel.BUFFERED)
+    val events: Flow<PlayerEvent> = _events.receiveAsFlow()
 
     /** `0` means "new player" - set once by the Route right after obtaining this instance. */
     var playerId: Long = 0
@@ -264,43 +283,53 @@ class PlayerViewModel(
         _uiState.update { it.copy(strategy = strategy) }
     }
 
-    /** Returns whether the save actually went through - the Route navigates up only then. */
-    suspend fun onSaveClick(): Boolean {
+    fun onSaveClick() {
         val current = _uiState.value
-        return savePlayerUseCase(
-            playerId,
-            current.name,
-            current.shirtNumberText.toIntOrNull(),
-            current.licenseNumberText,
-            current.imageUri?.toString(),
-            current.selectedPositions.toPositionsMask(),
-            encodePlayerSideFlagUseCase(current.pitchingLeft, current.pitchingRight),
-            encodePlayerSideFlagUseCase(current.battingLeft, current.battingRight),
-            current.email,
-            current.phone,
-            current.sex.id
-        ).fold(
-            onSuccess = { true },
-            onFailure = { throwable ->
-                _uiState.update {
-                    it.copy(
-                        nameError = throwable is NameEmptyException,
-                        emailError = throwable is InvalidEmailException,
-                        phoneError = throwable is InvalidPhoneException
-                    )
+        viewModelScope.launch {
+            savePlayerUseCase(
+                playerId,
+                current.name,
+                current.shirtNumberText.toIntOrNull(),
+                current.licenseNumberText,
+                current.imageUri?.toString(),
+                current.selectedPositions.toPositionsMask(),
+                encodePlayerSideFlagUseCase(current.pitchingLeft, current.pitchingRight),
+                encodePlayerSideFlagUseCase(current.battingLeft, current.battingRight),
+                current.email,
+                current.phone,
+                current.sex.id
+            )
+                .onSuccess { _events.send(PlayerEvent.Saved) }
+                .onFailure { throwable ->
+                    _uiState.update {
+                        it.copy(
+                            nameError = throwable is NameEmptyException,
+                            emailError = throwable is InvalidEmailException,
+                            phoneError = throwable is InvalidPhoneException
+                        )
+                    }
+                    if (throwable is NameEmptyException ||
+                        throwable is InvalidEmailException ||
+                        throwable is InvalidPhoneException
+                    ) {
+                        _events.send(PlayerEvent.SaveRejected)
+                    } else {
+                        Timber.e(throwable)
+                    }
                 }
-                if (throwable !is NameEmptyException &&
-                    throwable !is InvalidEmailException &&
-                    throwable !is InvalidPhoneException
-                ) {
-                    Timber.e(throwable)
-                }
-                false
-            }
-        )
+        }
     }
 
-    suspend fun deletePlayer(): Result<Unit> = deletePlayerUseCase(playerId)
+    fun onDeleteConfirmed() {
+        viewModelScope.launch {
+            deletePlayerUseCase(playerId)
+                .onSuccess { _events.send(PlayerEvent.Deleted) }
+                .onFailure {
+                    Timber.e(it)
+                    _events.send(PlayerEvent.DeleteFailed(it.message.orEmpty()))
+                }
+        }
+    }
 
     private fun PlayerUiState.toDraft() = PlayerFormDraft(
         name = name,

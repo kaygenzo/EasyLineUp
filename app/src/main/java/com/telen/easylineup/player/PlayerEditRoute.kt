@@ -8,24 +8,24 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -37,7 +37,7 @@ import org.koin.androidx.compose.koinViewModel
 fun PlayerEditRoute(navController: NavController, playerId: Long) {
     val viewModel = koinViewModel<PlayerViewModel>()
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
     remember(playerId) { viewModel.playerId = playerId }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -58,6 +58,28 @@ fun PlayerEditRoute(navController: NavController, playerId: Long) {
     }
 
     BackHandler { showDiscardDialog("back_pressed") }
+
+    LaunchedEffect(viewModel) {
+        viewModel.events
+            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .collect { event ->
+                when (event) {
+                    PlayerEvent.Saved -> navController.navigateUp()
+                    PlayerEvent.SaveRejected -> {
+                        val failed = viewModel.uiState.value
+                        when {
+                            failed.nameError -> FirebaseAnalyticsUtils.emptyPlayerName(context)
+                            failed.emailError ->
+                                FirebaseAnalyticsUtils.invalidPlayerEmail(context)
+                            failed.phoneError ->
+                                FirebaseAnalyticsUtils.invalidPlayerPhoneNumber(context)
+                        }
+                    }
+                    // Deleting happens from the profile screen, not this form.
+                    PlayerEvent.Deleted, is PlayerEvent.DeleteFailed -> Unit
+                }
+            }
+    }
 
     PlayerFormScreen(
         state = PlayerFormState(
@@ -112,25 +134,7 @@ fun PlayerEditRoute(navController: NavController, playerId: Long) {
         onEmailChanged = viewModel::onEmailChanged,
         onPhoneChanged = viewModel::onPhoneChanged,
         onCloseClick = { showDiscardDialog("close_icon") },
-        onSaveClick = {
-            coroutineScope.launch {
-                if (viewModel.onSaveClick()) {
-                    // navigateUp() asserts it's running on the main thread - resuming this
-                    // coroutine after onSaveClick()'s real Room write doesn't always land back
-                    // there under Compose's own test instrumentation, so dispatch explicitly
-                    // rather than rely on the implicit withContext(IO) return-dispatcher.
-                    withContext(Dispatchers.Main) { navController.navigateUp() }
-                } else {
-                    val failed = viewModel.uiState.value
-                    when {
-                        failed.nameError -> FirebaseAnalyticsUtils.emptyPlayerName(context)
-                        failed.emailError -> FirebaseAnalyticsUtils.invalidPlayerEmail(context)
-                        failed.phoneError ->
-                            FirebaseAnalyticsUtils.invalidPlayerPhoneNumber(context)
-                    }
-                }
-            }
-        }
+        onSaveClick = viewModel::onSaveClick
     )
 
     if (showDiscardSheet) {

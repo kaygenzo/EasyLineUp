@@ -22,6 +22,8 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,6 +33,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -44,6 +47,9 @@ data class LineupListUiState(
     val teamType: TeamType = TeamType.UNKNOWN
 )
 
+/** One-shot outcome of a tournament deletion that failed, for the Route's toast. */
+data class TournamentDeleteFailed(val detail: String)
+
 class LineupListViewModel(
     private val getTeamUseCase: GetTeam,
     private val observeAllTournamentsWithLineups: ObserveAllTournamentsWithLineups,
@@ -52,6 +58,9 @@ class LineupListViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LineupListUiState())
     val uiState: StateFlow<LineupListUiState> = _uiState.asStateFlow()
+
+    private val _events = Channel<TournamentDeleteFailed>(Channel.BUFFERED)
+    val events: Flow<TournamentDeleteFailed> = _events.receiveAsFlow()
 
     private val filterFlow = MutableStateFlow("")
     private val mapAddressesByTournamentId = mutableMapOf<Long, String?>()
@@ -109,7 +118,16 @@ class LineupListViewModel(
         filterFlow.value = query
     }
 
-    suspend fun deleteTournament(tournament: Tournament): Result<Unit> {
-        return deleteTournamentLineups(tournament)
+    /**
+     * Deletes [tournament]'s lineups in this ViewModel's scope, so leaving the screen can't
+     * cancel it halfway. The list itself follows the database and needs no success event.
+     */
+    fun onDeleteTournament(tournament: Tournament) {
+        viewModelScope.launch {
+            deleteTournamentLineups(tournament).onFailure { throwable ->
+                Timber.e(throwable)
+                _events.send(TournamentDeleteFailed(throwable.message.orEmpty()))
+            }
+        }
     }
 }

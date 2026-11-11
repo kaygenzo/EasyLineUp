@@ -4,8 +4,6 @@
 
 package com.telen.easylineup.lineup
 
-import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import com.telen.easylineup.domain.model.DpAndFlexConfiguration
 import com.telen.easylineup.domain.model.FieldPosition
@@ -42,8 +40,12 @@ import com.telen.easylineup.testDispatcherProvider
 import com.telen.easylineup.utils.LineupExportData
 import com.telen.easylineup.utils.LineupPdfWriter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -90,7 +92,6 @@ internal class LineupViewModelTest {
     @Mock lateinit var saveDpAndFlexUseCase: SaveDpAndFlex
     @Mock lateinit var updatePlayersWithBattersUseCase: UpdatePlayersWithBatters
     @Mock lateinit var lineupPdfWriter: LineupPdfWriter
-    @Mock lateinit var context: Context
 
     private lateinit var viewModel: LineupViewModel
 
@@ -228,11 +229,22 @@ internal class LineupViewModelTest {
         }
     }
 
-    @Test
-    fun shouldFailSaveWhenLineupIsNull() = runTest {
-        val result = viewModel.save()
+    /** Starts collecting [flow] on the test scheduler, for the rest of the test. */
+    private fun <T> TestScope.collectEvents(flow: Flow<T>): List<T> {
+        val events = mutableListOf<T>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { flow.toList(events) }
+        return events
+    }
 
-        assertTrue(result.isFailure)
+    @Test
+    fun shouldNotSaveWhenLineupIsNull() = runTest {
+        val events = collectEvents(viewModel.events)
+
+        viewModel.onSaveClick()
+        advanceUntilIdle()
+
+        assertTrue(events.isEmpty())
+        Mockito.verifyNoInteractions(saveBattingOrderAndPositionsUseCase)
     }
 
     @Test
@@ -245,9 +257,12 @@ internal class LineupViewModelTest {
                 .thenReturn(Result.success(Unit))
         }
 
-        val result = viewModel.save()
+        val events = collectEvents(viewModel.events)
 
-        assertTrue(result.isSuccess)
+        viewModel.onSaveClick()
+        advanceUntilIdle()
+
+        assertEquals(listOf(LineupEvent.Saved), events)
     }
 
     @Test
@@ -257,9 +272,27 @@ internal class LineupViewModelTest {
             Mockito.`when`(deleteLineupUseCase(1L)).thenReturn(Result.success(Unit))
         }
 
-        val result = viewModel.deleteLineup()
+        val events = collectEvents(viewModel.events)
 
-        assertTrue(result.isSuccess)
+        viewModel.onDeleteConfirmed()
+        advanceUntilIdle()
+
+        assertEquals(listOf(LineupEvent.Deleted), events)
+    }
+
+    @Test
+    fun shouldReportAFailedDelete() = runTest {
+        viewModel.lineupId = 1L
+        runBlocking {
+            Mockito.`when`(deleteLineupUseCase(1L))
+                .thenReturn(Result.failure(IllegalStateException("db error")))
+        }
+        val events = collectEvents(viewModel.events)
+
+        viewModel.onDeleteConfirmed()
+        advanceUntilIdle()
+
+        assertEquals(listOf(LineupEvent.DeleteFailed), events)
     }
 
     @Test
@@ -280,24 +313,29 @@ internal class LineupViewModelTest {
     }
 
     @Test
-    fun shouldExportLineupToIntent() = runTest {
+    fun shouldHandTheWrittenPdfOverForSharing() = runTest {
         val lineup = Lineup(id = 1L, name = "My Lineup", teamId = 1L, tournamentId = 1L)
         loadLineup(lineup)
         advanceUntilIdle()
         val uri = Mockito.mock(Uri::class.java)
-        Mockito.`when`(context.getString(Mockito.anyInt(), any())).thenReturn("Share subject")
         Mockito.`when`(lineupPdfWriter.write(any())).thenReturn(uri)
+        val events = collectEvents(viewModel.events)
 
-        // android.content.Intent's own methods aren't implemented on the unit test JVM -
-        // mockConstruction swaps the real Intent() for a plain mock so putExtra/setType/etc.
-        // don't throw "not mocked".
-        Mockito.mockConstruction(Intent::class.java) { mock, _ ->
-            Mockito.`when`(mock.type).thenReturn("application/pdf")
-        }.use {
-            val intent = viewModel.exportLineupToExternalStorage(context)
+        viewModel.onShareClick()
+        advanceUntilIdle()
 
-            assertEquals("application/pdf", intent.type)
-        }
+        assertEquals(listOf(LineupEvent.ShareReady(uri, "My Lineup")), events)
+    }
+
+    @Test
+    fun shouldSendNothingToShareWhenThePdfCannotBeWritten() = runTest {
+        Mockito.`when`(lineupPdfWriter.write(any())).thenThrow(IllegalStateException("disk full"))
+        val events = collectEvents(viewModel.events)
+
+        viewModel.onShareClick()
+        advanceUntilIdle()
+
+        assertTrue(events.isEmpty())
     }
 
     @Test
@@ -513,10 +551,9 @@ internal class LineupViewModelTest {
                 .thenReturn(Result.success(Unit))
         }
 
-        val result = viewModel.linkDpAndFlex(dp, null)
+        viewModel.onDpFlexLinked(dp, null)
         advanceUntilIdle()
 
-        assertTrue(result.isSuccess)
         assertNull(viewModel.uiState.value.dpFlexEvent)
     }
 
@@ -530,9 +567,12 @@ internal class LineupViewModelTest {
                 .thenReturn(Result.failure(NeedAssignBothPlayersException()))
         }
 
-        val result = viewModel.linkDpAndFlex(null, null)
+        val events = collectEvents(viewModel.events)
 
-        assertTrue(result.isFailure)
+        viewModel.onDpFlexLinked(null, null)
+        advanceUntilIdle()
+
+        assertEquals(listOf(LineupEvent.DpFlexIncomplete), events)
         assertEquals(
             LineupInfoMessage.BothDpAndFlexRequired,
             viewModel.uiState.value.infoMessage
@@ -540,10 +580,11 @@ internal class LineupViewModelTest {
     }
 
     @Test
-    fun shouldFailLinkDpAndFlexWhenLineupIsNull() = runTest {
-        val result = viewModel.linkDpAndFlex(null, null)
+    fun shouldNotLinkDpAndFlexWhenLineupIsNull() = runTest {
+        viewModel.onDpFlexLinked(null, null)
+        advanceUntilIdle()
 
-        assertTrue(result.isFailure)
+        Mockito.verifyNoInteractions(saveDpAndFlexUseCase)
     }
 
     @Test
@@ -844,12 +885,10 @@ internal class LineupViewModelTest {
     @Test
     fun shouldExportAnEmptyCardBeforeTheLineupIsLoaded() = runTest {
         val captor = argumentCaptor<LineupExportData>()
-        Mockito.`when`(context.getString(Mockito.anyInt(), any())).thenReturn("Share subject")
         Mockito.`when`(lineupPdfWriter.write(any())).thenReturn(Mockito.mock(Uri::class.java))
 
-        Mockito.mockConstruction(Intent::class.java).use {
-            viewModel.exportLineupToExternalStorage(context)
-        }
+        viewModel.onShareClick()
+        advanceUntilIdle()
 
         Mockito.verify(lineupPdfWriter).write(captor.capture())
         assertEquals("", captor.firstValue.lineupName)
@@ -985,9 +1024,12 @@ internal class LineupViewModelTest {
         Mockito.`when`(saveDpAndFlexUseCase(any(), any(), any(), any()))
             .thenReturn(Result.failure(IllegalStateException("boom")))
 
-        val result = viewModel.linkDpAndFlex(aPlayer, aPlayer)
+        val events = collectEvents(viewModel.events)
 
-        assertTrue(result.isFailure)
+        viewModel.onDpFlexLinked(aPlayer, aPlayer)
+        advanceUntilIdle()
+
+        assertTrue(events.isEmpty())
         assertNull(viewModel.uiState.value.infoMessage)
     }
 
