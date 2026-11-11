@@ -40,11 +40,16 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
     private lateinit var saveBattingOrder: SaveBattingOrderAndPositions
     private lateinit var players: MutableList<PlayerWithPosition>
 
+    private val transactionRunner = TestTransactionRunner()
+
     @Before
     fun init() {
         runBlocking {
         saveBattingOrder = SaveBattingOrderAndPositions(
-            lineupRepository, playerFieldPositionRepository, testDispatcherProvider()
+            lineupRepository,
+            playerFieldPositionRepository,
+            transactionRunner,
+            testDispatcherProvider()
         )
         Mockito.`when`(lineupRepository.updateLineup(lineup)).thenReturn(Unit)
         Mockito.`when`(playerFieldPositionRepository.updatePlayerFieldPosition(any()))
@@ -143,5 +148,23 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
         verify(playerFieldPositionRepository).deletePosition(check {
             Assert.assertTrue(it.id == 5L)
         })
+    }
+
+    @Test
+    fun shouldSaveLineupAndPositionsInOneTransaction() = runTest {
+        val inTransaction = mutableListOf<Boolean>()
+        Mockito.`when`(lineupRepository.updateLineup(lineup)).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            Unit
+        }
+        Mockito.`when`(playerFieldPositionRepository.insertPlayerFieldPosition(any())).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            1L
+        }
+
+        startUseCase()
+        Assert.assertTrue(inTransaction.isNotEmpty())
+        Assert.assertTrue(inTransaction.all { it })
+        Assert.assertEquals(1, transactionRunner.transactions)
     }
 }

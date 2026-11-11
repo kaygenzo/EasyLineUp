@@ -8,6 +8,7 @@ import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.isAssigned
 import com.telen.easylineup.domain.model.toPlayer
 import com.telen.easylineup.domain.ports.DispatcherProvider
+import com.telen.easylineup.domain.ports.TransactionRunner
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import kotlinx.coroutines.withContext
@@ -23,34 +24,37 @@ class UpdateLineupRoster(
     private val pfpRepository: PlayerFieldPositionRepository,
     private val deletePlayerFieldPosition: DeletePlayerFieldPosition,
     private val saveBattingOrderAndPositions: SaveBattingOrderAndPositions,
+    private val transactionRunner: TransactionRunner,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(lineupId: Long, roster: List<RosterPlayerStatus>): Result<Unit> =
         runCatchingCancellable {
             withContext(dispatcherProvider.io()) {
-                val lineup = lineupRepository.getLineupById(lineupId)
-                    .copy(roster = rosterToString(roster))
-                val removedIds = roster.filterNot { it.status }.map { it.player.id }.toSet()
-                val players = pfpRepository.getAllPlayersWithPositionsForLineup(lineupId)
-                val toRemove = players.filter { it.playerId in removedIds && it.isAssigned() }
-                if (toRemove.isEmpty()) {
-                    lineupRepository.updateLineup(lineup)
-                    return@withContext
-                }
-                toRemove.forEach { player ->
-                    // A field player first goes back to the bench, then leaves it: two steps,
-                    // exactly like removing them twice by hand.
-                    repeat(2) {
-                        if (!player.isAssigned()) return@repeat
-                        deletePlayerFieldPosition(
-                            players,
-                            player.toPlayer(),
-                            lineup.mode,
-                            lineup.extraHitters
-                        ).getOrThrow()
+                transactionRunner.inTransaction {
+                    val lineup = lineupRepository.getLineupById(lineupId)
+                        .copy(roster = rosterToString(roster))
+                    val removedIds = roster.filterNot { it.status }.map { it.player.id }.toSet()
+                    val players = pfpRepository.getAllPlayersWithPositionsForLineup(lineupId)
+                    val toRemove = players.filter { it.playerId in removedIds && it.isAssigned() }
+                    if (toRemove.isEmpty()) {
+                        lineupRepository.updateLineup(lineup)
+                        return@inTransaction
                     }
+                    toRemove.forEach { player ->
+                        // A field player first goes back to the bench, then leaves it: two steps,
+                        // exactly like removing them twice by hand.
+                        repeat(2) {
+                            if (!player.isAssigned()) return@repeat
+                            deletePlayerFieldPosition(
+                                players,
+                                player.toPlayer(),
+                                lineup.mode,
+                                lineup.extraHitters
+                            ).getOrThrow()
+                        }
+                    }
+                    saveBattingOrderAndPositions(lineup, players).getOrThrow()
                 }
-                saveBattingOrderAndPositions(lineup, players).getOrThrow()
             }
         }
 

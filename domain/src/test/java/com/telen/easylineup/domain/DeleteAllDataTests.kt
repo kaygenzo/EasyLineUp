@@ -12,6 +12,7 @@ import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.DeleteAllData
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -28,10 +29,17 @@ internal class DeleteAllDataTests {
     @Mock lateinit var tournamentDao: TournamentRepository
     lateinit var deleteAllData: DeleteAllData
 
+    private val transactionRunner = TestTransactionRunner()
+
     @Before
     fun init() {
         runBlocking {
-        deleteAllData = DeleteAllData(teamDao, tournamentDao, testDispatcherProvider())
+        deleteAllData = DeleteAllData(
+            teamDao,
+            tournamentDao,
+            transactionRunner,
+            testDispatcherProvider()
+        )
 
         tournaments.add(Tournament(1, "t1", 1L, 2L, 3L, null))
         tournaments.add(Tournament(2, "t2", 2L, 3L, 4L, null))
@@ -80,5 +88,22 @@ internal class DeleteAllDataTests {
     fun shouldSuccessfullyDeleteAllData() = runTest {
         val result = deleteAllData()
         assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun shouldDeleteTournamentsAndTeamsInOneTransaction() = runTest {
+        val inTransaction = mutableListOf<Boolean>()
+        Mockito.`when`(tournamentDao.deleteTournaments(tournaments)).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            Unit
+        }
+        Mockito.`when`(teamDao.deleteTeams(teams)).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            Unit
+        }
+
+        assertTrue(deleteAllData().isSuccess)
+        assertEquals(listOf(true, true), inTransaction)
+        assertEquals(1, transactionRunner.transactions)
     }
 }

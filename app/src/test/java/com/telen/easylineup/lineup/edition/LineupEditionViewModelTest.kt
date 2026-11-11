@@ -10,9 +10,7 @@ import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.usecases.GetLineupById
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.ObserveTournaments
-import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
-import com.telen.easylineup.domain.usecases.UpdateLineup
-import com.telen.easylineup.domain.usecases.UpdateLineupRoster
+import com.telen.easylineup.domain.usecases.SaveLineupChanges
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import kotlinx.coroutines.Dispatchers
@@ -47,13 +45,7 @@ internal class LineupEditionViewModelTest {
     lateinit var getRoster: GetRoster
 
     @Mock
-    lateinit var updateLineup: UpdateLineup
-
-    @Mock
-    lateinit var updateLineupRoster: UpdateLineupRoster
-
-    @Mock
-    lateinit var savePlayerNumberOverlay: SavePlayerNumberOverlay
+    lateinit var saveLineupChanges: SaveLineupChanges
 
     @Mock
     lateinit var observeTournaments: ObserveTournaments
@@ -74,9 +66,7 @@ internal class LineupEditionViewModelTest {
         viewModel = LineupEditionViewModel(
             getLineupById,
             getRoster,
-            updateLineup,
-            updateLineupRoster,
-            savePlayerNumberOverlay,
+            saveLineupChanges,
             observeTournaments
         )
     }
@@ -121,10 +111,8 @@ internal class LineupEditionViewModelTest {
     @Test
     fun shouldSendLineupUpdatedWhenSaveSucceeds() = runTest {
         runBlocking {
-            Mockito.`when`(updateLineup(lineup)).thenReturn(Result.success(Unit))
-            Mockito.`when`(updateLineupRoster(lineup.id, roster.players))
+            Mockito.`when`(saveLineupChanges(lineup, roster.players))
                 .thenReturn(Result.success(Unit))
-            Mockito.`when`(savePlayerNumberOverlay(roster.players)).thenReturn(Result.success(Unit))
         }
 
         val events = mutableListOf<LineupEditionEvent>()
@@ -140,7 +128,7 @@ internal class LineupEditionViewModelTest {
     @Test
     fun shouldSendInvalidLineupNameWhenUpdateLineupFailsWithEmptyName() = runTest {
         runBlocking {
-            Mockito.`when`(updateLineup(lineup))
+            Mockito.`when`(saveLineupChanges(lineup, roster.players))
                 .thenReturn(Result.failure(LineupNameEmptyException()))
         }
 
@@ -157,7 +145,7 @@ internal class LineupEditionViewModelTest {
     @Test
     fun shouldSendInvalidTournamentWhenUpdateLineupFailsWithEmptyTournament() = runTest {
         runBlocking {
-            Mockito.`when`(updateLineup(lineup))
+            Mockito.`when`(saveLineupChanges(lineup, roster.players))
                 .thenReturn(Result.failure(TournamentNameEmptyException()))
         }
 
@@ -174,7 +162,8 @@ internal class LineupEditionViewModelTest {
     @Test
     fun shouldNotSendAnyEventOnUnrelatedFailure() = runTest {
         runBlocking {
-            Mockito.`when`(updateLineup(lineup)).thenReturn(Result.failure(Exception("db error")))
+            Mockito.`when`(saveLineupChanges(lineup, roster.players))
+                .thenReturn(Result.failure(Exception("db error")))
         }
 
         val events = mutableListOf<LineupEditionEvent>()

@@ -66,6 +66,7 @@ import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
 import com.telen.easylineup.domain.usecases.SaveDashboardTiles
 import com.telen.easylineup.domain.usecases.SaveDpAndFlex
+import com.telen.easylineup.domain.usecases.SaveLineupChanges
 import com.telen.easylineup.domain.usecases.SavePlayer
 import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
 import com.telen.easylineup.domain.usecases.SaveTeam
@@ -106,7 +107,7 @@ object DomainModule {
         single { ObservePlayerNumberOverlays(get()) }
         single { InsertPlayers(get(), get()) }
         single { InsertPlayerNumberOverlays(get(), get()) }
-        single { SaveTeam(get(), get(), get(), get()) }
+        single { SaveTeam(get(), get(), get(), get(), get()) }
         single { CheckTeam(get()) }
         single { ObserveTeams(get()) }
         single { InsertTeam(get(), get()) }
@@ -114,28 +115,29 @@ object DomainModule {
         single { DeletePlayerFieldPosition(get()) }
         single { InsertPlayerFieldPositions(get(), get()) }
         single { GetListAvailablePlayersForSelection(get(), get()) }
-        single { SaveBattingOrderAndPositions(get(), get(), get()) }
+        single { SaveBattingOrderAndPositions(get(), get(), get(), get()) }
         single { DeleteLineup(get(), get()) }
         single { SetLineupMode(get(), get(), get()) }
         single { UpdatePlayersWithLineupMode(get()) }
         single { GetRoster(get(), get(), get(), get(), get()) }
-        single { UpdateLineupRoster(get(), get(), get(), get(), get()) }
-        single { DeleteTeam(get(), get()) }
+        single { UpdateLineupRoster(get(), get(), get(), get(), get(), get()) }
+        single { DeleteTeam(get(), get(), get()) }
         single { SwitchPlayersPosition(get(), get()) }
-        single { DeleteAllData(get(), get(), get()) }
+        single { DeleteAllData(get(), get(), get(), get()) }
         single { GetTournamentPlayerStats(get(), get(), get(), get()) }
-        single { CheckHashData(get(), get(), get(), get(), get(), get()) }
+        single { CheckHashData(get(), get(), get(), get(), get(), get(), get()) }
         single { ExportData(get(), get(), get(), get(), get(), get(), get(), get()) }
-        single { ImportData(get(), get(), get(), get(), get(), get(), get()) }
+        single { ImportData(get(), get(), get(), get(), get(), get(), get(), get()) }
         single { GetOnlyPlayersInField(get()) }
         single { GetDpAndFlexFromPlayersInField(get(), get()) }
         single { SaveDpAndFlex(get()) }
-        single { SavePlayerNumberOverlay(get(), get()) }
+        single { SavePlayerNumberOverlay(get(), get(), get()) }
         single { GetShirtNumberHistory(get(), get(), get(), get()) }
         single { IsEmailValid() }
         single { IsValidPhoneNumber(get()) }
         single { GetBattersState(get(), get()) }
         single { UpdateLineup(get(), get()) }
+        single { SaveLineupChanges(get(), get(), get(), get(), get()) }
         single { UpdatePlayersWithBatters(get()) }
         single { SaveTournament(get(), get()) }
         single { GetTournamentMapLink(get(), get()) }

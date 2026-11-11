@@ -10,6 +10,7 @@ import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.ports.DispatcherProvider
+import com.telen.easylineup.domain.ports.TransactionRunner
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
@@ -24,17 +25,20 @@ class CheckHashData(
     private val tournamentDao: TournamentRepository,
     private val lineupDao: LineupRepository,
     private val playerFieldPositionsDao: PlayerFieldPositionRepository,
+    private val transactionRunner: TransactionRunner,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(): Result<IntArray> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            intArrayOf(
-                updateTeams(),
-                updatePlayers(),
-                updateTournaments(),
-                updateLineups(),
-                updatePlayerFieldPositions()
-            )
+            transactionRunner.inTransaction {
+                intArrayOf(
+                    updateTeams(),
+                    updatePlayers(),
+                    updateTournaments(),
+                    updateLineups(),
+                    updatePlayerFieldPositions()
+                )
+            }
         }
     }
 

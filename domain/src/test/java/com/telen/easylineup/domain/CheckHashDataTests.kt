@@ -44,12 +44,14 @@ internal class CheckHashDataTests {
     lateinit var playerPositionsDao: PlayerFieldPositionRepository
     private lateinit var checkHash: CheckHashData
 
+    private val transactionRunner = TestTransactionRunner()
+
     @Before
     fun init() {
         runBlocking {
             checkHash = CheckHashData(
                 teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao,
-                testDispatcherProvider()
+                transactionRunner, testDispatcherProvider()
             )
 
             val teams = mutableListOf(
@@ -147,5 +149,22 @@ internal class CheckHashDataTests {
         })
 
         Assert.assertArrayEquals(intArrayOf(2, 2, 2, 2, 2), result.getOrNull())
+    }
+
+    @Test
+    fun shouldUpdateEveryTableInOneTransaction() = runTest {
+        val inTransaction = mutableListOf<Boolean>()
+        Mockito.`when`(teamDao.updateTeamsWithRowCount(any())).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            2
+        }
+        Mockito.`when`(playerDao.updatePlayersWithRowCount(any())).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            2
+        }
+
+        Assert.assertTrue(checkHash().isSuccess)
+        Assert.assertEquals(listOf(true, true), inTransaction)
+        Assert.assertEquals(1, transactionRunner.transactions)
     }
 }

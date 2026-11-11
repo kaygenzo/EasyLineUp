@@ -61,6 +61,8 @@ internal class UpdateLineupRosterTests {
         RosterPlayerStatus(player(id), status = status, playerNumberOverlay = null)
     }
 
+    private val transactionRunner = TestTransactionRunner()
+
     @Before
     fun init() {
         runBlocking {
@@ -69,7 +71,13 @@ internal class UpdateLineupRosterTests {
                 lineupRepository,
                 pfpRepository,
                 DeletePlayerFieldPosition(dispatchers),
-                SaveBattingOrderAndPositions(lineupRepository, pfpRepository, dispatchers),
+                SaveBattingOrderAndPositions(
+                    lineupRepository,
+                    pfpRepository,
+                    transactionRunner,
+                    dispatchers
+                ),
+                transactionRunner,
                 dispatchers
             )
             lineup = Lineup(id = 1L, name = "test", teamId = 1L, tournamentId = 1L)
@@ -161,5 +169,27 @@ internal class UpdateLineupRosterTests {
 
         assertTrue(result.isFailure)
         assertEquals(exception.message, result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun shouldRemovePlayersAndSaveTheLineupInOneTransaction() = runTest {
+        val pitcher = positioned(1L, FieldPosition.PITCHER, 1)
+        val catcher = positioned(2L, FieldPosition.CATCHER, 2)
+        Mockito.`when`(pfpRepository.getAllPlayersWithPositionsForLineup(1L))
+            .thenReturn(listOf(pitcher, catcher))
+        val inTransaction = mutableListOf<Boolean>()
+        Mockito.`when`(pfpRepository.deletePosition(any())).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            Unit
+        }
+        Mockito.`when`(lineupRepository.updateLineup(any())).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            Unit
+        }
+
+        assertTrue(updateLineupRoster(1L, roster(1L to true, 2L to false)).isSuccess)
+        assertEquals(listOf(true, true), inTransaction)
+        // SaveBattingOrderAndPositions joins this transaction instead of opening its own.
+        assertEquals(1, transactionRunner.transactions)
     }
 }

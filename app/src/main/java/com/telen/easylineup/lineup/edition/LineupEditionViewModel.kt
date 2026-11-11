@@ -12,9 +12,7 @@ import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.usecases.GetLineupById
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.ObserveTournaments
-import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
-import com.telen.easylineup.domain.usecases.UpdateLineup
-import com.telen.easylineup.domain.usecases.UpdateLineupRoster
+import com.telen.easylineup.domain.usecases.SaveLineupChanges
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import kotlinx.collections.immutable.ImmutableList
@@ -49,9 +47,7 @@ data class LineupEditionUiState(val tournaments: ImmutableList<Tournament> = per
 class LineupEditionViewModel(
     private val getLineupById: GetLineupById,
     private val getRoster: GetRoster,
-    private val updateLineup: UpdateLineup,
-    private val updateLineupRoster: UpdateLineupRoster,
-    private val savePlayerNumberOverlay: SavePlayerNumberOverlay,
+    private val saveLineupChanges: SaveLineupChanges,
     private val observeTournaments: ObserveTournaments
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LineupEditionUiState())
@@ -76,9 +72,7 @@ class LineupEditionViewModel(
 
     fun save(lineup: Lineup, roster: TeamRosterSummary) {
         viewModelScope.launch {
-            updateLineup(lineup)
-                .mapCatching { updateLineupRoster(lineup.id, roster.players).getOrThrow() }
-                .mapCatching { savePlayerNumberOverlay(roster.players).getOrThrow() }
+            saveLineupChanges(lineup, roster.players)
                 .onSuccess { _events.send(LineupUpdated) }
                 .onFailure { throwable ->
                     when (throwable) {

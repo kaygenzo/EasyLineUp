@@ -19,6 +19,7 @@ import com.telen.easylineup.domain.model.export.TeamExport
 import com.telen.easylineup.domain.model.export.TournamentExport
 import com.telen.easylineup.domain.model.normalizeLicenseNumber
 import com.telen.easylineup.domain.ports.DispatcherProvider
+import com.telen.easylineup.domain.ports.TransactionRunner
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
@@ -70,6 +71,7 @@ class ImportData(
     private val tournamentDao: TournamentRepository,
     private val lineupDao: LineupRepository,
     private val playerFieldPositionsDao: PlayerFieldPositionRepository,
+    private val transactionRunner: TransactionRunner,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(
@@ -77,63 +79,65 @@ class ImportData(
         updateIfExists: Boolean
     ): Result<ImportResult> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            val result = ImportResult()
+            transactionRunner.inTransaction {
+                val result = ImportResult()
 
-            exportBase.teams.forEach { teamExport ->
-                val team = processTeam(teamExport, result.teams, updateIfExists)
+                exportBase.teams.forEach { teamExport ->
+                    val team = processTeam(teamExport, result.teams, updateIfExists)
 
-                val playerIdMap: MutableMap<String, Long> = mutableMapOf()
-                teamExport.players.forEach { playerExport ->
-                    val player = processPlayer(
-                        playerExport,
-                        team.id,
-                        result.players,
-                        updateIfExists
-                    )
-                    playerIdMap[player.hash ?: UUID.randomUUID().toString()] = player.id
-                }
-
-                teamExport.tournaments.forEach { tournamentExport ->
-                    val tournament = processTournament(
-                        tournamentExport,
-                        result.tournaments,
-                        updateIfExists
-                    )
-
-                    tournamentExport.lineups.forEach { lineupExport ->
-                        val lineup = processLineup(
-                            lineupExport,
+                    val playerIdMap: MutableMap<String, Long> = mutableMapOf()
+                    teamExport.players.forEach { playerExport ->
+                        val player = processPlayer(
+                            playerExport,
                             team.id,
-                            tournament.id,
-                            playerIdMap,
-                            result.lineups,
+                            result.players,
+                            updateIfExists
+                        )
+                        playerIdMap[player.hash ?: UUID.randomUUID().toString()] = player.id
+                    }
+
+                    teamExport.tournaments.forEach { tournamentExport ->
+                        val tournament = processTournament(
+                            tournamentExport,
+                            result.tournaments,
                             updateIfExists
                         )
 
-                        lineupExport.playerPositions.forEach {
-                            processPlayerFieldPosition(
-                                it,
+                        tournamentExport.lineups.forEach { lineupExport ->
+                            val lineup = processLineup(
+                                lineupExport,
+                                team.id,
+                                tournament.id,
                                 playerIdMap,
-                                lineup.id,
-                                result.playerPositions,
+                                result.lineups,
                                 updateIfExists
                             )
-                        }
 
-                        (lineupExport.playerNumberOverlays ?: listOf()).forEach {
-                            processPlayerNumberOverlays(
-                                it,
-                                playerIdMap,
-                                lineup.id,
-                                result.playerNumberOverlays,
-                                updateIfExists
-                            )
+                            lineupExport.playerPositions.forEach {
+                                processPlayerFieldPosition(
+                                    it,
+                                    playerIdMap,
+                                    lineup.id,
+                                    result.playerPositions,
+                                    updateIfExists
+                                )
+                            }
+
+                            (lineupExport.playerNumberOverlays ?: listOf()).forEach {
+                                processPlayerNumberOverlays(
+                                    it,
+                                    playerIdMap,
+                                    lineup.id,
+                                    result.playerNumberOverlays,
+                                    updateIfExists
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            result
+                result
+            }
         }
     }
 

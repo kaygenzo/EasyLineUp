@@ -34,10 +34,12 @@ internal class DeleteTeamTests {
     lateinit var team3: Team
     lateinit var teams: List<Team>
 
+    private val transactionRunner = TestTransactionRunner()
+
     @Before
     fun init() {
         runBlocking {
-        deleteTeam = DeleteTeam(teamDao, testDispatcherProvider())
+        deleteTeam = DeleteTeam(teamDao, transactionRunner, testDispatcherProvider())
         team = Team(id = 1L, name = "toto", type = TeamType.BASEBALL.id, main = true)
         team2 = Team(id = 2L, name = "tata", type = TeamType.SOFTBALL.id, main = false)
         team3 = Team(id = 3L, name = "titi", type = TeamType.SOFTBALL.id, main = false)
@@ -53,6 +55,20 @@ internal class DeleteTeamTests {
         Mockito.`when`(teamDao.getTeams()).thenReturn(mutableListOf())
         val result = deleteTeam(team)
         assertTrue(result.exceptionOrNull() is NoTeamsLeftException)
+    }
+
+    @Test
+    fun shouldCommitTheDeleteOfTheLastTeamBeforeFailing() = runTest {
+        Mockito.`when`(teamDao.getTeams()).thenReturn(mutableListOf())
+
+        val result = deleteTeam(team)
+
+        // The NoTeamsLeftException must surface after the transaction: thrown inside it, Room
+        // would roll the delete back and the last team would never go away.
+        assertTrue(result.exceptionOrNull() is NoTeamsLeftException)
+        verify(teamDao).deleteTeam(team)
+        Assert.assertEquals(1, transactionRunner.transactions)
+        Assert.assertEquals(0, transactionRunner.rollbacks)
     }
 
     @Test
@@ -79,5 +95,22 @@ internal class DeleteTeamTests {
     fun shouldDeleteSuccessfully() = runTest {
         val result = deleteTeam(team)
         assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun shouldDeleteAndReassignMainTeamInOneTransaction() = runTest {
+        val inTransaction = mutableListOf<Boolean>()
+        Mockito.`when`(teamDao.deleteTeam(team)).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            Unit
+        }
+        Mockito.`when`(teamDao.updateTeam(team2.copy(main = true))).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            Unit
+        }
+
+        assertTrue(deleteTeam(team).isSuccess)
+        Assert.assertEquals(listOf(true, true), inTransaction)
+        Assert.assertEquals(1, transactionRunner.transactions)
     }
 }

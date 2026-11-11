@@ -36,10 +36,16 @@ internal class SavePlayerNumberOverlayTests {
             licenseNumber = id.toString()
         )
 
+    private val transactionRunner = TestTransactionRunner()
+
     @Before
     fun init() {
         runBlocking {
-        savePlayerNumberOverlay = SavePlayerNumberOverlay(playerNumberOverlayRepository, testDispatcherProvider())
+        savePlayerNumberOverlay = SavePlayerNumberOverlay(
+            playerNumberOverlayRepository,
+            transactionRunner,
+            testDispatcherProvider()
+        )
         Mockito.`when`(playerNumberOverlayRepository.deletePlayerNumberOverlays(any())).thenReturn(Unit)
         Mockito.`when`(playerNumberOverlayRepository.updatePlayerNumberOverlays(any())).thenReturn(Unit)
         Mockito.`when`(playerNumberOverlayRepository.insertPlayerNumberOverlays(any())).thenReturn(Unit)
@@ -152,5 +158,26 @@ internal class SavePlayerNumberOverlayTests {
         // coroutines may clone the exception across the withContext boundary to recover the
         // stack trace, so compare by message/type rather than reference/equals.
         assertEquals(exception.message, result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun shouldWriteAllOverlayChangesInOneTransaction() = runTest {
+        val inTransaction = mutableListOf<Boolean>()
+        Mockito.`when`(
+            playerNumberOverlayRepository.deletePlayerNumberOverlays(any())
+        ).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            Unit
+        }
+        Mockito.`when`(
+            playerNumberOverlayRepository.insertPlayerNumberOverlays(any())
+        ).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            Unit
+        }
+
+        assertTrue(savePlayerNumberOverlay(emptyList()).isSuccess)
+        assertEquals(listOf(true, true), inTransaction)
+        assertEquals(1, transactionRunner.transactions)
     }
 }

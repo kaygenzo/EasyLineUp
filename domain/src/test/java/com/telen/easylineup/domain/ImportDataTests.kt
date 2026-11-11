@@ -59,6 +59,8 @@ internal class ImportDataTests {
 
     private lateinit var exportBase: ExportBase
 
+    private val transactionRunner = TestTransactionRunner()
+
     @Before
     fun init() {
         runBlocking {
@@ -69,6 +71,7 @@ internal class ImportDataTests {
             tournamentDao = tournamentDao,
             lineupDao = lineupDao,
             playerFieldPositionsDao = playerFieldPositionsDao,
+            transactionRunner = transactionRunner,
             dispatcherProvider = testDispatcherProvider()
         )
 
@@ -414,5 +417,24 @@ internal class ImportDataTests {
 
         assertEquals(exception, importResult.exceptionOrNull())
         Mockito.verify(teamDao, Mockito.never()).insertTeam(any())
+    }
+
+    @Test
+    fun shouldImportEverythingInOneTransaction() = runTest {
+        mockAllNotFound()
+        mockAllInsertsSucceed()
+        val inTransaction = mutableListOf<Boolean>()
+        Mockito.`when`(teamDao.insertTeam(any())).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            1L
+        }
+        Mockito.`when`(playerFieldPositionsDao.insertPlayerFieldPosition(any())).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            5L
+        }
+
+        assertTrue(importData(exportBase, updateIfExists = false).isSuccess)
+        assertEquals(listOf(true, true), inTransaction)
+        assertEquals(1, transactionRunner.transactions)
     }
 }

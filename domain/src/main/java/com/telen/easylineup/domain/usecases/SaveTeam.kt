@@ -7,6 +7,7 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.ports.DispatcherProvider
+import com.telen.easylineup.domain.ports.TransactionRunner
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import kotlinx.coroutines.withContext
 
@@ -17,28 +18,31 @@ class SaveTeam(
     private val dao: TeamRepository,
     private val checkTeam: CheckTeam,
     private val saveCurrentTeam: SaveCurrentTeam,
+    private val transactionRunner: TransactionRunner,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(team: Team): Result<Team> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            checkTeam(team).getOrThrow()
+            transactionRunner.inTransaction {
+                checkTeam(team).getOrThrow()
 
-            val typedTeam = if (team.type == TeamType.UNKNOWN.id) {
-                team.copy(type = TeamType.BASEBALL.id)
-            } else {
-                team
+                val typedTeam = if (team.type == TeamType.UNKNOWN.id) {
+                    team.copy(type = TeamType.BASEBALL.id)
+                } else {
+                    team
+                }
+
+                val savedTeam = if (typedTeam.id == 0L) {
+                    val withCreatedAt = typedTeam.copy(createdAt = System.currentTimeMillis())
+                    withCreatedAt.copy(id = dao.insertTeam(withCreatedAt))
+                } else {
+                    dao.updateTeam(typedTeam)
+                    typedTeam
+                }
+
+                saveCurrentTeam(savedTeam).getOrThrow()
+                savedTeam
             }
-
-            val savedTeam = if (typedTeam.id == 0L) {
-                val withCreatedAt = typedTeam.copy(createdAt = System.currentTimeMillis())
-                withCreatedAt.copy(id = dao.insertTeam(withCreatedAt))
-            } else {
-                dao.updateTeam(typedTeam)
-                typedTeam
-            }
-
-            saveCurrentTeam(savedTeam).getOrThrow()
-            savedTeam
         }
     }
 }

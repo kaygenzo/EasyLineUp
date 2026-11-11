@@ -11,6 +11,7 @@ import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.tiles.TileType
+import com.telen.easylineup.domain.ports.TransactionRunner
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
@@ -22,6 +23,7 @@ import com.telen.easylineup.repository.adapters.impl.LineupRepositoryImpl
 import com.telen.easylineup.repository.adapters.impl.PlayerFieldPositionRepositoryImpl
 import com.telen.easylineup.repository.adapters.impl.PlayerNumberOverlayRepositoryImpl
 import com.telen.easylineup.repository.adapters.impl.PlayerRepositoryImpl
+import com.telen.easylineup.repository.adapters.impl.RoomTransactionRunner
 import com.telen.easylineup.repository.adapters.impl.TeamRepositoryImpl
 import com.telen.easylineup.repository.adapters.impl.TileRepositoryImpl
 import com.telen.easylineup.repository.adapters.impl.TournamentRepositoryImpl
@@ -95,6 +97,7 @@ object RepositoryModule {
         single<TournamentRepository> { TournamentRepositoryImpl(get()) }
         single<PlayerFieldPositionRepository> { PlayerFieldPositionRepositoryImpl(get()) }
         single<TilesRepository> { TileRepositoryImpl(get()) }
+        single<TransactionRunner> { RoomTransactionRunner(get()) }
     }
 
     private fun migration1To2(): Migration {

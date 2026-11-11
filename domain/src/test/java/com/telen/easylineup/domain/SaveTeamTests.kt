@@ -35,6 +35,8 @@ internal class SaveTeamTests {
     lateinit var saveTeam: SaveTeam
     lateinit var team: Team
 
+    private val transactionRunner = TestTransactionRunner()
+
     @Before
     fun init() {
         runBlocking {
@@ -42,6 +44,7 @@ internal class SaveTeamTests {
             teamDao,
             CheckTeam(testDispatcherProvider()),
             SaveCurrentTeam(teamDao, testDispatcherProvider()),
+            transactionRunner,
             testDispatcherProvider()
         )
         team = Team(id = 1L, name = "test", type = TeamType.BASEBALL.id, main = true)
@@ -100,5 +103,22 @@ internal class SaveTeamTests {
         val result = saveTeam(team)
         assertTrue(result.isSuccess)
         verify(teamDao).updateTeams(any())
+    }
+
+    @Test
+    fun shouldSaveTeamAndMakeItCurrentInOneTransaction() = runTest {
+        val inTransaction = mutableListOf<Boolean>()
+        Mockito.`when`(teamDao.updateTeam(any())).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            Unit
+        }
+        Mockito.`when`(teamDao.updateTeams(any())).thenAnswer {
+            inTransaction.add(transactionRunner.isInTransaction)
+            Unit
+        }
+
+        assertTrue(saveTeam(team).isSuccess)
+        assertEquals(listOf(true, true), inTransaction)
+        assertEquals(1, transactionRunner.transactions)
     }
 }

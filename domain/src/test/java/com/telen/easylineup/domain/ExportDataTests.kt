@@ -68,7 +68,7 @@ internal class ExportDataTests {
         runBlocking {
         val checkHashData = CheckHashData(
             teamDao, playerDao, tournamentDao, lineupDao, playerPositionsDao,
-            testDispatcherProvider()
+            TestTransactionRunner(), testDispatcherProvider()
         )
         export = ExportData(
             checkHashData = checkHashData,
