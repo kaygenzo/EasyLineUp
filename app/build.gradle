@@ -230,7 +230,7 @@ dependencies {
     ////////// OTHERS //////////
 
     implementation libs.timber
-    implementation libs.coil.compose
+    implementation libs.coil
     implementation libs.koin
     implementation libs.koin.androidx.compose
     implementation libs.licenser

@@ -29,7 +29,7 @@ timberVersion = "5.0.1"
 kotlinxCoroutinesVersion = "1.10.2"
 colorPickerVersion = "2.0.6"
 licenserVersion = "2.0.0"
-coilVersion = "2.7.0"
+coilVersion = "3.4.0"
 koinVersion = "4.1.1"
 annotationVersion = "1.11.0"
 # Google
@@ -82,7 +82,7 @@ kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesVersion" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesVersion" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutableVersion" }
-coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilVersion" }
+coil = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coilVersion" }
 koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koinVersion" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectricVersion" }
 roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazziVersion" }

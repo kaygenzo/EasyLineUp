@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.compose
 
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -76,9 +75,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.imageLoader
-import coil.request.ImageRequest
-import coil.size.Scale
+import coil3.imageLoader
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.size.Scale
+import coil3.toBitmap
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
@@ -273,8 +274,7 @@ fun rememberDugoutAvatarBitmap(uri: Uri?, size: Dp): ImageBitmap? {
             .scale(Scale.FILL)
             .allowHardware(false)
             .build()
-        val drawable = context.imageLoader.execute(request).drawable
-        bitmap = (drawable as? BitmapDrawable)?.bitmap?.asImageBitmap()
+        bitmap = context.imageLoader.execute(request).image?.toBitmap()?.asImageBitmap()
     }
     return bitmap
 }
