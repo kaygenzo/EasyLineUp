@@ -37,10 +37,11 @@ data object InvalidLineupName : LineupEditionEvent()
 data object InvalidTournament : LineupEditionEvent()
 
 /**
- * Shared "edit an existing lineup's fields/roster" service - hosted by both the Tournaments
- * list's Edit Lineup sheet and the Lineup screen's Roster Edit sheet. It has no screen of its
- * own, so [uiState] only carries its one true reactive source (the tournament picker options);
- * the sheet's own in-progress form fields stay local to whichever Route is hosting it.
+ * "Edit an existing lineup's fields/roster" service behind the Tournaments list's Edit Lineup
+ * sheet, which saves straight to the database. (The Lineup screen's own roster sheet edits the
+ * screen's unsaved draft instead, through LineupViewModel.) It has no screen of its own, so
+ * [uiState] only carries its one true reactive source (the tournament picker options); the
+ * sheet's own in-progress form fields stay local to the Route hosting it.
  */
 data class LineupEditionUiState(val tournaments: ImmutableList<Tournament> = persistentListOf())
 

@@ -23,7 +23,6 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
-import com.telen.easylineup.domain.usecases.ClearRoster
 import com.telen.easylineup.domain.usecases.DeleteLineup
 import com.telen.easylineup.domain.usecases.DeletePlayerFieldPosition
 import com.telen.easylineup.domain.usecases.GetBattersState
@@ -34,12 +33,10 @@ import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObserveLineupById
 import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
 import com.telen.easylineup.domain.usecases.ObserveTeamPlayersAndMaybePositionsForLineup
-import com.telen.easylineup.domain.usecases.OverrideRosterPlayerNumber
-import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
 import com.telen.easylineup.domain.usecases.SaveDpAndFlex
+import com.telen.easylineup.domain.usecases.SaveLineupDraft
 import com.telen.easylineup.domain.usecases.SetLineupMode
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
-import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
 import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
@@ -134,7 +131,6 @@ data class LineupUiState(
     val infoMessage: LineupInfoMessage? = null,
     val showDiscardSheet: Boolean = false,
     val showDeleteSheet: Boolean = false,
-    val rosterEditLineup: Lineup? = null,
     val rosterEditSummary: TeamRosterSummary = TeamRosterSummary(Constants.STATUS_ALL, emptyList()),
     val rosterEditOriginalSummary: TeamRosterSummary? = null,
     val showRosterEditSheet: Boolean = false,
@@ -148,7 +144,7 @@ class LineupViewModel(
     private val switchPlayersPositionUseCase: SwitchPlayersPosition,
     private val assignPlayerFieldPositionUseCase: AssignPlayerFieldPosition,
     private val getListAvailablePlayersForSelectionUseCase: GetListAvailablePlayersForSelection,
-    private val saveBattingOrderAndPositionsUseCase: SaveBattingOrderAndPositions,
+    private val saveLineupDraftUseCase: SaveLineupDraft,
     private val deleteLineupUseCase: DeleteLineup,
     private val setLineupModeUseCase: SetLineupMode,
     private val getDpAndFlexFromPlayersInFieldUseCase: GetDpAndFlexFromPlayersInField,
@@ -159,9 +155,7 @@ class LineupViewModel(
     private val getOnlyPlayersInFieldUseCase: GetOnlyPlayersInField,
     private val saveDpAndFlexUseCase: SaveDpAndFlex,
     private val updatePlayersWithBattersUseCase: UpdatePlayersWithBatters,
-    private val toggleRosterPlayerUseCase: ToggleRosterPlayer,
-    private val clearRosterUseCase: ClearRoster,
-    private val overrideRosterPlayerNumberUseCase: OverrideRosterPlayerNumber,
+    private val rosterUseCases: LineupRosterUseCases,
     private val lineupPdfWriter: LineupPdfWriter,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
@@ -199,6 +193,13 @@ class LineupViewModel(
      * unsaved changes: any write to the observed tables makes Room re-emit.
      */
     private var hasUnsavedChanges = false
+
+    /**
+     * The roster as edited during this session, once applied to the draft. Until the lineup is
+     * saved it exists only here: reopening the roster sheet starts from it, and saving writes
+     * its per-lineup shirt numbers along with the positions.
+     */
+    private var appliedRoster: TeamRosterSummary? = null
 
     private fun observeLineup() {
         val id = lineupId ?: return
@@ -327,9 +328,14 @@ class LineupViewModel(
             return
         }
         viewModelScope.launch {
-            saveBattingOrderAndPositionsUseCase(currentLineup, _listPlayersWithPosition)
+            saveLineupDraftUseCase(
+                currentLineup,
+                _listPlayersWithPosition,
+                appliedRoster?.players.orEmpty()
+            )
                 .onSuccess {
                     hasUnsavedChanges = false
+                    appliedRoster = null
                     _events.send(LineupEvent.Saved)
                 }
                 .onFailure { Timber.e(it) }
@@ -564,10 +570,26 @@ class LineupViewModel(
         }
     }
 
-    fun onRosterEditLoaded(lineup: Lineup, roster: TeamRosterSummary) {
+    /**
+     * Opens the roster sheet on the roster as this session last left it - the one already
+     * applied to the draft, or else the saved one.
+     */
+    fun onEditRosterClick() {
+        appliedRoster?.let {
+            showRosterEditSheet(it)
+            return
+        }
+        val id = lineupId ?: return
+        viewModelScope.launch {
+            rosterUseCases.getRoster(id)
+                .onSuccess(::showRosterEditSheet)
+                .onFailure { Timber.e(it) }
+        }
+    }
+
+    private fun showRosterEditSheet(roster: TeamRosterSummary) {
         _uiState.update {
             it.copy(
-                rosterEditLineup = lineup,
                 rosterEditSummary = roster,
                 rosterEditOriginalSummary = roster,
                 showRosterEditSheet = true
@@ -575,10 +597,39 @@ class LineupViewModel(
         }
     }
 
+    /**
+     * Applies the edited roster to the draft, like any other change of this session: nothing is
+     * written until the lineup is saved, and cancelling the edit drops it with the rest.
+     */
+    fun onRosterEditDone() {
+        val state = _uiState.value
+        val roster = state.rosterEditSummary
+        val currentLineup = lineup
+        if (roster == state.rosterEditOriginalSummary || currentLineup == null) {
+            closeRosterEditSheet()
+            return
+        }
+        markUnsaved()
+        viewModelScope.launch {
+            rosterUseCases.applyRosterToLineup(
+                currentLineup,
+                _listPlayersWithPosition,
+                roster.players
+            )
+                .onSuccess { updatedLineup ->
+                    lineup = updatedLineup
+                    appliedRoster = roster
+                    recomputeAndPublish()
+                    closeRosterEditSheet()
+                }
+                .onFailure { Timber.e(it) }
+        }
+    }
+
     fun onRosterEditPlayerToggled(position: Int, checked: Boolean) {
         _uiState.update {
             it.copy(
-                rosterEditSummary = toggleRosterPlayerUseCase(
+                rosterEditSummary = rosterUseCases.toggleRosterPlayer(
                     it.rosterEditSummary,
                     position,
                     checked
@@ -589,9 +640,9 @@ class LineupViewModel(
 
     fun onRosterEditNumberChanged(position: Int, number: Int) {
         _uiState.update {
-            val lineupId = it.rosterEditLineup?.id ?: 0L
+            val lineupId = lineup?.id ?: 0L
             it.copy(
-                rosterEditSummary = overrideRosterPlayerNumberUseCase(
+                rosterEditSummary = rosterUseCases.overrideRosterPlayerNumber(
                     it.rosterEditSummary,
                     position,
                     number,
@@ -602,7 +653,9 @@ class LineupViewModel(
     }
 
     fun onRosterEditClearAll() {
-        _uiState.update { it.copy(rosterEditSummary = clearRosterUseCase(it.rosterEditSummary)) }
+        _uiState.update {
+            it.copy(rosterEditSummary = rosterUseCases.clearRoster(it.rosterEditSummary))
+        }
     }
 
     fun onRosterEditDiscardSheetDismiss() {
@@ -622,18 +675,5 @@ class LineupViewModel(
         _uiState.update {
             it.copy(showRosterEditSheet = false, showRosterEditDiscardSheet = false)
         }
-    }
-
-    /**
-     * The roster edit was saved straight to the database (players taken off the roster leave
-     * the lineup there), so the database is now the reference: re-read it, even over unsaved
-     * changes, which the roster save itself was computed without.
-     */
-    fun onRosterEditSaved() {
-        closeRosterEditSheet()
-        hasUnsavedChanges = false
-        observeJob?.cancel()
-        observeJob = null
-        observeLineup()
     }
 }

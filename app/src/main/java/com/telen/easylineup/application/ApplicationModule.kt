@@ -12,6 +12,7 @@ import com.telen.easylineup.domain.ports.GeocodingProvider
 import com.telen.easylineup.domain.ports.ImportFileReader
 import com.telen.easylineup.domain.ports.PhoneNumberValidator
 import com.telen.easylineup.domain.ports.StringResourcesProvider
+import com.telen.easylineup.lineup.LineupRosterUseCases
 import com.telen.easylineup.lineup.LineupViewModel
 import com.telen.easylineup.lineup.create.LineupCreationViewModel
 import com.telen.easylineup.lineup.edition.LineupEditionViewModel
@@ -32,6 +33,7 @@ import com.telen.easylineup.utils.LineupPdfWriterImpl
 import com.telen.easylineup.utils.PhoneNumberValidatorImpl
 import com.telen.easylineup.utils.StringResourcesProviderImpl
 import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val appModules = module {
@@ -42,6 +44,7 @@ val appModules = module {
     single<ExportFileWriter> { ExportFileWriterImpl(get()) }
     single<ImportFileReader> { ImportFileReaderImpl(get()) }
     single<LineupPdfWriter> { LineupPdfWriterImpl(get(), get(), get()) }
+    factoryOf(::LineupRosterUseCases)
 
     // Every ViewModel in the app is constructor-injected and registered explicitly here -
     // no ViewModel resolves its own dependencies via KoinComponent/by inject().

@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.domain
 
+import com.telen.easylineup.domain.usecases.ApplyRosterToLineup
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.CheckHashData
 import com.telen.easylineup.domain.usecases.CheckTeam
@@ -67,6 +68,7 @@ import com.telen.easylineup.domain.usecases.SaveCurrentTeam
 import com.telen.easylineup.domain.usecases.SaveDashboardTiles
 import com.telen.easylineup.domain.usecases.SaveDpAndFlex
 import com.telen.easylineup.domain.usecases.SaveLineupChanges
+import com.telen.easylineup.domain.usecases.SaveLineupDraft
 import com.telen.easylineup.domain.usecases.SavePlayer
 import com.telen.easylineup.domain.usecases.SavePlayerNumberOverlay
 import com.telen.easylineup.domain.usecases.SaveTeam
@@ -120,6 +122,7 @@ object DomainModule {
         single { SetLineupMode(get(), get(), get()) }
         single { UpdatePlayersWithLineupMode(get()) }
         single { GetRoster(get(), get(), get(), get(), get()) }
+        single { ApplyRosterToLineup(get()) }
         single { UpdateLineupRoster(get(), get(), get(), get(), get(), get()) }
         single { DeleteTeam(get(), get(), get()) }
         single { SwitchPlayersPosition(get(), get()) }
@@ -138,6 +141,7 @@ object DomainModule {
         single { GetBattersState(get(), get()) }
         single { UpdateLineup(get(), get()) }
         single { SaveLineupChanges(get(), get(), get(), get(), get()) }
+        single { SaveLineupDraft(get(), get(), get(), get()) }
         single { UpdatePlayersWithBatters(get()) }
         single { SaveTournament(get(), get()) }
         single { GetTournamentMapLink(get(), get()) }

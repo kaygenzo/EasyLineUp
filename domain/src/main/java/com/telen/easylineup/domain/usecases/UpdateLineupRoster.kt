@@ -6,7 +6,6 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.isAssigned
-import com.telen.easylineup.domain.model.toPlayer
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.TransactionRunner
 import com.telen.easylineup.domain.ports.repository.LineupRepository
@@ -14,15 +13,16 @@ import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepositor
 import kotlinx.coroutines.withContext
 
 /**
- * Saves which players are on a lineup's roster. A player taken off the roster is no longer
- * part of that game, so they also leave the lineup itself: field, batting order and bench.
- * Removal goes through [DeletePlayerFieldPosition], the same rule as removing them by hand, so
- * a DP/Flex pair is unlinked and a batting substitute's slot passes to the next substitute.
+ * Saves which players are on a lineup's roster, straight to the database - for screens that
+ * edit the roster on its own, outside a lineup edit session. A player taken off the roster is
+ * no longer part of that game, so they also leave the lineup itself: field, batting order and
+ * bench. The rule itself is [ApplyRosterToLineup]'s, shared with the lineup editor, which
+ * applies it to its unsaved draft instead.
  */
 class UpdateLineupRoster(
     private val lineupRepository: LineupRepository,
     private val pfpRepository: PlayerFieldPositionRepository,
-    private val deletePlayerFieldPosition: DeletePlayerFieldPosition,
+    private val applyRosterToLineup: ApplyRosterToLineup,
     private val saveBattingOrderAndPositions: SaveBattingOrderAndPositions,
     private val transactionRunner: TransactionRunner,
     private val dispatcherProvider: DispatcherProvider
@@ -31,43 +31,21 @@ class UpdateLineupRoster(
         runCatchingCancellable {
             withContext(dispatcherProvider.io()) {
                 transactionRunner.inTransaction {
-                    val lineup = lineupRepository.getLineupById(lineupId)
-                        .copy(roster = rosterToString(roster))
-                    val removedIds = roster.filterNot { it.status }.map { it.player.id }.toSet()
                     val players = pfpRepository.getAllPlayersWithPositionsForLineup(lineupId)
-                    val toRemove = players.filter { it.playerId in removedIds && it.isAssigned() }
-                    if (toRemove.isEmpty()) {
+                    val removedIds = roster.filterNot { it.status }.map { it.player.id }.toSet()
+                    val removesAPlayer =
+                        players.any { it.playerId in removedIds && it.isAssigned() }
+                    val lineup = applyRosterToLineup(
+                        lineupRepository.getLineupById(lineupId),
+                        players,
+                        roster
+                    ).getOrThrow()
+                    if (removesAPlayer) {
+                        saveBattingOrderAndPositions(lineup, players).getOrThrow()
+                    } else {
                         lineupRepository.updateLineup(lineup)
-                        return@inTransaction
                     }
-                    toRemove.forEach { player ->
-                        // A field player first goes back to the bench, then leaves it: two steps,
-                        // exactly like removing them twice by hand.
-                        repeat(2) {
-                            if (!player.isAssigned()) return@repeat
-                            deletePlayerFieldPosition(
-                                players,
-                                player.toPlayer(),
-                                lineup.mode,
-                                lineup.extraHitters
-                            ).getOrThrow()
-                        }
-                    }
-                    saveBattingOrderAndPositions(lineup, players).getOrThrow()
                 }
             }
         }
-
-    private fun rosterToString(list: List<RosterPlayerStatus>): String {
-        val builder = StringBuilder()
-        list.forEach {
-            if (it.status) {
-                if (builder.isNotEmpty()) {
-                    builder.append(";")
-                }
-                builder.append(it.player.id)
-            }
-        }
-        return builder.toString()
-    }
 }

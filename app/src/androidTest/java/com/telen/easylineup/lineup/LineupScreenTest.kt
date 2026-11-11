@@ -186,6 +186,37 @@ class LineupScreenTest {
     }
 
     @Test
+    fun changingTheRosterKeepsTheOtherUnsavedChanges() {
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.waitForText(string(R.string.action_save_lineup))
+
+        composeTestRule.waitForTag(FieldPosition.PITCHER.markerTag)
+        composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).performClick()
+        composeTestRule.waitForText(string(R.string.defense_select_player_sheet_title))
+        composeTestRule.onNodeWithText("Substitute 1").performClick()
+        composeTestRule.waitForAbsence(string(R.string.defense_select_player_sheet_title))
+
+        // The roster used to be saved on its own and the lineup re-read from the database,
+        // which dropped the reassignment above.
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.action_edit_roster))
+            .performClick()
+        composeTestRule.waitForText("Starter 2")
+        composeTestRule.onNodeWithText("Starter 2").performClick()
+        val done = string(R.string.lineup_creation_roster_done) + " · " +
+            string(R.string.lineup_creation_roster_selected_format, 11, 12)
+        composeTestRule.waitForText(done)
+        composeTestRule.onNodeWithText(done).performClick()
+        composeTestRule.waitForAbsence(done)
+
+        composeTestRule
+            .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
+            .performClick()
+        composeTestRule.waitForText(string(R.string.new_lineup_tab_field_offense))
+        composeTestRule.onNodeWithText("Substitute 1").assertIsDisplayed()
+    }
+
+    @Test
     fun tappingDpDhInEditModeOpensLinkSheet() {
         composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))

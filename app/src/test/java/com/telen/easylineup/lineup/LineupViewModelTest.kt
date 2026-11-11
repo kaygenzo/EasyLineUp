@@ -15,6 +15,8 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.model.isAssigned
+import com.telen.easylineup.domain.usecases.ApplyRosterToLineup
 import com.telen.easylineup.domain.usecases.AssignPlayerFieldPosition
 import com.telen.easylineup.domain.usecases.ClearRoster
 import com.telen.easylineup.domain.usecases.DeleteLineup
@@ -23,13 +25,14 @@ import com.telen.easylineup.domain.usecases.GetBattersState
 import com.telen.easylineup.domain.usecases.GetDpAndFlexFromPlayersInField
 import com.telen.easylineup.domain.usecases.GetListAvailablePlayersForSelection
 import com.telen.easylineup.domain.usecases.GetOnlyPlayersInField
+import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ObserveLineupById
 import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
 import com.telen.easylineup.domain.usecases.ObserveTeamPlayersAndMaybePositionsForLineup
 import com.telen.easylineup.domain.usecases.OverrideRosterPlayerNumber
-import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
 import com.telen.easylineup.domain.usecases.SaveDpAndFlex
+import com.telen.easylineup.domain.usecases.SaveLineupDraft
 import com.telen.easylineup.domain.usecases.SetLineupMode
 import com.telen.easylineup.domain.usecases.SwitchPlayersPosition
 import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
@@ -81,7 +84,8 @@ internal class LineupViewModelTest {
     @Mock lateinit var assignPlayerFieldPositionUseCase: AssignPlayerFieldPosition
     @Mock
     lateinit var getListAvailablePlayersForSelectionUseCase: GetListAvailablePlayersForSelection
-    @Mock lateinit var saveBattingOrderAndPositionsUseCase: SaveBattingOrderAndPositions
+    @Mock lateinit var saveLineupDraftUseCase: SaveLineupDraft
+    @Mock lateinit var getRosterUseCase: GetRoster
     @Mock lateinit var deleteLineupUseCase: DeleteLineup
     @Mock lateinit var setLineupModeUseCase: SetLineupMode
     @Mock lateinit var getDpAndFlexFromPlayersInFieldUseCase: GetDpAndFlexFromPlayersInField
@@ -143,7 +147,7 @@ internal class LineupViewModelTest {
         switchPlayersPositionUseCase,
         assignPlayerFieldPositionUseCase,
         getListAvailablePlayersForSelectionUseCase,
-        saveBattingOrderAndPositionsUseCase,
+        saveLineupDraftUseCase,
         deleteLineupUseCase,
         setLineupModeUseCase,
         getDpAndFlexFromPlayersInFieldUseCase,
@@ -153,9 +157,13 @@ internal class LineupViewModelTest {
         getOnlyPlayersInFieldUseCase,
         saveDpAndFlexUseCase,
         updatePlayersWithBattersUseCase,
-        ToggleRosterPlayer(),
-        ClearRoster(),
-        OverrideRosterPlayerNumber(),
+        LineupRosterUseCases(
+            getRosterUseCase,
+            ApplyRosterToLineup(DeletePlayerFieldPosition(testDispatcherProvider())),
+            ToggleRosterPlayer(),
+            ClearRoster(),
+            OverrideRosterPlayerNumber()
+        ),
         lineupPdfWriter,
         testDispatcherProvider()
     )
@@ -244,7 +252,7 @@ internal class LineupViewModelTest {
         advanceUntilIdle()
 
         assertTrue(events.isEmpty())
-        Mockito.verifyNoInteractions(saveBattingOrderAndPositionsUseCase)
+        Mockito.verifyNoInteractions(saveLineupDraftUseCase)
     }
 
     @Test
@@ -253,7 +261,7 @@ internal class LineupViewModelTest {
         loadLineup(lineup)
         advanceUntilIdle()
         runBlocking {
-            Mockito.`when`(saveBattingOrderAndPositionsUseCase(eq(lineup), any()))
+            Mockito.`when`(saveLineupDraftUseCase(eq(lineup), any(), any()))
                 .thenReturn(Result.success(Unit))
         }
 
@@ -602,30 +610,35 @@ internal class LineupViewModelTest {
         }
     }
 
+    private suspend fun openRosterSheet(lineup: Lineup, roster: TeamRosterSummary) {
+        loadLineup(lineup)
+        Mockito.`when`(getRosterUseCase(lineup.id)).thenReturn(Result.success(roster))
+        viewModel.onEditRosterClick()
+    }
+
     @Test
-    fun shouldLoadAndMutateRosterEditState() {
+    fun shouldLoadAndMutateRosterEditState() = runTest {
         val lineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
         val roster = TeamRosterSummary(
             status = com.telen.easylineup.domain.Constants.STATUS_ALL,
             players = emptyList()
         )
 
-        viewModel.onRosterEditLoaded(lineup, roster)
+        openRosterSheet(lineup, roster)
 
         val state = viewModel.uiState.value
         assertTrue(state.showRosterEditSheet)
-        assertEquals(lineup, state.rosterEditLineup)
         assertEquals(roster, state.rosterEditOriginalSummary)
     }
 
     @Test
-    fun shouldDismissImmediatelyWhenRosterEditUnchanged() {
+    fun shouldDismissImmediatelyWhenRosterEditUnchanged() = runTest {
         val lineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
         val roster = TeamRosterSummary(
             status = com.telen.easylineup.domain.Constants.STATUS_ALL,
             players = emptyList()
         )
-        viewModel.onRosterEditLoaded(lineup, roster)
+        openRosterSheet(lineup, roster)
 
         viewModel.onRosterEditDismissRequested()
 
@@ -635,7 +648,7 @@ internal class LineupViewModelTest {
     }
 
     @Test
-    fun shouldShowDiscardSheetWhenRosterEditChanged() {
+    fun shouldShowDiscardSheetWhenRosterEditChanged() = runTest {
         val lineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
         val roster = TeamRosterSummary(
             status = com.telen.easylineup.domain.Constants.STATUS_ALL,
@@ -649,7 +662,7 @@ internal class LineupViewModelTest {
                 )
             )
         )
-        viewModel.onRosterEditLoaded(lineup, roster)
+        openRosterSheet(lineup, roster)
 
         viewModel.onRosterEditPlayerToggled(0, false)
         viewModel.onRosterEditDismissRequested()
@@ -658,13 +671,13 @@ internal class LineupViewModelTest {
     }
 
     @Test
-    fun shouldCloseRosterEditSheet() {
+    fun shouldCloseRosterEditSheet() = runTest {
         val lineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
         val roster = TeamRosterSummary(
             status = com.telen.easylineup.domain.Constants.STATUS_ALL,
             players = emptyList()
         )
-        viewModel.onRosterEditLoaded(lineup, roster)
+        openRosterSheet(lineup, roster)
 
         viewModel.closeRosterEditSheet()
 
@@ -743,9 +756,9 @@ internal class LineupViewModelTest {
     )
 
     @Test
-    fun shouldOverrideARosterPlayerNumberForTheEditedLineup() {
+    fun shouldOverrideARosterPlayerNumberForTheEditedLineup() = runTest {
         val lineup = Lineup(id = 7L, name = "L", teamId = 1L, tournamentId = 1L)
-        viewModel.onRosterEditLoaded(lineup, rosterOfOnePlayer())
+        openRosterSheet(lineup, rosterOfOnePlayer())
 
         viewModel.onRosterEditNumberChanged(0, 42)
 
@@ -756,9 +769,9 @@ internal class LineupViewModelTest {
     }
 
     @Test
-    fun shouldDeselectEveryPlayerWhenClearingTheRoster() {
+    fun shouldDeselectEveryPlayerWhenClearingTheRoster() = runTest {
         val lineup = Lineup(id = 7L, name = "L", teamId = 1L, tournamentId = 1L)
-        viewModel.onRosterEditLoaded(lineup, rosterOfOnePlayer())
+        openRosterSheet(lineup, rosterOfOnePlayer())
 
         viewModel.onRosterEditClearAll()
 
@@ -766,9 +779,9 @@ internal class LineupViewModelTest {
     }
 
     @Test
-    fun shouldKeepEditingWhenDismissingTheDiscardSheet() {
+    fun shouldKeepEditingWhenDismissingTheDiscardSheet() = runTest {
         val lineup = Lineup(id = 7L, name = "L", teamId = 1L, tournamentId = 1L)
-        viewModel.onRosterEditLoaded(lineup, rosterOfOnePlayer())
+        openRosterSheet(lineup, rosterOfOnePlayer())
         viewModel.onRosterEditPlayerToggled(0, false)
         viewModel.onRosterEditDismissRequested()
 
@@ -1078,7 +1091,7 @@ internal class LineupViewModelTest {
     @Test
     fun shouldReadTheDatabaseAgainOnceTheEditIsSaved() = runTest {
         startEditingAfterADelete()
-        Mockito.`when`(saveBattingOrderAndPositionsUseCase(eq(loadedLineup), any()))
+        Mockito.`when`(saveLineupDraftUseCase(eq(loadedLineup), any(), any()))
             .thenReturn(Result.success(Unit))
         viewModel.onSaveClick()
         advanceUntilIdle()
@@ -1102,18 +1115,116 @@ internal class LineupViewModelTest {
         assertEquals(listOf(1L), viewModel.uiState.value.defensePlayers.map { it.playerId })
     }
 
+    private fun rosterOf(vararg selected: Pair<Long, Boolean>) = TeamRosterSummary(
+        status = com.telen.easylineup.domain.Constants.STATUS_ALL,
+        players = selected.map { (id, status) ->
+            com.telen.easylineup.domain.model.RosterPlayerStatus(
+                player = Player(
+                    id = id,
+                    teamId = 1L,
+                    name = "p$id",
+                    shirtNumber = id.toInt(),
+                    licenseNumber = "$id"
+                ),
+                status = status,
+                playerNumberOverlay = null
+            )
+        }
+    )
+
+    /** Edit mode, pitcher 1 and catcher 2 on the field, roster sheet open with both picked. */
+    private suspend fun openRosterSheetWhileEditing() {
+        viewModel.editable = true
+        val pitcher = player(1L, FieldPosition.PITCHER.id, 1)
+        val catcher = player(2L, FieldPosition.CATCHER.id, 2)
+        loadLineup(loadedLineup, listOf(pitcher, catcher))
+        Mockito.`when`(getRosterUseCase(loadedLineup.id))
+            .thenReturn(Result.success(rosterOf(1L to true, 2L to true)))
+        viewModel.onEditRosterClick()
+    }
+
     @Test
-    fun shouldTakeTheDatabaseOverTheEditAfterASavedRosterChange() = runTest {
-        startEditingAfterADelete()
+    fun shouldApplyAnEditedRosterToTheDraftWithoutSavingIt() = runTest {
+        openRosterSheetWhileEditing()
+
+        viewModel.onRosterEditPlayerToggled(1, false)
+        viewModel.onRosterEditDone()
         advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.showRosterEditSheet)
+        val catcher = state.defensePlayers.single { it.playerId == 2L }
+        assertFalse(catcher.isAssigned())
+        val pitcher = state.defensePlayers.single { it.playerId == 1L }
+        assertEquals(FieldPosition.PITCHER.id, pitcher.position)
+        Mockito.verifyNoInteractions(saveLineupDraftUseCase)
+    }
+
+    @Test
+    fun shouldKeepTheDraftAfterARosterChangeInsteadOfReReadingTheDatabase() = runTest {
+        openRosterSheetWhileEditing()
+        viewModel.onRosterEditPlayerToggled(1, false)
+        viewModel.onRosterEditDone()
+        advanceUntilIdle()
+
         playersFlow.emit(listOf(player(9L)))
         advanceUntilIdle()
 
-        viewModel.onRosterEditSaved()
+        assertEquals(
+            listOf(1L, 2L),
+            viewModel.uiState.value.defensePlayers.map { it.playerId }
+        )
+        Mockito.verify(observeLineupByIdUseCase, Mockito.times(1)).invoke(loadedLineup.id)
+    }
+
+    @Test
+    fun shouldReopenTheRosterSheetOnTheRosterAlreadyApplied() = runTest {
+        openRosterSheetWhileEditing()
+        viewModel.onRosterEditPlayerToggled(1, false)
+        viewModel.onRosterEditDone()
         advanceUntilIdle()
 
-        assertEquals(listOf(9L), viewModel.uiState.value.defensePlayers.map { it.playerId })
+        viewModel.onEditRosterClick()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.showRosterEditSheet)
+        assertFalse(state.rosterEditSummary.players.single { it.player.id == 2L }.status)
+        Mockito.verify(getRosterUseCase, Mockito.times(1)).invoke(loadedLineup.id)
+    }
+
+    @Test
+    fun shouldSaveTheAppliedRosterAlongWithTheLineup() = runTest {
+        openRosterSheetWhileEditing()
+        viewModel.onRosterEditPlayerToggled(1, false)
+        viewModel.onRosterEditDone()
+        advanceUntilIdle()
+        Mockito.`when`(saveLineupDraftUseCase(any(), any(), any()))
+            .thenReturn(Result.success(Unit))
+
+        viewModel.onSaveClick()
+        advanceUntilIdle()
+
+        val savedLineup = argumentCaptor<Lineup>()
+        val savedNumbers =
+            argumentCaptor<List<com.telen.easylineup.domain.model.RosterPlayerStatus>>()
+        Mockito.verify(saveLineupDraftUseCase)
+            .invoke(savedLineup.capture(), any(), savedNumbers.capture())
+        assertEquals("1", savedLineup.firstValue.roster)
+        assertEquals(listOf(1L, 2L), savedNumbers.firstValue.map { it.player.id })
+    }
+
+    @Test
+    fun shouldLeaveTheDraftUntouchedWhenTheRosterIsUnchanged() = runTest {
+        openRosterSheetWhileEditing()
+
+        viewModel.onRosterEditDone()
+        advanceUntilIdle()
+
+        // Nothing was edited, so the draft still follows the database.
         assertFalse(viewModel.uiState.value.showRosterEditSheet)
+        playersFlow.emit(listOf(player(9L)))
+        advanceUntilIdle()
+        assertEquals(listOf(9L), viewModel.uiState.value.defensePlayers.map { it.playerId })
     }
 
     @Test

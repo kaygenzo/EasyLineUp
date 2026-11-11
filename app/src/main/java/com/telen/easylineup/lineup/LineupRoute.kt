@@ -31,8 +31,6 @@ import com.telen.easylineup.domain.model.toPlayer
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.lineup.defense.AvailablePlayersSheet
 import com.telen.easylineup.lineup.defense.DpFlexLinkSheet
-import com.telen.easylineup.lineup.edition.LineupEditionViewModel
-import com.telen.easylineup.lineup.edition.LineupUpdated
 import com.telen.easylineup.lineup.edition.RosterEditSheet
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
@@ -55,7 +53,6 @@ fun LineupRoute(
     fromShortcut: Boolean
 ) {
     val viewModel = koinViewModel<LineupViewModel>()
-    val editionViewModel = koinViewModel<LineupEditionViewModel>()
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
@@ -123,12 +120,6 @@ fun LineupRoute(
             }
     }
 
-    LaunchedEffect(editionViewModel) {
-        editionViewModel.events
-            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .collect { event -> if (event == LineupUpdated) viewModel.onRosterEditSaved() }
-    }
-
     BackHandler(enabled = editable) {
         FirebaseAnalyticsUtils.onClick(context, "click_lineup_edit_cancel_back_pressed")
         viewModel.onDiscardSheetRequested()
@@ -154,15 +145,7 @@ fun LineupRoute(
             FirebaseAnalyticsUtils.onClick(context, "click_lineup_edit")
             navController.navigate(Routes.Lineup(lineupId = lineupId, editable = true))
         },
-        onEditRosterClick = {
-            coroutineScope.launch {
-                editionViewModel.load(lineupId)
-                    .onSuccess { (loadedLineup, roster) ->
-                        viewModel.onRosterEditLoaded(loadedLineup, roster)
-                    }
-                    .onFailure { Timber.e(it) }
-            }
-        },
+        onEditRosterClick = viewModel::onEditRosterClick,
         defenseStrategy = state.defenseStrategy,
         defensePlayers = state.defensePlayers,
         lineupMode = state.lineupMode,
@@ -280,9 +263,7 @@ fun LineupRoute(
             onPlayerToggled = viewModel::onRosterEditPlayerToggled,
             onNumberChanged = viewModel::onRosterEditNumberChanged,
             onClearAll = viewModel::onRosterEditClearAll,
-            onDoneClick = {
-                state.rosterEditLineup?.let { editionViewModel.save(it, state.rosterEditSummary) }
-            }
+            onDoneClick = viewModel::onRosterEditDone
         )
     }
 

@@ -12,6 +12,7 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
+import com.telen.easylineup.domain.usecases.ApplyRosterToLineup
 import com.telen.easylineup.domain.usecases.DeletePlayerFieldPosition
 import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
 import com.telen.easylineup.domain.usecases.UpdateLineupRoster
@@ -70,7 +71,7 @@ internal class UpdateLineupRosterTests {
             updateLineupRoster = UpdateLineupRoster(
                 lineupRepository,
                 pfpRepository,
-                DeletePlayerFieldPosition(dispatchers),
+                ApplyRosterToLineup(DeletePlayerFieldPosition(dispatchers)),
                 SaveBattingOrderAndPositions(
                     lineupRepository,
                     pfpRepository,
