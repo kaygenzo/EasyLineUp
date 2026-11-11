@@ -43,6 +43,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -347,7 +348,7 @@ fun TournamentPickerSheet(
     onTournamentSelected: (Tournament) -> Unit,
     onCreateTournamentClick: (() -> Unit)? = null
 ) {
-    var query by remember { mutableStateOf("") }
+    var query by rememberSaveable { mutableStateOf("") }
     val filtered = remember(query, tournaments) {
         if (query.isBlank()) {
             tournaments
@@ -619,7 +620,7 @@ fun RosterPickerContent(
     onDoneClick: () -> Unit,
     onNumberChanged: ((Int, Int) -> Unit)? = null
 ) {
-    var query by remember { mutableStateOf("") }
+    var query by rememberSaveable { mutableStateOf("") }
     val indexedPlayers = remember(roster) { roster.players.withIndex().toList() }
     val filtered = remember(query, indexedPlayers) {
         if (query.isBlank()) {

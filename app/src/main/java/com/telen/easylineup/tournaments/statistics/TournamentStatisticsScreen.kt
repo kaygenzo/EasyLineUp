@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -95,7 +96,7 @@ fun TournamentStatisticsScreen(state: TournamentStatisticsUiState, onBackClick: 
     var selectedPlayerId by remember(playerStats) {
         mutableStateOf(playerStats.firstOrNull()?.playerId)
     }
-    var showPlayerPicker by remember { mutableStateOf(false) }
+    var showPlayerPicker by rememberSaveable { mutableStateOf(false) }
     // The positions actually played anywhere in this tournament, not one strategy's theoretical
     // column set - a team that played under more than one strategy (e.g. softball's Slowpitch,
     // with 4 outfielders instead of 3) would otherwise silently lose real data off the chart.

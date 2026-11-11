@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -61,7 +62,7 @@ fun TournamentListRoute(navController: NavController) {
     val teamUiState by teamViewModel.uiState.collectAsStateWithLifecycle()
     val editionUiState by editionViewModel.uiState.collectAsStateWithLifecycle()
 
-    var tournamentPendingDeletion by remember { mutableStateOf<Tournament?>(null) }
+    var tournamentPendingDeletion by rememberSaveable { mutableStateOf<Tournament?>(null) }
 
     // The Edit Lineup sheet's own in-progress scratch fields - local to this Route since
     // LineupEditionViewModel has no screen of its own, only load()/save() actions (see its

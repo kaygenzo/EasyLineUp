@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -137,7 +138,7 @@ fun DefenseScreen(
     onLineupModeChanged: (Boolean) -> Unit,
     sortSubstitutesForDisplay: SortSubstitutesForDisplay = SortSubstitutesForDisplay()
 ) {
-    var showDisableDhConfirm by remember { mutableStateOf(false) }
+    var showDisableDhConfirm by rememberSaveable { mutableStateOf(false) }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val horizontalPadding = 16.dp

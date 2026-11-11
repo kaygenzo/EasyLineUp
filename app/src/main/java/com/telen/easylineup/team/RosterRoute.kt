@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,7 +39,7 @@ fun RosterRoute(navController: NavController) {
         uiState.players.map { it.toRosterRowState() }.toImmutableList()
     }
 
-    var showMessageSheet by remember { mutableStateOf(false) }
+    var showMessageSheet by rememberSaveable { mutableStateOf(false) }
 
     RosterScreen(
         state = RosterState(

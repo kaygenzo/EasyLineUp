@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -46,7 +47,7 @@ fun TeamDetailsRoute(navController: NavController) {
         ActivityResultContracts.StartActivityForResult()
     ) { teamViewModel.loadTeam() }
 
-    var showDeleteSheet by remember { mutableStateOf(false) }
+    var showDeleteSheet by rememberSaveable { mutableStateOf(false) }
 
     val lineupsBuilt = remember(lineupListUiState.tournamentItems) {
         lineupListUiState.tournamentItems.sumOf { it.lineups.count() }
