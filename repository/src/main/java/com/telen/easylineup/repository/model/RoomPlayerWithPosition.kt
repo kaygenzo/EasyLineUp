@@ -20,6 +20,7 @@ import com.telen.easylineup.domain.model.PlayerWithPosition
  * @property flags
  * @property order
  * @property fieldPositionId
+ * @property fieldPositionHash
  * @property playerId
  * @property lineupId
  * @property playerPositions
@@ -37,6 +38,7 @@ internal data class RoomPlayerWithPosition(
     @ColumnInfo(name = "flags") var flags: Int = 0,
     @ColumnInfo(name = "order") var order: Int = 0,
     @ColumnInfo(name = "fieldPositionID") var fieldPositionId: Long = 0,
+    @ColumnInfo(name = "fieldPositionHash") val fieldPositionHash: String? = null,
     @ColumnInfo(name = "playerID") val playerId: Long,
     @ColumnInfo(name = "lineupID") val lineupId: Long,
     @ColumnInfo(name = "playerPositions") val playerPositions: Int
@@ -56,6 +58,7 @@ internal fun RoomPlayerWithPosition.toDomain(): PlayerWithPosition {
         flags = flags,
         order = order,
         fieldPositionId = fieldPositionId,
+        fieldPositionHash = fieldPositionHash,
         playerId = playerId,
         lineupId = lineupId,
         playerPositions = playerPositions

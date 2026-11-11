@@ -54,7 +54,8 @@ internal interface PlayerDao {
 
     @Query(
         """
-        SELECT result.*, position, x, y, `order`, playerFieldPosition.id as fieldPositionID, flags
+        SELECT result.*, position, x, y, `order`, playerFieldPosition.id as fieldPositionID, flags,
+            playerFieldPosition.hash as fieldPositionHash
         FROM (
             SELECT lineups.id as lineupID,
                 players.name as playerName,

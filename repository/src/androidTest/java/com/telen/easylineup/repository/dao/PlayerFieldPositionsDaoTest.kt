@@ -12,6 +12,7 @@ import com.telen.easylineup.repository.model.RoomPlayer
 import com.telen.easylineup.repository.model.RoomPlayerFieldPosition
 import com.telen.easylineup.repository.model.RoomTeam
 import com.telen.easylineup.repository.model.RoomTournament
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -149,6 +150,30 @@ class PlayerFieldPositionsDaoTest {
         assertEquals(listOf("First Batter", "Second Batter"), rows.map { it.playerName })
         assertEquals(listOf(1, 2), rows.map { it.position })
         assertEquals(listOf(lineupId, lineupId), rows.map { it.lineupId })
+    }
+
+    @Test
+    fun bothPlayerWithPositionQueriesCarryThePositionHash() = runBlocking {
+        val teamId = insertTeam("Riverside Hawks")
+        val tournamentId = insertTournament("Fall Classic")
+        val lineupId = insertLineup(teamId, tournamentId, "Game 1")
+        val playerId = insertPlayer(teamId, "Player")
+        dao.insertPlayerFieldPositions(
+            listOf(
+                RoomPlayerFieldPosition(
+                    playerId = playerId,
+                    lineupId = lineupId,
+                    position = 1,
+                    hash = "position-hash"
+                )
+            )
+        )
+
+        val positioned = dao.getAllPlayersWithPositionsForLineup(lineupId).single()
+        val teamRow = db.playerDao().getTeamPlayersAndMaybePositions(lineupId).first().single()
+
+        assertEquals("position-hash", positioned.fieldPositionHash)
+        assertEquals("position-hash", teamRow.fieldPositionHash)
     }
 
     @Test

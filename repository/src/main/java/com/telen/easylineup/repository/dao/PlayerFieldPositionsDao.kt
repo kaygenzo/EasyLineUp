@@ -67,6 +67,7 @@ internal interface PlayerFieldPositionsDao {
         playerFieldPosition.position,
         playerFieldPosition.x, playerFieldPosition.y,
         playerFieldPosition.`order`, playerFieldPosition.id as fieldPositionID,
+        playerFieldPosition.hash as fieldPositionHash,
         playerFieldPosition.lineupID,
         playerFieldPosition.flags,
         players.id as playerID,

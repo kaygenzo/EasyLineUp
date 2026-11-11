@@ -22,6 +22,8 @@ import com.telen.easylineup.domain.Constants
  * @property playerId
  * @property lineupId
  * @property playerPositions
+ * @property fieldPositionHash the hash of this player's position row, once it has one: an export
+ * identifies the row by it, so saving the row again must keep it
  */
 data class PlayerWithPosition(
     val playerName: String,
@@ -38,7 +40,8 @@ data class PlayerWithPosition(
     val fieldPositionId: Long = 0,
     val playerId: Long = 0,
     val lineupId: Long,
-    val playerPositions: Int
+    val playerPositions: Int,
+    val fieldPositionHash: String? = null
 )
 
 fun PlayerWithPosition.toPlayer(): Player {
@@ -55,10 +58,13 @@ fun PlayerWithPosition.toPlayer(): Player {
 }
 
 fun PlayerWithPosition.toPlayerFieldPosition(): PlayerFieldPosition {
-    return PlayerFieldPosition(
+    val position = PlayerFieldPosition(
         id = fieldPositionId, playerId = playerId, position = position, x = x, y = y,
         order = order, lineupId = lineupId, flags = flags
     )
+    // Without its own hash, each save gave the row a new random one, and importing an earlier
+    // export of the lineup then matched nothing and added the position a second time.
+    return fieldPositionHash?.let { position.copy(hash = it) } ?: position
 }
 
 fun PlayerWithPosition.isSubstitute(): Boolean {

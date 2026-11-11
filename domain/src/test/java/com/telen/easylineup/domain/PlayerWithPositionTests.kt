@@ -134,6 +134,21 @@ internal class PlayerWithPositionTests {
     }
 
     @Test
+    fun shouldKeepThePositionRowHashWhenMappingItBack() {
+        val saved = player(position = FieldPosition.PITCHER.id, order = 1, fieldPositionId = 7L)
+            .copy(fieldPositionHash = "position-hash")
+
+        assertEquals("position-hash", saved.toPlayerFieldPosition().hash)
+    }
+
+    @Test
+    fun shouldGiveANewPositionRowAFreshHash() {
+        val fresh = player(position = FieldPosition.PITCHER.id, order = 1)
+
+        assertTrue(!fresh.toPlayerFieldPosition().hash.isNullOrBlank())
+    }
+
+    @Test
     fun shouldMapToAMatchingPlayerFieldPosition() {
         val assigned = player(position = FieldPosition.PITCHER.id, order = 2, fieldPositionId = 7L)
             .copy(x = 12.5f, y = 88.25f, flags = PlayerFieldPosition.FLAG_FLEX)
