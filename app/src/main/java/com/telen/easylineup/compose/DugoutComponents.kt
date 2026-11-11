@@ -996,7 +996,7 @@ fun DugoutBottomNav(selected: BottomNavTab?, onSelect: (BottomNavTab) -> Unit) {
             .padding(top = 10.dp, bottom = 16.dp, start = 8.dp, end = 8.dp),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-        BottomNavTab.values().forEach { tab ->
+        BottomNavTab.entries.forEach { tab ->
             val active = tab == selected
             val tint = if (active) {
                 MaterialTheme.colorScheme.primary

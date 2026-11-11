@@ -29,7 +29,7 @@ import com.telen.easylineup.utils.startActivityOrNotify
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
 
-/** Replaces `PlayersFragment` - the `navigation_team` root tab. */
+/** The team roster, the `navigation_team` root tab. */
 @Composable
 fun RosterRoute(navController: NavController) {
     val viewModel = koinViewModel<TeamViewModel>()

@@ -35,7 +35,7 @@ enum class FieldPosition(val id: Int, val mask: Int, val position: Int) {
 
     companion object {
         fun getFieldPositionById(id: Int): FieldPosition? {
-            return values().firstOrNull { id == it.id }
+            return entries.firstOrNull { id == it.id }
         }
 
         /**
@@ -43,12 +43,12 @@ enum class FieldPosition(val id: Int, val mask: Int, val position: Int) {
          * covers - used to show a player's "main" position when only one can be displayed.
          */
         fun findPrimaryDefensePosition(positionsMask: Int): FieldPosition? {
-            return values().firstOrNull { it.isDefensePlayer() && it.matches(positionsMask) }
+            return entries.firstOrNull { it.isDefensePlayer() && it.matches(positionsMask) }
         }
 
         /** One representative position per mask group - the handful the position pickers offer. */
         val availablePositions: List<FieldPosition> by lazy {
-            values().filter { it.isDefensePlayer() }.groupBy { it.mask }.map { it.value.first() }
+            entries.filter { it.isDefensePlayer() }.groupBy { it.mask }.map { it.value.first() }
         }
     }
 }

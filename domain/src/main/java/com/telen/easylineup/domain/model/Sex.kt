@@ -15,7 +15,7 @@ enum class Sex(val id: Int) {
 
     companion object {
         fun getById(id: Int): Sex {
-            return values().firstOrNull { it.id == id } ?: UNKNOWN
+            return entries.firstOrNull { it.id == id } ?: UNKNOWN
         }
     }
 }

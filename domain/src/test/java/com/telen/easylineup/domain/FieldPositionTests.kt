@@ -26,7 +26,7 @@ internal class FieldPositionTests {
 
     @Test
     fun shouldNotMatchAnyPositionForAnEmptyMask() {
-        FieldPosition.values().forEach { position ->
+        FieldPosition.entries.forEach { position ->
             assertFalse(position.matches(0))
         }
     }

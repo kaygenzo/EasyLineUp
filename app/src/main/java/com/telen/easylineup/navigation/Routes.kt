@@ -7,11 +7,9 @@ package com.telen.easylineup.navigation
 import kotlinx.serialization.Serializable
 
 /**
- * Every destination the app's single [androidx.navigation.compose.NavHost] can show, replacing
- * `app_navigation.xml`'s Fragment destinations one for one - type-safe route args instead of
- * reading a Fragment's `arguments: Bundle`. [Lineup] collapses the old
- * `lineupFragmentFixed`/`lineupFragmentEditable` pair (same `LineupFragment` base class, only
- * differing by a constructor boolean) into one route distinguished by [Lineup.editable].
+ * Every destination the app's single [androidx.navigation.compose.NavHost] can show, with
+ * type-safe route arguments. A lineup is one route, fixed or editable as [Lineup.editable]
+ * says.
  */
 sealed interface Routes {
     @Serializable

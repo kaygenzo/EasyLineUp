@@ -15,9 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
@@ -43,7 +43,7 @@ import com.telen.easylineup.utils.startActivityOrNotify
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
-/** Replaces `SettingsFragment` - the `navigation_settings` root tab. */
+/** The settings, the `navigation_settings` root tab. */
 @Composable
 fun SettingsRoute(navController: NavController) {
     val viewModel = koinViewModel<SettingsViewModel>()

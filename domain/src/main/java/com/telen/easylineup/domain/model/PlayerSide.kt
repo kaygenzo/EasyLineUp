@@ -15,7 +15,7 @@ enum class PlayerSide(val flag: Int) {
 
     companion object {
         fun getSideByValue(value: Int): PlayerSide? {
-            values().forEach {
+            entries.forEach {
                 if (value == it.flag) {
                     return it
                 }

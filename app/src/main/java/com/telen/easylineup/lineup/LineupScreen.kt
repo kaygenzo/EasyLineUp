@@ -49,10 +49,7 @@ import com.telen.easylineup.lineup.defense.DefenseScreen
 /**
  * The Lineup container - app bar, Defense/Offense tabbar and (editable only) Save/Cancel
  * formbar, matching the mockup's chrome around the Defense/Attack screens, which otherwise keep
- * their own look untouched. Replaces the legacy `TabLayout`/`ViewPager2`/`BottomChoiceView` XML
- * container and the two child Fragments (`DefenseFragment`/`AttackFragment`) it used to host -
- * both screens are now plain composables sharing this one Fragment's `LineupViewModel` directly,
- * with no parent/child Fragment relationship left to maintain.
+ * their own look untouched. Both are plain composables sharing the one `LineupViewModel`.
  */
 @Composable
 fun LineupScreen(
@@ -95,7 +92,7 @@ fun LineupScreen(
             ),
             eyebrow = lineupName,
             title = stringResource(
-                if (selectedTab == FRAGMENT_DEFENSE_INDEX) {
+                if (selectedTab == LINEUP_DEFENSE_TAB) {
                     R.string.new_lineup_tab_field_defense
                 } else {
                     R.string.new_lineup_tab_field_offense
@@ -132,7 +129,7 @@ fun LineupScreen(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
         )
         Box(modifier = Modifier.weight(1f)) {
-            if (selectedTab == FRAGMENT_DEFENSE_INDEX) {
+            if (selectedTab == LINEUP_DEFENSE_TAB) {
                 DefenseScreen(
                     strategy = defenseStrategy,
                     players = defensePlayers,
@@ -204,14 +201,14 @@ private fun LineupTabBar(
     ) {
         LineupTabItem(
             label = stringResource(R.string.new_lineup_tab_field_defense),
-            active = selectedTab == FRAGMENT_DEFENSE_INDEX,
-            onClick = { onTabSelected(FRAGMENT_DEFENSE_INDEX) },
+            active = selectedTab == LINEUP_DEFENSE_TAB,
+            onClick = { onTabSelected(LINEUP_DEFENSE_TAB) },
             modifier = Modifier.weight(1f)
         )
         LineupTabItem(
             label = stringResource(R.string.new_lineup_tab_field_offense),
-            active = selectedTab == FRAGMENT_ATTACK_INDEX,
-            onClick = { onTabSelected(FRAGMENT_ATTACK_INDEX) },
+            active = selectedTab == LINEUP_ATTACK_TAB,
+            onClick = { onTabSelected(LINEUP_ATTACK_TAB) },
             modifier = Modifier.weight(1f)
         )
     }
@@ -361,7 +358,7 @@ private fun LineupScreenPreview() {
         LineupScreen(
             lineupName = "vs Riverside Hawks",
             editable = true,
-            selectedTab = FRAGMENT_DEFENSE_INDEX,
+            selectedTab = LINEUP_DEFENSE_TAB,
             onTabSelected = {},
             onBackClick = {},
             onCancelClick = {},
@@ -401,7 +398,7 @@ private fun EditModePillPreview() {
 private fun LineupTabBarPreview() {
     DugoutTheme {
         LineupTabBar(
-            selectedTab = FRAGMENT_DEFENSE_INDEX,
+            selectedTab = LINEUP_DEFENSE_TAB,
             onTabSelected = {}
         )
     }

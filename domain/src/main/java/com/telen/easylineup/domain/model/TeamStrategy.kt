@@ -62,7 +62,7 @@ enum class TeamStrategy(val id: Int, val batterSize: Int, vararg val positions: 
 
     companion object {
         fun getStrategyById(id: Int): TeamStrategy {
-            values().forEach {
+            entries.forEach {
                 if (it.id == id) {
                     return it
                 }

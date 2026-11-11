@@ -33,7 +33,7 @@ import com.telen.easylineup.tournaments.list.LineupListViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import org.koin.androidx.compose.koinViewModel
 
-/** Replaces `TeamDetailsFragment`. */
+/** The current team's details. */
 @Composable
 fun TeamDetailsRoute(navController: NavController) {
     val teamViewModel = koinViewModel<TeamViewModel>()

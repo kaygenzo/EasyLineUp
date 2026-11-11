@@ -30,9 +30,8 @@ import com.telen.easylineup.utils.ImagePickerUtils
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * Replaces `PlayerEditFragment`. [playerId] is `0` for a new player, matching the old behavior.
- * [PlayerViewModel.uiState] drives the whole form - there is no local Compose state left to
- * lose on rotation, so the old `onSaveInstanceState`-style snapshot hack is gone too.
+ * Creating or editing a player: [playerId] is `0` for a new one. [PlayerViewModel.uiState]
+ * drives the whole form, so there is no local Compose state to lose on rotation.
  */
 @Composable
 fun PlayerEditRoute(navController: NavController, playerId: Long) {

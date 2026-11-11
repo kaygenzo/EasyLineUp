@@ -62,10 +62,9 @@ internal object AttackTestTags {
 }
 
 /**
- * The batting-order list - single composable for both fixed/view and editable modes (mirrors
- * [AttackFragment]'s own existing "one Fragment, branch on `editable`" design, which the mockup's
- * own screen-note calls out as already correct: "not draggable" and "no handle drawn" are the
- * same fact, not two independently toggled ones).
+ * The batting-order list - one composable for both the fixed and the editable mode, branching
+ * on `editable`: "not draggable" and "no handle drawn" are the same fact, not two independently
+ * toggled ones.
  */
 @Composable
 fun AttackScreen(

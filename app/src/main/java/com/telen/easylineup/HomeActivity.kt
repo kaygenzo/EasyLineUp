@@ -18,8 +18,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -36,11 +36,9 @@ import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
- * No layout XML and no Fragments back this screen - [AppNavHost] (Jetpack Navigation Compose)
- * replaces the old `NavHostFragment`/`app_navigation.xml` entirely, with the bottom nav and
- * swap-team sheet as plain composables alongside it. The shared native Toolbar this used to
- * install via `setSupportActionBar` is gone too: every destination already draws its own
- * `ScreenHeader`, so it was pure redundant chrome.
+ * The main screen: [AppNavHost] (Jetpack Navigation Compose) hosts every destination, with the
+ * bottom nav and the swap-team sheet as plain composables alongside it. There is no toolbar:
+ * every destination draws its own `ScreenHeader`.
  */
 class HomeActivity : BaseActivity() {
     private val viewModel by viewModel<HomeViewModel>()
@@ -70,7 +68,7 @@ class HomeActivity : BaseActivity() {
                 val lifecycleOwner = LocalLifecycleOwner.current
 
                 val backStackEntry by navController.currentBackStackEntryAsState()
-                val currentTab = BottomNavTab.values().find { tab ->
+                val currentTab = BottomNavTab.entries.find { tab ->
                     backStackEntry?.destination?.hasRoute(tab.route::class) == true
                 }
 

@@ -18,7 +18,7 @@ import com.telen.easylineup.utils.hideSoftKeyboard
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * Replaces `DashboardFragment` - the `navigation_home` root tab. [homeViewModel] is
+ * The dashboard, the `navigation_home` root tab. [homeViewModel] is
  * Activity-scoped (shared with the swap-team sheet hosted directly by
  * [com.telen.easylineup.HomeActivity]), so it is obtained once there and passed down
  * instead of being resolved per destination like every other screen's [koinViewModel].

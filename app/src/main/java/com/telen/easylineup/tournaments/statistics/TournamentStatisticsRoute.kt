@@ -12,7 +12,7 @@ import androidx.navigation.NavController
 import com.telen.easylineup.compose.LoadFailedState
 import org.koin.androidx.compose.koinViewModel
 
-/** Replaces `TournamentStatisticsFragment`. */
+/** A tournament's playing time and position statistics. */
 @Composable
 fun TournamentStatisticsRoute(
     navController: NavController,

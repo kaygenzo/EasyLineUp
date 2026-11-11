@@ -33,10 +33,9 @@ import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 private const val SLIDE_DURATION_MILLIS = 300
 
 /**
- * Replaces `app_navigation.xml` and the `NavHostFragment` that used to host it - every
- * destination below is a `composable<Routes.X>`, type-safe route args replacing a Fragment's
- * `arguments: Bundle`. The 4 slide transitions replace `NavigationUtils.getOptions()`, set once
- * here instead of passed to every `navigate()` call site.
+ * The app's navigation graph: every destination below is a `composable<Routes.X>` with
+ * type-safe route arguments. The 4 slide transitions are set once here rather than at every
+ * `navigate()` call site.
  */
 @Composable
 fun AppNavHost(
@@ -49,6 +48,8 @@ fun AppNavHost(
 
     LaunchedEffect(currentBackStackEntry) {
         val entry = currentBackStackEntry ?: return@LaunchedEffect
+        // The old Fragment class names, on purpose: the analytics dashboards and their history
+        // are keyed by them, and renaming would split each screen's numbers in two.
         val screenName = when {
             entry.destination.hasRoute<Routes.Dashboard>() -> "DashboardFragment"
             entry.destination.hasRoute<Routes.Roster>() -> "TeamFragment"

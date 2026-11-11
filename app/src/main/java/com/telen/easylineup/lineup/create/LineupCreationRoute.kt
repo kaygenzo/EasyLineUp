@@ -24,7 +24,7 @@ import com.telen.easylineup.navigation.Routes
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * Replaces `LineupCreationFragment`. [LineupCreationViewModel.uiState] drives the whole screen
+ * Creating a lineup. [LineupCreationViewModel.uiState] drives the whole screen
  * and its sheets - date pickers included; the Route only hosts the platform pieces a ViewModel
  * can't own (navigation).
  */

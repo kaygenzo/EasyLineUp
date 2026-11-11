@@ -15,9 +15,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
@@ -38,9 +38,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * Replaces `LineupFragment`/`LineupFragmentFixed`/`LineupFragmentEditable` - [editable]
- * collapses what used to be two separate Fragment subclasses (same base class, only
- * differing by a constructor boolean) into the one [Routes.Lineup] destination.
+ * A lineup, fixed or [editable], as the one [Routes.Lineup] destination.
  * [LineupViewModel.uiState] drives the whole screen and its sheets; the Route only hosts the
  * platform pieces a ViewModel can't own (navigation, the one-shot share Intent).
  */

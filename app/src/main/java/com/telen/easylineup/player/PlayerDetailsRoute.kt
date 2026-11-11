@@ -33,8 +33,7 @@ import org.koin.androidx.compose.koinViewModel
 
 /**
  * Hosts a swipeable carousel of player profiles (the roster's full id list, starting on
- * whichever player was tapped) - replaces `PlayerDetailsFragment`/the old
- * `PlayersDetailsContainerFragment` (`ViewPager2` + per-page `PlayerDetailsFragment`).
+ * whichever player was tapped).
  */
 @Composable
 fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {

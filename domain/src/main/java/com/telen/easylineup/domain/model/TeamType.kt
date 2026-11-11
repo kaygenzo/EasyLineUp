@@ -22,7 +22,7 @@ enum class TeamType(
 
     companion object {
         fun getTypeById(id: Int): TeamType {
-            values().forEach {
+            entries.forEach {
                 if (it.id == id) {
                     return it
                 }

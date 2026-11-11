@@ -120,8 +120,8 @@ sealed interface LineupEvent {
     data object DpFlexIncomplete : LineupEvent
 }
 
-const val FRAGMENT_DEFENSE_INDEX = 0
-const val FRAGMENT_ATTACK_INDEX = 1
+const val LINEUP_DEFENSE_TAB = 0
+const val LINEUP_ATTACK_TAB = 1
 
 /** Everything [LineupScreen] and its sheets need to render. */
 data class LineupUiState(
@@ -139,7 +139,7 @@ data class LineupUiState(
     val teamType: TeamType = TeamType.UNKNOWN,
     val extraHitters: Int = 0,
     val batters: ImmutableList<BatterState> = persistentListOf(),
-    val selectedTab: Int = FRAGMENT_DEFENSE_INDEX,
+    val selectedTab: Int = LINEUP_DEFENSE_TAB,
     val availablePlayersEvent: ListAvailablePlayers? = null,
     val dpFlexEvent: LinkDpFlex? = null,
     val deleteConfirmPlayer: Player? = null,
