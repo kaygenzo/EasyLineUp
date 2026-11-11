@@ -111,8 +111,12 @@ class ScreenGalleryTest(
 
     /** Runs as the shell user, so the files outlive the app's uninstall after the test run. */
     private fun capture(screen: String) {
+        // Waits for the rotation itself rather than a fixed delay, then for Compose to settle.
+        composeTestRule.waitUntil(timeoutMillis = ROTATION_TIMEOUT_MILLIS) {
+            (device.displayWidth > device.displayHeight) ==
+                (orientation == Orientation.LANDSCAPE)
+        }
         composeTestRule.waitForIdle()
-        Thread.sleep(SETTLE_MILLIS)
         val isLandscape = device.displayWidth > device.displayHeight
         check(isLandscape == (orientation == Orientation.LANDSCAPE)) {
             "$screen is not in $orientation: ${device.displayWidth}x${device.displayHeight}"
@@ -237,7 +241,7 @@ class ScreenGalleryTest(
         private const val DEVICE_DIRECTORY = "/data/local/tmp/easylineup_screens"
 
         /** Lets the last transition finish on the real display, which Compose idling ignores. */
-        private const val SETTLE_MILLIS = 700L
+        private const val ROTATION_TIMEOUT_MILLIS = 5_000L
 
         @JvmStatic
         @Parameterized.Parameters(name = "{0}_{1}_{2}")
