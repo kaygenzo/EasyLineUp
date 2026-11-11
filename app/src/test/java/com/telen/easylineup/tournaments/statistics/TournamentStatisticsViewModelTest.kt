@@ -141,6 +141,29 @@ internal class TournamentStatisticsViewModelTest {
 
         val state = viewModel.uiState.value
         assertFalse(state.isLoading)
+        assertTrue(state.loadFailed)
         assertTrue(state.playerStats.isEmpty())
+    }
+
+    @Test
+    fun shouldReadTheSameTournamentAgainOnRetry() = runTest {
+        runBlocking {
+            Mockito.`when`(getTournamentPlayerStatsWithProfiles(tournament))
+                .thenReturn(Result.failure(Exception("db error")))
+                .thenReturn(Result.success(emptyList()))
+        }
+        Mockito.`when`(sortPlayersByPlayingTime(emptyList())).thenReturn(emptyList())
+        Mockito.`when`(getPlayingTimeSummary(emptyList()))
+            .thenReturn(PlayingTimeSummary(0f, 0, 0))
+        viewModel.load(tournament.id, tournament.name, TeamType.BASEBALL.id)
+        advanceUntilIdle()
+
+        viewModel.onRetryLoad()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.loadFailed)
+        assertFalse(state.isLoading)
+        assertEquals(tournament.name, state.tournamentName)
     }
 }

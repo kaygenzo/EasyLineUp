@@ -278,6 +278,9 @@
     <string name="error_team_save_failed">Couldn\'t save the team. Please try again.</string>
     <string name="error_delete_all_data_failed">Couldn\'t delete the data. Nothing was deleted,
         please try again.</string>
+    <string name="load_failed_title">Couldn\'t load your data</string>
+    <string name="load_failed_message">Nothing was changed. Please try again.</string>
+    <string name="load_failed_retry">Try again</string>
     <string name="create_player_favorite_positions">Favorite positions: (Max 3)</string>
     <string name="create_player_pitching_side">Pitching</string>
     <string name="create_player_batting_side">Batting</string>

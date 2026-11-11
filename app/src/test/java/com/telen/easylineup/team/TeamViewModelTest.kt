@@ -16,6 +16,8 @@ import com.telen.easylineup.domain.usecases.exceptions.NoTeamsLeftException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -108,6 +110,55 @@ internal class TeamViewModelTest {
 
         assertEquals(players, viewModel.uiState.value.players)
         assertFalse(viewModel.uiState.value.isLoading)
+    }
+
+    private fun newViewModel() = TeamViewModel(
+        getTeamUseCase,
+        deleteTeamUseCase,
+        observePlayersUseCase,
+        sortPlayersUseCase
+    )
+
+    @Test
+    fun shouldReportALoadFailureWhenThePlayersCannotBeRead() = runTest {
+        Mockito.`when`(observePlayersUseCase(team.id))
+            .thenReturn(flow { throw IllegalStateException("db error") })
+
+        viewModel = newViewModel()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.loadFailed)
+        assertFalse(viewModel.uiState.value.isLoading)
+    }
+
+    @Test
+    fun shouldReportALoadFailureWhenTheTeamCannotBeRead() = runTest {
+        runBlocking {
+            Mockito.`when`(getTeamUseCase()).thenReturn(Result.failure(Exception("db error")))
+        }
+
+        viewModel = newViewModel()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.loadFailed)
+    }
+
+    @Test
+    fun shouldReadTheTeamAndItsPlayersAgainOnRetry() = runTest {
+        val players = listOf(
+            Player(id = 1L, teamId = 1L, name = "Alice", shirtNumber = 1, licenseNumber = "1")
+        )
+        Mockito.`when`(observePlayersUseCase(team.id))
+            .thenReturn(flow { throw IllegalStateException("db error") })
+            .thenReturn(flowOf(players))
+        viewModel = newViewModel()
+        advanceUntilIdle()
+
+        viewModel.onRetryLoad()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.loadFailed)
+        assertEquals(players, viewModel.uiState.value.players)
     }
 
     @Test

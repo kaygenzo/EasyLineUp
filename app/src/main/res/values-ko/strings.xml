@@ -204,6 +204,9 @@
     <string name="error_player_save_failed">선수를 저장하지 못했습니다. 다시 시도하세요.</string>
     <string name="error_team_save_failed">팀을 저장하지 못했습니다. 다시 시도하세요.</string>
     <string name="error_delete_all_data_failed">데이터를 삭제하지 못했습니다. 아무것도 삭제되지 않았습니다. 다시 시도하세요.</string>
+    <string name="load_failed_title">데이터를 불러오지 못했습니다</string>
+    <string name="load_failed_message">아무것도 변경되지 않았습니다. 다시 시도하세요.</string>
+    <string name="load_failed_retry">다시 시도</string>
     <string name="create_player_favorite_positions">선호 포지션: (최대 3개)</string>
     <string name="create_player_pitching_side">투구</string>
     <string name="create_player_batting_side">타격</string>

@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.telen.easylineup.HomeViewModel
+import com.telen.easylineup.compose.LoadFailedState
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.hideSoftKeyboard
@@ -32,6 +33,11 @@ fun DashboardRoute(navController: NavController, homeViewModel: HomeViewModel) {
     val viewModel = koinViewModel<DashboardViewModel>()
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    if (uiState.loadFailed) {
+        LoadFailedState(onRetry = viewModel::onRetryLoad)
+        return
+    }
 
     DashboardScreen(
         state = uiState,

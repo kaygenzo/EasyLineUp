@@ -241,6 +241,9 @@
     <string name="error_team_save_failed">Nepavyko išsaugoti komandos. Bandykite dar kartą.</string>
     <string name="error_delete_all_data_failed">Nepavyko ištrinti duomenų. Niekas nebuvo ištrinta,
         bandykite dar kartą.</string>
+    <string name="load_failed_title">Nepavyko įkelti jūsų duomenų</string>
+    <string name="load_failed_message">Niekas nebuvo pakeista. Bandykite dar kartą.</string>
+    <string name="load_failed_retry">Bandyti dar kartą</string>
     <string name="create_player_favorite_positions">Mėgstamos pozicijos: (daugiausia 3)</string>
     <string name="create_player_pitching_side">Meta</string>
     <string name="create_player_batting_side">Muša</string>

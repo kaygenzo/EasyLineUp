@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.telen.easylineup.compose.LoadFailedState
 import org.koin.androidx.compose.koinViewModel
 
 /** Replaces `TournamentStatisticsFragment`. */
@@ -24,6 +25,11 @@ fun TournamentStatisticsRoute(
 
     LaunchedEffect(viewModel, tournamentId) {
         viewModel.load(tournamentId, tournamentName, teamTypeId)
+    }
+
+    if (uiState.loadFailed) {
+        LoadFailedState(onRetry = viewModel::onRetryLoad)
+        return
     }
 
     TournamentStatisticsScreen(

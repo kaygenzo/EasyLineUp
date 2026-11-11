@@ -231,6 +231,9 @@
     <string name="error_team_save_failed">Hindi na-save ang koponan. Subukan ulit.</string>
     <string name="error_delete_all_data_failed">Hindi nabura ang data. Walang nabura, subukan
         ulit.</string>
+    <string name="load_failed_title">Hindi ma-load ang iyong data</string>
+    <string name="load_failed_message">Walang nabago. Subukan ulit.</string>
+    <string name="load_failed_retry">Subukan ulit</string>
     <string name="create_player_favorite_positions">Mga paboritong posisyon: (Hanggang 3)</string>
     <string name="create_player_pitching_side">Pagbato</string>
     <string name="create_player_batting_side">Pagpalo</string>

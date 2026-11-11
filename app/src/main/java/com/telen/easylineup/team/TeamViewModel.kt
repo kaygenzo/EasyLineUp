@@ -43,6 +43,9 @@ import timber.log.Timber
  */
 data class TeamUiState(
     val isLoading: Boolean = true,
+
+    /** Reading the team or its players failed: the roster shows a retry state, not "empty". */
+    val loadFailed: Boolean = false,
     val teamName: String = "",
     val teamType: TeamType = TeamType.UNKNOWN,
     val teamImageUri: Uri? = null,
@@ -81,7 +84,10 @@ class TeamViewModel(
         loadTeam()
 
         _team.flatMapLatest { team ->
-            observePlayersUseCase(team.id).catch { e -> Timber.e(e) }
+            observePlayersUseCase(team.id).catch { e ->
+                Timber.e(e)
+                markLoadFailed()
+            }
         }
             .onEach { players ->
                 rawPlayers = players
@@ -105,8 +111,21 @@ class TeamViewModel(
                     }
                     _team.tryEmit(team)
                 }
-                .onFailure { Timber.e(it) }
+                .onFailure {
+                    Timber.e(it)
+                    markLoadFailed()
+                }
         }
+    }
+
+    /** Reads the team again; its players follow, since [loadTeam] re-emits it. */
+    fun onRetryLoad() {
+        _uiState.update { it.copy(isLoading = true, loadFailed = false) }
+        loadTeam()
+    }
+
+    private fun markLoadFailed() {
+        _uiState.update { it.copy(isLoading = false, loadFailed = true) }
     }
 
     fun setSortType(sortType: PlayerSortType) {

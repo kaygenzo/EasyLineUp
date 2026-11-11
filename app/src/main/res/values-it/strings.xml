@@ -238,6 +238,9 @@
     <string name="error_team_save_failed">Impossibile salvare la squadra. Riprova.</string>
     <string name="error_delete_all_data_failed">Impossibile eliminare i dati. Non è stato eliminato
         nulla, riprova.</string>
+    <string name="load_failed_title">Impossibile caricare i tuoi dati</string>
+    <string name="load_failed_message">Non è stato modificato nulla. Riprova.</string>
+    <string name="load_failed_retry">Riprova</string>
     <string name="create_player_favorite_positions">Ruoli preferiti: (max 3)</string>
     <string name="create_player_pitching_side">Lancia</string>
     <string name="create_player_batting_side">Batte</string>

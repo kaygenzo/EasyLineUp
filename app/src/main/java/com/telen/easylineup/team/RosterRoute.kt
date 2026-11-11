@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.LoadFailedState
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.navigation.Routes
@@ -40,6 +41,11 @@ fun RosterRoute(navController: NavController) {
     }
 
     var showMessageSheet by rememberSaveable { mutableStateOf(false) }
+
+    if (uiState.loadFailed) {
+        LoadFailedState(onRetry = viewModel::onRetryLoad)
+        return
+    }
 
     RosterScreen(
         state = RosterState(

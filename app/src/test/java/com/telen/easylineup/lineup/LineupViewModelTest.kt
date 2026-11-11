@@ -45,6 +45,7 @@ import com.telen.easylineup.utils.LineupPdfWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -182,6 +183,55 @@ internal class LineupViewModelTest {
         lineupFlow.emit(lineup)
         playersFlow.emit(players)
         overlaysFlow.emit(overlays)
+    }
+
+    @Test
+    fun shouldReportALoadFailureWhenTheLineupCannotBeRead() = runTest {
+        Mockito.`when`(observeLineupByIdUseCase(1L))
+            .thenReturn(flow { throw IllegalStateException("db error") })
+
+        viewModel.lineupId = 1L
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.loadFailed)
+        assertFalse(viewModel.uiState.value.isLoading)
+    }
+
+    @Test
+    fun shouldReadTheLineupAgainOnRetry() = runTest {
+        val lineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
+        Mockito.`when`(observeLineupByIdUseCase(1L))
+            .thenReturn(flow { throw IllegalStateException("db error") })
+            .thenReturn(lineupFlow)
+        viewModel.lineupId = 1L
+        advanceUntilIdle()
+
+        viewModel.onRetryLoad()
+        loadLineup(lineup)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.loadFailed)
+        assertEquals("L", viewModel.uiState.value.lineupName)
+    }
+
+    @Test
+    fun shouldKeepTheLoadedLineupOnScreenWhenALaterReadFails() = runTest {
+        val lineup = Lineup(id = 1L, name = "L", teamId = 1L, tournamentId = 1L)
+        val failingOverlays = MutableSharedFlow<List<PlayerNumberOverlay>>(replay = 1)
+        Mockito.`when`(observePlayerNumberOverlays(1L)).thenReturn(
+            flow {
+                emit(emptyList())
+                failingOverlays.collect { throw IllegalStateException("db error") }
+            }
+        )
+        loadLineup(lineup)
+        advanceUntilIdle()
+
+        failingOverlays.emit(emptyList())
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.loadFailed)
+        assertEquals("L", viewModel.uiState.value.lineupName)
     }
 
     @Test

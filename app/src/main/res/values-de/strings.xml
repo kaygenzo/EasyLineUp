@@ -234,6 +234,9 @@
         es erneut.</string>
     <string name="error_delete_all_data_failed">Die Daten konnten nicht gelöscht werden. Es wurde
         nichts gelöscht, bitte versuche es erneut.</string>
+    <string name="load_failed_title">Deine Daten konnten nicht geladen werden</string>
+    <string name="load_failed_message">Es wurde nichts geändert. Bitte versuche es erneut.</string>
+    <string name="load_failed_retry">Erneut versuchen</string>
     <string name="create_player_favorite_positions">Lieblingspositionen: (max. 3)</string>
     <string name="create_player_pitching_side">Wirft</string>
     <string name="create_player_batting_side">Schlägt</string>

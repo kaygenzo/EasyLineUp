@@ -198,6 +198,9 @@
     <string name="error_player_save_failed">無法儲存球員，請再試一次。</string>
     <string name="error_team_save_failed">無法儲存球隊，請再試一次。</string>
     <string name="error_delete_all_data_failed">無法刪除資料。沒有刪除任何內容，請再試一次。</string>
+    <string name="load_failed_title">無法載入資料</string>
+    <string name="load_failed_message">沒有任何變更，請再試一次。</string>
+    <string name="load_failed_retry">再試一次</string>
     <string name="create_player_favorite_positions">擅長位置:(最多 3 個)</string>
     <string name="create_player_pitching_side">投球</string>
     <string name="create_player_batting_side">打擊</string>

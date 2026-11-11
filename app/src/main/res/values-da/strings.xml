@@ -226,6 +226,9 @@
     <string name="error_team_save_failed">Holdet kunne ikke gemmes. Prøv igen.</string>
     <string name="error_delete_all_data_failed">Dataene kunne ikke slettes. Intet blev slettet, prøv
         igen.</string>
+    <string name="load_failed_title">Dine data kunne ikke indlæses</string>
+    <string name="load_failed_message">Intet blev ændret. Prøv igen.</string>
+    <string name="load_failed_retry">Prøv igen</string>
     <string name="create_player_favorite_positions">Foretrukne positioner: (maks. 3)</string>
     <string name="create_player_pitching_side">Kaster</string>
     <string name="create_player_batting_side">Slår</string>

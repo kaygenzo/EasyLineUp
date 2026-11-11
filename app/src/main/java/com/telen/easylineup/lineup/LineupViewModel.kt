@@ -121,6 +121,12 @@ const val FRAGMENT_ATTACK_INDEX = 1
 /** Everything [LineupScreen] and its sheets need to render. */
 data class LineupUiState(
     val isLoading: Boolean = true,
+
+    /**
+     * The lineup could not be read at all: the Route shows a retry state rather than an empty
+     * field. A read failing once it was on screen keeps what is shown, unsaved edits included.
+     */
+    val loadFailed: Boolean = false,
     val lineupName: String = "",
     val defensePlayers: ImmutableList<PlayerWithPosition> = persistentListOf(),
     val defenseStrategy: TeamStrategy = TeamStrategy.STANDARD,
@@ -220,15 +226,20 @@ class LineupViewModel(
         observeJob?.cancel()
         observeJob = viewModelScope.launch {
             observeLineupByIdUseCase(id)
-                .catch { Timber.e(it) }
                 .flatMapLatest { loadedLineup ->
                     observeTeamPlayersAndMaybePositionsForLineupUseCase(loadedLineup.id)
-                        .catch { e -> Timber.e(e) }
                         .flatMapLatest { positions ->
                             observePlayerNumberOverlays(id)
-                                .catch { e -> Timber.e(e) }
                                 .map { overlays -> Triple(loadedLineup, positions, overlays) }
                         }
+                }
+                .catch {
+                    Timber.e(it)
+                    if (lineup == null) {
+                        _uiState.update { state ->
+                            state.copy(isLoading = false, loadFailed = true)
+                        }
+                    }
                 }
                 .collect { (loadedLineup, positions, overlays) ->
                     if (editable && hasUnsavedChanges) {
@@ -297,6 +308,11 @@ class LineupViewModel(
                 _uiState.update { it.copy(batters = batters.toImmutableList()) }
             }
             .onFailure { Timber.e(it) }
+    }
+
+    fun onRetryLoad() {
+        _uiState.update { it.copy(isLoading = true, loadFailed = false) }
+        observeLineup()
     }
 
     fun onTabSelected(index: Int) {

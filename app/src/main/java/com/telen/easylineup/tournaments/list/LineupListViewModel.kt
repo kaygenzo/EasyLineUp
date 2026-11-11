@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -41,6 +42,9 @@ import timber.log.Timber
 /** Everything the Tournaments tab (and TeamDetails' own tournament/lineup counts) need. */
 data class LineupListUiState(
     val isLoading: Boolean = true,
+
+    /** Reading the tournaments failed: the Route shows a retry state, not "no tournaments". */
+    val loadFailed: Boolean = false,
     val tournamentItems: ImmutableList<TournamentItem> = persistentListOf(),
     val mapsByTournamentId: ImmutableMap<Long, GeoLocation> = persistentMapOf(),
     val searchQuery: String = "",
@@ -63,22 +67,34 @@ class LineupListViewModel(
     val events: Flow<TournamentDeleteFailed> = _events.receiveAsFlow()
 
     private val filterFlow = MutableStateFlow("")
+
+    /** Bumped by [onRetryLoad] to start reading again after a failure ended the stream. */
+    private val loadAttempt = MutableStateFlow(0)
     private val mapAddressesByTournamentId = mutableMapOf<Long, String?>()
 
     init {
         // Observed, not loaded once: the list follows every lineup/tournament write, including
         // those made on another screen (creating a lineup, deleting it from the lineup screen).
-        filterFlow
-            .flatMapLatest { filter -> observeAllTournamentsWithLineups(filter) }
-            .map { pairs ->
-                pairs.map { TournamentItem(it.first, it.second.toImmutableList()) }
-                    .toImmutableList()
-            }
-            .distinctUntilChanged()
-            .catch { Timber.e(it) }
-            .onEach { items ->
-                _uiState.update { it.copy(isLoading = false, tournamentItems = items) }
-                loadMaps(items)
+        combine(filterFlow, loadAttempt) { filter, _ -> filter }
+            .flatMapLatest { filter ->
+                observeAllTournamentsWithLineups(filter)
+                    .map { pairs ->
+                        pairs.map { TournamentItem(it.first, it.second.toImmutableList()) }
+                            .toImmutableList()
+                    }
+                    .distinctUntilChanged()
+                    .onEach { items ->
+                        _uiState.update {
+                            it.copy(isLoading = false, loadFailed = false, tournamentItems = items)
+                        }
+                        loadMaps(items)
+                    }
+                    .catch {
+                        Timber.e(it)
+                        _uiState.update { state ->
+                            state.copy(isLoading = false, loadFailed = true)
+                        }
+                    }
             }
             .launchIn(viewModelScope)
 
@@ -111,6 +127,11 @@ class LineupListViewModel(
                     }
             }
         }
+    }
+
+    fun onRetryLoad() {
+        _uiState.update { it.copy(isLoading = true, loadFailed = false) }
+        loadAttempt.update { it + 1 }
     }
 
     fun onSearchQueryChanged(query: String) {

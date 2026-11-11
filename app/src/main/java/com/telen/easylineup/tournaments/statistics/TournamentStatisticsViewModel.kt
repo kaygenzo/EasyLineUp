@@ -28,6 +28,9 @@ import timber.log.Timber
 /** Everything [TournamentStatisticsScreen] needs to render. */
 data class TournamentStatisticsUiState(
     val isLoading: Boolean = true,
+
+    /** Reading the stats failed: the Route shows a retry state, not "no stats yet". */
+    val loadFailed: Boolean = false,
     val tournamentName: String = "",
     val teamType: TeamType = TeamType.UNKNOWN,
     val playerStats: ImmutableList<PlayerStatsRow> = persistentListOf(),
@@ -43,9 +46,18 @@ class TournamentStatisticsViewModel(
     private val _uiState = MutableStateFlow(TournamentStatisticsUiState())
     val uiState: StateFlow<TournamentStatisticsUiState> = _uiState.asStateFlow()
 
+    /** What [load] was last asked for, so [onRetryLoad] can ask again. */
+    private var lastLoad: (() -> Unit)? = null
+
     fun load(tournamentId: Long, tournamentName: String, teamTypeId: Int) {
+        lastLoad = { load(tournamentId, tournamentName, teamTypeId) }
         _uiState.update {
-            it.copy(tournamentName = tournamentName, teamType = TeamType.getTypeById(teamTypeId))
+            it.copy(
+                isLoading = true,
+                loadFailed = false,
+                tournamentName = tournamentName,
+                teamType = TeamType.getTypeById(teamTypeId)
+            )
         }
         viewModelScope.launch {
             // Only `.id` is actually read by GetTournamentPlayerStats - the other fields are
@@ -83,8 +95,12 @@ class TournamentStatisticsViewModel(
                 }
                 .onFailure {
                     Timber.e(it)
-                    _uiState.update { state -> state.copy(isLoading = false) }
+                    _uiState.update { state -> state.copy(isLoading = false, loadFailed = true) }
                 }
         }
+    }
+
+    fun onRetryLoad() {
+        lastLoad?.invoke()
     }
 }

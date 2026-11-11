@@ -261,13 +261,31 @@ internal class DashboardViewModelTest {
     }
 
     @Test
-    fun shouldKeepLoadingWhenTilesCannotBeRead() = runTest {
+    fun shouldReportALoadFailureWhenTilesCannotBeRead() = runTest {
         Mockito.`when`(tilesRepository.getTiles()).thenThrow(RuntimeException("db error"))
 
         teamsProcessor.emit(emptyList())
         advanceUntilIdle()
 
-        assertTrue(viewModel.uiState.value.isLoading)
+        val state = viewModel.uiState.value
+        assertTrue(state.loadFailed)
+        assertFalse(state.isLoading)
+    }
+
+    @Test
+    fun shouldReadTheTilesAgainOnRetry() = runTest {
+        Mockito.`when`(tilesRepository.getTiles())
+            .thenThrow(RuntimeException("db error"))
+            .thenReturn(listOf(tile(TileType.LAST_PLAYER_NUMBER)))
+        teamsProcessor.emit(emptyList())
+        advanceUntilIdle()
+
+        viewModel.onRetryLoad()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.loadFailed)
+        assertFalse(state.isLoading)
     }
 
     @Test

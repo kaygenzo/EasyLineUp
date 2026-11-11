@@ -24,6 +24,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
+import com.telen.easylineup.compose.LoadFailedState
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamRosterSummary
@@ -135,6 +136,11 @@ fun TournamentListRoute(navController: NavController) {
                     ).show()
                 }
             }
+    }
+
+    if (uiState.loadFailed) {
+        LoadFailedState(onRetry = viewModel::onRetryLoad)
+        return
     }
 
     TournamentListScreen(

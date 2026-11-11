@@ -262,6 +262,9 @@
         réessayer.</string>
     <string name="error_delete_all_data_failed">Impossible de supprimer les données. Rien n\'a été
         supprimé, veuillez réessayer.</string>
+    <string name="load_failed_title">Impossible de charger vos données</string>
+    <string name="load_failed_message">Rien n\'a été modifié. Veuillez réessayer.</string>
+    <string name="load_failed_retry">Réessayer</string>
 
     <string name="tile_last_lineup_header">Dern. lineup</string>
 

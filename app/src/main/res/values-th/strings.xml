@@ -213,6 +213,9 @@
     <string name="error_team_save_failed">บันทึกทีมไม่สำเร็จ โปรดลองอีกครั้ง</string>
     <string name="error_delete_all_data_failed">ลบข้อมูลไม่สำเร็จ ไม่มีข้อมูลใดถูกลบ
         โปรดลองอีกครั้ง</string>
+    <string name="load_failed_title">โหลดข้อมูลไม่สำเร็จ</string>
+    <string name="load_failed_message">ไม่มีการเปลี่ยนแปลงใด โปรดลองอีกครั้ง</string>
+    <string name="load_failed_retry">ลองอีกครั้ง</string>
     <string name="create_player_favorite_positions">ตำแหน่งที่ถนัด: (สูงสุด 3)</string>
     <string name="create_player_pitching_side">ขว้าง</string>
     <string name="create_player_batting_side">ตี</string>

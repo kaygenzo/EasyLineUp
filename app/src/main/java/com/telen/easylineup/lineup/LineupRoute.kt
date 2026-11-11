@@ -25,6 +25,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
+import com.telen.easylineup.compose.LoadFailedState
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.toPlayer
@@ -130,9 +131,15 @@ fun LineupRoute(
             }
     }
 
-    BackHandler(enabled = editable) {
+    // Not while the load failed: the discard sheet is not shown then, back just leaves.
+    BackHandler(enabled = editable && !state.loadFailed) {
         FirebaseAnalyticsUtils.onClick(context, "click_lineup_edit_cancel_back_pressed")
         viewModel.onDiscardSheetRequested()
+    }
+
+    if (state.loadFailed) {
+        LoadFailedState(onRetry = viewModel::onRetryLoad)
+        return
     }
 
     LineupScreen(

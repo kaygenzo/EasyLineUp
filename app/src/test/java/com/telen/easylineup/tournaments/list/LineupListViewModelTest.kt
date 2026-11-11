@@ -16,6 +16,7 @@ import com.telen.easylineup.domain.usecases.ObserveAllTournamentsWithLineups
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -110,6 +111,48 @@ internal class LineupListViewModelTest {
         assertEquals(1, viewModel.uiState.value.tournamentItems.size)
         assertEquals(tournament, viewModel.uiState.value.tournamentItems[0].tournament)
         assertEquals(lineups, viewModel.uiState.value.tournamentItems[0].lineups)
+    }
+
+    @Test
+    fun shouldReportALoadFailureInsteadOfAnEmptyList() = runTest {
+        runBlocking {
+            Mockito.`when`(observeAllTournamentsWithLineups(""))
+                .thenReturn(flow { throw IllegalStateException("db error") })
+        }
+
+        viewModel = LineupListViewModel(
+            getTeamUseCase,
+            observeAllTournamentsWithLineups,
+            getTournamentMapLink,
+            deleteTournamentLineups
+        )
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.loadFailed)
+        assertFalse(viewModel.uiState.value.isLoading)
+    }
+
+    @Test
+    fun shouldReadTheTournamentsAgainOnRetry() = runTest {
+        val tournament = tournament(id = 1L)
+        runBlocking {
+            Mockito.`when`(observeAllTournamentsWithLineups(""))
+                .thenReturn(flow { throw IllegalStateException("db error") })
+                .thenReturn(flowOf(listOf(tournament to listOf(Lineup(id = 1L)))))
+        }
+        viewModel = LineupListViewModel(
+            getTeamUseCase,
+            observeAllTournamentsWithLineups,
+            getTournamentMapLink,
+            deleteTournamentLineups
+        )
+        advanceUntilIdle()
+
+        viewModel.onRetryLoad()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.loadFailed)
+        assertEquals(tournament, viewModel.uiState.value.tournamentItems[0].tournament)
     }
 
     @Test

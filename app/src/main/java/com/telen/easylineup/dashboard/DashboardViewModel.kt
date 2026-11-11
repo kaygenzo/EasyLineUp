@@ -30,6 +30,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -41,6 +43,9 @@ import timber.log.Timber
  */
 data class DashboardUiState(
     val isLoading: Boolean = true,
+
+    /** Reading the team or its tiles failed: the Route shows a retry state instead. */
+    val loadFailed: Boolean = false,
     val teamName: String = "",
     val teamImageUri: Uri? = null,
     val teamSize: Int? = null,
@@ -62,18 +67,32 @@ class DashboardViewModel(
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
+    /** Bumped by [onRetryLoad] to start reading again after a failure ended the stream. */
+    private val loadAttempt = MutableStateFlow(0)
+
     init {
-        viewModelScope.launch {
-            observeTeams().catch { Timber.e(it) }
-                .flatMapLatest { getDashboardTilesFlow() }
-                .collect { tiles -> applyTiles(tiles) }
-        }
+        loadAttempt
+            .flatMapLatest {
+                observeTeams()
+                    .flatMapLatest { getDashboardTilesFlow() }
+                    .catch {
+                        Timber.e(it)
+                        _uiState.update { state ->
+                            state.copy(isLoading = false, loadFailed = true)
+                        }
+                    }
+            }
+            .onEach { tiles -> applyTiles(tiles) }
+            .launchIn(viewModelScope)
     }
 
     private fun getDashboardTilesFlow(): Flow<List<DashboardTile>> = flow {
-        getDashboardTilesUseCase()
-            .onSuccess { emit(it) }
-            .onFailure { Timber.e(it) }
+        emit(getDashboardTilesUseCase().getOrThrow())
+    }
+
+    fun onRetryLoad() {
+        _uiState.update { it.copy(isLoading = true, loadFailed = false) }
+        loadAttempt.update { it + 1 }
     }
 
     private fun applyTiles(tiles: List<DashboardTile>) {
