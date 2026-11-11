@@ -63,8 +63,9 @@ class SwitchPlayersPosition(
             val oneIsFlex = playerPositions.any { it.isFlex() }
             val oneIsDp = playerPositions.any { it.isDpDh() }
 
-            // if at least one player has a flag flex and it is a baseball team, the pitcher is always
-            // the flex. Otherwise, the flex can be any other player. The only exception is the DP/DH
+            // if at least one player has a flag flex and it is a baseball team, the pitcher is
+            // always the flex. Otherwise, the flex can be any other player. The only exception is
+            // the DP/DH
             playerPositions.forEach {
                 if (lineupMode == MODE_ENABLED) {
                     val newPosition = FieldPosition.getFieldPositionById(it.position)
@@ -77,8 +78,8 @@ class SwitchPlayersPosition(
 
                             else -> {
                                 it.flags = PlayerFieldPosition.FLAG_NONE
-                                // if possible, just keep order, but in case of a swap with a pitcher,
-                                // exchange orders
+                                // if possible, just keep order, but in case of a swap with a
+                                // pitcher, exchange orders
                                 if (it.order == orderDesignatedPlayer) {
                                     // we were a pitcher but not anymore.
                                     it.order = tmpOrder

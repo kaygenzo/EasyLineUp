@@ -42,7 +42,8 @@ class GetShirtNumberHistory(
                     }
                 }.toMutableList()
 
-                val overlays = playerNumberOverlayRepo.getShirtNumberFromNumberOverlays(teamId, number)
+                val overlays =
+                    playerNumberOverlayRepo.getShirtNumberFromNumberOverlays(teamId, number)
                 overlays.forEach { overlay ->
                     val first = overlaysAdded.find {
                         it.playerId == overlay.playerId && it.lineupId == overlay.lineupId

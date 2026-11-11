@@ -66,7 +66,10 @@ fun PlayerWithPosition.isSubstitute(): Boolean {
             (position == FieldPosition.OLD_SUBSTITUTE.id && fieldPositionId > 0)
 }
 
-/** Whether this substitute currently holds a spot in the batting order (as opposed to bench-only). */
+/**
+ * Whether this substitute currently holds a spot in the batting order (as opposed to
+ * bench-only).
+ */
 fun PlayerWithPosition.isBattingSubstitute(): Boolean {
     return isSubstitute() && order in 1 until Constants.SUBSTITUTE_ORDER_VALUE
 }

@@ -141,17 +141,21 @@ object RepositoryModule {
                 // "`lineupID` INTEGER NOT NULL, " +
                 // "`position` INTEGER NOT NULL, " +
                 // "`order` INTEGER NOT NULL, " +
-                // "FOREIGN KEY(`playerID`) REFERENCES `players`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , " +
-                // "FOREIGN KEY(`lineupID`) REFERENCES `lineups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE" +
+                // "FOREIGN KEY(`playerID`) REFERENCES `players`(`id`) " +
+                // "ON UPDATE NO ACTION ON DELETE CASCADE , " +
+                // "FOREIGN KEY(`lineupID`) REFERENCES `lineups`(`id`) " +
+                // "ON UPDATE NO ACTION ON DELETE CASCADE" +
                 // ")")
                 // // Copy the data
                 // database.execSQL(
-                // "INSERT INTO playerFieldPosition_tmp (id, playerID, lineupID, position, order) " +
+                // "INSERT INTO playerFieldPosition_tmp " +
+                // "(id, playerID, lineupID, position, order) " +
                 // "SELECT id, playerID, lineupID, position, order FROM playerFieldPosition")
                 // // Remove the old table
                 // database.execSQL("DROP TABLE playerFieldPosition")
                 // // Change the table name to the correct one
-                // database.execSQL("ALTER TABLE playerFieldPosition_tmp RENAME TO playerFieldPosition")
+                // database.execSQL(
+                // "ALTER TABLE playerFieldPosition_tmp RENAME TO playerFieldPosition")
 
                 database.execSQL("ALTER TABLE teams ADD COLUMN hash TEXT DEFAULT null")
                 database.execSQL("ALTER TABLE players ADD COLUMN hash TEXT DEFAULT null")

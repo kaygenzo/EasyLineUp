@@ -27,13 +27,23 @@ object FirebaseAnalyticsUtils {
         logEvent(context, null, eventName)
     }
 
-    private fun logEvent(context: Context?, paramKey: String, paramValue: String, eventName: String) {
+    private fun logEvent(
+        context: Context?,
+        paramKey: String,
+        paramValue: String,
+        eventName: String
+    ) {
         val params = Bundle()
         params.putString(paramKey, paramValue)
         logEvent(context, params, eventName)
     }
 
-    private fun logEvent(context: Context?, paramKey: String, paramValue: Boolean, eventName: String) {
+    private fun logEvent(
+        context: Context?,
+        paramKey: String,
+        paramValue: Boolean,
+        eventName: String
+    ) {
         val params = Bundle()
         params.putBoolean(paramKey, paramValue)
         logEvent(context, params, eventName)
@@ -113,10 +123,12 @@ object FirebaseAnalyticsUtils {
 
     fun onScreen(context: Context?, screenName: String) {
         context?.run {
-            FirebaseAnalytics.getInstance(this).logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, Bundle().apply {
+            val params = Bundle().apply {
                 putString(FirebaseAnalytics.Param.SCREEN_NAME, screenName)
                 putString(FirebaseAnalytics.Param.SCREEN_CLASS, screenName)
-            })
+            }
+            FirebaseAnalytics.getInstance(this)
+                .logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, params)
         }
     }
 }

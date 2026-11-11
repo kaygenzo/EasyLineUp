@@ -124,7 +124,8 @@ fun PlayerEditRoute(navController: NavController, playerId: Long) {
                     when {
                         failed.nameError -> FirebaseAnalyticsUtils.emptyPlayerName(context)
                         failed.emailError -> FirebaseAnalyticsUtils.invalidPlayerEmail(context)
-                        failed.phoneError -> FirebaseAnalyticsUtils.invalidPlayerPhoneNumber(context)
+                        failed.phoneError ->
+                            FirebaseAnalyticsUtils.invalidPlayerPhoneNumber(context)
                     }
                 }
             }

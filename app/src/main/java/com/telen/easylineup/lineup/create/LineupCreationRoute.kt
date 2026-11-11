@@ -56,7 +56,8 @@ fun LineupCreationRoute(navController: NavController) {
                 .setValidator(CompositeDateValidator.allOf(listOf(min, max)))
                 .build()
         }
-        val builder = MaterialDatePicker.Builder.datePicker().setSelection(uiState.eventTimeInMillis)
+        val builder = MaterialDatePicker.Builder.datePicker()
+            .setSelection(uiState.eventTimeInMillis)
         constraints?.let { builder.setCalendarConstraints(it) }
         val datePicker = builder.build()
         datePicker.addOnPositiveButtonClickListener { selection ->

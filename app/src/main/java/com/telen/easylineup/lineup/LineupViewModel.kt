@@ -498,7 +498,11 @@ class LineupViewModel(
     fun onRosterEditPlayerToggled(position: Int, checked: Boolean) {
         _uiState.update {
             it.copy(
-                rosterEditSummary = toggleRosterPlayerUseCase(it.rosterEditSummary, position, checked)
+                rosterEditSummary = toggleRosterPlayerUseCase(
+                    it.rosterEditSummary,
+                    position,
+                    checked
+                )
             )
         }
     }

@@ -100,7 +100,12 @@ class DashboardViewModel(
                     MostUsedPlayerUi(data.name.trim(), data.shirtNumber, data.matchPlayed)
                 },
                 lastLineup = lastLineupData?.let { data ->
-                    LastLineupUi(data.lineupId, data.name, data.eventTimeInMillis, data.tournamentName)
+                    LastLineupUi(
+                        data.lineupId,
+                        data.name,
+                        data.eventTimeInMillis,
+                        data.tournamentName
+                    )
                 }
             )
         }

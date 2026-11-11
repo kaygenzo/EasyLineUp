@@ -227,7 +227,11 @@ class SettingsViewModel(
     }
 
     fun onImportOverwriteChanged(checked: Boolean) {
-        SharedPreferencesUtils.putBooleanSetting(context, R.string.key_import_data_update_object, checked)
+        SharedPreferencesUtils.putBooleanSetting(
+            context,
+            R.string.key_import_data_update_object,
+            checked
+        )
         _uiState.update { it.copy(importOverwriteExisting = checked) }
     }
 

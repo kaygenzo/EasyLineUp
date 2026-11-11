@@ -14,8 +14,9 @@ import com.telen.easylineup.repository.model.toDomain
 import com.telen.easylineup.repository.model.toRoom
 import timber.log.Timber
 
-internal class PlayerFieldPositionRepositoryImpl(private val playerFieldPositionsDao: PlayerFieldPositionsDao) :
-    PlayerFieldPositionRepository {
+internal class PlayerFieldPositionRepositoryImpl(
+    private val playerFieldPositionsDao: PlayerFieldPositionsDao
+) : PlayerFieldPositionRepository {
     init {
         Timber.i("PlayerFieldPositionRepositoryImpl.init")
     }

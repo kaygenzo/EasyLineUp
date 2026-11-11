@@ -82,7 +82,9 @@ internal interface LineupDao {
         FROM tournaments
         LEFT JOIN lineups ON tournaments.id = lineups.tournamentID
         LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = lineups.id
-        WHERE teamID = :teamId AND (tournamentName LIKE '%' || :filter || '%' OR lineupName LIKE '%' || :filter || '%')
+        WHERE teamID = :teamId
+            AND (tournamentName LIKE '%' || :filter || '%'
+                OR lineupName LIKE '%' || :filter || '%')
         ORDER BY tournaments.createdAt DESC
     """
     )

@@ -20,7 +20,9 @@ class GetDpAndFlexFromPlayersInField(
     private val getTeam: GetTeam,
     private val dispatcherProvider: DispatcherProvider
 ) {
-    suspend operator fun invoke(playersInLineup: List<PlayerWithPosition>): Result<DpAndFlexConfiguration> =
+    suspend operator fun invoke(
+        playersInLineup: List<PlayerWithPosition>
+    ): Result<DpAndFlexConfiguration> =
         runCatchingCancellable {
             withContext(dispatcherProvider.io()) {
                 val teamType = getTeam().getOrThrow().type

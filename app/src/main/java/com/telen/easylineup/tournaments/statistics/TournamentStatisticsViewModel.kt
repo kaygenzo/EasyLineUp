@@ -68,7 +68,10 @@ class TournamentStatisticsViewModel(
                             imageUri = profile.image?.let { uri -> Uri.parse(uri) },
                             totalGames = profile.totalGames,
                             positionCounts = profile.positionCounts.toImmutableMap(),
-                            isUnderused = isPlayingTimeUnderused(profile.totalGames, summary.average)
+                            isUnderused = isPlayingTimeUnderused(
+                                profile.totalGames,
+                                summary.average
+                            )
                         )
                     }
                     rows.toImmutableList() to summary
