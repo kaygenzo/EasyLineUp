@@ -16,6 +16,7 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
@@ -177,12 +178,27 @@ class LineupViewModel(
 
     var lineup: Lineup? = null
         private set
+    /**
+     * Set by the Route from its nav arguments on every composition of the screen, including
+     * after a rotation. Setting the id already being observed is a no-op: restarting the
+     * observation would re-read the database and replace the edit in progress.
+     */
     var lineupId: Long? = 0
         set(value) {
+            if (value == field && observeJob != null) {
+                return
+            }
             field = value
             observeLineup()
         }
     var editable = false
+
+    /**
+     * Whether the user changed the lineup since it was last read from the database. While it
+     * is, an edit session ignores what the database emits, which would otherwise overwrite the
+     * unsaved changes: any write to the observed tables makes Room re-emit.
+     */
+    private var hasUnsavedChanges = false
 
     private fun observeLineup() {
         val id = lineupId ?: return
@@ -201,34 +217,50 @@ class LineupViewModel(
             observeLineupByIdUseCase(id)
                 .catch { Timber.e(it) }
                 .flatMapLatest { loadedLineup ->
-                    lineup = loadedLineup
-                    _uiState.update {
-                        it.copy(
-                            lineupName = loadedLineup.name,
-                            defenseStrategy = TeamStrategy.getStrategyById(loadedLineup.strategy),
-                            lineupMode = loadedLineup.mode,
-                            extraHitters = loadedLineup.extraHitters
-                        )
-                    }
                     observeTeamPlayersAndMaybePositionsForLineupUseCase(loadedLineup.id)
                         .catch { e -> Timber.e(e) }
-                }
-                .flatMapLatest { positions ->
-                    _listPlayersWithPosition.clear()
-                    _listPlayersWithPosition.addAll(positions)
-                    val playerMap = mutableMapOf(
-                        *positions.map { Pair(it.playerId, it) }.toTypedArray()
-                    )
-                    observePlayerNumberOverlays(id).catch { e -> Timber.e(e) }
-                        .map { overlays ->
-                            overlays.forEach { overlay ->
-                                playerMap[overlay.playerId]?.shirtNumber = overlay.number
-                            }
-                            positions
+                        .flatMapLatest { positions ->
+                            observePlayerNumberOverlays(id)
+                                .catch { e -> Timber.e(e) }
+                                .map { overlays -> Triple(loadedLineup, positions, overlays) }
                         }
                 }
-                .collect { recomputeAndPublish() }
+                .collect { (loadedLineup, positions, overlays) ->
+                    if (editable && hasUnsavedChanges) {
+                        Timber.d("Lineup $id changed in the database, keeping the unsaved edit")
+                        return@collect
+                    }
+                    applyDatabaseSnapshot(loadedLineup, positions, overlays)
+                }
         }
+    }
+
+    private suspend fun applyDatabaseSnapshot(
+        loadedLineup: Lineup,
+        positions: List<PlayerWithPosition>,
+        overlays: List<PlayerNumberOverlay>
+    ) {
+        lineup = loadedLineup
+        _uiState.update {
+            it.copy(
+                lineupName = loadedLineup.name,
+                defenseStrategy = TeamStrategy.getStrategyById(loadedLineup.strategy),
+                lineupMode = loadedLineup.mode,
+                extraHitters = loadedLineup.extraHitters
+            )
+        }
+        // Copies, so the draft never shares instances with what Room handed out.
+        val draft = positions.map { it.copy() }
+        val byPlayerId = draft.associateBy { it.playerId }
+        overlays.forEach { overlay -> byPlayerId[overlay.playerId]?.shirtNumber = overlay.number }
+        _listPlayersWithPosition.clear()
+        _listPlayersWithPosition.addAll(draft)
+        recomputeAndPublish()
+    }
+
+    /** Called synchronously, before the change is launched, by every action editing the draft. */
+    private fun markUnsaved() {
+        hasUnsavedChanges = true
     }
 
     /**
@@ -279,6 +311,7 @@ class LineupViewModel(
     }
 
     fun onDeletePosition(player: Player) {
+        markUnsaved()
         val lineupMode = lineup?.mode ?: MODE_DISABLED
         val hitters = lineup?.extraHitters ?: 0
         viewModelScope.launch {
@@ -295,7 +328,10 @@ class LineupViewModel(
         }
         viewModelScope.launch {
             saveBattingOrderAndPositionsUseCase(currentLineup, _listPlayersWithPosition)
-                .onSuccess { _events.send(LineupEvent.Saved) }
+                .onSuccess {
+                    hasUnsavedChanges = false
+                    _events.send(LineupEvent.Saved)
+                }
                 .onFailure { Timber.e(it) }
         }
     }
@@ -313,6 +349,7 @@ class LineupViewModel(
 
     fun onLineupModeChanged(isEnabled: Boolean) {
         lineup?.let { currentLineup ->
+            markUnsaved()
             viewModelScope.launch {
                 setLineupModeUseCase(isEnabled, currentLineup, _listPlayersWithPosition)
                     .onSuccess { updatedLineup ->
@@ -363,6 +400,7 @@ class LineupViewModel(
 
     private fun switchPlayersPosition(position1: FieldPosition, position2: FieldPosition) {
         val currentLineup = lineup ?: return
+        markUnsaved()
         viewModelScope.launch {
             switchPlayersPositionUseCase(
                 _listPlayersWithPosition,
@@ -377,6 +415,7 @@ class LineupViewModel(
 
     fun onPlayerSelected(player: Player, position: FieldPosition) {
         lineup?.let {
+            markUnsaved()
             viewModelScope.launch {
                 assignPlayerFieldPositionUseCase(player, position, it, _listPlayersWithPosition)
                     .onSuccess { recomputeAndPublish() }
@@ -496,6 +535,7 @@ class LineupViewModel(
             Timber.e(IllegalStateException("Cannot link DP and Flex: the lineup is not loaded"))
             return
         }
+        markUnsaved()
         viewModelScope.launch {
             saveDpAndFlexUseCase(currentLineup, dp, flex, _listPlayersWithPosition)
                 .onSuccess {
@@ -517,6 +557,7 @@ class LineupViewModel(
     }
 
     fun onBattersChanged(batters: List<BatterState>) {
+        markUnsaved()
         viewModelScope.launch {
             updatePlayersWithBattersUseCase(_listPlayersWithPosition, batters)
                 .onFailure { Timber.e(it) }
@@ -581,5 +622,18 @@ class LineupViewModel(
         _uiState.update {
             it.copy(showRosterEditSheet = false, showRosterEditDiscardSheet = false)
         }
+    }
+
+    /**
+     * The roster edit was saved straight to the database (players taken off the roster leave
+     * the lineup there), so the database is now the reference: re-read it, even over unsaved
+     * changes, which the roster save itself was computed without.
+     */
+    fun onRosterEditSaved() {
+        closeRosterEditSheet()
+        hasUnsavedChanges = false
+        observeJob?.cancel()
+        observeJob = null
+        observeLineup()
     }
 }

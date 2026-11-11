@@ -163,6 +163,29 @@ class LineupScreenTest {
     }
 
     @Test
+    fun anUnsavedReassignmentSurvivesARotation() {
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.waitForText(string(R.string.action_save_lineup))
+
+        composeTestRule.waitForTag(FieldPosition.PITCHER.markerTag)
+        composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).performClick()
+        composeTestRule.waitForText(string(R.string.defense_select_player_sheet_title))
+        composeTestRule.onNodeWithText("Substitute 1").performClick()
+        composeTestRule.waitForAbsence(string(R.string.defense_select_player_sheet_title))
+
+        // Recreating the Activity used to make the screen read the lineup from the database
+        // again, dropping the unsaved reassignment.
+        OrientationTestUtils.rotateToLandscape()
+        composeTestRule.waitForText(string(R.string.action_save_lineup))
+
+        composeTestRule
+            .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
+            .performClick()
+        composeTestRule.waitForText(string(R.string.new_lineup_tab_field_offense))
+        composeTestRule.onNodeWithText("Substitute 1").assertIsDisplayed()
+    }
+
+    @Test
     fun tappingDpDhInEditModeOpensLinkSheet() {
         composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))

@@ -126,7 +126,7 @@ fun LineupRoute(
     LaunchedEffect(editionViewModel) {
         editionViewModel.events
             .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .collect { event -> if (event == LineupUpdated) viewModel.closeRosterEditSheet() }
+            .collect { event -> if (event == LineupUpdated) viewModel.onRosterEditSaved() }
     }
 
     BackHandler(enabled = editable) {

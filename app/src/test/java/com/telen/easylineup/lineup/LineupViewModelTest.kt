@@ -1043,4 +1043,90 @@ internal class LineupViewModelTest {
 
         Mockito.verify(updatePlayersWithBattersUseCase)(any(), any())
     }
+
+    private suspend fun startEditingAfterADelete() {
+        viewModel.editable = true
+        loadLineup(loadedLineup, listOf(player(1L, FieldPosition.PITCHER.id, 1)))
+        Mockito.`when`(deletePlayerFieldPositionUseCase(any(), any(), any(), any()))
+            .thenReturn(Result.success(Unit))
+        viewModel.onDeletePosition(aPlayer)
+    }
+
+    @Test
+    fun shouldKeepAnUnsavedEditWhenTheDatabaseEmitsAgain() = runTest {
+        startEditingAfterADelete()
+        advanceUntilIdle()
+
+        playersFlow.emit(listOf(player(9L)))
+        advanceUntilIdle()
+
+        assertEquals(listOf(1L), viewModel.uiState.value.defensePlayers.map { it.playerId })
+    }
+
+    @Test
+    fun shouldFollowTheDatabaseWhileNothingWasEdited() = runTest {
+        viewModel.editable = true
+        loadLineup(loadedLineup, listOf(player(1L)))
+        advanceUntilIdle()
+
+        playersFlow.emit(listOf(player(9L)))
+        advanceUntilIdle()
+
+        assertEquals(listOf(9L), viewModel.uiState.value.defensePlayers.map { it.playerId })
+    }
+
+    @Test
+    fun shouldReadTheDatabaseAgainOnceTheEditIsSaved() = runTest {
+        startEditingAfterADelete()
+        Mockito.`when`(saveBattingOrderAndPositionsUseCase(eq(loadedLineup), any()))
+            .thenReturn(Result.success(Unit))
+        viewModel.onSaveClick()
+        advanceUntilIdle()
+
+        playersFlow.emit(listOf(player(9L)))
+        advanceUntilIdle()
+
+        assertEquals(listOf(9L), viewModel.uiState.value.defensePlayers.map { it.playerId })
+    }
+
+    @Test
+    fun shouldNotRestartObservingWhenTheSameLineupIdIsSetAgain() = runTest {
+        startEditingAfterADelete()
+        advanceUntilIdle()
+
+        // What the Route does when the screen is recreated, e.g. after a rotation.
+        viewModel.lineupId = loadedLineup.id
+        advanceUntilIdle()
+
+        Mockito.verify(observeLineupByIdUseCase, Mockito.times(1)).invoke(loadedLineup.id)
+        assertEquals(listOf(1L), viewModel.uiState.value.defensePlayers.map { it.playerId })
+    }
+
+    @Test
+    fun shouldTakeTheDatabaseOverTheEditAfterASavedRosterChange() = runTest {
+        startEditingAfterADelete()
+        advanceUntilIdle()
+        playersFlow.emit(listOf(player(9L)))
+        advanceUntilIdle()
+
+        viewModel.onRosterEditSaved()
+        advanceUntilIdle()
+
+        assertEquals(listOf(9L), viewModel.uiState.value.defensePlayers.map { it.playerId })
+        assertFalse(viewModel.uiState.value.showRosterEditSheet)
+    }
+
+    @Test
+    fun shouldApplyShirtNumberOverlaysWithoutTouchingTheEmittedPlayers() = runTest {
+        val emitted = player(1L)
+        loadLineup(
+            loadedLineup,
+            listOf(emitted),
+            listOf(PlayerNumberOverlay(lineupId = 1L, playerId = 1L, number = 99))
+        )
+        advanceUntilIdle()
+
+        assertEquals(99, viewModel.uiState.value.defensePlayers.single().shirtNumber)
+        assertEquals(1, emitted.shirtNumber)
+    }
 }
