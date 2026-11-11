@@ -127,7 +127,6 @@ fun SettingsRoute(navController: NavController) {
                         message = R.string.settings_import_error_message
                     ).show()
 
-                    TeamsCountReady -> navController.navigate(Routes.TeamDetails)
                 }
             }
     }
@@ -163,7 +162,7 @@ fun SettingsRoute(navController: NavController) {
             womenColor = uiState.womenColor
         ),
         onBackClick = { navController.navigateUp() },
-        onTeamClick = { viewModel.getTeamsCount() },
+        onTeamClick = { navController.navigate(Routes.TeamDetails) },
         onThemeSelected = { newValue ->
             FirebaseAnalyticsUtils.onClick(context, "click_settings_theme")
             viewModel.onThemeSelected(newValue)

@@ -20,13 +20,11 @@ import com.telen.easylineup.domain.ports.WrittenExportFile
 import com.telen.easylineup.domain.usecases.DeleteAllData
 import com.telen.easylineup.domain.usecases.ExportData
 import com.telen.easylineup.domain.usecases.GenerateExportFileName
-import com.telen.easylineup.domain.usecases.GetAllTeams
 import com.telen.easylineup.domain.usecases.ImportResult
 import com.telen.easylineup.export.json.exportGson
 import com.telen.easylineup.export.json.toJson
 import com.telen.easylineup.utils.SharedPreferencesUtils
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -58,7 +56,6 @@ data object ExportSucceeded : SettingsEvent()
 data object ExportFailed : SettingsEvent()
 data object ImportSucceeded : SettingsEvent()
 data object ImportFailed : SettingsEvent()
-data object TeamsCountReady : SettingsEvent()
 
 /** Everything [SettingsScreen] and its export/import sheets need, except the team info card. */
 data class SettingsUiState(
@@ -77,7 +74,6 @@ data class SettingsUiState(
 class SettingsViewModel(
     private val deleteAllDataUseCase: DeleteAllData,
     private val exportDataUseCase: ExportData,
-    private val getAllTeamsUseCase: GetAllTeams,
     private val generateExportFileName: GenerateExportFileName,
     private val exportFileWriter: ExportFileWriter,
     private val context: Context,
@@ -150,22 +146,11 @@ class SettingsViewModel(
     fun deleteAllData() {
         viewModelScope.launch {
             deleteAllDataUseCase()
-                .onSuccess {
-                    delay(DELAY)
-                    _events.send(DeleteAllDataDone)
-                }
+                .onSuccess { _events.send(DeleteAllDataDone) }
                 .onFailure {
                     Timber.e(it)
                     _events.send(DeleteAllDataFailed)
                 }
-        }
-    }
-
-    fun getTeamsCount() {
-        viewModelScope.launch {
-            getAllTeamsUseCase()
-                .onSuccess { _events.send(TeamsCountReady) }
-                .onFailure { Timber.e(it) }
         }
     }
 
@@ -256,9 +241,5 @@ class SettingsViewModel(
 
     fun onImportSuccessDismiss() {
         _uiState.update { it.copy(importSuccess = null) }
-    }
-
-    private companion object {
-        const val DELAY = 1_000L
     }
 }

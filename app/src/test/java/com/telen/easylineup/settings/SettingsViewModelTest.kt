@@ -17,7 +17,6 @@ import com.telen.easylineup.domain.ports.WrittenExportFile
 import com.telen.easylineup.domain.usecases.DeleteAllData
 import com.telen.easylineup.domain.usecases.ExportData
 import com.telen.easylineup.domain.usecases.GenerateExportFileName
-import com.telen.easylineup.domain.usecases.GetAllTeams
 import com.telen.easylineup.domain.usecases.ImportResult
 import com.telen.easylineup.testDispatcherProvider
 import kotlinx.coroutines.Dispatchers
@@ -62,9 +61,6 @@ internal class SettingsViewModelTest {
 
     @Mock
     lateinit var exportDataUseCase: ExportData
-
-    @Mock
-    lateinit var getAllTeamsUseCase: GetAllTeams
 
     @Mock
     lateinit var generateExportFileName: GenerateExportFileName
@@ -116,7 +112,6 @@ internal class SettingsViewModelTest {
         viewModel = SettingsViewModel(
             deleteAllDataUseCase,
             exportDataUseCase,
-            getAllTeamsUseCase,
             generateExportFileName,
             exportFileWriter,
             context,
@@ -195,35 +190,7 @@ internal class SettingsViewModelTest {
         job.cancel()
     }
 
-    @Test
-    fun shouldSendTeamsCountReadyEventOnSuccess() = runTest(testDispatcher) {
-        runBlocking { Mockito.`when`(getAllTeamsUseCase()).thenReturn(Result.success(emptyList())) }
 
-        val events = mutableListOf<SettingsEvent>()
-        val job = launch { viewModel.events.collect { events.add(it) } }
-
-        viewModel.getTeamsCount()
-        advanceUntilIdle()
-
-        assertEquals(listOf(TeamsCountReady), events)
-        job.cancel()
-    }
-
-    @Test
-    fun shouldSendNoEventWhenGetTeamsCountFails() = runTest(testDispatcher) {
-        runBlocking {
-            Mockito.`when`(getAllTeamsUseCase()).thenReturn(Result.failure(RuntimeException("db")))
-        }
-
-        val events = mutableListOf<SettingsEvent>()
-        val job = launch { viewModel.events.collect { events.add(it) } }
-
-        viewModel.getTeamsCount()
-        advanceUntilIdle()
-
-        assertTrue(events.isEmpty())
-        job.cancel()
-    }
 
     @Test
     fun shouldUpdateExportPreviewOnLoadExportPreviewSuccess() = runTest(testDispatcher) {
