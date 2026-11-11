@@ -65,11 +65,13 @@ import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ModeBadge
+import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.FieldPositionCoordinate
 import com.telen.easylineup.domain.model.MODE_DISABLED
 import com.telen.easylineup.domain.model.MODE_ENABLED
 import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.SubstituteBattingSlots
@@ -786,6 +788,106 @@ private fun DefenseScreenFixedPreview() {
             onSubstituteLongClicked = {},
             onAddSubstitute = {},
             onLineupModeChanged = {}
+        )
+    }
+}
+
+private fun previewPlayer(
+    id: Long,
+    name: String,
+    position: FieldPosition,
+    order: Int,
+    flags: Int = PlayerFieldPosition.FLAG_NONE
+) = PlayerWithPosition(
+    playerName = name,
+    playerSex = 0,
+    shirtNumber = id.toInt() + 6,
+    licenseNumber = "$id",
+    teamId = 1L,
+    image = null,
+    position = position.id,
+    flags = flags,
+    order = order,
+    fieldPositionId = id,
+    playerId = id,
+    lineupId = 1L,
+    playerPositions = position.mask
+)
+
+private val DefensePreviewPlayers = listOf(
+    previewPlayer(1L, "Mia Chen", FieldPosition.PITCHER, 9, PlayerFieldPosition.FLAG_FLEX),
+    previewPlayer(2L, "Jordan Lee", FieldPosition.SHORT_STOP, 2),
+    previewPlayer(3L, "Sam Rivera", FieldPosition.DP_DH, 3),
+    previewPlayer(4L, "Alex Kim", FieldPosition.SUBSTITUTE, 10),
+    previewPlayer(5L, "Noa Martin", FieldPosition.SUBSTITUTE, Constants.SUBSTITUTE_ORDER_VALUE)
+)
+
+@DugoutPreviews
+@Composable
+private fun DhToggleRowPreview() {
+    DugoutTheme {
+        DhToggleRow(teamType = TeamType.BASEBALL.id, checked = true, onCheckedChange = {})
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun DpDhSlotRowAssignedPreview() {
+    DugoutTheme {
+        DpDhSlotRow(
+            players = DefensePreviewPlayers,
+            teamType = TeamType.SOFTBALL.id,
+            onClick = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun DpDhSlotRowUnassignedPreview() {
+    DugoutTheme {
+        DpDhSlotRow(players = emptyList(), teamType = TeamType.BASEBALL.id, onClick = {})
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun SubstituteAddRowPreview() {
+    DugoutTheme {
+        SubstituteAddRow(extraHitters = 2, players = DefensePreviewPlayers, onClick = {})
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun DefenseFieldPreview() {
+    DugoutTheme {
+        DefenseField(
+            strategy = TeamStrategy.STANDARD,
+            players = DefensePreviewPlayers,
+            lineupMode = MODE_ENABLED,
+            teamType = TeamType.BASEBALL.id,
+            editable = true,
+            fieldSize = 320.dp,
+            iconSize = 40.dp,
+            onPositionClicked = {},
+            onPlayersSwitched = { _, _ -> },
+            onPlayerReassigned = { _, _ -> },
+            onPlayerSentToTrash = { _, _ -> }
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun SubstitutesRowPreview() {
+    DugoutTheme {
+        SubstitutesRow(
+            substitutes = DefensePreviewPlayers.filter {
+                it.position == FieldPosition.SUBSTITUTE.id
+            },
+            iconSize = 40.dp,
+            onSubstituteLongClicked = {}
         )
     }
 }

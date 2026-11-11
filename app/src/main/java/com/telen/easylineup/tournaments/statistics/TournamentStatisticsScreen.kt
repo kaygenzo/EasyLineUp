@@ -378,3 +378,40 @@ private fun TournamentStatisticsScreenEmptyPreview() {
         )
     }
 }
+
+@DugoutPreviews
+@Composable
+private fun PlayingTimeCardPreview() {
+    DugoutTheme {
+        PlayingTimeCard(playerStats = PreviewPlayerStats, summary = PreviewPlayingTimeSummary)
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun PlayingTimeRowPreview() {
+    DugoutTheme {
+        PlayingTimeRow(player = PreviewPlayerStats.last(), maxGames = 15)
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun PositionUsageCardPreview() {
+    DugoutTheme {
+        PositionUsageCard(
+            selectedPlayer = PreviewPlayerStats.first(),
+            positions = listOf(FieldPosition.SHORT_STOP, FieldPosition.CENTER_FIELD),
+            teamType = TeamType.BASEBALL,
+            onPlayerFieldClick = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun PlayerPickerSheetPreview() {
+    DugoutTheme {
+        PlayerPickerSheet(players = PreviewPlayerStats, onPlayerSelected = {}, onDismiss = {})
+    }
+}

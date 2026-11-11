@@ -896,6 +896,19 @@ private fun primaryPositionLabel(positions: Int, teamType: TeamType): String? {
     return names.getOrNull(match.id)
 }
 
+@DugoutPreviews
+@Composable
+private fun PrimaryPositionLabelPreview() {
+    DugoutTheme {
+        Text(
+            text = primaryPositionLabel(
+                positions = FieldPosition.SHORT_STOP.mask,
+                teamType = TeamType.BASEBALL
+            ).orEmpty()
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewTournamentSheet(
