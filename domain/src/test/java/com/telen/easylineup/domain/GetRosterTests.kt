@@ -57,7 +57,8 @@ internal class GetRosterTests {
 
         Mockito.`when`(teamDao.getTeams()).thenReturn(listOf(team))
         Mockito.`when`(lineupDao.getLineupById(1L)).thenAnswer { lineup }
-        Mockito.`when`(playerDao.getPlayersByTeamId(1L)).thenReturn(listOf(player1, player2, player3))
+        Mockito.`when`(playerDao.getPlayersByTeamId(1L))
+            .thenReturn(listOf(player1, player2, player3))
 
         val overlays: MutableList<PlayerNumberOverlay> =
             mutableListOf<PlayerNumberOverlay>().apply {

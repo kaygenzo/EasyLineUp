@@ -46,9 +46,12 @@ internal class SavePlayerNumberOverlayTests {
             transactionRunner,
             testDispatcherProvider()
         )
-        Mockito.`when`(playerNumberOverlayRepository.deletePlayerNumberOverlays(any())).thenReturn(Unit)
-        Mockito.`when`(playerNumberOverlayRepository.updatePlayerNumberOverlays(any())).thenReturn(Unit)
-        Mockito.`when`(playerNumberOverlayRepository.insertPlayerNumberOverlays(any())).thenReturn(Unit)
+        Mockito.`when`(playerNumberOverlayRepository.deletePlayerNumberOverlays(any()))
+            .thenReturn(Unit)
+        Mockito.`when`(playerNumberOverlayRepository.updatePlayerNumberOverlays(any()))
+            .thenReturn(Unit)
+        Mockito.`when`(playerNumberOverlayRepository.insertPlayerNumberOverlays(any()))
+            .thenReturn(Unit)
     }
     }
 
@@ -145,7 +148,8 @@ internal class SavePlayerNumberOverlayTests {
     @Test
     fun shouldPropagateErrorFromRepository() = runTest {
         val exception = Exception("db error")
-        Mockito.`when`(playerNumberOverlayRepository.deletePlayerNumberOverlays(any())).thenAnswer { throw exception }
+        Mockito.`when`(playerNumberOverlayRepository.deletePlayerNumberOverlays(any()))
+            .thenAnswer { throw exception }
         val item = RosterPlayerStatus(
             player(1L, shirtNumber = 1),
             status = true,

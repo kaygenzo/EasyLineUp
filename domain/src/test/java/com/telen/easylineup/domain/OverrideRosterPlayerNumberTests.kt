@@ -34,7 +34,11 @@ internal class OverrideRosterPlayerNumberTests {
     fun shouldCreateOverlayWhenPlayerHasNone() {
         val roster = TeamRosterSummary(
             status = Constants.STATUS_ALL,
-            players = listOf(RosterPlayerStatus(player(1L), status = true, playerNumberOverlay = null))
+            players = listOf(RosterPlayerStatus(
+                player(1L),
+                status = true,
+                playerNumberOverlay = null
+            ))
         )
 
         val result = overrideRosterPlayerNumber(roster, position = 0, number = 42, lineupId = 7L)

@@ -90,7 +90,10 @@ internal abstract class AssignPlayerFieldPositionTests(
     @Before
     fun init() {
         savePlayerFieldPosition =
-            AssignPlayerFieldPosition(GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
+            AssignPlayerFieldPosition(
+                GetTeam(teamDao, testDispatcherProvider()),
+                testDispatcherProvider()
+            )
 
         players = mutableListOf()
         teamType.getValidPositions(strategy).forEachIndexed { i, pos ->

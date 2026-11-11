@@ -48,7 +48,10 @@ internal class GetListAvailablePlayersForSelectionTests : BaseUseCaseTests() {
             getTeam = GetTeam(teamDao, testDispatcherProvider()),
             dispatcherProvider = testDispatcherProvider()
         )
-        getListAvailablePlayersForSelection = GetListAvailablePlayersForSelection(getRoster, testDispatcherProvider())
+        getListAvailablePlayersForSelection = GetListAvailablePlayersForSelection(
+            getRoster,
+            testDispatcherProvider()
+        )
 
         val team = Team(id = 1L, name = "toto", main = true)
         Mockito.`when`(teamDao.getTeams()).thenReturn(listOf(team))

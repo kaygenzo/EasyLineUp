@@ -150,7 +150,8 @@ internal class ImportDataTests {
         Mockito.`when`(lineupDao.getLineupByHash(lineupHash)).thenReturn(null)
         Mockito.`when`(playerFieldPositionsDao.getPlayerFieldPositionByHash(positionHash))
             .thenReturn(null)
-        Mockito.`when`(playerNumberOverlayDao.getPlayerNumberOverlayByHash(overlayHash)).thenReturn(null)
+        Mockito.`when`(playerNumberOverlayDao.getPlayerNumberOverlayByHash(overlayHash))
+            .thenReturn(null)
     }
 
     private suspend fun mockAllInsertsSucceed() {

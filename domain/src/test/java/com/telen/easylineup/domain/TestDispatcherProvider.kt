@@ -16,7 +16,9 @@ import kotlinx.coroutines.Dispatchers
  * "Detected use of different schedulers" as soon as a use case does
  * `withContext(dispatcherProvider.io()) { ... }`.
  */
-fun testDispatcherProvider(dispatcher: CoroutineDispatcher = Dispatchers.Unconfined): DispatcherProvider =
+fun testDispatcherProvider(
+    dispatcher: CoroutineDispatcher = Dispatchers.Unconfined
+): DispatcherProvider =
     object : DispatcherProvider {
         override fun io() = dispatcher
         override fun main() = dispatcher

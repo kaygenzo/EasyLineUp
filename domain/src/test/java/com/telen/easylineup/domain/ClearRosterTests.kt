@@ -49,7 +49,11 @@ internal class ClearRosterTests {
     fun shouldReportPartialStatus() {
         val roster = TeamRosterSummary(
             status = Constants.STATUS_ALL,
-            players = listOf(RosterPlayerStatus(player(1L), status = true, playerNumberOverlay = null))
+            players = listOf(RosterPlayerStatus(
+                player(1L),
+                status = true,
+                playerNumberOverlay = null
+            ))
         )
 
         val result = clearRoster(roster)

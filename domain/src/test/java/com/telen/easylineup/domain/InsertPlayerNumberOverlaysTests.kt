@@ -28,7 +28,12 @@ internal class InsertPlayerNumberOverlaysTests {
 
     @Test
     fun shouldDelegateToRepository() = runTest {
-        val overlays = listOf(PlayerNumberOverlay(id = 1L, lineupId = 10L, playerId = 1L, number = 8))
+        val overlays = listOf(PlayerNumberOverlay(
+            id = 1L,
+            lineupId = 10L,
+            playerId = 1L,
+            number = 8
+        ))
         Mockito.`when`(playerDao.insertPlayerNumberOverlays(overlays)).thenReturn(Unit)
 
         val result = insertPlayerNumberOverlays(overlays)

@@ -28,7 +28,13 @@ internal class InsertTournamentsTests {
 
     @Test
     fun shouldDelegateToRepository() = runTest {
-        val tournaments = listOf(Tournament(id = 1L, name = "toto", createdAt = 1L, startTime = 2L, endTime = 3L))
+        val tournaments = listOf(Tournament(
+            id = 1L,
+            name = "toto",
+            createdAt = 1L,
+            startTime = 2L,
+            endTime = 3L
+        ))
         Mockito.`when`(tournamentDao.insertTournaments(tournaments))
             .thenReturn(Unit)
 

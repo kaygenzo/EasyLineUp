@@ -105,7 +105,11 @@ internal abstract class CreateLineupTests {
 
     @Before
     open fun init() {
-        createLineup = CreateLineup(lineupDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
+        createLineup = CreateLineup(
+            lineupDao,
+            GetTeam(teamDao, testDispatcherProvider()),
+            testDispatcherProvider()
+        )
 
         runBlocking {
             Mockito.`when`(teamDao.getTeams())

@@ -30,7 +30,11 @@ internal class GetPlayersTests {
     @Before
     fun init() {
         runBlocking {
-        getPlayers = GetPlayers(playerDao, GetTeam(teamDao, testDispatcherProvider()), testDispatcherProvider())
+        getPlayers = GetPlayers(
+            playerDao,
+            GetTeam(teamDao, testDispatcherProvider()),
+            testDispatcherProvider()
+        )
 
         val player1 = Player(
             id = 1L,

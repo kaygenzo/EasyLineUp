@@ -35,7 +35,7 @@ internal abstract class GetBattersStateEditableTests : GetBattersStateTests() {
     }
 
     @Test
-    fun dpShouldOnlyShowIndexAndShowDescriptionAndCanMoveInExtraHitterWhenLineupEditable() = runTest {
+    fun dpShowsIndexAndDescriptionAndMovesInExtraHittersWhenEditable() = runTest {
         addPlayers()
         addExtraHitters(extraHittersSize)
         players.edit(0) { copy(position = FieldPosition.DP_DH.id) }
@@ -390,7 +390,7 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
     }
 
     @Test
-    fun flexShouldOnlyHaveBackgroundAndShowPositionShowDescriptionWhenLineupNotEditable() = runTest {
+    fun flexHasBackgroundAndShowsPositionAndDescriptionWhenNotEditable() = runTest {
         addPlayers()
         addExtraHitters(extraHittersSize)
 
@@ -427,7 +427,7 @@ internal abstract class GetBattersStateNotEditableTests : GetBattersStateTests()
     }
 
     @Test
-    fun defensePlayerShouldOnlyShowIndexAndShowPositionShowDescriptionWhenLineupEditable() = runTest {
+    fun defensePlayerShowsIndexPositionAndDescriptionWhenEditable() = runTest {
         addPlayers()
 
         applyUserCase()

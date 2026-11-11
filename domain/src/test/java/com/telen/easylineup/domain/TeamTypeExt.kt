@@ -22,7 +22,8 @@ fun TeamType.getValidPositions(strategy: TeamStrategy): List<FieldPosition> {
     )
     return when (this) {
         TeamType.UNKNOWN, TeamType.BASEBALL -> when (strategy) {
-            TeamStrategy.FIVE_MAN_STANDARD -> default - FieldPosition.CENTER_FIELD + FieldPosition.MID_FIELDER
+            TeamStrategy.FIVE_MAN_STANDARD ->
+                default - FieldPosition.CENTER_FIELD + FieldPosition.MID_FIELDER
 
             else -> default
         }
@@ -41,7 +42,8 @@ fun TeamType.getValidPositions(strategy: TeamStrategy): List<FieldPosition> {
                 FieldPosition.SLOWPITCH_RF
             )
 
-            TeamStrategy.FIVE_MAN_STANDARD -> default - FieldPosition.CENTER_FIELD + FieldPosition.MID_FIELDER
+            TeamStrategy.FIVE_MAN_STANDARD ->
+                default - FieldPosition.CENTER_FIELD + FieldPosition.MID_FIELDER
 
             else -> default
         }

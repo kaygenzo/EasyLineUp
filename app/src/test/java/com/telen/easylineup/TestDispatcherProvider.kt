@@ -13,7 +13,9 @@ import kotlinx.coroutines.Dispatchers
  * [kotlinx.coroutines.test.TestCoroutineScheduler], so it never collides with the
  * scheduler `runTest { }` installs for the test body.
  */
-fun testDispatcherProvider(dispatcher: CoroutineDispatcher = Dispatchers.Unconfined): DispatcherProvider =
+fun testDispatcherProvider(
+    dispatcher: CoroutineDispatcher = Dispatchers.Unconfined
+): DispatcherProvider =
     object : DispatcherProvider {
         override fun io() = dispatcher
         override fun main() = dispatcher
