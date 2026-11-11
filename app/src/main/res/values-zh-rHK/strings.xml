@@ -234,7 +234,7 @@
     <string name="roster_message_share_caption">將聯絡人複製為純文字</string>
     <string name="roster_message_share_copied">已複製到剪貼簿</string>
     <string name="roster_message_footnote">上方統計中缺少的球員不會收到這則訊息——在名單中補上他們的資料,下次就能包含他們。</string>
-    <string name="roster_message_no_app">沒有可處理此動作的應用程式</string>
+    <string name="error_no_app_for_action">沒有可處理此動作的應用程式</string>
     <string name="player_side_abbr_left">左</string>
     <string name="player_side_abbr_right">右</string>
     <string name="player_side_abbr_both">左右</string>

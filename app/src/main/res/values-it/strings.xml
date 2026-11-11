@@ -278,7 +278,7 @@
     <string name="roster_message_footnote">I giocatori che mancano nei conteggi sopra non
         riceveranno il messaggio: aggiungi i loro dati dal roster per includerli la prossima
         volta.</string>
-    <string name="roster_message_no_app">Nessuna app disponibile per questa azione</string>
+    <string name="error_no_app_for_action">Nessuna app disponibile per questa azione</string>
     <string name="player_side_abbr_left">S</string>
     <string name="player_side_abbr_right">D</string>
     <string name="player_side_abbr_both">E</string>

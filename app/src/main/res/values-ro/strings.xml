@@ -270,7 +270,7 @@
     <string name="roster_message_share_copied">Copiat în clipboard</string>
     <string name="roster_message_footnote">Jucătorii care lipsesc din numărătorile de mai sus nu vor
         primi mesajul — adaugă-le datele din lot ca să-i incluzi data viitoare.</string>
-    <string name="roster_message_no_app">Nicio aplicație nu poate face asta</string>
+    <string name="error_no_app_for_action">Nicio aplicație nu poate face asta</string>
     <string name="player_side_abbr_left">S</string>
     <string name="player_side_abbr_right">D</string>
     <string name="player_side_abbr_both">A</string>

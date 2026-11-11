@@ -272,7 +272,7 @@
     <string name="roster_message_share_copied">Zkopírováno do schránky</string>
     <string name="roster_message_footnote">Hráči, kteří ve výše uvedeném počtu chybí, tuto zprávu
         nedostanou — doplňte jejich údaje v soupisce, abyste je příště zahrnuli.</string>
-    <string name="roster_message_no_app">Pro tuto akci není k dispozici žádná aplikace</string>
+    <string name="error_no_app_for_action">Pro tuto akci není k dispozici žádná aplikace</string>
     <string name="player_side_abbr_left">L</string>
     <string name="player_side_abbr_right">P</string>
     <string name="player_side_abbr_both">O</string>

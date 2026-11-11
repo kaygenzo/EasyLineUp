@@ -274,7 +274,7 @@
     <string name="roster_message_footnote">Los jugadores que falten en los recuentos de arriba no
         recibirán ese mensaje: añade sus datos desde la plantilla para incluirlos la próxima
         vez.</string>
-    <string name="roster_message_no_app">Ninguna app puede hacer esto</string>
+    <string name="error_no_app_for_action">Ninguna app puede hacer esto</string>
     <string name="player_side_abbr_left">I</string>
     <string name="player_side_abbr_right">D</string>
     <string name="player_side_abbr_both">A</string>

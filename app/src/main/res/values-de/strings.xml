@@ -274,7 +274,7 @@
     <string name="roster_message_footnote">Spieler, die oben in einer Zählung fehlen, erhalten diese
         Nachricht nicht — ergänze ihre Daten im Kader, um sie beim nächsten Mal
         einzubeziehen.</string>
-    <string name="roster_message_no_app">Keine App kann diese Aktion ausführen</string>
+    <string name="error_no_app_for_action">Keine App kann diese Aktion ausführen</string>
     <string name="player_side_abbr_left">L</string>
     <string name="player_side_abbr_right">R</string>
     <string name="player_side_abbr_both">B</string>

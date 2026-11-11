@@ -327,7 +327,7 @@
     <string name="roster_message_share_copied">Copied to clipboard</string>
     <string name="roster_message_footnote">Players missing from a count above won\'t receive that
         message — add their info from the roster to include them next time.</string>
-    <string name="roster_message_no_app">No app available to handle this</string>
+    <string name="error_no_app_for_action">No app available to handle this</string>
     <string name="player_side_abbr_left">L</string>
     <string name="player_side_abbr_right">R</string>
     <string name="player_side_abbr_both">B</string>

@@ -241,7 +241,7 @@
     <string name="roster_message_share_copied">클립보드에 복사했습니다</string>
     <string name="roster_message_footnote">위 인원에 포함되지 않은 선수는 메시지를 받지 못합니다. 다음에 포함하려면 명단에서 연락처를
         추가하세요.</string>
-    <string name="roster_message_no_app">이 작업을 처리할 앱이 없습니다</string>
+    <string name="error_no_app_for_action">이 작업을 처리할 앱이 없습니다</string>
     <string name="player_side_abbr_left">좌</string>
     <string name="player_side_abbr_right">우</string>
     <string name="player_side_abbr_both">양</string>

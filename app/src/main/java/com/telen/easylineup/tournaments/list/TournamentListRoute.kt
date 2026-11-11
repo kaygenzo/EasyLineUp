@@ -43,6 +43,7 @@ import com.telen.easylineup.lineup.edition.LineupUpdated
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import com.telen.easylineup.utils.startActivityOrNotify
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -193,7 +194,7 @@ fun TournamentListRoute(navController: NavController) {
         onDeleteClick = { tournamentPendingDeletion = it },
         onMapClick = { location ->
             val urlString = "geo:${location.latitude},${location.longitude}"
-            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(urlString)))
+            context.startActivityOrNotify(Intent(Intent.ACTION_VIEW, Uri.parse(urlString)))
         }
     )
 

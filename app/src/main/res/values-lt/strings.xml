@@ -280,7 +280,7 @@
     <string name="roster_message_footnote">Žaidėjai, kurių trūksta aukščiau esančiuose skaičiuose,
         šios žinutės negaus — papildykite jų duomenis sudėtyje, kad kitą kartą jie būtų
         įtraukti.</string>
-    <string name="roster_message_no_app">Nėra programos šiam veiksmui</string>
+    <string name="error_no_app_for_action">Nėra programos šiam veiksmui</string>
     <string name="player_side_abbr_left">K</string>
     <string name="player_side_abbr_right">D</string>
     <string name="player_side_abbr_both">A</string>

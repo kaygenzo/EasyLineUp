@@ -251,7 +251,7 @@
     <string name="roster_message_share_copied">คัดลอกไปยังคลิปบอร์ดแล้ว</string>
     <string name="roster_message_footnote">ผู้เล่นที่ไม่อยู่ในจำนวนด้านบนจะไม่ได้รับข้อความนั้น —
         เพิ่มข้อมูลของพวกเขาในรายชื่อเพื่อให้รวมอยู่ในครั้งหน้า</string>
-    <string name="roster_message_no_app">ไม่มีแอปที่ทำสิ่งนี้ได้</string>
+    <string name="error_no_app_for_action">ไม่มีแอปที่ทำสิ่งนี้ได้</string>
     <string name="player_side_abbr_left">ซ</string>
     <string name="player_side_abbr_right">ข</string>
     <string name="player_side_abbr_both">สองมือ</string>

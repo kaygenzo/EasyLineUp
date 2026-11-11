@@ -303,7 +303,7 @@
     <string name="roster_message_footnote">Les joueurs absents d\'un des comptages ci-dessus ne
         recevront pas ce message — complétez leurs informations depuis le roster pour les
         inclure la prochaine fois.</string>
-    <string name="roster_message_no_app">Aucune application disponible pour cette action</string>
+    <string name="error_no_app_for_action">Aucune application disponible pour cette action</string>
     <string name="player_side_abbr_left">G</string>
     <string name="player_side_abbr_right">D</string>
     <string name="player_side_abbr_both">A</string>

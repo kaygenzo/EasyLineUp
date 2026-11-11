@@ -39,6 +39,7 @@ import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import com.telen.easylineup.utils.startActivityOrNotify
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
@@ -84,7 +85,7 @@ fun SettingsRoute(navController: NavController) {
                 val link = "http://play.google.com/store/apps/details?id=${context.packageName}"
                 data = Uri.parse(link)
             }
-            context.startActivity(intent)
+            context.startActivityOrNotify(intent)
         }
     }
 

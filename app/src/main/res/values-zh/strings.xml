@@ -234,7 +234,7 @@
     <string name="roster_message_share_caption">将联系人复制为纯文本</string>
     <string name="roster_message_share_copied">已复制到剪贴板</string>
     <string name="roster_message_footnote">上方统计中缺少的球员不会收到这条消息——在名单中补充他们的信息,下次即可包含他们。</string>
-    <string name="roster_message_no_app">没有可处理此操作的应用</string>
+    <string name="error_no_app_for_action">没有可处理此操作的应用</string>
     <string name="player_side_abbr_left">左</string>
     <string name="player_side_abbr_right">右</string>
     <string name="player_side_abbr_both">双</string>

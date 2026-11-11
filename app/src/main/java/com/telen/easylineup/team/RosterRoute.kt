@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.team
 
-import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -26,9 +25,9 @@ import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import com.telen.easylineup.utils.startActivityOrNotify
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
 
 /** Replaces `PlayersFragment` - the `navigation_team` root tab. */
 @Composable
@@ -82,7 +81,7 @@ fun RosterRoute(navController: NavController) {
                         Intent.ACTION_SENDTO,
                         Uri.parse("smsto:" + numbers.joinToString(";"))
                     )
-                    launchOrNotify(context, intent)
+                    context.startActivityOrNotify(intent)
                 }
             },
             onEmailClick = {
@@ -92,7 +91,7 @@ fun RosterRoute(navController: NavController) {
                     val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")).apply {
                         putExtra(Intent.EXTRA_EMAIL, emails.toTypedArray())
                     }
-                    launchOrNotify(context, intent)
+                    context.startActivityOrNotify(intent)
                 }
             },
             onShareAnotherWayClick = {
@@ -107,15 +106,6 @@ fun RosterRoute(navController: NavController) {
                     .show()
             }
         )
-    }
-}
-
-private fun launchOrNotify(context: Context, intent: Intent) {
-    try {
-        context.startActivity(intent)
-    } catch (e: ActivityNotFoundException) {
-        Timber.e(e)
-        Toast.makeText(context, R.string.roster_message_no_app, Toast.LENGTH_SHORT).show()
     }
 }
 

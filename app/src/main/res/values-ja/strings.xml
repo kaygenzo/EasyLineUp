@@ -233,7 +233,7 @@
     <string name="roster_message_share_caption">連絡先をテキストでコピー</string>
     <string name="roster_message_share_copied">クリップボードにコピーしました</string>
     <string name="roster_message_footnote">上の件数に含まれない選手にはメッセージが届きません。次回含めるには、メンバー画面から連絡先を追加してください。</string>
-    <string name="roster_message_no_app">この操作に対応するアプリがありません</string>
+    <string name="error_no_app_for_action">この操作に対応するアプリがありません</string>
     <string name="player_side_abbr_left">左</string>
     <string name="player_side_abbr_right">右</string>
     <string name="player_side_abbr_both">両</string>

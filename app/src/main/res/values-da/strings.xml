@@ -264,7 +264,7 @@
     <string name="roster_message_share_copied">Kopieret til udklipsholderen</string>
     <string name="roster_message_footnote">Spillere, der mangler i optællingerne ovenfor, får ikke
         beskeden — tilføj deres oplysninger i truppen for at få dem med næste gang.</string>
-    <string name="roster_message_no_app">Ingen app kan håndtere dette</string>
+    <string name="error_no_app_for_action">Ingen app kan håndtere dette</string>
     <string name="player_side_abbr_left">V</string>
     <string name="player_side_abbr_right">H</string>
     <string name="player_side_abbr_both">B</string>

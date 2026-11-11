@@ -271,7 +271,7 @@
     <string name="roster_message_footnote">Hindi matatanggap ng mga manlalarong wala sa bilang sa
         itaas ang mensaheng iyon — idagdag ang kanilang impormasyon mula sa roster para maisama sila
         sa susunod.</string>
-    <string name="roster_message_no_app">Walang app na makakagawa nito</string>
+    <string name="error_no_app_for_action">Walang app na makakagawa nito</string>
     <string name="player_side_abbr_left">K</string>
     <string name="player_side_abbr_right">Kn</string>
     <string name="player_side_abbr_both">P</string>

@@ -273,7 +273,7 @@
     <string name="roster_message_share_copied">Copiado para a área de transferência</string>
     <string name="roster_message_footnote">Jogadores que faltam nas contagens acima não vão receber
         essa mensagem — adicione os dados deles no elenco para incluí-los da próxima vez.</string>
-    <string name="roster_message_no_app">Nenhum app disponível para isso</string>
+    <string name="error_no_app_for_action">Nenhum app disponível para isso</string>
     <string name="player_side_abbr_left">E</string>
     <string name="player_side_abbr_right">D</string>
     <string name="player_side_abbr_both">A</string>

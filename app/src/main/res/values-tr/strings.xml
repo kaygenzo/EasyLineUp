@@ -267,7 +267,7 @@
     <string name="roster_message_share_copied">Panoya kopyalandı</string>
     <string name="roster_message_footnote">Yukarıdaki sayımlarda olmayan oyuncular bu mesajı almaz —
         bir dahakine dahil etmek için bilgilerini kadrodan ekleyin.</string>
-    <string name="roster_message_no_app">Bu işlemi yapabilecek uygulama yok</string>
+    <string name="error_no_app_for_action">Bu işlemi yapabilecek uygulama yok</string>
     <string name="player_side_abbr_left">S</string>
     <string name="player_side_abbr_right">Sğ</string>
     <string name="player_side_abbr_both">İ</string>

@@ -4,7 +4,6 @@
 
 package com.telen.easylineup.lineup
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -35,9 +34,9 @@ import com.telen.easylineup.lineup.defense.DpFlexLinkSheet
 import com.telen.easylineup.lineup.edition.RosterEditSheet
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import com.telen.easylineup.utils.startActivityOrNotify
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
 
 /**
  * Replaces `LineupFragment`/`LineupFragmentFixed`/`LineupFragmentEditable` - [editable]
@@ -85,11 +84,7 @@ fun LineupRoute(
             putExtra(Intent.EXTRA_STREAM, event.pdfUri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        try {
-            context.startActivity(Intent.createChooser(intent, null))
-        } catch (e: ActivityNotFoundException) {
-            Timber.e(e)
-        }
+        context.startActivityOrNotify(Intent.createChooser(intent, null))
     }
 
     fun handlePositionClicked(position: FieldPosition) {

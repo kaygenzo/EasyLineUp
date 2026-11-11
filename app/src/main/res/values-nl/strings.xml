@@ -274,7 +274,7 @@
     <string name="roster_message_footnote">Spelers die hierboven in een telling ontbreken, krijgen
         dat bericht niet — vul hun gegevens aan in de selectie om ze volgende keer mee te
         nemen.</string>
-    <string name="roster_message_no_app">Geen app beschikbaar voor deze actie</string>
+    <string name="error_no_app_for_action">Geen app beschikbaar voor deze actie</string>
     <string name="player_side_abbr_left">L</string>
     <string name="player_side_abbr_right">R</string>
     <string name="player_side_abbr_both">B</string>
