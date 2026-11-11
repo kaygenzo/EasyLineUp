@@ -13,7 +13,7 @@ import com.telen.easylineup.domain.model.export.PlayerPositionExport
  * [PlayerPositionExport] which is free to evolve with the domain's own needs.
  */
 internal data class JsonPlayerPositionExport(
-    @SerializedName("id") val id: String,
+    @SerializedName("id") val id: String?,
     @SerializedName("playerID") val playerId: String?,
     @SerializedName("position") val position: Int,
     @SerializedName("x") val x: Float,
@@ -36,7 +36,7 @@ internal fun PlayerPositionExport.toJson(): JsonPlayerPositionExport {
 
 internal fun JsonPlayerPositionExport.toDomain(): PlayerPositionExport {
     return PlayerPositionExport(
-        id = id,
+        id = required(id, "player position id"),
         playerId = playerId,
         position = position,
         x = x,

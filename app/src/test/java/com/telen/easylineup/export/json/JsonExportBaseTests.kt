@@ -11,8 +11,10 @@ import com.telen.easylineup.domain.model.export.PlayerNumberOverlayExport
 import com.telen.easylineup.domain.model.export.PlayerPositionExport
 import com.telen.easylineup.domain.model.export.TeamExport
 import com.telen.easylineup.domain.model.export.TournamentExport
+import java.io.StringReader
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
@@ -218,5 +220,56 @@ class JsonExportBaseTests {
         assertEquals("player-1", lineup.playerPositions.single().playerId)
         assertEquals("player-1", lineup.playerNumberOverlays.single().playerId)
         assertEquals(23, lineup.playerNumberOverlays.single().number)
+    }
+
+    private fun minimalFile(lineup: String = MINIMAL_LINEUP, player: String = MINIMAL_PLAYER) =
+        """
+            {"teams": [{"id": "team-1", "name": "Hawks", "type": 0, "main": true,
+              "players": [$player],
+              "tournaments": [{"id": "t-1", "name": "Cup", "lineups": [$lineup]}]}]}
+        """.trimIndent()
+
+    @Test
+    fun treatsListsMissingFromAnOlderFileAsEmpty() {
+        val domain = parseExportFile(StringReader(minimalFile()))
+
+        val team = domain.teams.single()
+        val lineup = team.tournaments.single().lineups.single()
+        assertEquals(emptyList<Any>(), lineup.playerPositions)
+        assertEquals(emptyList<Any>(), lineup.playerNumberOverlays)
+        assertEquals("", team.players.single().licenseNumber)
+    }
+
+    @Test
+    fun refusesAFileWithAPlayerWithoutAName() {
+        val file = minimalFile(player = """{"id": "p-1", "shirtNumber": 7}""")
+
+        val error = runCatching { parseExportFile(StringReader(file)) }.exceptionOrNull()
+
+        assertTrue(error is InvalidExportFileException)
+        assertEquals("Missing player name", error?.message)
+    }
+
+    @Test
+    fun refusesAFileWithABlankLineupId() {
+        val file = minimalFile(lineup = """{"id": " ", "name": "L"}""")
+
+        val error = runCatching { parseExportFile(StringReader(file)) }.exceptionOrNull()
+
+        assertTrue(error is InvalidExportFileException)
+    }
+
+    @Test
+    fun refusesATruncatedOrEmptyFile() {
+        listOf(minimalFile().dropLast(20), "").forEach { file ->
+            val error = runCatching { parseExportFile(StringReader(file)) }.exceptionOrNull()
+
+            assertTrue("$file -> $error", error is InvalidExportFileException)
+        }
+    }
+
+    companion object {
+        private const val MINIMAL_PLAYER = """{"id": "p-1", "name": "Jo", "shirtNumber": 7}"""
+        private const val MINIMAL_LINEUP = """{"id": "l-1", "name": "Opening Day"}"""
     }
 }

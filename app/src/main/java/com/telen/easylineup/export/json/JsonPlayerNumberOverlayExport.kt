@@ -13,7 +13,7 @@ import com.telen.easylineup.domain.model.export.PlayerNumberOverlayExport
  * [PlayerNumberOverlayExport] which is free to evolve with the domain's own needs.
  */
 internal data class JsonPlayerNumberOverlayExport(
-    @SerializedName("id") val id: String,
+    @SerializedName("id") val id: String?,
     @SerializedName("playerID") val playerId: String?,
     @SerializedName("number") val number: Int
 )
@@ -28,7 +28,7 @@ internal fun PlayerNumberOverlayExport.toJson(): JsonPlayerNumberOverlayExport {
 
 internal fun JsonPlayerNumberOverlayExport.toDomain(): PlayerNumberOverlayExport {
     return PlayerNumberOverlayExport(
-        id = id,
+        id = required(id, "player number overlay id"),
         playerId = playerId,
         number = number
     )

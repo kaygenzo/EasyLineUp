@@ -13,11 +13,11 @@ import com.telen.easylineup.domain.model.export.PlayerExport
  * which is free to evolve with the domain's own needs.
  */
 internal data class JsonPlayerExport(
-    @SerializedName("id") val id: String,
-    @SerializedName("name") val name: String,
+    @SerializedName("id") val id: String?,
+    @SerializedName("name") val name: String?,
     @SerializedName("image") val image: String?,
     @SerializedName("shirtNumber") val shirtNumber: Int,
-    @SerializedName("licenseNumber") val licenseNumber: String,
+    @SerializedName("licenseNumber") val licenseNumber: String?,
     @SerializedName("positions") val positions: Int,
     @SerializedName("pitching") val pitching: Int,
     @SerializedName("batting") val batting: Int,
@@ -44,11 +44,11 @@ internal fun PlayerExport.toJson(): JsonPlayerExport {
 
 internal fun JsonPlayerExport.toDomain(): PlayerExport {
     return PlayerExport(
-        id = id,
-        name = name,
+        id = required(id, "player id"),
+        name = required(name, "player name"),
         image = image,
         shirtNumber = shirtNumber,
-        licenseNumber = licenseNumber,
+        licenseNumber = licenseNumber.orEmpty(),
         positions = positions,
         pitching = pitching,
         batting = batting,

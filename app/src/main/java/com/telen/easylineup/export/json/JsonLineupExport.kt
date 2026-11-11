@@ -13,8 +13,8 @@ import com.telen.easylineup.domain.model.export.LineupExport
  * which is free to evolve with the domain's own needs.
  */
 internal data class JsonLineupExport(
-    @SerializedName("id") val id: String,
-    @SerializedName("name") val name: String,
+    @SerializedName("id") val id: String?,
+    @SerializedName("name") val name: String?,
     @SerializedName("eventTime") val eventTime: Long,
     @SerializedName("createdAt") val createdAt: Long,
     @SerializedName("editedAt") val editedAt: Long,
@@ -22,9 +22,9 @@ internal data class JsonLineupExport(
     @SerializedName("strategy") val strategy: Int,
     @SerializedName("extraHitters") val extraHitters: Int,
     @SerializedName("roster") val roster: List<String>?,
-    @SerializedName("playerPositions") val playerPositions: List<JsonPlayerPositionExport>,
+    @SerializedName("playerPositions") val playerPositions: List<JsonPlayerPositionExport>?,
     @SerializedName("playerNumberOverlays")
-    val playerNumberOverlays: List<JsonPlayerNumberOverlayExport>
+    val playerNumberOverlays: List<JsonPlayerNumberOverlayExport>?
 )
 
 internal fun LineupExport.toJson(): JsonLineupExport {
@@ -45,8 +45,8 @@ internal fun LineupExport.toJson(): JsonLineupExport {
 
 internal fun JsonLineupExport.toDomain(): LineupExport {
     return LineupExport(
-        id = id,
-        name = name,
+        id = required(id, "lineup id"),
+        name = required(name, "lineup name"),
         eventTime = eventTime,
         createdAt = createdAt,
         editedAt = editedAt,
@@ -54,7 +54,7 @@ internal fun JsonLineupExport.toDomain(): LineupExport {
         strategy = strategy,
         extraHitters = extraHitters,
         roster = roster,
-        playerPositions = playerPositions.map { it.toDomain() },
-        playerNumberOverlays = playerNumberOverlays.map { it.toDomain() }
+        playerPositions = playerPositions.orEmpty().map { it.toDomain() },
+        playerNumberOverlays = playerNumberOverlays.orEmpty().map { it.toDomain() }
     )
 }

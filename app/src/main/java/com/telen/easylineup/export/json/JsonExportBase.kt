@@ -16,7 +16,7 @@ import com.telen.easylineup.domain.model.export.ExportBase
  * before writing, [LoginViewModel] deserializes it before handing data to `ImportData`.
  */
 internal data class JsonExportBase(
-    @SerializedName("teams") val teams: List<JsonTeamExport>
+    @SerializedName("teams") val teams: List<JsonTeamExport>?
 )
 
 internal fun ExportBase.toJson(): JsonExportBase {
@@ -24,5 +24,5 @@ internal fun ExportBase.toJson(): JsonExportBase {
 }
 
 internal fun JsonExportBase.toDomain(): ExportBase {
-    return ExportBase(teams = teams.map { it.toDomain() })
+    return ExportBase(teams = teams.orEmpty().map { it.toDomain() })
 }

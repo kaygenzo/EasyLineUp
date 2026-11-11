@@ -9,18 +9,14 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.ports.ImportFileReader
-import com.telen.easylineup.export.json.JsonExportBase
-import com.telen.easylineup.export.json.exportGson
-import com.telen.easylineup.export.json.toDomain
+import com.telen.easylineup.export.json.parseExportFile
 
 class ImportFileReaderImpl(private val context: Context) : ImportFileReader {
     override fun read(uri: String): ExportBase {
         val stream = context.contentResolver.openInputStream(Uri.parse(uri))
             ?: throw IllegalArgumentException("Cannot open uri")
         return stream.use { s ->
-            s.bufferedReader().use { reader ->
-                exportGson.fromJson(reader, JsonExportBase::class.java).toDomain()
-            }
+            s.bufferedReader().use { reader -> parseExportFile(reader) }
         }
     }
 

@@ -13,14 +13,14 @@ import com.telen.easylineup.domain.model.export.TeamExport
  * which is free to evolve with the domain's own needs.
  */
 internal data class JsonTeamExport(
-    @SerializedName("id") val id: String,
-    @SerializedName("name") val name: String,
+    @SerializedName("id") val id: String?,
+    @SerializedName("name") val name: String?,
     @SerializedName("image") val image: String?,
     @SerializedName("type") val type: Int,
     @SerializedName("main") val main: Boolean,
     @SerializedName("createdAt") val createdAt: Long = 0L,
-    @SerializedName("players") val players: List<JsonPlayerExport>,
-    @SerializedName("tournaments") val tournaments: List<JsonTournamentExport>
+    @SerializedName("players") val players: List<JsonPlayerExport>?,
+    @SerializedName("tournaments") val tournaments: List<JsonTournamentExport>?
 )
 
 internal fun TeamExport.toJson(): JsonTeamExport {
@@ -38,13 +38,13 @@ internal fun TeamExport.toJson(): JsonTeamExport {
 
 internal fun JsonTeamExport.toDomain(): TeamExport {
     return TeamExport(
-        id = id,
-        name = name,
+        id = required(id, "team id"),
+        name = required(name, "team name"),
         image = image,
         type = type,
         main = main,
         createdAt = createdAt,
-        players = players.map { it.toDomain() },
-        tournaments = tournaments.map { it.toDomain() }
+        players = players.orEmpty().map { it.toDomain() },
+        tournaments = tournaments.orEmpty().map { it.toDomain() }
     )
 }

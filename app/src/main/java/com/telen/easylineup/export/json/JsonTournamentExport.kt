@@ -13,13 +13,13 @@ import com.telen.easylineup.domain.model.export.TournamentExport
  * [TournamentExport] which is free to evolve with the domain's own needs.
  */
 internal data class JsonTournamentExport(
-    @SerializedName("id") val id: String,
-    @SerializedName("name") val name: String,
+    @SerializedName("id") val id: String?,
+    @SerializedName("name") val name: String?,
     @SerializedName("createdAt") val createdAt: Long,
     @SerializedName("startTime") val startTime: Long,
     @SerializedName("endTime") val endTime: Long,
     @SerializedName("address") val address: String?,
-    @SerializedName("lineups") val lineups: List<JsonLineupExport>
+    @SerializedName("lineups") val lineups: List<JsonLineupExport>?
 )
 
 internal fun TournamentExport.toJson(): JsonTournamentExport {
@@ -36,12 +36,12 @@ internal fun TournamentExport.toJson(): JsonTournamentExport {
 
 internal fun JsonTournamentExport.toDomain(): TournamentExport {
     return TournamentExport(
-        id = id,
-        name = name,
+        id = required(id, "tournament id"),
+        name = required(name, "tournament name"),
         createdAt = createdAt,
         startTime = startTime,
         endTime = endTime,
         address = address,
-        lineups = lineups.map { it.toDomain() }
+        lineups = lineups.orEmpty().map { it.toDomain() }
     )
 }
