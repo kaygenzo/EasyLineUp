@@ -7,6 +7,7 @@ package com.telen.easylineup.team.createTeam
 import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
@@ -84,6 +85,11 @@ class TeamCreationActivity : BaseActivity() {
 
         setContent {
             DugoutTheme {
+                // Not an onBackPressed() override: with targetSdk 36, Android 16 dispatches the
+                // system back through OnBackPressedDispatcher and never calls it. While the
+                // sheet is open it handles back itself.
+                BackHandler(enabled = !showDiscardSheet) { showDiscardDialog("back_pressed") }
+
                 TeamFormScreen(
                     state = TeamFormState(
                         isEditing = isEditing,
@@ -125,10 +131,6 @@ class TeamCreationActivity : BaseActivity() {
 
     private fun onSaveClicked() {
         viewModel.onSaveClicked()
-    }
-
-    override fun onBackPressed() {
-        showDiscardDialog("back_pressed")
     }
 
     private fun showDiscardDialog(trigger: String) {

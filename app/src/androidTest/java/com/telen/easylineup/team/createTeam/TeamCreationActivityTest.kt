@@ -13,11 +13,14 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.UiDevice
 import com.telen.easylineup.R
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -82,5 +85,18 @@ class TeamCreationActivityTest {
         composeTestRule.onNodeWithText(string(R.string.action_keep_editing)).performClick()
         composeTestRule.waitForAbsence(string(R.string.action_keep_editing))
         composeTestRule.onNodeWithText(string(R.string.team_form_title_create)).assertIsDisplayed()
+    }
+
+    @Test
+    fun systemBackShowsDiscardConfirmationInsteadOfClosing() {
+        // A real system back, through the window's back dispatch: with targetSdk 36, Android
+        // 16 no longer calls an Activity.onBackPressed() override for it.
+        UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).pressBack()
+
+        composeTestRule.waitForText(string(R.string.action_keep_editing))
+        assertEquals(
+            Lifecycle.State.RESUMED,
+            composeTestRule.activityRule.scenario.state
+        )
     }
 }
