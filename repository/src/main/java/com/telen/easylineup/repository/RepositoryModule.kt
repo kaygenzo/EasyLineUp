@@ -56,6 +56,7 @@ object RepositoryModule {
                 .addMigrations(migration19To20())
                 .addMigrations(migration20To21())
                 .addMigrations(migration21To22())
+                .addMigrations(migration22To23())
             if (BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
                     .fallbackToDestructiveMigration()
@@ -484,6 +485,41 @@ object RepositoryModule {
                     "CREATE UNIQUE INDEX IF NOT EXISTS `index_tournaments_name` " +
                         "ON `tournaments` (`name`)"
                 )
+            }
+        }
+    }
+
+    /**
+     * Makes `hash`, the column an import matches rows by, unique and indexed in every table that
+     * has one: each import lookup scanned the whole table, and nothing stopped two rows from
+     * sharing a hash, after which an import would update only one of them. Missing, blank and
+     * duplicate hashes (all but the oldest row of each) get a fresh random one first. The column
+     * stays nullable: making it NOT NULL means rebuilding six tables and their foreign keys,
+     * and every write already sets it.
+     */
+    fun migration22To23(): Migration {
+        return object : Migration(22, 23) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                val newHash = "lower(hex(randomblob(4)) || '-' || hex(randomblob(2)) || '-' || " +
+                    "hex(randomblob(2)) || '-' || hex(randomblob(2)) || '-' || " +
+                    "hex(randomblob(6)))"
+                listOf(
+                    "teams",
+                    "players",
+                    "tournaments",
+                    "lineups",
+                    "playerFieldPosition",
+                    "playerNumberOverlay"
+                ).forEach { table ->
+                    database.execSQL(
+                        "UPDATE `$table` SET hash = $newHash WHERE hash IS NULL OR hash = '' " +
+                            "OR id NOT IN (SELECT MIN(id) FROM `$table` GROUP BY hash)"
+                    )
+                    database.execSQL(
+                        "CREATE UNIQUE INDEX IF NOT EXISTS `index_${table}_hash` " +
+                            "ON `$table` (`hash`)"
+                    )
+                }
             }
         }
     }

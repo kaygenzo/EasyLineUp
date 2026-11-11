@@ -25,7 +25,8 @@ import java.util.UUID
     indices = [
         Index(value = ["number"]),
         Index(value = ["lineupID"]),
-        Index(value = ["playerID"])
+        Index(value = ["playerID"]),
+        Index(value = ["hash"], unique = true)
     ],
     foreignKeys = [
         ForeignKey(

@@ -7,7 +7,6 @@ package com.telen.easylineup.repository.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.telen.easylineup.repository.model.RoomPlayerFieldPosition
@@ -40,7 +39,7 @@ internal interface PlayerFieldPositionsDao {
     @Update
     suspend fun updatePlayerFieldPosition(fieldPosition: RoomPlayerFieldPosition)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertPlayerFieldPosition(fieldPositions: RoomPlayerFieldPosition): Long
 
     @Query("SELECT * from playerFieldPosition where hash = :hash")

@@ -23,7 +23,7 @@ import java.util.UUID
  */
 @Entity(
     tableName = "tournaments",
-    indices = [Index(value = ["name"], unique = true)]
+    indices = [Index(value = ["name"], unique = true), Index(value = ["hash"], unique = true)]
 )
 internal data class RoomTournament(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,

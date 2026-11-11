@@ -24,7 +24,7 @@ import java.util.UUID
  */
 @Entity(
     tableName = "teams",
-    indices = [Index(value = ["name"])]
+    indices = [Index(value = ["name"]), Index(value = ["hash"], unique = true)]
 )
 internal data class RoomTeam(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,

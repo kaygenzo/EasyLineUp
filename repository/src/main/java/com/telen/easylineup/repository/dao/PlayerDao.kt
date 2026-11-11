@@ -7,7 +7,6 @@ package com.telen.easylineup.repository.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.telen.easylineup.repository.model.RoomPlayer
@@ -20,19 +19,19 @@ internal interface PlayerDao {
     @Query("DELETE FROM players")
     suspend fun deleteAll()
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertPlayer(player: RoomPlayer): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertPlayers(players: List<RoomPlayer>)
 
     @Delete
     suspend fun deletePlayer(player: RoomPlayer)
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
+    @Update
     suspend fun updatePlayer(player: RoomPlayer)
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
+    @Update
     suspend fun updatePlayersWithRowCount(players: List<RoomPlayer>): Int
 
     @Query("SELECT * from players WHERE hash = :hash")

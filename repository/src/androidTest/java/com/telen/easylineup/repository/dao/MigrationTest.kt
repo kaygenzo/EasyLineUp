@@ -264,6 +264,50 @@ class MigrationTest {
     }
 
     @Test
+    fun migrate22To23_givesEveryRowItsOwnHashAndMakesHashesUnique() {
+        helper.createDatabase(TEST_DB_NAME, 22).apply {
+            listOf(1 to "'same'", 2 to "'same'", 3 to "NULL", 4 to "''", 5 to "'own'")
+                .forEach { (id, hash) ->
+                    execSQL(
+                        "INSERT INTO teams (id, name, type, main, createdAt, hash) " +
+                            "VALUES ($id, 'T$id', 0, 0, 0, $hash)"
+                    )
+                }
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(
+            TEST_DB_NAME,
+            23,
+            true,
+            RepositoryModule.migration22To23()
+        )
+
+        val hashes = db.query("SELECT id, hash FROM teams ORDER BY id").use { cursor ->
+            generateSequence {
+                if (cursor.moveToNext()) cursor.getLong(0) to cursor.getString(1) else null
+            }.toMap()
+        }
+        // The oldest row keeps a shared hash, and a hash nobody else had is untouched.
+        assertEquals("same", hashes[1L])
+        assertEquals("own", hashes[5L])
+        assertEquals(5, hashes.values.filterNot { it.isNullOrBlank() }.toSet().size)
+
+        db.query("EXPLAIN QUERY PLAN SELECT * FROM players WHERE hash = 'x'").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            val plan = cursor.getString(cursor.getColumnIndexOrThrow("detail"))
+            assertTrue(plan, plan.contains("index_players_hash"))
+        }
+        val duplicate = runCatching {
+            db.execSQL(
+                "INSERT INTO teams (name, type, main, createdAt, hash) " +
+                    "VALUES ('T6', 0, 0, 0, 'own')"
+            )
+        }
+        assertTrue(duplicate.exceptionOrNull() is SQLiteConstraintException)
+    }
+
+    @Test
     fun migrate16ToLatest_keepsEveryRowAndStaysReadableThroughTheDaos() {
         helper.createDatabase(TEST_DB_NAME, 16).apply {
             insertVersion16Rows()
@@ -272,14 +316,15 @@ class MigrationTest {
 
         helper.runMigrationsAndValidate(
             TEST_DB_NAME,
-            22,
+            23,
             true,
             RepositoryModule.migration16To17(),
             RepositoryModule.migration17To18(),
             RepositoryModule.migration18To19(),
             RepositoryModule.migration19To20(),
             RepositoryModule.migration20To21(),
-            RepositoryModule.migration21To22()
+            RepositoryModule.migration21To22(),
+            RepositoryModule.migration22To23()
         ).close()
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext

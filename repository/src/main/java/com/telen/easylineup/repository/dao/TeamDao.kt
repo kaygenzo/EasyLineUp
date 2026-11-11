@@ -7,7 +7,6 @@ package com.telen.easylineup.repository.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.telen.easylineup.repository.model.RoomTeam
@@ -18,7 +17,7 @@ internal interface TeamDao {
     @Query("DELETE FROM teams")
     suspend fun deleteAll()
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertTeam(team: RoomTeam): Long
 
     @Delete
