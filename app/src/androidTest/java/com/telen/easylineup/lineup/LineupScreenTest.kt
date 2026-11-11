@@ -19,6 +19,7 @@ import com.telen.easylineup.lineup.defense.DefenseTestTags
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.pluralString
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForTag
@@ -256,10 +257,12 @@ class LineupScreenTest {
         composeTestRule.onNodeWithText(string(R.string.action_delete)).performClick()
 
         // Back on Tournaments, and the list already reflects the deletion: the fixture's
-        // tournament had only this lineup, and the list only shows tournaments that have at
-        // least one (the tournament itself is kept, e.g. for the lineup creation picker).
+        // tournament had only this lineup, and stays listed with none left.
         composeTestRule.waitForText(string(R.string.tournaments_list_header_title))
-        composeTestRule.waitForAbsence(TestFixtures.TOURNAMENT_NAME)
+        composeTestRule.waitForText(
+            pluralString(R.plurals.tournaments_list_lineups_count, 0, 0)
+        )
+        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).assertIsDisplayed()
     }
 
     @Test
