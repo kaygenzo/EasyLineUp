@@ -40,6 +40,7 @@
 
     <string name="lineup_creation_error_name_empty">Le nom du lineup ne peut pas être vide</string>
     <string name="lineup_creation_error_tournament_empty">Le nom du tournoi ne peut pas être vide</string>
+    <string name="lineup_creation_error_tournament_name_taken">Un tournoi porte déjà ce nom</string>
 
 
     <string name="dialog_delete_team_title">Supprimer l\'équipe %s ?</string>

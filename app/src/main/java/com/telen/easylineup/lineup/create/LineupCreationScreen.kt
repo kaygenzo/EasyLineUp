@@ -914,6 +914,7 @@ private fun PrimaryPositionLabelPreview() {
 @Composable
 fun NewTournamentSheet(
     name: String,
+    nameErrorText: String?,
     startTimeInMillis: Long,
     endTimeInMillis: Long,
     address: String,
@@ -969,6 +970,10 @@ fun NewTournamentSheet(
                         )
                     },
                     singleLine = true,
+                    isError = nameErrorText != null,
+                    supportingText = nameErrorText?.let {
+                        { Text(it, style = MaterialTheme.typography.bodySmall) }
+                    },
                     textStyle = MaterialTheme.typography.bodyLarge,
                     shape = RoundedCornerShape(10.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -1053,9 +1058,30 @@ private fun NewTournamentSheetPreview() {
     DugoutTheme {
         NewTournamentSheet(
             name = "Fall Classic",
+            nameErrorText = null,
             startTimeInMillis = 1760000000000L,
             endTimeInMillis = 1760003600000L,
             address = "Riverside Park",
+            onNameChanged = {},
+            onStartDateClick = {},
+            onEndDateClick = {},
+            onAddressChanged = {},
+            onDismiss = {},
+            onAddClick = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun NewTournamentSheetNameTakenPreview() {
+    DugoutTheme {
+        NewTournamentSheet(
+            name = "Fall Classic",
+            nameErrorText = stringResource(R.string.lineup_creation_error_tournament_name_taken),
+            startTimeInMillis = 1760000000000L,
+            endTimeInMillis = 1760003600000L,
+            address = "",
             onNameChanged = {},
             onStartDateClick = {},
             onEndDateClick = {},

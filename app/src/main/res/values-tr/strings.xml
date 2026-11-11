@@ -38,6 +38,8 @@
         biçimi</string>
     <string name="lineup_creation_error_name_empty">Diziliş adı boş olamaz</string>
     <string name="lineup_creation_error_tournament_empty">Turnuva adı boş olamaz</string>
+    <string name="lineup_creation_error_tournament_name_taken">Bu adda bir turnuva zaten
+        var</string>
     <string name="dialog_delete_team_title">%s takımı silinsin mi?</string>
     <string name="dialog_delete_lineup_title">Diziliş silinsin mi?</string>
     <string name="dialog_delete_player_title">Oyuncu silinsin mi?</string>

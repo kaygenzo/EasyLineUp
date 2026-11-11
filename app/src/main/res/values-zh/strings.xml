@@ -37,6 +37,7 @@
     <string name="player_creation_error_invalid_phone_format">电话号码格式无效</string>
     <string name="lineup_creation_error_name_empty">阵容名称不能为空</string>
     <string name="lineup_creation_error_tournament_empty">赛事名称不能为空</string>
+    <string name="lineup_creation_error_tournament_name_taken">已有同名赛事</string>
     <string name="dialog_delete_team_title">删除球队 %s?</string>
     <string name="dialog_delete_lineup_title">删除阵容?</string>
     <string name="dialog_delete_player_title">删除球员?</string>

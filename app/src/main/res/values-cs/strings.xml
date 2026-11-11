@@ -38,6 +38,8 @@
         čísla</string>
     <string name="lineup_creation_error_name_empty">Název sestavy nesmí být prázdný</string>
     <string name="lineup_creation_error_tournament_empty">Název turnaje nesmí být prázdný</string>
+    <string name="lineup_creation_error_tournament_name_taken">Turnaj s tímto názvem už
+        existuje</string>
     <string name="dialog_delete_team_title">Smazat tým %s?</string>
     <string name="dialog_delete_lineup_title">Smazat sestavu?</string>
     <string name="dialog_delete_player_title">Smazat hráče?</string>

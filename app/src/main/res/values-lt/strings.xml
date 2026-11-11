@@ -40,6 +40,8 @@
         tuščias</string>
     <string name="lineup_creation_error_tournament_empty">Turnyro pavadinimas negali būti
         tuščias</string>
+    <string name="lineup_creation_error_tournament_name_taken">Turnyras tokiu pavadinimu jau
+        yra</string>
     <string name="dialog_delete_team_title">Ištrinti komandą %s?</string>
     <string name="dialog_delete_lineup_title">Ištrinti rikiuotę?</string>
     <string name="dialog_delete_player_title">Ištrinti žaidėją?</string>

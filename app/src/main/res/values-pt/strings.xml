@@ -39,6 +39,8 @@
         vazio</string>
     <string name="lineup_creation_error_tournament_empty">O nome do torneio não pode ficar
         vazio</string>
+    <string name="lineup_creation_error_tournament_name_taken">Já existe um torneio com este
+        nome</string>
     <string name="dialog_delete_team_title">Excluir o time %s?</string>
     <string name="dialog_delete_lineup_title">Excluir a escalação?</string>
     <string name="dialog_delete_player_title">Excluir o jogador?</string>

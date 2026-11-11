@@ -37,6 +37,7 @@
     <string name="player_creation_error_invalid_phone_format">รูปแบบหมายเลขโทรศัพท์ไม่ถูกต้อง</string>
     <string name="lineup_creation_error_name_empty">ต้องระบุชื่อไลน์อัป</string>
     <string name="lineup_creation_error_tournament_empty">ต้องระบุชื่อทัวร์นาเมนต์</string>
+    <string name="lineup_creation_error_tournament_name_taken">มีทัวร์นาเมนต์ชื่อนี้อยู่แล้ว</string>
     <string name="dialog_delete_team_title">ลบทีม %s ใช่ไหม</string>
     <string name="dialog_delete_lineup_title">ลบไลน์อัปใช่ไหม</string>
     <string name="dialog_delete_player_title">ลบผู้เล่นใช่ไหม</string>

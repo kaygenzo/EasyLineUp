@@ -39,6 +39,8 @@
         zijn</string>
     <string name="lineup_creation_error_tournament_empty">De toernooinaam mag niet leeg
         zijn</string>
+    <string name="lineup_creation_error_tournament_name_taken">Er bestaat al een toernooi met deze
+        naam</string>
     <string name="dialog_delete_team_title">Team %s verwijderen?</string>
     <string name="dialog_delete_lineup_title">Opstelling verwijderen?</string>
     <string name="dialog_delete_player_title">Speler verwijderen?</string>

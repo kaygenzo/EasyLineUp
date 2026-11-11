@@ -37,6 +37,7 @@
     <string name="player_creation_error_invalid_phone_format">電話番号の形式が正しくありません</string>
     <string name="lineup_creation_error_name_empty">オーダー名を入力してください</string>
     <string name="lineup_creation_error_tournament_empty">大会名を入力してください</string>
+    <string name="lineup_creation_error_tournament_name_taken">同じ名前の大会がすでにあります</string>
     <string name="dialog_delete_team_title">チーム「%s」を削除しますか?</string>
     <string name="dialog_delete_lineup_title">オーダーを削除しますか?</string>
     <string name="dialog_delete_player_title">選手を削除しますか?</string>

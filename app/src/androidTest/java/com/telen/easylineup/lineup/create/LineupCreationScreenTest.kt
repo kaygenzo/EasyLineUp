@@ -134,6 +134,30 @@ class LineupCreationScreenTest : KoinComponent {
     }
 
     @Test
+    fun addingATournamentUnderATakenNameSaysSoInTheSheet() {
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_tournament_placeholder))
+            .performClick()
+        composeTestRule.waitForText(string(R.string.lineup_creation_tournament_sheet_title))
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_tournament_create_row))
+            .performClick()
+        composeTestRule.waitForText(string(R.string.lineup_creation_new_tournament_title))
+
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_new_tournament_name_placeholder))
+            .performTextInput(TestFixtures.TOURNAMENT_NAME)
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_new_tournament_save))
+            .performClick()
+
+        composeTestRule.waitForText(string(R.string.lineup_creation_error_tournament_name_taken))
+        composeTestRule
+            .onNodeWithText(string(R.string.lineup_creation_new_tournament_title))
+            .assertIsDisplayed()
+    }
+
+    @Test
     fun togglingRosterPlayerUpdatesSummary() {
         composeTestRule
             .onNodeWithText(string(R.string.lineup_creation_roster_selected_format, 12, 12))

@@ -21,6 +21,7 @@ import com.telen.easylineup.domain.usecases.ObserveTournaments
 import com.telen.easylineup.domain.usecases.ResolveLineupEventTime
 import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
+import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournamentException
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import java.io.Serializable
@@ -44,6 +45,12 @@ import timber.log.Timber
 /** One-shot, non-render actions - everything else lives in [LineupCreationUiState]. */
 sealed class LineupCreationEvent
 data class LineupSaved(val lineupId: Long) : LineupCreationEvent()
+
+/** Why the new tournament sheet refused its name - [LineupCreationRoute] resolves the text. */
+sealed interface NewTournamentError {
+    data object NameEmpty : NewTournamentError
+    data object NameTaken : NewTournamentError
+}
 
 /** Which of the screen's dates a date picker is open on. */
 enum class LineupDatePicker { EVENT, NEW_TOURNAMENT_START, NEW_TOURNAMENT_END }
@@ -69,6 +76,7 @@ data class LineupCreationUiState(
     val newTournamentStartTime: Long = System.currentTimeMillis(),
     val newTournamentEndTime: Long = System.currentTimeMillis(),
     val newTournamentAddress: String = "",
+    val newTournamentError: NewTournamentError? = null,
     val openDatePicker: LineupDatePicker? = null
 )
 
@@ -248,7 +256,8 @@ class LineupCreationViewModel(
                 newTournamentName = "",
                 newTournamentStartTime = now,
                 newTournamentEndTime = now,
-                newTournamentAddress = ""
+                newTournamentAddress = "",
+                newTournamentError = null
             )
         }
     }
@@ -258,7 +267,7 @@ class LineupCreationViewModel(
     }
 
     fun onNewTournamentNameChanged(name: String) {
-        _uiState.update { it.copy(newTournamentName = name) }
+        _uiState.update { it.copy(newTournamentName = name, newTournamentError = null) }
     }
 
     fun onNewTournamentAddressChanged(address: String) {
@@ -290,8 +299,22 @@ class LineupCreationViewModel(
                         )
                     }
                 }
-                .onFailure { Timber.e(it) }
+                .onFailure { throwable ->
+                    when (throwable) {
+                        is TournamentNameEmptyException -> showNewTournamentError(
+                            NewTournamentError.NameEmpty
+                        )
+                        is AlreadyExistingTournamentException -> showNewTournamentError(
+                            NewTournamentError.NameTaken
+                        )
+                        else -> Timber.e(throwable)
+                    }
+                }
         }
+    }
+
+    private fun showNewTournamentError(error: NewTournamentError) {
+        _uiState.update { it.copy(newTournamentError = error) }
     }
 
     /** Returns whether it is safe to leave immediately (no unsaved changes to discard). */

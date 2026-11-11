@@ -40,6 +40,8 @@
         sein</string>
     <string name="lineup_creation_error_tournament_empty">Der Turniername darf nicht leer
         sein</string>
+    <string name="lineup_creation_error_tournament_name_taken">Ein Turnier mit diesem Namen
+        existiert bereits</string>
     <string name="dialog_delete_team_title">Team %s löschen?</string>
     <string name="dialog_delete_lineup_title">Aufstellung löschen?</string>
     <string name="dialog_delete_player_title">Spieler löschen?</string>

@@ -38,6 +38,8 @@
     <string name="lineup_creation_error_name_empty">Opstillingens navn må ikke være tomt</string>
     <string name="lineup_creation_error_tournament_empty">Turneringens navn må ikke være
         tomt</string>
+    <string name="lineup_creation_error_tournament_name_taken">Der findes allerede en turnering med
+        dette navn</string>
     <string name="dialog_delete_team_title">Slet holdet %s?</string>
     <string name="dialog_delete_lineup_title">Slet opstillingen?</string>
     <string name="dialog_delete_player_title">Slet spilleren?</string>

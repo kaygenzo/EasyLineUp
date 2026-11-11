@@ -22,6 +22,7 @@ import com.telen.easylineup.domain.usecases.ObserveTournaments
 import com.telen.easylineup.domain.usecases.ResolveLineupEventTime
 import com.telen.easylineup.domain.usecases.SaveTournament
 import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
+import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournamentException
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import kotlinx.coroutines.Dispatchers
@@ -485,6 +486,71 @@ internal class LineupCreationViewModelTest {
         val state = viewModel.uiState.value
         assertTrue(state.showNewTournamentSheet)
         assertNull(state.selectedTournament)
+    }
+
+    @Test
+    fun shouldShowAnEmptyNameErrorInTheNewTournamentSheet() = runTest {
+        runBlocking {
+            Mockito.`when`(saveTournament(any()))
+                .thenReturn(Result.failure(TournamentNameEmptyException()))
+        }
+        viewModel.onNewTournamentSheetOpen()
+
+        viewModel.onAddNewTournament()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.showNewTournamentSheet)
+        assertEquals(NewTournamentError.NameEmpty, state.newTournamentError)
+    }
+
+    @Test
+    fun shouldShowATakenNameErrorInTheNewTournamentSheet() = runTest {
+        runBlocking {
+            Mockito.`when`(saveTournament(any()))
+                .thenReturn(Result.failure(AlreadyExistingTournamentException()))
+        }
+        viewModel.onNewTournamentSheetOpen()
+        viewModel.onNewTournamentNameChanged("Cup")
+
+        viewModel.onAddNewTournament()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.showNewTournamentSheet)
+        assertEquals(NewTournamentError.NameTaken, state.newTournamentError)
+    }
+
+    @Test
+    fun shouldClearTheNewTournamentErrorOnceTheNameIsEdited() = runTest {
+        runBlocking {
+            Mockito.`when`(saveTournament(any()))
+                .thenReturn(Result.failure(AlreadyExistingTournamentException()))
+        }
+        viewModel.onNewTournamentSheetOpen()
+        viewModel.onNewTournamentNameChanged("Cup")
+        viewModel.onAddNewTournament()
+        advanceUntilIdle()
+
+        viewModel.onNewTournamentNameChanged("Cup 2")
+
+        assertNull(viewModel.uiState.value.newTournamentError)
+    }
+
+    @Test
+    fun shouldNotCarryANewTournamentErrorIntoTheNextSheet() = runTest {
+        runBlocking {
+            Mockito.`when`(saveTournament(any()))
+                .thenReturn(Result.failure(TournamentNameEmptyException()))
+        }
+        viewModel.onNewTournamentSheetOpen()
+        viewModel.onAddNewTournament()
+        advanceUntilIdle()
+        viewModel.onNewTournamentSheetDismiss()
+
+        viewModel.onNewTournamentSheetOpen()
+
+        assertNull(viewModel.uiState.value.newTournamentError)
     }
 
     @Test

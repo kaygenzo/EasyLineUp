@@ -47,6 +47,8 @@
 
     <string name="lineup_creation_error_name_empty">Lineup name cannot be empty</string>
     <string name="lineup_creation_error_tournament_empty">Tournament name cannot be empty</string>
+    <string name="lineup_creation_error_tournament_name_taken">A tournament with this name already
+        exists</string>
 
 
     <string name="dialog_delete_team_title">Delete team %s ?</string>

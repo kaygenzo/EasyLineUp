@@ -92,6 +92,13 @@ fun LineupCreationRoute(navController: NavController) {
     if (uiState.showNewTournamentSheet) {
         NewTournamentSheet(
             name = uiState.newTournamentName,
+            nameErrorText = when (uiState.newTournamentError) {
+                NewTournamentError.NameEmpty ->
+                    stringResource(R.string.lineup_creation_error_tournament_empty)
+                NewTournamentError.NameTaken ->
+                    stringResource(R.string.lineup_creation_error_tournament_name_taken)
+                null -> null
+            },
             startTimeInMillis = uiState.newTournamentStartTime,
             endTimeInMillis = uiState.newTournamentEndTime,
             address = uiState.newTournamentAddress,

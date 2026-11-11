@@ -42,6 +42,8 @@
         lineup</string>
     <string name="lineup_creation_error_tournament_empty">Hindi puwedeng walang laman ang pangalan
         ng torneo</string>
+    <string name="lineup_creation_error_tournament_name_taken">May torneo na sa pangalang
+        ito</string>
     <string name="dialog_delete_team_title">Burahin ang koponang %s?</string>
     <string name="dialog_delete_lineup_title">Burahin ang lineup?</string>
     <string name="dialog_delete_player_title">Burahin ang manlalaro?</string>

@@ -37,6 +37,7 @@
     <string name="player_creation_error_invalid_phone_format">電話號碼格式無效</string>
     <string name="lineup_creation_error_name_empty">陣容名稱不得空白</string>
     <string name="lineup_creation_error_tournament_empty">賽事名稱不得空白</string>
+    <string name="lineup_creation_error_tournament_name_taken">已有同名賽事</string>
     <string name="dialog_delete_team_title">刪除球隊 %s?</string>
     <string name="dialog_delete_lineup_title">刪除陣容?</string>
     <string name="dialog_delete_player_title">刪除球員?</string>

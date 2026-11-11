@@ -40,6 +40,8 @@
         vacío</string>
     <string name="lineup_creation_error_tournament_empty">El nombre del torneo no puede estar
         vacío</string>
+    <string name="lineup_creation_error_tournament_name_taken">Ya existe un torneo con este
+        nombre</string>
     <string name="dialog_delete_team_title">¿Eliminar el equipo %s?</string>
     <string name="dialog_delete_lineup_title">¿Eliminar la alineación?</string>
     <string name="dialog_delete_player_title">¿Eliminar el jugador?</string>

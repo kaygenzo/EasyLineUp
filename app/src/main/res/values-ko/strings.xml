@@ -37,6 +37,7 @@
     <string name="player_creation_error_invalid_phone_format">전화번호 형식이 올바르지 않습니다</string>
     <string name="lineup_creation_error_name_empty">라인업 이름을 입력하세요</string>
     <string name="lineup_creation_error_tournament_empty">대회 이름을 입력하세요</string>
+    <string name="lineup_creation_error_tournament_name_taken">같은 이름의 대회가 이미 있습니다</string>
     <string name="dialog_delete_team_title">%s 팀을 삭제할까요?</string>
     <string name="dialog_delete_lineup_title">라인업을 삭제할까요?</string>
     <string name="dialog_delete_player_title">선수를 삭제할까요?</string>

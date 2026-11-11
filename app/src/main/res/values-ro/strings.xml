@@ -37,6 +37,8 @@
     <string name="player_creation_error_invalid_phone_format">Format de telefon nevalid</string>
     <string name="lineup_creation_error_name_empty">Numele formației nu poate fi gol</string>
     <string name="lineup_creation_error_tournament_empty">Numele turneului nu poate fi gol</string>
+    <string name="lineup_creation_error_tournament_name_taken">Există deja un turneu cu acest
+        nume</string>
     <string name="dialog_delete_team_title">Ștergi echipa %s?</string>
     <string name="dialog_delete_lineup_title">Ștergi formația?</string>
     <string name="dialog_delete_player_title">Ștergi jucătorul?</string>
