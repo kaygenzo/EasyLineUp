@@ -25,7 +25,7 @@ import java.util.UUID
  */
 @Entity(
     tableName = "playerFieldPosition",
-    indices = [Index(value = ["playerID", "lineupID"])],
+    indices = [Index(value = ["playerID", "lineupID"]), Index(value = ["lineupID"])],
     foreignKeys = [
         ForeignKey(
             entity = RoomPlayer::class, parentColumns = ["id"], childColumns = ["playerID"],

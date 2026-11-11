@@ -22,7 +22,11 @@ import java.util.UUID
  */
 @Entity(
     tableName = "playerNumberOverlay",
-    indices = [Index(value = ["number"])],
+    indices = [
+        Index(value = ["number"]),
+        Index(value = ["lineupID"]),
+        Index(value = ["playerID"])
+    ],
     foreignKeys = [
         ForeignKey(
             entity = RoomPlayer::class, parentColumns = ["id"], childColumns = ["playerID"],

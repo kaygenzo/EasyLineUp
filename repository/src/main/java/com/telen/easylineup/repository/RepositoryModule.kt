@@ -54,6 +54,7 @@ object RepositoryModule {
                 .addMigrations(migration17To18())
                 .addMigrations(migration18To19())
                 .addMigrations(migration19To20())
+                .addMigrations(migration20To21())
             if (BuildConfig.usePrefilledDatabase) {
                 builder.createFromAsset("demo_database")
                     .fallbackToDestructiveMigration()
@@ -433,6 +434,29 @@ object RepositoryModule {
                     "CREATE INDEX IF NOT EXISTS `index_players_name_licenseNumber_teamID` " +
                         "ON `players` (`name`, `licenseNumber`, `teamID`)"
                 )
+            }
+        }
+    }
+
+    /**
+     * Indexes every foreign key column. SQLite only uses an index whose first column is the one
+     * looked up, so the existing composite indexes left `lineupID` (positions), `teamID`
+     * (players, lineups), `tournamentID` and both overlay keys unindexed: each lookup by them,
+     * and each `ON DELETE CASCADE` from their parent, scanned the whole table.
+     */
+    fun migration20To21(): Migration {
+        return object : Migration(20, 21) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                listOf(
+                    "index_playerFieldPosition_lineupID" to "`playerFieldPosition` (`lineupID`)",
+                    "index_players_teamID" to "`players` (`teamID`)",
+                    "index_lineups_teamID" to "`lineups` (`teamID`)",
+                    "index_lineups_tournamentID" to "`lineups` (`tournamentID`)",
+                    "index_playerNumberOverlay_lineupID" to "`playerNumberOverlay` (`lineupID`)",
+                    "index_playerNumberOverlay_playerID" to "`playerNumberOverlay` (`playerID`)"
+                ).forEach { (name, target) ->
+                    database.execSQL("CREATE INDEX IF NOT EXISTS `$name` ON $target")
+                }
             }
         }
     }

@@ -105,10 +105,9 @@ class PlayerFieldPositionsDaoTest {
 
     @Test
     fun aTieOnGamesPlayedBreaksByInsertionOrder() = runBlocking {
-        // Documents the query's actual, currently undocumented tie-break (no secondary ORDER BY
-        // key beyond COUNT(*) DESC) rather than leaving it to be rediscovered as a bug report -
-        // if a future query rewrite changes this order, this test should fail and force that to
-        // be a deliberate choice.
+        // The tie-break is explicit (playerID ASC, i.e. insertion order): it used to come from
+        // whichever order SQLite happened to scan the rows in, which the foreign key indexes
+        // added in schema 21 changed.
         val teamId = insertTeam("Riverside Hawks")
         val tournamentId = insertTournament("Fall Classic")
         val firstInsertedId = insertPlayer(teamId, "Starter 1")

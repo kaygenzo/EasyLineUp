@@ -29,7 +29,7 @@ import java.util.UUID
  */
 @Entity(
     tableName = "players",
-    indices = [Index(value = ["name", "licenseNumber", "teamID"])],
+    indices = [Index(value = ["name", "licenseNumber", "teamID"]), Index(value = ["teamID"])],
     foreignKeys = [
         ForeignKey(
             entity = RoomTeam::class, parentColumns = ["id"], childColumns = ["teamID"],

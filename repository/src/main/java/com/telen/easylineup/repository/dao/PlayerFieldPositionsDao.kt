@@ -77,7 +77,7 @@ internal interface PlayerFieldPositionsDao {
         INNER JOIN players ON playerFieldPosition.playerID = players.id
         INNER JOIN lineups ON playerFieldPosition.lineupID = lineups.id
         WHERE playerFieldPosition.lineupID = :lineupId
-        ORDER BY playerFieldPosition.`order` ASC
+        ORDER BY playerFieldPosition.`order` ASC, playerFieldPosition.id ASC
     """
     )
     suspend fun getAllPlayersWithPositionsForLineup(lineupId: Long): List<RoomPlayerWithPosition>
@@ -116,7 +116,7 @@ internal interface PlayerFieldPositionsDao {
         INNER JOIN lineups ON lineups.id = playerFieldPosition.lineupID
         INNER JOIN teams ON teams.id = lineups.teamID
         WHERE teams.id = :teamId
-        GROUP BY playerID ORDER BY 2 DESC
+        GROUP BY playerID ORDER BY 2 DESC, playerID ASC
      """
     )
     suspend fun getMostUsedPlayers(teamId: Long): List<RoomPlayerGamesCount>

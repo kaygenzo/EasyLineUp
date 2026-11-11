@@ -187,7 +187,38 @@ class MigrationTest {
     }
 
     @Test
-    fun migrate16To20_keepsEveryRowAndStaysReadableThroughTheDaos() {
+    fun migrate20To21_indexesEveryForeignKeyColumn() {
+        helper.createDatabase(TEST_DB_NAME, 20).close()
+
+        val db = helper.runMigrationsAndValidate(
+            TEST_DB_NAME,
+            21,
+            true,
+            RepositoryModule.migration20To21()
+        )
+
+        // SQLite must now pick the new index for each foreign key lookup, not scan the table.
+        listOf(
+            "SELECT * FROM playerFieldPosition WHERE lineupID = 1" to
+                "index_playerFieldPosition_lineupID",
+            "SELECT * FROM players WHERE teamID = 1" to "index_players_teamID",
+            "SELECT * FROM lineups WHERE teamID = 1" to "index_lineups_teamID",
+            "SELECT * FROM lineups WHERE tournamentID = 1" to "index_lineups_tournamentID",
+            "SELECT * FROM playerNumberOverlay WHERE lineupID = 1" to
+                "index_playerNumberOverlay_lineupID",
+            "SELECT * FROM playerNumberOverlay WHERE playerID = 1" to
+                "index_playerNumberOverlay_playerID"
+        ).forEach { (query, index) ->
+            db.query("EXPLAIN QUERY PLAN $query").use { cursor ->
+                assertTrue(cursor.moveToFirst())
+                val plan = cursor.getString(cursor.getColumnIndexOrThrow("detail"))
+                assertTrue("$query used: $plan", plan.contains(index))
+            }
+        }
+    }
+
+    @Test
+    fun migrate16To21_keepsEveryRowAndStaysReadableThroughTheDaos() {
         helper.createDatabase(TEST_DB_NAME, 16).apply {
             insertVersion16Rows()
             close()
@@ -195,12 +226,13 @@ class MigrationTest {
 
         helper.runMigrationsAndValidate(
             TEST_DB_NAME,
-            20,
+            21,
             true,
             RepositoryModule.migration16To17(),
             RepositoryModule.migration17To18(),
             RepositoryModule.migration18To19(),
-            RepositoryModule.migration19To20()
+            RepositoryModule.migration19To20(),
+            RepositoryModule.migration20To21()
         ).close()
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext
