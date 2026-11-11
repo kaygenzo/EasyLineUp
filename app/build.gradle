@@ -25,6 +25,14 @@ else {
     keystoreProperties.setProperty("debug.keyPassword", "${System.getenv('DEBUG_KEY_PASSWORD')}")
 }
 
+// The release keystore only exists in CI: locally, keystore-upload.properties has the debug
+// keys alone. Without this check the release signing config reads a null storeFile and every
+// Gradle invocation fails at configuration, debug builds included. Where it is missing, the
+// release build type stays unsigned - it never falls back to the debug key.
+def releaseStorePath = keystoreProperties['storeFile']
+def releaseStoreFile = releaseStorePath ? file(releaseStorePath) : null
+def hasReleaseKeystore = releaseStoreFile != null && releaseStoreFile.exists()
+
 android {
     namespace "com.telen.easylineup"
     compileSdkVersion compileVersion
@@ -56,12 +64,14 @@ android {
     flavorDimensions 'version'
 
     signingConfigs {
-//        release {
-//            storeFile file(keystoreProperties['storeFile'])
-//            storePassword keystoreProperties['storePassword']
-//            keyAlias keystoreProperties['keyAlias']
-//            keyPassword keystoreProperties['keyPassword']
-//        }
+        if (hasReleaseKeystore) {
+            release {
+                storeFile releaseStoreFile
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
 
         debug {
             storeFile file(keystoreProperties['debug.storeFile'])
@@ -105,7 +115,11 @@ android {
             enableAndroidTestCoverage true
         }
         release {
-            signingConfig signingConfigs.debug
+            if (hasReleaseKeystore) {
+                signingConfig signingConfigs.release
+            } else {
+                logger.warn("No release keystore found: release builds will be unsigned.")
+            }
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
