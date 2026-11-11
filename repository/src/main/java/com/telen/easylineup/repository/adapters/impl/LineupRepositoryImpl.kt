@@ -67,6 +67,10 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
             .map { it.toDomain() }
     }
 
+    override suspend fun hasLineupsForTournament(tournamentId: Long): Boolean {
+        return lineupDao.hasLineupsForTournament(tournamentId)
+    }
+
     override suspend fun getLastLineup(teamId: Long): Lineup? {
         return lineupDao.getLastLineup(teamId)?.toDomain()
     }

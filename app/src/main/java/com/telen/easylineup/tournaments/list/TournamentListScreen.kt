@@ -381,6 +381,33 @@ private fun TournamentTicketCardPreview() {
     }
 }
 
+/** A tournament just created, with no lineup yet and no dates: still listed. */
+@DugoutPreviews
+@Composable
+private fun TournamentTicketCardEmptyPreview() {
+    DugoutTheme {
+        TournamentTicketCard(
+            item = TournamentItem(
+                tournament = Tournament(
+                    id = 2L,
+                    name = "Spring Cup",
+                    createdAt = 1760000000000L,
+                    startTime = 0L,
+                    endTime = 0L
+                ),
+                lineups = persistentListOf()
+            ),
+            teamType = TeamType.BASEBALL,
+            mapLocation = null,
+            onLineupClick = {},
+            onEditLineupClick = {},
+            onStatsClick = {},
+            onDeleteClick = {},
+            onMapClick = {}
+        )
+    }
+}
+
 @Composable
 private fun TicketDateChip(startMillis: Long?) {
     val notchColor = MaterialTheme.colorScheme.background

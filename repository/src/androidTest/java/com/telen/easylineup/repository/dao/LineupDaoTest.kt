@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -106,16 +107,53 @@ class LineupDaoTest {
     }
 
     @Test
-    fun observeAllTournamentsWithLineupsExcludesATournamentWithNoLineupYet() = runBlocking {
+    fun observeAllTournamentsWithLineupsIncludesATournamentWithNoLineupYet() = runBlocking {
+        val teamId = insertTeam("Riverside Hawks")
+        val tournamentId = insertTournament("Empty Tournament", createdAt = 1_000L)
+
+        val rows = lineupDao.observeAllTournamentsWithLineups(filter = "", teamId = teamId).first()
+
+        assertEquals(tournamentId, rows.single().tournamentId)
+        assertEquals(0L, rows.single().lineupId)
+    }
+
+    @Test
+    fun observeAllTournamentsWithLineupsFiltersAnEmptyTournamentByItsName() = runBlocking {
         val teamId = insertTeam("Riverside Hawks")
         insertTournament("Empty Tournament", createdAt = 1_000L)
 
-        // A tournament with zero lineups never matches `teamID = :teamId` (that column only
-        // exists on the `lineups` side of the LEFT JOIN) - locking this in because it's easy to
-        // assume the LEFT JOIN alone would be enough to surface it.
-        val rows = lineupDao.observeAllTournamentsWithLineups(filter = "", teamId = teamId).first()
+        val match = lineupDao.observeAllTournamentsWithLineups("Empty", teamId).first()
+        val noMatch = lineupDao.observeAllTournamentsWithLineups("Fall", teamId).first()
 
-        assertTrue(rows.isEmpty())
+        assertEquals(1, match.size)
+        assertTrue(noMatch.isEmpty())
+    }
+
+    @Test
+    fun observeAllTournamentsWithLineupsLeavesOutATournamentOnlyAnotherTeamPlaysIn() =
+        runBlocking {
+            val teamAId = insertTeam("Riverside Hawks")
+            val teamBId = insertTeam("Lakeside Tigers")
+            val sharedId = insertTournament("Fall Classic", createdAt = 1_000L)
+            insertLineup("Hawks Opener", teamAId, sharedId)
+            insertLineup("Tigers Opener", teamBId, sharedId)
+            val tigersOnlyId = insertTournament("Spring Cup", createdAt = 2_000L)
+            insertLineup("Tigers Final", teamBId, tigersOnlyId)
+
+            val rows = lineupDao.observeAllTournamentsWithLineups("", teamAId).first()
+
+            assertEquals(listOf("Hawks Opener"), rows.map { it.lineupName })
+        }
+
+    @Test
+    fun hasLineupsForTournamentCountsEveryTeam() = runBlocking {
+        val teamId = insertTeam("Lakeside Tigers")
+        val playedId = insertTournament("Fall Classic", createdAt = 1_000L)
+        insertLineup("Tigers Opener", teamId, playedId)
+        val emptyId = insertTournament("Spring Cup", createdAt = 2_000L)
+
+        assertTrue(lineupDao.hasLineupsForTournament(playedId))
+        assertFalse(lineupDao.hasLineupsForTournament(emptyId))
     }
 
     @Test

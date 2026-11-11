@@ -57,6 +57,9 @@ internal interface LineupDao {
     )
     suspend fun getLineupsForTournament(tournamentId: Long, teamId: Long): List<RoomLineup>
 
+    @Query("SELECT EXISTS(SELECT 1 FROM lineups WHERE tournamentID = :tournamentId)")
+    suspend fun hasLineupsForTournament(tournamentId: Long): Boolean
+
     @Query("SELECT * FROM lineups WHERE teamID = :teamId ORDER BY editedAt DESC LIMIT 1")
     suspend fun getLastLineup(teamId: Long): RoomLineup?
 
@@ -80,9 +83,11 @@ internal interface LineupDao {
         lineups.extraHitters as lineupExtraHittersSize,
         x, y, position
         FROM tournaments
-        LEFT JOIN lineups ON tournaments.id = lineups.tournamentID
+        LEFT JOIN lineups ON tournaments.id = lineups.tournamentID AND lineups.teamID = :teamId
         LEFT JOIN playerFieldPosition ON playerFieldPosition.lineupID = lineups.id
-        WHERE teamID = :teamId
+        WHERE (lineups.id IS NOT NULL
+                OR NOT EXISTS (SELECT 1 FROM lineups AS any_team
+                    WHERE any_team.tournamentID = tournaments.id))
             AND (tournamentName LIKE '%' || :filter || '%'
                 OR lineupName LIKE '%' || :filter || '%')
         ORDER BY tournaments.createdAt DESC

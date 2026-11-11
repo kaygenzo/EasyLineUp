@@ -98,7 +98,7 @@ object DomainModule {
         single { CreateLineup(get(), get(), get()) }
         single { GetTournaments(get(), get()) }
         single { ObserveAllTournamentsWithLineups(get(), get(), get()) }
-        single { DeleteTournamentLineups(get(), get(), get()) }
+        single { DeleteTournamentLineups(get(), get(), get(), get(), get()) }
         single { GetPlayer(get(), get()) }
         single { DeletePlayer(get(), get(), get()) }
         single { SavePlayer(get(), get(), get(), get(), get()) }
