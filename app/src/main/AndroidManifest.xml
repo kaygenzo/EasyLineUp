@@ -15,6 +15,10 @@
     </queries>
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Not for new photos (the photo picker needs no permission), but for old ones: before it,
+         the app asked for this permission and stored MediaStore URIs, which stay readable on
+         Android 12 and below only with it. Removing it would revoke it for existing users and
+         blank their older player and team photos. -->
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"/>
