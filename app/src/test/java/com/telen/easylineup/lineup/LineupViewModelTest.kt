@@ -292,7 +292,7 @@ internal class LineupViewModelTest {
         assertEquals("Test Lineup", state.lineupName)
         assertEquals(TeamStrategy.STANDARD, state.defenseStrategy)
         assertEquals(1, state.extraHitters)
-        assertEquals(TeamType.BASEBALL.id, state.teamType)
+        assertEquals(TeamType.BASEBALL, state.teamType)
         assertFalse(state.isLoading)
         assertEquals(1, state.defensePlayers.size)
     }
@@ -538,7 +538,7 @@ internal class LineupViewModelTest {
         val result = viewModel.onPositionClicked(FieldPosition.DP_DH)
 
         assertTrue(result.isSuccess)
-        assertEquals(TeamType.BASEBALL.id, viewModel.uiState.value.dpFlexEvent?.teamType)
+        assertEquals(TeamType.BASEBALL, viewModel.uiState.value.dpFlexEvent?.teamType)
     }
 
     @Test

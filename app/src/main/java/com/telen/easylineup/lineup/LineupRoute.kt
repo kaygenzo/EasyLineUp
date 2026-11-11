@@ -182,7 +182,7 @@ fun LineupRoute(
     }
 
     state.dpFlexEvent?.let { event ->
-        val dpFlexTitle = if (event.teamType == TeamType.SOFTBALL.id) {
+        val dpFlexTitle = if (event.teamType == TeamType.SOFTBALL) {
             stringResource(R.string.link_dp_and_flex_dialog_title)
         } else {
             stringResource(R.string.link_dh_and_pitcher_dialog_title)
@@ -265,7 +265,7 @@ fun LineupRoute(
     if (state.showRosterEditSheet) {
         RosterEditSheet(
             roster = state.rosterEditSummary,
-            teamType = TeamType.getTypeById(state.teamType),
+            teamType = state.teamType,
             onDismiss = viewModel::onRosterEditDismissRequested,
             onPlayerToggled = viewModel::onRosterEditPlayerToggled,
             onNumberChanged = viewModel::onRosterEditNumberChanged,

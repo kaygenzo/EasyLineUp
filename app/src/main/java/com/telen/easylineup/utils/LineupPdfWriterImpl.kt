@@ -129,7 +129,7 @@ class LineupPdfWriterImpl(
         canvas.drawPath(infieldPath(), infieldPaint())
         canvas.drawPath(infieldPath(), diamondOutlinePaint())
 
-        val shortNames = stringResourcesProvider.positionShortNames(data.teamType)
+        val shortNames = stringResourcesProvider.positionShortNames(data.teamType.id)
         val labelPaint = diamondLabelPaint()
         data.defensePlayers.filterNot { it.isSubstitute() }.forEach { player ->
             val position = FieldPosition.getFieldPositionById(player.position) ?: return@forEach

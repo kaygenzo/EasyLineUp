@@ -80,7 +80,7 @@ fun DpFlexLinkSheet(
     dpBattingOrder: Int?,
     dpLocked: Boolean,
     flexLocked: Boolean,
-    teamType: Int,
+    teamType: TeamType,
     title: String,
     onRequestDpPlayers: suspend () -> List<Player>,
     onRequestFlexPlayers: suspend () -> List<Player>,
@@ -99,14 +99,14 @@ fun DpFlexLinkSheet(
     )
 
     val dpLabel = stringResource(
-        if (teamType == TeamType.SOFTBALL.id) {
+        if (teamType == TeamType.SOFTBALL) {
             R.string.field_position_dp
         } else {
             R.string.field_position_dh
         }
     )
     val flexLabel = stringResource(
-        if (teamType == TeamType.SOFTBALL.id) {
+        if (teamType == TeamType.SOFTBALL) {
             R.string.field_position_flex
         } else {
             R.string.field_position_pitcher
@@ -375,7 +375,7 @@ private fun DpFlexLinkSheetPreview() {
             dpBattingOrder = 4,
             dpLocked = false,
             flexLocked = false,
-            teamType = TeamType.SOFTBALL.id,
+            teamType = TeamType.SOFTBALL,
             title = "Link DP / Flex",
             onRequestDpPlayers = { listOf(Player(1L, 1L, "Alex Rivera", 12, "")) },
             onRequestFlexPlayers = { listOf(Player(2L, 1L, "Sam Cole", 7, "")) },

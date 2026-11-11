@@ -63,14 +63,14 @@ fun AvailablePlayersSheet(
     players: List<PlayerWithPosition>,
     lineupPlayers: List<PlayerWithPosition>,
     filterPosition: FieldPosition?,
-    teamType: Int,
+    teamType: TeamType,
     extraHitters: Int,
     onPlayerSelected: (Player) -> Unit,
     onDismiss: () -> Unit,
     getSubstituteBattingSlots: GetSubstituteBattingSlots = GetSubstituteBattingSlots()
 ) {
     val context = LocalContext.current
-    val positionShortNames = StringResourcesProviderImpl(context).positionShortNames(teamType)
+    val positionShortNames = StringResourcesProviderImpl(context).positionShortNames(teamType.id)
     val isSubstituteSheet = filterPosition == FieldPosition.SUBSTITUTE
 
     // The budget must be counted from the full lineup roster (`lineupPlayers`), not from
@@ -290,7 +290,7 @@ private fun AvailablePlayersSheetPreview() {
             players = AvailablePlayersSheetPreviewCandidates,
             lineupPlayers = emptyList(),
             filterPosition = FieldPosition.SUBSTITUTE,
-            teamType = TeamType.BASEBALL.id,
+            teamType = TeamType.BASEBALL,
             extraHitters = 2,
             onPlayerSelected = {},
             onDismiss = {}

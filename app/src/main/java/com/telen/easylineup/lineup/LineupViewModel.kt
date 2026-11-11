@@ -80,7 +80,7 @@ data class LinkDpFlex(
     val initialData: Pair<PlayerWithPosition?, PlayerWithPosition?>,
     val dpLocked: Boolean,
     val flexLocked: Boolean,
-    val teamType: Int
+    val teamType: TeamType
 ) : EventCase()
 
 /** Which of [LineupScreen]'s info dialogs to show - [LineupRoute] resolves the actual string. */
@@ -136,7 +136,7 @@ data class LineupUiState(
     val defensePlayers: ImmutableList<PlayerWithPosition> = persistentListOf(),
     val defenseStrategy: TeamStrategy = TeamStrategy.STANDARD,
     val lineupMode: Int = MODE_DISABLED,
-    val teamType: Int = TeamType.UNKNOWN.id,
+    val teamType: TeamType = TeamType.UNKNOWN,
     val extraHitters: Int = 0,
     val batters: ImmutableList<BatterState> = persistentListOf(),
     val selectedTab: Int = FRAGMENT_DEFENSE_INDEX,
@@ -263,7 +263,9 @@ class LineupViewModel(
             getTeamUseCase()
                 .onSuccess {
                     teamTypeId = it.type
-                    _uiState.update { state -> state.copy(teamType = it.type) }
+                    _uiState.update { state ->
+                        state.copy(teamType = TeamType.getTypeById(it.type))
+                    }
                     // The batting order depends on the team type: a draft already shown, such as
                     // a restored edit, was computed without it.
                     draftMutex.withLock {
@@ -536,7 +538,7 @@ class LineupViewModel(
                         Pair(it.dp, it.flex),
                         it.dpLocked,
                         it.flexLocked,
-                        it.teamType
+                        TeamType.getTypeById(it.teamType)
                     )
                     _uiState.update { state -> state.copy(dpFlexEvent = event) }
                 }

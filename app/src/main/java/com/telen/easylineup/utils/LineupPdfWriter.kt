@@ -8,6 +8,7 @@ import android.net.Uri
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
+import com.telen.easylineup.domain.model.TeamType
 
 /**
  * Everything a printable lineup card needs - plain data, no Android types, so
@@ -24,7 +25,7 @@ import com.telen.easylineup.domain.model.TeamStrategy
 data class LineupExportData(
     val lineupName: String,
     val eventTimeInMillis: Long,
-    val teamType: Int,
+    val teamType: TeamType,
     val strategy: TeamStrategy,
     val battingOrder: List<BatterState>,
     val defensePlayers: List<PlayerWithPosition>

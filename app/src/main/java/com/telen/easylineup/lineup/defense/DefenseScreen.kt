@@ -126,7 +126,7 @@ fun DefenseScreen(
     strategy: TeamStrategy,
     players: List<PlayerWithPosition>,
     lineupMode: Int,
-    teamType: Int,
+    teamType: TeamType,
     extraHitters: Int,
     editable: Boolean,
     onPositionClicked: (FieldPosition) -> Unit,
@@ -215,7 +215,7 @@ fun DefenseScreen(
     if (showDisableDhConfirm) {
         val dpPlayer = players.firstOrNull { it.isDpDh() }
         val flexPlayer = players.firstOrNull { it.isFlex() }
-        val isSoftball = teamType == TeamType.SOFTBALL.id
+        val isSoftball = teamType == TeamType.SOFTBALL
         ConfirmSheet(
             title = stringResource(
                 if (isSoftball) {
@@ -243,8 +243,8 @@ fun DefenseScreen(
 }
 
 @Composable
-private fun DhToggleRow(teamType: Int, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    val isSoftball = teamType == TeamType.SOFTBALL.id
+private fun DhToggleRow(teamType: TeamType, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    val isSoftball = teamType == TeamType.SOFTBALL
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -294,12 +294,12 @@ private fun DhToggleRow(teamType: Int, checked: Boolean, onCheckedChange: (Boole
 @Composable
 private fun DpDhSlotRow(
     players: List<PlayerWithPosition>,
-    teamType: Int,
+    teamType: TeamType,
     onClick: () -> Unit
 ) {
     val dpPlayer = players.firstOrNull { it.isDpDh() }
     val flexPlayer = players.firstOrNull { it.isFlex() }
-    val isSoftball = teamType == TeamType.SOFTBALL.id
+    val isSoftball = teamType == TeamType.SOFTBALL
     val badgeLabel = stringResource(
         if (isSoftball) R.string.field_position_dp else R.string.field_position_dh
     )
@@ -345,7 +345,7 @@ private fun DpDhSlotRow(
                 }
                 val flexPositionShort = flexPosition?.let {
                     StringResourcesProviderImpl(context)
-                        .positionShortNames(teamType)
+                        .positionShortNames(teamType.id)
                         .getOrNull(it.ordinal)
                 }
                 if (flexPlayer != null && flexPositionShort != null) {
@@ -439,7 +439,7 @@ private fun DefenseField(
     strategy: TeamStrategy,
     players: List<PlayerWithPosition>,
     lineupMode: Int,
-    teamType: Int,
+    teamType: TeamType,
     editable: Boolean,
     fieldSize: Dp,
     iconSize: Dp,
@@ -454,7 +454,7 @@ private fun DefenseField(
         R.drawable.baseball_field
     }
     val dpDhLabel = stringResource(
-        if (teamType == TeamType.SOFTBALL.id) {
+        if (teamType == TeamType.SOFTBALL) {
             R.string.field_position_dp
         } else {
             R.string.field_position_dh
@@ -757,7 +757,7 @@ private fun DefenseScreenEditablePreview() {
             strategy = TeamStrategy.STANDARD,
             players = emptyList(),
             lineupMode = MODE_ENABLED,
-            teamType = TeamType.BASEBALL.id,
+            teamType = TeamType.BASEBALL,
             extraHitters = 1,
             editable = true,
             onPositionClicked = {},
@@ -779,7 +779,7 @@ private fun DefenseScreenFixedPreview() {
             strategy = TeamStrategy.STANDARD,
             players = emptyList(),
             lineupMode = MODE_ENABLED,
-            teamType = TeamType.BASEBALL.id,
+            teamType = TeamType.BASEBALL,
             extraHitters = 1,
             editable = false,
             onPositionClicked = {},
@@ -827,7 +827,7 @@ private val DefensePreviewPlayers = listOf(
 @Composable
 private fun DhToggleRowPreview() {
     DugoutTheme {
-        DhToggleRow(teamType = TeamType.BASEBALL.id, checked = true, onCheckedChange = {})
+        DhToggleRow(teamType = TeamType.BASEBALL, checked = true, onCheckedChange = {})
     }
 }
 
@@ -837,7 +837,7 @@ private fun DpDhSlotRowAssignedPreview() {
     DugoutTheme {
         DpDhSlotRow(
             players = DefensePreviewPlayers,
-            teamType = TeamType.SOFTBALL.id,
+            teamType = TeamType.SOFTBALL,
             onClick = {}
         )
     }
@@ -847,7 +847,7 @@ private fun DpDhSlotRowAssignedPreview() {
 @Composable
 private fun DpDhSlotRowUnassignedPreview() {
     DugoutTheme {
-        DpDhSlotRow(players = emptyList(), teamType = TeamType.BASEBALL.id, onClick = {})
+        DpDhSlotRow(players = emptyList(), teamType = TeamType.BASEBALL, onClick = {})
     }
 }
 
@@ -867,7 +867,7 @@ private fun DefenseFieldPreview() {
             strategy = TeamStrategy.STANDARD,
             players = DefensePreviewPlayers,
             lineupMode = MODE_ENABLED,
-            teamType = TeamType.BASEBALL.id,
+            teamType = TeamType.BASEBALL,
             editable = true,
             fieldSize = 320.dp,
             iconSize = 40.dp,

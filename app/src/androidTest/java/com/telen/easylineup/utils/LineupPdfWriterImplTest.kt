@@ -71,7 +71,7 @@ class LineupPdfWriterImplTest : KoinComponent {
     ) = LineupExportData(
         lineupName = "Game 1",
         eventTimeInMillis = 1_000L,
-        teamType = TeamType.BASEBALL.id,
+        teamType = TeamType.BASEBALL,
         strategy = TeamStrategy.STANDARD,
         battingOrder = battingOrder,
         defensePlayers = defensePlayers
