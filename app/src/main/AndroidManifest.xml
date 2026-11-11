@@ -49,28 +49,25 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data
-                    android:scheme="file"
-                    android:pathPattern=".*\\.elu"
-                    android:host="*" />
-            </intent-filter>
+            <!-- Opening an .elu file from another app. Only content:// URIs: a file:// one
+                 throws FileUriExposedException in any sender targeting API 24+, and reading it
+                 would need storage permission. Not BROWSABLE: a web link is never an .elu file
+                 the app can read, and a binary download should not offer to open with it. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="content"
                     android:pathPattern=".*\\.elu"
                     android:host="*" />
             </intent-filter>
+            <!-- .elu is no registered type, so mail and messaging apps hand an attachment over as
+                 application/octet-stream behind an opaque URI with no file name in its path:
+                 this is the only filter that catches it. A file that turns out not to be an
+                 .elu export is refused when read, with the import's error message. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="content"
                     android:mimeType="application/octet-stream"

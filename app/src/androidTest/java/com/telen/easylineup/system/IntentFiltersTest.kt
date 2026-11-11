@@ -23,10 +23,15 @@ import org.junit.runner.RunWith
 class IntentFiltersTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private fun resolvedActivities(uri: String, mimeType: String? = null): List<String> {
-        val intent = Intent(Intent.ACTION_VIEW)
-            .addCategory(Intent.CATEGORY_BROWSABLE)
-            .setPackage(context.packageName)
+    private fun resolvedActivities(
+        uri: String,
+        mimeType: String? = null,
+        browsable: Boolean = false
+    ): List<String> {
+        val intent = Intent(Intent.ACTION_VIEW).setPackage(context.packageName)
+        if (browsable) {
+            intent.addCategory(Intent.CATEGORY_BROWSABLE)
+        }
         if (mimeType == null) {
             intent.data = Uri.parse(uri)
         } else {
@@ -45,11 +50,8 @@ class IntentFiltersTest {
     }
 
     @Test
-    fun anEluFileFromStorageOpensTheSplashScreen() {
-        assertEquals(
-            listOf(SplashScreenActivity::class.java.name),
-            resolvedActivities("file://storage/emulated/0/Download/team.elu")
-        )
+    fun aFileUriIsNotClaimed() {
+        assertTrue(resolvedActivities("file://storage/emulated/0/Download/team.elu").isEmpty())
     }
 
     @Test
@@ -75,5 +77,14 @@ class IntentFiltersTest {
     fun otherFilesAreNotClaimed() {
         assertTrue(resolvedActivities("file://storage/emulated/0/Download/team.pdf").isEmpty())
         assertTrue(resolvedActivities("https://example.com/team.elu").isEmpty())
+    }
+
+    @Test
+    fun aBinaryFileOpenedFromAWebPageIsNotClaimed() {
+        val download = "content://com.android.providers.downloads.documents/document/42"
+
+        assertTrue(
+            resolvedActivities(download, "application/octet-stream", browsable = true).isEmpty()
+        )
     }
 }
