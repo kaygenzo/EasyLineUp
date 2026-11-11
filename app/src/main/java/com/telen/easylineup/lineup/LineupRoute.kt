@@ -13,7 +13,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -56,10 +55,6 @@ fun LineupRoute(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
-    remember(lineupId, editable) {
-        viewModel.editable = editable
-        viewModel.lineupId = lineupId
-    }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     fun goBack(showFixedView: Boolean = true) {

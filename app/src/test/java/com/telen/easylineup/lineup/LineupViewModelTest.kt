@@ -5,6 +5,7 @@
 package com.telen.easylineup.lineup
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import com.telen.easylineup.domain.model.DpAndFlexConfiguration
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Lineup
@@ -98,7 +99,12 @@ internal class LineupViewModelTest {
     @Mock lateinit var updatePlayersWithBattersUseCase: UpdatePlayersWithBatters
     @Mock lateinit var lineupPdfWriter: LineupPdfWriter
 
-    private lateinit var viewModel: LineupViewModel
+    /** The navigation arguments the ViewModel is opened with, set before its first use. */
+    private var routeLineupId = 1L
+    private var editable = false
+
+    /** Built on first use, so a test can stub the observations and pick [editable] first. */
+    private val viewModel: LineupViewModel by lazy { buildViewModel() }
 
     private val lineupFlow = MutableSharedFlow<Lineup>(replay = 1, extraBufferCapacity = 1)
     private val playersFlow =
@@ -137,11 +143,10 @@ internal class LineupViewModelTest {
                 getBattersStateUseCase(any(), any(), any(), any(), any(), any())
             ).thenReturn(Result.success(emptyList()))
         }
-
-        viewModel = buildViewModel()
     }
 
     private fun buildViewModel(): LineupViewModel = LineupViewModel(
+        SavedStateHandle(mapOf("lineupId" to routeLineupId, "editable" to editable)),
         getTeamUseCase,
         observePlayerNumberOverlays,
         deletePlayerFieldPositionUseCase,
@@ -179,10 +184,21 @@ internal class LineupViewModelTest {
         players: List<PlayerWithPosition> = emptyList(),
         overlays: List<PlayerNumberOverlay> = emptyList()
     ) {
-        viewModel.lineupId = lineup.id
+        routeLineupId = lineup.id
+        viewModel
         lineupFlow.emit(lineup)
         playersFlow.emit(players)
         overlaysFlow.emit(overlays)
+    }
+
+    @Test
+    fun shouldObserveTheLineupNamedByItsNavigationArgumentsAsSoonAsItIsCreated() {
+        routeLineupId = 7L
+        editable = true
+
+        assertEquals(7L, viewModel.lineupId)
+        assertTrue(viewModel.editable)
+        Mockito.verify(observeLineupByIdUseCase).invoke(7L)
     }
 
     @Test
@@ -190,7 +206,7 @@ internal class LineupViewModelTest {
         Mockito.`when`(observeLineupByIdUseCase(1L))
             .thenReturn(flow { throw IllegalStateException("db error") })
 
-        viewModel.lineupId = 1L
+        viewModel
         advanceUntilIdle()
 
         assertTrue(viewModel.uiState.value.loadFailed)
@@ -203,7 +219,7 @@ internal class LineupViewModelTest {
         Mockito.`when`(observeLineupByIdUseCase(1L))
             .thenReturn(flow { throw IllegalStateException("db error") })
             .thenReturn(lineupFlow)
-        viewModel.lineupId = 1L
+        viewModel
         advanceUntilIdle()
 
         viewModel.onRetryLoad()
@@ -342,7 +358,7 @@ internal class LineupViewModelTest {
 
     @Test
     fun shouldDeleteLineupThroughUseCase() = runTest {
-        viewModel.lineupId = 1L
+        viewModel
         runBlocking {
             Mockito.`when`(deleteLineupUseCase(1L)).thenReturn(Result.success(Unit))
         }
@@ -357,7 +373,7 @@ internal class LineupViewModelTest {
 
     @Test
     fun shouldReportAFailedDelete() = runTest {
-        viewModel.lineupId = 1L
+        viewModel
         runBlocking {
             Mockito.`when`(deleteLineupUseCase(1L))
                 .thenReturn(Result.failure(IllegalStateException("db error")))
@@ -863,12 +879,6 @@ internal class LineupViewModelTest {
     private val aPlayer =
         Player(id = 1L, teamId = 1L, name = "p1", shirtNumber = 1, licenseNumber = "1")
 
-    @Test
-    fun shouldNotObserveAnythingWithoutALineupId() {
-        viewModel.lineupId = null
-
-        Mockito.verifyNoInteractions(observeLineupByIdUseCase)
-    }
 
     @Test
     fun shouldStillLoadTheLineupWhenTheTeamCannotBeRead() = runTest {
@@ -893,7 +903,7 @@ internal class LineupViewModelTest {
 
     @Test
     fun shouldComputeBattersForEditModeWhenEditable() = runTest {
-        viewModel.editable = true
+        editable = true
 
         loadLineup(loadedLineup, listOf(player(1L)))
         advanceUntilIdle()
@@ -1125,7 +1135,7 @@ internal class LineupViewModelTest {
     }
 
     private suspend fun startEditingAfterADelete() {
-        viewModel.editable = true
+        editable = true
         loadLineup(loadedLineup, listOf(player(1L, FieldPosition.PITCHER.id, 1)))
         Mockito.`when`(deletePlayerFieldPositionUseCase(any(), any(), any(), any()))
             .thenReturn(Result.success(Unit))
@@ -1145,7 +1155,7 @@ internal class LineupViewModelTest {
 
     @Test
     fun shouldFollowTheDatabaseWhileNothingWasEdited() = runTest {
-        viewModel.editable = true
+        editable = true
         loadLineup(loadedLineup, listOf(player(1L)))
         advanceUntilIdle()
 
@@ -1169,18 +1179,6 @@ internal class LineupViewModelTest {
         assertEquals(listOf(9L), viewModel.uiState.value.defensePlayers.map { it.playerId })
     }
 
-    @Test
-    fun shouldNotRestartObservingWhenTheSameLineupIdIsSetAgain() = runTest {
-        startEditingAfterADelete()
-        advanceUntilIdle()
-
-        // What the Route does when the screen is recreated, e.g. after a rotation.
-        viewModel.lineupId = loadedLineup.id
-        advanceUntilIdle()
-
-        Mockito.verify(observeLineupByIdUseCase, Mockito.times(1)).invoke(loadedLineup.id)
-        assertEquals(listOf(1L), viewModel.uiState.value.defensePlayers.map { it.playerId })
-    }
 
     private fun rosterOf(vararg selected: Pair<Long, Boolean>) = TeamRosterSummary(
         status = com.telen.easylineup.domain.Constants.STATUS_ALL,
@@ -1201,7 +1199,7 @@ internal class LineupViewModelTest {
 
     /** Edit mode, pitcher 1 and catcher 2 on the field, roster sheet open with both picked. */
     private suspend fun openRosterSheetWhileEditing() {
-        viewModel.editable = true
+        editable = true
         val pitcher = player(1L, FieldPosition.PITCHER.id, 1)
         val catcher = player(2L, FieldPosition.CATCHER.id, 2)
         loadLineup(loadedLineup, listOf(pitcher, catcher))

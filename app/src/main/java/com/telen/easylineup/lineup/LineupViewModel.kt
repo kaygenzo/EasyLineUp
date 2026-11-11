@@ -7,6 +7,7 @@
 package com.telen.easylineup.lineup
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.BuildConfig
@@ -41,6 +42,7 @@ import com.telen.easylineup.domain.usecases.UpdatePlayersWithBatters
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignBothPlayersException
 import com.telen.easylineup.domain.usecases.exceptions.NeedAssignPitcherFirstException
 import com.telen.easylineup.domain.usecases.runCatchingCancellable
+import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.utils.LineupExportData
 import com.telen.easylineup.utils.LineupPdfWriter
 import kotlinx.collections.immutable.ImmutableList
@@ -148,6 +150,7 @@ data class LineupUiState(
 )
 
 class LineupViewModel(
+    savedStateHandle: SavedStateHandle,
     private val getTeamUseCase: GetTeam,
     private val observePlayerNumberOverlays: ObservePlayerNumberOverlays,
     private val deletePlayerFieldPositionUseCase: DeletePlayerFieldPosition,
@@ -182,20 +185,16 @@ class LineupViewModel(
 
     var lineup: Lineup? = null
         private set
+
     /**
-     * Set by the Route from its nav arguments on every composition of the screen, including
-     * after a rotation. Setting the id already being observed is a no-op: restarting the
-     * observation would re-read the database and replace the edit in progress.
+     * Which lineup this screen shows, and whether it edits it, read once from the screen's own
+     * navigation arguments: they never change for a given back stack entry, and a rotation
+     * keeps this ViewModel, so the observation below starts once and is never restarted under
+     * an edit in progress. Read by the route's own property names, which Navigation uses as
+     * argument keys, rather than through `toRoute()`, which needs a real Bundle.
      */
-    var lineupId: Long? = 0
-        set(value) {
-            if (value == field && observeJob != null) {
-                return
-            }
-            field = value
-            observeLineup()
-        }
-    var editable = false
+    val lineupId: Long = checkNotNull(savedStateHandle[Routes.Lineup::lineupId.name])
+    val editable: Boolean = savedStateHandle[Routes.Lineup::editable.name] ?: false
 
     /**
      * Whether the user changed the lineup since it was last read from the database. While it
@@ -211,8 +210,12 @@ class LineupViewModel(
      */
     private var appliedRoster: TeamRosterSummary? = null
 
+    init {
+        observeLineup()
+    }
+
     private fun observeLineup() {
-        val id = lineupId ?: return
+        val id = lineupId
 
         viewModelScope.launch {
             getTeamUseCase()
@@ -605,9 +608,8 @@ class LineupViewModel(
             showRosterEditSheet(it)
             return
         }
-        val id = lineupId ?: return
         viewModelScope.launch {
-            rosterUseCases.getRoster(id)
+            rosterUseCases.getRoster(lineupId)
                 .onSuccess(::showRosterEditSheet)
                 .onFailure { Timber.e(it) }
         }
