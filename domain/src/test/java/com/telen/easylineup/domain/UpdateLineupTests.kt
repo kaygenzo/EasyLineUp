@@ -18,6 +18,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
 import org.mockito.kotlin.verifyNoInteractions
 
 @RunWith(MockitoJUnitRunner::class)
@@ -28,24 +29,25 @@ internal class UpdateLineupTests {
 
     @Before
     fun init() {
-        updateLineup = UpdateLineup(lineupRepo, testDispatcherProvider())
+        updateLineup = UpdateLineup(lineupRepo, fixedClock(), testDispatcherProvider())
         lineup = Lineup(id = 1L, name = "test", teamId = 1L, tournamentId = 1L)
     }
 
     @Test
-    fun shouldUpdateLineupThroughRepository() = runTest {
-        Mockito.`when`(lineupRepo.updateLineup(lineup)).thenReturn(Unit)
+    fun shouldUpdateLineupThroughRepositoryStampedAsEditedNow() = runTest {
+        val stamped = lineup.copy(editedTimeInMillis = TEST_NOW)
+        Mockito.`when`(lineupRepo.updateLineup(stamped)).thenReturn(Unit)
 
         val result = updateLineup(lineup)
 
         assertTrue(result.isSuccess)
-        verify(lineupRepo).updateLineup(lineup)
+        verify(lineupRepo).updateLineup(stamped)
     }
 
     @Test
     fun shouldPropagateErrorFromRepository() = runTest {
         val exception = Exception("db error")
-        Mockito.`when`(lineupRepo.updateLineup(lineup)).thenAnswer { throw exception }
+        Mockito.`when`(lineupRepo.updateLineup(any())).thenAnswer { throw exception }
 
         val result = updateLineup(lineup)
 

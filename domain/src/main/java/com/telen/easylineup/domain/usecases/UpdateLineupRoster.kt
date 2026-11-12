@@ -6,6 +6,7 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.isAssigned
+import com.telen.easylineup.domain.ports.Clock
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.TransactionRunner
 import com.telen.easylineup.domain.ports.repository.LineupRepository
@@ -25,6 +26,7 @@ class UpdateLineupRoster(
     private val applyRosterToLineup: ApplyRosterToLineup,
     private val saveBattingOrderAndPositions: SaveBattingOrderAndPositions,
     private val transactionRunner: TransactionRunner,
+    private val clock: Clock,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(lineupId: Long, roster: List<RosterPlayerStatus>): Result<Unit> =
@@ -43,7 +45,9 @@ class UpdateLineupRoster(
                     if (removesAPlayer) {
                         saveBattingOrderAndPositions(draft.lineup, draft.players).getOrThrow()
                     } else {
-                        lineupRepository.updateLineup(draft.lineup)
+                        lineupRepository.updateLineup(
+                            draft.lineup.copy(editedTimeInMillis = clock.nowMillis())
+                        )
                     }
                 }
             }

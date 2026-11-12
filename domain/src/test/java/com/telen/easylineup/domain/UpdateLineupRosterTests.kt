@@ -82,9 +82,11 @@ internal class UpdateLineupRosterTests {
                     lineupRepository,
                     pfpRepository,
                     transactionRunner,
+                    fixedClock(),
                     dispatchers
                 ),
                 transactionRunner,
+                fixedClock(),
                 dispatchers
             )
             lineup = Lineup(id = 1L, name = "test", teamId = 1L, tournamentId = 1L)
@@ -103,6 +105,7 @@ internal class UpdateLineupRosterTests {
         val captor = argumentCaptor<Lineup>()
         verify(lineupRepository).updateLineup(captor.capture())
         assertEquals("1;3", captor.firstValue.roster)
+        assertEquals(TEST_NOW, captor.firstValue.editedTimeInMillis)
     }
 
     @Test

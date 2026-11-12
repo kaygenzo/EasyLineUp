@@ -49,9 +49,10 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
             lineupRepository,
             playerFieldPositionRepository,
             transactionRunner,
+            fixedClock(),
             testDispatcherProvider()
         )
-        Mockito.`when`(lineupRepository.updateLineup(lineup)).thenReturn(Unit)
+        Mockito.`when`(lineupRepository.updateLineup(any())).thenReturn(Unit)
         Mockito.`when`(playerFieldPositionRepository.updatePlayerFieldPosition(any()))
             .thenReturn(Unit)
         Mockito.`when`(playerFieldPositionRepository.insertPlayerFieldPosition(any()))
@@ -150,9 +151,16 @@ internal class SaveBattingOrderAndPositionsTests : BaseUseCaseTests() {
     }
 
     @Test
+    fun shouldStampTheLineupAsEditedNow() = runTest {
+        startUseCase()
+
+        verify(lineupRepository).updateLineup(lineup.copy(editedTimeInMillis = TEST_NOW))
+    }
+
+    @Test
     fun shouldSaveLineupAndPositionsInOneTransaction() = runTest {
         val inTransaction = mutableListOf<Boolean>()
-        Mockito.`when`(lineupRepository.updateLineup(lineup)).thenAnswer {
+        Mockito.`when`(lineupRepository.updateLineup(any())).thenAnswer {
             inTransaction.add(transactionRunner.isInTransaction)
             Unit
         }

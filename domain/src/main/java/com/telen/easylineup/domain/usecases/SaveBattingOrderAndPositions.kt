@@ -8,16 +8,19 @@ import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.isAssigned
 import com.telen.easylineup.domain.model.toPlayerFieldPosition
+import com.telen.easylineup.domain.ports.Clock
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.TransactionRunner
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import kotlinx.coroutines.withContext
 
+/** Saves a lineup with its field positions and batting order, stamping it as edited now. */
 class SaveBattingOrderAndPositions(
     private val lineupRepository: LineupRepository,
     private val pfpRepository: PlayerFieldPositionRepository,
     private val transactionRunner: TransactionRunner,
+    private val clock: Clock,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(lineup: Lineup, players: List<PlayerWithPosition>): Result<Unit> =
@@ -26,7 +29,9 @@ class SaveBattingOrderAndPositions(
                 transactionRunner.inTransaction {
                     check(lineup.id > 0) { "The lineup id cannot be less or equal 0" }
 
-                    lineupRepository.updateLineup(lineup)
+                    lineupRepository.updateLineup(
+                        lineup.copy(editedTimeInMillis = clock.nowMillis())
+                    )
 
                     players.forEach {
                         val playerPosition = it.toPlayerFieldPosition()
