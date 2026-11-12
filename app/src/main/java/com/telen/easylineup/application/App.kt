@@ -13,9 +13,7 @@ import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderF
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.initialize
 import com.telen.easylineup.BuildConfig
-import com.telen.easylineup.R
-import com.telen.easylineup.domain.model.ThemeMode
-import com.telen.easylineup.utils.SharedPreferencesUtils
+import com.telen.easylineup.utils.UserPreferencesStore
 import com.telen.easylineup.utils.applyAsNightMode
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -45,13 +43,8 @@ open class App : Application() {
             modules(ModuleProvider.modules)
         }
 
-        ThemeMode.fromPreference(
-            SharedPreferencesUtils.getStringSetting(
-                this,
-                R.string.key_day_night_theme,
-                ThemeMode.FOLLOW_SYSTEM.preferenceValue
-            )
-        ).applyAsNightMode()
+        // Before the first Activity is created, so it starts in the right theme.
+        koinApp.koin.get<UserPreferencesStore>().read().themeMode.applyAsNightMode()
     }
 
     class ReleaseTree(private val context: Context) : Timber.DebugTree() {

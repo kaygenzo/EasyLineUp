@@ -298,7 +298,6 @@
         lineup, not just the current roster.</string>
 
 
-    <string name="lineup_theme_default_value" translatable="false">0</string>
     <string name="lineup_theme_system_value">System</string>
     <string name="lineup_theme_day_value">Day</string>
     <string name="lineup_theme_night_value">Night</string>

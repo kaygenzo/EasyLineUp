@@ -4,13 +4,11 @@
 
 package com.telen.easylineup.settings
 
-import android.content.Context
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.ThemeMode
 import com.telen.easylineup.domain.model.export.DataCounts
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.model.export.toDataCounts
@@ -21,9 +19,7 @@ import com.telen.easylineup.domain.usecases.DeleteAllData
 import com.telen.easylineup.domain.usecases.ExportData
 import com.telen.easylineup.domain.usecases.GenerateExportFileName
 import com.telen.easylineup.domain.usecases.ImportResult
-import com.telen.easylineup.export.json.exportGson
-import com.telen.easylineup.export.json.toJson
-import com.telen.easylineup.utils.SharedPreferencesUtils
+import com.telen.easylineup.utils.UserPreferencesStore
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,7 +55,7 @@ data object ImportFailed : SettingsEvent()
 
 /** Everything [SettingsScreen] and its export/import sheets need, except the team info card. */
 data class SettingsUiState(
-    val themeValue: String = "",
+    val themeMode: ThemeMode = ThemeMode.FOLLOW_SYSTEM,
     val menColor: Color = Color.Unspecified,
     val womenColor: Color = Color.Unspecified,
     val showDeleteAllDataSheet: Boolean = false,
@@ -76,63 +72,42 @@ class SettingsViewModel(
     private val exportDataUseCase: ExportData,
     private val generateExportFileName: GenerateExportFileName,
     private val exportFileWriter: ExportFileWriter,
-    private val context: Context,
+    private val preferences: UserPreferencesStore,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(loadPreferencesState())
+    private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
     private val _events = Channel<SettingsEvent>(Channel.BUFFERED)
     val events: Flow<SettingsEvent> = _events.receiveAsFlow()
 
-    private fun loadPreferencesState(): SettingsUiState {
-        val menColor = SharedPreferencesUtils.getIntSetting(
-            context,
-            R.string.key_men_style,
-            ContextCompat.getColor(context, R.color.default_men_color)
-        )
-        val womenColor = SharedPreferencesUtils.getIntSetting(
-            context,
-            R.string.key_women_style,
-            ContextCompat.getColor(context, R.color.default_women_color)
-        )
-        return SettingsUiState(
-            themeValue = SharedPreferencesUtils.getStringSetting(
-                context,
-                R.string.key_day_night_theme,
-                context.getString(R.string.lineup_theme_default_value)
-            ),
-            menColor = Color(menColor),
-            womenColor = Color(womenColor),
-            importOverwriteExisting = SharedPreferencesUtils.getBooleanSetting(
-                context,
-                R.string.key_import_data_update_object,
-                false
-            )
-        )
+    init {
+        viewModelScope.launch {
+            val stored = withContext(dispatcherProvider.io()) { preferences.read() }
+            _uiState.update {
+                it.copy(
+                    themeMode = stored.themeMode,
+                    menColor = Color(stored.menColor),
+                    womenColor = Color(stored.womenColor),
+                    importOverwriteExisting = stored.importOverwriteExisting
+                )
+            }
+        }
     }
 
-    fun onThemeSelected(value: String) {
-        putStringPreference(R.string.key_day_night_theme, value)
-        _uiState.update { it.copy(themeValue = value) }
+    fun onThemeSelected(mode: ThemeMode) {
+        preferences.setThemeMode(mode)
+        _uiState.update { it.copy(themeMode = mode) }
     }
 
     fun onMenColorPicked(color: Int) {
-        putIntPreference(R.string.key_men_style, color)
+        preferences.setMenColor(color)
         _uiState.update { it.copy(menColor = Color(color)) }
     }
 
     fun onWomenColorPicked(color: Int) {
-        putIntPreference(R.string.key_women_style, color)
+        preferences.setWomenColor(color)
         _uiState.update { it.copy(womenColor = Color(color)) }
-    }
-
-    private fun putStringPreference(keyRes: Int, value: String) {
-        SharedPreferencesUtils.putStringSetting(context, keyRes, value)
-    }
-
-    private fun putIntPreference(keyRes: Int, value: Int) {
-        SharedPreferencesUtils.putIntSetting(context, keyRes, value)
     }
 
     fun onDeleteAllDataClick() {
@@ -207,22 +182,15 @@ class SettingsViewModel(
         }
     }
 
-    private fun writeExportFile(exportBase: ExportBase, dirUri: Uri): WrittenExportFile {
-        val json = exportGson.toJson(exportBase.toJson())
-        val fileName = generateExportFileName()
-        return exportFileWriter.write(json, dirUri.toString(), fileName)
-    }
+    private fun writeExportFile(exportBase: ExportBase, dirUri: Uri): WrittenExportFile =
+        exportFileWriter.write(exportBase, dirUri.toString(), generateExportFileName())
 
     fun onImportPreviewReady(fileName: String, exportBase: ExportBase) {
         _uiState.update { it.copy(importFileName = fileName, importPreview = exportBase) }
     }
 
     fun onImportOverwriteChanged(checked: Boolean) {
-        SharedPreferencesUtils.putBooleanSetting(
-            context,
-            R.string.key_import_data_update_object,
-            checked
-        )
+        preferences.setImportOverwriteExisting(checked)
         _uiState.update { it.copy(importOverwriteExisting = checked) }
     }
 

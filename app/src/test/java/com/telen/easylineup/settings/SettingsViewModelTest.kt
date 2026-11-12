@@ -4,12 +4,9 @@
 
 package com.telen.easylineup.settings
 
-import android.content.Context
-import android.content.SharedPreferences
-import android.content.res.Resources
 import android.net.Uri
 import androidx.compose.ui.graphics.toArgb
-import androidx.preference.PreferenceManager
+import com.telen.easylineup.domain.model.ThemeMode
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.ExportFileWriter
@@ -19,6 +16,8 @@ import com.telen.easylineup.domain.usecases.ExportData
 import com.telen.easylineup.domain.usecases.GenerateExportFileName
 import com.telen.easylineup.domain.usecases.ImportResult
 import com.telen.easylineup.testDispatcherProvider
+import com.telen.easylineup.utils.UserPreferences
+import com.telen.easylineup.utils.UserPreferencesStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -35,24 +34,16 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyBoolean
-import org.mockito.ArgumentMatchers.anyInt
-import org.mockito.ArgumentMatchers.anyString
-import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mock
-import org.mockito.MockedStatic
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
 
 /**
- * Unit tests for [SettingsViewModel]. [loadPreferencesState] reads through
- * `PreferenceManager.getDefaultSharedPreferences(context)` eagerly at construction, so `Context`
- * and that static call are mocked just deep enough to let construction succeed - the exact
- * stored values don't matter for most tests, only that every preference read/write round-trips
- * through the same mocked [SharedPreferences] without throwing. `Dispatchers.setMain` uses a
- * single shared [UnconfinedTestDispatcher] (not a fresh one per test) so [runTest]'s own
- * `advanceUntilIdle()` can also drive the real `delay(...)` inside `deleteAllData()`.
+ * Unit tests for [SettingsViewModel]. The stored preferences come from a mocked
+ * [UserPreferencesStore], read once in `init`. `Dispatchers.setMain` uses a single shared
+ * [UnconfinedTestDispatcher] (not a fresh one per test) so [runTest]'s own `advanceUntilIdle()`
+ * drives the ViewModel's coroutines too.
  */
 @RunWith(MockitoJUnitRunner::class)
 internal class SettingsViewModelTest {
@@ -69,52 +60,29 @@ internal class SettingsViewModelTest {
     lateinit var exportFileWriter: ExportFileWriter
 
     @Mock
-    lateinit var context: Context
+    lateinit var preferences: UserPreferencesStore
 
-    @Mock
-    lateinit var sharedPreferences: SharedPreferences
-
-    @Mock
-    lateinit var editor: SharedPreferences.Editor
-
-    @Mock
-    lateinit var resources: Resources
-
+    private val stored = UserPreferences(
+        themeMode = ThemeMode.DARK,
+        menColor = 0x0000FF,
+        womenColor = 0xFF00FF,
+        importOverwriteExisting = true
+    )
     private val testDispatcher = UnconfinedTestDispatcher()
     private val dispatcherProvider: DispatcherProvider = testDispatcherProvider(testDispatcher)
-    private lateinit var preferenceManagerMock: MockedStatic<PreferenceManager>
     private lateinit var viewModel: SettingsViewModel
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-
-        preferenceManagerMock = Mockito.mockStatic(PreferenceManager::class.java)
-        preferenceManagerMock.`when`<SharedPreferences> {
-            PreferenceManager.getDefaultSharedPreferences(context)
-        }.thenReturn(sharedPreferences)
-
-        Mockito.lenient().`when`(context.getString(anyInt())).thenReturn("default")
-        Mockito.lenient().`when`(context.resources).thenReturn(resources)
-        @Suppress("DEPRECATION")
-        Mockito.lenient().`when`(resources.getColor(anyInt())).thenReturn(0)
-        Mockito.lenient().`when`(context.getColor(anyInt())).thenReturn(0)
-        Mockito.lenient().`when`(sharedPreferences.getString(anyString(), any()))
-            .thenReturn("value")
-        Mockito.lenient().`when`(sharedPreferences.getInt(anyString(), anyInt())).thenReturn(0)
-        Mockito.lenient().`when`(sharedPreferences.getBoolean(anyString(), anyBoolean()))
-            .thenReturn(false)
-        Mockito.lenient().`when`(sharedPreferences.edit()).thenReturn(editor)
-        Mockito.lenient().`when`(editor.putString(anyString(), any())).thenReturn(editor)
-        Mockito.lenient().`when`(editor.putInt(anyString(), anyInt())).thenReturn(editor)
-        Mockito.lenient().`when`(editor.putBoolean(anyString(), anyBoolean())).thenReturn(editor)
+        Mockito.lenient().`when`(preferences.read()).thenReturn(stored)
 
         viewModel = SettingsViewModel(
             deleteAllDataUseCase,
             exportDataUseCase,
             generateExportFileName,
             exportFileWriter,
-            context,
+            preferences,
             dispatcherProvider
         )
     }
@@ -122,14 +90,24 @@ internal class SettingsViewModelTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
-        preferenceManagerMock.close()
+    }
+
+    @Test
+    fun shouldLoadTheStoredPreferences() = runTest(testDispatcher) {
+        val state = viewModel.uiState.value
+
+        assertEquals(ThemeMode.DARK, state.themeMode)
+        assertEquals(0x0000FF, state.menColor.toArgb() and 0xFFFFFF)
+        assertEquals(0xFF00FF, state.womenColor.toArgb() and 0xFFFFFF)
+        assertTrue(state.importOverwriteExisting)
     }
 
     @Test
     fun shouldUpdateThemeValueWhenSelected() = runTest(testDispatcher) {
-        viewModel.onThemeSelected("2")
+        viewModel.onThemeSelected(ThemeMode.LIGHT)
 
-        assertEquals("2", viewModel.uiState.value.themeValue)
+        assertEquals(ThemeMode.LIGHT, viewModel.uiState.value.themeMode)
+        Mockito.verify(preferences).setThemeMode(ThemeMode.LIGHT)
     }
 
     @Test
@@ -189,8 +167,6 @@ internal class SettingsViewModelTest {
         assertEquals(listOf(DeleteAllDataFailed), events)
         job.cancel()
     }
-
-
 
     @Test
     fun shouldUpdateExportPreviewOnLoadExportPreviewSuccess() = runTest(testDispatcher) {
@@ -309,10 +285,10 @@ internal class SettingsViewModelTest {
 
     @Test
     fun shouldUpdateImportOverwritePreferenceWhenChanged() = runTest(testDispatcher) {
-        viewModel.onImportOverwriteChanged(true)
+        viewModel.onImportOverwriteChanged(false)
 
-        assertTrue(viewModel.uiState.value.importOverwriteExisting)
-        Mockito.verify(editor).putBoolean(anyString(), eq(true))
+        assertFalse(viewModel.uiState.value.importOverwriteExisting)
+        Mockito.verify(preferences).setImportOverwriteExisting(false)
     }
 
     @Test

@@ -147,7 +147,7 @@ fun SettingsRoute(navController: NavController) {
             teamName = teamUiState.teamName,
             teamType = teamUiState.teamType,
             teamImageUri = teamUiState.teamImageUri,
-            themeValue = uiState.themeValue,
+            themeValue = uiState.themeMode.preferenceValue,
             menColor = uiState.menColor,
             womenColor = uiState.womenColor
         ),
@@ -155,8 +155,9 @@ fun SettingsRoute(navController: NavController) {
         onTeamClick = { navController.navigate(Routes.TeamDetails) },
         onThemeSelected = { newValue ->
             FirebaseAnalyticsUtils.onClick(context, "click_settings_theme")
-            viewModel.onThemeSelected(newValue)
-            ThemeMode.fromPreference(newValue).applyAsNightMode()
+            val mode = ThemeMode.fromPreference(newValue)
+            viewModel.onThemeSelected(mode)
+            mode.applyAsNightMode()
         },
         onMenColorPicked = viewModel::onMenColorPicked,
         onWomenColorPicked = viewModel::onWomenColorPicked,

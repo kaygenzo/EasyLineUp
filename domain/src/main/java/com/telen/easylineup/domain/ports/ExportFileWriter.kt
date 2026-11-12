@@ -4,6 +4,8 @@
 
 package com.telen.easylineup.domain.ports
 
+import com.telen.easylineup.domain.model.export.ExportBase
+
 /**
  * @property fileName the file actually written
  * @property folderName the picked folder's display name, when the provider exposes one
@@ -11,9 +13,9 @@ package com.telen.easylineup.domain.ports
 data class WrittenExportFile(val fileName: String, val folderName: String?)
 
 /**
- * Writes an already-serialized export to a user-picked directory, behind the platform's own
+ * Serializes an export and writes it to a user-picked directory, behind the platform's own
  * storage APIs (Android's Storage Access Framework) so domain stays platform-agnostic.
  */
 interface ExportFileWriter {
-    fun write(content: String, directoryUri: String, fileName: String): WrittenExportFile
+    fun write(export: ExportBase, directoryUri: String, fileName: String): WrittenExportFile
 }

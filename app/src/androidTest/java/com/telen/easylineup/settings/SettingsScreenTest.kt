@@ -16,6 +16,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.ThemeMode
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
@@ -23,7 +24,7 @@ import com.telen.easylineup.testing.ThemeTestUtils
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
-import com.telen.easylineup.utils.SharedPreferencesUtils
+import com.telen.easylineup.utils.SharedPreferencesUserPreferencesStore
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -32,7 +33,7 @@ import org.junit.runner.RunWith
 
 /**
  * Covers [SettingsScreen]: render of the fixture's preference defaults, picking a day/night
- * theme (a real [SharedPreferencesUtils]-backed, process-wide
+ * theme (a real [SharedPreferencesUserPreferencesStore]-backed, process-wide
  * setting - reset in [resetPreferencesAndTheme] so it can't leak into another test), opening
  * and cancelling the delete-all-data confirmation, back navigation and rotation - the full
  * matrix policy for a core screen (see the test plan).
@@ -65,7 +66,7 @@ class SettingsScreenTest {
     @After
     fun resetPreferencesAndTheme() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        SharedPreferencesUtils.putStringSetting(context, R.string.key_day_night_theme, "0")
+        SharedPreferencesUserPreferencesStore(context).setThemeMode(ThemeMode.FOLLOW_SYSTEM)
         ThemeTestUtils.resetNightMode()
         OrientationTestUtils.rotateToPortrait()
     }

@@ -31,7 +31,9 @@ import com.telen.easylineup.utils.ImportFileReaderImpl
 import com.telen.easylineup.utils.LineupPdfWriter
 import com.telen.easylineup.utils.LineupPdfWriterImpl
 import com.telen.easylineup.utils.PhoneNumberValidatorImpl
+import com.telen.easylineup.utils.SharedPreferencesUserPreferencesStore
 import com.telen.easylineup.utils.StringResourcesProviderImpl
+import com.telen.easylineup.utils.UserPreferencesStore
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
@@ -42,6 +44,7 @@ val appModules = module {
     single<GeocodingProvider> { GeocodingProviderImpl(get()) }
     single<PhoneNumberValidator> { PhoneNumberValidatorImpl() }
     single<ExportFileWriter> { ExportFileWriterImpl(get()) }
+    single<UserPreferencesStore> { SharedPreferencesUserPreferencesStore(get()) }
     single<ImportFileReader> { ImportFileReaderImpl(get()) }
     single<LineupPdfWriter> { LineupPdfWriterImpl(get(), get(), get()) }
     factoryOf(::LineupRosterUseCases)
