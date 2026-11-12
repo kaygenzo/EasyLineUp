@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +27,7 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.ImagePickerUtils
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Creating or editing a player: [playerId] is `0` for a new one. [PlayerViewModel.uiState]
@@ -35,10 +35,9 @@ import org.koin.androidx.compose.koinViewModel
  */
 @Composable
 fun PlayerEditRoute(navController: NavController, playerId: Long) {
-    val viewModel = koinViewModel<PlayerViewModel>()
+    val viewModel = koinViewModel<PlayerViewModel> { parametersOf(playerId) }
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    remember(playerId) { viewModel.playerId = playerId }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     var showDiscardSheet by rememberSaveable { mutableStateOf(false) }

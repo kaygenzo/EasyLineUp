@@ -110,6 +110,7 @@ internal class PlayerViewModelTest {
             .thenReturn(PlayerSideSelection(left = false, right = true))
 
         viewModel = PlayerViewModel(
+            0L,
             SavedStateHandle(),
             getTeamUseCase,
             observePlayer,
@@ -129,7 +130,7 @@ internal class PlayerViewModelTest {
 
     @Test
     fun shouldStopLoadingImmediatelyForANewPlayer() = runTest {
-        viewModel.playerId = 0L
+        viewModel = buildViewModel(0L)
         advanceUntilIdle()
 
         assertFalse(viewModel.uiState.value.isLoading)
@@ -144,7 +145,7 @@ internal class PlayerViewModelTest {
                 .thenReturn(Result.success(mapOf(FieldPosition.SHORT_STOP to 3)))
         }
 
-        viewModel.playerId = 5L
+        viewModel = buildViewModel(5L)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -415,7 +416,8 @@ internal class PlayerViewModelTest {
         ).thenReturn(Result.failure(throwable))
     }
 
-    private fun buildViewModel() = PlayerViewModel(
+    private fun buildViewModel(playerId: Long = 0L) = PlayerViewModel(
+        playerId,
         SavedStateHandle(),
         getTeamUseCase,
         observePlayer,
@@ -464,7 +466,7 @@ internal class PlayerViewModelTest {
                 .thenReturn(Result.success(emptyMap()))
         }
 
-        viewModel.playerId = 5L
+        viewModel = buildViewModel(5L)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -482,7 +484,7 @@ internal class PlayerViewModelTest {
                 .thenReturn(Result.success(emptyMap()))
         }
 
-        viewModel.playerId = 5L
+        viewModel = buildViewModel(5L)
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -507,7 +509,7 @@ internal class PlayerViewModelTest {
                 .thenReturn(Result.failure(Exception("boom")))
         }
 
-        viewModel.playerId = 5L
+        viewModel = buildViewModel(5L)
         advanceUntilIdle()
 
         assertEquals("Jonas", viewModel.uiState.value.name)
@@ -547,7 +549,8 @@ internal class PlayerViewModelTest {
         assertFalse(state.phoneError)
     }
 
-    private fun viewModelWith(handle: SavedStateHandle) = PlayerViewModel(
+    private fun viewModelWith(handle: SavedStateHandle, playerId: Long) = PlayerViewModel(
+        playerId,
         handle,
         getTeamUseCase,
         observePlayer,
@@ -569,13 +572,11 @@ internal class PlayerViewModelTest {
                 .thenReturn(Result.success(emptyMap()))
         }
         dbUpdates.emit(player(5L))
-        val beforeKill = viewModelWith(handle)
-        beforeKill.playerId = 5L
+        val beforeKill = viewModelWith(handle, 5L)
         beforeKill.onNameChanged("Typed name")
         beforeKill.onEmailChanged("typed@easylineup.com")
 
-        val restored = viewModelWith(handle)
-        restored.playerId = 5L
+        val restored = viewModelWith(handle, 5L)
         advanceUntilIdle()
 
         assertEquals("Typed name", restored.uiState.value.name)
@@ -593,12 +594,10 @@ internal class PlayerViewModelTest {
                 .thenReturn(Result.success(emptyMap()))
         }
         dbUpdates.emit(player(5L))
-        viewModelWith(handle).apply {
-            playerId = 5L
+        viewModelWith(handle, 5L).apply {
             onNameChanged("Typed name")
         }
-        val restored = viewModelWith(handle)
-        restored.playerId = 5L
+        val restored = viewModelWith(handle, 5L)
 
         dbUpdates.emit(player(5L).copy(name = "Saved elsewhere"))
         advanceUntilIdle()
@@ -611,15 +610,13 @@ internal class PlayerViewModelTest {
         val handle = SavedStateHandle()
         Mockito.`when`(toggleFavoritePositionUseCase(any(), any()))
             .thenReturn(setOf(FieldPosition.PITCHER))
-        viewModelWith(handle).apply {
-            playerId = 0L
+        viewModelWith(handle, 0L).apply {
             onNameChanged("Rookie")
             onShirtNumberChanged("42")
             onPositionToggled(FieldPosition.PITCHER)
         }
 
-        val restored = viewModelWith(handle)
-        restored.playerId = 0L
+        val restored = viewModelWith(handle, 0L)
 
         assertEquals("Rookie", restored.uiState.value.name)
         assertEquals("42", restored.uiState.value.shirtNumberText)

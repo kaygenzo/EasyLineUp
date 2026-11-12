@@ -30,6 +30,7 @@ import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Hosts a swipeable carousel of player profiles (the roster's full id list, starting on
@@ -76,7 +77,9 @@ fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {
     pendingDeletePlayerId?.let { playerId ->
         // Same key as the pager page's own PlayerViewModel: this is that page's instance, so
         // the delete runs in a scope that outlives both the sheet and the page.
-        val deleteViewModel = koinViewModel<PlayerViewModel>(key = playerId.toString())
+        val deleteViewModel = koinViewModel<PlayerViewModel>(key = playerId.toString()) {
+            parametersOf(playerId)
+        }
         LaunchedEffect(deleteViewModel) {
             deleteViewModel.events
                 .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
@@ -114,10 +117,6 @@ fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {
                 onConfirm = {
                     FirebaseAnalyticsUtils.onClick(context, "click_player_details_delete")
                     showDeleteSheet = false
-                    // Normally already set by the page; setting it again would reload the player.
-                    if (deleteViewModel.playerId != playerId) {
-                        deleteViewModel.playerId = playerId
-                    }
                     deleteViewModel.onDeleteConfirmed()
                 }
             )
@@ -133,8 +132,9 @@ private fun PlayerProfilePage(
     onDeleteRequested: (Long) -> Unit
 ) {
     val context = LocalContext.current
-    val viewModel = koinViewModel<PlayerViewModel>(key = playerId.toString())
-    remember(playerId) { viewModel.playerId = playerId }
+    val viewModel = koinViewModel<PlayerViewModel>(key = playerId.toString()) {
+        parametersOf(playerId)
+    }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     PlayerProfileScreen(

@@ -21,7 +21,13 @@ class KoinGraphTest {
     @Test
     fun everyDefinitionFindsItsDependencies() {
         module { includes(ModuleProvider.modules) }.verify(
-            extraTypes = listOf(Context::class, Application::class, SavedStateHandle::class)
+            // Long: PlayerViewModel's player id, passed by its Routes through parametersOf().
+            extraTypes = listOf(
+                Context::class,
+                Application::class,
+                SavedStateHandle::class,
+                Long::class
+            )
         )
     }
 }

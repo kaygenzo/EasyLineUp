@@ -107,7 +107,12 @@ sealed interface PlayerEvent {
     data class DeleteFailed(val detail: String) : PlayerEvent
 }
 
+/**
+ * [playerId] is `0` for a new player. It comes in through Koin's parameters, not the route's
+ * [SavedStateHandle]: the profile pager hosts one instance per player in a single destination.
+ */
 class PlayerViewModel(
+    private val playerId: Long,
     private val savedStateHandle: SavedStateHandle,
     private val getTeamUseCase: GetTeam,
     private val observePlayer: ObservePlayer,
@@ -123,13 +128,6 @@ class PlayerViewModel(
 
     private val _events = Channel<PlayerEvent>(Channel.BUFFERED)
     val events: Flow<PlayerEvent> = _events.receiveAsFlow()
-
-    /** `0` means "new player" - set once by the Route right after obtaining this instance. */
-    var playerId: Long = 0
-        set(value) {
-            field = value
-            loadPlayer(value)
-        }
 
     /** What the form held when the process was killed, applied once instead of the database. */
     private var restoredDraft: PlayerFormDraft? = savedStateHandle[KEY_DRAFT]
@@ -152,6 +150,7 @@ class PlayerViewModel(
                 }
                 .onFailure { Timber.e(it) }
         }
+        loadPlayer(playerId)
     }
 
     private fun loadPlayer(id: Long) {
