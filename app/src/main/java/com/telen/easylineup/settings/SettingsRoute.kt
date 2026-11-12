@@ -13,6 +13,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
@@ -22,6 +25,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
+import com.telen.easylineup.compose.ErrorDialog
 import com.telen.easylineup.compose.ExportConfirmSheet
 import com.telen.easylineup.compose.ExportSuccessSheet
 import com.telen.easylineup.compose.ImportConfirmSheet
@@ -36,7 +40,6 @@ import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.login.LoginViewModel
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.TeamViewModel
-import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.applyAsNightMode
 import com.telen.easylineup.utils.startActivityOrNotify
@@ -53,6 +56,7 @@ fun SettingsRoute(navController: NavController) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val teamUiState by teamViewModel.uiState.collectAsStateWithLifecycle()
+    var transferError by rememberSaveable { mutableStateOf<TransferError?>(null) }
 
     val openFile = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -103,20 +107,11 @@ fun SettingsRoute(navController: NavController) {
                         Timber.d("Successfully exported data!")
                     }
 
-                    ExportFailed -> DialogFactory.getErrorDialog(
-                        context,
-                        title = R.string.settings_export_error_title,
-                        message = R.string.settings_export_error_message
-                    ).show()
+                    ExportFailed -> transferError = TransferError.EXPORT
 
                     ImportSucceeded -> FirebaseAnalyticsUtils.importData(context)
 
-                    ImportFailed -> DialogFactory.getErrorDialog(
-                        context,
-                        title = R.string.settings_import_error_title,
-                        message = R.string.settings_import_error_message
-                    ).show()
-
+                    ImportFailed -> transferError = TransferError.IMPORT
                 }
             }
     }
@@ -233,4 +228,28 @@ fun SettingsRoute(navController: NavController) {
             onDismiss = viewModel::onImportSuccessDismiss
         )
     }
+
+    transferError?.let { error ->
+        val isExport = error == TransferError.EXPORT
+        ErrorDialog(
+            title = stringResource(
+                if (isExport) {
+                    R.string.settings_export_error_title
+                } else {
+                    R.string.settings_import_error_title
+                }
+            ),
+            message = stringResource(
+                if (isExport) {
+                    R.string.settings_export_error_message
+                } else {
+                    R.string.settings_import_error_message
+                }
+            ),
+            onDismiss = { transferError = null }
+        )
+    }
 }
+
+/** Which data transfer failed, kept across rotation until the user dismisses its dialog. */
+private enum class TransferError { EXPORT, IMPORT }

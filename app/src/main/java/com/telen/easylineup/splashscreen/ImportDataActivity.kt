@@ -12,9 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import com.telen.easylineup.BaseImportActivity
-import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutTheme
-import com.telen.easylineup.utils.DialogFactory
 import timber.log.Timber
 
 class ImportDataActivity : BaseImportActivity() {
@@ -28,7 +26,7 @@ class ImportDataActivity : BaseImportActivity() {
                         .fillMaxSize()
                         .background(MaterialTheme.colorScheme.background)
                 ) {
-                    ImportSheets(onCancelled = ::finish)
+                    ImportSheets(onCancelled = ::finish, onFailureDismissed = ::finish)
                 }
             }
         }
@@ -40,16 +38,5 @@ class ImportDataActivity : BaseImportActivity() {
             Timber.d("No data found, it's not expected")
             finish()
         }
-    }
-
-    override fun displayImportFailure() {
-        DialogFactory.getErrorDialog(
-            context = this,
-            title = R.string.settings_import_error_title,
-            message = R.string.settings_import_error_message,
-            confirmClick = { dialogInterface, _ ->
-                dialogInterface.dismiss()
-                finish()
-            }).show()
     }
 }

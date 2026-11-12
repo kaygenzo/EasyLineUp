@@ -4,8 +4,6 @@
 
 package com.telen.easylineup.login
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import com.telen.easylineup.BaseImportActivity
@@ -34,10 +32,7 @@ class LoginActivity : BaseImportActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CREATE_TEAM && resultCode == Activity.RESULT_OK) {
-            launchHome()
-        }
+    override fun onTeamCreated() {
+        launchHome()
     }
 }

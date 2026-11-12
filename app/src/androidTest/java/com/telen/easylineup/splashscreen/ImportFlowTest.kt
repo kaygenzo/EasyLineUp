@@ -12,11 +12,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.preference.PreferenceManager
 import androidx.test.core.app.ActivityScenario
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.RootMatchers.isDialog
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.telen.easylineup.HomeActivity
@@ -156,9 +151,7 @@ class ImportFlowTest {
 
         open(file("not valid json at all"))
 
-        onView(withText(string(R.string.settings_import_error_title)))
-            .inRoot(isDialog())
-            .check(matches(isDisplayed()))
+        composeTestRule.waitForText(string(R.string.settings_import_error_title))
         assertTrue(runBlocking { teams.getTeams() }.isEmpty())
     }
 }

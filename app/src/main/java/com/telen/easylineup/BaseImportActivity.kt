@@ -6,16 +6,18 @@ package com.telen.easylineup
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.PreferenceManager
+import com.telen.easylineup.compose.ErrorDialog
 import com.telen.easylineup.compose.ImportConfirmSheet
 import com.telen.easylineup.compose.ImportSuccessSheet
 import com.telen.easylineup.domain.model.export.ExportBase
@@ -28,9 +30,7 @@ import com.telen.easylineup.login.ImportPreviewReady
 import com.telen.easylineup.login.ImportSuccessfulEvent
 import com.telen.easylineup.login.LoginViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
-import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
-import com.telen.easylineup.utils.StorageUtils
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -40,7 +40,16 @@ abstract class BaseImportActivity : BaseActivity() {
     private var pendingFileName by mutableStateOf("")
     private var importPreview by mutableStateOf<ExportBase?>(null)
     private var importResult by mutableStateOf<ImportResult?>(null)
+    private var importFailed by mutableStateOf(false)
     protected var updateExistingOnImport by mutableStateOf(false)
+
+    private val openFile = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri -> uri?.let(viewModel::peekImportFile) }
+
+    private val createTeam = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result -> if (result.resultCode == Activity.RESULT_OK) onTeamCreated() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +72,7 @@ abstract class BaseImportActivity : BaseActivity() {
                             importResult = it.result
                         }
 
-                        ImportFailure -> displayImportFailure()
+                        ImportFailure -> importFailed = true
 
                         is GetTeamSuccess -> {
                             // the file contains at least one main team
@@ -87,7 +96,7 @@ abstract class BaseImportActivity : BaseActivity() {
      * confirmation regardless of how they got here.
      */
     @Composable
-    protected fun ImportSheets(onCancelled: () -> Unit = {}) {
+    protected fun ImportSheets(onCancelled: () -> Unit = {}, onFailureDismissed: () -> Unit = {}) {
         importPreview?.let { exportBase ->
             ImportConfirmSheet(
                 fileName = pendingFileName,
@@ -121,29 +130,30 @@ abstract class BaseImportActivity : BaseActivity() {
                 }
             )
         }
+
+        if (importFailed) {
+            ErrorDialog(
+                title = stringResource(R.string.settings_import_error_title),
+                message = stringResource(R.string.settings_import_error_message),
+                onDismiss = {
+                    importFailed = false
+                    onFailureDismissed()
+                }
+            )
+        }
     }
 
     protected fun importDataFromBrowser() {
-        StorageUtils.openFile(this)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                StorageUtils.REQUEST_CODE_OPEN_DOCUMENT -> {
-                    val uri = data?.data ?: return
-                    viewModel.peekImportFile(uri)
-                }
-            }
-        }
+        openFile.launch(arrayOf(IMPORT_MIME_TYPE))
     }
 
     protected fun launchTeamCreation() {
         FirebaseAnalyticsUtils.startTutorial(this, true)
-        val intent = Intent(this, TeamCreationActivity::class.java)
-        startActivityForResult(intent, REQUEST_CREATE_TEAM)
+        createTeam.launch(Intent(this, TeamCreationActivity::class.java))
     }
+
+    /** Called once [TeamCreationActivity] saved the new team; nothing to do by default. */
+    protected open fun onTeamCreated() {}
 
     protected fun launchHome() {
         val intent = Intent(this, HomeActivity::class.java).apply {
@@ -153,15 +163,8 @@ abstract class BaseImportActivity : BaseActivity() {
         finish()
     }
 
-    protected open fun displayImportFailure() {
-        DialogFactory.getErrorDialog(
-            context = this@BaseImportActivity,
-            title = R.string.settings_import_error_title,
-            message = R.string.settings_import_error_message
-        ).show()
-    }
-
-    companion object {
-        const val REQUEST_CREATE_TEAM = 2
+    private companion object {
+        // What mail and messaging apps hand an .elu attachment over as.
+        const val IMPORT_MIME_TYPE = "application/octet-stream"
     }
 }

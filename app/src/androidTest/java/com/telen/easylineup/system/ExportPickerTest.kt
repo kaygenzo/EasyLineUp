@@ -12,15 +12,10 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.rule.IntentsRule
-import androidx.test.espresso.matcher.RootMatchers.isDialog
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
@@ -90,8 +85,6 @@ class ExportPickerTest {
 
         chooseFolder(ActivityResult(Activity.RESULT_OK, Intent().setData(notGranted)))
 
-        onView(withText(string(R.string.settings_export_error_title)))
-            .inRoot(isDialog())
-            .check(matches(isDisplayed()))
+        composeTestRule.waitForText(string(R.string.settings_export_error_title))
     }
 }

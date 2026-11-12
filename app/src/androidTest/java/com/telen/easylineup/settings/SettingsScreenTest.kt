@@ -42,7 +42,7 @@ import org.junit.runner.RunWith
  * the same external-flow boundary the import-flow's own Phase 3 coverage owns), the men/women
  * color swatches (the skydoves `ColorPickerDialog` is a non-Compose dialog, not driveable via
  * Compose test APIs - a pre-existing interop boundary per CLAUDE.md, not a regression),
- * licenses (`DialogFactory`'s plain `AlertDialog.Builder`, same interop boundary), the Play
+ * licenses (`LicensesManager`'s plain native dialog, same interop boundary), the Play
  * Store row (launches a real external `Intent`), and actually confirming delete-all-data (wipes
  * the whole app and routes to `LoginActivity`, finishing `HomeActivity` - that is Welcome/
  * Login's own territory, same reasoning as TeamDetailsScreenTest skipping a real team delete).

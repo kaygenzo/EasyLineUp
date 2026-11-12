@@ -30,6 +30,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -43,6 +44,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -891,9 +893,8 @@ private fun HeaderActionIconChipPreview() {
 
 /**
  * A destructive/discard confirmation bottom sheet (mockup's `.sheet` + `.formbar--danger`),
- * replacing a native `AlertDialog` (`DialogFactory`) with the same two-button shape the mockup
- * uses everywhere a confirm/cancel choice is destructive - "Keep editing"/"Discard", "Cancel"/
- * "Delete team", etc.
+ * replacing a native `AlertDialog` with the same two-button shape the mockup uses everywhere a
+ * confirm/cancel choice is destructive - "Keep editing"/"Discard", "Cancel"/"Delete team", etc.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -958,6 +959,38 @@ private fun ConfirmSheetPreview() {
             cancelLabel = "Keep editing",
             onDismiss = {},
             onConfirm = {}
+        )
+    }
+}
+
+/** A failure the user can only acknowledge: a warning icon, [title], [message] and one OK. */
+@Composable
+fun ErrorDialog(title: String, message: String, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                painter = painterResource(R.drawable.ic_warning_red_24dp),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error
+            )
+        },
+        title = { Text(title) },
+        text = { Text(message) },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.ok)) }
+        }
+    )
+}
+
+@DugoutPreviews
+@Composable
+private fun ErrorDialogPreview() {
+    DugoutTheme {
+        ErrorDialog(
+            title = "Import failed",
+            message = "The file could not be read.",
+            onDismiss = {}
         )
     }
 }
