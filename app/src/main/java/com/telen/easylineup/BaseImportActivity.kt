@@ -90,6 +90,9 @@ abstract class BaseImportActivity : BaseActivity() {
      * sibling to call inside each subclass's own `setContent {}`, so both the cold-start
      * file-open flow and the Welcome screen's "Import an existing team" show the exact same
      * confirmation regardless of how they got here.
+     *
+     * No preview of its own: it only wires this Activity's state into [ImportConfirmSheet],
+     * [ImportSuccessSheet] and [ErrorDialog], which have theirs.
      */
     @Composable
     protected fun ImportSheets(onCancelled: () -> Unit = {}, onFailureDismissed: () -> Unit = {}) {

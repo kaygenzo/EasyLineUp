@@ -141,6 +141,16 @@ row, chip, marker, icon button, badge) all get their own preview too — an
 earlier version of this rule scoped previews to full screens only; it was
 broadened deliberately to cover every composable, no exceptions.
 
+The one category that can't carry a preview is state wiring, not UI: a
+composable that obtains a ViewModel or reads an Activity's own state, and
+renders nothing but stateless composables that are previewed themselves. That
+is every `XRoute`, `AppNavHost`, `PlayerProfilePage` (the profile pager's
+per-page route, one `PlayerViewModel` per player) and
+`BaseImportActivity.ImportSheets` (the import sheets wired to the Activity's
+state) — plus `DugoutTheme`, which every preview already runs inside. Anything
+in that category stays thin: as soon as it lays out UI of its own, that UI
+moves into a stateless composable with its preview.
+
 Pattern (see `SettingsScreenPreview`/`WelcomeScreenPreview` at the bottom of
 `SettingsScreen.kt`/`WelcomeScreen.kt`): a private `@Composable *Preview()`
 function wraps the real composable in `DugoutTheme`, passing representative

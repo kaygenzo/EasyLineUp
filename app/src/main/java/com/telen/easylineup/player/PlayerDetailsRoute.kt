@@ -126,6 +126,10 @@ fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {
     }
 }
 
+/**
+ * One pager page: the route for a single player, with its own [PlayerViewModel]. No preview of
+ * its own - like any Route it only wires state into [PlayerProfileScreen], which has them.
+ */
 @Composable
 private fun PlayerProfilePage(
     playerId: Long,
