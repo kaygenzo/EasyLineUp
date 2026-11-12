@@ -17,6 +17,7 @@ import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
@@ -29,7 +30,6 @@ import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -53,13 +53,18 @@ class ExtraHittersTest {
 
     private val positions: PlayerFieldPositionRepository by inject()
 
-    @Before
-    fun openLineup() {
-        composeTestRule.openFixtureLineup()
-    }
-
     @Test
     fun offenseMarksSubstitutesInsideTheBattingOrderAsExtraHitters() {
+        // The fixture also puts a 10th starter at DP/DH, batting 10th although the DH is off -
+        // a state the app never writes. Benched here, so the order is what a coach would have:
+        // nine batters, then the two extra hitters.
+        runBlocking {
+            val lineupId = seedRule.fixture.lineupId
+            val designated = positions.getAllPlayerFieldPositionsForLineup(lineupId)
+                .single { it.position == FieldPosition.DP_DH.id }
+            positions.deletePosition(designated)
+        }
+        composeTestRule.openFixtureLineup()
         composeTestRule
             .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
             .performClick()
@@ -76,6 +81,7 @@ class ExtraHittersTest {
 
     @Test
     fun theFlexedPitcherBatsAfterTheExtraHitters() {
+        composeTestRule.openFixtureLineup()
         composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))
         composeTestRule.onNodeWithTag(DefenseTestTags.DH_TOGGLE).performClick()
