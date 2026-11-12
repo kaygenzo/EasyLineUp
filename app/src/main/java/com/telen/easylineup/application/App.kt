@@ -5,9 +5,10 @@
 package com.telen.easylineup.application
 
 import android.app.Application
-import android.content.Context
+import android.os.Build
 import android.util.Log
 import com.google.firebase.Firebase
+import com.google.firebase.appcheck.AppCheckProviderFactory
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -23,20 +24,17 @@ open class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        val crashlytics: FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
+        crashlytics.setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         } else {
-            Timber.plant(ReleaseTree(this))
+            crashlytics.setCustomKey("installer", installerPackageName() ?: "unknown")
+            Timber.plant(ReleaseTree(crashlytics))
         }
 
-        val crashlytics: FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
-        crashlytics.setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
-
         Firebase.initialize(context = this)
-
-        Firebase.appCheck.installAppCheckProviderFactory(
-            PlayIntegrityAppCheckProviderFactory.getInstance(),
-        )
+        Firebase.appCheck.installAppCheckProviderFactory(appCheckProviderFactory())
 
         val koinApp = startKoin {
             androidContext(this@App)
@@ -47,19 +45,36 @@ open class App : Application() {
         koinApp.koin.get<UserPreferencesStore>().read().themeMode.applyAsNightMode()
     }
 
-    class ReleaseTree(private val context: Context) : Timber.DebugTree() {
-        override fun log(priority: Int, tag: String?, message: String, throwable: Throwable?) {
-            val crashlytics: FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
-            crashlytics.setCustomKey("installer", getInstaller() ?: "unknown")
-            when (priority) {
-                Log.ERROR -> throwable?.let { crashlytics.recordException(it) }
-                Log.WARN -> crashlytics.log("W/${tag ?: ""}: $message")
-                else -> {}
-            }
-        }
+    /**
+     * Play Integrity only vouches for an app installed from the Play Store: debug builds swap in
+     * the debug provider (see DebugApp).
+     */
+    protected open fun appCheckProviderFactory(): AppCheckProviderFactory =
+        PlayIntegrityAppCheckProviderFactory.getInstance()
 
-        private fun getInstaller(): String? {
-            return context.packageManager.getInstallerPackageName(context.packageName)
+    private fun installerPackageName(): String? = runCatching {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            packageManager.getInstallSourceInfo(packageName).installingPackageName
+        } else {
+            @Suppress("DEPRECATION")
+            packageManager.getInstallerPackageName(packageName)
+        }
+    }.getOrNull()
+
+    /**
+     * Sends errors with an exception to Crashlytics as non-fatal reports, and other warnings and
+     * errors as breadcrumbs; everything below a warning is dropped before Timber even formats the
+     * message.
+     */
+    class ReleaseTree(private val crashlytics: FirebaseCrashlytics) : Timber.Tree() {
+        override fun isLoggable(tag: String?, priority: Int) = priority >= Log.WARN
+
+        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+            when (priority) {
+                Log.ERROR, Log.ASSERT -> t?.let(crashlytics::recordException)
+                    ?: crashlytics.log("E/${tag ?: ""}: $message")
+                else -> crashlytics.log("W/${tag ?: ""}: $message")
+            }
         }
     }
 }

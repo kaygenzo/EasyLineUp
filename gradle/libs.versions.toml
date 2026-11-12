@@ -53,6 +53,7 @@ firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref =
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-appcheck = { module = "com.google.firebase:firebase-appcheck" }
 firebase-appcheck-playintegrity = { module = "com.google.firebase:firebase-appcheck-playintegrity" }
+firebase-appcheck-debug = { module = "com.google.firebase:firebase-appcheck-debug" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotationVersion" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }
