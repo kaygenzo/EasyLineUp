@@ -10,7 +10,6 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,7 +26,7 @@ import com.telen.easylineup.compose.ExportConfirmSheet
 import com.telen.easylineup.compose.ExportSuccessSheet
 import com.telen.easylineup.compose.ImportConfirmSheet
 import com.telen.easylineup.compose.ImportSuccessSheet
-import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.ThemeMode
 import com.telen.easylineup.domain.model.export.toDataCounts
 import com.telen.easylineup.license.LicensesManager
 import com.telen.easylineup.login.ImportFailure
@@ -39,6 +38,7 @@ import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.utils.DialogFactory
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
+import com.telen.easylineup.utils.applyAsNightMode
 import com.telen.easylineup.utils.startActivityOrNotify
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -61,16 +61,6 @@ fun SettingsRoute(navController: NavController) {
     val createFile = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocumentTree()
     ) { uri -> uri?.let(viewModel::exportData) }
-
-    fun applyNightMode(value: String) {
-        AppCompatDelegate.setDefaultNightMode(
-            when (value.toIntOrNull()) {
-                Constants.MODE_NIGHT_NO -> AppCompatDelegate.MODE_NIGHT_NO
-                Constants.MODE_NIGHT_YES -> AppCompatDelegate.MODE_NIGHT_YES
-                else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-            }
-        )
-    }
 
     fun openPlayStore() {
         FirebaseAnalyticsUtils.onClick(context, "click_settings_play_store")
@@ -166,7 +156,7 @@ fun SettingsRoute(navController: NavController) {
         onThemeSelected = { newValue ->
             FirebaseAnalyticsUtils.onClick(context, "click_settings_theme")
             viewModel.onThemeSelected(newValue)
-            applyNightMode(newValue)
+            ThemeMode.fromPreference(newValue).applyAsNightMode()
         },
         onMenColorPicked = viewModel::onMenColorPicked,
         onWomenColorPicked = viewModel::onWomenColorPicked,

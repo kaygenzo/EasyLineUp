@@ -7,7 +7,6 @@ package com.telen.easylineup.application
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.appcompat.app.AppCompatDelegate
 import com.google.firebase.Firebase
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
@@ -15,8 +14,9 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.initialize
 import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.R
-import com.telen.easylineup.domain.Constants
+import com.telen.easylineup.domain.model.ThemeMode
 import com.telen.easylineup.utils.SharedPreferencesUtils
+import com.telen.easylineup.utils.applyAsNightMode
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
@@ -45,18 +45,13 @@ open class App : Application() {
             modules(ModuleProvider.modules)
         }
 
-        SharedPreferencesUtils.getStringSetting(
-            this,
-            R.string.key_day_night_theme,
-            getString(R.string.lineup_theme_default_value)
-        ).let {
-            val styleValue = it.toInt()
-            AppCompatDelegate.setDefaultNightMode(when (styleValue) {
-                Constants.MODE_NIGHT_NO -> AppCompatDelegate.MODE_NIGHT_NO
-                Constants.MODE_NIGHT_YES -> AppCompatDelegate.MODE_NIGHT_YES
-                else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-            })
-        }
+        ThemeMode.fromPreference(
+            SharedPreferencesUtils.getStringSetting(
+                this,
+                R.string.key_day_night_theme,
+                ThemeMode.FOLLOW_SYSTEM.preferenceValue
+            )
+        ).applyAsNightMode()
     }
 
     class ReleaseTree(private val context: Context) : Timber.DebugTree() {
