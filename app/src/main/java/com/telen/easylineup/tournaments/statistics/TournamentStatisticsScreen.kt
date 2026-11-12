@@ -97,12 +97,6 @@ fun TournamentStatisticsScreen(state: TournamentStatisticsUiState, onBackClick: 
         mutableStateOf(playerStats.firstOrNull()?.playerId)
     }
     var showPlayerPicker by rememberSaveable { mutableStateOf(false) }
-    // The positions actually played anywhere in this tournament, not one strategy's theoretical
-    // column set - a team that played under more than one strategy (e.g. softball's Slowpitch,
-    // with 4 outfielders instead of 3) would otherwise silently lose real data off the chart.
-    val playedPositions = remember(playerStats) {
-        playerStats.flatMap { it.positionCounts.keys }.distinct().sortedBy { it.id }
-    }
 
     Column(
         modifier = Modifier
@@ -136,7 +130,7 @@ fun TournamentStatisticsScreen(state: TournamentStatisticsUiState, onBackClick: 
                 Spacer(modifier = Modifier.height(4.dp))
                 PositionUsageCard(
                     selectedPlayer = playerStats.firstOrNull { it.playerId == selectedPlayerId },
-                    positions = playedPositions,
+                    positions = state.playedPositions,
                     teamType = state.teamType,
                     onPlayerFieldClick = { showPlayerPicker = true }
                 )
@@ -146,7 +140,7 @@ fun TournamentStatisticsScreen(state: TournamentStatisticsUiState, onBackClick: 
 
     if (showPlayerPicker) {
         PlayerPickerSheet(
-            players = playerStats,
+            players = state.playersByName,
             onPlayerSelected = {
                 selectedPlayerId = it
                 showPlayerPicker = false
@@ -295,7 +289,6 @@ private fun PlayerPickerSheet(
     onPlayerSelected: (Long) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val sortedByName = remember(players) { players.sortedBy { it.name } }
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Text(
             text = stringResource(R.string.tournament_stats_select_player_placeholder),
@@ -305,7 +298,7 @@ private fun PlayerPickerSheet(
         )
         Spacer(modifier = Modifier.height(10.dp))
         LazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
-            items(sortedByName, key = { it.playerId }) { player ->
+            items(players, key = { it.playerId }) { player ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -345,6 +338,20 @@ private val PreviewPlayerStats = persistentListOf(
         isUnderused = true
     )
 )
+private val PreviewPlayersByName = persistentListOf(
+    PreviewPlayerStats[2],
+    PreviewPlayerStats[1],
+    PreviewPlayerStats[0],
+    PreviewPlayerStats[3],
+    PreviewPlayerStats[4]
+)
+private val PreviewPlayedPositions = persistentListOf(
+    FieldPosition.PITCHER,
+    FieldPosition.CATCHER,
+    FieldPosition.FIRST_BASE,
+    FieldPosition.SHORT_STOP,
+    FieldPosition.CENTER_FIELD
+)
 private val PreviewPlayingTimeSummary =
     PlayingTimeSummary(average = 11.6f, lowest = 4, highest = 15)
 
@@ -357,6 +364,8 @@ private fun TournamentStatisticsScreenPreview() {
                 isLoading = false,
                 tournamentName = "Fall Classic",
                 playerStats = PreviewPlayerStats,
+                playersByName = PreviewPlayersByName,
+                playedPositions = PreviewPlayedPositions,
                 playingTimeSummary = PreviewPlayingTimeSummary,
                 teamType = TeamType.BASEBALL
             ),
@@ -413,6 +422,6 @@ private fun PositionUsageCardPreview() {
 @Composable
 private fun PlayerPickerSheetPreview() {
     DugoutTheme {
-        PlayerPickerSheet(players = PreviewPlayerStats, onPlayerSelected = {}, onDismiss = {})
+        PlayerPickerSheet(players = PreviewPlayersByName, onPlayerSelected = {}, onDismiss = {})
     }
 }

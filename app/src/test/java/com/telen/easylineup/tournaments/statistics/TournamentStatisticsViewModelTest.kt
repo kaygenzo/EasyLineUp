@@ -129,6 +129,35 @@ internal class TournamentStatisticsViewModelTest {
     }
 
     @Test
+    fun shouldExposeThePickerOrderAndThePlayedPositions() = runTest {
+        val zoe = profile(1L, 10).copy(
+            playerName = "zoe",
+            positionCounts = mapOf(FieldPosition.SHORT_STOP to 10)
+        )
+        val adam = profile(2L, 2).copy(
+            playerName = "Adam",
+            positionCounts = mapOf(FieldPosition.CATCHER to 1, FieldPosition.PITCHER to 1)
+        )
+        val profiles = listOf(zoe, adam)
+        runBlocking {
+            Mockito.`when`(getTournamentPlayerStatsWithProfiles(tournament))
+                .thenReturn(Result.success(profiles))
+        }
+        Mockito.`when`(getPlayingTimeSummary(profiles)).thenReturn(PlayingTimeSummary(6f, 2, 10))
+        Mockito.`when`(sortPlayersByPlayingTime(profiles)).thenReturn(profiles)
+
+        viewModel.load(tournament.id, tournament.name, TeamType.BASEBALL.id)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(listOf(2L, 1L), state.playersByName.map { it.playerId })
+        assertEquals(
+            listOf(FieldPosition.PITCHER, FieldPosition.CATCHER, FieldPosition.SHORT_STOP),
+            state.playedPositions
+        )
+    }
+
+    @Test
     fun shouldStopLoadingWithoutPlayerStatsOnFailure() = runTest {
         val exception = Exception("db error")
         runBlocking {

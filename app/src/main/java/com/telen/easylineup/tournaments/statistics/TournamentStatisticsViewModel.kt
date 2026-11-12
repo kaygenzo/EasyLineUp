@@ -7,9 +7,13 @@ package com.telen.easylineup.tournaments.statistics
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.PlayerTournamentStatsProfile
 import com.telen.easylineup.domain.model.PlayingTimeSummary
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.playedPositions
+import com.telen.easylineup.domain.model.sortedByName
 import com.telen.easylineup.domain.usecases.GetPlayingTimeSummary
 import com.telen.easylineup.domain.usecases.GetTournamentPlayerStatsWithProfiles
 import com.telen.easylineup.domain.usecases.IsPlayingTimeUnderused
@@ -34,7 +38,20 @@ data class TournamentStatisticsUiState(
     val tournamentName: String = "",
     val teamType: TeamType = TeamType.UNKNOWN,
     val playerStats: ImmutableList<PlayerStatsRow> = persistentListOf(),
+
+    /** The same rows alphabetically, for the player picker. */
+    val playersByName: ImmutableList<PlayerStatsRow> = persistentListOf(),
+
+    /** Every position someone played in this tournament, in field order: the chart's columns. */
+    val playedPositions: ImmutableList<FieldPosition> = persistentListOf(),
     val playingTimeSummary: PlayingTimeSummary = PlayingTimeSummary(0f, 0, 0)
+)
+
+private class LoadedStats(
+    val byPlayingTime: List<PlayerStatsRow>,
+    val byName: List<PlayerStatsRow>,
+    val playedPositions: List<FieldPosition>,
+    val summary: PlayingTimeSummary
 )
 
 class TournamentStatisticsViewModel(
@@ -72,25 +89,31 @@ class TournamentStatisticsViewModel(
             getTournamentPlayerStatsWithProfiles(tournament)
                 .mapCatching { profiles ->
                     val summary = getPlayingTimeSummary(profiles)
-                    val rows = sortPlayersByPlayingTime(profiles).map { profile ->
-                        PlayerStatsRow(
-                            playerId = profile.playerId,
-                            name = profile.playerName,
-                            shirtNumber = profile.shirtNumber,
-                            imageUri = profile.image?.let { uri -> Uri.parse(uri) },
-                            totalGames = profile.totalGames,
-                            positionCounts = profile.positionCounts.toImmutableMap(),
-                            isUnderused = isPlayingTimeUnderused(
-                                profile.totalGames,
-                                summary.average
-                            )
-                        )
-                    }
-                    rows.toImmutableList() to summary
+                    fun PlayerTournamentStatsProfile.toRow() = PlayerStatsRow(
+                        playerId = playerId,
+                        name = playerName,
+                        shirtNumber = shirtNumber,
+                        imageUri = image?.let { uri -> Uri.parse(uri) },
+                        totalGames = totalGames,
+                        positionCounts = positionCounts.toImmutableMap(),
+                        isUnderused = isPlayingTimeUnderused(totalGames, summary.average)
+                    )
+                    LoadedStats(
+                        byPlayingTime = sortPlayersByPlayingTime(profiles).map { it.toRow() },
+                        byName = profiles.sortedByName().map { it.toRow() },
+                        playedPositions = profiles.playedPositions(),
+                        summary = summary
+                    )
                 }
-                .onSuccess { (rows, summary) ->
+                .onSuccess { loaded ->
                     _uiState.update {
-                        it.copy(isLoading = false, playerStats = rows, playingTimeSummary = summary)
+                        it.copy(
+                            isLoading = false,
+                            playerStats = loaded.byPlayingTime.toImmutableList(),
+                            playersByName = loaded.byName.toImmutableList(),
+                            playedPositions = loaded.playedPositions.toImmutableList(),
+                            playingTimeSummary = loaded.summary
+                        )
                     }
                 }
                 .onFailure {
