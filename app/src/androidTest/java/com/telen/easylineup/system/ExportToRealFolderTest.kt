@@ -31,8 +31,8 @@ import java.util.regex.Pattern
 /**
  * Exports into a real folder picked through the real system picker, driven with UiAutomator:
  * the only way to give [com.telen.easylineup.utils.ExportFileWriterImpl] a folder it is
- * actually allowed to write to. The picker's labels are matched in English, like the rest of
- * the instrumented tests' device setup.
+ * actually allowed to write to. Nothing is matched on the picker's own labels, which follow
+ * the device language: folders by their name, its buttons by their view id.
  */
 @RunWith(AndroidJUnit4::class)
 class ExportToRealFolderTest {
@@ -65,11 +65,33 @@ class ExportToRealFolderTest {
             .filter { it.size >= 8 && it.last().endsWith(".elu") }
             .map { it.last() to it[4].toLong() }
 
-    private fun clickInPicker(label: String) {
-        val pattern = Pattern.compile(label, Pattern.CASE_INSENSITIVE)
-        val node = device.wait(Until.findObject(By.text(pattern)), PICKER_TIMEOUT_MILLIS)
-        assertNotNull("\"$label\" not found in the system picker", node)
+    private fun openFolder(name: String) {
+        val node = device.wait(Until.findObject(By.text(name)), PICKER_TIMEOUT_MILLIS)
+        assertNotNull("Folder \"$name\" not found in the system picker", node)
         node.click()
+    }
+
+    /** "Use this folder", the picker's own positive button. */
+    private fun useThisFolder() {
+        val node = device.wait(Until.findObject(By.res(POSITIVE_BUTTON)), PICKER_TIMEOUT_MILLIS)
+        assertNotNull("The picker's \"Use this folder\" button was not found", node)
+        node.click()
+    }
+
+    /**
+     * "Allow" in the access confirmation dialog. Its button has the same id as "Use this
+     * folder", still on screen behind it, so it is looked up inside the dialog only.
+     */
+    private fun allowAccess() {
+        val title = device.wait(Until.findObject(By.res(DIALOG_TITLE)), PICKER_TIMEOUT_MILLIS)
+        assertNotNull("The picker's access confirmation was not shown", title)
+        var dialog = title
+        while (dialog.parent != null) {
+            dialog = dialog.parent
+        }
+        val allow = dialog.findObject(By.res(POSITIVE_BUTTON))
+        assertNotNull("The access confirmation has no \"Allow\" button", allow)
+        allow.click()
     }
 
     @Test
@@ -87,10 +109,10 @@ class ExportToRealFolderTest {
             .performScrollTo()
             .performClick()
 
-        clickInPicker("Documents")
-        clickInPicker(folder)
-        clickInPicker("Use this folder")
-        clickInPicker("Allow")
+        openFolder("Documents")
+        openFolder(folder)
+        useThisFolder()
+        allowAccess()
 
         // The file shows up as soon as it's created, before its content is written. What that
         // content holds is covered by ExportImportRoundTripTest.
@@ -102,5 +124,10 @@ class ExportToRealFolderTest {
     private companion object {
         const val PICKER_TIMEOUT_MILLIS = 10_000L
         const val EXPORT_TIMEOUT_MILLIS = 10_000L
+        const val POSITIVE_BUTTON = "android:id/button1"
+
+        // The picker app is com.google.android.documentsui on Google images and
+        // com.android.documentsui on AOSP ones.
+        val DIALOG_TITLE: Pattern = Pattern.compile(".*documentsui:id/alertTitle")
     }
 }
