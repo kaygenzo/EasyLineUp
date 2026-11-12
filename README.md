@@ -174,9 +174,7 @@ screenshots from.
 - CircleCI (`.circleci/config.yml`): `jacocoFullReport` (every module's unit tests
   plus coverage), `androidTest` APK assembly, Fastlane-driven alpha deploys,
   Firebase App Distribution. Instrumented tests are built but not run in CI yet.
-- `detekt` (`detekt.gradle`) reports Kotlin style issues on every module, without
-  failing the build;
-  Jacoco (`jacoco.gradle`, root `jacocoFullReport` task) reports unit test coverage
+- Jacoco (`jacoco.gradle`, root `jacocoFullReport` task) reports unit test coverage
   of all three modules in one place. Generated code, DI wiring, `domain`'s pure
   data classes and Compose UI/Activities are excluded, so the number reflects what
   unit tests are responsible for: Compose UI is covered by instrumented tests,
@@ -213,8 +211,7 @@ per-module.
 - **Testing** — JUnit4, Mockito + `mockito-kotlin`, `kotlinx-coroutines-test`,
   Espresso + Barista 4.3.0 + UiAutomator + Screengrab for instrumented UI tests,
   Room's own testing artifact for migrations.
-- **Quality/CI** — detekt 1.23.8 (Kotlin style), Jacoco
-  (coverage), OWASP dependency-check 6.5.3, SonarQube plugin 3.3, Fastlane (CI
+- **Quality/CI** — Jacoco (coverage), OWASP dependency-check 6.5.3, Fastlane (CI
   deploys) + Firebase App Distribution 5.2.1.
 
 ## Revamp status — "The Dugout Card"

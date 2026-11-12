@@ -276,4 +276,3 @@ configurations.matching { it.name.contains("AndroidTest") }.configureEach {
 
 apply from: '../dependency-check.gradle'
 apply from: '../screen-gallery.gradle'
-apply from: '../detekt.gradle'

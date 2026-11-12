@@ -78,5 +78,3 @@ dependencies {
     androidTestImplementation libs.tests.runner
     androidTestImplementation libs.tests.junit
 }
-
-apply from: '../detekt.gradle'

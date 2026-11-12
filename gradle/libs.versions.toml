@@ -37,9 +37,7 @@ firebaseBOMVersion = "34.19.0"
 materialVersion = "1.14.0"
 gsonVersion = "2.15.0"
 #Plugins
-detektPluginVersion = "1.23.8"
 googleServicesPluginVersion = "4.6.0"
-sonarqubePluginVersion = "7.5.0.8588"
 appDistributionPluginVersion = "5.2.1"
 crashlyticsPluginVersion = "3.0.8"
 dependencyCheckPluginVerison = "13.0.0"
@@ -92,7 +90,6 @@ preview-scanner = { group = "io.github.sergio-sastre.ComposablePreviewScanner", 
 koin-test = { group = "io.insert-koin", name = "koin-test-junit4", version.ref = "koinVersion" }
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koinVersion" }
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koinVersion" }
-detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detektPluginVersion" }
 licenser = { group = "com.github.marcoscgdev", name = "Licenser", version.ref = "licenserVersion" }
 colorPicker = { group = "com.github.skydoves", name = "colorpickerpreference", version.ref = "colorPickerVersion" }
 material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
@@ -115,9 +112,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinVersion" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinVersion" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinVersion" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "googleServicesPluginVersion" }
-sonarqube = { id = "org.sonarqube", version.ref = "sonarqubePluginVersion" }
 dependencyCheck = { id = "org.owasp.dependencycheck", version.ref = "dependencyCheckPluginVerison" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detektPluginVersion" }
 appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "appDistributionPluginVersion" }
 crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsPluginVersion" }
 room = { id = "androidx.room", version.ref = "roomVersion" }

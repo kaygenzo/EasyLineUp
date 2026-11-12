@@ -20,4 +20,3 @@ dependencies {
 }
 
 apply plugin: 'jacoco'
-apply from: '../detekt.gradle'
