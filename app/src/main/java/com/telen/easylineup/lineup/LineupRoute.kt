@@ -55,15 +55,13 @@ fun LineupRoute(
     val coroutineScope = rememberCoroutineScope()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    fun goBack(showFixedView: Boolean = true) {
-        if (fromShortcut) {
-            navController.popBackStack(Routes.Dashboard, false)
-        } else {
-            val success = !showFixedView &&
-                navController.popBackStack(Routes.Tournaments, false)
-            if (!success) {
-                navController.popBackStack()
-            }
+    fun goBack(afterDelete: Boolean = false) {
+        when (lineupExit(fromShortcut, afterDelete)) {
+            LineupExit.DASHBOARD -> navController.popBackStack(Routes.Dashboard, false)
+            LineupExit.TOURNAMENTS ->
+                navController.popBackStack(Routes.Tournaments, false) ||
+                    navController.popBackStack()
+            LineupExit.PREVIOUS -> navController.popBackStack()
         }
     }
 
@@ -102,7 +100,7 @@ fun LineupRoute(
                         R.string.error_lineup_save_failed,
                         Toast.LENGTH_LONG
                     ).show()
-                    LineupEvent.Deleted -> goBack(showFixedView = false)
+                    LineupEvent.Deleted -> goBack(afterDelete = true)
                     LineupEvent.DeleteFailed -> Toast.makeText(
                         context,
                         R.string.error_when_deleting_lineup,
@@ -282,4 +280,20 @@ fun LineupRoute(
             onConfirm = viewModel::closeRosterEditSheet
         )
     }
+}
+
+/** Where leaving the Lineup screen lands. */
+internal enum class LineupExit { DASHBOARD, TOURNAMENTS, PREVIOUS }
+
+/**
+ * Opened from a home-screen shortcut, the screen always returns to the dashboard it sits on.
+ * Otherwise a deleted lineup has no read-only view left to go back to, so it returns to the
+ * tournaments list (or, if that is not on the back stack, wherever it came from); anything else
+ * - saving, discarding, the back button - returns to the previous screen, which after an edit
+ * is that lineup's read-only view.
+ */
+internal fun lineupExit(fromShortcut: Boolean, afterDelete: Boolean): LineupExit = when {
+    fromShortcut -> LineupExit.DASHBOARD
+    afterDelete -> LineupExit.TOURNAMENTS
+    else -> LineupExit.PREVIOUS
 }

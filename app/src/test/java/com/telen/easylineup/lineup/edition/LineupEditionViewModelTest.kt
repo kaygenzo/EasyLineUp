@@ -4,13 +4,20 @@
 
 package com.telen.easylineup.lineup.edition
 
+import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Lineup
+import com.telen.easylineup.domain.model.Player
+import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.usecases.ClearRoster
 import com.telen.easylineup.domain.usecases.GetLineupById
 import com.telen.easylineup.domain.usecases.GetRoster
+import com.telen.easylineup.domain.usecases.HasUnsavedLineupEdits
 import com.telen.easylineup.domain.usecases.ObserveTournaments
+import com.telen.easylineup.domain.usecases.OverrideRosterPlayerNumber
 import com.telen.easylineup.domain.usecases.SaveLineupChanges
+import com.telen.easylineup.domain.usecases.ToggleRosterPlayer
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
 import com.telen.easylineup.domain.usecases.exceptions.TournamentNameEmptyException
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +31,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -33,8 +42,9 @@ import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 
 /**
- * Unit tests for [LineupEditionViewModel]: its use cases are mocked directly (each already has
- * its own domain-level test suite), so this only verifies the ViewModel's own orchestration.
+ * Unit tests for [LineupEditionViewModel]: the Tournaments list's Edit Lineup sheet, from
+ * loading a lineup into the form to saving or discarding it. The use cases that read or write
+ * the database are mocked; the pure roster ones are real, so the form's roster really changes.
  */
 @RunWith(MockitoJUnitRunner::class)
 internal class LineupEditionViewModelTest {
@@ -54,7 +64,8 @@ internal class LineupEditionViewModelTest {
     private val tournament =
         Tournament(id = 1L, name = "Summer cup", createdAt = 0L, startTime = 0L, endTime = 0L)
     private val lineup = Lineup(id = 1L, name = "Game 1", teamId = 1L, tournamentId = 1L)
-    private val roster = TeamRosterSummary(status = 0, players = emptyList())
+    private val ana = RosterPlayerStatus(Player(1L, 1L, "Ana", 4, "L1"), true, null)
+    private val roster = TeamRosterSummary(Constants.STATUS_ALL, listOf(ana))
 
     @Before
     fun setup() {
@@ -67,7 +78,11 @@ internal class LineupEditionViewModelTest {
             getLineupById,
             getRoster,
             saveLineupChanges,
-            observeTournaments
+            observeTournaments,
+            ToggleRosterPlayer(),
+            ClearRoster(),
+            OverrideRosterPlayerNumber(),
+            HasUnsavedLineupEdits()
         )
     }
 
@@ -75,6 +90,16 @@ internal class LineupEditionViewModelTest {
     fun tearDown() {
         Dispatchers.resetMain()
     }
+
+    private fun openForm() {
+        runBlocking {
+            Mockito.`when`(getLineupById(1L)).thenReturn(Result.success(lineup))
+            Mockito.`when`(getRoster(1L)).thenReturn(Result.success(roster))
+        }
+        viewModel.onEditLineup(1L)
+    }
+
+    private val form get() = viewModel.uiState.value.form
 
     @Test
     fun shouldExposeTournamentsFromObserveTournaments() = runTest {
@@ -84,95 +109,168 @@ internal class LineupEditionViewModelTest {
     }
 
     @Test
-    fun shouldReturnLineupAndRosterOnLoadSuccess() = runTest {
-        runBlocking {
-            Mockito.`when`(getLineupById(1L)).thenReturn(Result.success(lineup))
-            Mockito.`when`(getRoster(1L)).thenReturn(Result.success(roster))
-        }
-
-        val result = viewModel.load(1L)
-
-        assertTrue(result.isSuccess)
-        assertEquals(lineup to roster, result.getOrNull())
+    fun theSheetIsClosedUntilALineupIsLoaded() = runTest {
+        assertNull(form)
     }
 
     @Test
-    fun shouldFailLoadWhenGetLineupByIdFails() = runTest {
-        val exception = Exception("not found")
-        runBlocking {
-            Mockito.`when`(getLineupById(1L)).thenReturn(Result.failure(exception))
-        }
+    fun loadingALineupOpensTheFormOnIt() = runTest {
+        openForm()
 
-        val result = viewModel.load(1L)
-
-        assertTrue(result.isFailure)
+        val form = form!!
+        assertEquals("Game 1", form.name)
+        assertEquals(tournament, form.tournament)
+        assertEquals(roster, form.roster)
+        assertEquals(EditLineupStep.FIELDS, form.step)
+        assertFalse(form.nameError)
     }
 
     @Test
-    fun shouldSendLineupUpdatedWhenSaveSucceeds() = runTest {
+    fun aLineupThatFailsToLoadLeavesTheSheetClosed() = runTest {
         runBlocking {
-            Mockito.`when`(saveLineupChanges(lineup, roster.players))
+            Mockito.`when`(getLineupById(1L)).thenReturn(Result.failure(Exception("not found")))
+        }
+
+        viewModel.onEditLineup(1L)
+
+        assertNull(form)
+    }
+
+    @Test
+    fun cancellingAnUntouchedFormClosesIt() = runTest {
+        openForm()
+
+        viewModel.onCancel()
+
+        assertNull(form)
+    }
+
+    @Test
+    fun cancellingAfterRenamingAsksFirst() = runTest {
+        openForm()
+        viewModel.onNameChanged("Game 2")
+
+        viewModel.onCancel()
+
+        assertTrue(form!!.showDiscardSheet)
+        viewModel.onDiscardDismiss()
+        assertFalse(form!!.showDiscardSheet)
+        assertEquals("Game 2", form!!.name)
+    }
+
+    @Test
+    fun cancellingAfterARosterChangeAsksFirst() = runTest {
+        openForm()
+        viewModel.onPlayerToggled(0, false)
+
+        viewModel.onCancel()
+
+        assertTrue(form!!.showDiscardSheet)
+    }
+
+    @Test
+    fun confirmingTheDiscardClosesTheForm() = runTest {
+        openForm()
+        viewModel.onNameChanged("Game 2")
+        viewModel.onCancel()
+
+        viewModel.onDiscardConfirm()
+
+        assertNull(form)
+    }
+
+    @Test
+    fun theRosterStepAndTheTournamentPickerOpenAndClose() = runTest {
+        openForm()
+
+        viewModel.onRosterClick()
+        assertEquals(EditLineupStep.ROSTER, form!!.step)
+        viewModel.onRosterBackClick()
+        assertEquals(EditLineupStep.FIELDS, form!!.step)
+        viewModel.onTournamentClick()
+        assertTrue(form!!.showTournamentSheet)
+        viewModel.onTournamentSheetDismiss()
+        assertFalse(form!!.showTournamentSheet)
+    }
+
+    @Test
+    fun rosterEditsApplyToTheForm() = runTest {
+        openForm()
+
+        viewModel.onNumberChanged(0, 42)
+        assertEquals(42, form!!.roster.players[0].playerNumberOverlay?.number)
+        assertEquals(1L, form!!.roster.players[0].playerNumberOverlay?.lineupId)
+        viewModel.onClearAll()
+        assertFalse(form!!.roster.players[0].status)
+    }
+
+    @Test
+    fun savingAppliesTheEditsToTheLoadedLineupAndClosesTheForm() = runTest {
+        val other = Tournament(id = 2L, name = "Fall", createdAt = 0L, startTime = 0L, endTime = 0L)
+        val expected = lineup.copy(name = "Game 2", tournamentId = 2L)
+        runBlocking {
+            Mockito.`when`(saveLineupChanges(expected, roster.players))
                 .thenReturn(Result.success(Unit))
         }
+        openForm()
+        viewModel.onNameChanged("Game 2")
+        viewModel.onTournamentSelected(other)
 
-        val events = mutableListOf<LineupEditionEvent>()
-        val job = launch { viewModel.events.collect { events.add(it) } }
-
-        viewModel.save(lineup, roster)
+        viewModel.onSave()
         advanceUntilIdle()
 
-        assertEquals(listOf(LineupUpdated), events)
-        job.cancel()
+        assertNull(form)
     }
 
     @Test
-    fun shouldSendInvalidLineupNameWhenUpdateLineupFailsWithEmptyName() = runTest {
+    fun aBlankNameIsFlaggedOnTheForm() = runTest {
         runBlocking {
-            Mockito.`when`(saveLineupChanges(lineup, roster.players))
+            Mockito.`when`(saveLineupChanges(lineup.copy(name = " "), roster.players))
                 .thenReturn(Result.failure(LineupNameEmptyException()))
         }
+        openForm()
+        viewModel.onNameChanged(" ")
 
-        val events = mutableListOf<LineupEditionEvent>()
-        val job = launch { viewModel.events.collect { events.add(it) } }
-
-        viewModel.save(lineup, roster)
+        viewModel.onSave()
         advanceUntilIdle()
 
-        assertEquals(listOf(InvalidLineupName), events)
-        job.cancel()
+        assertTrue(form!!.nameError)
+        viewModel.onNameChanged("Game 3")
+        assertFalse(form!!.nameError)
     }
 
     @Test
-    fun shouldSendInvalidTournamentWhenUpdateLineupFailsWithEmptyTournament() = runTest {
+    fun aMissingTournamentIsFlaggedOnTheForm() = runTest {
         runBlocking {
             Mockito.`when`(saveLineupChanges(lineup, roster.players))
                 .thenReturn(Result.failure(TournamentNameEmptyException()))
         }
+        openForm()
 
-        val events = mutableListOf<LineupEditionEvent>()
-        val job = launch { viewModel.events.collect { events.add(it) } }
-
-        viewModel.save(lineup, roster)
+        viewModel.onSave()
         advanceUntilIdle()
 
-        assertEquals(listOf(InvalidTournament), events)
-        job.cancel()
+        assertTrue(form!!.tournamentError)
+        viewModel.onTournamentSelected(tournament)
+        assertFalse(form!!.tournamentError)
     }
 
     @Test
-    fun shouldReportAnUnrelatedFailure() = runTest {
+    fun shouldReportAnUnrelatedFailureAndKeepTheForm() = runTest {
         runBlocking {
             Mockito.`when`(saveLineupChanges(lineup, roster.players))
                 .thenReturn(Result.failure(Exception("db error")))
         }
+        openForm()
 
         val events = mutableListOf<LineupEditionEvent>()
         val job = launch { viewModel.events.collect { events.add(it) } }
 
-        viewModel.save(lineup, roster)
+        viewModel.onSave()
         advanceUntilIdle()
 
         assertEquals(listOf(LineupUpdateFailed), events)
+        assertEquals("Game 1", form?.name)
         job.cancel()
     }
 }
