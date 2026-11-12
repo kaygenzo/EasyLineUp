@@ -298,6 +298,11 @@ landed vs. what's left, so it doesn't go stale inside the design doc.
 
 ### Not started yet
 
+- **Accessibility pass** — review the ~30 `contentDescription = null` one by one:
+  meaningful icons inside clickable rows get a description or are merged with
+  `Modifier.semantics(mergeDescendants = true)`. Give the Defense and Attack
+  drag-and-drop an accessible alternative (`customActions` such as move up / move
+  down / move to…), and check that `Pill`/`SortPill` touch targets reach 48 dp.
 - **Defense field (view + edit mode)** — the big one: `DefenseFragmentFixed` /
   `DefenseFragmentEditable` stay as two separate View implementations; this is
   "step 2" of the sequencing plan in `REDESIGN.md` §1, the single screen most
