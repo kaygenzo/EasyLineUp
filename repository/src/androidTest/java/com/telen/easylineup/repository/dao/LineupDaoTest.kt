@@ -107,6 +107,23 @@ class LineupDaoTest {
     }
 
     @Test
+    fun observeAllTournamentsWithLineupsFilterTakesWildcardsLiterally() = runBlocking {
+        val teamId = insertTeam("Riverside Hawks")
+        insertLineup("100% effort", teamId, insertTournament("Cup", createdAt = 1_000L))
+        insertLineup("1000 runs", teamId, insertTournament("Open", createdAt = 2_000L))
+        insertLineup("U_12 final", teamId, insertTournament("Youth", createdAt = 3_000L))
+        insertLineup("U312 final", teamId, insertTournament("Masters", createdAt = 4_000L))
+
+        val percent =
+            lineupDao.observeAllTournamentsWithLineups("100%".escapeForLike(), teamId).first()
+        val underscore =
+            lineupDao.observeAllTournamentsWithLineups("U_1".escapeForLike(), teamId).first()
+
+        assertEquals(listOf("100% effort"), percent.map { it.lineupName })
+        assertEquals(listOf("U_12 final"), underscore.map { it.lineupName })
+    }
+
+    @Test
     fun observeAllTournamentsWithLineupsIncludesATournamentWithNoLineupYet() = runBlocking {
         val teamId = insertTeam("Riverside Hawks")
         val tournamentId = insertTournament("Empty Tournament", createdAt = 1_000L)

@@ -9,6 +9,7 @@ import com.telen.easylineup.domain.model.PlayerInLineup
 import com.telen.easylineup.domain.model.TournamentWithLineup
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.repository.dao.LineupDao
+import com.telen.easylineup.repository.dao.escapeForLike
 import com.telen.easylineup.repository.model.toDomain
 import com.telen.easylineup.repository.model.toNewRoom
 import com.telen.easylineup.repository.model.toRoom
@@ -80,7 +81,7 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
         filter: String,
         teamId: Long
     ): Flow<List<TournamentWithLineup>> {
-        return lineupDao.observeAllTournamentsWithLineups(filter, teamId)
+        return lineupDao.observeAllTournamentsWithLineups(filter.escapeForLike(), teamId)
             .map { rows -> rows.map { it.toDomain() } }
     }
 
