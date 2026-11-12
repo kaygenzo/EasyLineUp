@@ -4,6 +4,7 @@
 
 package com.telen.easylineup
 
+import androidx.lifecycle.SavedStateHandle
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.usecases.GetAllTeams
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
@@ -17,7 +18,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,7 +29,8 @@ import org.mockito.junit.MockitoJUnitRunner
 /**
  * Unit tests for [HomeViewModel]: its two use cases are mocked directly (each already has its
  * own domain-level test suite), so this only verifies the ViewModel's own orchestration -
- * forwarding the right [Event] on success/failure.
+ * forwarding the right [Event] on success/failure, and
+ * opening/closing the swap-team sheet through [HomeUiState].
  */
 @RunWith(MockitoJUnitRunner::class)
 internal class HomeViewModelTest {
@@ -43,7 +45,7 @@ internal class HomeViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        viewModel = HomeViewModel(getAllTeams, saveCurrentTeam)
+        viewModel = HomeViewModel(getAllTeams, saveCurrentTeam, SavedStateHandle())
     }
 
     @After
@@ -52,20 +54,40 @@ internal class HomeViewModelTest {
     }
 
     @Test
-    fun shouldSendSwapButtonSuccessWhenTeamsAreFetched() = runTest {
+    fun shouldOpenTheSwapSheetWithTheFetchedTeams() = runTest {
         val teams = listOf(Team(id = 1L, name = "Panthers", main = true))
         runBlocking { Mockito.`when`(getAllTeams()).thenReturn(Result.success(teams)) }
-
-        val events = mutableListOf<Event>()
-        val job = launch { viewModel.events.collect { events.add(it) } }
 
         viewModel.onSwapButtonClicked()
         advanceUntilIdle()
 
-        assertEquals(1, events.size)
-        assertTrue(events[0] is SwapButtonSuccess)
-        assertEquals(teams, (events[0] as SwapButtonSuccess).teams)
-        job.cancel()
+        assertEquals(teams, viewModel.uiState.value.swapTeams)
+    }
+
+    @Test
+    fun dismissingTheSwapSheetClosesIt() = runTest {
+        val teams = listOf(Team(id = 1L, name = "Panthers", main = true))
+        runBlocking { Mockito.`when`(getAllTeams()).thenReturn(Result.success(teams)) }
+        viewModel.onSwapButtonClicked()
+        advanceUntilIdle()
+
+        viewModel.onSwapTeamDismiss()
+
+        assertNull(viewModel.uiState.value.swapTeams)
+    }
+
+    @Test
+    fun anOpenSwapSheetIsReopenedWithFreshTeamsAfterProcessDeath() = runTest {
+        val teams = listOf(Team(id = 1L, name = "Panthers", main = true))
+        runBlocking { Mockito.`when`(getAllTeams()).thenReturn(Result.success(teams)) }
+        val saved = SavedStateHandle()
+        HomeViewModel(getAllTeams, saveCurrentTeam, saved).onSwapButtonClicked()
+        advanceUntilIdle()
+
+        val restored = HomeViewModel(getAllTeams, saveCurrentTeam, saved)
+        advanceUntilIdle()
+
+        assertEquals(teams, restored.uiState.value.swapTeams)
     }
 
     @Test

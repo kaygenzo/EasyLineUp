@@ -15,11 +15,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -27,7 +26,6 @@ import androidx.navigation.compose.rememberNavController
 import com.telen.easylineup.compose.BottomNavTab
 import com.telen.easylineup.compose.DugoutBottomNav
 import com.telen.easylineup.compose.DugoutTheme
-import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.navigation.AppNavHost
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
@@ -43,8 +41,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class HomeActivity : BaseActivity() {
     private val viewModel by viewModel<HomeViewModel>()
     private var popToDashboard: (() -> Unit)? = null
-    private var showSwapTeamSheet by mutableStateOf(false)
-    private var swapTeamTeams by mutableStateOf<List<Team>>(emptyList())
     private val createTeam =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
@@ -54,18 +50,12 @@ class HomeActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        savedInstanceState?.let {
-            showSwapTeamSheet = it.getBoolean(KEY_SHOW_SWAP_TEAM_SHEET)
-            @Suppress("UNCHECKED_CAST")
-            swapTeamTeams = it.getSerializable(KEY_SWAP_TEAM_TEAMS) as? List<Team>
-                ?: emptyList()
-        }
-
         setContent {
             DugoutTheme {
                 val navController = rememberNavController()
                 popToDashboard = { navController.popBackStack(Routes.Dashboard, false) }
                 val lifecycleOwner = LocalLifecycleOwner.current
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
                 val backStackEntry by navController.currentBackStackEntryAsState()
                 val currentTab = BottomNavTab.entries.find { tab ->
@@ -79,11 +69,6 @@ class HomeActivity : BaseActivity() {
                             when (event) {
                                 UpdateCurrentTeamSuccess ->
                                     navController.popBackStack(Routes.Dashboard, false)
-
-                                is SwapButtonSuccess -> {
-                                    swapTeamTeams = event.teams
-                                    showSwapTeamSheet = true
-                                }
 
                                 else -> {}
                             }
@@ -123,17 +108,17 @@ class HomeActivity : BaseActivity() {
                     }
                 }
 
-                if (showSwapTeamSheet) {
+                uiState.swapTeams?.let { teams ->
                     SwapTeamSheet(
-                        teams = swapTeamTeams,
-                        onDismiss = { showSwapTeamSheet = false },
+                        teams = teams,
+                        onDismiss = viewModel::onSwapTeamDismiss,
                         onTeamClick = { team ->
                             FirebaseAnalyticsUtils.onClick(
                                 this@HomeActivity,
                                 "click_team_swap_selection"
                             )
                             viewModel.updateCurrentTeam(team)
-                            showSwapTeamSheet = false
+                            viewModel.onSwapTeamDismiss()
                         },
                         onCreateTeamClick = {
                             FirebaseAnalyticsUtils.onClick(
@@ -141,7 +126,7 @@ class HomeActivity : BaseActivity() {
                                 "click_team_swap_create"
                             )
                             onCreateTeamClick()
-                            showSwapTeamSheet = false
+                            viewModel.onSwapTeamDismiss()
                         }
                     )
                 }
@@ -149,20 +134,9 @@ class HomeActivity : BaseActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(KEY_SHOW_SWAP_TEAM_SHEET, showSwapTeamSheet)
-        outState.putSerializable(KEY_SWAP_TEAM_TEAMS, ArrayList(swapTeamTeams))
-    }
-
     private fun onCreateTeamClick() {
         FirebaseAnalyticsUtils.startTutorial(this, false)
         val intent = Intent(this, TeamCreationActivity::class.java)
         createTeam.launch(intent)
-    }
-
-    private companion object {
-        const val KEY_SHOW_SWAP_TEAM_SHEET = "key_show_swap_team_sheet"
-        const val KEY_SWAP_TEAM_TEAMS = "key_swap_team_teams"
     }
 }
