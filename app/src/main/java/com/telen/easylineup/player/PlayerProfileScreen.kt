@@ -266,7 +266,7 @@ private fun mostPlayedPositionLabel(
 
 @DugoutPreviews
 @Composable
-private fun mostPlayedPositionLabelPreview() {
+private fun MostPlayedPositionLabelPreview() {
     DugoutTheme {
         Text(
             text = mostPlayedPositionLabel(

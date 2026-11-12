@@ -1,4 +1,7 @@
+<!-- A full-screen field drawing, not an icon: drawn large on purpose. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="VectorRaster"
     android:width="1024dp"
     android:height="1024dp"
     android:viewportWidth="550.0"

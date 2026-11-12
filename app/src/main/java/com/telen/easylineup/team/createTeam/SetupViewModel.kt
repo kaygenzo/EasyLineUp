@@ -5,6 +5,7 @@
 package com.telen.easylineup.team.createTeam
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -67,7 +68,7 @@ class SetupViewModel(
     }
 
     fun observeTeamImage(): Flow<Uri?> {
-        return _team.map { team -> team.image?.let { Uri.parse(it) } }
+        return _team.map { team -> team.image?.toUri() }
     }
 
     fun setTeamName(name: String) {

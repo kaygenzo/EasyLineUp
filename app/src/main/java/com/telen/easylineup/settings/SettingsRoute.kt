@@ -6,7 +6,6 @@ package com.telen.easylineup.settings
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,6 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -70,14 +70,14 @@ fun SettingsRoute(navController: NavController) {
         FirebaseAnalyticsUtils.onClick(context, "click_settings_play_store")
         try {
             val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("market://details?id=${context.packageName}")
+                data = "market://details?id=${context.packageName}".toUri()
             }
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             Timber.e(e)
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 val link = "http://play.google.com/store/apps/details?id=${context.packageName}"
-                data = Uri.parse(link)
+                data = link.toUri()
             }
             context.startActivityOrNotify(intent)
         }

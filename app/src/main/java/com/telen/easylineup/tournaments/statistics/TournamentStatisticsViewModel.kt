@@ -4,7 +4,7 @@
 
 package com.telen.easylineup.tournaments.statistics
 
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.telen.easylineup.domain.model.FieldPosition
@@ -93,7 +93,7 @@ class TournamentStatisticsViewModel(
                         playerId = playerId,
                         name = playerName,
                         shirtNumber = shirtNumber,
-                        imageUri = image?.let { uri -> Uri.parse(uri) },
+                        imageUri = image?.toUri(),
                         totalGames = totalGames,
                         positionCounts = positionCounts.toImmutableMap(),
                         isUnderused = isPlayingTimeUnderused(totalGames, summary.average)

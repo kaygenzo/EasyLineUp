@@ -3,6 +3,7 @@ package com.telen.easylineup.utils
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
+import androidx.annotation.RequiresApi
 import com.telen.easylineup.domain.model.GeoLocation
 import com.telen.easylineup.domain.ports.GeocodingProvider
 import java.io.IOException
@@ -31,6 +32,7 @@ class GeocodingProviderImpl(
         return found?.let { GeoLocation(it.latitude, it.longitude) }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private suspend fun lookUp(address: String): Address? = suspendCancellableCoroutine {
         geocoder.getFromLocationName(address, 1, object : Geocoder.GeocodeListener {
             override fun onGeocode(addresses: MutableList<Address>) {

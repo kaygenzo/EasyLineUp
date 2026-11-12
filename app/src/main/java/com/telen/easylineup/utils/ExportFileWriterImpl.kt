@@ -5,7 +5,7 @@
 package com.telen.easylineup.utils
 
 import android.content.Context
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.ports.ExportFileWriter
@@ -18,7 +18,7 @@ class ExportFileWriterImpl(private val context: Context) : ExportFileWriter {
         directoryUri: String,
         fileName: String
     ): WrittenExportFile {
-        val dir = DocumentFile.fromTreeUri(context, Uri.parse(directoryUri))
+        val dir = DocumentFile.fromTreeUri(context, directoryUri.toUri())
         val file = dir?.createFile("application/octet-stream", fileName)
             ?: throw Exception("Cannot open directory")
         val outputStream = context.contentResolver.openOutputStream(file.uri)

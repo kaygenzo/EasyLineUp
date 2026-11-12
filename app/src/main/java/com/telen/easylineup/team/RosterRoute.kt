@@ -8,7 +8,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.telen.easylineup.R
@@ -79,7 +79,7 @@ fun RosterRoute(navController: NavController) {
                 if (numbers.isNotEmpty()) {
                     val intent = Intent(
                         Intent.ACTION_SENDTO,
-                        Uri.parse("smsto:" + numbers.joinToString(";"))
+                        ("smsto:" + numbers.joinToString(";")).toUri()
                     )
                     context.startActivityOrNotify(intent)
                 }
@@ -88,7 +88,7 @@ fun RosterRoute(navController: NavController) {
                 FirebaseAnalyticsUtils.onClick(context, "click_team_players_message_email")
                 val emails = players.mapNotNull { it.email?.takeIf(String::isNotBlank) }
                 if (emails.isNotEmpty()) {
-                    val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")).apply {
+                    val intent = Intent(Intent.ACTION_SENDTO, "mailto:".toUri()).apply {
                         putExtra(Intent.EXTRA_EMAIL, emails.toTypedArray())
                     }
                     context.startActivityOrNotify(intent)
@@ -113,7 +113,7 @@ private fun Player.toRosterRowState(): RosterRowState = RosterRowState(
     id = id,
     name = name,
     shirtNumber = shirtNumber,
-    imageUri = image?.let { Uri.parse(it) },
+    imageUri = image?.toUri(),
     battingSide = PlayerSide.getSideByValue(batting),
     pitchingSide = PlayerSide.getSideByValue(pitching),
     phone = phone,

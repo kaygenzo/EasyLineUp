@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -51,6 +52,7 @@ fun LineupRoute(
 ) {
     val viewModel = koinViewModel<LineupViewModel>()
     val context = LocalContext.current
+    val resources = LocalResources.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -69,7 +71,7 @@ fun LineupRoute(
         val intent = Intent(Intent.ACTION_SEND).apply {
             putExtra(
                 Intent.EXTRA_SUBJECT,
-                context.getString(R.string.share_lineup_subject, event.lineupName)
+                resources.getString(R.string.share_lineup_subject, event.lineupName)
             )
             type = "application/pdf"
             putExtra(Intent.EXTRA_STREAM, event.pdfUri)

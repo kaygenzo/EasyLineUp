@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.splashscreen
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -23,6 +24,8 @@ import timber.log.Timber
  * Activity never actually shows its own UI; it used to inflate a custom splashscreen.xml
  * layout that was permanently hidden behind that system splash and has been removed.
  */
+// Not a second launch screen: it shows nothing of its own and only routes (see above).
+@SuppressLint("CustomSplashScreen")
 class SplashScreenActivity : BaseImportActivity() {
     private val splashViewModel by viewModel<SplashViewModel>()
     private val activityResult =

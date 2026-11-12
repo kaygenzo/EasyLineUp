@@ -1107,11 +1107,11 @@ fun SelectField(
     value: String?,
     placeholder: String,
     subLabel: String?,
+    modifier: Modifier = Modifier,
     required: Boolean = false,
     enabled: Boolean = true,
     isError: Boolean = false,
     errorText: String? = null,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Column(modifier = modifier) {

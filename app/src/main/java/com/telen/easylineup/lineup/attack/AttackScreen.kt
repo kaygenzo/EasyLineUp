@@ -28,6 +28,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -75,8 +76,8 @@ fun AttackScreen(
 ) {
     var localBatters by remember { mutableStateOf(batters) }
     var draggedId by remember { mutableStateOf<Long?>(null) }
-    var dragOffsetPx by remember { mutableStateOf(0f) }
-    var rowHeightPx by remember { mutableStateOf(0f) }
+    var dragOffsetPx by remember { mutableFloatStateOf(0f) }
+    var rowHeightPx by remember { mutableFloatStateOf(0f) }
 
     LaunchedEffect(batters) {
         if (draggedId == null) {

@@ -14,8 +14,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.utils.localTimeToPickerDate
 import com.telen.easylineup.utils.pickerDateToLocalTime
@@ -52,7 +54,10 @@ fun DugoutDatePickerDialog(
             }
         }
     }
-    val compact = LocalConfiguration.current.screenHeightDp < COMPACT_HEIGHT_DP
+    val windowHeight = with(LocalDensity.current) {
+        LocalWindowInfo.current.containerSize.height.toDp()
+    }
+    val compact = windowHeight < COMPACT_HEIGHT_DP.dp
     val state = rememberDatePickerState(
         initialSelectedDateMillis = localTimeToPickerDate(initialDateMillis),
         initialDisplayMode = if (compact) DisplayMode.Input else DisplayMode.Picker,

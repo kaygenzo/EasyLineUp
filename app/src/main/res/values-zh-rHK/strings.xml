@@ -54,7 +54,7 @@
     <string name="attack_editing_order_badge">正在編輯棒次</string>
     <string name="attack_legend_content_description">如何閱讀這份清單</string>
     <string name="attack_legend_title">如何閱讀這份清單</string>
-    <string name="attack_legend_body">左邊的數字是棒次。每位球員姓名下方是守備位置:記錄表上的經典編號(1-9)及其簡稱。右邊的數字是背號。</string>
+    <string name="attack_legend_body">左邊的數字是棒次。每位球員姓名下方是守備位置:記錄表上的經典編號(1–9)及其簡稱。右邊的數字是背號。</string>
     <string name="attack_legend_body_editable_suffix"> 編輯時,長按左側的拖曳控點即可把球員拖到新的棒次。</string>
     <string name="form_lineup_creation_date_label">日期</string>
     <string name="form_lineup_creation_roster_label">此陣容的名單</string>

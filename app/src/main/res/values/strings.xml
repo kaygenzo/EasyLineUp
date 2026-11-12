@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<!-- PluralsCandidate is ignored where the count reads right for any number ("3 of 12
+     selected", "wearing #7 tonight"): no plural form changes the wording. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Baseball Softball Lineups Keeper</string>
 
     <string name="action_edit">Edit</string>
@@ -90,9 +92,13 @@
     <string name="lineup_creation_tournament_selected_pill">Selected</string>
     <string name="lineup_creation_roster_search_placeholder">Find a player…</string>
     <string name="lineup_creation_roster_clear_all">Clear all</string>
-    <string name="lineup_creation_roster_selected_format">%1$d of %2$d selected</string>
+    <string
+        name="lineup_creation_roster_selected_format"
+        tools:ignore="PluralsCandidate">%1$d of %2$d selected</string>
     <string name="lineup_creation_roster_status_default">default #%1$d</string>
-    <string name="lineup_creation_roster_status_override">wearing #%1$d tonight</string>
+    <string
+        name="lineup_creation_roster_status_override"
+        tools:ignore="PluralsCandidate">wearing #%1$d tonight</string>
     <string name="lineup_creation_roster_status_sitting_out">Sitting out</string>
     <string name="lineup_creation_roster_done">Done</string>
     <string name="lineup_creation_save">Create lineup</string>
@@ -211,7 +217,9 @@
     <string name="data_transfer_count_players">Players</string>
     <string name="data_transfer_count_lineups">Lineups</string>
     <string name="data_transfer_count_tournaments">Tournaments</string>
-    <string name="data_transfer_added_updated">%1$d added · %2$d updated</string>
+    <string
+        name="data_transfer_added_updated"
+        tools:ignore="PluralsCandidate">%1$d added · %2$d updated</string>
 
     <string name="export_confirm_title">Export all data</string>
     <string name="export_confirm_message">Every team on this device — not just %1$s — saved as
@@ -318,9 +326,13 @@
     <string name="roster_message_team_content_description">Message the team</string>
     <string name="roster_message_sheet_title">Message the team</string>
     <string name="roster_message_text_label">Text message</string>
-    <string name="roster_message_phone_count">%1$d of %2$d have a number on file</string>
+    <string
+        name="roster_message_phone_count"
+        tools:ignore="PluralsCandidate">%1$d of %2$d have a number on file</string>
     <string name="roster_message_email_label">Email</string>
-    <string name="roster_message_email_count">%1$d of %2$d have an email on file</string>
+    <string
+        name="roster_message_email_count"
+        tools:ignore="PluralsCandidate">%1$d of %2$d have an email on file</string>
     <string name="roster_message_share_label">Share another way</string>
     <string name="roster_message_share_caption">Copies contacts as plain text</string>
     <string name="roster_message_share_copied">Copied to clipboard</string>
@@ -348,7 +360,7 @@
         their turn</string>
     <string name="defense_dh_slot_batting_format">Bats for %1$s (%2$s) · batting #%3$d</string>
     <string name="defense_dh_slot_unassigned">Tap to assign</string>
-    <string name="defense_substitute_slots_free">%1$d of %2$d extra hitter slot free</string>
+    <string name="defense_substitute_slots_free">Extra hitter slots free: %1$d of %2$d</string>
     <string name="defense_substitute_slots_unlimited">Unlimited extra hitters</string>
     <string name="defense_turn_off_dh_title_baseball">Turn off DH?</string>
     <string name="defense_turn_off_dh_title_softball">Turn off DP/Flex?</string>
@@ -359,7 +371,7 @@
     <string name="defense_keep_dp_flex_on">Keep DP/Flex on</string>
     <string name="defense_add_substitute_sheet_title">Add substitute</string>
     <string name="defense_select_player_sheet_title">Select a player</string>
-    <string name="defense_add_substitute_budget_free">%1$d of %2$d extra hitter slot free — next
+    <string name="defense_add_substitute_budget_free">Extra hitter slots free: %1$d of %2$d — next
         pick bats</string>
     <string name="defense_add_substitute_budget_none">No extra hitter slot free — next pick sits
         on the bench</string>

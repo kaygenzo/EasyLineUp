@@ -235,7 +235,7 @@ private fun arrayLabel(labelsRes: Int, valuesRes: Int, value: String): String {
 
 @DugoutPreviews
 @Composable
-private fun arrayLabelPreview() {
+private fun ArrayLabelPreview() {
     DugoutTheme {
         Text(
             text = arrayLabel(
@@ -411,6 +411,7 @@ private fun ColorSwatchRow(
     onColorPicked: (Int) -> Unit
 ) {
     val context = LocalContext.current
+    val okLabel = stringResource(android.R.string.ok)
     SettingsRow(
         leading = {
             Box(
@@ -434,7 +435,7 @@ private fun ColorSwatchRow(
                 .attachAlphaSlideBar(false)
                 .attachBrightnessSlideBar(true)
                 .setPositiveButton(
-                    context.getString(android.R.string.ok),
+                    okLabel,
                     ColorEnvelopeListener { envelope, _ -> onColorPicked(envelope.color) }
                 )
                 .setNegativeButton(android.R.string.cancel) { dialogInterface, _ ->

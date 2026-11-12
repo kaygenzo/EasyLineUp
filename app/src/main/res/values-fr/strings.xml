@@ -117,10 +117,12 @@
     <plurals name="tournaments_list_lineups_count">
         <item quantity="one">%d composition</item>
         <item quantity="other">%d compositions</item>
+        <item quantity="many">%d de compositions</item>
     </plurals>
     <plurals name="tournaments_list_show_more">
         <item quantity="one">Afficher %d de plus</item>
         <item quantity="other">Afficher %d de plus</item>
+        <item quantity="many">Afficher %d de plus</item>
     </plurals>
     <string name="tournaments_list_empty_title">Pas encore de tournoi</string>
     <string name="tournaments_list_empty_subtitle">Créez une composition pour ajouter le
@@ -143,6 +145,7 @@
     <plurals name="lineups_quantity">
         <item quantity="one">%d lineup</item>
         <item quantity="other">%d lineups</item>
+        <item quantity="many">%d de lineups</item>
     </plurals>
 
     <string name="players_list_empty">Plus aucun joueur disponible</string>
@@ -161,6 +164,7 @@
     <plurals name="switch_team_sheet_subtitle">
         <item quantity="one">%d équipe sur ce compte</item>
         <item quantity="other">%d équipes sur ce compte</item>
+        <item quantity="many">%d d\'équipes sur ce compte</item>
     </plurals>
     <string name="switch_team_sheet_create_row">Créer une nouvelle équipe</string>
     <string name="switch_team_sheet_current">Actuelle</string>
@@ -172,6 +176,7 @@
     <plurals name="team_details_roster_count">
         <item quantity="one">%d joueur</item>
         <item quantity="other">%d joueurs</item>
+        <item quantity="many">%d de joueurs</item>
     </plurals>
     <string name="team_details_roster_label">Effectif</string>
     <string name="team_details_lineups_label">Lineups créés</string>
@@ -326,8 +331,8 @@
         prend son tour</string>
     <string name="defense_dh_slot_batting_format">Frappe pour %1$s (%2$s) · ordre #%3$d</string>
     <string name="defense_dh_slot_unassigned">Appuyez pour assigner</string>
-    <string name="defense_substitute_slots_free">%1$d place(s) sur %2$d frappeur(s)
-        supplémentaire(s) libre(s)</string>
+    <string name="defense_substitute_slots_free">Places de frappeur supplémentaire libres : %1$d
+        sur %2$d</string>
     <string name="defense_substitute_slots_unlimited">Frappeurs supplémentaires illimités</string>
     <string name="defense_turn_off_dh_title_baseball">Désactiver le DH ?</string>
     <string name="defense_turn_off_dh_title_softball">Désactiver le DP/Flex ?</string>
@@ -339,8 +344,8 @@
     <string name="defense_keep_dp_flex_on">Garder le DP/Flex actif</string>
     <string name="defense_add_substitute_sheet_title">Ajouter un remplaçant</string>
     <string name="defense_select_player_sheet_title">Sélectionner un joueur</string>
-    <string name="defense_add_substitute_budget_free">%1$d place(s) sur %2$d frappeur(s)
-        supplémentaire(s) libre(s) — le prochain choix frappera</string>
+    <string name="defense_add_substitute_budget_free">Places de frappeur supplémentaire libres :
+        %1$d sur %2$d — le prochain choix frappera</string>
     <string name="defense_add_substitute_budget_none">Aucune place de frappeur supplémentaire
         libre — le prochain choix restera sur le banc</string>
     <string name="defense_add_substitute_budget_unlimited">Frappeurs supplémentaires illimités —
