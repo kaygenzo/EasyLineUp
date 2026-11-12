@@ -30,24 +30,23 @@ import com.telen.easylineup.testing.ActivityTestUtils
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.inject
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForText
+import java.io.File
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import java.io.File
 
 /**
  * Both "import" buttons open the system's file picker, replaced by espresso-intents answering
  * with a real exported file: from the Welcome screen of a fresh install, and from Settings.
  */
 @RunWith(AndroidJUnit4::class)
-class ImportPickerTest : KoinComponent {
+class ImportPickerTest {
     @get:Rule(order = 0)
     val seedRule = SeedDatabaseRule()
 

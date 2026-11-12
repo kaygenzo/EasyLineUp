@@ -120,7 +120,29 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        // The release R8 configuration on a debug-signed, debuggable build, so instrumented tests
+        // can check what only breaks once minified - Gson reading the export classes by
+        // reflection, above all. Run with -PminifiedTests (see testBuildType below).
+        minified {
+            initWith debug
+            // R8 skips renaming on a debuggable build, which would hide exactly the bugs this
+            // build type is for. Instrumentation still works: both APKs share the debug key.
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                'proguard-rules.pro', 'proguard-minified-rules.pro'
+            testProguardFiles 'proguard-test-rules.pro'
+            versionNameSuffix "-minified"
+            matchingFallbacks = ['release']
+            // Coverage instruments the classes R8 would rewrite: the two don't mix.
+            enableUnitTestCoverage false
+            enableAndroidTestCoverage false
+        }
     }
+    // ./gradlew connectedDevMinifiedAndroidTest -PminifiedTests \
+    //     -Pandroid.testInstrumentationRunnerArguments.package=com.telen.easylineup.export
+    testBuildType project.hasProperty('minifiedTests') ? 'minified' : 'debug'
     packaging {
         resources {
             excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE', 'META-INF/LICENSE.txt', 'META-INF/license.txt', 'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'META-INF/notice.txt', 'META-INF/ASL2.0']

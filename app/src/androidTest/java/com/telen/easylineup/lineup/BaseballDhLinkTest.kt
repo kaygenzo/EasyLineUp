@@ -20,6 +20,7 @@ import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.lineup.defense.DefenseTestTags
 import com.telen.easylineup.testing.SeedDatabaseRule
+import com.telen.easylineup.testing.inject
 import com.telen.easylineup.testing.openFixtureLineup
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
@@ -30,8 +31,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * Baseball's DH link: the pitcher stays on the mound without batting, so turning the DH on must
@@ -39,7 +38,7 @@ import org.koin.core.component.inject
  * after a real save, since the sheet only edits an in-memory copy until then.
  */
 @RunWith(AndroidJUnit4::class)
-class BaseballDhLinkTest : KoinComponent {
+class BaseballDhLinkTest {
     @get:Rule(order = 0)
     val seedRule = SeedDatabaseRule()
 

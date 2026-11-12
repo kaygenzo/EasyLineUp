@@ -31,6 +31,7 @@ import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.testing.ActivityTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.inject
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForText
 import java.io.File
@@ -41,8 +42,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * The import screens as a user meets them after opening an `.elu` file: preview, confirmation,
@@ -50,7 +49,7 @@ import org.koin.core.component.inject
  * goes through the system's file picker first, which this doesn't cover.
  */
 @RunWith(AndroidJUnit4::class)
-class ImportFlowTest : KoinComponent {
+class ImportFlowTest {
     @get:Rule(order = 0)
     val seedRule = SeedDatabaseRule()
 

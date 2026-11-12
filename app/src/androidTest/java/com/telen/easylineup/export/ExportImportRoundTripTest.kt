@@ -17,10 +17,11 @@ import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.DeleteAllData
 import com.telen.easylineup.domain.usecases.ExportData
 import com.telen.easylineup.domain.usecases.ImportData
-import com.telen.easylineup.export.json.exportGson
-import com.telen.easylineup.export.json.toJson
+import com.telen.easylineup.export.json.writeExportFile
 import com.telen.easylineup.testing.SeedDatabaseRule
+import com.telen.easylineup.testing.inject
 import com.telen.easylineup.utils.ImportFileReaderImpl
+import java.io.File
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -28,9 +29,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import java.io.File
 
 /**
  * An `.elu` file is how a coach backs up or moves their whole season, so this runs the real chain
@@ -43,7 +41,7 @@ import java.io.File
  * picked through the system's document picker. The file is written directly here instead.
  */
 @RunWith(AndroidJUnit4::class)
-class ExportImportRoundTripTest : KoinComponent {
+class ExportImportRoundTripTest {
     @get:Rule
     val seedRule = SeedDatabaseRule()
 
@@ -111,8 +109,10 @@ class ExportImportRoundTripTest : KoinComponent {
     }
 
     private suspend fun exportToFile(): File {
-        val json = exportGson.toJson(exportData().getOrThrow().toJson())
-        return File(context.cacheDir, "round_trip.elu").apply { writeText(json) }
+        val export = exportData().getOrThrow()
+        return File(context.cacheDir, "round_trip.elu").apply {
+            bufferedWriter().use { writeExportFile(export, it) }
+        }
     }
 
     private fun read(file: File) = ImportFileReaderImpl(context).read(Uri.fromFile(file).toString())

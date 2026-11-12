@@ -18,6 +18,7 @@ import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.inject
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -26,15 +27,13 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * Regression test for the bug migration 18 to 19 had to repair: Baseball 5 has no strategy
  * picker, and creating a lineup used to save the baseball default instead of its only strategy.
  */
 @RunWith(AndroidJUnit4::class)
-class Baseball5LineupCreationTest : KoinComponent {
+class Baseball5LineupCreationTest {
     @get:Rule(order = 0)
     val seedRule = SeedDatabaseRule(
         SeedDatabaseRule.Mode.LINEUP_VARIANT,

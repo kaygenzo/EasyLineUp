@@ -19,6 +19,7 @@ import com.telen.easylineup.testing.ActivityTestUtils
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.inject
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForText
 import kotlinx.coroutines.runBlocking
@@ -27,15 +28,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * Confirming "Delete all data" for real - [SettingsScreenTest] only cancels it. Its own class
  * because it ends outside [HomeActivity], on [LoginActivity], in a fresh task.
  */
 @RunWith(AndroidJUnit4::class)
-class DeleteAllDataTest : KoinComponent {
+class DeleteAllDataTest {
     @get:Rule(order = 0)
     val seedRule = SeedDatabaseRule()
 

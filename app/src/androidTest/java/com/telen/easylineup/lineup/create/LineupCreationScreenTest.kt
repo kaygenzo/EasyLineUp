@@ -22,6 +22,7 @@ import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.inject
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -35,8 +36,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * Covers [LineupCreationScreen]: render, name entry, picking an existing tournament, creating
@@ -46,7 +45,7 @@ import org.koin.core.component.inject
  * test plan).
  */
 @RunWith(AndroidJUnit4::class)
-class LineupCreationScreenTest : KoinComponent {
+class LineupCreationScreenTest {
     @get:Rule(order = 0)
     val seedRule = SeedDatabaseRule()
 

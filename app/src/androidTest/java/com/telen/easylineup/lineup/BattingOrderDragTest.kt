@@ -16,6 +16,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.lineup.attack.AttackTestTags
 import com.telen.easylineup.testing.SeedDatabaseRule
+import com.telen.easylineup.testing.inject
 import com.telen.easylineup.testing.openFixtureLineup
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
@@ -28,15 +29,13 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * Reordering batters: long press a row's handle, then drag. Driven with raw touch input on the
  * handle, since the gesture has no accessibility action to trigger it another way.
  */
 @RunWith(AndroidJUnit4::class)
-class BattingOrderDragTest : KoinComponent {
+class BattingOrderDragTest {
     @get:Rule(order = 0)
     val seedRule = SeedDatabaseRule()
 

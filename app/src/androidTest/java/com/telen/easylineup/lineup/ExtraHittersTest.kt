@@ -22,6 +22,7 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.lineup.defense.DefenseTestTags
 import com.telen.easylineup.testing.SeedDatabaseRule
+import com.telen.easylineup.testing.inject
 import com.telen.easylineup.testing.openFixtureLineup
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
@@ -32,15 +33,13 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * A lineup with two extra hitters: two substitutes bat without playing the field, which also
  * pushes the slot reserved for a flexed pitcher two places further.
  */
 @RunWith(AndroidJUnit4::class)
-class ExtraHittersTest : KoinComponent {
+class ExtraHittersTest {
     @get:Rule(order = 0)
     val seedRule = SeedDatabaseRule(
         SeedDatabaseRule.Mode.LINEUP_VARIANT,

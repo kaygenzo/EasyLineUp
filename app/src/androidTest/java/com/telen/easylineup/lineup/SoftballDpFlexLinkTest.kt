@@ -20,6 +20,7 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.lineup.defense.DefenseTestTags
 import com.telen.easylineup.testing.SeedDatabaseRule
+import com.telen.easylineup.testing.inject
 import com.telen.easylineup.testing.openFixtureLineup
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
@@ -30,15 +31,13 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * Softball's DP/Flex link: unlike baseball, the Flex is any field player the coach picks, so the
  * sheet starts with an empty slot and refuses to confirm until both are filled.
  */
 @RunWith(AndroidJUnit4::class)
-class SoftballDpFlexLinkTest : KoinComponent {
+class SoftballDpFlexLinkTest {
     @get:Rule(order = 0)
     val seedRule = SeedDatabaseRule(
         SeedDatabaseRule.Mode.LINEUP_VARIANT,

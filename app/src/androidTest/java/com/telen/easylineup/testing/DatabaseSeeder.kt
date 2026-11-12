@@ -12,8 +12,6 @@ import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.DeleteAllData
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * Ids generated while seeding [TestFixtures], for tests that need to navigate straight to a
@@ -33,7 +31,7 @@ data class SeededFixture(
  * app's own bulk `Insert*` use cases) specifically to get each row's generated id back, needed
  * to wire players into field positions/lineups.
  */
-class DatabaseSeeder : KoinComponent {
+class DatabaseSeeder {
     private val deleteAllData: DeleteAllData by inject()
     private val teamRepository: TeamRepository by inject()
     private val playerRepository: PlayerRepository by inject()

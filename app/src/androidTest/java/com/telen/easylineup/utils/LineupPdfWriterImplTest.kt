@@ -15,13 +15,12 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.testing.inject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * The PDF has no readable text API, so this renders the real file back to a bitmap and checks
@@ -29,7 +28,7 @@ import org.koin.core.component.inject
  * FileProvider and draws each section where expected - not that the card looks right.
  */
 @RunWith(AndroidJUnit4::class)
-class LineupPdfWriterImplTest : KoinComponent {
+class LineupPdfWriterImplTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val writer: LineupPdfWriter by inject()
 

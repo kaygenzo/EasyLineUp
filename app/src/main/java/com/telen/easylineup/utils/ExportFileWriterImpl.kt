@@ -10,8 +10,7 @@ import androidx.documentfile.provider.DocumentFile
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.ports.ExportFileWriter
 import com.telen.easylineup.domain.ports.WrittenExportFile
-import com.telen.easylineup.export.json.exportGson
-import com.telen.easylineup.export.json.toJson
+import com.telen.easylineup.export.json.writeExportFile
 
 class ExportFileWriterImpl(private val context: Context) : ExportFileWriter {
     override fun write(
@@ -26,7 +25,7 @@ class ExportFileWriterImpl(private val context: Context) : ExportFileWriter {
             ?: throw Exception("Cannot write in file")
         outputStream.use { stream ->
             stream.bufferedWriter().use { writer ->
-                exportGson.toJson(export.toJson(), writer)
+                writeExportFile(export, writer)
                 writer.flush()
             }
         }
