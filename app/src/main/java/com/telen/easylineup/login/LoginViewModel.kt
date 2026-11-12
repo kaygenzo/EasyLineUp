@@ -14,8 +14,12 @@ import com.telen.easylineup.domain.ports.ImportFileReader
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ImportData
 import com.telen.easylineup.domain.usecases.ImportResult
+import com.telen.easylineup.utils.UserPreferencesStore
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,10 +46,29 @@ class LoginViewModel(
     private val getTeamUseCase: GetTeam,
     private val importDataUseCase: ImportData,
     private val importFileReader: ImportFileReader,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val preferences: UserPreferencesStore
 ) : ViewModel() {
     private val _events = Channel<LoginEvent>(Channel.BUFFERED)
     val events: Flow<LoginEvent> = _events.receiveAsFlow()
+
+    private val _importOverwriteExisting = MutableStateFlow(false)
+
+    /** The import sheet's "update what already exists" switch, as last left by the user. */
+    val importOverwriteExisting: StateFlow<Boolean> = _importOverwriteExisting.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            _importOverwriteExisting.value = withContext(dispatcherProvider.io()) {
+                preferences.read().importOverwriteExisting
+            }
+        }
+    }
+
+    fun onImportOverwriteChanged(checked: Boolean) {
+        preferences.setImportOverwriteExisting(checked)
+        _importOverwriteExisting.value = checked
+    }
 
     /**
      * Parses the picked file into an [ExportBase] preview - no database writes yet, so the

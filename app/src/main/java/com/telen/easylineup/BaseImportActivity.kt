@@ -14,9 +14,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.preference.PreferenceManager
 import com.telen.easylineup.compose.ErrorDialog
 import com.telen.easylineup.compose.ImportConfirmSheet
 import com.telen.easylineup.compose.ImportSuccessSheet
@@ -41,7 +41,6 @@ abstract class BaseImportActivity : BaseActivity() {
     private var importPreview by mutableStateOf<ExportBase?>(null)
     private var importResult by mutableStateOf<ImportResult?>(null)
     private var importFailed by mutableStateOf(false)
-    protected var updateExistingOnImport by mutableStateOf(false)
 
     private val openFile = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -53,9 +52,6 @@ abstract class BaseImportActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        updateExistingOnImport = PreferenceManager.getDefaultSharedPreferences(this)
-            .getBoolean(getString(R.string.key_import_data_update_object), false)
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -97,25 +93,20 @@ abstract class BaseImportActivity : BaseActivity() {
      */
     @Composable
     protected fun ImportSheets(onCancelled: () -> Unit = {}, onFailureDismissed: () -> Unit = {}) {
+        val overwriteExisting by viewModel.importOverwriteExisting.collectAsStateWithLifecycle()
         importPreview?.let { exportBase ->
             ImportConfirmSheet(
                 fileName = pendingFileName,
                 counts = exportBase.toDataCounts(),
-                overwriteExisting = updateExistingOnImport,
-                onOverwriteChanged = { checked ->
-                    updateExistingOnImport = checked
-                    PreferenceManager.getDefaultSharedPreferences(this)
-                        .edit()
-                        .putBoolean(getString(R.string.key_import_data_update_object), checked)
-                        .apply()
-                },
+                overwriteExisting = overwriteExisting,
+                onOverwriteChanged = viewModel::onImportOverwriteChanged,
                 onDismiss = {
                     importPreview = null
                     onCancelled()
                 },
                 onConfirm = {
                     FirebaseAnalyticsUtils.onClick(this, "click_import_data_confirm")
-                    viewModel.confirmImport(exportBase, updateExistingOnImport)
+                    viewModel.confirmImport(exportBase, overwriteExisting)
                 }
             )
         }

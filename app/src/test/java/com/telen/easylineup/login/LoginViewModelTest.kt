@@ -6,12 +6,15 @@ package com.telen.easylineup.login
 
 import android.net.Uri
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.ThemeMode
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.ports.ImportFileReader
 import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.ImportData
 import com.telen.easylineup.domain.usecases.ImportResult
 import com.telen.easylineup.testDispatcherProvider
+import com.telen.easylineup.utils.UserPreferences
+import com.telen.easylineup.utils.UserPreferencesStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -22,6 +25,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -49,16 +53,21 @@ internal class LoginViewModelTest {
     @Mock
     lateinit var uri: Uri
 
+    @Mock
+    lateinit var preferences: UserPreferencesStore
+
     lateinit var viewModel: LoginViewModel
 
     @Before
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        Mockito.lenient().`when`(preferences.read()).thenReturn(storedPreferences(true))
         viewModel = LoginViewModel(
             getTeamUseCase,
             importDataUseCase,
             importFileReader,
-            testDispatcherProvider()
+            testDispatcherProvider(),
+            preferences
         )
     }
 
@@ -66,6 +75,26 @@ internal class LoginViewModelTest {
     fun tearDown() {
         Dispatchers.resetMain()
     }
+
+    @Test
+    fun shouldStartFromTheStoredImportOverwriteChoice() {
+        assertTrue(viewModel.importOverwriteExisting.value)
+    }
+
+    @Test
+    fun shouldStoreTheImportOverwriteChoice() {
+        viewModel.onImportOverwriteChanged(false)
+
+        assertFalse(viewModel.importOverwriteExisting.value)
+        Mockito.verify(preferences).setImportOverwriteExisting(false)
+    }
+
+    private fun storedPreferences(importOverwriteExisting: Boolean) = UserPreferences(
+        themeMode = ThemeMode.FOLLOW_SYSTEM,
+        menColor = 0,
+        womenColor = 0,
+        importOverwriteExisting = importOverwriteExisting
+    )
 
     @Test
     fun shouldSendImportPreviewReadyWhenFileParsesSuccessfully() = runTest {
