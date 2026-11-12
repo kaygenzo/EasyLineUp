@@ -73,4 +73,19 @@ class LocalizedDatesTest {
             formatLocalizedDate(millis, DATE_SKELETON_DAY_MONTH, Locale.JAPAN)
         )
     }
+
+    @Test
+    fun aDateBadgeSplitsTheDayAndTheMonth() {
+        assertEquals("10", formatLocalizedDate(millis, DATE_SKELETON_DAY, Locale.US))
+        assertEquals("Nov", formatLocalizedDate(millis, DATE_SKELETON_MONTH, Locale.US))
+        assertEquals("nov.", formatLocalizedDate(millis, DATE_SKELETON_MONTH, Locale.FRANCE))
+    }
+
+    @Test
+    fun aBadgeMonthUsesTheStandaloneForm() {
+        // Russian declines a month next to a day ("ноя." in "10 ноя.") but not on its own.
+        val russian = Locale.forLanguageTag("ru")
+
+        assertEquals("нояб.", formatLocalizedDate(millis, DATE_SKELETON_MONTH, russian))
+    }
 }

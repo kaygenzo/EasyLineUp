@@ -81,12 +81,11 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.getStrategies
 import com.telen.easylineup.domain.model.hasDateWindow
+import com.telen.easylineup.utils.DATE_SKELETON_DAY
+import com.telen.easylineup.utils.DATE_SKELETON_MONTH
 import com.telen.easylineup.utils.DATE_SKELETON_WEEKDAY_DAY_MONTH
 import com.telen.easylineup.utils.formatLocalizedDate
 import com.telen.easylineup.utils.getStrategiesDisplayName
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlinx.collections.immutable.persistentListOf
 
 private val LineupCreationPreviewTournament = Tournament(
@@ -467,7 +466,10 @@ private fun TournamentPickerRowPreview() {
 
 @Composable
 private fun MiniDateChip(startMillis: Long) {
-    val date = Date(startMillis)
+    val day = remember(startMillis) { formatLocalizedDate(startMillis, DATE_SKELETON_DAY) }
+    val month = remember(startMillis) {
+        formatLocalizedDate(startMillis, DATE_SKELETON_MONTH).uppercase()
+    }
     Column(
         modifier = Modifier
             .width(44.dp)
@@ -478,13 +480,13 @@ private fun MiniDateChip(startMillis: Long) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = SimpleDateFormat("d", Locale.getDefault()).format(date),
+            text = day,
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.ExtraBold
         )
         Text(
-            text = SimpleDateFormat("MMM", Locale.getDefault()).format(date).uppercase(),
+            text = month,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             style = MaterialTheme.typography.labelSmall
         )

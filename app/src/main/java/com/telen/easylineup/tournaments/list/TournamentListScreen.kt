@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -61,12 +62,11 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.getStrategies
 import com.telen.easylineup.domain.usecases.IsExtraHittersUnlimited
+import com.telen.easylineup.utils.DATE_SKELETON_DAY
 import com.telen.easylineup.utils.DATE_SKELETON_DAY_MONTH
+import com.telen.easylineup.utils.DATE_SKELETON_MONTH
 import com.telen.easylineup.utils.formatLocalizedDate
 import com.telen.easylineup.utils.getStrategiesDisplayName
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
@@ -442,15 +442,18 @@ private fun TicketDateChip(startMillis: Long?) {
         verticalArrangement = Arrangement.Center
     ) {
         if (startMillis != null) {
-            val date = Date(startMillis)
+            val day = remember(startMillis) { formatLocalizedDate(startMillis, DATE_SKELETON_DAY) }
+        val month = remember(startMillis) {
+            formatLocalizedDate(startMillis, DATE_SKELETON_MONTH).uppercase()
+        }
             Text(
-                text = SimpleDateFormat("d", Locale.getDefault()).format(date),
+                text = day,
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.ExtraBold
             )
             Text(
-                text = SimpleDateFormat("MMM", Locale.getDefault()).format(date).uppercase(),
+                text = month,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 style = MaterialTheme.typography.labelMedium
             )

@@ -21,6 +21,15 @@ const val DATE_SKELETON_DAY_MONTH_YEAR = "yMMMd"
 /** Abbreviated month and year: "Nov 2026" in English, "nov. 2026" in French. */
 const val DATE_SKELETON_MONTH_YEAR = "yMMM"
 
+/** The day of the month alone, for a date badge: "10". */
+const val DATE_SKELETON_DAY = "d"
+
+/**
+ * The abbreviated month alone, for a date badge: "Nov" in English, "nov." in French - in its
+ * standalone form, which languages such as Russian or Polish spell differently.
+ */
+const val DATE_SKELETON_MONTH = "MMM"
+
 /**
  * Formats [millis] with the fields of [skeleton] laid out the way the current language writes
  * them: order, punctuation and words. A fixed pattern such as "EEE, MMM d" only translates the
