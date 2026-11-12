@@ -42,6 +42,7 @@ import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.GetTournamentPlayerStats
 import com.telen.easylineup.domain.usecases.GetTournamentPlayerStatsWithProfiles
 import com.telen.easylineup.domain.usecases.GetTournaments
+import com.telen.easylineup.domain.usecases.HasUnsavedLineupChanges
 import com.telen.easylineup.domain.usecases.ImportData
 import com.telen.easylineup.domain.usecases.InsertLineups
 import com.telen.easylineup.domain.usecases.InsertPlayerFieldPositions
@@ -155,6 +156,7 @@ object DomainModule {
         single { ClearRoster() }
         single { OverrideRosterPlayerNumber() }
         single { ResolveLineupEventTime(get()) }
+        single { HasUnsavedLineupChanges() }
         single { ToggleFavoritePosition() }
         single { EncodePlayerSideFlag() }
         single { DecodePlayerSideFlag() }

@@ -19,6 +19,7 @@ import com.telen.easylineup.domain.usecases.ClearRoster
 import com.telen.easylineup.domain.usecases.CreateLineup
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.HasUnsavedLineupChanges
 import com.telen.easylineup.domain.usecases.ObserveTournaments
 import com.telen.easylineup.domain.usecases.ResolveLineupEventTime
 import com.telen.easylineup.domain.usecases.SaveTournament
@@ -106,6 +107,7 @@ internal class LineupCreationViewModelTest {
             toggleRosterPlayerUseCase,
             clearRosterUseCase,
             resolveLineupEventTimeUseCase,
+            HasUnsavedLineupChanges(),
             clock
         )
     }
@@ -138,6 +140,7 @@ internal class LineupCreationViewModelTest {
             toggleRosterPlayerUseCase,
             clearRosterUseCase,
             resolveLineupEventTimeUseCase,
+            HasUnsavedLineupChanges(),
             clock
         )
         advanceUntilIdle()
@@ -429,6 +432,7 @@ internal class LineupCreationViewModelTest {
         toggleRosterPlayerUseCase,
         clearRosterUseCase,
         resolveLineupEventTimeUseCase,
+        HasUnsavedLineupChanges(),
         clock
     )
 
@@ -628,6 +632,7 @@ internal class LineupCreationViewModelTest {
         ToggleRosterPlayer(),
         clearRosterUseCase,
         resolveLineupEventTimeUseCase,
+        HasUnsavedLineupChanges(),
         clock
     )
 

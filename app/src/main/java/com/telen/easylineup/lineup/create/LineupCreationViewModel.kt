@@ -18,6 +18,7 @@ import com.telen.easylineup.domain.usecases.ClearRoster
 import com.telen.easylineup.domain.usecases.CreateLineup
 import com.telen.easylineup.domain.usecases.GetRoster
 import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.HasUnsavedLineupChanges
 import com.telen.easylineup.domain.usecases.ObserveTournaments
 import com.telen.easylineup.domain.usecases.ResolveLineupEventTime
 import com.telen.easylineup.domain.usecases.SaveTournament
@@ -111,6 +112,7 @@ class LineupCreationViewModel(
     private val toggleRosterPlayerUseCase: ToggleRosterPlayer,
     private val clearRosterUseCase: ClearRoster,
     private val resolveLineupEventTimeUseCase: ResolveLineupEventTime,
+    private val hasUnsavedLineupChanges: HasUnsavedLineupChanges,
     private val clock: Clock
 ) : ViewModel() {
     private val _uiState =
@@ -332,7 +334,7 @@ class LineupCreationViewModel(
     /** Returns whether it is safe to leave immediately (no unsaved changes to discard). */
     fun onCancelRequested(): Boolean {
         val current = _uiState.value
-        return if (current.name.isNotBlank() || current.selectedTournament != null) {
+        return if (hasUnsavedLineupChanges(current.name, current.selectedTournament)) {
             _uiState.update { it.copy(showDiscardSheet = true) }
             false
         } else {
