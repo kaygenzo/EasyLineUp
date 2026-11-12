@@ -8,7 +8,6 @@ import com.telen.easylineup.domain.model.export.LineupExport
 import com.telen.easylineup.domain.model.export.PlayerNumberOverlayExport
 import com.telen.easylineup.domain.model.export.PlayerPositionExport
 import java.io.Serializable
-import java.util.Calendar
 import java.util.UUID
 
 const val MODE_DISABLED = 0
@@ -37,8 +36,8 @@ data class Lineup(
     val strategy: Int = TeamStrategy.STANDARD.id,
     val extraHitters: Int = 0,
     val eventTimeInMillis: Long = 0L,
-    val createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
-    val editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
+    val createdTimeInMillis: Long = 0L,
+    val editedTimeInMillis: Long = 0L,
     val roster: String? = null,
     val hash: String? = UUID.randomUUID().toString()
 ) : Serializable {

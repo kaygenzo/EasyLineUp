@@ -154,7 +154,7 @@ internal class LineupViewModelTest {
                 )
             )
             Mockito.lenient().`when`(
-                getBattersStateUseCase(any(), any(), any(), any(), any(), any())
+                getBattersStateUseCase(any(), any(), any(), any(), any())
             ).thenReturn(Result.success(emptyList()))
         }
     }
@@ -918,7 +918,7 @@ internal class LineupViewModelTest {
 
     @Test
     fun shouldKeepPreviousBattersWhenRecomputingFails() = runTest {
-        Mockito.`when`(getBattersStateUseCase(any(), any(), any(), any(), any(), any()))
+        Mockito.`when`(getBattersStateUseCase(any(), any(), any(), any(), any()))
             .thenReturn(Result.failure(Exception("boom")))
 
         loadLineup(loadedLineup, listOf(player(1L)))
@@ -939,7 +939,6 @@ internal class LineupViewModelTest {
             any(),
             any(),
             any(),
-            any(),
             eq(true)
         )
     }
@@ -954,7 +953,6 @@ internal class LineupViewModelTest {
 
         Mockito.verify(deletePlayerFieldPositionUseCase)(any(), eq(aPlayer), eq(0), eq(0))
         Mockito.verify(getBattersStateUseCase, Mockito.never())(
-            any(),
             any(),
             any(),
             any(),

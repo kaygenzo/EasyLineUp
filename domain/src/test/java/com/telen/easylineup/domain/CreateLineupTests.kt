@@ -108,6 +108,7 @@ internal abstract class CreateLineupTests {
         createLineup = CreateLineup(
             lineupDao,
             GetTeam(teamDao, testDispatcherProvider()),
+            fixedClock(),
             testDispatcherProvider()
         )
 
@@ -153,6 +154,14 @@ internal abstract class CreateLineupTests {
         verify(lineupDao).insertLineup(check {
             Assert.assertEquals("1;2;3", it.roster)
         })
+    }
+
+    @Test
+    fun shouldStampTheCreationAndEditionTimesWithTheClock() = runTest {
+        val result = startUseCase(roster)
+
+        Assert.assertEquals(TEST_NOW, result.getOrNull()?.createdTimeInMillis)
+        Assert.assertEquals(TEST_NOW, result.getOrNull()?.editedTimeInMillis)
     }
 
     @Test

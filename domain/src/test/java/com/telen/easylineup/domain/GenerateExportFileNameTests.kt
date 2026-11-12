@@ -6,27 +6,27 @@ package com.telen.easylineup.domain
 
 import com.telen.easylineup.domain.usecases.GenerateExportFileName
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 
 internal class GenerateExportFileNameTests {
-    private lateinit var generateExportFileName: GenerateExportFileName
-
-    @Before
-    fun init() {
-        generateExportFileName = GenerateExportFileName()
-    }
-
     @Test
     fun shouldEndWithTheEluExtension() {
-        assertTrue(generateExportFileName(0L).endsWith(".elu"))
+        assertTrue(GenerateExportFileName(fixedClock(0L))().endsWith(".elu"))
     }
 
     @Test
     fun shouldProduceDifferentNamesForDifferentTimestamps() {
-        val first = generateExportFileName(0L)
-        val second = generateExportFileName(86_400_000L)
+        val first = GenerateExportFileName(fixedClock(0L))()
+        val second = GenerateExportFileName(fixedClock(86_400_000L))()
 
         assertTrue(first != second)
+    }
+
+    @Test
+    fun shouldStampTheClocksTime() {
+        val name = GenerateExportFileName(fixedClock(86_400_000L))()
+
+        // In the device's time zone, with its offset: a day after the epoch, give or take one.
+        assertTrue(name, Regex("""1970-01-0[123]T\d{2}:\d{2}:\d{2}[+-]\d{4}\.elu""").matches(name))
     }
 }

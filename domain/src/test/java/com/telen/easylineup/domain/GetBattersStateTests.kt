@@ -820,7 +820,6 @@ internal abstract class GetBattersStateTests {
             teamType.id,
             batterSize,
             extraHittersSize,
-            false,
             isEditable
         ).getOrThrow()
     }

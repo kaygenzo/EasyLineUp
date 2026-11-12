@@ -6,6 +6,7 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.domain.ports.Clock
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.TransactionRunner
 import com.telen.easylineup.domain.ports.repository.TeamRepository
@@ -19,6 +20,7 @@ class SaveTeam(
     private val checkTeam: CheckTeam,
     private val saveCurrentTeam: SaveCurrentTeam,
     private val transactionRunner: TransactionRunner,
+    private val clock: Clock,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(team: Team): Result<Team> = runCatchingCancellable {
@@ -33,7 +35,7 @@ class SaveTeam(
                 }
 
                 val savedTeam = if (typedTeam.id == 0L) {
-                    val withCreatedAt = typedTeam.copy(createdAt = System.currentTimeMillis())
+                    val withCreatedAt = typedTeam.copy(createdAt = clock.nowMillis())
                     withCreatedAt.copy(id = dao.insertTeam(withCreatedAt))
                 } else {
                     dao.updateTeam(typedTeam)

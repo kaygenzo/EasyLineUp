@@ -6,6 +6,7 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.RosterPlayerStatus
+import com.telen.easylineup.domain.ports.Clock
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.usecases.exceptions.LineupNameEmptyException
@@ -15,6 +16,7 @@ import kotlinx.coroutines.withContext
 class CreateLineup(
     private val lineupsDao: LineupRepository,
     private val getTeam: GetTeam,
+    private val clock: Clock,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(lineup: Lineup, roster: List<RosterPlayerStatus>): Result<Lineup> =
@@ -34,7 +36,13 @@ class CreateLineup(
                 }
 
                 val team = getTeam().getOrThrow()
-                val toInsert = lineup.copy(roster = rosterString, teamId = team.id)
+                val now = clock.nowMillis()
+                val toInsert = lineup.copy(
+                    roster = rosterString,
+                    teamId = team.id,
+                    createdTimeInMillis = now,
+                    editedTimeInMillis = now
+                )
                 toInsert.copy(id = lineupsDao.insertLineup(toInsert))
             }
         }

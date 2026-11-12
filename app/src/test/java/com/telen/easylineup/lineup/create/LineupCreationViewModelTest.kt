@@ -14,6 +14,7 @@ import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.ports.Clock
 import com.telen.easylineup.domain.usecases.ClearRoster
 import com.telen.easylineup.domain.usecases.CreateLineup
 import com.telen.easylineup.domain.usecases.GetRoster
@@ -63,6 +64,7 @@ internal class LineupCreationViewModelTest {
     @Mock lateinit var toggleRosterPlayerUseCase: ToggleRosterPlayer
     @Mock lateinit var clearRosterUseCase: ClearRoster
     @Mock lateinit var resolveLineupEventTimeUseCase: ResolveLineupEventTime
+    private val clock = Clock { NOW }
 
     private val tournamentsProcessor =
         MutableSharedFlow<List<Tournament>>(replay = 1, extraBufferCapacity = 1)
@@ -103,7 +105,8 @@ internal class LineupCreationViewModelTest {
             saveTournament,
             toggleRosterPlayerUseCase,
             clearRosterUseCase,
-            resolveLineupEventTimeUseCase
+            resolveLineupEventTimeUseCase,
+            clock
         )
     }
 
@@ -134,7 +137,8 @@ internal class LineupCreationViewModelTest {
             saveTournament,
             toggleRosterPlayerUseCase,
             clearRosterUseCase,
-            resolveLineupEventTimeUseCase
+            resolveLineupEventTimeUseCase,
+            clock
         )
         advanceUntilIdle()
 
@@ -283,8 +287,15 @@ internal class LineupCreationViewModelTest {
         viewModel.onNewTournamentSheetOpen()
 
         assertEquals("", viewModel.uiState.value.newTournamentName)
+        assertEquals(NOW, viewModel.uiState.value.newTournamentStartTime)
+        assertEquals(NOW, viewModel.uiState.value.newTournamentEndTime)
         assertTrue(viewModel.uiState.value.showNewTournamentSheet)
         assertFalse(viewModel.uiState.value.showTournamentSheet)
+    }
+
+    @Test
+    fun shouldStartTheEventTimeAtNow() = runTest {
+        assertEquals(NOW, viewModel.uiState.value.eventTimeInMillis)
     }
 
     @Test
@@ -417,7 +428,8 @@ internal class LineupCreationViewModelTest {
         saveTournament,
         toggleRosterPlayerUseCase,
         clearRosterUseCase,
-        resolveLineupEventTimeUseCase
+        resolveLineupEventTimeUseCase,
+        clock
     )
 
     @Test
@@ -615,7 +627,8 @@ internal class LineupCreationViewModelTest {
         saveTournament,
         ToggleRosterPlayer(),
         clearRosterUseCase,
-        resolveLineupEventTimeUseCase
+        resolveLineupEventTimeUseCase,
+        clock
     )
 
     @Test
@@ -656,5 +669,9 @@ internal class LineupCreationViewModelTest {
             TeamStrategy.B5_DEFAULT,
             viewModelWith(SavedStateHandle()).uiState.value.strategy
         )
+    }
+
+    private companion object {
+        const val NOW = 1_760_000_000_000L
     }
 }

@@ -6,6 +6,7 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.hasDateWindow
+import com.telen.easylineup.domain.ports.Clock
 
 /**
  * Picks the event time to prefill when a tournament is (re)selected for a lineup: the
@@ -13,14 +14,14 @@ import com.telen.easylineup.domain.model.hasDateWindow
  * the tournament's start time if it falls outside it, or now if the tournament has no
  * window at all.
  */
-class ResolveLineupEventTime {
+class ResolveLineupEventTime(private val clock: Clock) {
     operator fun invoke(tournament: Tournament, currentEventTime: Long): Long {
         return if (tournament.hasDateWindow()) {
             val outsideRange = tournament.startTime > currentEventTime ||
                 currentEventTime > tournament.endTime
             if (outsideRange) tournament.startTime else currentEventTime
         } else {
-            System.currentTimeMillis()
+            clock.nowMillis()
         }
     }
 }

@@ -43,23 +43,20 @@ internal class GetBattersStateEdgeCasesTests {
 
     private suspend fun batters(
         vararg players: PlayerWithPosition,
-        teamType: TeamType = TeamType.BASEBALL,
-        isDebug: Boolean = false
+        teamType: TeamType = TeamType.BASEBALL
     ): List<BatterState> = getBattersState(
         players = players.toList(),
         teamType = teamType.id,
         batterSize = 9,
         extraHitterSize = 0,
-        isDebug = isDebug,
         isEditable = false
     ).getOrThrow()
 
     @Test
-    fun debugBuildsShowTheOrderOfSubstitutesOutsideTheBattingOrder() = runTest {
+    fun substitutesOutsideTheBattingOrderHideTheirOrder() = runTest {
         val substitute = player(FieldPosition.SUBSTITUTE.id, order = 10)
 
         assertFalse(batters(substitute).single().canShowOrder)
-        assertTrue(batters(substitute, isDebug = true).single().canShowOrder)
     }
 
     @Test

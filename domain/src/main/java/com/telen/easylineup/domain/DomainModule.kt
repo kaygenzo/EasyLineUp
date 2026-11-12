@@ -95,7 +95,7 @@ object DomainModule {
         single { GetDashboardTiles(get(), get(), get(), get(), get(), get(), get(), get()) }
         single { SaveDashboardTiles(get(), get()) }
         single { CreateDashboardTiles(get(), get()) }
-        single { CreateLineup(get(), get(), get()) }
+        single { CreateLineup(get(), get(), get(), get()) }
         single { GetTournaments(get(), get()) }
         single { ObserveAllTournamentsWithLineups(get(), get(), get()) }
         single { DeleteTournamentLineups(get(), get(), get(), get(), get()) }
@@ -109,7 +109,7 @@ object DomainModule {
         single { ObservePlayerNumberOverlays(get()) }
         single { InsertPlayers(get(), get()) }
         single { InsertPlayerNumberOverlays(get(), get()) }
-        single { SaveTeam(get(), get(), get(), get(), get()) }
+        single { SaveTeam(get(), get(), get(), get(), get(), get()) }
         single { CheckTeam(get()) }
         single { ObserveTeams(get()) }
         single { InsertTeam(get(), get()) }
@@ -143,7 +143,7 @@ object DomainModule {
         single { SaveLineupChanges(get(), get(), get(), get(), get()) }
         single { SaveLineupDraft(get(), get(), get(), get()) }
         single { UpdatePlayersWithBatters(get()) }
-        single { SaveTournament(get(), get()) }
+        single { SaveTournament(get(), get(), get()) }
         single { GetTournamentMapLink(get(), get()) }
         single { ObserveTournaments(get()) }
         single { InsertTournaments(get(), get()) }
@@ -154,7 +154,7 @@ object DomainModule {
         single { ToggleRosterPlayer() }
         single { ClearRoster() }
         single { OverrideRosterPlayerNumber() }
-        single { ResolveLineupEventTime() }
+        single { ResolveLineupEventTime(get()) }
         single { ToggleFavoritePosition() }
         single { EncodePlayerSideFlag() }
         single { DecodePlayerSideFlag() }
@@ -163,7 +163,7 @@ object DomainModule {
         single { GetSubstituteBattingSlots(get()) }
         single { GetTournamentDisplayStart() }
         single { GetTournamentPlayerStatsWithProfiles(get(), get()) }
-        single { GenerateExportFileName() }
+        single { GenerateExportFileName(get()) }
         single { GetPlayingTimeSummary() }
         single { IsPlayingTimeUnderused() }
         single { SortPlayersByPlayingTime() }

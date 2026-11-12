@@ -1161,7 +1161,7 @@ private fun LineupCreationScreenEmptyPreview() {
                 teamType = TeamType.BASEBALL,
                 name = "",
                 selectedTournament = null,
-                eventTimeInMillis = System.currentTimeMillis(),
+                eventTimeInMillis = 1760000000000L,
                 roster = TeamRosterSummary(Constants.STATUS_ALL, emptyList()),
                 strategy = TeamStrategy.STANDARD,
                 extraHitters = 0

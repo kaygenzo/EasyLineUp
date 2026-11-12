@@ -6,6 +6,7 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.hasDateWindow
+import com.telen.easylineup.domain.ports.Clock
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.domain.usecases.exceptions.AlreadyExistingTournamentException
@@ -20,6 +21,7 @@ import kotlinx.coroutines.withContext
  */
 class SaveTournament(
     private val repository: TournamentRepository,
+    private val clock: Clock,
     private val dispatcherProvider: DispatcherProvider
 ) {
     suspend operator fun invoke(
@@ -41,7 +43,7 @@ class SaveTournament(
 
             val withCreatedAt = tournament.copy(
                 name = name,
-                createdAt = System.currentTimeMillis()
+                createdAt = clock.nowMillis()
             )
             withCreatedAt.copy(id = repository.insertTournament(withCreatedAt))
         }

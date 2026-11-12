@@ -32,7 +32,7 @@ internal class SaveTournamentTests {
 
     @Before
     fun init() {
-        saveTournament = SaveTournament(repository, testDispatcherProvider())
+        saveTournament = SaveTournament(repository, fixedClock(), testDispatcherProvider())
         tournament = Tournament(
             id = 0L,
             name = "champs",
@@ -103,7 +103,7 @@ internal class SaveTournamentTests {
 
         assertTrue(result.isSuccess)
         assertEquals(42L, result.getOrNull()?.id)
-        assertTrue((result.getOrNull()?.createdAt ?: 0L) > 0L)
+        assertEquals(TEST_NOW, result.getOrNull()?.createdAt)
         verify(repository).insertTournament(any())
     }
 

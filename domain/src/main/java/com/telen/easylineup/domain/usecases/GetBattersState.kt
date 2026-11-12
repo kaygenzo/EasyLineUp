@@ -25,7 +25,6 @@ class GetBattersState(
         teamType: Int,
         batterSize: Int,
         extraHitterSize: Int,
-        isDebug: Boolean,
         isEditable: Boolean
     ): Result<List<BatterState>> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
@@ -83,10 +82,6 @@ class GetBattersState(
                                 canShowIndex = true
                             }
                         }
-                    }
-
-                    if (isDebug) {
-                        canShowIndex = true
                     }
 
                     if (player.position >= 0) {

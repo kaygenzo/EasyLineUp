@@ -6,6 +6,7 @@ package com.telen.easylineup.application
 
 import com.telen.easylineup.HomeViewModel
 import com.telen.easylineup.dashboard.DashboardViewModel
+import com.telen.easylineup.domain.ports.Clock
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.ExportFileWriter
 import com.telen.easylineup.domain.ports.GeocodingProvider
@@ -34,12 +35,14 @@ import com.telen.easylineup.utils.PhoneNumberValidatorImpl
 import com.telen.easylineup.utils.SharedPreferencesUserPreferencesStore
 import com.telen.easylineup.utils.StringResourcesProviderImpl
 import com.telen.easylineup.utils.UserPreferencesStore
+import com.telen.easylineup.utils.WallClock
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val appModules = module {
     single<DispatcherProvider> { DispatcherProviderImpl() }
+    single<Clock> { WallClock() }
     single<StringResourcesProvider> { StringResourcesProviderImpl(get()) }
     single<GeocodingProvider> { GeocodingProviderImpl(get()) }
     single<PhoneNumberValidator> { PhoneNumberValidatorImpl() }

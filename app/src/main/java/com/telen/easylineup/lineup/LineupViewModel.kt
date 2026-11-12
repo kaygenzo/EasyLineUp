@@ -10,7 +10,6 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.telen.easylineup.BuildConfig
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
@@ -339,7 +338,6 @@ class LineupViewModel(
             teamType = teamTypeId,
             batterSize = batterSize,
             extraHitterSize = currentLineup.extraHitters,
-            isDebug = BuildConfig.DEBUG,
             isEditable = editable
         )
             .onSuccess { batters ->

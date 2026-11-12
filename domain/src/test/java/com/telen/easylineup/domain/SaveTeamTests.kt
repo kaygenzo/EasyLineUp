@@ -45,6 +45,7 @@ internal class SaveTeamTests {
             CheckTeam(testDispatcherProvider()),
             SaveCurrentTeam(teamDao, testDispatcherProvider()),
             transactionRunner,
+            fixedClock(),
             testDispatcherProvider()
         )
         team = Team(id = 1L, name = "test", type = TeamType.BASEBALL.id, main = true)
@@ -88,6 +89,7 @@ internal class SaveTeamTests {
         verify(teamDao).insertTeam(any())
         verify(teamDao, never()).updateTeam(any())
         assertEquals(2L, result.getOrNull()?.id)
+        assertEquals(TEST_NOW, result.getOrNull()?.createdAt)
     }
 
     @Test

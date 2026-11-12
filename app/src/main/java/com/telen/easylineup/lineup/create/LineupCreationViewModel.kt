@@ -13,6 +13,7 @@ import com.telen.easylineup.domain.model.TeamRosterSummary
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.ports.Clock
 import com.telen.easylineup.domain.usecases.ClearRoster
 import com.telen.easylineup.domain.usecases.CreateLineup
 import com.telen.easylineup.domain.usecases.GetRoster
@@ -70,7 +71,7 @@ data class LineupCreationUiState(
     val tournaments: ImmutableList<Tournament> = persistentListOf(),
     val selectedTournament: Tournament? = null,
     val tournamentError: Boolean = false,
-    val eventTimeInMillis: Long = System.currentTimeMillis(),
+    val eventTimeInMillis: Long = 0L,
     val roster: TeamRosterSummary = TeamRosterSummary(Constants.STATUS_ALL, emptyList()),
     val strategy: TeamStrategy = TeamStrategy.STANDARD,
     val extraHitters: Int = 0,
@@ -79,8 +80,8 @@ data class LineupCreationUiState(
     val showDiscardSheet: Boolean = false,
     val showNewTournamentSheet: Boolean = false,
     val newTournamentName: String = "",
-    val newTournamentStartTime: Long = System.currentTimeMillis(),
-    val newTournamentEndTime: Long = System.currentTimeMillis(),
+    val newTournamentStartTime: Long = 0L,
+    val newTournamentEndTime: Long = 0L,
     val newTournamentAddress: String = "",
     val newTournamentError: NewTournamentError? = null,
     val openDatePicker: LineupDatePicker? = null
@@ -109,9 +110,11 @@ class LineupCreationViewModel(
     private val saveTournament: SaveTournament,
     private val toggleRosterPlayerUseCase: ToggleRosterPlayer,
     private val clearRosterUseCase: ClearRoster,
-    private val resolveLineupEventTimeUseCase: ResolveLineupEventTime
+    private val resolveLineupEventTimeUseCase: ResolveLineupEventTime,
+    private val clock: Clock
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(LineupCreationUiState())
+    private val _uiState =
+        MutableStateFlow(LineupCreationUiState(eventTimeInMillis = clock.nowMillis()))
     val uiState: StateFlow<LineupCreationUiState> = _uiState.asStateFlow()
 
     private val _events = Channel<LineupCreationEvent>(Channel.BUFFERED)
@@ -254,7 +257,7 @@ class LineupCreationViewModel(
     }
 
     fun onNewTournamentSheetOpen() {
-        val now = System.currentTimeMillis()
+        val now = clock.nowMillis()
         _uiState.update {
             it.copy(
                 showTournamentSheet = false,

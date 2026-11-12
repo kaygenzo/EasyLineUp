@@ -221,7 +221,7 @@ internal class SettingsViewModelTest {
         advanceUntilIdle()
 
         val written = WrittenExportFile(fileName = "export.elu", folderName = "Documents")
-        Mockito.lenient().`when`(generateExportFileName(Mockito.anyLong())).thenReturn("export.elu")
+        Mockito.lenient().`when`(generateExportFileName()).thenReturn("export.elu")
         Mockito.lenient().`when`(exportFileWriter.write(any(), any(), any())).thenReturn(written)
 
         val events = mutableListOf<SettingsEvent>()
@@ -245,7 +245,7 @@ internal class SettingsViewModelTest {
         viewModel.loadExportPreview()
         advanceUntilIdle()
 
-        Mockito.lenient().`when`(generateExportFileName(Mockito.anyLong())).thenReturn("export.elu")
+        Mockito.lenient().`when`(generateExportFileName()).thenReturn("export.elu")
         Mockito.lenient().`when`(exportFileWriter.write(any(), any(), any()))
             .thenThrow(RuntimeException("disk error"))
 
