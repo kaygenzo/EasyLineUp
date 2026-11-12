@@ -169,7 +169,12 @@ android {
         jacocoVersion = rootProject.ext.jacocoVersion
     }
     lint {
-        abortOnError false
+        // Warnings fail the build too: the report was cleared to zero, and a gate that only
+        // stops on errors lets the warnings pile up again.
+        warningsAsErrors true
+        // Version checks change whenever a library ships, so they would fail a build nobody
+        // touched. Bumps are deliberate (see the minSdk notes in CLAUDE.md).
+        disable 'NewerVersionAvailable', 'GradleDependency', 'AndroidGradlePluginVersion'
     }
 }
 

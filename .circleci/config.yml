@@ -145,7 +145,14 @@ jobs:
           variable: KEYSTORE_FILE
           path: telen.release.jks
       - restore-gradle-cache
-      - run: ./gradlew assembleProdRelease --stacktrace
+      # lintProdRelease runs in app and repository; warnings fail it (see their lint blocks).
+      - run: ./gradlew assembleProdRelease lintProdRelease --stacktrace
+      - store_artifacts:
+          path: app/build/reports
+          destination: lint/app
+      - store_artifacts:
+          path: repository/build/reports
+          destination: lint/repository
       - store_artifacts:
           path: app/build/outputs/apk/prod/release
           destination: release
