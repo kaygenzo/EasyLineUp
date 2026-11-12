@@ -8,6 +8,7 @@ import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.ports.repository.TournamentRepository
 import com.telen.easylineup.repository.dao.TournamentDao
 import com.telen.easylineup.repository.model.toDomain
+import com.telen.easylineup.repository.model.toNewRoom
 import com.telen.easylineup.repository.model.toRoom
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -37,11 +38,11 @@ internal class TournamentRepositoryImpl(
     }
 
     override suspend fun insertTournament(tournament: Tournament): Long {
-        return tournamentDao.insertTournament(tournament.toRoom())
+        return tournamentDao.insertTournament(tournament.toNewRoom())
     }
 
     override suspend fun insertTournaments(tournaments: List<Tournament>) {
-        tournamentDao.insertTournaments(tournaments.map { it.toRoom() })
+        tournamentDao.insertTournaments(tournaments.map { it.toNewRoom() })
     }
 
     override suspend fun updateTournament(tournament: Tournament) {

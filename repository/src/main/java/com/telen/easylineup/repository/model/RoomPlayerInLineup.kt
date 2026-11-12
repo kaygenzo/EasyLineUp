@@ -15,11 +15,11 @@ import com.telen.easylineup.domain.model.PlayerInLineup
  * @property playerId
  */
 internal data class RoomPlayerInLineup(
-    @ColumnInfo(name = "lineupName") var lineupName: String = "",
-    @ColumnInfo(name = "lineupID") var lineupId: Long = 0,
-    @ColumnInfo(name = "position") var position: Int?,
-    @ColumnInfo(name = "playerName") var playerName: String?,
-    @ColumnInfo(name = "playerID") var playerId: Long?
+    @ColumnInfo(name = "lineupName") val lineupName: String = "",
+    @ColumnInfo(name = "lineupID") val lineupId: Long = 0,
+    @ColumnInfo(name = "position") val position: Int?,
+    @ColumnInfo(name = "playerName") val playerName: String?,
+    @ColumnInfo(name = "playerID") val playerId: Long?
 )
 
 internal fun RoomPlayerInLineup.toDomain(): PlayerInLineup {

@@ -10,6 +10,7 @@ import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepositor
 import com.telen.easylineup.repository.dao.PlayerDao
 import com.telen.easylineup.repository.dao.PlayerNumberOverlayDao
 import com.telen.easylineup.repository.model.toDomain
+import com.telen.easylineup.repository.model.toNewRoom
 import com.telen.easylineup.repository.model.toRoom
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -42,11 +43,11 @@ internal class PlayerNumberOverlayRepositoryImpl(
     }
 
     override suspend fun insertPlayerNumberOverlays(overlays: List<PlayerNumberOverlay>) {
-        numberOverlayDao.insertPlayerNumberOverlays(overlays.map { it.toRoom() })
+        numberOverlayDao.insertPlayerNumberOverlays(overlays.map { it.toNewRoom() })
     }
 
     override suspend fun insertPlayerNumberOverlay(overlay: PlayerNumberOverlay) {
-        numberOverlayDao.insertPlayerNumberOverlay(overlay.toRoom())
+        numberOverlayDao.insertPlayerNumberOverlay(overlay.toNewRoom())
     }
 
     override suspend fun getShirtNumberFromNumberOverlays(

@@ -10,6 +10,7 @@ import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.ports.repository.PlayerRepository
 import com.telen.easylineup.repository.dao.PlayerDao
 import com.telen.easylineup.repository.model.toDomain
+import com.telen.easylineup.repository.model.toNewRoom
 import com.telen.easylineup.repository.model.toRoom
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -23,11 +24,11 @@ internal class PlayerRepositoryImpl(
     }
 
     override suspend fun insertPlayer(player: Player): Long {
-        return playerDao.insertPlayer(player.toRoom())
+        return playerDao.insertPlayer(player.toNewRoom())
     }
 
     override suspend fun insertPlayers(players: List<Player>) {
-        playerDao.insertPlayers(players.map { it.toRoom() })
+        playerDao.insertPlayers(players.map { it.toNewRoom() })
     }
 
     override suspend fun deletePlayer(player: Player) {

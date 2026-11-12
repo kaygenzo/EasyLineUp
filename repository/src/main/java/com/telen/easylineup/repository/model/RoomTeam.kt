@@ -10,7 +10,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.telen.easylineup.domain.model.Team
 import java.io.Serializable
-import java.util.UUID
 
 /**
  * @property id
@@ -27,13 +26,13 @@ import java.util.UUID
     indices = [Index(value = ["name"]), Index(value = ["hash"], unique = true)]
 )
 internal data class RoomTeam(
-    @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    @ColumnInfo(name = "name") var name: String = "",
-    @ColumnInfo(name = "image") var image: String? = null,
-    @ColumnInfo(name = "type") var type: Int = 0,
-    @ColumnInfo(name = "main") var main: Boolean = false,
-    @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString(),
-    @ColumnInfo(name = "createdAt") var createdAt: Long = 0L
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "name") val name: String = "",
+    @ColumnInfo(name = "image") val image: String? = null,
+    @ColumnInfo(name = "type") val type: Int = 0,
+    @ColumnInfo(name = "main") val main: Boolean = false,
+    @ColumnInfo(name = "hash") val hash: String? = null,
+    @ColumnInfo(name = "createdAt") val createdAt: Long = 0L
 ) : Serializable {
     override fun toString(): String {
         val builder = StringBuffer().apply {

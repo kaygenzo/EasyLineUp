@@ -11,7 +11,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import java.io.Serializable
-import java.util.UUID
 
 /**
  * @property id
@@ -40,11 +39,11 @@ import java.util.UUID
     ]
 )
 internal data class RoomPlayerNumberOverlay(
-    @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    @ColumnInfo(name = "lineupID") var lineupId: Long = 0,
-    @ColumnInfo(name = "playerID") var playerId: Long = 0,
-    @ColumnInfo(name = "number") var number: Int = 0,
-    @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "lineupID") val lineupId: Long = 0,
+    @ColumnInfo(name = "playerID") val playerId: Long = 0,
+    @ColumnInfo(name = "number") val number: Int = 0,
+    @ColumnInfo(name = "hash") val hash: String? = null
 ) : Serializable
 
 internal fun RoomPlayerNumberOverlay.toDomain(): PlayerNumberOverlay {

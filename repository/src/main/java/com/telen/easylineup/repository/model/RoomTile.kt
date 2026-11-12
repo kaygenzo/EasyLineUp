@@ -23,10 +23,10 @@ import java.io.Serializable
     indices = [Index(value = ["position"])]
 )
 internal data class RoomTile(
-    @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    @ColumnInfo(name = "position") var position: Int = 0,
-    @ColumnInfo(name = "type") var type: Int = TileType.BETA.type,
-    @ColumnInfo(name = "enabled") var enabled: Boolean = true
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "position") val position: Int = 0,
+    @ColumnInfo(name = "type") val type: Int = TileType.BETA.type,
+    @ColumnInfo(name = "enabled") val enabled: Boolean = true
 ) : Serializable
 
 internal fun RoomTile.toDomain(): DashboardTile {

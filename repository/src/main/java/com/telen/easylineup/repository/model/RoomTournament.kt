@@ -10,7 +10,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.telen.easylineup.domain.model.Tournament
 import java.io.Serializable
-import java.util.UUID
 
 /**
  * @property id
@@ -26,13 +25,13 @@ import java.util.UUID
     indices = [Index(value = ["name"], unique = true), Index(value = ["hash"], unique = true)]
 )
 internal data class RoomTournament(
-    @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    @ColumnInfo(name = "name") var name: String = "",
-    @ColumnInfo(name = "createdAt") var createdAt: Long = 0L,
-    @ColumnInfo(name = "startTime") var startTime: Long = 0L,
-    @ColumnInfo(name = "endTime") var endTime: Long = 0L,
-    @ColumnInfo(name = "address") var address: String? = null,
-    @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "name") val name: String = "",
+    @ColumnInfo(name = "createdAt") val createdAt: Long = 0L,
+    @ColumnInfo(name = "startTime") val startTime: Long = 0L,
+    @ColumnInfo(name = "endTime") val endTime: Long = 0L,
+    @ColumnInfo(name = "address") val address: String? = null,
+    @ColumnInfo(name = "hash") val hash: String? = null
 ) : Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) {

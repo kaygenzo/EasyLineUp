@@ -16,12 +16,12 @@ import com.telen.easylineup.domain.model.PositionWithLineup
  * @property tournamentName
  */
 internal data class RoomPositionWithLineup(
-    @ColumnInfo(name = "position") var position: Int = 0,
-    @ColumnInfo(name = "x") var x: Float = 0f,
-    @ColumnInfo(name = "y") var y: Float = 0f,
-    @ColumnInfo(name = "order") var order: Int = 0,
-    @ColumnInfo(name = "lineupName") var lineupName: String = "",
-    @ColumnInfo(name = "tournamentName") var tournamentName: String = ""
+    @ColumnInfo(name = "position") val position: Int = 0,
+    @ColumnInfo(name = "x") val x: Float = 0f,
+    @ColumnInfo(name = "y") val y: Float = 0f,
+    @ColumnInfo(name = "order") val order: Int = 0,
+    @ColumnInfo(name = "lineupName") val lineupName: String = "",
+    @ColumnInfo(name = "tournamentName") val tournamentName: String = ""
 )
 
 internal fun RoomPositionWithLineup.toDomain(): PositionWithLineup {

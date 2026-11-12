@@ -40,13 +40,13 @@ class CascadeDeleteTest {
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
 
         team = RoomTeam(name = "Riverside Hawks")
-        team.id = db.teamDao().insertTeam(team)
+            .let { it.copy(id = db.teamDao().insertTeam(it)) }
         tournament = RoomTournament(name = "Fall Classic")
-        tournament.id = db.tournamentDao().insertTournament(tournament)
+            .let { it.copy(id = db.tournamentDao().insertTournament(it)) }
         player = RoomPlayer(teamId = team.id, name = "Player")
-        player.id = db.playerDao().insertPlayer(player)
+            .let { it.copy(id = db.playerDao().insertPlayer(it)) }
         lineup = RoomLineup(name = "Game 1", teamId = team.id, tournamentId = tournament.id)
-        lineup.id = db.lineupDao().insertLineup(lineup)
+            .let { it.copy(id = db.lineupDao().insertLineup(it)) }
         db.playerFieldPositionsDao().insertPlayerFieldPositions(
             listOf(RoomPlayerFieldPosition(playerId = player.id, lineupId = lineup.id))
         )

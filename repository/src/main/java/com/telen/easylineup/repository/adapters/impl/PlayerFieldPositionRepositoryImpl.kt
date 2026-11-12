@@ -11,6 +11,7 @@ import com.telen.easylineup.domain.model.PositionWithLineup
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.repository.dao.PlayerFieldPositionsDao
 import com.telen.easylineup.repository.model.toDomain
+import com.telen.easylineup.repository.model.toNewRoom
 import com.telen.easylineup.repository.model.toRoom
 import timber.log.Timber
 
@@ -22,7 +23,7 @@ internal class PlayerFieldPositionRepositoryImpl(
     }
 
     override suspend fun insertPlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>) {
-        playerFieldPositionsDao.insertPlayerFieldPositions(fieldPositions.map { it.toRoom() })
+        playerFieldPositionsDao.insertPlayerFieldPositions(fieldPositions.map { it.toNewRoom() })
     }
 
     override suspend fun updatePlayerFieldPositions(fieldPositions: List<PlayerFieldPosition>) {
@@ -50,7 +51,7 @@ internal class PlayerFieldPositionRepositoryImpl(
     }
 
     override suspend fun insertPlayerFieldPosition(fieldPosition: PlayerFieldPosition): Long {
-        return playerFieldPositionsDao.insertPlayerFieldPosition(fieldPosition.toRoom())
+        return playerFieldPositionsDao.insertPlayerFieldPosition(fieldPosition.toNewRoom())
     }
 
     override suspend fun getPlayerFieldPositionByHash(hash: String): PlayerFieldPosition? {

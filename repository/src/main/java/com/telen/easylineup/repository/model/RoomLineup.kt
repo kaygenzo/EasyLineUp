@@ -10,8 +10,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.telen.easylineup.domain.model.Lineup
-import java.util.Calendar
-import java.util.UUID
 
 /**
  * @property id
@@ -47,20 +45,20 @@ import java.util.UUID
     ]
 )
 internal data class RoomLineup(
-    @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    @ColumnInfo(name = "name") var name: String = "",
-    @ColumnInfo(name = "teamID") var teamId: Long = 0,
-    @ColumnInfo(name = "tournamentID") var tournamentId: Long = 0,
-    @ColumnInfo(name = "mode") var mode: Int = 0,
-    @ColumnInfo(name = "strategy") var strategy: Int = 0,
-    @ColumnInfo(name = "extraHitters") var extraHitters: Int = 0,
-    @ColumnInfo(name = "eventTime") var eventTimeInMillis: Long = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "name") val name: String = "",
+    @ColumnInfo(name = "teamID") val teamId: Long = 0,
+    @ColumnInfo(name = "tournamentID") val tournamentId: Long = 0,
+    @ColumnInfo(name = "mode") val mode: Int = 0,
+    @ColumnInfo(name = "strategy") val strategy: Int = 0,
+    @ColumnInfo(name = "extraHitters") val extraHitters: Int = 0,
+    @ColumnInfo(name = "eventTime") val eventTimeInMillis: Long = 0,
     @ColumnInfo(name = "createdAt")
-    var createdTimeInMillis: Long = Calendar.getInstance().timeInMillis,
+    val createdTimeInMillis: Long = 0L,
     @ColumnInfo(name = "editedAt")
-    var editedTimeInMillis: Long = Calendar.getInstance().timeInMillis,
-    @ColumnInfo(name = "roaster") var roster: String? = null,
-    @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
+    val editedTimeInMillis: Long = 0L,
+    @ColumnInfo(name = "roaster") val roster: String? = null,
+    @ColumnInfo(name = "hash") val hash: String? = null
 )
 
 internal fun Lineup.toRoom(): RoomLineup {

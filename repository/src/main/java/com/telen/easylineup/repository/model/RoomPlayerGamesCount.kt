@@ -12,8 +12,8 @@ import com.telen.easylineup.domain.model.PlayerGamesCount
  * @property size
  */
 internal data class RoomPlayerGamesCount(
-    @ColumnInfo(name = "playerID") var playerId: Long = 0,
-    @ColumnInfo(name = "size") var size: Int = 0
+    @ColumnInfo(name = "playerID") val playerId: Long = 0,
+    @ColumnInfo(name = "size") val size: Int = 0
 )
 
 internal fun RoomPlayerGamesCount.toDomain(): PlayerGamesCount {

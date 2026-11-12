@@ -10,6 +10,7 @@ import com.telen.easylineup.domain.model.TournamentWithLineup
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.repository.dao.LineupDao
 import com.telen.easylineup.repository.model.toDomain
+import com.telen.easylineup.repository.model.toNewRoom
 import com.telen.easylineup.repository.model.toRoom
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -21,11 +22,11 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
     }
 
     override suspend fun insertLineup(lineup: Lineup): Long {
-        return lineupDao.insertLineup(lineup.toRoom())
+        return lineupDao.insertLineup(lineup.toNewRoom())
     }
 
     override suspend fun insertLineups(lineups: List<Lineup>) {
-        lineupDao.insertLineups(lineups.map { it.toRoom() })
+        lineupDao.insertLineups(lineups.map { it.toNewRoom() })
     }
 
     override suspend fun updateLineup(lineup: Lineup) {

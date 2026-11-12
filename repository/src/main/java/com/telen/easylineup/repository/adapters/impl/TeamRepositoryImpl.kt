@@ -8,6 +8,7 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.repository.dao.TeamDao
 import com.telen.easylineup.repository.model.toDomain
+import com.telen.easylineup.repository.model.toNewRoom
 import com.telen.easylineup.repository.model.toRoom
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -19,7 +20,7 @@ internal class TeamRepositoryImpl(private val teamDao: TeamDao) : TeamRepository
     }
 
     override suspend fun insertTeam(team: Team): Long {
-        return teamDao.insertTeam(team.toRoom())
+        return teamDao.insertTeam(team.toNewRoom())
     }
 
     override suspend fun deleteTeam(team: Team) {

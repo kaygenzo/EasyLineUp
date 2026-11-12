@@ -10,7 +10,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.telen.easylineup.domain.model.Player
-import java.util.UUID
 
 /**
  * @property id
@@ -42,19 +41,19 @@ import java.util.UUID
     ]
 )
 internal data class RoomPlayer(
-    @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    @ColumnInfo(name = "teamID") var teamId: Long = 0,
-    @ColumnInfo(name = "name") var name: String = "",
-    @ColumnInfo(name = "shirtNumber") var shirtNumber: Int = 0,
-    @ColumnInfo(name = "licenseNumber") var licenseNumber: String = "",
-    @ColumnInfo(name = "image") var image: String? = null,
-    @ColumnInfo(name = "positions") var positions: Int = 0,
-    @ColumnInfo(name = "pitching") var pitching: Int = 0,
-    @ColumnInfo(name = "batting") var batting: Int = 0,
-    @ColumnInfo(name = "email") var email: String? = null,
-    @ColumnInfo(name = "phone") var phone: String? = null,
-    @ColumnInfo(name = "sex") var sex: Int = 0,
-    @ColumnInfo(name = "hash") var hash: String? = UUID.randomUUID().toString()
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "teamID") val teamId: Long = 0,
+    @ColumnInfo(name = "name") val name: String = "",
+    @ColumnInfo(name = "shirtNumber") val shirtNumber: Int = 0,
+    @ColumnInfo(name = "licenseNumber") val licenseNumber: String = "",
+    @ColumnInfo(name = "image") val image: String? = null,
+    @ColumnInfo(name = "positions") val positions: Int = 0,
+    @ColumnInfo(name = "pitching") val pitching: Int = 0,
+    @ColumnInfo(name = "batting") val batting: Int = 0,
+    @ColumnInfo(name = "email") val email: String? = null,
+    @ColumnInfo(name = "phone") val phone: String? = null,
+    @ColumnInfo(name = "sex") val sex: Int = 0,
+    @ColumnInfo(name = "hash") val hash: String? = null
 )
 
 internal fun Player.toRoom(): RoomPlayer {
