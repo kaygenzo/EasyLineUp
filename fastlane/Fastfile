@@ -10,8 +10,8 @@
 #     https://docs.fastlane.tools/plugins/available-plugins
 #
 
-# Uncomment the line if you want fastlane to automatically update itself
-update_fastlane
+# fastlane is pinned by Gemfile.lock and run through bundler: no update_fastlane here, so a CI
+# run never installs a version nobody chose, with the Play Store credentials on disk.
 
 # More documentation about how to customize your build
 # can be found here:

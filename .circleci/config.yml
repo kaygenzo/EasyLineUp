@@ -3,56 +3,85 @@ version: 2.1
 executors:
   easylineup-executor:
     docker:
-      - image: kaygenzo/android-fastlane:36
+      # CircleCI's maintained Android image: SDK, JDK 17/21, Ruby, bundler and fastlane are already
+      # there, so there is no custom image to build. Pinned by digest, so a re-pushed tag can't
+      # change what runs next to the signing keys; bump the tag and the digest together.
+      - image: cimg/android:2026.10.1@sha256:4e5677b17e50ea9b478f9b88071cf58dbd751ae4d62f296c676dd47e99a88e4b
     resource_class: large
     working_directory: ~/easylineup
     environment:
-      # The image's JDK 17.0.2 has cgroup bugs (fixed in 17.0.5) that can make
-      # ManagementFactory.getPlatformMBeanServer() throw inside a container. AGP's lint calls it
-      # in AndroidLintWorkAction's static initializer, and build-prod failed only on CircleCI
-      # with "Could not initialize class AndroidLintWorkAction". Gradle sets its heaps
-      # explicitly in gradle.properties, so the JVM doesn't need container detection for them.
-      # Without it the JVM also sees every CPU of the host, not the executor's 4, so pin that
-      # back: it sizes GC, JIT, R8 and Gradle worker threads.
-      JAVA_TOOL_OPTIONS: -XX:-UseContainerSupport -XX:ActiveProcessorCount=4
       # The Kotlin compile daemon stays resident (~1.5 GB) until the build ends, and next to the
       # Gradle daemon running R8 (~6.3 GB) that went past the executor's 8 GB: the OOM killer
       # took the Gradle daemon during minifyProdReleaseWithR8. Compiling in the Gradle daemon
-      # instead peaks at ~7.2 GB in this image capped at 8 GB / 4 CPUs. Setting GRADLE_OPTS here
-      # also overrides the project-level GRADLE_OPTS variable, so the CI JVMs are fully
+      # instead peaks at ~7.2 GB in this executor capped at 8 GB / 4 CPUs. Setting GRADLE_OPTS
+      # here also overrides the project-level GRADLE_OPTS variable, so the CI JVMs are fully
       # described by this file and gradle.properties.
       GRADLE_OPTS: -Dorg.gradle.project.kotlin.compiler.execution.strategy=in-process
 
-jobs:
-  pre-build:
-    executor: easylineup-executor
-    description: "Unit tests"
+commands:
+  # Each job decodes only the secrets it uses, straight from the project's environment
+  # variables: nothing is persisted to a workspace, and the files go away with the container.
+  decode-secret:
+    parameters:
+      variable:
+        type: string
+      path:
+        type: string
     steps:
       - run:
+          name: Decode << parameters.path >>
           command: |
-              mkdir -p app
-              echo $KEYSTORE_FILE | base64 -d > telen.release.jks
-              echo $GOOGLE_SERVICES_FILE | base64 -d > app/google-services.json
-              echo $APP_DISTRIBUTION_SERVICE_FILE | base64 -d > easylineup-services.json
-              echo $APP_DISTRIBUTION_TESTERS_FILE | base64 -d > testers.txt
-              echo $PLAY_STORE_CREDENTIALS | base64 -d > play-store-credentials.json
-              echo $DEBUG_KEYSTORE_FILE | base64 -d > telen.debug.jks
-      - persist_to_workspace:
-          root: .
+            value="${<< parameters.variable >>:-}"
+            if [ -z "$value" ]; then
+              echo "<< parameters.variable >> is not set"
+              exit 1
+            fi
+            mkdir -p "$(dirname "<< parameters.path >>")"
+            printf '%s' "$value" | base64 -d > "<< parameters.path >>"
+
+  # Dependencies, the Gradle distribution and the build cache, one cache per job since each job
+  # resolves a different set (Robolectric's android-all jars, R8, lint, androidTest...). The key
+  # changes with any version or build script; the fallback reuses the job's last cache, so a
+  # version bump only downloads what changed.
+  restore-gradle-cache:
+    steps:
+      - run:
+          name: Compute the Gradle cache key
+          command: |
+            cat gradle/wrapper/gradle-wrapper.properties gradle/libs.versions.toml \
+              gradle.properties settings.gradle build.gradle */build.gradle *.gradle \
+              > /tmp/gradle-cache-key
+      - restore_cache:
+          keys:
+            - gradle-v1-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/gradle-cache-key" }}
+            - gradle-v1-{{ .Environment.CIRCLE_JOB }}-
+
+  save-gradle-cache:
+    steps:
+      - run:
+          name: Drop Gradle's lock files before caching
+          command: |
+            ./gradlew --stop
+            find ~/.gradle/caches -name '*.lock' -delete
+            rm -f ~/.gradle/caches/*/fileHashes/fileHashes.bin
+      - save_cache:
+          key: gradle-v1-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/gradle-cache-key" }}
           paths:
-            - telen.release.jks
-            - telen.debug.jks
-            - app/google-services.json
-            - easylineup-services.json
-            - testers.txt
-            - play-store-credentials.json
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
+            - ~/.m2/repository/org/robolectric
+
+jobs:
   unit-tests:
     executor: easylineup-executor
     description: "Unit tests"
     steps:
       - checkout
-      - attach_workspace:
-          at: .
+      # Not a signing secret, but the google-services plugin needs it to configure the app.
+      - decode-secret:
+          variable: GOOGLE_SERVICES_FILE
+          path: app/google-services.json
+      - restore-gradle-cache
       # Depends on every module's unit tests. domain is a plain JVM module with no
       # testProdDebugUnitTest task, so that name alone would skip it.
       - run: ./gradlew jacocoFullReport
@@ -62,6 +91,9 @@ jobs:
       # Feeds the Codacy coverage badge. CODACY_PROJECT_TOKEN is the project API token from
       # Codacy (Settings > Integrations > Project API), set in the CircleCI project's
       # environment variables; without it (a fork, or before it is set) the upload is skipped.
+      # The reporter is a pinned release checked against its SHA-256, not a script fetched at
+      # run time; to update it, take the new version's codacy-coverage-reporter-linux digest
+      # from its GitHub release page.
       - run:
           name: Upload coverage to Codacy
           command: |
@@ -69,16 +101,29 @@ jobs:
               echo "CODACY_PROJECT_TOKEN is not set, skipping the coverage upload"
               exit 0
             fi
-            bash <(curl -Ls https://coverage.codacy.com/get.sh) report \
+            version=14.1.3
+            sha256=15c5f052207d27b8501ab5d5910c68c206ea70b0157ee1725132780530580875
+            releases=https://github.com/codacy/codacy-coverage-reporter/releases/download
+            curl -fsSLo /tmp/codacy-coverage-reporter \
+              "$releases/$version/codacy-coverage-reporter-linux"
+            echo "$sha256  /tmp/codacy-coverage-reporter" | sha256sum -c -
+            chmod +x /tmp/codacy-coverage-reporter
+            /tmp/codacy-coverage-reporter report \
               -r build/reports/jacoco/jacocoFullReport/jacocoFullReport.xml
+      - save-gradle-cache
 
   android-tests-build:
     executor: easylineup-executor
     description: "Android tests build"
     steps:
       - checkout
-      - attach_workspace:
-          at: .
+      - decode-secret:
+          variable: GOOGLE_SERVICES_FILE
+          path: app/google-services.json
+      - decode-secret:
+          variable: DEBUG_KEYSTORE_FILE
+          path: telen.debug.jks
+      - restore-gradle-cache
       - run: ./gradlew assembleDemoDebug assembleDemoDebugAndroidTest
       - store_artifacts:
           path: app/build/outputs/apk/demo/debug
@@ -86,14 +131,20 @@ jobs:
       - store_artifacts:
           path: app/build/outputs/apk/androidTest/demo/debug
           destination: androidTestBinaries
+      - save-gradle-cache
 
   build-prod:
     executor: easylineup-executor
     description: "Build artifacts"
     steps:
       - checkout
-      - attach_workspace:
-          at: .
+      - decode-secret:
+          variable: GOOGLE_SERVICES_FILE
+          path: app/google-services.json
+      - decode-secret:
+          variable: KEYSTORE_FILE
+          path: telen.release.jks
+      - restore-gradle-cache
       - run: ./gradlew assembleProdRelease --stacktrace
       - store_artifacts:
           path: app/build/outputs/apk/prod/release
@@ -101,59 +152,80 @@ jobs:
       - store_artifacts:
           path: app/build/outputs/mapping/prodRelease/mapping.txt
           destination: release/mapping.txt
-      - persist_to_workspace:
-          root: .
-          paths:
-            - app/build/outputs/apk/prod/release
+      - save-gradle-cache
+
   firebase:
     executor: easylineup-executor
     description: "Send built artifact to firebase"
     steps:
       - checkout
-      - attach_workspace:
-          at: .
-      - run: 
+      - decode-secret:
+          variable: GOOGLE_SERVICES_FILE
+          path: app/google-services.json
+      - decode-secret:
+          variable: KEYSTORE_FILE
+          path: telen.release.jks
+      - decode-secret:
+          variable: APP_DISTRIBUTION_SERVICE_FILE
+          path: easylineup-services.json
+      - decode-secret:
+          variable: APP_DISTRIBUTION_TESTERS_FILE
+          path: testers.txt
+      - restore-gradle-cache
+      - run:
           command: |
               git rev-parse --abbrev-ref HEAD > releasenotes.txt
               git log -1 --pretty="%B %ad" >> releasenotes.txt
-              ./gradlew assembleRelease appDistributionUploadProdRelease appDistributionUploadDemoRelease appDistributionUploadDevRelease
+              ./gradlew assembleRelease appDistributionUploadProdRelease \
+                appDistributionUploadDemoRelease appDistributionUploadDevRelease
+      - save-gradle-cache
+
   deploy-alpha:
     executor: easylineup-executor
     description: "Build alpha version artifacts"
     steps:
       - checkout
-      - attach_workspace:
-          at: .
+      - decode-secret:
+          variable: GOOGLE_SERVICES_FILE
+          path: app/google-services.json
+      - decode-secret:
+          variable: KEYSTORE_FILE
+          path: telen.release.jks
+      - decode-secret:
+          variable: PLAY_STORE_CREDENTIALS
+          path: play-store-credentials.json
+      - restore-gradle-cache
+      # fastlane and its gems, as pinned by Gemfile.lock. The image is part of the key since
+      # native extensions are built against its Ruby.
+      - restore_cache:
+          keys:
+            - gems-v1-cimg-android-2026.10.1-{{ checksum "Gemfile.lock" }}
       - run:
+          name: Install fastlane
           command: |
-            ./gradlew bundleProdRelease
-            bundle install
-            bundle exec fastlane deploy_to_alpha
+            bundle config set --local path vendor/bundle
+            bundle install --jobs 4
+      - save_cache:
+          key: gems-v1-cimg-android-2026.10.1-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+      - run: ./gradlew bundleProdRelease
+      - run: bundle exec fastlane deploy_to_alpha
       - store_artifacts:
           path: app/build/outputs/mapping/prodRelease/mapping.txt
           destination: release/mapping.txt
-      
+      - save-gradle-cache
+
 workflows:
   build-deploy:
     jobs:
-      - pre-build:
-          filters:
-            tags:
-              only: /([0-9]+\.?){1,4}/
       - unit-tests:
-          requires:
-            - pre-build
           filters:
             tags:
               only: /([0-9]+\.?){1,4}/
       - build-prod:
           requires:
             - unit-tests
-          post-steps:
-            - run:
-                command: |
-                  rm telen.release.jks
-                  rm app/google-services.json
           filters:
             tags:
               only: /([0-9]+\.?){1,4}/
@@ -161,14 +233,8 @@ workflows:
           requires:
             - build-prod
       - firebase:
-          requires: 
+          requires:
             - build-prod
-          post-steps:
-            - run:
-                command: |
-                  rm easylineup-services.json
-                  rm testers.txt
-                  rm releasenotes.txt
       - deploy-alpha:
           requires:
             - build-prod
@@ -177,10 +243,3 @@ workflows:
               only: /([0-9]+\.?){1,4}/
             branches:
               ignore: /.*/
-
-#      - restore_cache:
-#          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-#      - save_cache:
-#          paths:
-#            - ~/.gradle
-#          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
