@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.application
 
+import android.location.Geocoder
 import com.telen.easylineup.HomeViewModel
 import com.telen.easylineup.dashboard.DashboardViewModel
 import com.telen.easylineup.domain.ports.Clock
@@ -44,7 +45,7 @@ val appModules = module {
     single<DispatcherProvider> { DispatcherProviderImpl() }
     single<Clock> { WallClock() }
     single<StringResourcesProvider> { StringResourcesProviderImpl(get()) }
-    single<GeocodingProvider> { GeocodingProviderImpl(get()) }
+    single<GeocodingProvider> { GeocodingProviderImpl(Geocoder(get())) }
     single<PhoneNumberValidator> { PhoneNumberValidatorImpl() }
     single<ExportFileWriter> { ExportFileWriterImpl(get()) }
     single<UserPreferencesStore> { SharedPreferencesUserPreferencesStore(get()) }
