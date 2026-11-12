@@ -1,6 +1,6 @@
 # Baseball softball lineups keeper
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ae373afec7fe4dacaae97a2c03cc0013)](https://www.codacy.com/manual/kaygenzo/EasyLineUp?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kaygenzo/EasyLineUp&amp;utm_campaign=Badge_Grade) [![pipeline status](https://gitlab.com/telen.lannion/EasyLineUp/badges/develop/pipeline.svg)](https://gitlab.com/telen.lannion/EasyLineUp/-/commits/develop)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ae373afec7fe4dacaae97a2c03cc0013)](https://www.codacy.com/manual/kaygenzo/EasyLineUp?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kaygenzo/EasyLineUp&amp;utm_campaign=Badge_Grade) [![Codacy Coverage](https://app.codacy.com/project/badge/Coverage/ae373afec7fe4dacaae97a2c03cc0013)](https://app.codacy.com/gh/kaygenzo/EasyLineUp/coverage) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/kaygenzo/EasyLineUp/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/kaygenzo/EasyLineUp/tree/develop)
 
 ## Description and purpose
 
@@ -178,8 +178,9 @@ screenshots from.
   of all three modules in one place. Generated code, DI wiring, `domain`'s pure
   data classes and Compose UI/Activities are excluded, so the number reflects what
   unit tests are responsible for: Compose UI is covered by instrumented tests,
-  which this report doesn't include yet. Codacy and the GitLab pipeline badges at
-  the top of this file track both on `develop`.
+  which this report doesn't include yet. The `unit-tests` job uploads it to
+  Codacy, whose grade and coverage badges, with CircleCI's, sit at the top of this
+  file and track `develop`.
 
 ## Libraries
 
