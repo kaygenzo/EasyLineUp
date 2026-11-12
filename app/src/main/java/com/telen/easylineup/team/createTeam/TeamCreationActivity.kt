@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -33,7 +34,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TeamCreationActivity : BaseActivity() {
     private val viewModel by viewModel<SetupViewModel>()
-    private val isEditing by lazy { intent.extras?.get(Constants.EXTRA_TEAM) != null }
+    private val teamToEdit: Team? by lazy {
+        IntentCompat.getSerializableExtra(intent, Constants.EXTRA_TEAM, Team::class.java)
+    }
+    private val isEditing get() = teamToEdit != null
 
     private var teamName by mutableStateOf("")
     private var teamImageUri by mutableStateOf<Uri?>(null)
@@ -50,7 +54,7 @@ class TeamCreationActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.setTeam(intent.extras?.get(Constants.EXTRA_TEAM) as? Team)
+        viewModel.setTeam(teamToEdit)
 
         viewModel.observeTeamName()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
