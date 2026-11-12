@@ -12,7 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
-import com.telen.easylineup.repository.RepositoryModule
+import com.telen.easylineup.repository.Migrations
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -48,7 +48,7 @@ class MigrationTest {
             TEST_DB_NAME,
             17,
             true,
-            RepositoryModule.migration16To17()
+            Migrations.migration16To17()
         )
 
         db.query("SELECT startTime, endTime, address FROM tournaments WHERE id = 1").use { cursor ->
@@ -76,7 +76,7 @@ class MigrationTest {
             TEST_DB_NAME,
             18,
             true,
-            RepositoryModule.migration17To18()
+            Migrations.migration17To18()
         )
 
         db.query("SELECT createdAt FROM teams WHERE id = 1").use { cursor ->
@@ -118,7 +118,7 @@ class MigrationTest {
             TEST_DB_NAME,
             19,
             true,
-            RepositoryModule.migration18To19()
+            Migrations.migration18To19()
         )
 
         db.query("SELECT strategy FROM lineups WHERE id = 1").use { cursor ->
@@ -172,7 +172,7 @@ class MigrationTest {
             TEST_DB_NAME,
             20,
             true,
-            RepositoryModule.migration19To20()
+            Migrations.migration19To20()
         )
 
         db.query("SELECT id, licenseNumber FROM players ORDER BY id").use { cursor ->
@@ -195,7 +195,7 @@ class MigrationTest {
             TEST_DB_NAME,
             21,
             true,
-            RepositoryModule.migration20To21()
+            Migrations.migration20To21()
         )
 
         // SQLite must now pick the new index for each foreign key lookup, not scan the table.
@@ -242,7 +242,7 @@ class MigrationTest {
             TEST_DB_NAME,
             22,
             true,
-            RepositoryModule.migration21To22()
+            Migrations.migration21To22()
         )
 
         db.query("SELECT id FROM tournaments ORDER BY id").use { cursor ->
@@ -280,7 +280,7 @@ class MigrationTest {
             TEST_DB_NAME,
             23,
             true,
-            RepositoryModule.migration22To23()
+            Migrations.migration22To23()
         )
 
         val hashes = db.query("SELECT id, hash FROM teams ORDER BY id").use { cursor ->
@@ -318,13 +318,13 @@ class MigrationTest {
             TEST_DB_NAME,
             23,
             true,
-            RepositoryModule.migration16To17(),
-            RepositoryModule.migration17To18(),
-            RepositoryModule.migration18To19(),
-            RepositoryModule.migration19To20(),
-            RepositoryModule.migration20To21(),
-            RepositoryModule.migration21To22(),
-            RepositoryModule.migration22To23()
+            Migrations.migration16To17(),
+            Migrations.migration17To18(),
+            Migrations.migration18To19(),
+            Migrations.migration19To20(),
+            Migrations.migration20To21(),
+            Migrations.migration21To22(),
+            Migrations.migration22To23()
         ).close()
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext
