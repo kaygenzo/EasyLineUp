@@ -178,7 +178,7 @@ screenshots from.
 Versions tracked in `gradle/libs.versions.toml` (version catalog), not pinned
 per-module.
 
-- **Language/build** — Kotlin 2.3.20, KSP 2.3.2, AGP 9.1.0, JVM target 17; minSdk
+- **Language/build** — Kotlin 2.3.20, KSP 2.3.13, AGP 9.1.0, JVM target 17; minSdk
   23, compileSdk 37, targetSdk 36 (see `CLAUDE.md` for what blocks the next
   minSdk).
 - **UI** — Jetpack Compose (BOM `2026.09.00`), Material3, Material Components

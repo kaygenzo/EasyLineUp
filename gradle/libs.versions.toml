@@ -1,7 +1,7 @@
 [versions]
 # Main
 kotlinVersion = '2.3.20'
-kspVersion = "2.3.2"
+kspVersion = "2.3.13"
 kotlinxSerializationVersion = "1.13.0"
 kotlinxCollectionsImmutableVersion = "0.5.2"
 androidGradlePluginVersion = "9.1.0"
