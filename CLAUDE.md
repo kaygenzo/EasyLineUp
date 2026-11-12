@@ -15,10 +15,14 @@ the design rationale behind the visual system.
   (`app/src/main/java/com/telen/easylineup/compose/DugoutTheme.kt`) instead of
   hand-rolling a second set of color constants — it reads the same `themes.xml` /
   `material-colors.xml` tokens via `MaterialColors.getColor`, so both stay in sync.
-- `androidx.compose:compose-bom` is pinned to `2025.09.01` (compose-ui 1.9.x).
-  Newer BOMs (compose-ui 1.10+) raise the library's minSdk to 23, which is above
-  this app's minSdk 21 — bumping the BOM past this line means deciding to drop
-  API 21/22 support first, not a side effect of a routine dependency bump.
+- minSdk is 23 (API 21/22 support was dropped to unblock the AndroidX, Compose,
+  Coil, Koin and Firebase releases that require it). The next wall is minSdk 24:
+  Navigation 2.10+ and Firebase BOM 35+ require it, so `navigation-compose`
+  stays on 2.9.x and the Firebase BOM on 34.x. Raising minSdk again is a product
+  decision (who still runs Android 6), not a side effect of a dependency bump —
+  check each new release's AAR manifest before bumping it.
+- compileSdk is 37 (core 1.19 and Coil 3.6 require it); targetSdk stays 36
+  until the Android 17 behavior changes have been checked.
 - Prefer Compose's own components (`AlertDialog`, etc.) over native
   `AlertDialog.Builder`/dialogs for anything new. Existing non-Compose dialogs
   (`DialogFactory`, the skydoves `ColorPickerDialog`) are reused as-is from a
@@ -153,10 +157,7 @@ shows something, matching the already-established treatment of
 `PlayerSide.shortLabel()`/`arrayLabel`/`mostPlayedPositionLabel` — rather than
 skipping it.
 
-This needs `androidx.compose.ui:ui-tooling` as a `debugImplementation` (added
-back once the BOM was pinned to 2025.09.01 — the minSdk-23 conflict that made
-us drop it originally was specific to the newer BOM, re-tested and confirmed
-gone on this one).
+This needs `androidx.compose.ui:ui-tooling` as a `debugImplementation`.
 
 ## Every Compose screen must be resilient on small screens
 

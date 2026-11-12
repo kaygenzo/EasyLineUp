@@ -4,9 +4,9 @@ buildscript {
     ext {
         appVersionName = "2.1.0"
         appVersionCode = 2_01_00_02
-        minVersion = 21
+        minVersion = 23
         targetVersion = 36
-        compileVersion = 36
+        compileVersion = 37
         // 0.8.8 is the first release that reads Java 17 class files.
         jacocoVersion = "0.8.14"
     }
