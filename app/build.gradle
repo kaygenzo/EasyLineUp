@@ -260,7 +260,6 @@ dependencies {
     implementation libs.coil
     implementation libs.koin
     implementation libs.koin.androidx.compose
-    implementation libs.licenser
     implementation libs.colorPicker
 
     // only debug libraries

@@ -42,8 +42,7 @@ import org.junit.runner.RunWith
  * the same external-flow boundary the import-flow's own Phase 3 coverage owns), the men/women
  * color swatches (the skydoves `ColorPickerDialog` is a non-Compose dialog, not driveable via
  * Compose test APIs - a pre-existing interop boundary per CLAUDE.md, not a regression),
- * licenses (`LicensesManager`'s plain native dialog, same interop boundary), the Play
- * Store row (launches a real external `Intent`), and actually confirming delete-all-data (wipes
+ * the Play Store row and a library's project page (launch a real external `Intent`), and actually confirming delete-all-data (wipes
  * the whole app and routes to `LoginActivity`, finishing `HomeActivity` - that is Welcome/
  * Login's own territory, same reasoning as TeamDetailsScreenTest skipping a real team delete).
  */
@@ -140,6 +139,19 @@ class SettingsScreenTest {
         composeTestRule
             .onNodeWithText(string(R.string.setting_delete_data_description))
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun licensesOpenTheLibrariesDialogAndOkClosesIt() {
+        composeTestRule
+            .onNodeWithText(string(R.string.setting_licenses_title))
+            .performScrollTo()
+            .performClick()
+        composeTestRule.waitForText(string(R.string.libraries_title))
+        composeTestRule.onNodeWithText("AndroidX Activity").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText(string(android.R.string.ok)).performClick()
+        composeTestRule.waitForAbsence(string(R.string.libraries_title))
     }
 
     @Test

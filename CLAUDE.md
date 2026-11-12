@@ -24,10 +24,10 @@ the design rationale behind the visual system.
 - compileSdk is 37 (core 1.19 and Coil 3.6 require it); targetSdk stays 36
   until the Android 17 behavior changes have been checked.
 - Prefer Compose's own components (`AlertDialog`, etc.) over native
-  `AlertDialog.Builder`/dialogs for anything new. Existing non-Compose dialogs
-  (`DialogFactory`, the skydoves `ColorPickerDialog`) are reused as-is from a
-  Compose row's `onClick` where no Compose equivalent exists yet — that's a
-  normal interop boundary, not a regression.
+  `AlertDialog.Builder`/dialogs for anything new. The one non-Compose dialog
+  left, the skydoves `ColorPickerDialog`, is reused as-is from a Compose row's
+  `onClick` since no Compose equivalent exists yet — that's a normal interop
+  boundary, not a regression.
 
 ## No RxJava — coroutines/Flow only
 

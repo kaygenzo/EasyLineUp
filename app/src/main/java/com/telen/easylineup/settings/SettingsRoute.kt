@@ -32,7 +32,8 @@ import com.telen.easylineup.compose.ImportConfirmSheet
 import com.telen.easylineup.compose.ImportSuccessSheet
 import com.telen.easylineup.domain.model.ThemeMode
 import com.telen.easylineup.domain.model.export.toDataCounts
-import com.telen.easylineup.license.LicensesManager
+import com.telen.easylineup.license.LicensesDialog
+import com.telen.easylineup.license.openSourceLibraries
 import com.telen.easylineup.login.ImportFailure
 import com.telen.easylineup.login.ImportPreviewReady
 import com.telen.easylineup.login.ImportSuccessfulEvent
@@ -57,6 +58,7 @@ fun SettingsRoute(navController: NavController) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val teamUiState by teamViewModel.uiState.collectAsStateWithLifecycle()
     var transferError by rememberSaveable { mutableStateOf<TransferError?>(null) }
+    var showLicenses by rememberSaveable { mutableStateOf(false) }
 
     val openFile = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -167,10 +169,20 @@ fun SettingsRoute(navController: NavController) {
         onDeleteAllDataClick = viewModel::onDeleteAllDataClick,
         onLicensesClick = {
             FirebaseAnalyticsUtils.onClick(context, "click_settings_licenses")
-            LicensesManager.getDialog(context).show()
+            showLicenses = true
         },
         onPlayStoreClick = { openPlayStore() }
     )
+
+    if (showLicenses) {
+        LicensesDialog(
+            libraries = openSourceLibraries,
+            onLibraryClick = { library ->
+                context.startActivityOrNotify(Intent(Intent.ACTION_VIEW, library.url.toUri()))
+            },
+            onDismiss = { showLicenses = false }
+        )
+    }
 
     if (uiState.showDeleteAllDataSheet) {
         ConfirmSheet(

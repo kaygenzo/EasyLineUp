@@ -28,7 +28,6 @@ junit4Version = "4.13.2"
 timberVersion = "5.0.1"
 kotlinxCoroutinesVersion = "1.11.0"
 colorPickerVersion = "2.0.6"
-licenserVersion = "2.0.0"
 coilVersion = "3.6.3"
 koinVersion = "4.2.2"
 annotationVersion = "1.11.0"
@@ -90,7 +89,6 @@ preview-scanner = { group = "io.github.sergio-sastre.ComposablePreviewScanner", 
 koin-test = { group = "io.insert-koin", name = "koin-test-junit4", version.ref = "koinVersion" }
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koinVersion" }
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koinVersion" }
-licenser = { group = "com.github.marcoscgdev", name = "Licenser", version.ref = "licenserVersion" }
 colorPicker = { group = "com.github.skydoves", name = "colorpickerpreference", version.ref = "colorPickerVersion" }
 material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBomVersion" }
