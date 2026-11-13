@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
 import org.junit.Rule
@@ -42,5 +43,34 @@ class SwapTeamTest {
 
         composeTestRule.waitForAbsence(TestFixtures.TEAM_NAME)
         composeTestRule.onNodeWithText(TestFixtures.SECOND_TEAM_NAME).assertIsDisplayed()
+    }
+
+    /**
+     * The bottom navigation keeps each tab's screen alive: a tab opened before the switch must
+     * still show the new team once reopened, not the one it was first opened on.
+     */
+    @Test
+    fun aTabOpenedBeforeTheSwitchShowsTheNewTeam() {
+        composeTestRule.waitForText(TestFixtures.TEAM_NAME)
+        composeTestRule.onNodeWithText(string(R.string.title_team).uppercase()).performClick()
+        composeTestRule.waitForText(FIRST_TEAM_PLAYER)
+        composeTestRule.onNodeWithText(string(R.string.title_last_lineup).uppercase())
+            .performClick()
+
+        composeTestRule.waitForText(TestFixtures.TEAM_NAME)
+        composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).performClick()
+        composeTestRule.waitForText(TestFixtures.SECOND_TEAM_NAME)
+        composeTestRule.onNodeWithText(TestFixtures.SECOND_TEAM_NAME).performClick()
+        composeTestRule.waitForAbsence(TestFixtures.TEAM_NAME)
+
+        composeTestRule.onNodeWithText(string(R.string.title_team).uppercase()).performClick()
+        composeTestRule.waitForText(string(R.string.title_team))
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText(FIRST_TEAM_PLAYER).assertDoesNotExist()
+    }
+
+    private companion object {
+        /** A player of [TestFixtures.TEAM_NAME]; the second team has none. */
+        const val FIRST_TEAM_PLAYER = "Starter 1"
     }
 }

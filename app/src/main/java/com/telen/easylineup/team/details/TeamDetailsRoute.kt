@@ -26,6 +26,7 @@ import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.Sex
+import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.team.TeamEvent
 import com.telen.easylineup.team.TeamViewModel
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
@@ -43,9 +44,10 @@ fun TeamDetailsRoute(navController: NavController) {
     val teamUiState by teamViewModel.uiState.collectAsStateWithLifecycle()
     val lineupListUiState by lineupListViewModel.uiState.collectAsStateWithLifecycle()
 
+    // TeamViewModel follows the current team: the edited one shows up without being reloaded.
     val editTeam = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { teamViewModel.loadTeam() }
+    ) {}
 
     var showDeleteSheet by rememberSaveable { mutableStateOf(false) }
 
@@ -55,6 +57,13 @@ fun TeamDetailsRoute(navController: NavController) {
             .collect { event ->
                 when (event) {
                     TeamEvent.TeamDeleted -> navController.popBackStack()
+                    TeamEvent.LastTeamDeleted -> {
+                        // Nothing left to show here: start over, as after deleting all data.
+                        val intent = Intent(context, LoginActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }
+                        context.startActivity(intent)
+                    }
                     TeamEvent.TeamDeleteFailed -> Toast.makeText(
                         context,
                         R.string.error_when_deleting_team,

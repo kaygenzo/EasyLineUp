@@ -9,7 +9,7 @@ import com.telen.easylineup.domain.model.PlayerSortType
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.usecases.DeleteTeam
-import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.ObserveCurrentTeam
 import com.telen.easylineup.domain.usecases.ObservePlayers
 import com.telen.easylineup.domain.usecases.SortPlayers
 import com.telen.easylineup.domain.usecases.exceptions.NoTeamsLeftException
@@ -42,13 +42,13 @@ import org.mockito.kotlin.any
 /**
  * Unit tests for [TeamViewModel]: its use cases are mocked directly (each already has its own
  * domain-level test suite). `init {}` eagerly loads the team and flatMaps into the observed
- * players Flow, so both [getTeamUseCase]'s and [observePlayersUseCase]'s stubs must be in place
+ * players Flow, so both [observeCurrentTeam]'s and [observePlayersUseCase]'s stubs must be in place
  * before construction - same gotcha as [com.telen.easylineup.dashboard.DashboardViewModelTest].
  */
 @RunWith(MockitoJUnitRunner::class)
 internal class TeamViewModelTest {
     @Mock
-    lateinit var getTeamUseCase: GetTeam
+    lateinit var observeCurrentTeam: ObserveCurrentTeam
 
     @Mock
     lateinit var deleteTeamUseCase: DeleteTeam
@@ -62,21 +62,20 @@ internal class TeamViewModelTest {
     private val playersProcessor =
         MutableSharedFlow<List<Player>>(replay = 1, extraBufferCapacity = 1)
     private val team = Team(id = 1L, name = "Panthers", type = 0, main = true, createdAt = 100L)
+    private val currentTeam = MutableSharedFlow<Team?>(replay = 1).apply { tryEmit(team) }
 
     lateinit var viewModel: TeamViewModel
 
     @Before
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        runBlocking {
-            Mockito.lenient().`when`(getTeamUseCase()).thenReturn(Result.success(team))
-        }
+        Mockito.lenient().`when`(observeCurrentTeam()).thenReturn(currentTeam)
         Mockito.lenient().`when`(observePlayersUseCase(team.id)).thenReturn(playersProcessor)
         Mockito.lenient().`when`(sortPlayersUseCase(any(), any()))
             .thenAnswer { invocation -> invocation.arguments[0] }
 
         viewModel = TeamViewModel(
-            getTeamUseCase,
+            observeCurrentTeam,
             deleteTeamUseCase,
             observePlayersUseCase,
             sortPlayersUseCase
@@ -113,7 +112,7 @@ internal class TeamViewModelTest {
     }
 
     private fun newViewModel() = TeamViewModel(
-        getTeamUseCase,
+        observeCurrentTeam,
         deleteTeamUseCase,
         observePlayersUseCase,
         sortPlayersUseCase
@@ -133,9 +132,7 @@ internal class TeamViewModelTest {
 
     @Test
     fun shouldReportALoadFailureWhenTheTeamCannotBeRead() = runTest {
-        runBlocking {
-            Mockito.`when`(getTeamUseCase()).thenReturn(Result.failure(Exception("db error")))
-        }
+        Mockito.`when`(observeCurrentTeam()).thenReturn(flow { throw Exception("db error") })
 
         viewModel = newViewModel()
         advanceUntilIdle()
@@ -196,7 +193,7 @@ internal class TeamViewModelTest {
     }
 
     @Test
-    fun shouldTreatDeletingTheLastTeamAsADelete() = runTest {
+    fun shouldReportDeletingTheLastTeam() = runTest {
         runBlocking {
             Mockito.`when`(deleteTeamUseCase(team))
                 .thenReturn(Result.failure(NoTeamsLeftException()))
@@ -205,7 +202,24 @@ internal class TeamViewModelTest {
 
         viewModel.onDeleteTeam(team)
 
-        assertEquals(listOf(TeamEvent.TeamDeleted), events)
+        assertEquals(listOf(TeamEvent.LastTeamDeleted), events)
+    }
+
+    @Test
+    fun shouldShowTheNewCurrentTeamAfterASwitch() = runTest {
+        val tigers = Team(id = 2L, name = "Tigers", type = 1, main = true)
+        val tigersPlayers = listOf(
+            Player(id = 9L, teamId = 2L, name = "Zoe", shirtNumber = 9, licenseNumber = "9")
+        )
+        Mockito.`when`(observePlayersUseCase(tigers.id)).thenReturn(flowOf(tigersPlayers))
+        advanceUntilIdle()
+
+        currentTeam.tryEmit(tigers)
+        advanceUntilIdle()
+
+        assertEquals("Tigers", viewModel.uiState.value.teamName)
+        assertEquals(tigersPlayers, viewModel.uiState.value.players)
+        assertEquals(tigers, viewModel.team)
     }
 
     @Test

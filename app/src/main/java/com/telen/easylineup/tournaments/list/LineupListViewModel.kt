@@ -12,9 +12,9 @@ import com.telen.easylineup.domain.model.GeoLocation
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
-import com.telen.easylineup.domain.usecases.GetTeam
 import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.ObserveAllTournamentsWithLineups
+import com.telen.easylineup.domain.usecases.ObserveCurrentTeam
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -55,7 +56,7 @@ data class LineupListUiState(
 data class TournamentDeleteFailed(val detail: String)
 
 class LineupListViewModel(
-    private val getTeamUseCase: GetTeam,
+    private val observeCurrentTeam: ObserveCurrentTeam,
     private val observeAllTournamentsWithLineups: ObserveAllTournamentsWithLineups,
     private val getTournamentMapLink: GetTournamentMapLink,
     private val deleteTournamentLineups: DeleteTournamentLineups
@@ -98,13 +99,14 @@ class LineupListViewModel(
             }
             .launchIn(viewModelScope)
 
-        viewModelScope.launch {
-            getTeamUseCase()
-                .onSuccess { team ->
-                    _uiState.update { it.copy(teamType = TeamType.getTypeById(team.type)) }
-                }
-                .onFailure { Timber.e(it) }
-        }
+        // Followed like the list itself: this tab's ViewModel outlives a team switch.
+        observeCurrentTeam()
+            .filterNotNull()
+            .onEach { team ->
+                _uiState.update { it.copy(teamType = TeamType.getTypeById(team.type)) }
+            }
+            .catch { Timber.e(it) }
+            .launchIn(viewModelScope)
     }
 
     private fun loadMaps(tournamentItems: List<TournamentItem>) {

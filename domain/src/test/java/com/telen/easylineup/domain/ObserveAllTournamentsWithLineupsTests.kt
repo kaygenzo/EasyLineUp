@@ -10,8 +10,9 @@ import com.telen.easylineup.domain.model.TournamentWithLineup
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import com.telen.easylineup.domain.usecases.ObserveAllTournamentsWithLineups
-import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.ObserveCurrentTeam
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -38,11 +39,11 @@ internal class ObserveAllTournamentsWithLineupsTests {
         team = Team(id = 1L, name = "toto", main = true)
         observeAllTournamentsWithLineups = ObserveAllTournamentsWithLineups(
             lineupDao,
-            GetTeam(teamDao, testDispatcherProvider()),
+            ObserveCurrentTeam(teamDao),
             testDispatcherProvider()
         )
 
-        Mockito.`when`(teamDao.getTeams()).thenReturn(listOf(team))
+        Mockito.`when`(teamDao.observeTeams()).thenReturn(flowOf(listOf(team)))
     }
     }
 
@@ -142,6 +143,29 @@ internal class ObserveAllTournamentsWithLineupsTests {
         assertEquals(2, lineup.extraHitters)
         assertEquals(1_000L, lineup.eventTimeInMillis)
         assertEquals("1;2", lineup.roster)
+    }
+
+    @Test
+    fun shouldFollowTheCurrentTeamWhenItChanges() = runTest {
+        val other = Team(id = 2L, name = "other", main = true)
+        Mockito.`when`(teamDao.observeTeams()).thenReturn(
+            flowOf(listOf(team), listOf(team.copy(main = false), other))
+        )
+        Mockito.`when`(lineupDao.observeAllTournamentsWithLineups(team.id))
+            .thenReturn(flowOf(listOf(row(tournamentId = 1L, lineupId = 1L))))
+        Mockito.`when`(lineupDao.observeAllTournamentsWithLineups(other.id))
+            .thenReturn(flowOf(emptyList()))
+
+        val emissions = observeAllTournamentsWithLineups("").toList()
+
+        assertEquals(listOf(1, 0), emissions.map { it.size })
+    }
+
+    @Test
+    fun shouldBeEmptyWithoutACurrentTeam() = runTest {
+        Mockito.`when`(teamDao.observeTeams()).thenReturn(flowOf(emptyList()))
+
+        assertTrue(observeAllTournamentsWithLineups("").first().isEmpty())
     }
 
     private suspend fun lineupNamesFor(filter: String, vararg rows: TournamentWithLineup) = run {

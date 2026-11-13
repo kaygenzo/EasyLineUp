@@ -5,6 +5,7 @@
 package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.Team
+import com.telen.easylineup.domain.model.currentTeam
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.TeamRepository
 import kotlinx.coroutines.withContext
@@ -15,7 +16,7 @@ class GetTeam(
 ) {
     suspend operator fun invoke(): Result<Team> = runCatchingCancellable {
         withContext(dispatcherProvider.io()) {
-            dao.getTeams().first { team -> team.main }
+            dao.getTeams().currentTeam() ?: throw NoSuchElementException("No current team")
         }
     }
 }

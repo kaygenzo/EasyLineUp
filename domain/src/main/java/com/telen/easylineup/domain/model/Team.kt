@@ -83,6 +83,12 @@ data class Team(
     }
 }
 
+/**
+ * The team the app is working on: the one marked [Team.main]. A database left with teams but none
+ * marked, as an older import could do, falls back to the first one rather than to no team at all.
+ */
+fun List<Team>.currentTeam(): Team? = firstOrNull { it.main } ?: firstOrNull()
+
 fun Team.toTeamExport(
     players: List<PlayerExport>,
     tournaments: List<TournamentExport>

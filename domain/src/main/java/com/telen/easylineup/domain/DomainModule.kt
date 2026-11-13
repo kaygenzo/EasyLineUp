@@ -49,6 +49,7 @@ import com.telen.easylineup.domain.usecases.IsExtraHittersUnlimited
 import com.telen.easylineup.domain.usecases.IsPlayingTimeUnderused
 import com.telen.easylineup.domain.usecases.IsValidPhoneNumber
 import com.telen.easylineup.domain.usecases.ObserveAllTournamentsWithLineups
+import com.telen.easylineup.domain.usecases.ObserveCurrentTeam
 import com.telen.easylineup.domain.usecases.ObserveLineupById
 import com.telen.easylineup.domain.usecases.ObservePlayer
 import com.telen.easylineup.domain.usecases.ObservePlayerNumberOverlays
@@ -102,6 +103,7 @@ object DomainModule {
         single { SaveTeam(get(), get(), get(), get(), get(), get()) }
         single { CheckTeam(get()) }
         single { ObserveTeams(get()) }
+        single { ObserveCurrentTeam(get()) }
         single { AssignPlayerFieldPosition(get(), get()) }
         single { DeletePlayerFieldPosition(get()) }
         single { GetListAvailablePlayersForSelection(get(), get()) }

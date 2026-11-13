@@ -20,6 +20,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -53,7 +54,7 @@ class HomeActivity : BaseActivity() {
         setContent {
             DugoutTheme {
                 val navController = rememberNavController()
-                popToDashboard = { navController.popBackStack(Routes.Dashboard, false) }
+                popToDashboard = { navController.startOverOnDashboard() }
                 val lifecycleOwner = LocalLifecycleOwner.current
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -67,8 +68,7 @@ class HomeActivity : BaseActivity() {
                         .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
                         .collect { event ->
                             when (event) {
-                                UpdateCurrentTeamSuccess ->
-                                    navController.popBackStack(Routes.Dashboard, false)
+                                UpdateCurrentTeamSuccess -> navController.startOverOnDashboard()
 
                                 else -> {}
                             }
@@ -132,6 +132,18 @@ class HomeActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * Back to the Dashboard after the current team changed. The other tabs' saved back stacks
+     * belong to the team just left - a lineup or a player of it - so they are dropped rather
+     * than restored on the next tab switch.
+     */
+    private fun NavController.startOverOnDashboard() {
+        popBackStack(Routes.Dashboard, false)
+        BottomNavTab.entries
+            .filter { it != BottomNavTab.HOME }
+            .forEach { tab -> clearBackStack(tab.route) }
     }
 
     private fun onCreateTeamClick() {

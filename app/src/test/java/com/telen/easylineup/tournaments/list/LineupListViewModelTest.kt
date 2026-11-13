@@ -10,7 +10,7 @@ import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.usecases.DeleteTournamentLineups
-import com.telen.easylineup.domain.usecases.GetTeam
+import com.telen.easylineup.domain.usecases.ObserveCurrentTeam
 import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.ObserveAllTournamentsWithLineups
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +46,7 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 internal class LineupListViewModelTest {
     @Mock
-    lateinit var getTeamUseCase: GetTeam
+    lateinit var observeCurrentTeam: ObserveCurrentTeam
 
     @Mock
     lateinit var observeAllTournamentsWithLineups: ObserveAllTournamentsWithLineups
@@ -74,11 +74,11 @@ internal class LineupListViewModelTest {
         runBlocking {
             Mockito.lenient().`when`(observeAllTournamentsWithLineups(""))
                 .thenReturn(flowOf(emptyList()))
-            Mockito.lenient().`when`(getTeamUseCase())
-                .thenReturn(Result.success(Team(id = 1L, name = "Panthers", type = 0)))
+            Mockito.lenient().`when`(observeCurrentTeam())
+                .thenReturn(flowOf(Team(id = 1L, name = "Panthers", type = 0, main = true)))
         }
         viewModel = LineupListViewModel(
-            getTeamUseCase,
+            observeCurrentTeam,
             observeAllTournamentsWithLineups,
             getTournamentMapLink,
             deleteTournamentLineups
@@ -100,7 +100,7 @@ internal class LineupListViewModelTest {
         }
 
         viewModel = LineupListViewModel(
-            getTeamUseCase,
+            observeCurrentTeam,
             observeAllTournamentsWithLineups,
             getTournamentMapLink,
             deleteTournamentLineups
@@ -121,7 +121,7 @@ internal class LineupListViewModelTest {
         }
 
         viewModel = LineupListViewModel(
-            getTeamUseCase,
+            observeCurrentTeam,
             observeAllTournamentsWithLineups,
             getTournamentMapLink,
             deleteTournamentLineups
@@ -141,7 +141,7 @@ internal class LineupListViewModelTest {
                 .thenReturn(flowOf(listOf(tournament to listOf(Lineup(id = 1L)))))
         }
         viewModel = LineupListViewModel(
-            getTeamUseCase,
+            observeCurrentTeam,
             observeAllTournamentsWithLineups,
             getTournamentMapLink,
             deleteTournamentLineups
@@ -158,12 +158,12 @@ internal class LineupListViewModelTest {
     @Test
     fun shouldUpdateTeamTypeOnInit() = runTest {
         runBlocking {
-            Mockito.`when`(getTeamUseCase())
-                .thenReturn(Result.success(Team(id = 1L, name = "Panthers", type = 1)))
+            Mockito.`when`(observeCurrentTeam())
+                .thenReturn(flowOf(Team(id = 1L, name = "Panthers", type = 1, main = true)))
         }
 
         viewModel = LineupListViewModel(
-            getTeamUseCase,
+            observeCurrentTeam,
             observeAllTournamentsWithLineups,
             getTournamentMapLink,
             deleteTournamentLineups
@@ -193,7 +193,7 @@ internal class LineupListViewModelTest {
         val source = MutableStateFlow<List<Pair<Tournament, List<Lineup>>>>(emptyList())
         Mockito.`when`(observeAllTournamentsWithLineups("")).thenReturn(source)
         viewModel = LineupListViewModel(
-            getTeamUseCase,
+            observeCurrentTeam,
             observeAllTournamentsWithLineups,
             getTournamentMapLink,
             deleteTournamentLineups
@@ -219,7 +219,7 @@ internal class LineupListViewModelTest {
             Mockito.`when`(getTournamentMapLink(tournament)).thenReturn(Result.success(location))
         }
         viewModel = LineupListViewModel(
-            getTeamUseCase,
+            observeCurrentTeam,
             observeAllTournamentsWithLineups,
             getTournamentMapLink,
             deleteTournamentLineups
@@ -243,7 +243,7 @@ internal class LineupListViewModelTest {
         }
 
         viewModel = LineupListViewModel(
-            getTeamUseCase,
+            observeCurrentTeam,
             observeAllTournamentsWithLineups,
             getTournamentMapLink,
             deleteTournamentLineups
