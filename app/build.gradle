@@ -20,7 +20,10 @@ else {
     keystoreProperties.setProperty("keyAlias", "${System.getenv('KEY_ALIAS')}")
     keystoreProperties.setProperty("keyPassword", "${System.getenv('KEY_PASSWORD')}")
     keystoreProperties.setProperty("debug.storeFile", "../telen.debug.jks")
-    keystoreProperties.setProperty("debug.storePassword", "${System.getenv('DEBUG_KEYSTORE_PASSWORD')}")
+    keystoreProperties.setProperty(
+        "debug.storePassword",
+        "${System.getenv('DEBUG_KEYSTORE_PASSWORD')}"
+    )
     keystoreProperties.setProperty("debug.keyAlias", "${System.getenv('DEBUG_KEY_ALIAS')}")
     keystoreProperties.setProperty("debug.keyPassword", "${System.getenv('DEBUG_KEY_PASSWORD')}")
 }
@@ -115,7 +118,8 @@ android {
             }
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                'proguard-rules.pro'
         }
         // The release R8 configuration on a debug-signed, debuggable build, so instrumented tests
         // can check what only breaks once minified - Gson reading the export classes by
@@ -142,7 +146,16 @@ android {
     testBuildType project.hasProperty('minifiedTests') ? 'minified' : 'debug'
     packaging {
         resources {
-            excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE', 'META-INF/LICENSE.txt', 'META-INF/license.txt', 'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'META-INF/notice.txt', 'META-INF/ASL2.0']
+            excludes += [
+                'META-INF/DEPENDENCIES',
+                'META-INF/LICENSE',
+                'META-INF/LICENSE.txt',
+                'META-INF/license.txt',
+                'META-INF/NOTICE',
+                'META-INF/NOTICE.txt',
+                'META-INF/notice.txt',
+                'META-INF/ASL2.0'
+            ]
         }
     }
 

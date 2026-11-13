@@ -45,58 +45,58 @@ roborazziVersion = "1.78.0"
 previewScannerVersion = "0.10.0"
 
 [libraries]
-firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBOMVersion" }
+firebase = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBOMVersion" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-appcheck = { module = "com.google.firebase:firebase-appcheck" }
 firebase-appcheck-playintegrity = { module = "com.google.firebase:firebase-appcheck-playintegrity" }
 firebase-appcheck-debug = { module = "com.google.firebase:firebase-appcheck-debug" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotationVersion" }
+annotation = { module = "androidx.annotation:annotation", version.ref = "annotationVersion" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlinVersion" }
-tests-archCore = { group = "androidx.arch.core", name = "core-testing", version.ref = "archCoreTestingVersion" }
+tests-archCore = { module = "androidx.arch.core:core-testing", version.ref = "archCoreTestingVersion" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
 room-testing = { group = "androidx.room", name = "room-testing", version.ref = "roomVersion" }
 tests-runner = { group = "androidx.test", name = "runner", version.ref = "testRunnerVersion" }
-tests-espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCoreVersion" }
-tests-espressoIntents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoCoreVersion" }
-tests-uiAutomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiAutomatorVersion" }
+tests-espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
+tests-espressoIntents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espressoCoreVersion" }
+tests-uiAutomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiAutomatorVersion" }
 tests-junit = { group = "androidx.test.ext", name = "junit", version.ref = "extJUnitVersion" }
 junit4 = { group = "junit", name = "junit", version.ref = "junit4Version" }
 activity = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityVersion" }
-preference = { group = "androidx.preference", name = "preference-ktx", version.ref = "preferenceVersion" }
-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleVersion" }
-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleVersion" }
-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationVersion" }
-documentFile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentFileVersion" }
-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreenVersion" }
+preference = { module = "androidx.preference:preference-ktx", version.ref = "preferenceVersion" }
+viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleVersion" }
+lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleVersion" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationVersion" }
+documentFile = { module = "androidx.documentfile:documentfile", version.ref = "documentFileVersion" }
+splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreenVersion" }
 android-core = { group = "androidx.core", name = "core-ktx", version.ref = "coreVersion" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gsonVersion" }
-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationVersion" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationVersion" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timberVersion" }
-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesVersion" }
-kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesVersion" }
-kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesVersion" }
-kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutableVersion" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesVersion" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesVersion" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesVersion" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutableVersion" }
 coil = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coilVersion" }
 koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koinVersion" }
-robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectricVersion" }
-roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazziVersion" }
-roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose", version.ref = "roborazziVersion" }
-preview-scanner = { group = "io.github.sergio-sastre.ComposablePreviewScanner", name = "android", version.ref = "previewScannerVersion" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectricVersion" }
+roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = "roborazziVersion" }
+roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazziVersion" }
+preview-scanner = { module = "io.github.sergio-sastre.ComposablePreviewScanner:android", version.ref = "previewScannerVersion" }
 koin-test = { group = "io.insert-koin", name = "koin-test-junit4", version.ref = "koinVersion" }
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koinVersion" }
-koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koinVersion" }
-colorPicker = { group = "com.github.skydoves", name = "colorpickerpreference", version.ref = "colorPickerVersion" }
-material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBomVersion" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinVersion" }
+colorPicker = { module = "com.github.skydoves:colorpickerpreference", version.ref = "colorPickerVersion" }
+material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 compose-activity = { group = "androidx.activity", name = "activity-compose" }
-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleVersion" }
+lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleVersion" }
 compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 

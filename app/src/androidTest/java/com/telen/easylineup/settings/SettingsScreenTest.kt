@@ -42,9 +42,10 @@ import org.junit.runner.RunWith
  * the same external-flow boundary the import-flow's own Phase 3 coverage owns), the men/women
  * color swatches (the skydoves `ColorPickerDialog` is a non-Compose dialog, not driveable via
  * Compose test APIs - a pre-existing interop boundary per CLAUDE.md, not a regression),
- * the Play Store row and a library's project page (launch a real external `Intent`), and actually confirming delete-all-data (wipes
- * the whole app and routes to `LoginActivity`, finishing `HomeActivity` - that is Welcome/
- * Login's own territory, same reasoning as TeamDetailsScreenTest skipping a real team delete).
+ * the Play Store row and a library's project page (launch a real external `Intent`), and
+ * actually confirming delete-all-data (wipes the whole app and routes to `LoginActivity`,
+ * finishing `HomeActivity` - that is Welcome/Login's own territory, same reasoning as
+ * TeamDetailsScreenTest skipping a real team delete).
  */
 @RunWith(AndroidJUnit4::class)
 class SettingsScreenTest {

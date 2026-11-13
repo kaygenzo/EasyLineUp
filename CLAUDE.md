@@ -123,10 +123,10 @@ this: it is a convention to follow by hand.
 
 This applies to all new code going forward, and was applied retroactively to
 every line added across the Settings and Welcome/Login Compose pilots. It does
-not apply to prose documentation (`REDESIGN.md`) or to a TOML inline table that
-must stay on one line to parse (a couple of entries in `libs.versions.toml`
-slightly exceed 100 for this reason — a format constraint, not an exception to
-the rule).
+not apply to prose documentation (`REDESIGN.md`) or to the version catalog
+(`gradle/libs.versions.toml`): its entries are TOML inline tables, which must stay
+on one line to parse, so the catalog is left out of the limit altogether rather
+than shortened to fit.
 
 ## Every composable gets previews: small/large × portrait/landscape
 
