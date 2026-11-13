@@ -26,9 +26,6 @@ internal interface TournamentDao {
     @Query("SELECT * from tournaments where hash = :hash")
     suspend fun getTournamentByHash(hash: String): RoomTournament?
 
-    @Query("SELECT * from tournaments where name = :name")
-    suspend fun getTournamentByName(name: String): RoomTournament?
-
     // Not REPLACE: with the unique name index, REPLACE would delete the tournament already
     // using that name, and every lineup in it through the cascade, instead of failing.
     @Insert

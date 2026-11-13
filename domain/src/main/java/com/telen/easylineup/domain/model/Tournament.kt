@@ -86,3 +86,10 @@ fun Tournament.toTournamentExport(lineups: List<LineupExport>): TournamentExport
         lineups
     )
 }
+
+/**
+ * The tournament named [name], if any. Tournament names are unique across teams whatever their
+ * case: "Cup" and "cup" are the same tournament.
+ */
+fun List<Tournament>.withName(name: String): Tournament? =
+    firstOrNull { it.name.trim().equals(name.trim(), ignoreCase = true) }

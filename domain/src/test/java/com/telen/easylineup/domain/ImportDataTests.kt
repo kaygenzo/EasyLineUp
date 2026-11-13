@@ -74,6 +74,7 @@ internal class ImportDataTests {
             transactionRunner = transactionRunner,
             dispatcherProvider = testDispatcherProvider()
         )
+        Mockito.lenient().`when`(tournamentDao.getTournaments()).thenReturn(emptyList())
 
         val playerExport = PlayerExport(
             id = playerHash,
@@ -331,7 +332,7 @@ internal class ImportDataTests {
             endTime = 0L,
             hash = "local-hash"
         )
-        Mockito.`when`(tournamentDao.getTournamentByName("champs")).thenReturn(local)
+        Mockito.`when`(tournamentDao.getTournaments()).thenReturn(listOf(local))
 
         importData(exportBase, updateIfExists = false)
 
@@ -356,7 +357,7 @@ internal class ImportDataTests {
         Mockito.`when`(tournamentDao.getTournamentByHash(tournamentHash)).thenReturn(
             other.copy(id = 3L, name = "local name", hash = tournamentHash)
         )
-        Mockito.`when`(tournamentDao.getTournamentByName("champs")).thenReturn(other)
+        Mockito.`when`(tournamentDao.getTournaments()).thenReturn(listOf(other))
 
         importData(exportBase, updateIfExists = true)
 

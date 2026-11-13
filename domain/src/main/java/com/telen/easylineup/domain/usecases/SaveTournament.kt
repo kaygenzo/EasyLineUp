@@ -6,6 +6,7 @@ package com.telen.easylineup.domain.usecases
 
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.hasDateWindow
+import com.telen.easylineup.domain.model.withName
 import com.telen.easylineup.domain.ports.Clock
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.repository.TournamentRepository
@@ -37,7 +38,7 @@ class SaveTournament(
                 throw TournamentEndBeforeStartException()
             }
 
-            if (repository.getTournamentByName(name) != null) {
+            if (repository.getTournaments().withName(name) != null) {
                 throw AlreadyExistingTournamentException()
             }
 

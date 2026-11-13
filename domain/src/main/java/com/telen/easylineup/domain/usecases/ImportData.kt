@@ -18,6 +18,7 @@ import com.telen.easylineup.domain.model.export.PlayerPositionExport
 import com.telen.easylineup.domain.model.export.TeamExport
 import com.telen.easylineup.domain.model.export.TournamentExport
 import com.telen.easylineup.domain.model.normalizeLicenseNumber
+import com.telen.easylineup.domain.model.withName
 import com.telen.easylineup.domain.ports.DispatcherProvider
 import com.telen.easylineup.domain.ports.TransactionRunner
 import com.telen.easylineup.domain.ports.repository.LineupRepository
@@ -220,7 +221,7 @@ class ImportData(
 
         // Tournament names are unique and shared by every team: one exported from another
         // device under a name already used here is the same tournament, not a second one.
-        val sameName = tournamentDao.getTournamentByName(export.name)
+        val sameName = tournamentDao.getTournaments().withName(export.name)
         val tournamentDb = tournamentDao.getTournamentByHash(export.id) ?: sameName
         return if (tournamentDb == null) {
             counts.recordInsert()

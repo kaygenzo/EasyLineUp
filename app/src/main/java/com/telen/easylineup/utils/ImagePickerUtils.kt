@@ -10,6 +10,7 @@ import android.net.Uri
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import timber.log.Timber
 
 class ImagePickerUtils {
     companion object {
@@ -19,8 +20,17 @@ class ImagePickerUtils {
             )
         }
 
+        /**
+         * Keeps the right to read the picked image after a restart. A provider may not grant a
+         * persistable permission: the image still shows for now, it just may not later, which
+         * is no reason to crash the pick.
+         */
         fun persistImage(resolver: ContentResolver, uri: Uri) {
-            resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            try {
+                resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            } catch (e: SecurityException) {
+                Timber.w(e, "No persistable permission for the picked image")
+            }
         }
     }
 }

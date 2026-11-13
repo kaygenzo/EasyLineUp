@@ -49,7 +49,7 @@ internal class SaveTournamentTests {
         val result = saveTournament(tournament)
 
         assertTrue(result.exceptionOrNull() is TournamentNameEmptyException)
-        verify(repository, never()).getTournamentByName(any())
+        verify(repository, never()).getTournaments()
         verify(repository, never()).insertTournament(any())
     }
 
@@ -65,7 +65,7 @@ internal class SaveTournamentTests {
 
     @Test
     fun shouldTrimTheNameBeforeCheckingAndSavingIt() = runTest {
-        Mockito.`when`(repository.getTournamentByName("champs")).thenReturn(null)
+        Mockito.`when`(repository.getTournaments()).thenReturn(emptyList())
         Mockito.`when`(repository.insertTournament(any())).thenReturn(42L)
 
         val result = saveTournament(tournament.copy(name = "  champs "))
@@ -86,7 +86,7 @@ internal class SaveTournamentTests {
 
     @Test
     fun shouldAcceptAOneDayTournament() = runTest {
-        Mockito.`when`(repository.getTournamentByName("champs")).thenReturn(null)
+        Mockito.`when`(repository.getTournaments()).thenReturn(emptyList())
         Mockito.`when`(repository.insertTournament(any())).thenReturn(42L)
 
         val result = saveTournament(tournament.copy(startTime = 1_000L, endTime = 1_000L))
@@ -96,7 +96,7 @@ internal class SaveTournamentTests {
 
     @Test
     fun shouldInsertTournamentWhenNameDoesNotExist() = runTest {
-        Mockito.`when`(repository.getTournamentByName("champs")).thenReturn(null)
+        Mockito.`when`(repository.getTournaments()).thenReturn(emptyList())
         Mockito.`when`(repository.insertTournament(any())).thenReturn(42L)
 
         val result = saveTournament(tournament)
@@ -110,7 +110,7 @@ internal class SaveTournamentTests {
     @Test
     fun shouldTriggerAlreadyExistingExceptionAndNotInsertWhenNameAlreadyExists() = runTest {
         val existing = tournament.copy(id = 1L)
-        Mockito.`when`(repository.getTournamentByName("champs")).thenReturn(existing)
+        Mockito.`when`(repository.getTournaments()).thenReturn(listOf(existing))
 
         val result = saveTournament(tournament)
 
@@ -119,9 +119,20 @@ internal class SaveTournamentTests {
     }
 
     @Test
+    fun shouldRefuseANameAlreadyTakenWithAnotherCase() = runTest {
+        val existing = tournament.copy(id = 1L, name = "Champs")
+        Mockito.`when`(repository.getTournaments()).thenReturn(listOf(existing))
+
+        val result = saveTournament(tournament.copy(name = "CHAMPS"))
+
+        assertTrue(result.exceptionOrNull() is AlreadyExistingTournamentException)
+        verify(repository, never()).insertTournament(any())
+    }
+
+    @Test
     fun shouldPropagateUnrelatedInsertErrors() = runTest {
         val exception = Exception("db error")
-        Mockito.`when`(repository.getTournamentByName("champs")).thenReturn(null)
+        Mockito.`when`(repository.getTournaments()).thenReturn(emptyList())
         Mockito.`when`(repository.insertTournament(any())).thenAnswer { throw exception }
 
         val result = saveTournament(tournament)
@@ -131,13 +142,13 @@ internal class SaveTournamentTests {
     }
 
     /**
-     * [repository.getTournamentByName] failing for an actual repository error must propagate,
+     * [repository.getTournaments] failing for an actual repository error must propagate,
      * not be treated as "no tournament with this name yet".
      */
     @Test
     fun shouldPropagateLookupErrorsInsteadOfTreatingThemAsNotFound() = runTest {
         val exception = RuntimeException("connection lost")
-        Mockito.`when`(repository.getTournamentByName("champs")).thenAnswer { throw exception }
+        Mockito.`when`(repository.getTournaments()).thenAnswer { throw exception }
 
         val result = saveTournament(tournament)
 

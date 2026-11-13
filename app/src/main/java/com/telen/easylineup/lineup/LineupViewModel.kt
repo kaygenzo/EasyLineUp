@@ -201,6 +201,7 @@ class LineupViewModel(
     private var draft: List<PlayerWithPosition> = emptyList()
     private val draftMutex = Mutex()
     private var saveJob: Job? = null
+    private var deleteStarted = false
     private var teamTypeId: Int = TeamType.UNKNOWN.id
     private var observeJob: Job? = null
 
@@ -423,11 +424,20 @@ class LineupViewModel(
         }
     }
 
+    /**
+     * Ignored once a delete is running or done: a second one would fail and report it, after the
+     * screen already left on the first.
+     */
     fun onDeleteConfirmed() {
+        if (deleteStarted) {
+            return
+        }
+        deleteStarted = true
         viewModelScope.launch {
             deleteLineupUseCase(lineupId)
                 .onSuccess { _events.send(LineupEvent.Deleted) }
                 .onFailure {
+                    deleteStarted = false
                     Timber.e(it)
                     _events.send(LineupEvent.DeleteFailed)
                 }

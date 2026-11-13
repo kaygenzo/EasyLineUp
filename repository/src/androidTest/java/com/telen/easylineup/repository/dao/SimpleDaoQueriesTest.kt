@@ -96,12 +96,6 @@ class SimpleDaoQueriesTest {
     }
 
     @Test
-    fun tournamentIsFoundByExactName() = runBlocking {
-        assertEquals(tournamentId, db.tournamentDao().getTournamentByName("Tournament")?.id)
-        assertNull(db.tournamentDao().getTournamentByName("Tourn"))
-    }
-
-    @Test
     fun lineupsForTournamentAreLimitedToTheTeam() = runBlocking {
         val rows = db.lineupDao().getLineupsForTournament(tournamentId, teamId)
 

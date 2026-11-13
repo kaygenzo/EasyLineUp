@@ -1049,6 +1049,19 @@ internal class LineupViewModelTest {
     }
 
     @Test
+    fun shouldDeleteOnlyOnceWhenTheConfirmationIsTappedTwice() = runTest {
+        Mockito.`when`(deleteLineupUseCase(any())).thenReturn(Result.success(Unit))
+        val events = collectEvents(viewModel.events)
+
+        viewModel.onDeleteConfirmed()
+        viewModel.onDeleteConfirmed()
+        advanceUntilIdle()
+
+        Mockito.verify(deleteLineupUseCase).invoke(any())
+        assertEquals(listOf(LineupEvent.Deleted), events)
+    }
+
+    @Test
     fun shouldCloseThePlayerPickerEvenBeforeTheLineupIsLoaded() = runTest {
         viewModel.onPlayerSelected(aPlayer, FieldPosition.PITCHER)
         advanceUntilIdle()

@@ -82,16 +82,6 @@ internal class TournamentRepositoryImplTest {
     }
 
     @Test
-    fun shouldGetTournamentByNameMappedToDomain() = runTest {
-        val room = RoomTournament(id = 1L, name = "Champs")
-        Mockito.`when`(tournamentDao.getTournamentByName("Champs")).thenReturn(room)
-
-        val result = repository.getTournamentByName("Champs")
-
-        assertEquals(1L, result?.id)
-    }
-
-    @Test
     fun shouldInsertTournamentMappedToRoom() = runTest {
         Mockito.`when`(tournamentDao.insertTournament(any())).thenReturn(7L)
 

@@ -11,7 +11,6 @@ interface TournamentRepository {
     suspend fun getTournaments(): List<Tournament>
     fun observeTournaments(): Flow<List<Tournament>>
     suspend fun getTournamentByHash(hash: String): Tournament?
-    suspend fun getTournamentByName(name: String): Tournament?
     suspend fun insertTournament(tournament: Tournament): Long
     suspend fun updateTournament(tournament: Tournament)
     suspend fun updateTournamentsWithRowCount(tournaments: List<Tournament>): Int
