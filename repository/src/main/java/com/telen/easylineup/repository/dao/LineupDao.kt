@@ -22,9 +22,6 @@ internal interface LineupDao {
     @Insert
     suspend fun insertLineup(lineup: RoomLineup): Long
 
-    @Insert
-    suspend fun insertLineups(lineups: List<RoomLineup>)
-
     @Update
     suspend fun updateLineup(lineup: RoomLineup)
 

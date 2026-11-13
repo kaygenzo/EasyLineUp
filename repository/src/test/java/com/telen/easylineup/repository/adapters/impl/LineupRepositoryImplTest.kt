@@ -53,18 +53,6 @@ internal class LineupRepositoryImplTest {
     }
 
     @Test
-    fun shouldInsertLineupsMappedToRoom() = runTest {
-        val lineups = listOf(
-            Lineup(id = 0, name = "A", teamId = 1L, tournamentId = 1L),
-            Lineup(id = 0, name = "B", teamId = 1L, tournamentId = 1L)
-        )
-
-        repository.insertLineups(lineups)
-
-        verify(lineupDao).insertLineups(argThat { size == 2 })
-    }
-
-    @Test
     fun shouldUpdateLineupMappedToRoom() = runTest {
         val lineup = Lineup(id = 1L, name = "Renamed", teamId = 1L, tournamentId = 1L)
 

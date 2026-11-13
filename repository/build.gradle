@@ -65,7 +65,6 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation libs.room.ktx
     ksp libs.room.compiler

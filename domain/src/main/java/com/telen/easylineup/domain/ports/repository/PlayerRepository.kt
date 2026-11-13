@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface PlayerRepository {
     suspend fun insertPlayer(player: Player): Long
-    suspend fun insertPlayers(players: List<Player>)
     suspend fun deletePlayer(player: Player)
     suspend fun updatePlayer(player: Player)
     suspend fun updatePlayersWithRowCount(players: List<Player>): Int

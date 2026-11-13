@@ -49,18 +49,6 @@ internal class TileRepositoryImplTest {
     }
 
     @Test
-    fun shouldUpdateTilesMappedToRoom() = runTest {
-        val tiles = listOf(
-            DashboardTile(id = 1L, position = 0, type = 1),
-            DashboardTile(id = 2L, position = 1, type = 2)
-        )
-
-        repository.updateTiles(tiles)
-
-        verify(tilesDao).updateTiles(argThat { size == 2 && map { it.position } == listOf(0, 1) })
-    }
-
-    @Test
     fun shouldInsertTilesMappedToRoom() = runTest {
         val tiles = listOf(DashboardTile(id = 0, position = 0, type = 1))
 

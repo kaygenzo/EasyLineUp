@@ -71,18 +71,6 @@ object FirebaseAnalyticsUtils {
         logEvent(context, KEY_INVALID_FORMAT, "player_phone_number", EVENT_NAME_EXCEPTION)
     }
 
-    fun emptyPlayerId(context: Context?) {
-        logEvent(context, KEY_EMPTY_FIELD, "player_id", EVENT_NAME_EXCEPTION)
-    }
-
-    fun emptyTournamentName(context: Context?) {
-        logEvent(context, KEY_EMPTY_FIELD, "tournament_name", EVENT_NAME_EXCEPTION)
-    }
-
-    fun emptyLineupName(context: Context?) {
-        logEvent(context, KEY_EMPTY_FIELD, "lineup_name", EVENT_NAME_EXCEPTION)
-    }
-
     fun missingPitcher(context: Context?) {
         logEvent(context, EVENT_MISSING_PITCHER)
     }

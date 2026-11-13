@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface LineupRepository {
     suspend fun insertLineup(lineup: Lineup): Long
-    suspend fun insertLineups(lineups: List<Lineup>)
     suspend fun updateLineup(lineup: Lineup)
     suspend fun updateLineupsWithRowCount(lineups: List<Lineup>): Int
     suspend fun deleteLineup(lineup: Lineup)

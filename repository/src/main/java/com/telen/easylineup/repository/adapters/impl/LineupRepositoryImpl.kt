@@ -26,10 +26,6 @@ internal class LineupRepositoryImpl(private val lineupDao: LineupDao) : LineupRe
         return lineupDao.insertLineup(lineup.toNewRoom())
     }
 
-    override suspend fun insertLineups(lineups: List<Lineup>) {
-        lineupDao.insertLineups(lineups.map { it.toNewRoom() })
-    }
-
     override suspend fun updateLineup(lineup: Lineup) {
         lineupDao.updateLineup(lineup.toRoom())
     }

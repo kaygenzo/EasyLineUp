@@ -13,7 +13,6 @@ interface TournamentRepository {
     suspend fun getTournamentByHash(hash: String): Tournament?
     suspend fun getTournamentByName(name: String): Tournament?
     suspend fun insertTournament(tournament: Tournament): Long
-    suspend fun insertTournaments(tournaments: List<Tournament>)
     suspend fun updateTournament(tournament: Tournament)
     suspend fun updateTournamentsWithRowCount(tournaments: List<Tournament>): Int
     suspend fun deleteTournament(tournament: Tournament)

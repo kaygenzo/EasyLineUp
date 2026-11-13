@@ -34,9 +34,6 @@ internal interface TournamentDao {
     @Insert
     suspend fun insertTournament(tournament: RoomTournament): Long
 
-    @Insert
-    suspend fun insertTournaments(tournaments: List<RoomTournament>)
-
     @Update
     suspend fun updateTournament(tournament: RoomTournament)
 

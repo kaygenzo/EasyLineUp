@@ -22,9 +22,6 @@ internal interface PlayerDao {
     @Insert
     suspend fun insertPlayer(player: RoomPlayer): Long
 
-    @Insert
-    suspend fun insertPlayers(players: List<RoomPlayer>)
-
     @Delete
     suspend fun deletePlayer(player: RoomPlayer)
 

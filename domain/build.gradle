@@ -8,7 +8,6 @@ kotlin {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     testImplementation libs.junit4
     testImplementation libs.mockito.core

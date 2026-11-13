@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.domain
 
+import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerWithPosition
 
 /**
@@ -26,3 +27,11 @@ internal fun MutableList<PlayerWithPosition>.edit(
 ) {
     this[index] = this[index].transform()
 }
+
+internal fun PlayerWithPosition.isFirstBase() = position == FieldPosition.FIRST_BASE.id
+
+internal fun PlayerWithPosition.isShortStop() = position == FieldPosition.SHORT_STOP.id
+
+internal fun PlayerWithPosition.isRightField() = position == FieldPosition.RIGHT_FIELD.id
+
+internal fun PlayerWithPosition.isCatcher() = position == FieldPosition.CATCHER.id

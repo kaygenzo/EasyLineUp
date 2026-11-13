@@ -54,15 +54,6 @@ internal class PlayerRepositoryImplTest {
     }
 
     @Test
-    fun shouldInsertPlayersMappedToRoom() = runTest {
-        val players = listOf(player(name = "A"), player(name = "B"))
-
-        repository.insertPlayers(players)
-
-        verify(playerDao).insertPlayers(argThat { size == 2 })
-    }
-
-    @Test
     fun shouldDeletePlayerMappedToRoom() = runTest {
         val target = player(id = 1L)
 

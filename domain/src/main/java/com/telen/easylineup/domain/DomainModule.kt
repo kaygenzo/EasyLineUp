@@ -41,16 +41,9 @@ import com.telen.easylineup.domain.usecases.GetTournamentDisplayStart
 import com.telen.easylineup.domain.usecases.GetTournamentMapLink
 import com.telen.easylineup.domain.usecases.GetTournamentPlayerStats
 import com.telen.easylineup.domain.usecases.GetTournamentPlayerStatsWithProfiles
-import com.telen.easylineup.domain.usecases.GetTournaments
 import com.telen.easylineup.domain.usecases.HasUnsavedLineupChanges
 import com.telen.easylineup.domain.usecases.HasUnsavedLineupEdits
 import com.telen.easylineup.domain.usecases.ImportData
-import com.telen.easylineup.domain.usecases.InsertLineups
-import com.telen.easylineup.domain.usecases.InsertPlayerFieldPositions
-import com.telen.easylineup.domain.usecases.InsertPlayerNumberOverlays
-import com.telen.easylineup.domain.usecases.InsertPlayers
-import com.telen.easylineup.domain.usecases.InsertTeam
-import com.telen.easylineup.domain.usecases.InsertTournaments
 import com.telen.easylineup.domain.usecases.IsEmailValid
 import com.telen.easylineup.domain.usecases.IsExtraHittersUnlimited
 import com.telen.easylineup.domain.usecases.IsPlayingTimeUnderused
@@ -67,7 +60,6 @@ import com.telen.easylineup.domain.usecases.OverrideRosterPlayerNumber
 import com.telen.easylineup.domain.usecases.ResolveLineupEventTime
 import com.telen.easylineup.domain.usecases.SaveBattingOrderAndPositions
 import com.telen.easylineup.domain.usecases.SaveCurrentTeam
-import com.telen.easylineup.domain.usecases.SaveDashboardTiles
 import com.telen.easylineup.domain.usecases.SaveDpAndFlex
 import com.telen.easylineup.domain.usecases.SaveLineupChanges
 import com.telen.easylineup.domain.usecases.SaveLineupDraft
@@ -95,10 +87,8 @@ object DomainModule {
         single { GetAllTeams(get(), get()) }
         single { SaveCurrentTeam(get(), get()) }
         single { GetDashboardTiles(get(), get(), get(), get(), get(), get(), get(), get()) }
-        single { SaveDashboardTiles(get(), get()) }
         single { CreateDashboardTiles(get(), get()) }
         single { CreateLineup(get(), get(), get(), get()) }
-        single { GetTournaments(get(), get()) }
         single { ObserveAllTournamentsWithLineups(get(), get(), get()) }
         single { DeleteTournamentLineups(get(), get(), get(), get(), get()) }
         single { GetPlayer(get(), get()) }
@@ -109,15 +99,11 @@ object DomainModule {
         single { ObservePlayer(get()) }
         single { ObservePlayers(get()) }
         single { ObservePlayerNumberOverlays(get()) }
-        single { InsertPlayers(get(), get()) }
-        single { InsertPlayerNumberOverlays(get(), get()) }
         single { SaveTeam(get(), get(), get(), get(), get(), get()) }
         single { CheckTeam(get()) }
         single { ObserveTeams(get()) }
-        single { InsertTeam(get(), get()) }
         single { AssignPlayerFieldPosition(get(), get()) }
         single { DeletePlayerFieldPosition(get()) }
-        single { InsertPlayerFieldPositions(get(), get()) }
         single { GetListAvailablePlayersForSelection(get(), get()) }
         single { SaveBattingOrderAndPositions(get(), get(), get(), get(), get()) }
         single { DeleteLineup(get(), get()) }
@@ -148,8 +134,6 @@ object DomainModule {
         single { SaveTournament(get(), get(), get()) }
         single { GetTournamentMapLink(get(), get()) }
         single { ObserveTournaments(get()) }
-        single { InsertTournaments(get(), get()) }
-        single { InsertLineups(get(), get()) }
         single { ObserveLineupById(get()) }
         single { GetLineupById(get(), get()) }
         single { ObserveTeamPlayersAndMaybePositionsForLineup(get()) }

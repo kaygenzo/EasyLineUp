@@ -27,10 +27,6 @@ internal class PlayerRepositoryImpl(
         return playerDao.insertPlayer(player.toNewRoom())
     }
 
-    override suspend fun insertPlayers(players: List<Player>) {
-        playerDao.insertPlayers(players.map { it.toNewRoom() })
-    }
-
     override suspend fun deletePlayer(player: Player) {
         playerDao.deletePlayer(player.toRoom())
     }

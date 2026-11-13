@@ -8,6 +8,5 @@ import com.telen.easylineup.domain.model.DashboardTile
 
 interface TilesRepository {
     suspend fun getTiles(): List<DashboardTile>
-    suspend fun updateTiles(tiles: List<DashboardTile>)
     suspend fun insertTiles(tiles: List<DashboardTile>)
 }

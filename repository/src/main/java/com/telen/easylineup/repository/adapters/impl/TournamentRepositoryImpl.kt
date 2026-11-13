@@ -41,10 +41,6 @@ internal class TournamentRepositoryImpl(
         return tournamentDao.insertTournament(tournament.toNewRoom())
     }
 
-    override suspend fun insertTournaments(tournaments: List<Tournament>) {
-        tournamentDao.insertTournaments(tournaments.map { it.toNewRoom() })
-    }
-
     override suspend fun updateTournament(tournament: Tournament) {
         tournamentDao.updateTournament(tournament.toRoom())
     }

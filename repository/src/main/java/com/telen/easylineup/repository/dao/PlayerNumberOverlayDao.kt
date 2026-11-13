@@ -24,9 +24,6 @@ internal interface PlayerNumberOverlayDao {
     suspend fun insertPlayerNumberOverlays(items: List<RoomPlayerNumberOverlay>)
 
     @Delete
-    suspend fun deletePlayerNumberOverlay(item: RoomPlayerNumberOverlay)
-
-    @Delete
     suspend fun deletePlayerNumberOverlays(items: List<RoomPlayerNumberOverlay>)
 
     @Update

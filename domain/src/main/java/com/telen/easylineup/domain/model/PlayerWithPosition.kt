@@ -89,24 +89,8 @@ fun PlayerWithPosition.isBatter(): Boolean {
     return isAssigned() && order > 0
 }
 
-fun PlayerWithPosition.isFirstBase(): Boolean {
-    return position == FieldPosition.FIRST_BASE.id
-}
-
-fun PlayerWithPosition.isShortStop(): Boolean {
-    return position == FieldPosition.SHORT_STOP.id
-}
-
-fun PlayerWithPosition.isRightField(): Boolean {
-    return position == FieldPosition.RIGHT_FIELD.id
-}
-
 fun PlayerWithPosition.isPitcher(): Boolean {
     return position == FieldPosition.PITCHER.id
-}
-
-fun PlayerWithPosition.isCatcher(): Boolean {
-    return position == FieldPosition.CATCHER.id
 }
 
 fun PlayerWithPosition.isDpDh(): Boolean {

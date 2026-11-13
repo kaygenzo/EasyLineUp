@@ -102,13 +102,6 @@ internal class TournamentRepositoryImplTest {
     }
 
     @Test
-    fun shouldInsertTournamentsMappedToRoom() = runTest {
-        repository.insertTournaments(listOf(tournament(name = "A"), tournament(name = "B")))
-
-        verify(tournamentDao).insertTournaments(argThat { size == 2 })
-    }
-
-    @Test
     fun shouldUpdateTournamentMappedToRoom() = runTest {
         repository.updateTournament(tournament(id = 1L, name = "Renamed"))
 
