@@ -10,6 +10,7 @@ import com.telen.easylineup.domain.model.PlayerFieldPosition
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.Tournament
+import com.telen.easylineup.domain.model.currentTeam
 import com.telen.easylineup.domain.model.export.ExportBase
 import com.telen.easylineup.domain.model.export.LineupExport
 import com.telen.easylineup.domain.model.export.PlayerExport
@@ -82,9 +83,11 @@ class ImportData(
         withContext(dispatcherProvider.io()) {
             transactionRunner.inTransaction {
                 val result = ImportResult()
+                val importedTeams = mutableListOf<Pair<Team, Boolean>>()
 
                 exportBase.teams.forEach { teamExport ->
                     val team = processTeam(teamExport, result.teams, updateIfExists)
+                    importedTeams += team to teamExport.main
 
                     val playerIdMap: MutableMap<String, Long> = mutableMapOf()
                     teamExport.players.forEach { playerExport ->
@@ -137,9 +140,26 @@ class ImportData(
                     }
                 }
 
+                keepOneCurrentTeam(importedTeams)
                 result
             }
         }
+    }
+
+    /**
+     * A file's `main` flag says which team was current on the device it was exported from, so it
+     * never replaces the current team here: [processTeam] leaves it out. Only a device left with
+     * no current team takes one from the file - the one it marks as current, else the first.
+     */
+    private suspend fun keepOneCurrentTeam(importedTeams: List<Pair<Team, Boolean>>) {
+        if (teamDao.getTeams().any { it.main }) {
+            return
+        }
+        val team = importedTeams.firstOrNull { (_, wasMain) -> wasMain }?.first
+            ?: importedTeams.firstOrNull()?.first
+            ?: teamDao.getTeams().currentTeam()
+            ?: return
+        teamDao.updateTeam(team.copy(main = true))
     }
 
     private suspend fun processTeam(
@@ -152,7 +172,7 @@ class ImportData(
             name = teamExport.name,
             image = teamExport.image,
             type = teamExport.type,
-            main = teamExport.main,
+            main = false,
             hash = teamExport.id,
             createdAt = teamExport.createdAt
         )
@@ -163,7 +183,7 @@ class ImportData(
             t.copy(id = teamDao.insertTeam(t))
         } else if (updateIfExists) {
             counts.recordUpdate()
-            val updated = t.copy(id = teamDb.id)
+            val updated = t.copy(id = teamDb.id, main = teamDb.main)
             teamDao.updateTeam(updated)
             updated
         } else {

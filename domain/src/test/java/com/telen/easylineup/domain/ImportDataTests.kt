@@ -37,6 +37,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.argThat
 
 @RunWith(MockitoJUnitRunner::class)
 internal class ImportDataTests {
@@ -74,6 +75,8 @@ internal class ImportDataTests {
             transactionRunner = transactionRunner,
             dispatcherProvider = testDispatcherProvider()
         )
+        // No team on the device unless a test says otherwise: the import then picks a current one.
+        Mockito.lenient().`when`(teamDao.getTeams()).thenReturn(emptyList())
         Mockito.lenient().`when`(tournamentDao.getTournaments()).thenReturn(emptyList())
 
         val playerExport = PlayerExport(
@@ -166,8 +169,9 @@ internal class ImportDataTests {
     }
 
     private suspend fun mockAllFound() {
-        Mockito.`when`(teamDao.getTeamByHash(teamHash))
-            .thenReturn(Team(id = 1L, name = "team", hash = teamHash))
+        val localTeam = Team(id = 1L, name = "team", hash = teamHash, main = true)
+        Mockito.`when`(teamDao.getTeamByHash(teamHash)).thenReturn(localTeam)
+        Mockito.lenient().`when`(teamDao.getTeams()).thenReturn(listOf(localTeam))
         Mockito.`when`(playerDao.getPlayerByHash(playerHash))
             .thenReturn(
                 
@@ -485,5 +489,56 @@ internal class ImportDataTests {
         assertTrue(importData(exportBase, updateIfExists = false).isSuccess)
         assertEquals(listOf(true, true), inTransaction)
         assertEquals(1, transactionRunner.transactions)
+    }
+
+    @Test
+    fun shouldKeepTheCurrentTeamHereWhenTheFileHasItsOwn() = runTest {
+        mockAllNotFound()
+        mockAllInsertsSucceed()
+        Mockito.`when`(teamDao.getTeams())
+            .thenReturn(listOf(Team(id = 9L, name = "local", main = true)))
+
+        assertTrue(importData(exportBase, updateIfExists = false).isSuccess)
+
+        Mockito.verify(teamDao).insertTeam(argThat { !main })
+        Mockito.verify(teamDao, Mockito.never()).updateTeam(any())
+    }
+
+    @Test
+    fun shouldKeepTheLocalFlagWhenUpdatingAnExistingTeam() = runTest {
+        mockAllFound()
+        mockAllUpdatesSucceed()
+        val local = Team(id = 1L, name = "team", hash = teamHash, main = false)
+        Mockito.`when`(teamDao.getTeamByHash(teamHash)).thenReturn(local)
+        Mockito.`when`(teamDao.getTeams())
+            .thenReturn(listOf(local, Team(id = 9L, name = "local", main = true)))
+
+        assertTrue(importData(exportBase, updateIfExists = true).isSuccess)
+
+        Mockito.verify(teamDao).updateTeam(argThat { id == 1L && !main })
+        Mockito.verify(teamDao, Mockito.never()).updateTeam(argThat { main })
+    }
+
+    @Test
+    fun shouldMakeTheFilesCurrentTeamCurrentWhenThereIsNoneHere() = runTest {
+        mockAllNotFound()
+        mockAllInsertsSucceed()
+        Mockito.`when`(teamDao.getTeams()).thenReturn(emptyList())
+
+        assertTrue(importData(exportBase, updateIfExists = false).isSuccess)
+
+        Mockito.verify(teamDao).updateTeam(argThat { id == 1L && main })
+    }
+
+    @Test
+    fun shouldMakeTheFirstImportedTeamCurrentWhenTheFileMarksNone() = runTest {
+        mockAllNotFound()
+        mockAllInsertsSucceed()
+        Mockito.`when`(teamDao.getTeams()).thenReturn(emptyList())
+        val unmarked = ExportBase(exportBase.teams.map { it.copy(main = false) })
+
+        assertTrue(importData(unmarked, updateIfExists = false).isSuccess)
+
+        Mockito.verify(teamDao).updateTeam(argThat { id == 1L && main })
     }
 }

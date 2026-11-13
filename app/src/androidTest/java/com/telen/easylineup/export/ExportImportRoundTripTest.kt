@@ -8,6 +8,7 @@ import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.telen.easylineup.domain.model.PlayerNumberOverlay
+import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.domain.ports.repository.PlayerFieldPositionRepository
 import com.telen.easylineup.domain.ports.repository.PlayerNumberOverlayRepository
@@ -193,5 +194,29 @@ class ExportImportRoundTripTest {
 
         assertEquals(before, snapshot())
         assertEquals(12, result.players.updated)
+    }
+
+    @Test
+    fun importingAnotherDevicesFileKeepsTheLocalCurrentTeam() = runBlocking {
+        // The file's team is the current one where it was exported, so it is marked main too.
+        val file = exportToFile()
+        deleteAllData().getOrThrow()
+        val localId = teams.insertTeam(Team(name = "Local", main = true))
+
+        importData(read(file), updateIfExists = false).getOrThrow()
+
+        assertEquals(listOf(localId), teams.getTeams().filter { it.main }.map { it.id })
+    }
+
+    @Test
+    fun importingAFileWithoutACurrentTeamStillLeavesOne() = runBlocking {
+        val team = teams.getTeams().single()
+        teams.updateTeam(team.copy(main = false))
+        val file = exportToFile()
+        deleteAllData().getOrThrow()
+
+        importData(read(file), updateIfExists = false).getOrThrow()
+
+        assertEquals(1, teams.getTeams().count { it.main })
     }
 }
