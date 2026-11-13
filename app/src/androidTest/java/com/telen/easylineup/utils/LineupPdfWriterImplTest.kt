@@ -76,11 +76,16 @@ class LineupPdfWriterImplTest {
         defensePlayers = defensePlayers
     )
 
-    private fun render(uri: Uri): Bitmap {
+    private fun pageCount(uri: Uri): Int {
+        val descriptor = context.contentResolver.openFileDescriptor(uri, "r")!!
+        return PdfRenderer(descriptor).use { it.pageCount }
+    }
+
+    private fun render(uri: Uri, pageIndex: Int = 0, expectedPages: Int = 1): Bitmap {
         val descriptor = context.contentResolver.openFileDescriptor(uri, "r")!!
         return PdfRenderer(descriptor).use { renderer ->
-            assertEquals(1, renderer.pageCount)
-            renderer.openPage(0).use { page ->
+            assertEquals(expectedPages, renderer.pageCount)
+            renderer.openPage(pageIndex).use { page ->
                 assertEquals(PAGE_WIDTH, page.width)
                 assertEquals(PAGE_HEIGHT, page.height)
                 Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888).also {
@@ -109,6 +114,27 @@ class LineupPdfWriterImplTest {
         assertEquals("content", uri.scheme)
         assertEquals(context.packageName + ".fileprovider", uri.authority)
         render(uri)
+    }
+
+    @Test
+    fun carriesALongBattingOrderOverToANextPage() {
+        val uri = writer.write(data(battingOrder = (1..40).map(::batter)))
+
+        assertEquals(2, pageCount(uri))
+        val next = render(uri, pageIndex = 1, expectedPages = 2)
+        assertTrue(next.hasInk(40, 70, 280, 300))
+        assertFalse(next.hasInk(320, 40, 555, 800))
+    }
+
+    @Test
+    fun carriesALongBenchOverToANextPage() {
+        val starter = player(1L, FieldPosition.PITCHER)
+        val bench = (2L..30L).map { player(it, FieldPosition.SUBSTITUTE) }
+        val uri = writer.write(data(defensePlayers = listOf(starter) + bench))
+
+        val next = render(uri, pageIndex = 1, expectedPages = 2)
+        assertTrue(next.hasInk(320, 40, 555, 200))
+        assertFalse(next.hasInk(40, 40, 280, 800))
     }
 
     @Test

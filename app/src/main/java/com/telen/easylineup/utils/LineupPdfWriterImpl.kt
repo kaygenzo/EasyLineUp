@@ -16,6 +16,7 @@ import androidx.core.content.FileProvider
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.domain.model.PlayerWithPosition
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.ports.StringResourcesProvider
 import com.telen.easylineup.domain.usecases.SortSubstitutesForDisplay
@@ -37,33 +38,78 @@ class LineupPdfWriterImpl(
 ) : LineupPdfWriter {
 
     override fun write(data: LineupExportData): Uri {
+        val now = System.currentTimeMillis()
+        deleteOldCards(now)
+        val file = File(context.cacheDir, "$FILE_PREFIX$now$FILE_SUFFIX")
+
         val document = PdfDocument()
-        val pageInfo = PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, 1).create()
-        val page = document.startPage(pageInfo)
-        drawCard(page.canvas, data)
-        document.finishPage(page)
+        try {
+            drawCard(document, data)
+            FileOutputStream(file).use { stream -> document.writeTo(stream) }
+        } finally {
+            document.close()
+        }
 
-        val file = File(context.cacheDir, "lineup_${System.currentTimeMillis()}.pdf")
-        FileOutputStream(file).use { stream -> document.writeTo(stream) }
-        document.close()
-
-        val authority = context.packageName + ".fileprovider"
+        val authority = context.getString(R.string.file_provider_authority)
         return FileProvider.getUriForFile(context, authority, file)
     }
 
-    private fun drawCard(canvas: Canvas, data: LineupExportData) {
-        canvas.drawRect(0f, 0f, PAGE_WIDTH.toFloat(), PAGE_HEIGHT.toFloat(), backgroundPaint())
+    /**
+     * Each share writes a new file to the cache. The ones from earlier days go: a day is long
+     * past the app the card was shared with reading it, a minute might not be.
+     */
+    private fun deleteOldCards(now: Long) {
+        context.cacheDir
+            .listFiles { file ->
+                file.name.startsWith(FILE_PREFIX) && file.name.endsWith(FILE_SUFFIX) &&
+                    now - file.lastModified() > OLD_CARD_AGE_MILLIS
+            }
+            ?.forEach { it.delete() }
+    }
 
+    /**
+     * The first page holds the whole card. A batting order or a bench too long for it - extra
+     * hitters can be unlimited - carries on over as many pages as needed, each column where it
+     * was.
+     */
+    private fun drawCard(document: PdfDocument, data: LineupExportData) {
+        var pageNumber = 1
+        val page = document.startPage(pageInfo(pageNumber))
+        val canvas = page.canvas
+        drawBackground(canvas)
         drawTitle(canvas)
         drawHeader(canvas, data)
         canvas.drawLine(MARGIN, HEADER_RULE_Y, PAGE_WIDTH - MARGIN, HEADER_RULE_Y, rulePaint())
 
-        drawBattingOrder(canvas, data.battingOrder)
+        val batters = data.battingOrder.withIndex().toList()
+        var battersLeft = drawBattingOrder(canvas, batters, COLUMNS_TITLE_Y)
         val diamondBottom = drawDefenseDiamond(canvas, data)
 
         // Placed under the diamond rather than after the batting order: a full roster's batting
         // order list can already reach close to the page bottom, leaving no room below it.
-        drawSubstitutes(canvas, data, startX = DIAMOND_LEFT, startY = diamondBottom + SECTION_GAP)
+        var substitutesLeft = drawSubstitutes(
+            canvas,
+            sortSubstitutesForDisplay(data.defensePlayers),
+            startY = diamondBottom + SECTION_GAP
+        )
+        document.finishPage(page)
+
+        while (battersLeft.isNotEmpty() || substitutesLeft.isNotEmpty()) {
+            pageNumber++
+            val next = document.startPage(pageInfo(pageNumber))
+            drawBackground(next.canvas)
+            battersLeft =
+                drawBattingOrder(next.canvas, battersLeft, CONTINUED_TITLE_Y, continued = true)
+            substitutesLeft = drawSubstitutes(next.canvas, substitutesLeft, CONTINUED_TITLE_Y)
+            document.finishPage(next)
+        }
+    }
+
+    private fun pageInfo(number: Int) =
+        PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, number).create()
+
+    private fun drawBackground(canvas: Canvas) {
+        canvas.drawRect(0f, 0f, PAGE_WIDTH.toFloat(), PAGE_HEIGHT.toFloat(), backgroundPaint())
     }
 
     private fun drawTitle(canvas: Canvas) {
@@ -86,18 +132,32 @@ class LineupPdfWriterImpl(
         canvas.drawText(opponentLabel, OPPONENT_X, HEADER_Y, paint)
     }
 
-    private fun drawBattingOrder(canvas: Canvas, battingOrder: List<BatterState>) {
+    /**
+     * Draws the batters that fit under [titleY] and returns the ones left for the next page. The
+     * first page shows the section even empty, a page after it only to carry on a long one.
+     */
+    private fun drawBattingOrder(
+        canvas: Canvas,
+        batters: List<IndexedValue<BatterState>>,
+        titleY: Float,
+        continued: Boolean = false
+    ): List<IndexedValue<BatterState>> {
+        if (batters.isEmpty() && continued) {
+            return emptyList()
+        }
         canvas.drawText(
             context.getString(R.string.lineup_pdf_batting_order_title),
             MARGIN,
-            COLUMNS_TITLE_Y,
+            titleY,
             sectionTitlePaint()
         )
 
         val orderPaint = bodyPaint(bold = true)
         val namePaint = bodyPaint(bold = false)
-        var rowY = BATTING_ROWS_TOP
-        battingOrder.forEachIndexed { index, batter ->
+        val firstRowY = titleY + BATTING_ROWS_GAP
+        val (fitting, left) = batters.splitAt(rowsThatFit(firstRowY))
+        var rowY = firstRowY
+        fitting.forEach { (index, batter) ->
             canvas.drawText("${index + 1}", MARGIN, rowY, orderPaint)
             canvas.drawText(
                 "${batter.playerName} (#${batter.playerNumber})",
@@ -114,7 +174,15 @@ class LineupPdfWriterImpl(
             )
             rowY += ROW_HEIGHT
         }
+        return left
     }
+
+    /** How many rows starting at [firstRowY] fit above the bottom margin. */
+    private fun rowsThatFit(firstRowY: Float): Int =
+        ((PAGE_HEIGHT - MARGIN - firstRowY) / ROW_HEIGHT).toInt() + 1
+
+    private fun <T> List<T>.splitAt(count: Int): Pair<List<T>, List<T>> =
+        take(count) to drop(count)
 
     /** Returns the y just past the diamond, so the substitutes section can start below it. */
     private fun drawDefenseDiamond(canvas: Canvas, data: LineupExportData): Float {
@@ -141,30 +209,40 @@ class LineupPdfWriterImpl(
         return DIAMOND_TOP + DIAMOND_SIZE
     }
 
+    /**
+     * Draws the substitutes that fit in the right column under [startY] and returns the ones left
+     * for the next page.
+     */
     private fun drawSubstitutes(
         canvas: Canvas,
-        data: LineupExportData,
-        startX: Float,
+        substitutes: List<PlayerWithPosition>,
         startY: Float
-    ) {
-        val substitutes = sortSubstitutesForDisplay(data.defensePlayers)
+    ): List<PlayerWithPosition> {
         if (substitutes.isEmpty()) {
-            return
+            return emptyList()
         }
 
         canvas.drawText(
             context.getString(R.string.lineup_pdf_substitutes_title),
-            startX,
+            DIAMOND_LEFT,
             startY,
             sectionTitlePaint()
         )
 
         val paint = bodyPaint(bold = false)
-        var rowY = startY + ROW_HEIGHT
-        substitutes.forEach { player ->
-            canvas.drawText("${player.playerName} (#${player.shirtNumber})", startX, rowY, paint)
+        val firstRowY = startY + ROW_HEIGHT
+        val (fitting, left) = substitutes.splitAt(rowsThatFit(firstRowY))
+        var rowY = firstRowY
+        fitting.forEach { player ->
+            canvas.drawText(
+                "${player.playerName} (#${player.shirtNumber})",
+                DIAMOND_LEFT,
+                rowY,
+                paint
+            )
             rowY += ROW_HEIGHT
         }
+        return left
     }
 
     private fun outfieldPath(): Path {
@@ -274,7 +352,9 @@ class LineupPdfWriterImpl(
         const val SECTION_TITLE_TEXT_SIZE = 15f
         const val BODY_TEXT_SIZE = 12f
 
-        const val BATTING_ROWS_TOP = 165f
+        // The first row sits this far under its section title, as on the first page (y = 165).
+        const val BATTING_ROWS_GAP = 25f
+        const val CONTINUED_TITLE_Y = 60f
         const val BATTING_NAME_INDENT = 24f
         const val BATTING_COLUMN_WIDTH = 240f
         const val ROW_HEIGHT = 24f
@@ -286,5 +366,9 @@ class LineupPdfWriterImpl(
         const val DIAMOND_LABEL_TEXT_SIZE = 10f
 
         const val SECTION_GAP = 30f
+
+        const val FILE_PREFIX = "lineup_"
+        const val FILE_SUFFIX = ".pdf"
+        const val OLD_CARD_AGE_MILLIS = 24 * 60 * 60 * 1000L
     }
 }
