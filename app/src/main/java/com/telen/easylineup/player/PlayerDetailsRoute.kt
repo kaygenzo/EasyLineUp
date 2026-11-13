@@ -117,6 +117,10 @@ fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {
                 onConfirm = {
                     FirebaseAnalyticsUtils.onClick(context, "click_player_details_delete")
                     showDeleteSheet = false
+                    // ConfirmSheet calls onDismiss first, in the same click: set the id back
+                    // before the next frame, or the collector above goes away with it and the
+                    // Deleted event is never seen.
+                    pendingDeletePlayerId = playerId
                     deleteViewModel.onDeleteConfirmed()
                 }
             )
