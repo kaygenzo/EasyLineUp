@@ -7,6 +7,7 @@ package com.telen.easylineup.domain.usecases
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.domain.model.TournamentWithLineup
+import com.telen.easylineup.domain.model.matchesSearch
 import com.telen.easylineup.domain.model.toLineup
 import com.telen.easylineup.domain.model.toTournament
 import com.telen.easylineup.domain.ports.DispatcherProvider
@@ -28,10 +29,22 @@ class ObserveAllTournamentsWithLineups(
     private val getTeam: GetTeam,
     private val dispatcherProvider: DispatcherProvider
 ) {
+    /**
+     * [filter] keeps the lineups whose name, or whose tournament's name, matches it, along with a
+     * matching tournament's lineups. It is applied here rather than in SQL, whose `LIKE` only
+     * ignores the case of unaccented Latin letters.
+     */
     operator fun invoke(filter: String): Flow<List<Pair<Tournament, List<Lineup>>>> = flow {
         val team = getTeam().getOrThrow()
-        emitAll(dao.observeAllTournamentsWithLineups(filter, team.id).map(::groupByTournament))
+        emitAll(
+            dao.observeAllTournamentsWithLineups(team.id).map { rows ->
+                groupByTournament(rows.filter { it.matchesSearch(filter) })
+            }
+        )
     }.flowOn(dispatcherProvider.io())
+
+    private fun TournamentWithLineup.matchesSearch(filter: String): Boolean =
+        tournamentName.matchesSearch(filter) || lineupName.orEmpty().matchesSearch(filter)
 
     private fun groupByTournament(
         items: List<TournamentWithLineup>

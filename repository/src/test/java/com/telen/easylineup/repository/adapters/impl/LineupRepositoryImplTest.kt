@@ -182,10 +182,10 @@ internal class LineupRepositoryImplTest {
     @Test
     fun shouldObserveAllTournamentsWithLineupsMappedToDomain() = runTest {
         val rooms = listOf(RoomTournamentWithLineup(tournamentId = 1L, tournamentName = "Cup"))
-        Mockito.`when`(lineupDao.observeAllTournamentsWithLineups("filter", 1L))
+        Mockito.`when`(lineupDao.observeAllTournamentsWithLineups(1L))
             .thenReturn(flowOf(rooms))
 
-        val result = repository.observeAllTournamentsWithLineups("filter", 1L).first()
+        val result = repository.observeAllTournamentsWithLineups(1L).first()
 
         assertEquals(listOf("Cup"), result.map { it.tournamentName })
     }

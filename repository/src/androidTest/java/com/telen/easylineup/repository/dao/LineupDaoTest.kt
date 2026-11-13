@@ -70,7 +70,7 @@ class LineupDaoTest {
         insertLineup("Hawks Opener", teamAId, tournamentAId)
         insertLineup("Tigers Opener", teamBId, tournamentBId)
 
-        val rows = lineupDao.observeAllTournamentsWithLineups(filter = "", teamId = teamAId).first()
+        val rows = lineupDao.observeAllTournamentsWithLineups(teamId = teamAId).first()
 
         assertEquals(1, rows.size)
         assertEquals("Fall Classic", rows.single().tournamentName)
@@ -85,42 +85,9 @@ class LineupDaoTest {
         insertLineup("Lineup A", teamId, olderTournamentId)
         insertLineup("Lineup B", teamId, newerTournamentId)
 
-        val rows = lineupDao.observeAllTournamentsWithLineups(filter = "", teamId = teamId).first()
+        val rows = lineupDao.observeAllTournamentsWithLineups(teamId = teamId).first()
 
         assertEquals(listOf("Late Fall", "Early Spring"), rows.map { it.tournamentName })
-    }
-
-    @Test
-    fun observeAllTournamentsWithLineupsFilterMatchesEitherTournamentOrLineupName() = runBlocking {
-        val teamId = insertTeam("Riverside Hawks")
-        val tournamentId = insertTournament("Fall Classic", createdAt = 1_000L)
-        insertLineup("Championship Game", teamId, tournamentId)
-
-        val byTournamentName = lineupDao.observeAllTournamentsWithLineups("Fall", teamId).first()
-        val byLineupName =
-            lineupDao.observeAllTournamentsWithLineups("Championship", teamId).first()
-        val noMatch = lineupDao.observeAllTournamentsWithLineups("Nonexistent", teamId).first()
-
-        assertEquals(1, byTournamentName.size)
-        assertEquals(1, byLineupName.size)
-        assertTrue(noMatch.isEmpty())
-    }
-
-    @Test
-    fun observeAllTournamentsWithLineupsFilterTakesWildcardsLiterally() = runBlocking {
-        val teamId = insertTeam("Riverside Hawks")
-        insertLineup("100% effort", teamId, insertTournament("Cup", createdAt = 1_000L))
-        insertLineup("1000 runs", teamId, insertTournament("Open", createdAt = 2_000L))
-        insertLineup("U_12 final", teamId, insertTournament("Youth", createdAt = 3_000L))
-        insertLineup("U312 final", teamId, insertTournament("Masters", createdAt = 4_000L))
-
-        val percent =
-            lineupDao.observeAllTournamentsWithLineups("100%".escapeForLike(), teamId).first()
-        val underscore =
-            lineupDao.observeAllTournamentsWithLineups("U_1".escapeForLike(), teamId).first()
-
-        assertEquals(listOf("100% effort"), percent.map { it.lineupName })
-        assertEquals(listOf("U_12 final"), underscore.map { it.lineupName })
     }
 
     @Test
@@ -128,22 +95,10 @@ class LineupDaoTest {
         val teamId = insertTeam("Riverside Hawks")
         val tournamentId = insertTournament("Empty Tournament", createdAt = 1_000L)
 
-        val rows = lineupDao.observeAllTournamentsWithLineups(filter = "", teamId = teamId).first()
+        val rows = lineupDao.observeAllTournamentsWithLineups(teamId = teamId).first()
 
         assertEquals(tournamentId, rows.single().tournamentId)
         assertEquals(0L, rows.single().lineupId)
-    }
-
-    @Test
-    fun observeAllTournamentsWithLineupsFiltersAnEmptyTournamentByItsName() = runBlocking {
-        val teamId = insertTeam("Riverside Hawks")
-        insertTournament("Empty Tournament", createdAt = 1_000L)
-
-        val match = lineupDao.observeAllTournamentsWithLineups("Empty", teamId).first()
-        val noMatch = lineupDao.observeAllTournamentsWithLineups("Fall", teamId).first()
-
-        assertEquals(1, match.size)
-        assertTrue(noMatch.isEmpty())
     }
 
     @Test
@@ -157,7 +112,7 @@ class LineupDaoTest {
             val tigersOnlyId = insertTournament("Spring Cup", createdAt = 2_000L)
             insertLineup("Tigers Final", teamBId, tigersOnlyId)
 
-            val rows = lineupDao.observeAllTournamentsWithLineups("", teamAId).first()
+            val rows = lineupDao.observeAllTournamentsWithLineups(teamAId).first()
 
             assertEquals(listOf("Hawks Opener"), rows.map { it.lineupName })
         }

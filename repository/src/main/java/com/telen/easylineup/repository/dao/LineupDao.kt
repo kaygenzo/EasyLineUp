@@ -85,16 +85,11 @@ internal interface LineupDao {
         WHERE (lineups.id IS NOT NULL
                 OR NOT EXISTS (SELECT 1 FROM lineups AS any_team
                     WHERE any_team.tournamentID = tournaments.id))
-            AND (tournamentName LIKE '%' || :filter || '%' ESCAPE '\'
-                OR lineupName LIKE '%' || :filter || '%' ESCAPE '\')
         ORDER BY tournaments.createdAt DESC
     """
     )
-    /** [filter] is matched literally once escaped with [escapeForLike]: `%` and `_` included. */
-    fun observeAllTournamentsWithLineups(
-        filter: String,
-        teamId: Long
-    ): Flow<List<RoomTournamentWithLineup>>
+    /** Every row of the team: the search filter is the domain's, see its use case. */
+    fun observeAllTournamentsWithLineups(teamId: Long): Flow<List<RoomTournamentWithLineup>>
 
     @Query(
         """

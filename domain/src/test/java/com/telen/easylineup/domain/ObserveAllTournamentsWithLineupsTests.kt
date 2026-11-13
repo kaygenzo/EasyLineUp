@@ -48,13 +48,13 @@ internal class ObserveAllTournamentsWithLineupsTests {
 
     @Test
     fun shouldReturnEmptyListWhenNoTournamentsForCurrentTeam() = runTest {
-        Mockito.`when`(lineupDao.observeAllTournamentsWithLineups("summer", team.id))
+        Mockito.`when`(lineupDao.observeAllTournamentsWithLineups(team.id))
             .thenReturn(flowOf(emptyList()))
 
         val result = observeAllTournamentsWithLineups("summer").first()
 
         Assert.assertTrue(result.isEmpty())
-        Mockito.verify(lineupDao).observeAllTournamentsWithLineups("summer", team.id)
+        Mockito.verify(lineupDao).observeAllTournamentsWithLineups(team.id)
     }
 
     private fun row(
@@ -73,7 +73,7 @@ internal class ObserveAllTournamentsWithLineupsTests {
     )
 
     private suspend fun resultFor(vararg rows: TournamentWithLineup) = run {
-        Mockito.`when`(lineupDao.observeAllTournamentsWithLineups("", team.id))
+        Mockito.`when`(lineupDao.observeAllTournamentsWithLineups(team.id))
             .thenReturn(flowOf(rows.toList()))
         observeAllTournamentsWithLineups("").first()
     }
@@ -142,5 +142,64 @@ internal class ObserveAllTournamentsWithLineupsTests {
         assertEquals(2, lineup.extraHitters)
         assertEquals(1_000L, lineup.eventTimeInMillis)
         assertEquals("1;2", lineup.roster)
+    }
+
+    private suspend fun lineupNamesFor(filter: String, vararg rows: TournamentWithLineup) = run {
+        Mockito.`when`(lineupDao.observeAllTournamentsWithLineups(team.id))
+            .thenReturn(flowOf(rows.toList()))
+        observeAllTournamentsWithLineups(filter).first().flatMap { (_, lineups) ->
+            lineups.map { it.name }
+        }
+    }
+
+    private fun named(tournamentId: Long, lineupId: Long, tournament: String, lineup: String) =
+        row(tournamentId, lineupId).copy(tournamentName = tournament, lineupName = lineup)
+
+    @Test
+    fun shouldMatchEitherTheTournamentOrTheLineupName() = runTest {
+        val rows = arrayOf(
+            named(1L, 1L, "Fall Classic", "Opening game"),
+            named(2L, 2L, "Spring Cup", "Championship Game"),
+            named(3L, 3L, "Summer Open", "Friendly")
+        )
+
+        assertEquals(listOf("Opening game"), lineupNamesFor("fall", *rows))
+        assertEquals(listOf("Championship Game"), lineupNamesFor("champion", *rows))
+        assertTrue(lineupNamesFor("nonexistent", *rows).isEmpty())
+    }
+
+    @Test
+    fun shouldMatchWhateverTheCaseOrTheAccents() = runTest {
+        val rows = arrayOf(named(1L, 1L, "Tournoi d'Été", "Finale"))
+
+        assertEquals(listOf("Finale"), lineupNamesFor("été", *rows))
+        assertEquals(listOf("Finale"), lineupNamesFor("ETE", *rows))
+    }
+
+    @Test
+    fun shouldTakeWildcardCharactersLiterally() = runTest {
+        val rows = arrayOf(
+            named(1L, 1L, "Cup", "100% effort"),
+            named(2L, 2L, "Open", "1000 runs"),
+            named(3L, 3L, "Youth", "U_12 final"),
+            named(4L, 4L, "Masters", "U312 final")
+        )
+
+        assertEquals(listOf("100% effort"), lineupNamesFor("100%", *rows))
+        assertEquals(listOf("U_12 final"), lineupNamesFor("U_1", *rows))
+    }
+
+    @Test
+    fun shouldFilterATournamentWithoutLineupByItsName() = runTest {
+        val empty = TournamentWithLineup(
+            tournamentId = 1L,
+            tournamentName = "Empty Tournament",
+            lineupName = null
+        )
+        Mockito.`when`(lineupDao.observeAllTournamentsWithLineups(team.id))
+            .thenReturn(flowOf(listOf(empty)))
+
+        assertEquals(1, observeAllTournamentsWithLineups("empty").first().size)
+        assertTrue(observeAllTournamentsWithLineups("fall").first().isEmpty())
     }
 }

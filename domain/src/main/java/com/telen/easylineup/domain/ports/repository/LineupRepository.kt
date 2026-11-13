@@ -24,10 +24,7 @@ interface LineupRepository {
     /** Whether any team still has a lineup in this tournament. */
     suspend fun hasLineupsForTournament(tournamentId: Long): Boolean
     suspend fun getLastLineup(teamId: Long): Lineup?
-    fun observeAllTournamentsWithLineups(
-        filter: String,
-        teamId: Long
-    ): Flow<List<TournamentWithLineup>>
+    fun observeAllTournamentsWithLineups(teamId: Long): Flow<List<TournamentWithLineup>>
 
     suspend fun getAllPlayerPositionsForTournament(
         tournamentId: Long,
