@@ -197,8 +197,8 @@ per-module.
 - **Testing** — JUnit4, Mockito + `mockito-kotlin`, `kotlinx-coroutines-test`,
   Robolectric + Roborazzi for preview screenshots, Compose UI tests + Espresso +
   UiAutomator for instrumented tests, Room's own testing artifact for migrations.
-- **Quality/CI** — Android lint, Jacoco (coverage, uploaded to Codacy), OWASP
-  dependency-check 13.0.0, Fastlane (CI deploys) + Firebase App Distribution 5.2.1.
+- **Quality/CI** — Android lint, Jacoco (coverage, uploaded to Codacy), Fastlane (CI
+  deploys) + Firebase App Distribution 5.2.1.
 
 ## Revamp status — "The Dugout Card"
 
