@@ -260,6 +260,44 @@ class JsonExportBaseTests {
     }
 
     @Test
+    fun refusesAPositionPointingAtAPlayerMissingFromTheFile() {
+        val file = minimalFile(
+            lineup = """{"id": "l-1", "name": "L", "playerPositions": [
+                {"id": "pos-1", "playerID": "nobody", "position": 1, "order": 1}]}"""
+        )
+
+        val error = runCatching { parseExportFile(StringReader(file)) }.exceptionOrNull()
+
+        assertTrue(error is InvalidExportFileException)
+        assertEquals(
+            "Lineup l-1 points at player nobody, missing from team team-1",
+            error?.message
+        )
+    }
+
+    @Test
+    fun refusesANumberOverlayWithoutAPlayer() {
+        val file = minimalFile(
+            lineup = """{"id": "l-1", "name": "L", "playerNumberOverlays": [
+                {"id": "o-1", "number": 7}]}"""
+        )
+
+        val error = runCatching { parseExportFile(StringReader(file)) }.exceptionOrNull()
+
+        assertTrue(error is InvalidExportFileException)
+    }
+
+    @Test
+    fun acceptsARosterEntryForAPlayerMissingFromTheFile() {
+        val file = minimalFile(lineup = """{"id": "l-1", "name": "L", "roster": ["nobody"]}""")
+
+        val lineup = parseExportFile(StringReader(file)).teams.single().tournaments.single()
+            .lineups.single()
+
+        assertEquals(listOf("nobody"), lineup.roster)
+    }
+
+    @Test
     fun refusesATruncatedOrEmptyFile() {
         listOf(minimalFile().dropLast(20), "").forEach { file ->
             val error = runCatching { parseExportFile(StringReader(file)) }.exceptionOrNull()
