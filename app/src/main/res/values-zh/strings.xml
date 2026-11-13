@@ -216,7 +216,11 @@
     <string name="lineup_theme_day_value">浅色</string>
     <string name="lineup_theme_night_value">深色</string>
     <string name="generic_not_found">未找到</string>
-    <string name="generic_error_with_detail">出现问题:%1$s</string>
+    <string name="error_player_delete_failed">无法删除球员，请重试。</string>
+    <string name="error_tournament_delete_failed">无法删除赛事，请重试。</string>
+    <string name="error_lineup_edit_failed">无法应用此更改，请重试。</string>
+    <string name="error_lineup_load_failed">无法打开阵容，请重试。</string>
+    <string name="error_shirt_number_search_failed">无法搜索此号码，请重试。</string>
     <string name="form_lineup_creation_extra_hitters_label">额外打者</string>
     <string name="form_lineup_creation_strategy_label">战术</string>
     <string name="roster_sort_by_name">按姓名</string>

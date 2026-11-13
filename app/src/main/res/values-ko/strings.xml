@@ -222,7 +222,11 @@
     <string name="lineup_theme_day_value">라이트</string>
     <string name="lineup_theme_night_value">다크</string>
     <string name="generic_not_found">찾을 수 없음</string>
-    <string name="generic_error_with_detail">문제가 발생했습니다: %1$s</string>
+    <string name="error_player_delete_failed">선수를 삭제하지 못했습니다. 다시 시도하세요.</string>
+    <string name="error_tournament_delete_failed">대회를 삭제하지 못했습니다. 다시 시도하세요.</string>
+    <string name="error_lineup_edit_failed">변경 사항을 적용하지 못했습니다. 다시 시도하세요.</string>
+    <string name="error_lineup_load_failed">라인업을 열지 못했습니다. 다시 시도하세요.</string>
+    <string name="error_shirt_number_search_failed">이 번호를 검색하지 못했습니다. 다시 시도하세요.</string>
     <string name="form_lineup_creation_extra_hitters_label">추가 타자</string>
     <string name="form_lineup_creation_strategy_label">전략</string>
     <string name="roster_sort_by_name">이름순</string>

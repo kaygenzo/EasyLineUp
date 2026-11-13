@@ -23,6 +23,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -59,6 +61,12 @@ data class DashboardUiState(
     val showShirtNumberHistoryDialog: Boolean = false
 )
 
+/** One-shot outcomes for [DashboardRoute] to show. */
+sealed interface DashboardEvent {
+    /** The shirt number history couldn't be read: the previous result is left as it was. */
+    data object ShirtNumberSearchFailed : DashboardEvent
+}
+
 class DashboardViewModel(
     private val observeTeams: ObserveTeams,
     private val getDashboardTilesUseCase: GetDashboardTiles,
@@ -66,6 +74,9 @@ class DashboardViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
+
+    private val _events = Channel<DashboardEvent>(Channel.BUFFERED)
+    val events: Flow<DashboardEvent> = _events.receiveAsFlow()
 
     /** Bumped by [onRetryLoad] to start reading again after a failure ended the stream. */
     private val loadAttempt = MutableStateFlow(0)
@@ -148,7 +159,10 @@ class DashboardViewModel(
                         )
                     }
                 }
-                .onFailure { Timber.e(it) }
+                .onFailure {
+                    Timber.e(it)
+                    _events.send(DashboardEvent.ShirtNumberSearchFailed)
+                }
         }
         return true
     }

@@ -17,7 +17,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -41,7 +40,6 @@ import org.koin.core.parameter.parametersOf
 fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {
     val teamViewModel = koinViewModel<TeamViewModel>()
     val context = LocalContext.current
-    val resources = LocalResources.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val teamUiState by teamViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -91,13 +89,13 @@ fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {
                             pendingDeletePlayerId = null
                             navController.popBackStack(Routes.Roster, false)
                         }
-                        is PlayerEvent.DeleteFailed -> {
+                        PlayerEvent.DeleteFailed -> {
                             pendingDeletePlayerId = null
-                            val message = resources.getString(
-                                R.string.generic_error_with_detail,
-                                event.detail
-                            )
-                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                context,
+                                R.string.error_player_delete_failed,
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                         PlayerEvent.Saved,
                         PlayerEvent.SaveRejected,

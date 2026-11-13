@@ -245,7 +245,12 @@
     <string name="lineup_theme_day_value">Lyst</string>
     <string name="lineup_theme_night_value">Mørkt</string>
     <string name="generic_not_found">Ikke fundet</string>
-    <string name="generic_error_with_detail">Noget gik galt: %1$s</string>
+    <string name="error_player_delete_failed">Spilleren kunne ikke slettes. Prøv igen.</string>
+    <string name="error_tournament_delete_failed">Turneringen kunne ikke slettes. Prøv
+        igen.</string>
+    <string name="error_lineup_edit_failed">Ændringen kunne ikke anvendes. Prøv igen.</string>
+    <string name="error_lineup_load_failed">Holdopstillingen kunne ikke åbnes. Prøv igen.</string>
+    <string name="error_shirt_number_search_failed">Nummeret kunne ikke søges. Prøv igen.</string>
     <string name="form_lineup_creation_extra_hitters_label">Ekstra slagmænd</string>
     <string name="form_lineup_creation_strategy_label">Strategi</string>
     <string name="roster_sort_by_name">Efter navn</string>

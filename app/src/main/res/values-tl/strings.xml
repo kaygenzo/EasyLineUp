@@ -250,7 +250,12 @@
     <string name="lineup_theme_day_value">Maliwanag</string>
     <string name="lineup_theme_night_value">Madilim</string>
     <string name="generic_not_found">Hindi nakita</string>
-    <string name="generic_error_with_detail">May nangyaring mali: %1$s</string>
+    <string name="error_player_delete_failed">Hindi nabura ang manlalaro. Subukan ulit.</string>
+    <string name="error_tournament_delete_failed">Hindi nabura ang torneo. Subukan ulit.</string>
+    <string name="error_lineup_edit_failed">Hindi nailapat ang pagbabago. Subukan ulit.</string>
+    <string name="error_lineup_load_failed">Hindi nabuksan ang lineup. Subukan ulit.</string>
+    <string name="error_shirt_number_search_failed">Hindi nahanap ang numerong ito. Subukan
+        ulit.</string>
     <string name="form_lineup_creation_extra_hitters_label">Dagdag na hitter</string>
     <string name="form_lineup_creation_strategy_label">Estratehiya</string>
     <string name="roster_sort_by_name">Ayon sa pangalan</string>

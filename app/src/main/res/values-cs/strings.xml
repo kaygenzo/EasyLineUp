@@ -253,7 +253,13 @@
     <string name="lineup_theme_day_value">Světlý</string>
     <string name="lineup_theme_night_value">Tmavý</string>
     <string name="generic_not_found">Nenalezeno</string>
-    <string name="generic_error_with_detail">Něco se pokazilo: %1$s</string>
+    <string name="error_player_delete_failed">Hráče se nepodařilo smazat. Zkuste to znovu.</string>
+    <string name="error_tournament_delete_failed">Turnaj se nepodařilo smazat. Zkuste to
+        znovu.</string>
+    <string name="error_lineup_edit_failed">Změnu se nepodařilo použít. Zkuste to znovu.</string>
+    <string name="error_lineup_load_failed">Sestavu se nepodařilo otevřít. Zkuste to znovu.</string>
+    <string name="error_shirt_number_search_failed">Číslo se nepodařilo vyhledat. Zkuste to
+        znovu.</string>
     <string name="form_lineup_creation_extra_hitters_label">Pálkaři navíc</string>
     <string name="form_lineup_creation_strategy_label">Strategie</string>
     <string name="roster_sort_by_name">Podle jména</string>

@@ -252,7 +252,16 @@
     <string name="lineup_theme_day_value">Licht</string>
     <string name="lineup_theme_night_value">Donker</string>
     <string name="generic_not_found">Niet gevonden</string>
-    <string name="generic_error_with_detail">Er ging iets mis: %1$s</string>
+    <string name="error_player_delete_failed">De speler kon niet worden verwijderd. Probeer het
+        opnieuw.</string>
+    <string name="error_tournament_delete_failed">Het toernooi kon niet worden verwijderd. Probeer
+        het opnieuw.</string>
+    <string name="error_lineup_edit_failed">De wijziging kon niet worden toegepast. Probeer het
+        opnieuw.</string>
+    <string name="error_lineup_load_failed">De opstelling kon niet worden geopend. Probeer het
+        opnieuw.</string>
+    <string name="error_shirt_number_search_failed">Dit nummer kon niet worden gezocht. Probeer het
+        opnieuw.</string>
     <string name="form_lineup_creation_extra_hitters_label">Extra slagmensen</string>
     <string name="form_lineup_creation_strategy_label">Strategie</string>
     <string name="roster_sort_by_name">Op naam</string>

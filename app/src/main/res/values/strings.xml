@@ -311,7 +311,14 @@
     <string name="lineup_theme_night_value">Night</string>
 
     <string name="generic_not_found">Not found</string>
-    <string name="generic_error_with_detail">Something went wrong: %1$s</string>
+    <string name="error_player_delete_failed">Couldn\'t delete the player. Please try
+        again.</string>
+    <string name="error_tournament_delete_failed">Couldn\'t delete the tournament. Please try
+        again.</string>
+    <string name="error_lineup_edit_failed">Couldn\'t apply this change. Please try again.</string>
+    <string name="error_lineup_load_failed">Couldn\'t open the lineup. Please try again.</string>
+    <string name="error_shirt_number_search_failed">Couldn\'t search for this number. Please try
+        again.</string>
 
     <string name="generic_infinite" translatable="false">&#8734;</string>
     <string name="form_lineup_creation_extra_hitters_label">Extra hitters</string>

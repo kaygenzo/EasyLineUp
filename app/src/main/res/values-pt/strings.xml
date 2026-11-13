@@ -254,7 +254,16 @@
     <string name="lineup_theme_day_value">Claro</string>
     <string name="lineup_theme_night_value">Escuro</string>
     <string name="generic_not_found">Não encontrado</string>
-    <string name="generic_error_with_detail">Algo deu errado: %1$s</string>
+    <string name="error_player_delete_failed">Não foi possível excluir o jogador. Tente
+        novamente.</string>
+    <string name="error_tournament_delete_failed">Não foi possível excluir o torneio. Tente
+        novamente.</string>
+    <string name="error_lineup_edit_failed">Não foi possível aplicar a alteração. Tente
+        novamente.</string>
+    <string name="error_lineup_load_failed">Não foi possível abrir a escalação. Tente
+        novamente.</string>
+    <string name="error_shirt_number_search_failed">Não foi possível pesquisar este número. Tente
+        novamente.</string>
     <string name="form_lineup_creation_extra_hitters_label">Rebatedores extras</string>
     <string name="form_lineup_creation_strategy_label">Estratégia</string>
     <string name="roster_sort_by_name">Por nome</string>

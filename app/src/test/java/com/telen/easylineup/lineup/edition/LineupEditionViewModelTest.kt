@@ -131,9 +131,15 @@ internal class LineupEditionViewModelTest {
             Mockito.`when`(getLineupById(1L)).thenReturn(Result.failure(Exception("not found")))
         }
 
+        val events = mutableListOf<LineupEditionEvent>()
+        val job = launch { viewModel.events.collect { events.add(it) } }
+
         viewModel.onEditLineup(1L)
+        advanceUntilIdle()
 
         assertNull(form)
+        assertEquals(listOf(LineupLoadFailed), events)
+        job.cancel()
     }
 
     @Test

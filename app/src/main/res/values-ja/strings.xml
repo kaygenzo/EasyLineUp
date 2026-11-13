@@ -215,7 +215,11 @@
     <string name="lineup_theme_day_value">ライト</string>
     <string name="lineup_theme_night_value">ダーク</string>
     <string name="generic_not_found">見つかりません</string>
-    <string name="generic_error_with_detail">問題が発生しました:%1$s</string>
+    <string name="error_player_delete_failed">選手を削除できませんでした。もう一度お試しください。</string>
+    <string name="error_tournament_delete_failed">大会を削除できませんでした。もう一度お試しください。</string>
+    <string name="error_lineup_edit_failed">変更を適用できませんでした。もう一度お試しください。</string>
+    <string name="error_lineup_load_failed">オーダーを開けませんでした。もう一度お試しください。</string>
+    <string name="error_shirt_number_search_failed">この背番号を検索できませんでした。もう一度お試しください。</string>
     <string name="form_lineup_creation_extra_hitters_label">エキストラヒッター</string>
     <string name="form_lineup_creation_strategy_label">戦術</string>
     <string name="roster_sort_by_name">名前順</string>

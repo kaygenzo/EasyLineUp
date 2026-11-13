@@ -1062,6 +1062,20 @@ internal class LineupViewModelTest {
     }
 
     @Test
+    fun shouldSayWhenAChangeOfTheDraftFails() = runTest {
+        Mockito.`when`(switchPlayersPositionUseCase(any(), any(), any(), any()))
+            .thenReturn(Result.failure(Exception("boom")))
+        loadLineup(loadedLineup)
+        advanceUntilIdle()
+        val events = collectEvents(viewModel.events)
+
+        viewModel.switchPlayersPosition(player(1L), FieldPosition.PITCHER)
+        advanceUntilIdle()
+
+        assertEquals(listOf(LineupEvent.EditFailed), events)
+    }
+
+    @Test
     fun shouldCloseThePlayerPickerEvenBeforeTheLineupIsLoaded() = runTest {
         viewModel.onPlayerSelected(aPlayer, FieldPosition.PITCHER)
         advanceUntilIdle()
@@ -1145,7 +1159,7 @@ internal class LineupViewModelTest {
     }
 
     @Test
-    fun shouldShowNoMessageWhenLinkingFailsForAnotherReason() = runTest {
+    fun shouldShowOnlyTheGenericFailureWhenLinkingFailsForAnotherReason() = runTest {
         loadLineup(loadedLineup)
         advanceUntilIdle()
         Mockito.`when`(saveDpAndFlexUseCase(any(), any(), any(), any()))
@@ -1156,7 +1170,7 @@ internal class LineupViewModelTest {
         viewModel.onDpFlexLinked(aPlayer, aPlayer)
         advanceUntilIdle()
 
-        assertTrue(events.isEmpty())
+        assertEquals(listOf(LineupEvent.EditFailed), events)
         assertNull(viewModel.uiState.value.infoMessage)
     }
 

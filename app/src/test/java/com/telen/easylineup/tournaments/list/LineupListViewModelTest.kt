@@ -292,6 +292,6 @@ internal class LineupListViewModelTest {
         viewModel.onDeleteTournament(tournament)
         advanceUntilIdle()
 
-        assertEquals(listOf(TournamentDeleteFailed("db error")), events)
+        assertEquals(listOf(TournamentDeleteFailed), events)
     }
 }

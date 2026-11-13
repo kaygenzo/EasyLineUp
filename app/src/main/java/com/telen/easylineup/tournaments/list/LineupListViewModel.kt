@@ -53,7 +53,8 @@ data class LineupListUiState(
 )
 
 /** One-shot outcome of a tournament deletion that failed, for the Route's toast. */
-data class TournamentDeleteFailed(val detail: String)
+/** A tournament's lineups couldn't be deleted; the cause only goes to the logs. */
+data object TournamentDeleteFailed
 
 class LineupListViewModel(
     private val observeCurrentTeam: ObserveCurrentTeam,
@@ -149,7 +150,7 @@ class LineupListViewModel(
         viewModelScope.launch {
             deleteTournamentLineups(tournament).onFailure { throwable ->
                 Timber.e(throwable)
-                _events.send(TournamentDeleteFailed(throwable.message.orEmpty()))
+                _events.send(TournamentDeleteFailed)
             }
         }
     }

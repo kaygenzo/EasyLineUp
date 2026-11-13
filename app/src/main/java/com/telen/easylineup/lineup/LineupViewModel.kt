@@ -117,6 +117,9 @@ sealed interface LineupEvent {
 
     /** The DP/Flex link was refused for lacking one of the two players. */
     data object DpFlexIncomplete : LineupEvent
+
+    /** A change of the draft (a drop, an assignment) was refused: the draft is as it was. */
+    data object EditFailed : LineupEvent
 }
 
 const val LINEUP_DEFENSE_TAB = 0
@@ -350,23 +353,38 @@ class LineupViewModel(
     /**
      * Runs one change of the draft: [change] gets the draft as left by the previous change and
      * returns the new one, which replaces it before [onChanged] runs. Marks the draft unsaved
-     * right away, before the change is even launched.
+     * right away, before the change is even launched, so a database emission in between can't
+     * replace it. A failed change takes that back if the draft was saved before it - no change
+     * then made it unsaved - and says so, unless [explainsFailure] says [change] already told the
+     * user why.
      */
     private fun editDraft(
         change: suspend (List<PlayerWithPosition>) -> Result<List<PlayerWithPosition>>,
-        onChanged: suspend () -> Unit = {}
+        onChanged: suspend () -> Unit = {},
+        explainsFailure: (Throwable) -> Boolean = { false }
     ) {
+        val wasUnsaved = hasUnsavedChanges
         markUnsaved()
         viewModelScope.launch {
             draftMutex.withLock {
                 change(draft)
                     .onSuccess {
+                        // Set again: a change queued behind a failed one is the first edit.
+                        markUnsaved()
                         draft = it
                         recomputeAndPublish()
                         onChanged()
                         persistUnsavedEdit()
                     }
-                    .onFailure { Timber.e(it) }
+                    .onFailure {
+                        Timber.e(it)
+                        if (!wasUnsaved) {
+                            hasUnsavedChanges = false
+                        }
+                        if (!explainsFailure(it)) {
+                            _events.send(LineupEvent.EditFailed)
+                        }
+                    }
             }
         }
     }
@@ -634,7 +652,8 @@ class LineupViewModel(
                     }
                 }
             },
-            onChanged = { _uiState.update { it.copy(dpFlexEvent = null) } }
+            onChanged = { _uiState.update { it.copy(dpFlexEvent = null) } },
+            explainsFailure = { it is NeedAssignBothPlayersException }
         )
     }
 

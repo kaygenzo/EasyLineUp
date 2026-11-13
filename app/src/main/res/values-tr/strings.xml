@@ -246,7 +246,13 @@
     <string name="lineup_theme_day_value">Açık</string>
     <string name="lineup_theme_night_value">Koyu</string>
     <string name="generic_not_found">Bulunamadı</string>
-    <string name="generic_error_with_detail">Bir sorun oluştu: %1$s</string>
+    <string name="error_player_delete_failed">Oyuncu silinemedi. Lütfen tekrar deneyin.</string>
+    <string name="error_tournament_delete_failed">Turnuva silinemedi. Lütfen tekrar
+        deneyin.</string>
+    <string name="error_lineup_edit_failed">Değişiklik uygulanamadı. Lütfen tekrar deneyin.</string>
+    <string name="error_lineup_load_failed">Kadro açılamadı. Lütfen tekrar deneyin.</string>
+    <string name="error_shirt_number_search_failed">Bu numara aranamadı. Lütfen tekrar
+        deneyin.</string>
     <string name="form_lineup_creation_extra_hitters_label">Ek vurucular</string>
     <string name="form_lineup_creation_strategy_label">Strateji</string>
     <string name="roster_sort_by_name">Ada göre</string>

@@ -393,5 +393,14 @@
     <string name="welcome_value_defense">Schéma défensif visuel, placement par
         glisser-déposer</string>
     <string name="welcome_value_message">Écrivez à toute l\'équipe en un geste</string>
-    <string name="generic_error_with_detail">Une erreur est survenue : %1$s</string>
+    <string name="error_player_delete_failed">Impossible de supprimer le joueur. Veuillez
+        réessayer.</string>
+    <string name="error_tournament_delete_failed">Impossible de supprimer le tournoi. Veuillez
+        réessayer.</string>
+    <string name="error_lineup_edit_failed">Impossible d\'appliquer ce changement. Veuillez
+        réessayer.</string>
+    <string name="error_lineup_load_failed">Impossible d\'ouvrir le lineup. Veuillez
+        réessayer.</string>
+    <string name="error_shirt_number_search_failed">Impossible de rechercher ce numéro. Veuillez
+        réessayer.</string>
 </resources>

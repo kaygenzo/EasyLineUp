@@ -251,7 +251,16 @@
     <string name="lineup_theme_day_value">Luminoasă</string>
     <string name="lineup_theme_night_value">Întunecată</string>
     <string name="generic_not_found">Negăsit</string>
-    <string name="generic_error_with_detail">A apărut o problemă: %1$s</string>
+    <string name="error_player_delete_failed">Jucătorul nu a putut fi șters. Încearcă din
+        nou.</string>
+    <string name="error_tournament_delete_failed">Turneul nu a putut fi șters. Încearcă din
+        nou.</string>
+    <string name="error_lineup_edit_failed">Modificarea nu a putut fi aplicată. Încearcă din
+        nou.</string>
+    <string name="error_lineup_load_failed">Formația nu a putut fi deschisă. Încearcă din
+        nou.</string>
+    <string name="error_shirt_number_search_failed">Numărul nu a putut fi căutat. Încearcă din
+        nou.</string>
     <string name="form_lineup_creation_extra_hitters_label">Batători suplimentari</string>
     <string name="form_lineup_creation_strategy_label">Strategie</string>
     <string name="roster_sort_by_name">După nume</string>

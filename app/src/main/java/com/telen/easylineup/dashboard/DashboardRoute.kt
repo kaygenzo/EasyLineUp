@@ -5,12 +5,18 @@
 package com.telen.easylineup.dashboard
 
 import android.app.Activity
+import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
 import com.telen.easylineup.HomeViewModel
+import com.telen.easylineup.R
 import com.telen.easylineup.compose.LoadFailedState
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
@@ -33,6 +39,21 @@ fun DashboardRoute(navController: NavController, homeViewModel: HomeViewModel) {
     val viewModel = koinViewModel<DashboardViewModel>()
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(viewModel) {
+        viewModel.events
+            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .collect { event ->
+                when (event) {
+                    DashboardEvent.ShirtNumberSearchFailed -> Toast.makeText(
+                        context,
+                        R.string.error_shirt_number_search_failed,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+    }
 
     if (uiState.loadFailed) {
         LoadFailedState(onRetry = viewModel::onRetryLoad)

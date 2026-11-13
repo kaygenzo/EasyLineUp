@@ -80,7 +80,7 @@ fun PlayerEditRoute(navController: NavController, playerId: Long) {
                         Toast.LENGTH_LONG
                     ).show()
                     // Deleting happens from the profile screen, not this form.
-                    PlayerEvent.Deleted, is PlayerEvent.DeleteFailed -> Unit
+                    PlayerEvent.Deleted, PlayerEvent.DeleteFailed -> Unit
                 }
             }
     }

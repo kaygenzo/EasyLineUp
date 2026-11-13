@@ -40,6 +40,9 @@ sealed class LineupEditionEvent
 /** Saving failed for a reason the sheet can't point at: nothing was written. */
 data object LineupUpdateFailed : LineupEditionEvent()
 
+/** The lineup to edit couldn't be read: the sheet stays closed. */
+data object LineupLoadFailed : LineupEditionEvent()
+
 /**
  * The Edit Lineup sheet's form, from the moment a lineup is loaded into it until it is saved or
  * dismissed.
@@ -117,7 +120,10 @@ class LineupEditionViewModel(
                         )
                     }
                 }
-                .onFailure { Timber.e(it) }
+                .onFailure {
+                    Timber.e(it)
+                    _events.send(LineupLoadFailed)
+                }
         }
     }
 

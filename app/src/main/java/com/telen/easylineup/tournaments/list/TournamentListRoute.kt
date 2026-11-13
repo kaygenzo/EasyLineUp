@@ -13,7 +13,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
@@ -28,6 +27,7 @@ import com.telen.easylineup.domain.model.Tournament
 import com.telen.easylineup.lineup.create.TournamentPickerSheet
 import com.telen.easylineup.lineup.edition.EditLineupSheet
 import com.telen.easylineup.lineup.edition.LineupEditionViewModel
+import com.telen.easylineup.lineup.edition.LineupLoadFailed
 import com.telen.easylineup.lineup.edition.LineupUpdateFailed
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.TeamViewModel
@@ -42,7 +42,6 @@ fun TournamentListRoute(navController: NavController) {
     val teamViewModel = koinViewModel<TeamViewModel>()
     val editionViewModel = koinViewModel<LineupEditionViewModel>()
     val context = LocalContext.current
-    val resources = LocalResources.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val teamUiState by teamViewModel.uiState.collectAsStateWithLifecycle()
@@ -53,12 +52,9 @@ fun TournamentListRoute(navController: NavController) {
     LaunchedEffect(viewModel) {
         viewModel.events
             .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-            .collect { event ->
-                Toast.makeText(
-                    context,
-                    resources.getString(R.string.generic_error_with_detail, event.detail),
-                    Toast.LENGTH_LONG
-                ).show()
+            .collect {
+                Toast.makeText(context, R.string.error_tournament_delete_failed, Toast.LENGTH_LONG)
+                    .show()
             }
     }
 
@@ -70,6 +66,11 @@ fun TournamentListRoute(navController: NavController) {
                     LineupUpdateFailed -> Toast.makeText(
                         context,
                         R.string.error_lineup_save_failed,
+                        Toast.LENGTH_LONG
+                    ).show()
+                    LineupLoadFailed -> Toast.makeText(
+                        context,
+                        R.string.error_lineup_load_failed,
                         Toast.LENGTH_LONG
                     ).show()
                 }

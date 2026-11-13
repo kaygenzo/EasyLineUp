@@ -253,7 +253,16 @@
     <string name="lineup_theme_day_value">Hell</string>
     <string name="lineup_theme_night_value">Dunkel</string>
     <string name="generic_not_found">Nicht gefunden</string>
-    <string name="generic_error_with_detail">Etwas ist schiefgelaufen: %1$s</string>
+    <string name="error_player_delete_failed">Der Spieler konnte nicht gelöscht werden. Bitte
+        versuche es erneut.</string>
+    <string name="error_tournament_delete_failed">Das Turnier konnte nicht gelöscht werden. Bitte
+        versuche es erneut.</string>
+    <string name="error_lineup_edit_failed">Die Änderung konnte nicht übernommen werden. Bitte
+        versuche es erneut.</string>
+    <string name="error_lineup_load_failed">Die Aufstellung konnte nicht geöffnet werden. Bitte
+        versuche es erneut.</string>
+    <string name="error_shirt_number_search_failed">Die Nummer konnte nicht gesucht werden. Bitte
+        versuche es erneut.</string>
     <string name="form_lineup_creation_extra_hitters_label">Extra-Hitter</string>
     <string name="form_lineup_creation_strategy_label">Strategie</string>
     <string name="roster_sort_by_name">Nach Name</string>

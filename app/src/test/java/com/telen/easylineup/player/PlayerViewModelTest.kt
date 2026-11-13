@@ -388,7 +388,7 @@ internal class PlayerViewModelTest {
 
         viewModel.onDeleteConfirmed()
 
-        assertEquals(listOf(PlayerEvent.DeleteFailed("db error")), events)
+        assertEquals(listOf(PlayerEvent.DeleteFailed), events)
     }
 
     /** Starts collecting [flow] on the test scheduler, for the rest of the test. */

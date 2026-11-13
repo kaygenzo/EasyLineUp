@@ -260,7 +260,16 @@
     <string name="lineup_theme_day_value">Šviesi</string>
     <string name="lineup_theme_night_value">Tamsi</string>
     <string name="generic_not_found">Nerasta</string>
-    <string name="generic_error_with_detail">Įvyko klaida: %1$s</string>
+    <string name="error_player_delete_failed">Nepavyko ištrinti žaidėjo. Bandykite dar
+        kartą.</string>
+    <string name="error_tournament_delete_failed">Nepavyko ištrinti turnyro. Bandykite dar
+        kartą.</string>
+    <string name="error_lineup_edit_failed">Nepavyko pritaikyti pakeitimo. Bandykite dar
+        kartą.</string>
+    <string name="error_lineup_load_failed">Nepavyko atidaryti sudėties. Bandykite dar
+        kartą.</string>
+    <string name="error_shirt_number_search_failed">Nepavyko ieškoti šio numerio. Bandykite dar
+        kartą.</string>
     <string name="form_lineup_creation_extra_hitters_label">Papildomi mušėjai</string>
     <string name="form_lineup_creation_strategy_label">Strategija</string>
     <string name="roster_sort_by_name">Pagal vardą</string>

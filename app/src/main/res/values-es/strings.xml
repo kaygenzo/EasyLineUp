@@ -254,7 +254,16 @@
     <string name="lineup_theme_day_value">Día</string>
     <string name="lineup_theme_night_value">Noche</string>
     <string name="generic_not_found">No encontrado</string>
-    <string name="generic_error_with_detail">Algo salió mal: %1$s</string>
+    <string name="error_player_delete_failed">No se pudo eliminar el jugador. Inténtalo de
+        nuevo.</string>
+    <string name="error_tournament_delete_failed">No se pudo eliminar el torneo. Inténtalo de
+        nuevo.</string>
+    <string name="error_lineup_edit_failed">No se pudo aplicar el cambio. Inténtalo de
+        nuevo.</string>
+    <string name="error_lineup_load_failed">No se pudo abrir la alineación. Inténtalo de
+        nuevo.</string>
+    <string name="error_shirt_number_search_failed">No se pudo buscar este número. Inténtalo de
+        nuevo.</string>
     <string name="form_lineup_creation_extra_hitters_label">Bateadores extra</string>
     <string name="form_lineup_creation_strategy_label">Estrategia</string>
     <string name="roster_sort_by_name">Por nombre</string>

@@ -27,6 +27,7 @@ import com.telen.easylineup.domain.usecases.ObserveTeams
 import com.telen.easylineup.testDispatcherProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -196,10 +197,15 @@ internal class DashboardViewModelTest {
         Mockito.`when`(playerRepository.getShirtNumberFromPlayers(1L, 8))
             .thenThrow(RuntimeException("db error"))
 
+        val events = mutableListOf<DashboardEvent>()
+        val job = launch { viewModel.events.collect { events.add(it) } }
+
         viewModel.onShirtNumberQueryChanged("8")
         viewModel.onShirtNumberSearch()
         advanceUntilIdle()
 
+        assertEquals(listOf(DashboardEvent.ShirtNumberSearchFailed), events)
+        job.cancel()
         val state = viewModel.uiState.value
         assertFalse(state.shirtNumberHasSearched)
         assertTrue(state.shirtNumberHistory.isEmpty())

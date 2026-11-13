@@ -232,7 +232,12 @@
     <string name="lineup_theme_day_value">สว่าง</string>
     <string name="lineup_theme_night_value">มืด</string>
     <string name="generic_not_found">ไม่พบ</string>
-    <string name="generic_error_with_detail">เกิดข้อผิดพลาด: %1$s</string>
+    <string name="error_player_delete_failed">ลบผู้เล่นไม่สำเร็จ โปรดลองอีกครั้ง</string>
+    <string name="error_tournament_delete_failed">ลบทัวร์นาเมนต์ไม่สำเร็จ โปรดลองอีกครั้ง</string>
+    <string name="error_lineup_edit_failed">ใช้การเปลี่ยนแปลงไม่สำเร็จ โปรดลองอีกครั้ง</string>
+    <string name="error_lineup_load_failed">เปิดรายชื่อผู้เล่นไม่สำเร็จ โปรดลองอีกครั้ง</string>
+    <string name="error_shirt_number_search_failed">ค้นหาหมายเลขนี้ไม่สำเร็จ
+        โปรดลองอีกครั้ง</string>
     <string name="form_lineup_creation_extra_hitters_label">ผู้ตีเพิ่มเติม</string>
     <string name="form_lineup_creation_strategy_label">กลยุทธ์</string>
     <string name="roster_sort_by_name">ตามชื่อ</string>

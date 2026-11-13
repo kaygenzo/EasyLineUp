@@ -108,6 +108,11 @@ fun LineupRoute(
                         R.string.error_when_deleting_lineup,
                         Toast.LENGTH_LONG
                     ).show()
+                    LineupEvent.EditFailed -> Toast.makeText(
+                        context,
+                        R.string.error_lineup_edit_failed,
+                        Toast.LENGTH_LONG
+                    ).show()
                     is LineupEvent.ShareReady -> shareLineup(event)
                     LineupEvent.ShareFailed -> Toast.makeText(
                         context,

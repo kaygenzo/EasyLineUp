@@ -104,7 +104,7 @@ sealed interface PlayerEvent {
     /** Saving failed for a reason no field can point at: nothing was written. */
     data object SaveFailed : PlayerEvent
     data object Deleted : PlayerEvent
-    data class DeleteFailed(val detail: String) : PlayerEvent
+    data object DeleteFailed : PlayerEvent
 }
 
 /**
@@ -329,7 +329,7 @@ class PlayerViewModel(
                 .onSuccess { _events.send(PlayerEvent.Deleted) }
                 .onFailure {
                     Timber.e(it)
-                    _events.send(PlayerEvent.DeleteFailed(it.message.orEmpty()))
+                    _events.send(PlayerEvent.DeleteFailed)
                 }
         }
     }
