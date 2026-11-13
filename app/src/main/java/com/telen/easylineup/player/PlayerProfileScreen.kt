@@ -44,6 +44,7 @@ import com.telen.easylineup.compose.PositionUsageChart
 import com.telen.easylineup.compose.PositionUsageEmptyState
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.shortLabel
+import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.Sex
@@ -147,7 +148,9 @@ fun PlayerProfileScreen(
         DugoutCard {
             Column(modifier = Modifier.padding(14.dp)) {
                 Text(
-                    text = stringResource(R.string.player_profile_position_usage_label).uppercase(),
+                    text = stringResource(
+                        R.string.player_profile_position_usage_label
+                    ).uppercaseLocalized(),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelMedium
                 )

@@ -47,6 +47,7 @@ import com.telen.easylineup.compose.AvatarPicker
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Sex
 import com.telen.easylineup.domain.model.TeamType
@@ -223,7 +224,7 @@ fun PlayerFormScreen(
 private fun SexRow(selected: Sex, onSexSelected: (Sex) -> Unit) {
     Column {
         Text(
-            text = stringResource(R.string.create_player_sex).uppercase(),
+            text = stringResource(R.string.create_player_sex).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelSmall
         )
@@ -265,7 +266,7 @@ private fun SideToggleRow(
 ) {
     Column {
         Text(
-            text = label.uppercase(),
+            text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelSmall
         )
@@ -351,7 +352,7 @@ private fun RequiredField(
     Column {
         Row {
             Text(
-                text = label.uppercase(),
+                text = label.uppercaseLocalized(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelSmall
             )
@@ -405,7 +406,7 @@ private fun OptionalField(
 ) {
     Column(modifier = modifier) {
         Text(
-            text = label.uppercase(),
+            text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelSmall
         )
@@ -455,7 +456,7 @@ private fun FavoritePositions(
     val names = StringResourcesProviderImpl(context).positionShortNames(teamType.id)
     Column {
         Text(
-            text = stringResource(R.string.create_player_favorite_positions).uppercase(),
+            text = stringResource(R.string.create_player_favorite_positions).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelSmall
         )

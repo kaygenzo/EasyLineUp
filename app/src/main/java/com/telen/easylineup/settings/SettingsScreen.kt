@@ -51,6 +51,7 @@ import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
 
@@ -307,7 +308,7 @@ private fun SingleChoiceDialogPreview() {
 @Composable
 private fun SectionLabel(text: String) {
     Text(
-        text = text.uppercase(),
+        text = text.uppercaseLocalized(),
         color = MaterialTheme.colorScheme.primary,
         style = MaterialTheme.typography.labelMedium,
         modifier = Modifier.padding(start = 4.dp, top = 16.dp, bottom = 8.dp)

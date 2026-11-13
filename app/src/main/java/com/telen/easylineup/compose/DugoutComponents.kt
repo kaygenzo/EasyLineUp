@@ -395,7 +395,7 @@ fun ModeBadge(label: String, modifier: Modifier = Modifier) {
                 .background(MaterialTheme.colorScheme.primary)
         )
         Text(
-            text = label.uppercase(),
+            text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.labelMedium
         )
@@ -430,7 +430,7 @@ fun InfoCell(modifier: Modifier = Modifier, label: String, value: String, tabula
             .padding(horizontal = 10.dp, vertical = 10.dp)
     ) {
         Text(
-            text = label.uppercase(),
+            text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             style = MaterialTheme.typography.labelSmall
         )
@@ -482,7 +482,7 @@ fun StatChip(
             fontSize = 19.sp
         )
         Text(
-            text = label.uppercase(),
+            text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelSmall,
             modifier = Modifier.padding(top = 2.dp)
@@ -780,7 +780,7 @@ fun ScreenHeader(
         Column(modifier = Modifier.weight(1f)) {
             if (eyebrow != null) {
                 Text(
-                    text = eyebrow.uppercase(),
+                    text = eyebrow.uppercaseLocalized(),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelMedium
                 )
@@ -1050,7 +1050,7 @@ fun DugoutBottomNav(selected: BottomNavTab?, onSelect: (BottomNavTab) -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = stringResource(tab.labelRes).uppercase(),
+                    text = stringResource(tab.labelRes).uppercaseLocalized(),
                     style = MaterialTheme.typography.labelSmall,
                     color = tint
                 )
@@ -1077,7 +1077,7 @@ private fun DugoutBottomNavPreview() {
 fun FormLabel(text: String, required: Boolean = false) {
     Row {
         Text(
-            text = text.uppercase(),
+            text = text.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold

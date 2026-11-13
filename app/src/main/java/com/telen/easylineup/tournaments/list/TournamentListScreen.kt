@@ -55,6 +55,7 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.GeoLocation
 import com.telen.easylineup.domain.model.Lineup
 import com.telen.easylineup.domain.model.TeamStrategy
@@ -444,7 +445,7 @@ private fun TicketDateChip(startMillis: Long?) {
         if (startMillis != null) {
             val day = remember(startMillis) { formatLocalizedDate(startMillis, DATE_SKELETON_DAY) }
         val month = remember(startMillis) {
-            formatLocalizedDate(startMillis, DATE_SKELETON_MONTH).uppercase()
+            formatLocalizedDate(startMillis, DATE_SKELETON_MONTH).uppercaseLocalized()
         }
             Text(
                 text = day,

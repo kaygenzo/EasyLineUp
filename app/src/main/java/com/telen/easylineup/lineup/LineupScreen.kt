@@ -36,6 +36,7 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderIconChip
 import com.telen.easylineup.compose.NARROW_BUTTON_PADDING
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.MODE_ENABLED
@@ -232,7 +233,7 @@ private fun LineupTabItem(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = label.uppercase(),
+            text = label.uppercaseLocalized(),
             color = if (active) {
                 MaterialTheme.colorScheme.onPrimary
             } else {

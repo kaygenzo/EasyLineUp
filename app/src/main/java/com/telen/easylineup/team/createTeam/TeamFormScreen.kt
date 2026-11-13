@@ -46,6 +46,7 @@ import com.telen.easylineup.compose.AvatarPicker
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
 
@@ -146,7 +147,7 @@ private fun NameField(name: String, error: String?, onNameChanged: (String) -> U
     Column {
         Row {
             Text(
-                text = stringResource(R.string.team_form_name_label).uppercase(),
+                text = stringResource(R.string.team_form_name_label).uppercaseLocalized(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelSmall
             )
@@ -187,7 +188,7 @@ private fun NameFieldPreview() {
 private fun TypeField(selectedType: TeamType, onTypeSelected: (TeamType) -> Unit) {
     Column {
         Text(
-            text = stringResource(R.string.team_form_type_label).uppercase(),
+            text = stringResource(R.string.team_form_type_label).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelSmall
         )
@@ -247,7 +248,7 @@ private fun TypeCard(
         )
         Spacer(modifier = Modifier.height(5.dp))
         Text(
-            text = stringResource(type.titleRes()).uppercase(),
+            text = stringResource(type.titleRes()).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.labelSmall
         )

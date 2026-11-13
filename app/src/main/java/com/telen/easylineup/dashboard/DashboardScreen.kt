@@ -54,6 +54,7 @@ import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.DATE_SKELETON_DAY_MONTH_YEAR
@@ -231,7 +232,7 @@ private fun HeroLastLineupCard(lastLineup: LastLineupUi?, onClick: (Long) -> Uni
             .padding(16.dp)
     ) {
         Text(
-            text = stringResource(R.string.tile_last_lineup_header).uppercase(),
+            text = stringResource(R.string.tile_last_lineup_header).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.labelMedium
         )
@@ -296,7 +297,7 @@ private fun MiniStatCell(
             .padding(horizontal = 14.dp, vertical = 14.dp)
     ) {
         Text(
-            text = label.uppercase(),
+            text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelMedium
         )
@@ -357,7 +358,7 @@ private fun ShirtNumberLookupRow(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = stringResource(R.string.dashboard_lookup_hint).uppercase(),
+                text = stringResource(R.string.dashboard_lookup_hint).uppercaseLocalized(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -632,7 +633,7 @@ private fun CurrentPill() {
             .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(
-            text = stringResource(R.string.switch_team_sheet_current).uppercase(),
+            text = stringResource(R.string.switch_team_sheet_current).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.labelSmall
         )

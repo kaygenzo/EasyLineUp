@@ -36,6 +36,7 @@ import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
@@ -190,7 +191,7 @@ private fun CurrentPill() {
             .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(
-            text = stringResource(R.string.switch_team_sheet_current).uppercase(),
+            text = stringResource(R.string.switch_team_sheet_current).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.labelSmall
         )

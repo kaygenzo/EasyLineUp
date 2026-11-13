@@ -43,6 +43,7 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.InfoCell
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.DATE_SKELETON_MONTH_YEAR
 import com.telen.easylineup.utils.formatLocalizedDate
@@ -139,7 +140,9 @@ fun TeamDetailsScreen(
         DugoutCard {
             Column(modifier = Modifier.padding(14.dp)) {
                 Text(
-                    text = stringResource(R.string.team_details_roster_by_gender).uppercase(),
+                    text = stringResource(
+                        R.string.team_details_roster_by_gender
+                    ).uppercaseLocalized(),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelMedium
                 )
@@ -245,7 +248,7 @@ private fun Pill(text: String, color: Color) {
             .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(
-            text = text.uppercase(),
+            text = text.uppercaseLocalized(),
             color = color,
             style = MaterialTheme.typography.labelSmall
         )
@@ -276,7 +279,7 @@ private fun StatChip(modifier: Modifier = Modifier, value: Int, label: String, c
             fontSize = 19.sp
         )
         Text(
-            text = label.uppercase(),
+            text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelSmall,
             modifier = Modifier.padding(top = 2.dp)

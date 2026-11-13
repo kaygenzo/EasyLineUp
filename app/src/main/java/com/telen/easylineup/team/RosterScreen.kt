@@ -48,6 +48,7 @@ import com.telen.easylineup.compose.PlayerPhotoTile
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.compose.shortLabel
+import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.PlayerSide
 import com.telen.easylineup.domain.model.PlayerSortType
 import kotlinx.collections.immutable.ImmutableList
@@ -222,7 +223,7 @@ private fun SortPill(text: String, selected: Boolean, onClick: () -> Unit) {
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Text(
-            text = text.uppercase(),
+            text = text.uppercaseLocalized(),
             color = contentColor,
             style = MaterialTheme.typography.labelSmall
         )

@@ -71,6 +71,7 @@ import com.telen.easylineup.compose.FormLabel
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.SelectField
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
@@ -468,7 +469,7 @@ private fun TournamentPickerRowPreview() {
 private fun MiniDateChip(startMillis: Long) {
     val day = remember(startMillis) { formatLocalizedDate(startMillis, DATE_SKELETON_DAY) }
     val month = remember(startMillis) {
-        formatLocalizedDate(startMillis, DATE_SKELETON_MONTH).uppercase()
+        formatLocalizedDate(startMillis, DATE_SKELETON_MONTH).uppercaseLocalized()
     }
     Column(
         modifier = Modifier

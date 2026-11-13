@@ -50,6 +50,7 @@ import com.telen.easylineup.compose.PositionUsageEmptyState
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.SelectField
 import com.telen.easylineup.compose.StatChip
+import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.PlayingTimeSummary
 import com.telen.easylineup.domain.model.TeamType
@@ -155,7 +156,9 @@ private fun PlayingTimeCard(playerStats: List<PlayerStatsRow>, summary: PlayingT
     DugoutCard {
         Column(modifier = Modifier.padding(14.dp)) {
             Text(
-                text = stringResource(R.string.tournament_stats_playing_time_label).uppercase(),
+                text = stringResource(
+                    R.string.tournament_stats_playing_time_label
+                ).uppercaseLocalized(),
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -255,7 +258,9 @@ private fun PositionUsageCard(
     DugoutCard {
         Column(modifier = Modifier.padding(14.dp)) {
             Text(
-                text = stringResource(R.string.player_profile_position_usage_label).uppercase(),
+                text = stringResource(
+                    R.string.player_profile_position_usage_label
+                ).uppercaseLocalized(),
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.labelMedium
             )

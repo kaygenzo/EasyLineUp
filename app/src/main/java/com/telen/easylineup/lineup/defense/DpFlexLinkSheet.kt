@@ -55,6 +55,7 @@ import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.NARROW_BUTTON_PADDING
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.TeamType
 import kotlinx.coroutines.launch
@@ -334,7 +335,7 @@ private fun DpFlexSlotRow(
         Column(modifier = Modifier.weight(1f)) {
             // Mockup's `.dp-flex-slot__role` is `text-transform: uppercase; letter-spacing: .06em`.
             Text(
-                text = role.uppercase(),
+                text = role.uppercaseLocalized(),
                 color = gold,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.labelLarge,
