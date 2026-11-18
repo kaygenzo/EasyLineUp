@@ -38,6 +38,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -577,8 +578,10 @@ fun RosterPickerSheet(
     onClearAll: () -> Unit,
     onNumberChanged: ((Int, Int) -> Unit)? = null
 ) {
+    // Fully expanded from the start, like EditLineupSheet: half-open, Done sat below the screen.
     ModalBottomSheet(
         onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surface
     ) {
         RosterPickerContent(
@@ -675,7 +678,13 @@ fun RosterPickerContent(
         )
         Spacer(modifier = Modifier.height(4.dp))
         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-        LazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
+        // The list gives up height first, so Done below it stays on screen when the sheet
+        // is shorter than the list's 360 dp plus the header, search field and button.
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f, fill = false)
+                .heightIn(max = 360.dp)
+        ) {
             itemsIndexed(
                 items = filtered,
                 key = { _, indexed -> indexed.index }

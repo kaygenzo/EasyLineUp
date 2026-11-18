@@ -39,6 +39,9 @@ fun RosterEditSheet(
     // check can decide whether to show a discard-confirm instead of letting the sheet vanish.
     val currentOnDismiss = rememberUpdatedState(onDismiss)
     val sheetState = rememberModalBottomSheetState(
+        // Opens fully expanded: half-open, the sheet's last rows and its Done/Save button sat
+        // below the screen, on a 360x640 dp phone even once dragged up.
+        skipPartiallyExpanded = true,
         confirmValueChange = {
             if (it == SheetValue.Hidden) {
                 currentOnDismiss.value()
