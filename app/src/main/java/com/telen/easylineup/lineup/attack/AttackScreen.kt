@@ -57,8 +57,13 @@ import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.isSubstitute
 import com.telen.easylineup.domain.usecases.SwapBattersOrder
 
-/** The drag handle has no text or content description of its own to find it by. */
+/**
+ * The drag handle has no text or content description of its own to find it by; the list is
+ * lazy, so a test scrolls it to reach a batter who isn't on screen yet.
+ */
 internal object AttackTestTags {
+    const val BATTING_ORDER = "attack_batting_order"
+
     fun dragHandle(playerId: Long): String = "attack_drag_handle_$playerId"
 }
 
@@ -117,7 +122,8 @@ fun AttackScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .weight(1f)
+                .testTag(AttackTestTags.BATTING_ORDER),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
