@@ -42,6 +42,7 @@ fun DugoutTheme(content: @Composable () -> Unit) {
     // the ComposeView after a theme flip picks up the new palette.
     val uiMode = LocalConfiguration.current.uiMode and Configuration.UI_MODE_NIGHT_MASK
     val colorScheme = remember(uiMode) { context.toDugoutColorScheme() }
+    KeepInitialFocusOffTextFields()
     MaterialTheme(colorScheme = colorScheme, typography = DugoutTypography, content = content)
 }
 

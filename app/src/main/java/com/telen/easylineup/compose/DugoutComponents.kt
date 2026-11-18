@@ -167,6 +167,8 @@ fun DugoutSearchField(
     placeholder: String,
     modifier: Modifier = Modifier
 ) {
+    // It's often the only text field of a sheet (the roster and tournament pickers).
+    KeepInitialFocusOffTextFields()
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,

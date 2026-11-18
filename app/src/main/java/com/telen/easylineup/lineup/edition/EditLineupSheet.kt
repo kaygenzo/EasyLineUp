@@ -32,6 +32,7 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.FormBar
 import com.telen.easylineup.compose.FormLabel
 import com.telen.easylineup.compose.HeaderIconChip
+import com.telen.easylineup.compose.KeepInitialFocusOffTextFields
 import com.telen.easylineup.compose.SelectField
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.RosterPlayerStatus
@@ -86,6 +87,7 @@ fun EditLineupSheet(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
+        KeepInitialFocusOffTextFields()
         when (step) {
             EditLineupStep.FIELDS -> EditLineupFieldsContent(
                 name = name,

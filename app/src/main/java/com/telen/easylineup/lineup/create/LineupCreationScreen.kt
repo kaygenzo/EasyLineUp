@@ -68,6 +68,7 @@ import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutSearchField
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.FormBar
+import com.telen.easylineup.compose.KeepInitialFocusOffTextFields
 import com.telen.easylineup.compose.FormLabel
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.SelectField
@@ -941,6 +942,7 @@ fun NewTournamentSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
+        KeepInitialFocusOffTextFields()
         Column(modifier = Modifier.fillMaxWidth()) {
             // The fields scroll and take only the height left over once the action bar is
             // measured: on a small screen with the keyboard up, a plain Column squeezed the
