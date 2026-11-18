@@ -13,7 +13,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
-import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
@@ -21,6 +20,8 @@ import com.telen.easylineup.player.PlayerFormTestTags
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.UI_TIMEOUT_MILLIS
+import com.telen.easylineup.testing.pressBack
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -141,7 +142,7 @@ class RosterScreenTest {
         composeTestRule.waitForAbsence(string(R.string.player_form_title_create))
         // Scrolls first: the new name sorts above the rest, and the list can stay anchored on
         // the row it was showing, which leaves the new row just out of view.
-        composeTestRule.waitUntil(5_000) {
+        composeTestRule.waitUntil(UI_TIMEOUT_MILLIS) {
             runCatching {
                 composeTestRule.onNodeWithTag(RosterTestTags.PLAYER_LIST)
                     .performScrollToNode(hasText("Brand New Player"))

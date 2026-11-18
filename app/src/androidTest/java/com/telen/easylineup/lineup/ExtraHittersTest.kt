@@ -12,7 +12,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
@@ -25,6 +24,7 @@ import com.telen.easylineup.lineup.defense.DefenseTestTags
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.inject
 import com.telen.easylineup.testing.openFixtureLineup
+import com.telen.easylineup.testing.scrollToAndClick
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -67,7 +67,7 @@ class ExtraHittersTest {
         composeTestRule.openFixtureLineup()
         composeTestRule
             .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText("Starter 1")
 
         composeTestRule.onNode(hasScrollToNodeAction())
@@ -82,15 +82,15 @@ class ExtraHittersTest {
     @Test
     fun theFlexedPitcherBatsAfterTheExtraHitters() {
         composeTestRule.openFixtureLineup()
-        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))
-        composeTestRule.onNodeWithTag(DefenseTestTags.DH_TOGGLE).performClick()
+        composeTestRule.onNodeWithTag(DefenseTestTags.DH_TOGGLE).scrollToAndClick()
         composeTestRule.waitForText("Starter 10")
-        composeTestRule.onNodeWithText("Starter 10").performClick()
+        composeTestRule.onNodeWithText("Starter 10").scrollToAndClick()
         composeTestRule.waitForText(string(R.string.link_dh_and_pitcher_dialog_title))
-        composeTestRule.onNodeWithText(string(R.string.action_confirm)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_confirm)).scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.link_dh_and_pitcher_dialog_title))
-        composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.action_save_lineup))
 
         val pitcher = runBlocking {

@@ -4,9 +4,20 @@
 
 package com.telen.easylineup.testing
 
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+
+/**
+ * How long a test waits for the UI to reach the state it expects. 5 s was enough on a local
+ * emulator but not always on CI's, which render on the CPU: the first sheet a test class opened
+ * on the API 28 one took longer. A test that passes doesn't wait any longer for it.
+ */
+const val UI_TIMEOUT_MILLIS = 10_000L
 
 /**
  * Polls for a node with [text] instead of asserting immediately - a screen's first render (a
@@ -18,9 +29,9 @@ import androidx.compose.ui.test.onAllNodesWithText
 fun ComposeTestRule.waitForText(
     text: String,
     useUnmergedTree: Boolean = false,
-    timeoutMillis: Long = 5_000
+    timeoutMillis: Long = UI_TIMEOUT_MILLIS
 ) {
-    waitUntil(timeoutMillis) {
+    waitUntilOrDump(timeoutMillis, "text \"$text\"") {
         onAllNodesWithText(text, useUnmergedTree = useUnmergedTree)
             .fetchSemanticsNodes().isNotEmpty()
     }
@@ -31,8 +42,8 @@ fun ComposeTestRule.waitForText(
  * position marker computed from its own ViewModel state) can lag a frame or more behind the
  * surrounding chrome that a `waitForText` already confirmed is up.
  */
-fun ComposeTestRule.waitForTag(tag: String, timeoutMillis: Long = 5_000) {
-    waitUntil(timeoutMillis) {
+fun ComposeTestRule.waitForTag(tag: String, timeoutMillis: Long = UI_TIMEOUT_MILLIS) {
+    waitUntilOrDump(timeoutMillis, "tag \"$tag\"") {
         onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
     }
 }
@@ -46,10 +57,36 @@ fun ComposeTestRule.waitForTag(tag: String, timeoutMillis: Long = 5_000) {
 fun ComposeTestRule.waitForAbsence(
     text: String,
     useUnmergedTree: Boolean = false,
-    timeoutMillis: Long = 5_000
+    timeoutMillis: Long = UI_TIMEOUT_MILLIS
 ) {
-    waitUntil(timeoutMillis) {
+    waitUntilOrDump(timeoutMillis, "\"$text\" to disappear") {
         onAllNodesWithText(text, useUnmergedTree = useUnmergedTree)
             .fetchSemanticsNodes().isEmpty()
     }
+}
+
+/**
+ * Scrolls the node into view, when it sits in a scrollable container, then clicks it. A node
+ * below the fold is still in the tree - so `waitForText` finds it - but a plain `performClick`
+ * then injects its touch off-screen, under the bottom bar, and nothing happens: on a 360x640 dp
+ * phone that is the DH slot under the field, the last settings, the rows low in a sheet.
+ * `performScrollTo` alone would fail on a node with no scrollable ancestor.
+ */
+fun SemanticsNodeInteraction.scrollToAndClick(): SemanticsNodeInteraction {
+    if (hasScrollableAncestor()) {
+        performScrollTo()
+    }
+    return performClick()
+}
+
+/** [scrollToAndClick]'s check: whether any ancestor can scroll. */
+fun SemanticsNodeInteraction.hasScrollableAncestor(): Boolean {
+    var parent = fetchSemanticsNode().parent
+    while (parent != null) {
+        if (SemanticsActions.ScrollBy in parent.config) {
+            return true
+        }
+        parent = parent.parent
+    }
+    return false
 }

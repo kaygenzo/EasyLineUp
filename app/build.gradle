@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.roborazzi)
 }
 
+apply from: rootProject.file('gradle/test-devices.gradle')
+
 def keystorePropertiesFile = rootProject.file("keystore-upload.properties")
 def keystoreProperties = new Properties()
 if (keystorePropertiesFile.exists()) {
@@ -45,7 +47,8 @@ android {
         targetSdk targetVersion
         versionCode appVersionCode
         versionName appVersionName
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // AndroidJUnitRunner that starts the tests in touch mode (see TouchModeTestRunner).
+        testInstrumentationRunner "com.telen.easylineup.testing.TouchModeTestRunner"
         // ./gradlew connectedDemoDebugAndroidTest -PscreenGallery also captures the screens for
         // generateScreenGallery (see ScreenGalleryTest); without it, that test is skipped.
         if (project.hasProperty('screenGallery')) {

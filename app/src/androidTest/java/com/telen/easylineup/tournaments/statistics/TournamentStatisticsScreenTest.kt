@@ -4,14 +4,19 @@
 
 package com.telen.easylineup.tournaments.statistics
 
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.filterToOne
+import androidx.compose.ui.test.hasAnyDescendant
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
@@ -19,9 +24,11 @@ import com.telen.easylineup.R
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.scrollToAndClick
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
+import com.telen.easylineup.tournaments.statistics.TournamentStatisticsTestTags.PLAYER_SELECT_FIELD
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -45,7 +52,9 @@ class TournamentStatisticsScreenTest {
     fun openTournamentStatistics() {
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
-        composeTestRule.onNodeWithText(string(R.string.title_lineups).uppercase()).performClick()
+        composeTestRule
+            .onNodeWithText(string(R.string.title_lineups).uppercase())
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.tournaments_list_header_title))
         composeTestRule.waitForText(TestFixtures.TOURNAMENT_NAME)
 
@@ -55,7 +64,7 @@ class TournamentStatisticsScreenTest {
             .onNodeWithContentDescription(
                 string(R.string.tournaments_list_stats_content_description)
             )
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.title_tournament_statistics))
     }
 
@@ -86,18 +95,26 @@ class TournamentStatisticsScreenTest {
     fun openingPlayerPickerAndSelectingUpdatesPositionUsage() {
         // The field's own text is whichever player the (tied) playing-time ranking happens to
         // put first - not predictable at test-time, so it's targeted by tag, not its text.
-        composeTestRule.onNodeWithTag(TournamentStatisticsTestTags.PLAYER_SELECT_FIELD)
-            .performClick()
+        composeTestRule.onNodeWithTag(PLAYER_SELECT_FIELD)
+            .scrollToAndClick()
         composeTestRule.waitForText("Starter 2")
 
-        composeTestRule.onNodeWithText("Starter 2").performClick()
+        // "Starter 2" is also a row of the playing-time list behind the sheet (and maybe the
+        // field's own value): the picker's row is the one clickable node that isn't the field.
+        composeTestRule.onAllNodesWithText("Starter 2")
+            .filterToOne(hasClickAction() and !hasTestTag(PLAYER_SELECT_FIELD))
+            .scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.defense_select_player_sheet_title))
-        composeTestRule.onNodeWithText("Starter 2").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PLAYER_SELECT_FIELD)
+            .assert(hasAnyDescendant(hasText("Starter 2")))
+            .assertIsDisplayed()
     }
 
     @Test
     fun backIconNavigatesToTournaments() {
-        composeTestRule.onNodeWithContentDescription(string(R.string.generic_back)).performClick()
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.generic_back))
+            .scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.title_tournament_statistics))
         composeTestRule.waitForText(string(R.string.tournaments_list_header_title))
     }

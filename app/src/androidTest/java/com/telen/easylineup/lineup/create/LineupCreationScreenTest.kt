@@ -22,6 +22,7 @@ import com.telen.easylineup.domain.ports.repository.LineupRepository
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.UI_TIMEOUT_MILLIS
 import com.telen.easylineup.testing.inject
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
@@ -266,7 +267,7 @@ class LineupCreationScreenTest {
             substring = true,
             ignoreCase = true
         ) and hasClickAction()
-        composeTestRule.waitUntil(5_000) {
+        composeTestRule.waitUntil(UI_TIMEOUT_MILLIS) {
             composeTestRule.onAllNodes(otherDayCell).fetchSemanticsNodes().isNotEmpty()
         }
         composeTestRule.onNode(otherDayCell).performSemanticsAction(SemanticsActions.OnClick)

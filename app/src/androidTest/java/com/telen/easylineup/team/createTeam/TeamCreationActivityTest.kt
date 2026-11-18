@@ -17,6 +17,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.telen.easylineup.R
 import com.telen.easylineup.testing.SeedDatabaseRule
+import com.telen.easylineup.testing.UI_TIMEOUT_MILLIS
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -62,7 +63,7 @@ class TeamCreationActivityTest {
         composeTestRule.onNodeWithText(string(R.string.save_button)).performClick()
         // A successful save calls finish() - no Compose hierarchy is left to query afterwards,
         // so the Activity's own lifecycle state is the only thing left to assert on.
-        composeTestRule.waitUntil(5_000) {
+        composeTestRule.waitUntil(UI_TIMEOUT_MILLIS) {
             composeTestRule.activityRule.scenario.state == Lifecycle.State.DESTROYED
         }
     }

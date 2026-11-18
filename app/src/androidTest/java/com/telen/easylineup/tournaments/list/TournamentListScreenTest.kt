@@ -10,15 +10,15 @@ import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.pressBack
+import com.telen.easylineup.testing.scrollToAndClick
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -47,7 +47,9 @@ class TournamentListScreenTest {
     fun openTournaments() {
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
-        composeTestRule.onNodeWithText(string(R.string.title_lineups).uppercase()).performClick()
+        composeTestRule
+            .onNodeWithText(string(R.string.title_lineups).uppercase())
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.tournaments_list_header_title))
         composeTestRule.waitForText(TestFixtures.TOURNAMENT_NAME)
     }
@@ -75,17 +77,17 @@ class TournamentListScreenTest {
 
     @Test
     fun expandingTicketShowsLineupRow() {
-        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).performClick()
+        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).scrollToAndClick()
         composeTestRule.waitForText(TestFixtures.LINEUP_NAME)
         composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME).assertIsDisplayed()
     }
 
     @Test
     fun lineupRowNavigatesToLineupScreen() {
-        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).performClick()
+        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).scrollToAndClick()
         composeTestRule.waitForText(TestFixtures.LINEUP_NAME)
 
-        composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME).performClick()
+        composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME).scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.tournaments_list_header_title))
 
         pressBack()
@@ -94,17 +96,19 @@ class TournamentListScreenTest {
 
     @Test
     fun editLineupIconOpensEditLineupSheetWithPreFilledFieldsAndRosterStep() {
-        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).performClick()
+        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).scrollToAndClick()
         composeTestRule.waitForText(TestFixtures.LINEUP_NAME)
 
-        composeTestRule.onNodeWithContentDescription(string(R.string.action_edit)).performClick()
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.action_edit))
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.edit_lineup_title))
 
         // The roster-selection step is reached from here but shares its own toggle logic with
         // LineupCreationScreenTest - only confirming it actually opens, not re-testing toggling.
         composeTestRule
             .onNodeWithText(string(R.string.lineup_creation_roster_selected_format, 12, 12))
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText("Starter 1")
 
         // The sheet's own roster-step back arrow shares its content description with the
@@ -113,11 +117,11 @@ class TournamentListScreenTest {
         composeTestRule
             .onAllNodesWithContentDescription(string(R.string.generic_back))
             .onLast()
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.edit_lineup_title))
 
         // Nothing was actually changed, so Cancel closes directly without a discard prompt.
-        composeTestRule.onNodeWithText(string(R.string.cancel_button)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.cancel_button)).scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.edit_lineup_title))
     }
 
@@ -127,7 +131,7 @@ class TournamentListScreenTest {
             .onNodeWithContentDescription(
                 string(R.string.tournaments_list_create_lineup_content_description)
             )
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.tournaments_list_header_title))
 
         pressBack()
@@ -136,12 +140,14 @@ class TournamentListScreenTest {
 
     @Test
     fun deletingTheOnlyTournamentShowsEmptyState() {
-        composeTestRule.onNodeWithContentDescription(string(R.string.action_delete)).performClick()
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.action_delete))
+            .scrollToAndClick()
         composeTestRule.waitForText(
             string(R.string.dialog_delete_tournament_title, TestFixtures.TOURNAMENT_NAME)
         )
 
-        composeTestRule.onNodeWithText(string(R.string.action_delete)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_delete)).scrollToAndClick()
 
         composeTestRule.waitForText(string(R.string.tournaments_list_empty_title))
         composeTestRule.waitForAbsence(TestFixtures.TOURNAMENT_NAME)

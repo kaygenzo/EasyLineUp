@@ -1,5 +1,20 @@
 version: 2.1
 
+parameters:
+  # Each runs one instrumented-test workflow, and only that one. Nothing sets them on a push:
+  # the nightly schedules do (Project Settings > Triggers, a scheduled trigger on develop with
+  # the parameter set to true), and so can anyone, from the CircleCI UI's "Trigger Pipeline"
+  # button with the same parameter.
+  # - run-android-tests: the nightly, on the `ci` group of gradle/test-devices.gradle.
+  # - run-android-tests-legacy: the nightly-legacy, on the `legacy` group (the minSdk) alone.
+  # Each device is a job of its own (see the workflows at the bottom).
+  run-android-tests:
+    type: boolean
+    default: false
+  run-android-tests-legacy:
+    type: boolean
+    default: false
+
 executors:
   easylineup-executor:
     docker:
@@ -223,8 +238,167 @@ jobs:
           destination: release/mapping.txt
       - save-gradle-cache
 
+  android-tests:
+    # One device per job: three devices of ~20 min of app tests each, plus the build, went past
+    # the job's one-hour limit (the Small Phone was cut off with "context deadline exceeded").
+    parameters:
+      device:
+        description: >-
+          A managed device of gradle/test-devices.gradle, by its Gradle name (Pixel 9a + 36 =
+          pixel9aApi36). A name Gradle doesn't know fails the first test step at once (task not
+          found).
+        type: string
+    # The emulator needs KVM, which the Docker executor doesn't have: the Android machine image
+    # is a full VM with it. Same release as cimg/android above.
+    machine:
+      image: android:2026.10.1
+    resource_class: large
+    working_directory: ~/easylineup
+    environment:
+      GRADLE_OPTS: -Dorg.gradle.project.kotlin.compiler.execution.strategy=in-process
+    description: "Instrumented tests on one emulator of gradle/test-devices.gradle"
+    steps:
+      - checkout
+      - run:
+          name: Check that the emulator can use KVM
+          command: |
+            if [ ! -w /dev/kvm ]; then
+              ls -l /dev/kvm || true
+              echo "No usable /dev/kvm: the emulator would be too slow to run the tests"
+              exit 1
+            fi
+            java -version
+      # The SDK packages this job downloads (the emulators' system images, the compileSdk
+      # platform, build-tools) and the emulators Gradle creates for them, snapshot included, so
+      # a run boots straight from it. The key changes with the device list; the fallback
+      # reuses the device's last cache. The SDK
+      # lives outside the home folder and has preinstalled packages too, so only this job's
+      # packages are cached, from a copy under ~/sdk-cache (see "Collect the SDK packages").
+      # build.gradle holds the compileVersion.
+      - run:
+          name: Compute the emulator cache key
+          command: cat gradle/test-devices.gradle build.gradle > /tmp/gmd-cache-key
+      - restore_cache:
+          keys:
+            - gmd-v1-<< parameters.device >>-{{ checksum "/tmp/gmd-cache-key" }}
+            - gmd-v1-<< parameters.device >>-
+      - run:
+          name: Put the cached SDK packages back
+          command: |
+            if [ -d ~/sdk-cache ]; then
+              cp -a ~/sdk-cache/. "$ANDROID_HOME/"
+              du -sh ~/sdk-cache/* ~/.android/avd/gradle-managed
+            fi
+      # The machine image only ships platforms 29 to 35 (cimg/android has newer ones), and AGP
+      # doesn't download a missing compileSdk platform itself. The version comes from
+      # build.gradle's compileVersion, so a bump needs no change here; build-tools 36.0.0 is
+      # AGP 9.1's default. Recent platforms carry a minor version (android-37.0), older ones
+      # don't (android-35).
+      - run:
+          name: Install the compileSdk platform
+          command: |
+            version=$(sed -n 's/.*compileVersion = \([0-9]*\).*/\1/p' build.gradle)
+            yes | sdkmanager --licenses > /dev/null || true
+            sdkmanager "platforms;android-$version.0" "build-tools;36.0.0" \
+              || sdkmanager "platforms;android-$version" "build-tools;36.0.0"
+            ls "$ANDROID_HOME/platforms"
+      - decode-secret:
+          variable: GOOGLE_SERVICES_FILE
+          path: app/google-services.json
+      - decode-secret:
+          variable: DEBUG_KEYSTORE_FILE
+          path: telen.debug.jks
+      - restore-gradle-cache
+      # Gradle Managed Devices: the device is downloaded if needed, booted headless, tested,
+      # then shut down. One module per step, so the two modules' emulators never run side by
+      # side (Gradle runs projects in parallel), and the app's tests still run when the
+      # repository's fail.
+      # swiftshader_indirect: the VM has no GPU, so the emulator renders on the CPU. Gradle is
+      # silent while a device runs its tests (~20 min for the app's on an M-series Mac), hence
+      # the long no_output_timeout.
+      # The job is killed at one hour, and a killed job keeps nothing: no reports, no cache. So
+      # a test that hangs fails after 3 minutes instead (the runner's timeout_msec, results
+      # kept), and each step is cut short early enough for the reports and the cache to be saved
+      # (timeout; 15 + 32 minutes leave the rest of the hour to the other steps). A step cut
+      # short can leave its emulator running: the next step stops it first. '[q]emu-system',
+      # not 'qemu-system': pkill -f matches whole command lines, the step's own shell included,
+      # and Linux's pkill would kill that shell too (macOS's leaves its ancestors out).
+      - run:
+          name: Repository tests
+          no_output_timeout: 60m
+          command: |
+            timeout --kill-after=1m 15m \
+              ./gradlew :repository:<< parameters.device >>ProdDebugAndroidTest \
+              -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect \
+              -Pandroid.testInstrumentationRunnerArguments.timeout_msec=180000
+      - run:
+          name: App tests
+          no_output_timeout: 60m
+          when: always
+          command: |
+            pkill -f '[q]emu-system' || true
+            timeout --kill-after=1m 32m \
+              ./gradlew :app:<< parameters.device >>DemoDebugAndroidTest \
+              -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect \
+              -Pandroid.testInstrumentationRunnerArguments.timeout_msec=180000
+      # JUnit XML for the Tests tab, and the HTML reports plus the raw results (logcat
+      # included) as artifacts, one folder per module and per device.
+      - store_test_results:
+          path: repository/build/outputs/androidTest-results/managedDevice
+      - store_test_results:
+          path: app/build/outputs/androidTest-results/managedDevice
+      - store_artifacts:
+          path: repository/build/reports/androidTests/managedDevice
+          destination: android-tests/repository/report
+      - store_artifacts:
+          path: app/build/reports/androidTests/managedDevice
+          destination: android-tests/app/report
+      - store_artifacts:
+          path: repository/build/outputs/androidTest-results/managedDevice
+          destination: android-tests/repository/results
+      - store_artifacts:
+          path: app/build/outputs/androidTest-results/managedDevice
+          destination: android-tests/app/results
+      # Copies (hard links where possible) of this job's SDK packages: each emulator's system
+      # image, read from its config.ini, plus the platform and build-tools installed above.
+      # Lock files would be stale in the next run. Saved even when tests failed, since the
+      # downloads and emulators are fine then too; a key that already exists isn't saved again.
+      - run:
+          name: Collect the SDK packages to cache
+          when: always
+          command: |
+            pkill -f '[q]emu-system' || true
+            rm -rf ~/sdk-cache
+            version=$(sed -n 's/.*compileVersion = \([0-9]*\).*/\1/p' build.gradle)
+            avds=~/.android/avd/gradle-managed
+            packages=$(sed -n 's|^image\.sysdir\.1 *= *||p' "$avds"/*.avd/config.ini)
+            for package in $packages platforms/android-$version.0 platforms/android-$version \
+                build-tools/36.0.0; do
+              package=${package%/}
+              [ -d "$ANDROID_HOME/$package" ] || continue
+              mkdir -p ~/sdk-cache/"$(dirname "$package")"
+              if ! cp -al "$ANDROID_HOME/$package" ~/sdk-cache/"$package" 2>/dev/null; then
+                rm -rf ~/sdk-cache/"$package"
+                cp -a "$ANDROID_HOME/$package" ~/sdk-cache/"$package"
+              fi
+              echo "$package"
+            done
+            find "$avds" -name '*.lock' -delete
+            du -sh ~/sdk-cache "$avds"
+      - save_cache:
+          when: always
+          key: gmd-v1-<< parameters.device >>-{{ checksum "/tmp/gmd-cache-key" }}
+          paths:
+            - ~/sdk-cache
+            - ~/.android/avd/gradle-managed
+      - save-gradle-cache
+
 workflows:
   build-deploy:
+    unless:
+      or:
+        - << pipeline.parameters.run-android-tests >>
+        - << pipeline.parameters.run-android-tests-legacy >>
     jobs:
       - unit-tests:
           filters:
@@ -250,3 +424,26 @@ workflows:
               only: /([0-9]+\.?){1,4}/
             branches:
               ignore: /.*/
+
+  # One job per device of gradle/test-devices.gradle, side by side: each job has a VM of its
+  # own, so the emulators don't compete for one machine. A device added there needs its job
+  # here too.
+  android-tests:
+    when: << pipeline.parameters.run-android-tests >>
+    jobs:
+      - android-tests:
+          name: android-tests-pixel9aApi36
+          device: pixel9aApi36
+      - android-tests:
+          name: android-tests-smallphoneApi28
+          device: smallphoneApi28
+      - android-tests:
+          name: android-tests-pixeltabletApi34
+          device: pixeltabletApi34
+
+  android-tests-legacy:
+    when: << pipeline.parameters.run-android-tests-legacy >>
+    jobs:
+      - android-tests:
+          name: android-tests-nexus5Api23
+          device: nexus5Api23

@@ -4,6 +4,7 @@
 
 package com.telen.easylineup.system
 
+import android.os.Build
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -22,6 +23,7 @@ import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForText
 import org.junit.After
 import org.junit.Assert.assertNotNull
+import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -96,6 +98,14 @@ class ExportToRealFolderTest {
 
     @Test
     fun exportingWritesAnEluFileIntoThePickedFolder() {
+        // Before Android 10 the picker opens on Recent and hides the device's storage until
+        // "Show internal storage" is turned on in its menu, whose labels follow the device
+        // language. The app's side is the same tree-URI write on every version, so the older
+        // picker would only add a fragile walk through its menus.
+        assumeTrue(
+            "The pre-Android 10 picker hides internal storage",
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+        )
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
         composeTestRule.onNodeWithText(string(R.string.title_settings).uppercase()).performClick()

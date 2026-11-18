@@ -10,7 +10,6 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -21,6 +20,7 @@ import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.ThemeTestUtils
+import com.telen.easylineup.testing.scrollToAndClick
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -59,7 +59,9 @@ class SettingsScreenTest {
     fun openSettings() {
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
-        composeTestRule.onNodeWithText(string(R.string.title_settings).uppercase()).performClick()
+        composeTestRule
+            .onNodeWithText(string(R.string.title_settings).uppercase())
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.title_settings))
     }
 
@@ -86,10 +88,10 @@ class SettingsScreenTest {
     fun selectingThemeUpdatesSubtitle() {
         composeTestRule
             .onNodeWithText(string(R.string.setting_day_night_style_description))
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.lineup_theme_night_value))
 
-        composeTestRule.onNodeWithText(string(R.string.lineup_theme_night_value)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.lineup_theme_night_value)).scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.lineup_theme_system_value))
         composeTestRule
             .onNodeWithText(string(R.string.lineup_theme_night_value))
@@ -104,7 +106,7 @@ class SettingsScreenTest {
         composeTestRule
             .onNodeWithText(string(R.string.setting_export_data_description))
             .performScrollTo()
-            .performClick()
+            .scrollToAndClick()
 
         composeTestRule.waitForText(string(R.string.export_confirm_title))
         // InfoCell always renders its label uppercased. In French that label is also the bottom
@@ -121,7 +123,7 @@ class SettingsScreenTest {
             .performScrollTo()
             .assertIsDisplayed()
 
-        composeTestRule.onNodeWithText(string(R.string.cancel_button)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.cancel_button)).scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.export_confirm_title))
         composeTestRule
             .onNodeWithText(string(R.string.setting_export_data_description))
@@ -132,10 +134,10 @@ class SettingsScreenTest {
     fun deleteAllDataOpensConfirmationAndCancelDismissesIt() {
         composeTestRule
             .onNodeWithText(string(R.string.setting_delete_data_description))
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.cancel_button))
 
-        composeTestRule.onNodeWithText(string(R.string.cancel_button)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.cancel_button)).scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.dialog_delete_cannot_undo_message))
         composeTestRule
             .onNodeWithText(string(R.string.setting_delete_data_description))
@@ -147,17 +149,19 @@ class SettingsScreenTest {
         composeTestRule
             .onNodeWithText(string(R.string.setting_licenses_title))
             .performScrollTo()
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.libraries_title))
         composeTestRule.onNodeWithText("AndroidX Activity").assertIsDisplayed()
 
-        composeTestRule.onNodeWithText(string(android.R.string.ok)).performClick()
+        composeTestRule.onNodeWithText(string(android.R.string.ok)).scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.libraries_title))
     }
 
     @Test
     fun backIconNavigatesToDashboard() {
-        composeTestRule.onNodeWithContentDescription(string(R.string.generic_back)).performClick()
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.generic_back))
+            .scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.setting_day_night_style_description))
         composeTestRule.onNodeWithText(TestFixtures.TEAM_NAME).assertIsDisplayed()
     }

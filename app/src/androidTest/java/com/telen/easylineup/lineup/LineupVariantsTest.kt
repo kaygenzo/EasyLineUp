@@ -5,19 +5,23 @@
 package com.telen.easylineup.lineup
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
+import com.telen.easylineup.lineup.attack.AttackTestTags
 import com.telen.easylineup.lineup.defense.DefenseTestTags
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.scrollToAndClick
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForTag
 import com.telen.easylineup.testing.waitForText
@@ -44,11 +48,13 @@ class LineupVariantsTest(private val teamType: TeamType, private val strategy: T
     fun openLineup() {
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
-        composeTestRule.onNodeWithText(string(R.string.title_lineups).uppercase()).performClick()
+        composeTestRule
+            .onNodeWithText(string(R.string.title_lineups).uppercase())
+            .scrollToAndClick()
         composeTestRule.waitForText(TestFixtures.TOURNAMENT_NAME)
-        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).performClick()
+        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).scrollToAndClick()
         composeTestRule.waitForText(TestFixtures.LINEUP_NAME)
-        composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME).performClick()
+        composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.new_lineup_tab_field_defense))
     }
 
@@ -57,7 +63,8 @@ class LineupVariantsTest(private val teamType: TeamType, private val strategy: T
         strategy.positions.filterNot { it == FieldPosition.DP_DH }.forEach { position ->
             val tag = DefenseTestTags.marker(position.id)
             composeTestRule.waitForTag(tag)
-            composeTestRule.onNodeWithTag(tag).assertIsDisplayed()
+            // The field can run past the bottom of the screen (small phone, tablet in landscape).
+            composeTestRule.onNodeWithTag(tag).performScrollTo().assertIsDisplayed()
         }
     }
 
@@ -65,10 +72,14 @@ class LineupVariantsTest(private val teamType: TeamType, private val strategy: T
     fun offenseListsTheBatterOfEveryFieldPositionOfTheStrategy() {
         composeTestRule
             .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.new_lineup_tab_field_offense))
 
+        // The list is lazy: on a small screen the last batters aren't composed until it scrolls.
+        composeTestRule.waitForText("Starter 1")
         (1..strategy.batterSize).forEach { index ->
+            composeTestRule.onNodeWithTag(AttackTestTags.BATTING_ORDER)
+                .performScrollToNode(hasText("Starter $index"))
             composeTestRule.waitForText("Starter $index")
         }
     }

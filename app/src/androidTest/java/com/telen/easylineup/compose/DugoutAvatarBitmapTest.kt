@@ -18,6 +18,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.telen.easylineup.testing.UI_TIMEOUT_MILLIS
 
 /**
  * A player or team photo goes through Coil into a bitmap the avatar draws: this decodes a real
@@ -45,7 +46,7 @@ class DugoutAvatarBitmapTest {
             bitmap = rememberDugoutAvatarBitmap(Uri.fromFile(file), 56.dp)
         }
 
-        composeRule.waitUntil(timeoutMillis = 5_000) { bitmap != null }
+        composeRule.waitUntil(timeoutMillis = UI_TIMEOUT_MILLIS) { bitmap != null }
         // Scaled to fill the square avatar: the shorter side matches it.
         assertEquals(expectedPx, minOf(bitmap!!.width, bitmap!!.height))
         file.delete()

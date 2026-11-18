@@ -6,7 +6,6 @@ package com.telen.easylineup.settings
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
@@ -20,6 +19,7 @@ import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.inject
+import com.telen.easylineup.testing.scrollToAndClick
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForText
 import kotlinx.coroutines.runBlocking
@@ -55,14 +55,16 @@ class DeleteAllDataTest {
     fun confirmingWipesEverythingAndReturnsToLogin() {
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
-        composeTestRule.onNodeWithText(string(R.string.title_settings).uppercase()).performClick()
+        composeTestRule
+            .onNodeWithText(string(R.string.title_settings).uppercase())
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.title_settings))
 
         composeTestRule
             .onNodeWithText(string(R.string.setting_delete_data_description))
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.dialog_delete_cannot_undo_message))
-        composeTestRule.onNodeWithText(string(R.string.action_delete)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_delete)).scrollToAndClick()
 
         ActivityTestUtils.waitForResumed(LoginActivity::class.java)
         runBlocking {

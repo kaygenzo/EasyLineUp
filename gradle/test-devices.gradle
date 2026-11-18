@@ -1,0 +1,80 @@
+// The emulators the instrumented tests run on, as Gradle Managed Devices: Gradle downloads the
+// system image, creates the emulator, boots it without a window, runs the tests, then shuts it
+// down. CI tests each one in a job of its own, side by side (see .circleci/config.yml); locally
+// the same tasks work too, e.g. ./gradlew :app:pixel9aApi36DemoDebugAndroidTest.
+//
+// To add an emulator, add one line here, and its job (by the device's name, below) to the
+// android-tests or android-tests-legacy workflow of .circleci/config.yml:
+// - device: a hardware profile, as `avdmanager list device` names it ("Pixel 9a", "Pixel C",
+//   "Pixel Tablet", "Medium Phone"...). It sets the screen size and density.
+// - apiLevel: the Android version (36 = Android 16, 35 = 15, 34 = 14, 33 = 13...).
+// - image (optional): the system image, `google-atd` by default. Together with the apiLevel and
+//   the host's ABI, that is one sdkmanager package: `google-atd` on API 36 is
+//   system-images;android-36;google_atd;x86_64 in CI (arm64-v8a on an Apple Silicon Mac).
+//   ATD (Automated Test Device) images are made for this: Google APIs, but no Play Store and
+//   none of the apps and background services a test never uses, so they boot faster and keep
+//   the CPU free. They exist from API 30; below that, use `google` (google_apis) or `aosp`
+//   (no Google APIs at all: the lightest, for the oldest versions).
+//   `sdkmanager --list | grep system-images` lists what exists for each API level.
+//
+// - group (optional): `ci` (the nightly's devices, the default) or `legacy` (the
+//   nightly-legacy's). Locally, ./gradlew ciGroupDemoDebugAndroidTest runs every device of a
+//   group, one at a time
+//   (android.experimental.testOptions.managedDevices.maxConcurrentDevices in gradle.properties).
+//
+// Each line becomes a device named after it (Pixel 9a + 36 = pixel9aApi36).
+def testDevices = [
+    // Today's phone, on the targetSdk: the same setup as a local Pixel 9a emulator.
+    [device: 'Pixel 9a', apiLevel: 36],
+    // The 360x640 dp small screen every Compose screen must hold up on (see CLAUDE.md), on
+    // Android 9, the last version before scoped storage.
+    [device: 'Small Phone', apiLevel: 28, image: 'google'],
+    // Large screen, landscape by default, on a version in between.
+    [device: 'Pixel Tablet', apiLevel: 34],
+    // The minSdk, alone in its own run: no ATD image this old, and slower. AOSP rather than
+    // Google APIs: on CircleCI the google_apis image's first boot went past 30 minutes. The app
+    // doesn't call Play services itself, and Firebase (Analytics, Crashlytics, App Check's debug
+    // provider) runs without them; back to `google` if a test turns out to need them.
+    [device: 'Nexus 5', apiLevel: 23, image: 'aosp', group: 'legacy'],
+]
+
+def deviceName(spec) {
+    spec.device.toLowerCase().replaceAll('[^a-z0-9]', '') + "Api${spec.apiLevel}"
+}
+
+android {
+    testOptions {
+        // System animations off for every instrumented run (managed devices and connected ones):
+        // Compose follows the system scale, so sheets, dialogs and screen transitions land at
+        // once and endless animations (the defense markers') stop, instead of tests waiting on
+        // windows still animating in.
+        animationsDisabled = true
+        managedDevices {
+            testDevices.each { spec ->
+                def name = deviceName(spec)
+                // localDevices rather than allDevices.create(name, ManagedVirtualDevice): a
+                // script applied with `apply from` doesn't see the Android plugin's classes.
+                localDevices.create(name) {
+                    device = spec.device
+                    apiLevel = spec.apiLevel
+                    systemImageSource = spec.image ?: 'google-atd'
+                }
+            }
+            // maxConcurrentDevices only limits the test runs: the Setup tasks (download the
+            // image, create the emulator, boot it once for its snapshot) would still run side
+            // by side, and two at once failed with an image left half-downloaded. Chain them.
+            def setupTasks = testDevices.collect { "${deviceName(it)}Setup" }
+            tasks.configureEach { task ->
+                def index = setupTasks.indexOf(task.name)
+                if (index > 0) {
+                    task.mustRunAfter(setupTasks[index - 1])
+                }
+            }
+            testDevices.groupBy { it.group ?: 'ci' }.each { group, specs ->
+                groups.create(group) {
+                    specs.each { targetDevices.add(localDevices.getByName(deviceName(it))) }
+                }
+            }
+        }
+    }
+}

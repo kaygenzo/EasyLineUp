@@ -9,8 +9,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
-import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
@@ -20,6 +18,8 @@ import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.pluralString
+import com.telen.easylineup.testing.pressBack
+import com.telen.easylineup.testing.scrollToAndClick
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForTag
@@ -53,13 +53,15 @@ class LineupScreenTest {
     fun openLineup() {
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForText(TestFixtures.TEAM_NAME)
-        composeTestRule.onNodeWithText(string(R.string.title_lineups).uppercase()).performClick()
+        composeTestRule
+            .onNodeWithText(string(R.string.title_lineups).uppercase())
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.tournaments_list_header_title))
         composeTestRule.waitForText(TestFixtures.TOURNAMENT_NAME)
 
-        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).performClick()
+        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).scrollToAndClick()
         composeTestRule.waitForText(TestFixtures.LINEUP_NAME)
-        composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME).performClick()
+        composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.new_lineup_tab_field_defense))
     }
 
@@ -86,7 +88,7 @@ class LineupScreenTest {
     fun switchingToOffenseTabShowsBattingOrder() {
         composeTestRule
             .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.new_lineup_tab_field_offense))
         composeTestRule.onNodeWithText("Starter 1").assertIsDisplayed()
     }
@@ -95,39 +97,39 @@ class LineupScreenTest {
     fun attackLegendDialogOpensAndDismisses() {
         composeTestRule
             .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.new_lineup_tab_field_offense))
 
         composeTestRule
             .onNodeWithContentDescription(string(R.string.attack_legend_content_description))
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText(string(android.R.string.ok))
         composeTestRule.onNodeWithText(string(R.string.attack_legend_title)).assertIsDisplayed()
 
-        composeTestRule.onNodeWithText(string(android.R.string.ok)).performClick()
+        composeTestRule.onNodeWithText(string(android.R.string.ok)).scrollToAndClick()
         composeTestRule.waitForAbsence(string(android.R.string.ok))
     }
 
     @Test
     fun editPillEntersEditModeWithFormBar() {
-        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))
         composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).assertIsDisplayed()
     }
 
     @Test
     fun tappingPositionInEditModeOpensAvailablePlayersSheet() {
-        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))
 
         composeTestRule.waitForTag(FieldPosition.PITCHER.markerTag)
-        composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).performClick()
+        composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.defense_select_player_sheet_title))
 
         composeTestRule.onNodeWithText("Substitute 1").assertIsDisplayed()
         composeTestRule.onNodeWithText("Substitute 2").assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("Substitute 1").performClick()
+        composeTestRule.onNodeWithText("Substitute 1").scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.defense_select_player_sheet_title))
     }
 
@@ -136,16 +138,16 @@ class LineupScreenTest {
         // This flow's post-save navigation once crashed off the main thread, when the save ran
         // in the screen's own coroutine scope; it now runs in LineupViewModel's scope and
         // reports back with LineupEvent.Saved, collected on the main thread.
-        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))
 
         composeTestRule.waitForTag(FieldPosition.PITCHER.markerTag)
-        composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).performClick()
+        composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.defense_select_player_sheet_title))
-        composeTestRule.onNodeWithText("Substitute 1").performClick()
+        composeTestRule.onNodeWithText("Substitute 1").scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.defense_select_player_sheet_title))
 
-        composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).scrollToAndClick()
 
         // Edit mode is a separate pushed destination (see LineupRoute's onEditClick ->
         // navController.navigate(Routes.Lineup(..., editable = true))) - a successful save
@@ -158,20 +160,20 @@ class LineupScreenTest {
 
         composeTestRule
             .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.new_lineup_tab_field_offense))
         composeTestRule.onNodeWithText("Substitute 1").assertIsDisplayed()
     }
 
     @Test
     fun anUnsavedReassignmentSurvivesARotation() {
-        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))
 
         composeTestRule.waitForTag(FieldPosition.PITCHER.markerTag)
-        composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).performClick()
+        composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.defense_select_player_sheet_title))
-        composeTestRule.onNodeWithText("Substitute 1").performClick()
+        composeTestRule.onNodeWithText("Substitute 1").scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.defense_select_player_sheet_title))
 
         // Recreating the Activity used to make the screen read the lineup from the database
@@ -181,45 +183,45 @@ class LineupScreenTest {
 
         composeTestRule
             .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.new_lineup_tab_field_offense))
         composeTestRule.onNodeWithText("Substitute 1").assertIsDisplayed()
     }
 
     @Test
     fun changingTheRosterKeepsTheOtherUnsavedChanges() {
-        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))
 
         composeTestRule.waitForTag(FieldPosition.PITCHER.markerTag)
-        composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).performClick()
+        composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.defense_select_player_sheet_title))
-        composeTestRule.onNodeWithText("Substitute 1").performClick()
+        composeTestRule.onNodeWithText("Substitute 1").scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.defense_select_player_sheet_title))
 
         // The roster used to be saved on its own and the lineup re-read from the database,
         // which dropped the reassignment above.
         composeTestRule
             .onNodeWithContentDescription(string(R.string.action_edit_roster))
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText("Starter 2")
-        composeTestRule.onNodeWithText("Starter 2").performClick()
+        composeTestRule.onNodeWithText("Starter 2").scrollToAndClick()
         val done = string(R.string.lineup_creation_roster_done) + " · " +
             string(R.string.lineup_creation_roster_selected_format, 11, 12)
         composeTestRule.waitForText(done)
-        composeTestRule.onNodeWithText(done).performClick()
+        composeTestRule.onNodeWithText(done).scrollToAndClick()
         composeTestRule.waitForAbsence(done)
 
         composeTestRule
             .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.new_lineup_tab_field_offense))
         composeTestRule.onNodeWithText("Substitute 1").assertIsDisplayed()
     }
 
     @Test
     fun tappingDpDhInEditModeOpensLinkSheet() {
-        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))
 
         // The fixture's lineup starts with DH/DP mode off, which forces the DP_DH marker to
@@ -228,22 +230,22 @@ class LineupScreenTest {
         // assigned, so the slot row shows their name (not an "unassigned" placeholder) once
         // DH mode is on - that name is this screen's only other use of it, so it's a safe,
         // unique target for the slot's own click handler.
-        composeTestRule.onNodeWithTag(DefenseTestTags.DH_TOGGLE).performClick()
+        composeTestRule.onNodeWithTag(DefenseTestTags.DH_TOGGLE).scrollToAndClick()
         composeTestRule.waitForText("Starter 10")
-        composeTestRule.onNodeWithText("Starter 10").performClick()
+        composeTestRule.onNodeWithText("Starter 10").scrollToAndClick()
 
         composeTestRule.waitForText(string(R.string.link_dh_and_pitcher_dialog_title))
     }
 
     @Test
     fun cancelInEditModeShowsDiscardConfirmation() {
-        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))
 
         pressBack()
 
         composeTestRule.waitForText(string(R.string.action_keep_editing))
-        composeTestRule.onNodeWithText(string(R.string.action_discard)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_discard)).scrollToAndClick()
 
         composeTestRule.waitForText(string(R.string.new_lineup_tab_field_defense))
         composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).assertDoesNotExist()
@@ -251,10 +253,12 @@ class LineupScreenTest {
 
     @Test
     fun deletingLineupNavigatesToTournaments() {
-        composeTestRule.onNodeWithContentDescription(string(R.string.action_delete)).performClick()
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.action_delete))
+            .scrollToAndClick()
         composeTestRule.waitForText(string(R.string.dialog_delete_lineup_title))
 
-        composeTestRule.onNodeWithText(string(R.string.action_delete)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_delete)).scrollToAndClick()
 
         // Back on Tournaments, and the list already reflects the deletion: the fixture's
         // tournament had only this lineup, and stays listed with none left.

@@ -9,7 +9,6 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
@@ -22,6 +21,7 @@ import com.telen.easylineup.lineup.defense.DefenseTestTags
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.inject
 import com.telen.easylineup.testing.openFixtureLineup
+import com.telen.easylineup.testing.scrollToAndClick
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -55,18 +55,18 @@ class BaseballDhLinkTest {
     @Before
     fun openDhSheet() {
         composeTestRule.openFixtureLineup()
-        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))
-        composeTestRule.onNodeWithTag(DefenseTestTags.DH_TOGGLE).performClick()
+        composeTestRule.onNodeWithTag(DefenseTestTags.DH_TOGGLE).scrollToAndClick()
         composeTestRule.waitForText("Starter 10")
-        composeTestRule.onNodeWithText("Starter 10").performClick()
+        composeTestRule.onNodeWithText("Starter 10").scrollToAndClick()
         composeTestRule.waitForText(string(R.string.link_dh_and_pitcher_dialog_title))
     }
 
     private fun confirmAndSave() {
-        composeTestRule.onNodeWithText(string(R.string.action_confirm)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_confirm)).scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.link_dh_and_pitcher_dialog_title))
-        composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.action_save_lineup))
     }
 
@@ -96,9 +96,9 @@ class BaseballDhLinkTest {
 
     @Test
     fun pickingAnotherDhReplacesThePreviousOne() {
-        composeTestRule.onAllNodesWithText("Starter 10").onLast().performClick()
+        composeTestRule.onAllNodesWithText("Starter 10").onLast().scrollToAndClick()
         composeTestRule.waitForText("Substitute 1")
-        composeTestRule.onAllNodesWithText("Substitute 1").onLast().performClick()
+        composeTestRule.onAllNodesWithText("Substitute 1").onLast().scrollToAndClick()
         composeTestRule.waitForText(string(R.string.action_confirm))
 
         confirmAndSave()
@@ -116,7 +116,9 @@ class BaseballDhLinkTest {
     @Test
     fun cancellingLeavesTheDhAsItWas() {
         // The sheet's own button: edit mode's form bar has a Cancel of its own underneath.
-        composeTestRule.onAllNodesWithText(string(android.R.string.cancel)).onLast().performClick()
+        composeTestRule
+            .onAllNodesWithText(string(android.R.string.cancel)).onLast()
+            .scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.link_dh_and_pitcher_dialog_title))
 
         val saved = savedPositions().associateBy { it.playerId }

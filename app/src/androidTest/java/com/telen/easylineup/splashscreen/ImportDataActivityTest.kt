@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.testing.SeedDatabaseRule
+import com.telen.easylineup.testing.UI_TIMEOUT_MILLIS
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,7 +32,7 @@ class ImportDataActivityTest {
 
     @Test
     fun launchingWithoutUriFinishesImmediately() {
-        composeTestRule.waitUntil(5_000) {
+        composeTestRule.waitUntil(UI_TIMEOUT_MILLIS) {
             composeTestRule.activityRule.scenario.state == Lifecycle.State.DESTROYED
         }
     }

@@ -9,7 +9,6 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
@@ -22,6 +21,7 @@ import com.telen.easylineup.lineup.defense.DefenseTestTags
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.inject
 import com.telen.easylineup.testing.openFixtureLineup
+import com.telen.easylineup.testing.scrollToAndClick
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForText
@@ -53,17 +53,17 @@ class SoftballDpFlexLinkTest {
     @Before
     fun openDpFlexSheet() {
         composeTestRule.openFixtureLineup()
-        composeTestRule.onNodeWithText(string(R.string.action_edit)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).scrollToAndClick()
         composeTestRule.waitForText(string(R.string.action_save_lineup))
-        composeTestRule.onNodeWithTag(DefenseTestTags.DH_TOGGLE).performClick()
+        composeTestRule.onNodeWithTag(DefenseTestTags.DH_TOGGLE).scrollToAndClick()
         composeTestRule.waitForText("Starter 10")
-        composeTestRule.onNodeWithText("Starter 10").performClick()
+        composeTestRule.onNodeWithText("Starter 10").scrollToAndClick()
         composeTestRule.waitForText(string(R.string.link_dp_and_flex_dialog_title))
     }
 
     @Test
     fun confirmingWithoutAFlexIsRefused() {
-        composeTestRule.onNodeWithText(string(R.string.action_confirm)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_confirm)).scrollToAndClick()
 
         composeTestRule.waitForText(string(R.string.error_need_assign_both_players_message))
     }
@@ -72,14 +72,14 @@ class SoftballDpFlexLinkTest {
     fun pickingAFlexSavesTheLink() {
         val flexId = seedRule.fixture.playerIds[3]
         composeTestRule.onAllNodesWithText(string(R.string.field_position_flex)).onLast()
-            .performClick()
+            .scrollToAndClick()
         composeTestRule.waitForText("Starter 4")
-        composeTestRule.onAllNodesWithText("Starter 4").onLast().performClick()
+        composeTestRule.onAllNodesWithText("Starter 4").onLast().scrollToAndClick()
         composeTestRule.waitForText(string(R.string.action_confirm))
 
-        composeTestRule.onNodeWithText(string(R.string.action_confirm)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_confirm)).scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.link_dp_and_flex_dialog_title))
-        composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).scrollToAndClick()
         composeTestRule.waitForAbsence(string(R.string.action_save_lineup))
 
         val saved = runBlocking {
