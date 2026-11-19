@@ -93,6 +93,13 @@ import com.telen.easylineup.views.StateDefense
 import kotlin.math.roundToInt
 
 private const val ICON_SIZE_SCALE = 0.12f
+
+/** The column's vertical padding, plus the field card's bottom padding and border. */
+private val FIELD_VERTICAL_CHROME = 44.dp
+
+/** Smallest field the height cap may shrink it to; a shorter pane scrolls instead. */
+private val MIN_FIELD_SIZE = 180.dp
+
 private val TRASH_COORDINATE = FieldPositionCoordinate(100f, 100f)
 private val DH_ROW_MIN_HEIGHT = 64.dp
 
@@ -142,7 +149,13 @@ fun DefenseScreen(
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val horizontalPadding = 16.dp
-        val fieldSize = maxWidth - horizontalPadding * 2
+        // As wide as the pane, but never taller than it: in landscape, where the lineup shows
+        // defense and offense side by side, a field sized on the width alone ran off the bottom
+        // of a short screen. The floor keeps the markers tappable; below it, the column scrolls.
+        val fieldSize = minOf(
+            maxWidth - horizontalPadding * 2,
+            maxOf(maxHeight - FIELD_VERTICAL_CHROME, MIN_FIELD_SIZE)
+        )
         val iconSize = fieldSize * ICON_SIZE_SCALE
 
         Column(
@@ -168,19 +181,21 @@ fun DefenseScreen(
             }
 
             DugoutCard {
-                DefenseField(
-                    strategy = strategy,
-                    players = players,
-                    lineupMode = lineupMode,
-                    teamType = teamType,
-                    editable = editable,
-                    fieldSize = fieldSize,
-                    iconSize = iconSize,
-                    onPositionClicked = onPositionClicked,
-                    onPlayersSwitched = onPlayersSwitched,
-                    onPlayerReassigned = onPlayerReassigned,
-                    onPlayerSentToTrash = onPlayerSentToTrash
-                )
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    DefenseField(
+                        strategy = strategy,
+                        players = players,
+                        lineupMode = lineupMode,
+                        teamType = teamType,
+                        editable = editable,
+                        fieldSize = fieldSize,
+                        iconSize = iconSize,
+                        onPositionClicked = onPositionClicked,
+                        onPlayersSwitched = onPlayersSwitched,
+                        onPlayerReassigned = onPlayerReassigned,
+                        onPlayerSentToTrash = onPlayerSentToTrash
+                    )
+                }
             }
 
             if (editable && lineupMode == MODE_ENABLED) {

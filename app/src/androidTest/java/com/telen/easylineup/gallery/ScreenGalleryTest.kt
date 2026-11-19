@@ -17,6 +17,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
+import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.lineup.LineupTestTags
+import com.telen.easylineup.lineup.defense.DefenseTestTags
 import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
 import com.telen.easylineup.testing.ActivityTestUtils
@@ -25,8 +28,10 @@ import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.ThemeTestUtils
 import com.telen.easylineup.testing.pressBack
+import com.telen.easylineup.testing.showOffense
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
+import com.telen.easylineup.testing.waitForTag
 import com.telen.easylineup.testing.waitForText
 import org.junit.After
 import org.junit.Assume.assumeTrue
@@ -205,10 +210,13 @@ class ScreenGalleryTest(
         text(TestFixtures.TOURNAMENT_NAME).performClick()
         composeTestRule.waitForText(TestFixtures.LINEUP_NAME)
         text(TestFixtures.LINEUP_NAME).scrollAndClick()
-        composeTestRule.waitForText(string(R.string.new_lineup_tab_field_defense))
+        // Landscape shows defense and offense side by side, with no tabbar: both captures then
+        // show the same screen.
+        composeTestRule.waitForTag(LineupTestTags.SCREEN)
+        composeTestRule.waitForTag(DefenseTestTags.marker(FieldPosition.PITCHER.id))
         capture("lineup_defense")
 
-        text(string(R.string.new_lineup_tab_field_offense).uppercase()).performClick()
+        composeTestRule.showOffense()
         composeTestRule.waitForText("Starter 1")
         capture("lineup_offense")
 

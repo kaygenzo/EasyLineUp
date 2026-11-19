@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,10 +22,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,10 +50,21 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.lineup.attack.AttackScreen
 import com.telen.easylineup.lineup.defense.DefenseScreen
 
+/** Tags for what the tests can't find by text: the screen itself, in either layout. */
+internal object LineupTestTags {
+    const val SCREEN = "lineup_screen"
+}
+
 /**
  * The Lineup container - app bar, Defense/Offense tabbar and (editable only) Save/Cancel
  * formbar, matching the mockup's chrome around the Defense/Attack screens, which otherwise keep
  * their own look untouched. Both are plain composables sharing the one `LineupViewModel`.
+ *
+ * In a window wider than tall (any landscape phone or tablet, or a wide split screen) the two
+ * screens sit side by side, defense on the left and offense on the right, half the width each,
+ * as the legacy screen had them: no tabbar then, and the header shows the lineup's name. In
+ * edit mode the Save button moves up into the header too (the close icon already cancels), so a
+ * 360 dp tall landscape phone doesn't lose another bar's height under the two screens.
  */
 @Composable
 fun LineupScreen(
@@ -80,88 +94,147 @@ fun LineupScreen(
     batters: List<BatterState>,
     onReorder: (List<BatterState>) -> Unit
 ) {
-    Column(
+    val defense = @Composable {
+        DefenseScreen(
+            strategy = defenseStrategy,
+            players = defensePlayers,
+            lineupMode = lineupMode,
+            teamType = teamType,
+            extraHitters = extraHitters,
+            editable = editable,
+            onPositionClicked = onPositionClicked,
+            onPlayersSwitched = onPlayersSwitched,
+            onPlayerReassigned = onPlayerReassigned,
+            onPlayerSentToTrash = onPlayerSentToTrash,
+            onSubstituteLongClicked = onSubstituteLongClicked,
+            onAddSubstitute = onAddSubstitute,
+            onLineupModeChanged = onLineupModeChanged
+        )
+    }
+    val attack = @Composable {
+        AttackScreen(batters = batters, editable = editable, onReorder = onReorder)
+    }
+
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .testTag(LineupTestTags.SCREEN)
     ) {
-        ScreenHeader(
-            icon = if (editable) R.drawable.ic_close_24dp else R.drawable.ic_arrow_left_white_24dp,
-            onIconClick = if (editable) onCancelClick else onBackClick,
-            iconContentDescription = stringResource(
-                if (editable) R.string.cancel_button else R.string.generic_back
-            ),
-            eyebrow = lineupName,
-            title = stringResource(
-                if (selectedTab == LINEUP_DEFENSE_TAB) {
-                    R.string.new_lineup_tab_field_defense
+        val sideBySide = maxWidth > maxHeight
+        Column(modifier = Modifier.fillMaxSize()) {
+            LineupHeader(
+                lineupName = lineupName,
+                title = if (sideBySide) {
+                    null
                 } else {
-                    R.string.new_lineup_tab_field_offense
+                    stringResource(
+                        if (selectedTab == LINEUP_DEFENSE_TAB) {
+                            R.string.new_lineup_tab_field_defense
+                        } else {
+                            R.string.new_lineup_tab_field_offense
+                        }
+                    )
+                },
+                editable = editable,
+                onBackClick = onBackClick,
+                onCancelClick = onCancelClick,
+                onSaveClick = if (sideBySide) onSaveClick else null,
+                onShareLineup = onShareLineup,
+                onDeleteClick = onDeleteClick,
+                onEditClick = onEditClick,
+                onEditRosterClick = onEditRosterClick
+            )
+            if (sideBySide) {
+                Row(modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.weight(1f)) { defense() }
+                    VerticalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                    Box(modifier = Modifier.weight(1f)) { attack() }
                 }
-            ),
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 10.dp),
-            actions = {
-                if (editable) {
-                    HeaderIconChip(
-                        icon = R.drawable.ic_people_outline_24dp,
-                        contentDescription = stringResource(R.string.action_edit_roster),
-                        onClick = onEditRosterClick
-                    )
-                } else {
-                    HeaderIconChip(
-                        icon = R.drawable.ic_share_outline_24dp,
-                        contentDescription = stringResource(R.string.action_share),
-                        onClick = onShareLineup
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    HeaderIconChip(
-                        icon = R.drawable.ic_delete_outline_24dp,
-                        contentDescription = stringResource(R.string.action_delete),
-                        onClick = onDeleteClick
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    EditModePill(onClick = onEditClick)
-                }
-            }
-        )
-        LineupTabBar(
-            selectedTab = selectedTab,
-            onTabSelected = onTabSelected,
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
-        )
-        Box(modifier = Modifier.weight(1f)) {
-            if (selectedTab == LINEUP_DEFENSE_TAB) {
-                DefenseScreen(
-                    strategy = defenseStrategy,
-                    players = defensePlayers,
-                    lineupMode = lineupMode,
-                    teamType = teamType,
-                    extraHitters = extraHitters,
-                    editable = editable,
-                    onPositionClicked = onPositionClicked,
-                    onPlayersSwitched = onPlayersSwitched,
-                    onPlayerReassigned = onPlayerReassigned,
-                    onPlayerSentToTrash = onPlayerSentToTrash,
-                    onSubstituteLongClicked = onSubstituteLongClicked,
-                    onAddSubstitute = onAddSubstitute,
-                    onLineupModeChanged = onLineupModeChanged
-                )
             } else {
-                AttackScreen(
-                    batters = batters,
-                    editable = editable,
-                    onReorder = onReorder
+                LineupTabBar(
+                    selectedTab = selectedTab,
+                    onTabSelected = onTabSelected,
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
                 )
+                Box(modifier = Modifier.weight(1f)) {
+                    if (selectedTab == LINEUP_DEFENSE_TAB) defense() else attack()
+                }
             }
-        }
-        if (editable) {
-            LineupFormBar(onCancelClick = onCancelClick, onSaveClick = onSaveClick)
+            if (editable && !sideBySide) {
+                LineupFormBar(onCancelClick = onCancelClick, onSaveClick = onSaveClick)
+            }
         }
     }
 }
 
+/**
+ * The app bar. [title] is the shown tab's name, with the lineup's name as the eyebrow above it;
+ * null when both screens are shown, and the lineup's name becomes the title itself. With an
+ * [onSaveClick], edit mode shows a Save button next to the roster icon.
+ */
 @Composable
-private fun EditModePill(onClick: () -> Unit) {
+private fun LineupHeader(
+    lineupName: String,
+    title: String?,
+    editable: Boolean,
+    onBackClick: () -> Unit,
+    onCancelClick: () -> Unit,
+    onSaveClick: (() -> Unit)?,
+    onShareLineup: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onEditRosterClick: () -> Unit
+) {
+    ScreenHeader(
+        icon = if (editable) R.drawable.ic_close_24dp else R.drawable.ic_arrow_left_white_24dp,
+        onIconClick = if (editable) onCancelClick else onBackClick,
+        iconContentDescription = stringResource(
+            if (editable) R.string.cancel_button else R.string.generic_back
+        ),
+        eyebrow = if (title == null) null else lineupName,
+        title = title ?: lineupName,
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 10.dp),
+        actions = {
+            if (editable) {
+                HeaderIconChip(
+                    icon = R.drawable.ic_people_outline_24dp,
+                    contentDescription = stringResource(R.string.action_edit_roster),
+                    onClick = onEditRosterClick
+                )
+                if (onSaveClick != null) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    HeaderPill(
+                        label = stringResource(R.string.action_save_lineup),
+                        onClick = onSaveClick
+                    )
+                }
+            } else {
+                HeaderIconChip(
+                    icon = R.drawable.ic_share_outline_24dp,
+                    contentDescription = stringResource(R.string.action_share),
+                    onClick = onShareLineup
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                HeaderIconChip(
+                    icon = R.drawable.ic_delete_outline_24dp,
+                    contentDescription = stringResource(R.string.action_delete),
+                    onClick = onDeleteClick
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                HeaderPill(
+                    label = stringResource(R.string.action_edit),
+                    onClick = onEditClick,
+                    showChevron = true
+                )
+            }
+        }
+    )
+}
+
+/** A filled header button: Edit (with a chevron) in view mode, Save in landscape edit mode. */
+@Composable
+private fun HeaderPill(label: String, onClick: () -> Unit, showChevron: Boolean = false) {
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(10.dp))
@@ -172,17 +245,19 @@ private fun EditModePill(onClick: () -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(3.dp)
     ) {
         Text(
-            text = stringResource(R.string.action_edit),
+            text = label,
             color = MaterialTheme.colorScheme.onPrimary,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.labelMedium
         )
-        Text(
-            text = "›",
-            color = MaterialTheme.colorScheme.onPrimary,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.labelMedium
-        )
+        if (showChevron) {
+            Text(
+                text = "›",
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
     }
 }
 
@@ -388,9 +463,81 @@ private fun LineupScreenPreview() {
 
 @DugoutPreviews
 @Composable
-private fun EditModePillPreview() {
+private fun LineupScreenViewModePreview() {
     DugoutTheme {
-        EditModePill(onClick = {})
+        LineupScreen(
+            lineupName = "vs Riverside Hawks",
+            editable = false,
+            selectedTab = LINEUP_ATTACK_TAB,
+            onTabSelected = {},
+            onBackClick = {},
+            onCancelClick = {},
+            onSaveClick = {},
+            onShareLineup = {},
+            onDeleteClick = {},
+            onEditClick = {},
+            onEditRosterClick = {},
+            defenseStrategy = TeamStrategy.STANDARD,
+            defensePlayers = LineupScreenPreviewDefensePlayers,
+            lineupMode = MODE_ENABLED,
+            teamType = TeamType.BASEBALL,
+            extraHitters = 1,
+            onPositionClicked = {},
+            onPlayersSwitched = { _, _ -> },
+            onPlayerReassigned = { _, _ -> },
+            onPlayerSentToTrash = { _, _ -> },
+            onSubstituteLongClicked = {},
+            onAddSubstitute = {},
+            onLineupModeChanged = {},
+            batters = LineupScreenPreviewBatters,
+            onReorder = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun LineupHeaderPreview() {
+    DugoutTheme {
+        LineupHeader(
+            lineupName = "vs Riverside Hawks",
+            title = "Defense",
+            editable = false,
+            onBackClick = {},
+            onCancelClick = {},
+            onSaveClick = null,
+            onShareLineup = {},
+            onDeleteClick = {},
+            onEditClick = {},
+            onEditRosterClick = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun LineupHeaderSideBySidePreview() {
+    DugoutTheme {
+        LineupHeader(
+            lineupName = "vs Riverside Hawks",
+            title = null,
+            editable = true,
+            onBackClick = {},
+            onCancelClick = {},
+            onSaveClick = {},
+            onShareLineup = {},
+            onDeleteClick = {},
+            onEditClick = {},
+            onEditRosterClick = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun HeaderPillPreview() {
+    DugoutTheme {
+        HeaderPill(label = "Edit", onClick = {}, showChevron = true)
     }
 }
 

@@ -5,6 +5,9 @@
 package com.telen.easylineup.lineup
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -13,13 +16,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.telen.easylineup.HomeActivity
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.FieldPosition
+import com.telen.easylineup.lineup.attack.AttackTestTags
 import com.telen.easylineup.lineup.defense.DefenseTestTags
 import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
+import com.telen.easylineup.testing.UI_TIMEOUT_MILLIS
 import com.telen.easylineup.testing.pluralString
 import com.telen.easylineup.testing.pressBack
 import com.telen.easylineup.testing.scrollToAndClick
+import com.telen.easylineup.testing.showOffense
 import com.telen.easylineup.testing.string
 import com.telen.easylineup.testing.waitForAbsence
 import com.telen.easylineup.testing.waitForTag
@@ -181,11 +187,15 @@ class LineupScreenTest {
         OrientationTestUtils.rotateToLandscape()
         composeTestRule.waitForText(string(R.string.action_save_lineup))
 
-        composeTestRule
-            .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
-            .scrollToAndClick()
-        composeTestRule.waitForText(string(R.string.new_lineup_tab_field_offense))
-        composeTestRule.onNodeWithText("Substitute 1").assertIsDisplayed()
+        // Landscape shows the offense next to the defense: Substitute 1 bats in the pitcher's
+        // place, in the batting order (the defense side shows the same player too).
+        composeTestRule.showOffense()
+        val inBattingOrder = hasText("Substitute 1") and
+            hasAnyAncestor(hasTestTag(AttackTestTags.BATTING_ORDER))
+        composeTestRule.waitUntil(UI_TIMEOUT_MILLIS) {
+            composeTestRule.onAllNodes(inBattingOrder).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeTestRule.onNode(inBattingOrder).assertIsDisplayed()
     }
 
     @Test
@@ -270,17 +280,34 @@ class LineupScreenTest {
     }
 
     @Test
-    fun rotatingPortraitToLandscapeKeepsContent() {
+    fun landscapeShowsDefenseAndOffenseSideBySide() {
         OrientationTestUtils.rotateToLandscape()
-        composeTestRule.waitForIdle()
 
-        composeTestRule.waitForText(TestFixtures.LINEUP_NAME.uppercase())
+        // No tabbar: the lineup's name is the header's title, and both screens are on it.
+        composeTestRule.waitForText(TestFixtures.LINEUP_NAME)
+        composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME).assertIsDisplayed()
         composeTestRule
-            .onNodeWithText(string(R.string.new_lineup_tab_field_defense))
-            .assertIsDisplayed()
+            .onNodeWithText(string(R.string.new_lineup_tab_field_offense).uppercase())
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(FieldPosition.PITCHER.markerTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(AttackTestTags.BATTING_ORDER).assertIsDisplayed()
 
         OrientationTestUtils.rotateToPortrait()
-        composeTestRule.waitForIdle()
+        composeTestRule.waitForText(string(R.string.new_lineup_tab_field_defense))
+    }
+
+    @Test
+    fun landscapeEditModeSavesFromTheHeader() {
+        OrientationTestUtils.rotateToLandscape()
+        composeTestRule.waitForText(TestFixtures.LINEUP_NAME)
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).scrollToAndClick()
+
+        // The Save button sits in the header there, no bottom bar with a Cancel button.
+        composeTestRule.waitForText(string(R.string.action_save_lineup))
+        composeTestRule.onNodeWithText(string(R.string.cancel_button)).assertDoesNotExist()
+        composeTestRule.onNodeWithText(string(R.string.action_save_lineup)).scrollToAndClick()
+        composeTestRule.waitForAbsence(string(R.string.action_save_lineup))
+        composeTestRule.onNodeWithText(string(R.string.action_edit)).assertIsDisplayed()
     }
 
 }
