@@ -2,7 +2,9 @@
 <!-- PluralsCandidate is ignored where the count reads right for any number ("3 of 12
      selected", "wearing #7 tonight"): no plural form changes the wording. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name" translatable="false">Baseball Softball Lineups Keeper</string>
+    <string name="app_name" translatable="false">Diamond Lineup</string>
+    <!-- Shorter label under the launcher icon, where launchers cut the full name. -->
+    <string name="app_launcher_name" translatable="false">Diamond</string>
 
     <string name="action_edit">Edit</string>
     <string name="action_edit_roster">Edit roster</string>

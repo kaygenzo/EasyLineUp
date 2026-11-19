@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Dev - Baseball Softball Lineups Keeper</string>
+    <string name="app_name" translatable="false">Dev - Diamond Lineup</string>
+    <string name="app_launcher_name" translatable="false">Dev Diamond</string>
     <string name="file_provider_authority" translatable="false">com.telen.easylineup.dev.fileprovider</string>
 </resources>

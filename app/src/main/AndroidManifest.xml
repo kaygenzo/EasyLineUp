@@ -49,6 +49,7 @@
             android:exported="false"/>
         <activity
             android:name=".splashscreen.SplashScreenActivity"
+            android:label="@string/app_launcher_name"
             android:theme="@style/Theme.App.Starting"
             android:exported="true">
             <intent-filter>

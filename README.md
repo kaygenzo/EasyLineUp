@@ -1,4 +1,4 @@
-# Baseball softball lineups keeper
+# Diamond Lineup
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ae373afec7fe4dacaae97a2c03cc0013)](https://www.codacy.com/manual/kaygenzo/EasyLineUp?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kaygenzo/EasyLineUp&amp;utm_campaign=Badge_Grade) [![Codacy Coverage](https://app.codacy.com/project/badge/Coverage/ae373afec7fe4dacaae97a2c03cc0013)](https://app.codacy.com/gh/kaygenzo/EasyLineUp/coverage) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/kaygenzo/EasyLineUp/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/kaygenzo/EasyLineUp/tree/develop)
 
