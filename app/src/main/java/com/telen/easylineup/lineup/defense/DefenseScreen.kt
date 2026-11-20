@@ -97,8 +97,22 @@ private const val ICON_SIZE_SCALE = 0.12f
 /** The column's vertical padding, plus the field card's bottom padding and border. */
 private val FIELD_VERTICAL_CHROME = 44.dp
 
+/** The column's horizontal padding, plus the field card's border. */
+private val FIELD_HORIZONTAL_CHROME = 34.dp
+
 /** Smallest field the height cap may shrink it to; a shorter pane scrolls instead. */
 private val MIN_FIELD_SIZE = 180.dp
+
+/** The size of the field a pane [paneHeight] tall shows when it has the width for it. */
+private fun fieldSizeFor(paneHeight: Dp): Dp =
+    maxOf(paneHeight - FIELD_VERTICAL_CHROME, MIN_FIELD_SIZE)
+
+/**
+ * How wide a [DefenseScreen] [paneHeight] tall needs to be for its field to fill its height:
+ * any wider, and the square field leaves empty bands on its sides.
+ */
+internal fun defensePaneWidth(paneHeight: Dp): Dp =
+    fieldSizeFor(paneHeight) + FIELD_HORIZONTAL_CHROME
 
 private val TRASH_COORDINATE = FieldPositionCoordinate(100f, 100f)
 private val DH_ROW_MIN_HEIGHT = 64.dp
@@ -151,10 +165,7 @@ fun DefenseScreen(
         // As wide as the pane, but never taller than it: in landscape, where the lineup shows
         // defense and offense side by side, a field sized on the width alone ran off the bottom
         // of a short screen. The floor keeps the markers tappable; below it, the column scrolls.
-        val fieldSize = minOf(
-            maxWidth - horizontalPadding * 2,
-            maxOf(maxHeight - FIELD_VERTICAL_CHROME, MIN_FIELD_SIZE)
-        )
+        val fieldSize = minOf(maxWidth - FIELD_HORIZONTAL_CHROME, fieldSizeFor(maxHeight))
         val iconSize = fieldSize * ICON_SIZE_SCALE
 
         Column(

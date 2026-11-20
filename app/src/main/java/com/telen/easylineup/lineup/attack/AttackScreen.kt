@@ -100,29 +100,39 @@ fun AttackScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Side by side, the lineup's header shows the one editing badge, and [header] (the
-            // DP/DH toggle) takes this row next to the legend button instead.
-            when {
-                header != null -> Row(modifier = Modifier.weight(1f)) { header() }
-                editable && !sideBySide -> ModeBadge(
-                    stringResource(R.string.attack_editing_order_badge)
-                )
-                else -> Box {}
-            }
-            IconButton(onClick = { showLegend = true }) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_settings_info),
-                    contentDescription = stringResource(R.string.attack_legend_content_description),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    modifier = Modifier.size(20.dp)
-                )
+        // Side by side, the lineup's header shows the one editing badge, and the legend button
+        // is left out: its row would take height from the batters for a hint. The row then only
+        // holds [header] (the DP/DH toggle), and isn't there at all without one.
+        if (!sideBySide || header != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 16.dp,
+                        end = if (sideBySide) 16.dp else 4.dp,
+                        top = 8.dp,
+                        bottom = 4.dp
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                when {
+                    header != null -> Row(modifier = Modifier.weight(1f)) { header() }
+                    editable -> ModeBadge(stringResource(R.string.attack_editing_order_badge))
+                    else -> Box {}
+                }
+                if (!sideBySide) {
+                    IconButton(onClick = { showLegend = true }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_settings_info),
+                            contentDescription = stringResource(
+                                R.string.attack_legend_content_description
+                            ),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
             }
         }
 

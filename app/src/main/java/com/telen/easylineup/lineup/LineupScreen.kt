@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -52,6 +53,7 @@ import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.lineup.attack.AttackScreen
 import com.telen.easylineup.lineup.defense.DefenseScreen
 import com.telen.easylineup.lineup.defense.DhToggle
+import com.telen.easylineup.lineup.defense.defensePaneWidth
 
 /** Tags for what the tests can't find by text: the screen itself, in either layout. */
 internal object LineupTestTags {
@@ -209,10 +211,20 @@ private fun LineupLayout(
                 onEditRosterClick = onEditRosterClick
             )
             if (sideBySide) {
-                Row(modifier = Modifier.weight(1f)) {
-                    Box(modifier = Modifier.weight(1f)) { defense(true) }
-                    VerticalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-                    Box(modifier = Modifier.weight(1f)) { attack(true) }
+                BoxWithConstraints(modifier = Modifier.weight(1f)) {
+                    // The defense pane is as wide as its field, which its height caps, so a
+                    // wide screen gives the rest to the batters instead of empty bands on both
+                    // sides of the square field; never more than half, though.
+                    val defenseWidth = minOf(defensePaneWidth(maxHeight), maxWidth / 2)
+                    Row(modifier = Modifier.fillMaxSize()) {
+                        Box(modifier = Modifier.width(defenseWidth).fillMaxHeight()) {
+                            defense(true)
+                        }
+                        VerticalDivider(
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        )
+                        Box(modifier = Modifier.weight(1f)) { attack(true) }
+                    }
                 }
             } else {
                 LineupTabBar(
