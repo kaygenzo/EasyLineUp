@@ -55,6 +55,7 @@
     <string name="dashboard_lookup_hint">Hvem bar dette nummer?</string>
     <string name="attack_extra_hitter_suffix">ekstra slagmand</string>
     <string name="attack_editing_order_badge">Redigerer rækkefølge</string>
+    <string name="lineup_editing_badge">Redigerer</string>
     <string name="attack_legend_content_description">Sådan læser du listen</string>
     <string name="attack_legend_title">Sådan læser du listen</string>
     <string name="attack_legend_body">Tallet til venstre er slagrækkefølgen. Under hver spillers

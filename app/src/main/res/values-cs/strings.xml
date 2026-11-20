@@ -55,6 +55,7 @@
     <string name="dashboard_lookup_hint">Kdo nosil toto číslo?</string>
     <string name="attack_extra_hitter_suffix">pálkař navíc</string>
     <string name="attack_editing_order_badge">Úprava pořadí</string>
+    <string name="lineup_editing_badge">Úpravy</string>
     <string name="attack_legend_content_description">Jak číst tento seznam</string>
     <string name="attack_legend_title">Jak číst tento seznam</string>
     <string name="attack_legend_body">Číslo vlevo je pořadí na pálce. Pod jménem každého hráče je

@@ -52,6 +52,7 @@
     <string name="dashboard_lookup_hint">この背番号をつけたのは?</string>
     <string name="attack_extra_hitter_suffix">エキストラヒッター</string>
     <string name="attack_editing_order_badge">打順を編集中</string>
+    <string name="lineup_editing_badge">編集中</string>
     <string name="attack_legend_content_description">このリストの見方</string>
     <string name="attack_legend_title">このリストの見方</string>
     <string name="attack_legend_body">左の数字は打順です。各選手の名前の下は守備位置で、スコアブックの番号(1〜9)と略称を表示します。右の数字は背番号です。</string>

@@ -143,10 +143,9 @@ fun DefenseScreen(
     onSubstituteLongClicked: (Player) -> Unit,
     onAddSubstitute: () -> Unit,
     onLineupModeChanged: (Boolean) -> Unit,
+    sideBySide: Boolean = false,
     sortSubstitutesForDisplay: SortSubstitutesForDisplay = SortSubstitutesForDisplay()
 ) {
-    var showDisableDhConfirm by rememberSaveable { mutableStateOf(false) }
-
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val horizontalPadding = 16.dp
         // As wide as the pane, but never taller than it: in landscape, where the lineup shows
@@ -164,20 +163,19 @@ fun DefenseScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = horizontalPadding, vertical = 16.dp)
         ) {
-            if (editable) {
+            // Side by side, the lineup's header shows the one editing badge and the DP/DH toggle
+            // sits above the batting order, so the field gets the pane's whole height.
+            if (editable && !sideBySide) {
                 ModeBadge(stringResource(R.string.defense_mode_badge_editing))
                 Spacer(modifier = Modifier.height(12.dp))
-                // Hidden, not just disabled, where the strategy has no DP/DH (Baseball 5).
-                if (strategy.supportsDesignatedPlayer()) {
-                    DhToggleRow(
-                        teamType = teamType,
-                        checked = lineupMode == MODE_ENABLED,
-                        onCheckedChange = { checked ->
-                            if (checked) onLineupModeChanged(true) else showDisableDhConfirm = true
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
+                DhToggle(
+                    strategy = strategy,
+                    players = players,
+                    teamType = teamType,
+                    lineupMode = lineupMode,
+                    onLineupModeChanged = onLineupModeChanged,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
             }
 
             DugoutCard {
@@ -226,6 +224,37 @@ fun DefenseScreen(
             }
         }
     }
+}
+
+/**
+ * The DP/DH (softball: DP/Flex) on-off row, with the confirmation turning it off asks for: in
+ * the defense screen in portrait, above the batting order when the lineup shows both side by
+ * side ([compact]: no explanation line under it then). Nothing where the strategy has no DP/DH
+ * (Baseball 5): hidden, not just disabled.
+ */
+@Composable
+fun DhToggle(
+    strategy: TeamStrategy,
+    players: List<PlayerWithPosition>,
+    teamType: TeamType,
+    lineupMode: Int,
+    onLineupModeChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    compact: Boolean = false
+) {
+    if (!strategy.supportsDesignatedPlayer()) {
+        return
+    }
+    var showDisableDhConfirm by rememberSaveable { mutableStateOf(false) }
+    DhToggleRow(
+        teamType = teamType,
+        checked = lineupMode == MODE_ENABLED,
+        onCheckedChange = { checked ->
+            if (checked) onLineupModeChanged(true) else showDisableDhConfirm = true
+        },
+        showDescription = !compact,
+        modifier = modifier
+    )
 
     if (showDisableDhConfirm) {
         val dpPlayer = players.firstOrNull { it.isDpDh() }
@@ -258,10 +287,16 @@ fun DefenseScreen(
 }
 
 @Composable
-private fun DhToggleRow(teamType: TeamType, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+private fun DhToggleRow(
+    teamType: TeamType,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    showDescription: Boolean = true
+) {
     val isSoftball = teamType == TeamType.SOFTBALL
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .heightIn(min = DH_ROW_MIN_HEIGHT)
             .clip(RoundedCornerShape(10.dp))
@@ -286,17 +321,19 @@ private fun DhToggleRow(teamType: TeamType, checked: Boolean, onCheckedChange: (
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
-            Text(
-                text = stringResource(
-                    if (isSoftball) {
-                        R.string.defense_dh_toggle_sub_softball
-                    } else {
-                        R.string.defense_dh_toggle_sub_baseball
-                    }
-                ),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-            )
+            if (showDescription) {
+                Text(
+                    text = stringResource(
+                        if (isSoftball) {
+                            R.string.defense_dh_toggle_sub_softball
+                        } else {
+                            R.string.defense_dh_toggle_sub_baseball
+                        }
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                )
+            }
         }
         Switch(
             checked = checked,
@@ -843,6 +880,21 @@ private val DefensePreviewPlayers = listOf(
 private fun DhToggleRowPreview() {
     DugoutTheme {
         DhToggleRow(teamType = TeamType.BASEBALL, checked = true, onCheckedChange = {})
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun DhToggleCompactPreview() {
+    DugoutTheme {
+        DhToggle(
+            strategy = TeamStrategy.STANDARD,
+            players = DefensePreviewPlayers,
+            teamType = TeamType.SOFTBALL,
+            lineupMode = MODE_ENABLED,
+            onLineupModeChanged = {},
+            compact = true
+        )
     }
 }
 

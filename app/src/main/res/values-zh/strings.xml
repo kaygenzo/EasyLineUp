@@ -52,6 +52,7 @@
     <string name="dashboard_lookup_hint">谁穿过这个号码?</string>
     <string name="attack_extra_hitter_suffix">额外打者</string>
     <string name="attack_editing_order_badge">正在编辑棒次</string>
+    <string name="lineup_editing_badge">正在编辑</string>
     <string name="attack_legend_content_description">如何阅读此列表</string>
     <string name="attack_legend_title">如何阅读此列表</string>
     <string name="attack_legend_body">左边的数字是棒次。每位球员姓名下方是其守备位置:记分表上的经典编号(1–9)及其简称。右边的数字是球衣号码。</string>

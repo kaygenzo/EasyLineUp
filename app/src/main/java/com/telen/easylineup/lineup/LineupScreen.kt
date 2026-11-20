@@ -34,9 +34,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.AdaptiveScale
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderIconChip
+import com.telen.easylineup.compose.ModeBadge
 import com.telen.easylineup.compose.NARROW_BUTTON_PADDING
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.uppercaseLocalized
@@ -49,6 +51,7 @@ import com.telen.easylineup.domain.model.TeamStrategy
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.lineup.attack.AttackScreen
 import com.telen.easylineup.lineup.defense.DefenseScreen
+import com.telen.easylineup.lineup.defense.DhToggle
 
 /** Tags for what the tests can't find by text: the screen itself, in either layout. */
 internal object LineupTestTags {
@@ -65,6 +68,9 @@ internal object LineupTestTags {
  * as the legacy screen had them: no tabbar then, and the header shows the lineup's name. In
  * edit mode the Save button moves up into the header too (the close icon already cancels), so a
  * 360 dp tall landscape phone doesn't lose another bar's height under the two screens.
+ *
+ * Everything on it scales to the screen ([AdaptiveScale]): bigger on a tablet, a little smaller
+ * on a small phone.
  */
 @Composable
 fun LineupScreen(
@@ -94,7 +100,7 @@ fun LineupScreen(
     batters: List<BatterState>,
     onReorder: (List<BatterState>) -> Unit
 ) {
-    val defense = @Composable {
+    val defense: @Composable (Boolean) -> Unit = { sideBySide ->
         DefenseScreen(
             strategy = defenseStrategy,
             players = defensePlayers,
@@ -108,13 +114,70 @@ fun LineupScreen(
             onPlayerSentToTrash = onPlayerSentToTrash,
             onSubstituteLongClicked = onSubstituteLongClicked,
             onAddSubstitute = onAddSubstitute,
-            onLineupModeChanged = onLineupModeChanged
+            onLineupModeChanged = onLineupModeChanged,
+            sideBySide = sideBySide
         )
     }
-    val attack = @Composable {
-        AttackScreen(batters = batters, editable = editable, onReorder = onReorder)
+    val attack: @Composable (Boolean) -> Unit = { sideBySide ->
+        AttackScreen(
+            batters = batters,
+            editable = editable,
+            onReorder = onReorder,
+            sideBySide = sideBySide,
+            // Side by side, the DP/DH toggle sits above the batting order it changes.
+            header = if (editable && sideBySide) {
+                {
+                    DhToggle(
+                        strategy = defenseStrategy,
+                        players = defensePlayers,
+                        teamType = teamType,
+                        lineupMode = lineupMode,
+                        onLineupModeChanged = onLineupModeChanged,
+                        compact = true
+                    )
+                }
+            } else {
+                null
+            }
+        )
     }
 
+    AdaptiveScale {
+        LineupLayout(
+            lineupName = lineupName,
+            editable = editable,
+            selectedTab = selectedTab,
+            onTabSelected = onTabSelected,
+            onBackClick = onBackClick,
+            onCancelClick = onCancelClick,
+            onSaveClick = onSaveClick,
+            onShareLineup = onShareLineup,
+            onDeleteClick = onDeleteClick,
+            onEditClick = onEditClick,
+            onEditRosterClick = onEditRosterClick,
+            defense = defense,
+            attack = attack
+        )
+    }
+}
+
+/** [LineupScreen]'s layout: tabs in portrait, [defense] and [attack] side by side otherwise. */
+@Composable
+private fun LineupLayout(
+    lineupName: String,
+    editable: Boolean,
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit,
+    onBackClick: () -> Unit,
+    onCancelClick: () -> Unit,
+    onSaveClick: () -> Unit,
+    onShareLineup: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onEditRosterClick: () -> Unit,
+    defense: @Composable (sideBySide: Boolean) -> Unit,
+    attack: @Composable (sideBySide: Boolean) -> Unit
+) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -147,9 +210,9 @@ fun LineupScreen(
             )
             if (sideBySide) {
                 Row(modifier = Modifier.weight(1f)) {
-                    Box(modifier = Modifier.weight(1f)) { defense() }
+                    Box(modifier = Modifier.weight(1f)) { defense(true) }
                     VerticalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-                    Box(modifier = Modifier.weight(1f)) { attack() }
+                    Box(modifier = Modifier.weight(1f)) { attack(true) }
                 }
             } else {
                 LineupTabBar(
@@ -158,7 +221,7 @@ fun LineupScreen(
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
                 )
                 Box(modifier = Modifier.weight(1f)) {
-                    if (selectedTab == LINEUP_DEFENSE_TAB) defense() else attack()
+                    if (selectedTab == LINEUP_DEFENSE_TAB) defense(false) else attack(false)
                 }
             }
             if (editable && !sideBySide) {
@@ -171,7 +234,8 @@ fun LineupScreen(
 /**
  * The app bar. [title] is the shown tab's name, with the lineup's name as the eyebrow above it;
  * null when both screens are shown, and the lineup's name becomes the title itself. With an
- * [onSaveClick], edit mode shows a Save button next to the roster icon.
+ * [onSaveClick] (both shown), edit mode shows a Save button next to the roster icon, and one
+ * "Editing" badge before them stands for the two screens' own.
  */
 @Composable
 private fun LineupHeader(
@@ -197,6 +261,10 @@ private fun LineupHeader(
         modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 10.dp),
         actions = {
             if (editable) {
+                if (onSaveClick != null) {
+                    ModeBadge(stringResource(R.string.lineup_editing_badge))
+                    Spacer(modifier = Modifier.width(12.dp))
+                }
                 HeaderIconChip(
                     icon = R.drawable.ic_people_outline_24dp,
                     contentDescription = stringResource(R.string.action_edit_roster),
@@ -491,6 +559,28 @@ private fun LineupScreenViewModePreview() {
             onLineupModeChanged = {},
             batters = LineupScreenPreviewBatters,
             onReorder = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun LineupLayoutPreview() {
+    DugoutTheme {
+        LineupLayout(
+            lineupName = "vs Riverside Hawks",
+            editable = false,
+            selectedTab = LINEUP_DEFENSE_TAB,
+            onTabSelected = {},
+            onBackClick = {},
+            onCancelClick = {},
+            onSaveClick = {},
+            onShareLineup = {},
+            onDeleteClick = {},
+            onEditClick = {},
+            onEditRosterClick = {},
+            defense = { Text("Defense") },
+            attack = { Text("Offense") }
         )
     }
 }

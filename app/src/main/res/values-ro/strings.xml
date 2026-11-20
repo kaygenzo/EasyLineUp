@@ -54,6 +54,7 @@
     <string name="dashboard_lookup_hint">Cine a purtat acest număr?</string>
     <string name="attack_extra_hitter_suffix">batător suplimentar</string>
     <string name="attack_editing_order_badge">Se editează ordinea</string>
+    <string name="lineup_editing_badge">Se editează</string>
     <string name="attack_legend_content_description">Cum citești această listă</string>
     <string name="attack_legend_title">Cum citești această listă</string>
     <string name="attack_legend_body">Numărul din stânga este ordinea la bătaie. Sub numele fiecărui

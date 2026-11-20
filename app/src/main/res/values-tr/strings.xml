@@ -54,6 +54,7 @@
     <string name="dashboard_lookup_hint">Bu numarayı kim giydi?</string>
     <string name="attack_extra_hitter_suffix">ek vurucu</string>
     <string name="attack_editing_order_badge">Sıra düzenleniyor</string>
+    <string name="lineup_editing_badge">Düzenleniyor</string>
     <string name="attack_legend_content_description">Bu liste nasıl okunur</string>
     <string name="attack_legend_title">Bu liste nasıl okunur</string>
     <string name="attack_legend_body">Soldaki sayı vuruş sırasıdır. Her oyuncunun adının altında

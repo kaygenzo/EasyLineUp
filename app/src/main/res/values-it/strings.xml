@@ -59,6 +59,7 @@
     <string name="dashboard_lookup_hint">Chi ha indossato questo numero?</string>
     <string name="attack_extra_hitter_suffix">battitore extra</string>
     <string name="attack_editing_order_badge">Modifica dell\'ordine</string>
+    <string name="lineup_editing_badge">Modifica</string>
     <string name="attack_legend_content_description">Come leggere questa lista</string>
     <string name="attack_legend_title">Come leggere questa lista</string>
     <string name="attack_legend_body">Il numero a sinistra è l\'ordine di battuta. Sotto il nome di

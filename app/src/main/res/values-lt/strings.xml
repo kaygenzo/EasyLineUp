@@ -57,6 +57,7 @@
     <string name="dashboard_lookup_hint">Kas vilkėjo šį numerį?</string>
     <string name="attack_extra_hitter_suffix">papildomas mušėjas</string>
     <string name="attack_editing_order_badge">Tvarka redaguojama</string>
+    <string name="lineup_editing_badge">Redaguojama</string>
     <string name="attack_legend_content_description">Kaip skaityti šį sąrašą</string>
     <string name="attack_legend_title">Kaip skaityti šį sąrašą</string>
     <string name="attack_legend_body">Skaičius kairėje yra mušimo eilė. Po kiekvieno žaidėjo vardu

@@ -52,6 +52,7 @@
     <string name="dashboard_lookup_hint">誰穿過這個背號?</string>
     <string name="attack_extra_hitter_suffix">額外打者</string>
     <string name="attack_editing_order_badge">正在編輯棒次</string>
+    <string name="lineup_editing_badge">正在編輯</string>
     <string name="attack_legend_content_description">如何閱讀這份清單</string>
     <string name="attack_legend_title">如何閱讀這份清單</string>
     <string name="attack_legend_body">左邊的數字是棒次。每位球員姓名下方是守備位置:記錄表上的經典編號(1–9)及其簡稱。右邊的數字是背號。</string>

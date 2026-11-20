@@ -71,6 +71,7 @@
 
     <string name="attack_extra_hitter_suffix">extra hitter</string>
     <string name="attack_editing_order_badge">Editing order</string>
+    <string name="lineup_editing_badge">Editing</string>
     <string name="attack_legend_content_description">How to read this list</string>
     <string name="attack_legend_title">How to read this list</string>
     <string name="attack_legend_body">The number on the left is the batting order. Below each

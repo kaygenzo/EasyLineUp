@@ -57,6 +57,7 @@
     <string name="dashboard_lookup_hint">¿Quién llevó este número?</string>
     <string name="attack_extra_hitter_suffix">bateador extra</string>
     <string name="attack_editing_order_badge">Editando el orden</string>
+    <string name="lineup_editing_badge">Editando</string>
     <string name="attack_legend_content_description">Cómo leer esta lista</string>
     <string name="attack_legend_title">Cómo leer esta lista</string>
     <string name="attack_legend_body">El número de la izquierda es el orden al bate. Bajo el nombre

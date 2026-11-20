@@ -57,6 +57,7 @@
     <string name="dashboard_lookup_hint">Wer trug diese Nummer?</string>
     <string name="attack_extra_hitter_suffix">Extra-Hitter</string>
     <string name="attack_editing_order_badge">Reihenfolge bearbeiten</string>
+    <string name="lineup_editing_badge">Bearbeitung</string>
     <string name="attack_legend_content_description">So liest du diese Liste</string>
     <string name="attack_legend_title">So liest du diese Liste</string>
     <string name="attack_legend_body">Die Zahl links ist die Schlagreihenfolge. Unter dem Namen

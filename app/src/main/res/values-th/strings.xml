@@ -52,6 +52,7 @@
     <string name="dashboard_lookup_hint">ใครเคยใส่หมายเลขนี้</string>
     <string name="attack_extra_hitter_suffix">ผู้ตีเพิ่มเติม</string>
     <string name="attack_editing_order_badge">กำลังแก้ไขลำดับ</string>
+    <string name="lineup_editing_badge">กำลังแก้ไข</string>
     <string name="attack_legend_content_description">วิธีอ่านรายการนี้</string>
     <string name="attack_legend_title">วิธีอ่านรายการนี้</string>
     <string name="attack_legend_body">ตัวเลขทางซ้ายคือลำดับการตี ใต้ชื่อผู้เล่นแต่ละคนคือตำแหน่งรับ:

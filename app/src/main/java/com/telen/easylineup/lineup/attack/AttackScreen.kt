@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -77,6 +78,8 @@ fun AttackScreen(
     batters: List<BatterState>,
     editable: Boolean,
     onReorder: (List<BatterState>) -> Unit,
+    sideBySide: Boolean = false,
+    header: (@Composable RowScope.() -> Unit)? = null,
     swapBattersOrder: SwapBattersOrder = SwapBattersOrder()
 ) {
     var localBatters by remember { mutableStateOf(batters) }
@@ -104,10 +107,14 @@ fun AttackScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            if (editable) {
-                ModeBadge(stringResource(R.string.attack_editing_order_badge))
-            } else {
-                Box {}
+            // Side by side, the lineup's header shows the one editing badge, and [header] (the
+            // DP/DH toggle) takes this row next to the legend button instead.
+            when {
+                header != null -> Row(modifier = Modifier.weight(1f)) { header() }
+                editable && !sideBySide -> ModeBadge(
+                    stringResource(R.string.attack_editing_order_badge)
+                )
+                else -> Box {}
             }
             IconButton(onClick = { showLegend = true }) {
                 Icon(

@@ -52,6 +52,7 @@
     <string name="dashboard_lookup_hint">이 번호를 단 선수는?</string>
     <string name="attack_extra_hitter_suffix">추가 타자</string>
     <string name="attack_editing_order_badge">타순 편집 중</string>
+    <string name="lineup_editing_badge">편집 중</string>
     <string name="attack_legend_content_description">목록 보는 법</string>
     <string name="attack_legend_title">목록 보는 법</string>
     <string name="attack_legend_body">왼쪽 숫자는 타순입니다. 선수 이름 아래에는 수비 위치가 표시됩니다. 기록지의 번호(1-9)와 약어입니다.

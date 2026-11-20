@@ -56,6 +56,7 @@
     <string name="dashboard_lookup_hint">Quem usou este número?</string>
     <string name="attack_extra_hitter_suffix">rebatedor extra</string>
     <string name="attack_editing_order_badge">Editando a ordem</string>
+    <string name="lineup_editing_badge">Editando</string>
     <string name="attack_legend_content_description">Como ler esta lista</string>
     <string name="attack_legend_title">Como ler esta lista</string>
     <string name="attack_legend_body">O número à esquerda é a ordem de rebatida. Abaixo do nome de

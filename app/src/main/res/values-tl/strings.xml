@@ -59,6 +59,7 @@
     <string name="dashboard_lookup_hint">Sino ang nagsuot ng numerong ito?</string>
     <string name="attack_extra_hitter_suffix">dagdag na hitter</string>
     <string name="attack_editing_order_badge">Ine-edit ang pagkakasunod</string>
+    <string name="lineup_editing_badge">Ine-edit</string>
     <string name="attack_legend_content_description">Paano basahin ang listahang ito</string>
     <string name="attack_legend_title">Paano basahin ang listahang ito</string>
     <string name="attack_legend_body">Ang numero sa kaliwa ay ang batting order. Sa ilalim ng
