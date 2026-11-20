@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -34,8 +33,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.DugoutBottomSheet
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.PlayerWithPosition
@@ -84,7 +85,7 @@ fun AvailablePlayersSheet(
         is SubstituteBattingSlots.Limited -> battingSlots.remaining > 0
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    DugoutBottomSheet(onDismissRequest = onDismiss) {
         Column(modifier = Modifier.navigationBarsPadding()) {
             Column(modifier = Modifier.padding(horizontal = 18.dp)) {
                 Text(
@@ -95,7 +96,7 @@ fun AvailablePlayersSheet(
                             R.string.defense_select_player_sheet_title
                         }
                     ),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.sheetTitle,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 if (isSubstituteSheet) {

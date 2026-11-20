@@ -32,8 +32,8 @@ internal fun adaptiveScale(smallestScreenWidthDp: Int): Float =
  * Scales every dp and sp in [content] to the screen: text, icons, paddings and rows grow on a
  * tablet, where they looked lost at their phone size, and shrink a little on a small phone,
  * where they crowded each other. Layouts keep their proportions, since everything scales
- * together. Sheets and dialogs opened from [content] are windows of their own and keep their
- * size.
+ * together. [DugoutTheme] applies it to every screen; sheets and dialogs are windows of their
+ * own, which [DugoutBottomSheet] scales again for sheets.
  */
 @Composable
 fun AdaptiveScale(content: @Composable () -> Unit) {
@@ -49,8 +49,6 @@ fun AdaptiveScale(content: @Composable () -> Unit) {
 @Composable
 private fun AdaptiveScalePreview() {
     DugoutTheme {
-        AdaptiveScale {
-            Text("Scaled to the screen")
-        }
+        Text("Scaled to the screen")
     }
 }

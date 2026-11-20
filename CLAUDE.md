@@ -114,6 +114,21 @@ the label in Compose from the data that's already there instead of
 precomputing and shipping an id for something the UiState didn't need a new
 field to express.
 
+## Text sizes come from text roles, scaled once for the whole app
+
+A text's style names the role it plays, not a size: `MaterialTheme.typography.rowTitle`,
+`sheetTitle`, `heroTitle`, `emptyStateTitle`, `buttonLabel`, `statValue`, ...
+(`compose/DugoutTextStyles.kt`), so the same kind of text has the same size on every screen.
+Screens had drifted apart picking sizes on their own (a player's name in a list from 14 to
+18 sp, a sheet's title from 18 to 22 sp depending on the screen). A new kind of text gets a new
+role there, not a raw `titleMedium`/`bodyLarge` or a `fontSize` literal at the call site; the
+slots of `DugoutTypography` are what the roles point to.
+
+Sizes then follow the screen once, for the whole app: `DugoutTheme` wraps everything in
+`AdaptiveScale` (88 % at 360 dp, 100 % at 411 dp, up to 130 % on a tablet). A bottom sheet is a
+window of its own that this scale doesn't reach, so sheets go through `DugoutBottomSheet`, never
+a raw `ModalBottomSheet`. Never wrap a screen in `AdaptiveScale` again: it would scale twice.
+
 ## Code style: AOSP, 100-column hard limit
 
 All code (Kotlin, Java, XML, Gradle) follows the official AOSP style. Concretely:

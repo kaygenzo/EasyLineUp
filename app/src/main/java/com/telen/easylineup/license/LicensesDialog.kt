@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.rowSubtitle
+import com.telen.easylineup.compose.rowTitle
 
 /**
  * The open source libraries the app ships with, from Settings. Tapping one opens its project
@@ -74,10 +76,10 @@ private fun LibraryRow(library: OpenSourceLibrary, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(vertical = 12.dp)
     ) {
-        Text(text = library.name, style = MaterialTheme.typography.bodyLarge)
+        Text(text = library.name, style = MaterialTheme.typography.rowTitle)
         Text(
             text = library.license.displayName,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.rowSubtitle,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }

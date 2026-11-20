@@ -21,7 +21,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,9 +32,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutAvatar
+import com.telen.easylineup.compose.DugoutBottomSheet
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.rowSubtitle
+import com.telen.easylineup.compose.rowTitle
+import com.telen.easylineup.compose.sheetSubtitle
+import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.Team
 import com.telen.easylineup.domain.model.TeamType
@@ -49,7 +53,7 @@ fun SwapTeamSheet(
     onTeamClick: (Team) -> Unit,
     onCreateTeamClick: () -> Unit
 ) {
-    ModalBottomSheet(
+    DugoutBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
@@ -91,7 +95,7 @@ fun SwitchTeamSheetContent(
         Text(
             text = stringResource(R.string.switch_team_sheet_title),
             color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.sheetTitle
         )
         Spacer(modifier = Modifier.height(2.dp))
         Text(
@@ -101,7 +105,7 @@ fun SwitchTeamSheetContent(
                 teams.size
             ),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.sheetSubtitle
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -153,14 +157,14 @@ private fun TeamRow(team: Team, onClick: () -> Unit) {
             Text(
                 text = team.name,
                 color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.rowTitle
             )
             val teamType = TeamType.getTypeById(team.type)
             if (teamType.titleRes() != 0) {
                 Text(
                     text = stringResource(teamType.titleRes()),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.rowSubtitle
                 )
             }
         }
@@ -231,7 +235,7 @@ private fun CreateTeamRow(onClick: () -> Unit) {
         Text(
             text = stringResource(R.string.switch_team_sheet_create_row),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.titleSmall
+            style = MaterialTheme.typography.rowTitle
         )
     }
 }

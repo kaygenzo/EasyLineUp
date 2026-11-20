@@ -26,7 +26,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
@@ -51,10 +50,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutAvatar
+import com.telen.easylineup.compose.DugoutBottomSheet
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.NARROW_BUTTON_PADDING
+import com.telen.easylineup.compose.buttonLabel
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.rowTitle
+import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.TeamType
@@ -128,7 +131,7 @@ fun DpFlexLinkSheet(
         flexLabel
     }
 
-    ModalBottomSheet(
+    DugoutBottomSheet(
         onDismissRequest = {},
         sheetState = sheetState,
         dragHandle = if (selecting == null) {
@@ -147,7 +150,7 @@ fun DpFlexLinkSheet(
             }
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.sheetTitle,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -239,8 +242,7 @@ fun DpFlexLinkSheet(
                 ) {
                     Text(
                         text = stringResource(android.R.string.cancel),
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.buttonLabel,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -252,8 +254,7 @@ fun DpFlexLinkSheet(
                 ) {
                     Text(
                         text = stringResource(R.string.action_confirm),
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.buttonLabel
                     )
                 }
             }
@@ -343,8 +344,7 @@ private fun DpFlexSlotRow(
             )
             Text(
                 text = player?.name ?: stringResource(R.string.defense_dh_slot_unassigned),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.rowTitle,
                 color = MaterialTheme.colorScheme.onBackground
             )
         }

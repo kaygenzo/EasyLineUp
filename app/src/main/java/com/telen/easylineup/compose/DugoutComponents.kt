@@ -39,7 +39,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -479,9 +478,7 @@ fun StatChip(
         Text(
             text = value.toString(),
             color = color,
-            fontWeight = FontWeight.ExtraBold,
-            fontFamily = FontFamily.Monospace,
-            fontSize = 19.sp
+            style = MaterialTheme.typography.statValue
         )
         Text(
             text = label.uppercaseLocalized(),
@@ -617,7 +614,7 @@ fun PositionUsageEmptyState(
         Text(
             text = stringResource(R.string.player_profile_empty_title),
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleSmall
+            style = MaterialTheme.typography.emptyStateTitle
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
@@ -789,7 +786,7 @@ fun ScreenHeader(
             }
             // One line, shrunk to fit: a long translation would otherwise break mid-word next
             // to the header's action chips on a small screen.
-            val titleStyle = MaterialTheme.typography.titleMedium
+            val titleStyle = MaterialTheme.typography.screenTitle
             BasicText(
                 text = title,
                 style = titleStyle.copy(color = MaterialTheme.colorScheme.onBackground),
@@ -908,7 +905,7 @@ fun ConfirmSheet(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    ModalBottomSheet(
+    DugoutBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
@@ -916,7 +913,7 @@ fun ConfirmSheet(
             Text(
                 text = title,
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.sheetTitle
             )
             Text(
                 text = message,
@@ -930,7 +927,7 @@ fun ConfirmSheet(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(text = cancelLabel, fontWeight = FontWeight.Bold)
+                    Text(text = cancelLabel, style = MaterialTheme.typography.buttonLabel)
                 }
                 Button(
                     onClick = {
@@ -943,7 +940,7 @@ fun ConfirmSheet(
                         containerColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text(text = confirmLabel, fontWeight = FontWeight.Bold)
+                    Text(text = confirmLabel, style = MaterialTheme.typography.buttonLabel)
                 }
             }
         }
@@ -1226,8 +1223,7 @@ fun FormBar(
             ) {
                 Text(
                     text = cancelLabel,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.buttonLabel,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -1239,8 +1235,7 @@ fun FormBar(
             ) {
                 Text(
                     text = saveLabel,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.buttonLabel
                 )
             }
         }

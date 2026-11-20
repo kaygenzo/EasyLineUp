@@ -43,6 +43,7 @@ import com.telen.easylineup.compose.PlayerPhotoTile
 import com.telen.easylineup.compose.PositionUsageChart
 import com.telen.easylineup.compose.PositionUsageEmptyState
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.heroTitle
 import com.telen.easylineup.compose.shortLabel
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.FieldPosition
@@ -192,7 +193,7 @@ private fun ProfileHeader(state: PlayerProfileState) {
                 Text(
                     text = state.name,
                     color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.heroTitle
                 )
                 val sexIconRes = when (state.sex) {
                     Sex.MALE -> R.drawable.ic_male_black

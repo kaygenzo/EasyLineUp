@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.buttonLabel
 
 private data class ValueProp(@DrawableRes val iconRes: Int, @StringRes val textRes: Int)
 
@@ -120,7 +121,7 @@ fun WelcomeScreen(
             ) {
                 Text(
                     text = stringResource(R.string.login_create),
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.buttonLabel
                 )
             }
 
@@ -136,7 +137,7 @@ fun WelcomeScreen(
                 Text(
                     text = stringResource(R.string.login_import),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.buttonLabel
                 )
             }
         }

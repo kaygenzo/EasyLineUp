@@ -28,7 +28,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,12 +40,18 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.DugoutBottomSheet
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.PlayerPhotoTile
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.emptyStateTitle
+import com.telen.easylineup.compose.rowSubtitle
+import com.telen.easylineup.compose.rowTitle
+import com.telen.easylineup.compose.sheetSubtitle
+import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.compose.shortLabel
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.PlayerSide
@@ -254,7 +259,7 @@ private fun PlayerRow(row: RosterRowState, onClick: () -> Unit) {
             Text(
                 text = row.name,
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.rowTitle
             )
             val subtitle = listOfNotNull(
                 row.battingSide?.let {
@@ -268,7 +273,7 @@ private fun PlayerRow(row: RosterRowState, onClick: () -> Unit) {
                 Text(
                     text = subtitle,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.rowSubtitle
                 )
             }
         }
@@ -315,7 +320,7 @@ private fun RosterEmptyState() {
         Text(
             text = stringResource(R.string.roster_empty_title),
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleSmall
+            style = MaterialTheme.typography.emptyStateTitle
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
@@ -347,7 +352,7 @@ fun MessageTeamSheet(
     val phoneCount = players.count { !it.phone.isNullOrBlank() }
     val emailCount = players.count { !it.email.isNullOrBlank() }
 
-    ModalBottomSheet(
+    DugoutBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
@@ -359,7 +364,7 @@ fun MessageTeamSheet(
             Text(
                 text = stringResource(R.string.roster_message_sheet_title),
                 color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.sheetTitle
             )
             Text(
                 text = teamName + " · " + pluralStringResource(
@@ -368,7 +373,7 @@ fun MessageTeamSheet(
                     players.size
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.sheetSubtitle,
                 modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
             )
             MessageSheetRow(
@@ -482,12 +487,12 @@ private fun MessageSheetRow(
                 Text(
                     text = label,
                     color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.rowTitle
                 )
                 Text(
                     text = caption,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.rowSubtitle
                 )
             }
             Icon(

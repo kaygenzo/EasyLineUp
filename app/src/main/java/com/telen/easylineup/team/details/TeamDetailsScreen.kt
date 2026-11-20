@@ -31,10 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutCard
@@ -43,6 +40,8 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.InfoCell
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.heroTitle
+import com.telen.easylineup.compose.statValue
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.DATE_SKELETON_MONTH_YEAR
@@ -214,7 +213,7 @@ private fun ProfileHead(teamName: String, teamType: TeamType, teamImageUri: Uri?
             Text(
                 text = teamName,
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.heroTitle
             )
             Spacer(modifier = Modifier.height(5.dp))
             if (teamType.titleRes() != 0) {
@@ -274,9 +273,7 @@ private fun StatChip(modifier: Modifier = Modifier, value: Int, label: String, c
         Text(
             text = value.toString(),
             color = color,
-            fontWeight = FontWeight.ExtraBold,
-            fontFamily = FontFamily.Monospace,
-            fontSize = 19.sp
+            style = MaterialTheme.typography.statValue
         )
         Text(
             text = label.uppercaseLocalized(),

@@ -51,6 +51,8 @@ import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.rowSubtitle
+import com.telen.easylineup.compose.rowTitle
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
@@ -346,12 +348,12 @@ private fun SettingsRow(
             leading()
         }
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = title, color = titleColor, style = MaterialTheme.typography.titleSmall)
+            Text(text = title, color = titleColor, style = MaterialTheme.typography.rowTitle)
             if (subtitle != null) {
                 Text(
                     text = subtitle,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.rowSubtitle,
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }

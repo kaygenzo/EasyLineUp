@@ -34,6 +34,10 @@ import com.google.android.material.R as MaterialR
  * tones, scrim, surfaceTint, surface dim/bright) fall back to Compose's
  * baseline M3 defaults, same as the rest of the app, which doesn't define
  * them either.
+ *
+ * Everything in [content] scales to the screen ([AdaptiveScale]), so every screen of the app
+ * draws its text at the same size on a given device; sheets are windows of their own and scale
+ * through [DugoutBottomSheet].
  */
 @Composable
 fun DugoutTheme(content: @Composable () -> Unit) {
@@ -43,15 +47,18 @@ fun DugoutTheme(content: @Composable () -> Unit) {
     val uiMode = LocalConfiguration.current.uiMode and Configuration.UI_MODE_NIGHT_MASK
     val colorScheme = remember(uiMode) { context.toDugoutColorScheme() }
     KeepInitialFocusOffTextFields()
-    MaterialTheme(colorScheme = colorScheme, typography = DugoutTypography, content = content)
+    MaterialTheme(colorScheme = colorScheme, typography = DugoutTypography) {
+        AdaptiveScale(content)
+    }
 }
 
 /**
  * Shared type scale for the Dugout Card design system - every screen sources its text size and
- * weight from here instead of hardcoding its own, so fixing "this reads small" on one screen
- * doesn't turn into a one-off literal that the next screen has to rediscover on its own. Slots
- * this app doesn't override keep Compose's M3 defaults, so AlertDialog/TextButton/RadioButton
- * (which already read MaterialTheme.typography internally) are unaffected.
+ * weight from here (through the text roles of DugoutTextStyles.kt) instead of hardcoding its
+ * own, so fixing "this reads small" on one screen doesn't turn into a one-off literal that the
+ * next screen has to rediscover on its own. Slots this app doesn't override keep Compose's M3
+ * defaults, so AlertDialog/TextButton/RadioButton (which already read MaterialTheme.typography
+ * internally) are unaffected.
  *
  * Deliberately not covered here - these aren't a typographic register, not a missing token:
  * - DugoutAvatar's initials, sized proportionally to the avatar (size.value * 0.33f).

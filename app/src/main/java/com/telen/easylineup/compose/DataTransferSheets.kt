@@ -18,7 +18,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -27,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.export.DataCounts
@@ -146,7 +144,7 @@ private fun SheetButtonRow(
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(text = cancelLabel, fontWeight = FontWeight.Bold)
+                Text(text = cancelLabel, style = MaterialTheme.typography.buttonLabel)
             }
         }
         Button(
@@ -155,7 +153,7 @@ private fun SheetButtonRow(
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
-            Text(text = confirmLabel, fontWeight = FontWeight.Bold)
+            Text(text = confirmLabel, style = MaterialTheme.typography.buttonLabel)
         }
     }
 }
@@ -192,13 +190,12 @@ private fun ToggleRow(
                 Text(
                     text = label,
                     color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.rowTitle,
                 )
                 Text(
                     text = sub,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.rowSubtitle
                 )
             }
             Switch(checked = checked, onCheckedChange = onCheckedChange)
@@ -227,7 +224,7 @@ fun ExportConfirmSheet(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    ModalBottomSheet(
+    DugoutBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
@@ -239,7 +236,7 @@ fun ExportConfirmSheet(
             Text(
                 text = stringResource(R.string.export_confirm_title),
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.sheetTitle
             )
             Text(
                 text = stringResource(R.string.export_confirm_message, teamName),
@@ -286,7 +283,7 @@ fun ExportSuccessSheet(
     counts: DataCounts,
     onDismiss: () -> Unit
 ) {
-    ModalBottomSheet(
+    DugoutBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
@@ -298,7 +295,7 @@ fun ExportSuccessSheet(
             Text(
                 text = stringResource(R.string.export_success_title),
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.sheetTitle
             )
             Text(
                 text = if (folderName != null) {
@@ -346,7 +343,7 @@ fun ImportConfirmSheet(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    ModalBottomSheet(
+    DugoutBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
@@ -358,12 +355,12 @@ fun ImportConfirmSheet(
             Text(
                 text = stringResource(R.string.import_confirm_title),
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.sheetTitle
             )
             Text(
                 text = fileName,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.sheetSubtitle,
                 fontFamily = FontFamily.Monospace,
                 modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
             )
@@ -410,7 +407,7 @@ private fun ImportConfirmSheetPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImportSuccessSheet(fileName: String, result: ImportResult, onDismiss: () -> Unit) {
-    ModalBottomSheet(
+    DugoutBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
@@ -422,12 +419,12 @@ fun ImportSuccessSheet(fileName: String, result: ImportResult, onDismiss: () -> 
             Text(
                 text = stringResource(R.string.import_success_title),
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.sheetTitle
             )
             Text(
                 text = fileName,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.sheetSubtitle,
                 fontFamily = FontFamily.Monospace,
                 modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
             )

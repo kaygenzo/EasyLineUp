@@ -34,7 +34,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -64,6 +63,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.DugoutBottomSheet
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutSearchField
 import com.telen.easylineup.compose.DugoutTheme
@@ -72,7 +72,12 @@ import com.telen.easylineup.compose.KeepInitialFocusOffTextFields
 import com.telen.easylineup.compose.FormLabel
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.SelectField
+import com.telen.easylineup.compose.buttonLabel
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.rowSubtitle
+import com.telen.easylineup.compose.rowTitle
+import com.telen.easylineup.compose.sheetSubtitle
+import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.FieldPosition
@@ -359,7 +364,7 @@ fun TournamentPickerSheet(
         }
     }
 
-    ModalBottomSheet(
+    DugoutBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
@@ -367,7 +372,7 @@ fun TournamentPickerSheet(
             Text(
                 text = stringResource(R.string.lineup_creation_tournament_sheet_title),
                 color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.sheetTitle,
                 modifier = Modifier.padding(horizontal = 18.dp, vertical = 4.dp)
             )
             Spacer(modifier = Modifier.height(14.dp))
@@ -436,14 +441,13 @@ private fun TournamentPickerRow(
             Text(
                 text = tournament.name,
                 color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.rowTitle
             )
             tournament.address?.let {
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.rowSubtitle,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -555,8 +559,7 @@ private fun CreateTournamentRow(onClick: () -> Unit) {
         Text(
             text = stringResource(R.string.lineup_creation_tournament_create_row),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.rowTitle
         )
     }
 }
@@ -580,7 +583,7 @@ fun RosterPickerSheet(
     onNumberChanged: ((Int, Int) -> Unit)? = null
 ) {
     // Fully expanded from the start, like EditLineupSheet: half-open, Done sat below the screen.
-    ModalBottomSheet(
+    DugoutBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surface
@@ -654,12 +657,12 @@ fun RosterPickerContent(
                 Text(
                     text = stringResource(R.string.form_lineup_creation_roster_label),
                     color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.sheetTitle
                 )
                 Text(
                     text = summary,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.sheetSubtitle
                 )
             }
             Text(
@@ -719,8 +722,7 @@ fun RosterPickerContent(
         ) {
             Text(
                 text = "${stringResource(R.string.lineup_creation_roster_done)} · $summary",
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.buttonLabel
             )
         }
     }
@@ -837,12 +839,12 @@ private fun RosterPickerRow(
                 text = player.name,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.rowTitle
             )
             Text(
                 text = if (positionLabel != null) "$positionLabel · $statusText" else statusText,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.rowSubtitle
             )
         }
     }
@@ -938,7 +940,7 @@ fun NewTournamentSheet(
     onDismiss: () -> Unit,
     onAddClick: () -> Unit
 ) {
-    ModalBottomSheet(
+    DugoutBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
@@ -956,14 +958,13 @@ fun NewTournamentSheet(
                 Text(
                     text = stringResource(R.string.lineup_creation_new_tournament_title),
                     color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.sheetTitle
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = stringResource(R.string.lineup_creation_new_tournament_subtitle),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    fontWeight = FontWeight.Normal,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.sheetSubtitle
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 

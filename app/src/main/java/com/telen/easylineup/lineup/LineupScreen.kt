@@ -35,13 +35,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.telen.easylineup.R
-import com.telen.easylineup.compose.AdaptiveScale
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderIconChip
 import com.telen.easylineup.compose.ModeBadge
 import com.telen.easylineup.compose.NARROW_BUTTON_PADDING
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.buttonLabel
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
@@ -70,9 +70,6 @@ internal object LineupTestTags {
  * as the legacy screen had them: no tabbar then, and the header shows the lineup's name. In
  * edit mode the Save button moves up into the header too (the close icon already cancels), so a
  * 360 dp tall landscape phone doesn't lose another bar's height under the two screens.
- *
- * Everything on it scales to the screen ([AdaptiveScale]): bigger on a tablet, a little smaller
- * on a small phone.
  */
 @Composable
 fun LineupScreen(
@@ -144,23 +141,21 @@ fun LineupScreen(
         )
     }
 
-    AdaptiveScale {
-        LineupLayout(
-            lineupName = lineupName,
-            editable = editable,
-            selectedTab = selectedTab,
-            onTabSelected = onTabSelected,
-            onBackClick = onBackClick,
-            onCancelClick = onCancelClick,
-            onSaveClick = onSaveClick,
-            onShareLineup = onShareLineup,
-            onDeleteClick = onDeleteClick,
-            onEditClick = onEditClick,
-            onEditRosterClick = onEditRosterClick,
-            defense = defense,
-            attack = attack
-        )
-    }
+    LineupLayout(
+        lineupName = lineupName,
+        editable = editable,
+        selectedTab = selectedTab,
+        onTabSelected = onTabSelected,
+        onBackClick = onBackClick,
+        onCancelClick = onCancelClick,
+        onSaveClick = onSaveClick,
+        onShareLineup = onShareLineup,
+        onDeleteClick = onDeleteClick,
+        onEditClick = onEditClick,
+        onEditRosterClick = onEditRosterClick,
+        defense = defense,
+        attack = attack
+    )
 }
 
 /** [LineupScreen]'s layout: tabs in portrait, [defense] and [attack] side by side otherwise. */
@@ -423,8 +418,8 @@ private fun LineupFormBar(
                 contentPadding = NARROW_BUTTON_PADDING
             ) {
                 Text(
+                    style = MaterialTheme.typography.buttonLabel,
                     text = stringResource(R.string.cancel_button),
-                    fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -435,8 +430,8 @@ private fun LineupFormBar(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
+                    style = MaterialTheme.typography.buttonLabel,
                     text = stringResource(R.string.action_save_lineup),
-                    fontWeight = FontWeight.Bold
                 )
             }
         }

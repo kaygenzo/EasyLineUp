@@ -47,6 +47,7 @@ import com.telen.easylineup.compose.AvatarPicker
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.buttonLabel
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Sex
@@ -568,7 +569,10 @@ private fun FormBar(onSaveClick: () -> Unit) {
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(text = stringResource(R.string.save_button), fontWeight = FontWeight.Bold)
+                Text(
+                    text = stringResource(R.string.save_button),
+                    style = MaterialTheme.typography.buttonLabel
+                )
             }
         }
     }

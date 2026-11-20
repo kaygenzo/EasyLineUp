@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SheetValue
@@ -27,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
+import com.telen.easylineup.compose.DugoutBottomSheet
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.FormBar
@@ -34,6 +34,8 @@ import com.telen.easylineup.compose.FormLabel
 import com.telen.easylineup.compose.HeaderIconChip
 import com.telen.easylineup.compose.KeepInitialFocusOffTextFields
 import com.telen.easylineup.compose.SelectField
+import com.telen.easylineup.compose.sheetSubtitle
+import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.domain.model.Player
 import com.telen.easylineup.domain.model.RosterPlayerStatus
 import com.telen.easylineup.domain.model.TeamRosterSummary
@@ -82,7 +84,7 @@ fun EditLineupSheet(
             }
         }
     )
-    ModalBottomSheet(
+    DugoutBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface
@@ -175,13 +177,13 @@ private fun EditLineupFieldsContent(
             Text(
                 text = stringResource(R.string.edit_lineup_title),
                 color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.sheetTitle
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = selectedTournament?.name.orEmpty(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.sheetSubtitle
             )
             Spacer(modifier = Modifier.height(16.dp))
 

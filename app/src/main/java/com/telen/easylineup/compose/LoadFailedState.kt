@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
@@ -55,7 +54,7 @@ fun LoadFailedState(onRetry: () -> Unit) {
         Text(
             text = stringResource(R.string.load_failed_title),
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.emptyStateTitle,
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -69,8 +68,7 @@ fun LoadFailedState(onRetry: () -> Unit) {
         Button(onClick = onRetry, shape = RoundedCornerShape(12.dp)) {
             Text(
                 text = stringResource(R.string.load_failed_retry),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.buttonLabel
             )
         }
     }

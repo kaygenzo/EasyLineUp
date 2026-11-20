@@ -55,6 +55,9 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.emptyStateTitle
+import com.telen.easylineup.compose.rowSubtitle
+import com.telen.easylineup.compose.rowTitle
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.GeoLocation
 import com.telen.easylineup.domain.model.Lineup
@@ -174,7 +177,7 @@ private fun TournamentsEmptyState(isSearching: Boolean) {
                 }
             ),
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.emptyStateTitle
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
@@ -238,7 +241,7 @@ private fun TournamentTicketCard(
                     Text(
                         text = item.tournament.name,
                         color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.rowTitle,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
@@ -496,8 +499,7 @@ private fun LineupRow(
             Text(
                 text = lineup.name,
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.rowTitle,
             )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -508,7 +510,7 @@ private fun LineupRow(
                 Text(
                     text = formatLocalizedDate(eventDate, DATE_SKELETON_DAY_MONTH),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.rowSubtitle
                 )
                 val context = LocalContext.current
                 val strategyLabel = teamType.getStrategiesDisplayName(context)?.let { array ->

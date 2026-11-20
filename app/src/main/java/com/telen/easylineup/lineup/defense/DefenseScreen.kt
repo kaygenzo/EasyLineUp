@@ -66,6 +66,8 @@ import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ModeBadge
+import com.telen.easylineup.compose.rowSubtitle
+import com.telen.easylineup.compose.rowTitle
 import com.telen.easylineup.domain.Constants
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.FieldPositionCoordinate
@@ -328,8 +330,7 @@ private fun DhToggleRow(
                 text = stringResource(
                     if (isSoftball) R.string.action_add_dp_flex else R.string.action_add_dh
                 ),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.rowTitle,
                 color = MaterialTheme.colorScheme.onBackground
             )
             if (showDescription) {
@@ -341,7 +342,7 @@ private fun DhToggleRow(
                             R.string.defense_dh_toggle_sub_baseball
                         }
                     ),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.rowSubtitle,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
             }
@@ -399,8 +400,7 @@ private fun DpDhSlotRow(
             if (dpPlayer != null) {
                 Text(
                     text = dpPlayer.playerName,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.rowTitle,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 val flexPosition = flexPlayer?.let {
@@ -426,8 +426,7 @@ private fun DpDhSlotRow(
             } else {
                 Text(
                     text = badgeLabel,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.rowTitle,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(

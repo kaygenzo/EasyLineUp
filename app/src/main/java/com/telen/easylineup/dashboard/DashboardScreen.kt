@@ -29,7 +29,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -51,9 +50,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutAvatar
+import com.telen.easylineup.compose.DugoutBottomSheet
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.heroTitle
+import com.telen.easylineup.compose.sheetSubtitle
+import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.TeamType
@@ -178,7 +181,7 @@ private fun TeamSwitchHeader(teamName: String, teamImageUri: Uri?, onClick: () -
         Text(
             text = teamName,
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.heroTitle,
             maxLines = 1
         )
         Icon(
@@ -240,7 +243,7 @@ private fun HeroLastLineupCard(lastLineup: LastLineupUi?, onClick: (Long) -> Uni
         Text(
             text = lastLineup.name,
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.heroTitle
         )
         if (subtitle.isNotEmpty()) {
             Spacer(modifier = Modifier.height(2.dp))
@@ -459,7 +462,7 @@ fun ShirtNumberHistorySheet(history: List<ShirtNumberEntry>, onDismiss: () -> Un
     val distinctPlayerCount = history.map { it.playerId }.distinct().size
     val number = history.firstOrNull()?.number?.toString()?.padStart(2, '0').orEmpty()
 
-    ModalBottomSheet(
+    DugoutBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
@@ -471,7 +474,7 @@ fun ShirtNumberHistorySheet(history: List<ShirtNumberEntry>, onDismiss: () -> Un
             Text(
                 text = stringResource(R.string.shirt_number_history_title, number),
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.sheetTitle
             )
             Text(
                 text = pluralStringResource(
@@ -484,7 +487,7 @@ fun ShirtNumberHistorySheet(history: List<ShirtNumberEntry>, onDismiss: () -> Un
                     history.size
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.sheetSubtitle,
                 modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
             )
             history.forEachIndexed { index, entry ->
