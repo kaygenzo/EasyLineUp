@@ -44,10 +44,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutBottomSheet
@@ -55,7 +53,11 @@ import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.NARROW_BUTTON_PADDING
 import com.telen.easylineup.compose.buttonLabel
+import com.telen.easylineup.compose.chipLabel
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.footnote
+import com.telen.easylineup.compose.message
+import com.telen.easylineup.compose.rowGlyph
 import com.telen.easylineup.compose.rowTitle
 import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.compose.uppercaseLocalized
@@ -175,7 +177,7 @@ fun DpFlexLinkSheet(
                     )
                     Text(
                         text = stringResource(R.string.link_dp_flex_locked_footnote),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.footnote,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                         modifier = Modifier.padding(top = 10.dp)
                     )
@@ -183,7 +185,7 @@ fun DpFlexLinkSheet(
             } else if (selectablePlayers.isEmpty()) {
                 Text(
                     text = stringResource(R.string.players_list_empty),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.message,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
@@ -213,7 +215,7 @@ fun DpFlexLinkSheet(
                             Text(
                                 text = player.name,
                                 color = MaterialTheme.colorScheme.onBackground,
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.rowTitle
                             )
                         }
                     }
@@ -334,13 +336,11 @@ private fun DpFlexSlotRow(
             }
         }
         Column(modifier = Modifier.weight(1f)) {
-            // Mockup's `.dp-flex-slot__role` is `text-transform: uppercase; letter-spacing: .06em`.
+            // Mockup's `.dp-flex-slot__role` is uppercase.
             Text(
                 text = role.uppercaseLocalized(),
                 color = gold,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.labelLarge,
-                letterSpacing = 0.06.em
+                style = MaterialTheme.typography.chipLabel
             )
             Text(
                 text = player?.name ?: stringResource(R.string.defense_dh_slot_unassigned),
@@ -359,7 +359,7 @@ private fun DpFlexSlotRow(
             // Mockup's `.select-field__chev` is a plain "›" glyph, not an icon.
             Text(
                 text = "›",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.rowGlyph,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

@@ -56,8 +56,6 @@ import androidx.compose.ui.res.integerArrayResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -73,9 +71,18 @@ import com.telen.easylineup.compose.FormLabel
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.SelectField
 import com.telen.easylineup.compose.buttonLabel
+import com.telen.easylineup.compose.chipLabel
+import com.telen.easylineup.compose.compactDateDay
+import com.telen.easylineup.compose.compactDateMonth
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.fieldPlaceholder
+import com.telen.easylineup.compose.fieldSupport
+import com.telen.easylineup.compose.fieldText
+import com.telen.easylineup.compose.jerseyNumber
+import com.telen.easylineup.compose.rowGlyph
 import com.telen.easylineup.compose.rowSubtitle
 import com.telen.easylineup.compose.rowTitle
+import com.telen.easylineup.compose.segmentLabel
 import com.telen.easylineup.compose.sheetSubtitle
 import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.compose.uppercaseLocalized
@@ -168,13 +175,18 @@ fun LineupCreationScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 64.dp),
-                placeholder = { Text(stringResource(R.string.lineup_creation_name_placeholder)) },
+                placeholder = {
+                    Text(
+                        stringResource(R.string.lineup_creation_name_placeholder),
+                        style = MaterialTheme.typography.fieldPlaceholder
+                    )
+                },
                 singleLine = true,
                 isError = state.nameError,
                 supportingText = nameErrorText?.let {
-                    { Text(it, style = MaterialTheme.typography.bodySmall) }
+                    { Text(it, style = MaterialTheme.typography.fieldSupport) }
                 },
-                textStyle = MaterialTheme.typography.bodyLarge,
+                textStyle = MaterialTheme.typography.fieldText,
                 shape = RoundedCornerShape(10.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -316,9 +328,7 @@ private fun SegmentOption(
         Text(
             text = text,
             color = contentColor,
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
+            style = MaterialTheme.typography.segmentLabel,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
@@ -489,13 +499,12 @@ private fun MiniDateChip(startMillis: Long) {
         Text(
             text = day,
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.ExtraBold
+            style = MaterialTheme.typography.compactDateDay,
         )
         Text(
             text = month,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.compactDateMonth
         )
     }
 }
@@ -519,8 +528,7 @@ private fun SelectedPill() {
         Text(
             text = stringResource(R.string.lineup_creation_tournament_selected_pill),
             color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.chipLabel
         )
     }
 }
@@ -553,7 +561,7 @@ private fun CreateTournamentRow(onClick: () -> Unit) {
             Text(
                 text = "+",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.rowGlyph
             )
         }
         Text(
@@ -668,8 +676,7 @@ fun RosterPickerContent(
             Text(
                 text = stringResource(R.string.lineup_creation_roster_clear_all),
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.labelLarge,
+                style = MaterialTheme.typography.buttonLabel,
                 modifier = Modifier.clickable(onClick = onClearAll)
             )
         }
@@ -815,10 +822,8 @@ private fun RosterPickerRow(
                     },
                     modifier = Modifier.width(28.dp),
                     singleLine = true,
-                    textStyle = MaterialTheme.typography.titleSmall.copy(
+                    textStyle = MaterialTheme.typography.jerseyNumber.copy(
                         color = numberTint,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace,
                         textAlign = TextAlign.Center
                     ),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -828,9 +833,7 @@ private fun RosterPickerRow(
                 Text(
                     text = "%02d".format(player.shirtNumber),
                     color = numberTint,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace,
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.jerseyNumber
                 )
             }
         }
@@ -838,7 +841,6 @@ private fun RosterPickerRow(
             Text(
                 text = player.name,
                 color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.rowTitle
             )
             Text(
@@ -981,15 +983,18 @@ fun NewTournamentSheet(
                         .heightIn(min = 64.dp),
                     placeholder = {
                         Text(
-                            stringResource(R.string.lineup_creation_new_tournament_name_placeholder)
+                            stringResource(
+                                R.string.lineup_creation_new_tournament_name_placeholder
+                            ),
+                            style = MaterialTheme.typography.fieldPlaceholder
                         )
                     },
                     singleLine = true,
                     isError = nameErrorText != null,
                     supportingText = nameErrorText?.let {
-                        { Text(it, style = MaterialTheme.typography.bodySmall) }
+                        { Text(it, style = MaterialTheme.typography.fieldSupport) }
                     },
-                    textStyle = MaterialTheme.typography.bodyLarge,
+                    textStyle = MaterialTheme.typography.fieldText,
                     shape = RoundedCornerShape(10.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -1041,11 +1046,12 @@ fun NewTournamentSheet(
                         Text(
                             stringResource(
                                 R.string.lineup_creation_new_tournament_location_placeholder
-                            )
+                            ),
+                            style = MaterialTheme.typography.fieldPlaceholder
                         )
                     },
                     singleLine = true,
-                    textStyle = MaterialTheme.typography.bodyLarge,
+                    textStyle = MaterialTheme.typography.fieldText,
                     shape = RoundedCornerShape(10.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedContainerColor = MaterialTheme.colorScheme.surface,

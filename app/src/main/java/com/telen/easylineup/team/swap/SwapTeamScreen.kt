@@ -35,7 +35,9 @@ import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutBottomSheet
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.chipLabel
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.message
 import com.telen.easylineup.compose.rowSubtitle
 import com.telen.easylineup.compose.rowTitle
 import com.telen.easylineup.compose.sheetSubtitle
@@ -114,7 +116,7 @@ fun SwitchTeamSheetContent(
             Text(
                 text = stringResource(R.string.team_list_empty_text),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.message,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
         } else {
@@ -197,7 +199,7 @@ private fun CurrentPill() {
         Text(
             text = stringResource(R.string.switch_team_sheet_current).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.chipLabel
         )
     }
 }

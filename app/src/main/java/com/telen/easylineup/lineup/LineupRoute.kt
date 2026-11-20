@@ -8,6 +8,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,6 +26,8 @@ import androidx.navigation.NavController
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.ConfirmSheet
 import com.telen.easylineup.compose.LoadFailedState
+import com.telen.easylineup.compose.buttonLabel
+import com.telen.easylineup.compose.message
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.domain.model.toPlayer
@@ -234,10 +237,13 @@ fun LineupRoute(
         }
         AlertDialog(
             onDismissRequest = viewModel::onInfoMessageDismiss,
-            text = { Text(stringResource(messageRes)) },
+            text = { Text(stringResource(messageRes), style = MaterialTheme.typography.message) },
             confirmButton = {
                 TextButton(onClick = viewModel::onInfoMessageDismiss) {
-                    Text(stringResource(android.R.string.ok))
+                    Text(
+                        stringResource(android.R.string.ok),
+                        style = MaterialTheme.typography.buttonLabel
+                    )
                 }
             }
         )

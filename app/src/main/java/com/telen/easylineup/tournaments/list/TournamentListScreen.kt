@@ -45,7 +45,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutCard
@@ -54,8 +53,13 @@ import com.telen.easylineup.compose.DugoutSearchField
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.buttonLabel
+import com.telen.easylineup.compose.chipLabel
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.dateDay
+import com.telen.easylineup.compose.dateMonth
 import com.telen.easylineup.compose.emptyStateTitle
+import com.telen.easylineup.compose.message
 import com.telen.easylineup.compose.rowSubtitle
 import com.telen.easylineup.compose.rowTitle
 import com.telen.easylineup.compose.uppercaseLocalized
@@ -189,7 +193,7 @@ private fun TournamentsEmptyState(isSearching: Boolean) {
                 }
             ),
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.message
         )
     }
 }
@@ -241,8 +245,7 @@ private fun TournamentTicketCard(
                     Text(
                         text = item.tournament.name,
                         color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.rowTitle,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.rowTitle
                     )
                     Text(
                         text = pluralStringResource(
@@ -251,7 +254,7 @@ private fun TournamentTicketCard(
                             item.lineups.size
                         ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.rowSubtitle
                     )
                     item.tournament.address?.let { address ->
                         Row(
@@ -272,8 +275,7 @@ private fun TournamentTicketCard(
                             Text(
                                 text = address,
                                 color = MaterialTheme.colorScheme.primary,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold
+                                style = MaterialTheme.typography.rowSubtitle,
                             )
                         }
                     }
@@ -337,7 +339,7 @@ private fun TournamentTicketCard(
                             item.lineups.size - 2
                         ),
                         color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.titleSmall
+                        style = MaterialTheme.typography.buttonLabel
                     )
                     Icon(
                         painter = painterResource(R.drawable.ic_chevron_down_24dp),
@@ -453,19 +455,18 @@ private fun TicketDateChip(startMillis: Long?) {
             Text(
                 text = day,
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.ExtraBold
+                style = MaterialTheme.typography.dateDay,
             )
             Text(
                 text = month,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.dateMonth
             )
         } else {
             Text(
                 text = "—",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.dateDay
             )
         }
     }
@@ -567,7 +568,7 @@ private fun LineupBadge(text: String) {
         Text(
             text = text,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.chipLabel
         )
     }
 }

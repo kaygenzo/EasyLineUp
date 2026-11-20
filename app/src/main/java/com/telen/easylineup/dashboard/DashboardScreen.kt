@@ -41,9 +41,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -53,10 +50,22 @@ import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutBottomSheet
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.chipLabel
 import com.telen.easylineup.compose.dashedBorder
+import com.telen.easylineup.compose.footnote
+import com.telen.easylineup.compose.heroSubtitle
 import com.telen.easylineup.compose.heroTitle
+import com.telen.easylineup.compose.jerseyNumber
+import com.telen.easylineup.compose.message
+import com.telen.easylineup.compose.numberInput
+import com.telen.easylineup.compose.rowMeta
+import com.telen.easylineup.compose.rowSubtitle
+import com.telen.easylineup.compose.rowTitle
+import com.telen.easylineup.compose.sectionLabel
 import com.telen.easylineup.compose.sheetSubtitle
 import com.telen.easylineup.compose.sheetTitle
+import com.telen.easylineup.compose.statLabel
+import com.telen.easylineup.compose.tileValue
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.ShirtNumberEntry
 import com.telen.easylineup.domain.model.TeamType
@@ -218,7 +227,7 @@ private fun HeroLastLineupCard(lastLineup: LastLineupUi?, onClick: (Long) -> Uni
             Text(
                 text = stringResource(R.string.dashboard_hero_empty_title),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.message
             )
         }
         return
@@ -237,7 +246,7 @@ private fun HeroLastLineupCard(lastLineup: LastLineupUi?, onClick: (Long) -> Uni
         Text(
             text = stringResource(R.string.tile_last_lineup_header).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.sectionLabel
         )
         Spacer(modifier = Modifier.height(6.dp))
         Text(
@@ -250,7 +259,7 @@ private fun HeroLastLineupCard(lastLineup: LastLineupUi?, onClick: (Long) -> Uni
             Text(
                 text = subtitle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.heroSubtitle
             )
         }
     }
@@ -302,21 +311,20 @@ private fun MiniStatCell(
         Text(
             text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.statLabel
         )
         Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = value,
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.displaySmall,
-            fontFamily = FontFamily.Monospace
+            style = MaterialTheme.typography.tileValue,
         )
         if (footer != null) {
             Spacer(modifier = Modifier.height(3.dp))
             Text(
                 text = footer,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.footnote,
                 maxLines = 1
             )
         }
@@ -363,15 +371,14 @@ private fun ShirtNumberLookupRow(
             Text(
                 text = stringResource(R.string.dashboard_lookup_hint).uppercaseLocalized(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.sectionLabel
             )
             if (result != null) {
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = result,
                     color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.rowTitle,
                     maxLines = 1
                 )
             }
@@ -430,11 +437,8 @@ private fun ShirtNumberInputBox(
             value = query,
             onValueChange = onQueryChanged,
             singleLine = true,
-            textStyle = TextStyle(
+            textStyle = MaterialTheme.typography.numberInput.copy(
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace,
-                fontSize = MaterialTheme.typography.titleMedium.fontSize,
                 textAlign = TextAlign.Center
             ),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
@@ -500,7 +504,7 @@ fun ShirtNumberHistorySheet(history: List<ShirtNumberEntry>, onDismiss: () -> Un
             Text(
                 text = stringResource(R.string.shirt_number_history_footnote),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.footnote,
                 modifier = Modifier.padding(top = 10.dp, bottom = 18.dp)
             )
         }
@@ -571,22 +575,19 @@ private fun ShirtNumberHistoryRow(
                     } else {
                         MaterialTheme.colorScheme.onSurfaceVariant
                     },
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.jerseyNumber
                 )
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = entry.playerName,
                     color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.rowTitle,
                 )
                 Text(
                     text = entry.lineupName,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.rowSubtitle
                 )
             }
             if (isCurrent) {
@@ -596,8 +597,7 @@ private fun ShirtNumberHistoryRow(
                 Text(
                     text = DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(dateInMillis)),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontFamily = FontFamily.Monospace
+                    style = MaterialTheme.typography.rowMeta,
                 )
             }
         }
@@ -638,7 +638,7 @@ private fun CurrentPill() {
         Text(
             text = stringResource(R.string.switch_team_sheet_current).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.chipLabel
         )
     }
 }

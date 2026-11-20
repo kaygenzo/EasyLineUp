@@ -37,16 +37,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.AvatarPicker
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.buttonLabel
+import com.telen.easylineup.compose.chipLabel
+import com.telen.easylineup.compose.emojiIcon
+import com.telen.easylineup.compose.fieldLabel
+import com.telen.easylineup.compose.fieldSupport
+import com.telen.easylineup.compose.fieldText
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
@@ -150,12 +153,12 @@ private fun NameField(name: String, error: String?, onNameChanged: (String) -> U
             Text(
                 text = stringResource(R.string.team_form_name_label).uppercaseLocalized(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.fieldLabel
             )
             Text(
                 text = "*",
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.fieldLabel,
                 modifier = Modifier.padding(start = 2.dp)
             )
         }
@@ -164,10 +167,14 @@ private fun NameField(name: String, error: String?, onNameChanged: (String) -> U
             value = name,
             onValueChange = onNameChanged,
             modifier = Modifier.fillMaxWidth(),
-            textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+            textStyle = MaterialTheme.typography.fieldText,
             singleLine = true,
             isError = error != null,
-            supportingText = error?.let { { Text(it) } },
+            supportingText = error?.let {
+                {
+                    Text(it, style = MaterialTheme.typography.fieldSupport)
+                }
+            },
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -191,7 +198,7 @@ private fun TypeField(selectedType: TeamType, onTypeSelected: (TeamType) -> Unit
         Text(
             text = stringResource(R.string.team_form_type_label).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.fieldLabel
         )
         Spacer(modifier = Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -243,7 +250,7 @@ private fun TypeCard(
     ) {
         Text(
             text = type.emoji(),
-            fontSize = 20.sp,
+            style = MaterialTheme.typography.emojiIcon,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
@@ -251,7 +258,7 @@ private fun TypeCard(
         Text(
             text = stringResource(type.titleRes()).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.chipLabel
         )
     }
 }

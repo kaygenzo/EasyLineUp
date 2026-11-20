@@ -43,7 +43,10 @@ import com.telen.easylineup.compose.PlayerPhotoTile
 import com.telen.easylineup.compose.PositionUsageChart
 import com.telen.easylineup.compose.PositionUsageEmptyState
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.chipLabel
+import com.telen.easylineup.compose.heroSubtitle
 import com.telen.easylineup.compose.heroTitle
+import com.telen.easylineup.compose.sectionLabel
 import com.telen.easylineup.compose.shortLabel
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.FieldPosition
@@ -153,7 +156,7 @@ fun PlayerProfileScreen(
                         R.string.player_profile_position_usage_label
                     ).uppercaseLocalized(),
                     color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.sectionLabel
                 )
                 if (strategyOptions.size > 1) {
                     Spacer(modifier = Modifier.height(10.dp))
@@ -224,7 +227,7 @@ private fun ProfileHeader(state: PlayerProfileState) {
                 Text(
                     text = subtitle,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.heroSubtitle,
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }
@@ -336,7 +339,7 @@ private fun StrategyPill(text: String, selected: Boolean, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
-        Text(text = text, color = contentColor, style = MaterialTheme.typography.labelSmall)
+        Text(text = text, color = contentColor, style = MaterialTheme.typography.chipLabel)
     }
 }
 

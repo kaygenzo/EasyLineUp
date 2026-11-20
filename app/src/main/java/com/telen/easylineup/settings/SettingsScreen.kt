@@ -40,7 +40,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
@@ -51,8 +50,13 @@ import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.buttonLabel
+import com.telen.easylineup.compose.dialogTitle
+import com.telen.easylineup.compose.message
+import com.telen.easylineup.compose.rowMeta
 import com.telen.easylineup.compose.rowSubtitle
 import com.telen.easylineup.compose.rowTitle
+import com.telen.easylineup.compose.sectionLabel
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
@@ -191,8 +195,8 @@ fun SettingsScreen(
                 trailing = {
                     Text(
                         text = BuildConfig.VERSION_NAME,
-                        fontFamily = FontFamily.Monospace,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.rowMeta
                     )
                 }
             )
@@ -264,7 +268,7 @@ private fun SingleChoiceDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(titleRes)) },
+        title = { Text(stringResource(titleRes), style = MaterialTheme.typography.dialogTitle) },
         text = {
             Column {
                 labels.forEachIndexed { index, label ->
@@ -280,14 +284,23 @@ private fun SingleChoiceDialog(
                             selected = value == currentValue,
                             onClick = { onSelected(value) }
                         )
-                        Text(text = label, modifier = Modifier.padding(start = 8.dp))
+                        Text(
+                            text = label,
+                            modifier = Modifier.padding(start = 8.dp),
+                            style = MaterialTheme.typography.message
+                        )
                     }
                 }
             }
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) }
+            TextButton(onClick = onDismiss) {
+                Text(
+                    stringResource(android.R.string.cancel),
+                    style = MaterialTheme.typography.buttonLabel
+                )
+            }
         }
     )
 }
@@ -312,7 +325,7 @@ private fun SectionLabel(text: String) {
     Text(
         text = text.uppercaseLocalized(),
         color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.labelMedium,
+        style = MaterialTheme.typography.sectionLabel,
         modifier = Modifier.padding(start = 4.dp, top = 16.dp, bottom = 8.dp)
     )
 }

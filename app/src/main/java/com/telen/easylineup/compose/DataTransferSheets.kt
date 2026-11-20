@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.domain.model.export.DataCounts
@@ -241,14 +240,14 @@ fun ExportConfirmSheet(
             Text(
                 text = stringResource(R.string.export_confirm_message, teamName),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.message,
                 modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
             )
             DataCountsGrid(counts)
             Text(
                 text = stringResource(R.string.export_confirm_footnote),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.footnote,
                 modifier = Modifier.padding(top = 10.dp, bottom = 18.dp)
             )
             SheetButtonRow(
@@ -304,7 +303,7 @@ fun ExportSuccessSheet(
                     stringResource(R.string.export_success_message_no_folder, fileName)
                 },
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.message,
                 modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
             )
             DataCountsGrid(counts)
@@ -360,8 +359,7 @@ fun ImportConfirmSheet(
             Text(
                 text = fileName,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.sheetSubtitle,
-                fontFamily = FontFamily.Monospace,
+                style = MaterialTheme.typography.fileName,
                 modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
             )
             DataCountsGrid(counts)
@@ -375,7 +373,7 @@ fun ImportConfirmSheet(
             Text(
                 text = stringResource(R.string.import_confirm_footnote),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.footnote,
                 modifier = Modifier.padding(top = 10.dp, bottom = 18.dp)
             )
             SheetButtonRow(
@@ -424,8 +422,7 @@ fun ImportSuccessSheet(fileName: String, result: ImportResult, onDismiss: () -> 
             Text(
                 text = fileName,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.sheetSubtitle,
-                fontFamily = FontFamily.Monospace,
+                style = MaterialTheme.typography.fileName,
                 modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
             )
             ImportResultGrid(result)

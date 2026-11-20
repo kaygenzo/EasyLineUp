@@ -46,8 +46,11 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.PlayerPhotoTile
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.chipLabel
 import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.compose.emptyStateTitle
+import com.telen.easylineup.compose.footnote
+import com.telen.easylineup.compose.message
 import com.telen.easylineup.compose.rowSubtitle
 import com.telen.easylineup.compose.rowTitle
 import com.telen.easylineup.compose.sheetSubtitle
@@ -230,7 +233,7 @@ private fun SortPill(text: String, selected: Boolean, onClick: () -> Unit) {
         Text(
             text = text.uppercaseLocalized(),
             color = contentColor,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.chipLabel
         )
     }
 }
@@ -326,7 +329,7 @@ private fun RosterEmptyState() {
         Text(
             text = stringResource(R.string.roster_empty_message),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.message
         )
     }
 }
@@ -409,7 +412,7 @@ fun MessageTeamSheet(
             Text(
                 text = stringResource(R.string.roster_message_footnote),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.footnote,
                 modifier = Modifier.padding(top = 10.dp, bottom = 24.dp)
             )
         }

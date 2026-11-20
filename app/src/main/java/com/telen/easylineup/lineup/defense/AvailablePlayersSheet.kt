@@ -30,12 +30,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutBottomSheet
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.chipLabel
+import com.telen.easylineup.compose.footnote
+import com.telen.easylineup.compose.rowSubtitle
+import com.telen.easylineup.compose.rowTitle
+import com.telen.easylineup.compose.sheetSubtitle
 import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Player
@@ -115,8 +119,7 @@ fun AvailablePlayersSheet(
                                 stringResource(R.string.defense_add_substitute_budget_none)
                             }
                         },
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.sheetSubtitle,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(top = 4.dp)
                     )
@@ -148,7 +151,7 @@ fun AvailablePlayersSheet(
                             Text(
                                 text = player.name,
                                 color = MaterialTheme.colorScheme.onBackground,
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.rowTitle
                             )
                             if (isSubstituteSheet) {
                                 val positionLabel = primaryPositionShortName(
@@ -162,7 +165,7 @@ fun AvailablePlayersSheet(
                                     text = positionLabel
                                         ?.let { stringResource(positionFormatRes, it) }
                                         ?: stringResource(benchLabelRes),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = MaterialTheme.typography.rowSubtitle,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -191,7 +194,7 @@ fun AvailablePlayersSheet(
                                     Text(
                                         text = positionShortNames[matchingPosition.ordinal],
                                         color = MaterialTheme.colorScheme.onPrimary,
-                                        style = MaterialTheme.typography.labelSmall
+                                        style = MaterialTheme.typography.chipLabel
                                     )
                                 }
                             }
@@ -203,7 +206,7 @@ fun AvailablePlayersSheet(
             if (isSubstituteSheet) {
                 Text(
                     text = stringResource(R.string.defense_add_substitute_footnote),
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.footnote,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp)
                 )
@@ -233,8 +236,7 @@ private fun CandidatePill(text: String, emphasized: Boolean) {
             } else {
                 MaterialTheme.colorScheme.onSurfaceVariant
             },
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.chipLabel
         )
     }
 }

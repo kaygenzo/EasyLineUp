@@ -37,7 +37,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -48,6 +47,11 @@ import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.buttonLabel
+import com.telen.easylineup.compose.chipLabel
+import com.telen.easylineup.compose.fieldLabel
+import com.telen.easylineup.compose.fieldPlaceholder
+import com.telen.easylineup.compose.fieldSupport
+import com.telen.easylineup.compose.fieldText
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Sex
@@ -227,7 +231,7 @@ private fun SexRow(selected: Sex, onSexSelected: (Sex) -> Unit) {
         Text(
             text = stringResource(R.string.create_player_sex).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.fieldLabel
         )
         Spacer(modifier = Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -269,7 +273,7 @@ private fun SideToggleRow(
         Text(
             text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.fieldLabel
         )
         Spacer(modifier = Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -331,7 +335,7 @@ private fun FormPill(text: String, selected: Boolean, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Text(text = text, color = contentColor, style = MaterialTheme.typography.labelSmall)
+        Text(text = text, color = contentColor, style = MaterialTheme.typography.chipLabel)
     }
 }
 
@@ -355,12 +359,12 @@ private fun RequiredField(
             Text(
                 text = label.uppercaseLocalized(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.fieldLabel
             )
             Text(
                 text = "*",
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.fieldLabel,
                 modifier = Modifier.padding(start = 2.dp)
             )
         }
@@ -369,10 +373,14 @@ private fun RequiredField(
             value = value,
             onValueChange = onValueChanged,
             modifier = Modifier.fillMaxWidth().testTag(PlayerFormTestTags.NAME_FIELD),
-            textStyle = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+            textStyle = MaterialTheme.typography.fieldText,
             singleLine = true,
             isError = error != null,
-            supportingText = error?.let { { Text(it) } },
+            supportingText = error?.let {
+                {
+                    Text(it, style = MaterialTheme.typography.fieldSupport)
+                }
+            },
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -409,18 +417,27 @@ private fun OptionalField(
         Text(
             text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.fieldLabel
         )
         Spacer(modifier = Modifier.height(6.dp))
         OutlinedTextField(
             value = value,
             onValueChange = onValueChanged,
             modifier = Modifier.fillMaxWidth(),
-            textStyle = MaterialTheme.typography.bodyLarge,
+            textStyle = MaterialTheme.typography.fieldText,
             singleLine = true,
             isError = error != null,
-            supportingText = error?.let { { Text(it) } },
-            placeholder = { Text(stringResource(R.string.generic_optional)) },
+            supportingText = error?.let {
+                {
+                    Text(it, style = MaterialTheme.typography.fieldSupport)
+                }
+            },
+            placeholder = {
+                Text(
+                    stringResource(R.string.generic_optional),
+                    style = MaterialTheme.typography.fieldPlaceholder
+                )
+            },
             keyboardOptions = KeyboardOptions(
                 capitalization = capitalization,
                 keyboardType = keyboardType
@@ -459,7 +476,7 @@ private fun FavoritePositions(
         Text(
             text = stringResource(R.string.create_player_favorite_positions).uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.fieldLabel
         )
         Spacer(modifier = Modifier.height(8.dp))
         // A grid of same-width Material 3 filter chips: as many columns as fit, every cell the
@@ -506,7 +523,8 @@ private fun PositionFilterChip(
                 text = label,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.chipLabel
             )
         },
         // Same selected look as the form's other pills (pitching/batting side), not M3's

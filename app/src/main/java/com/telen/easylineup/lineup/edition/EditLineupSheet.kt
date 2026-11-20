@@ -34,6 +34,10 @@ import com.telen.easylineup.compose.FormLabel
 import com.telen.easylineup.compose.HeaderIconChip
 import com.telen.easylineup.compose.KeepInitialFocusOffTextFields
 import com.telen.easylineup.compose.SelectField
+import com.telen.easylineup.compose.fieldPlaceholder
+import com.telen.easylineup.compose.fieldSupport
+import com.telen.easylineup.compose.fieldText
+import com.telen.easylineup.compose.footnote
 import com.telen.easylineup.compose.sheetSubtitle
 import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.domain.model.Player
@@ -198,13 +202,18 @@ private fun EditLineupFieldsContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 64.dp),
-                placeholder = { Text(stringResource(R.string.lineup_creation_name_placeholder)) },
+                placeholder = {
+                    Text(
+                        stringResource(R.string.lineup_creation_name_placeholder),
+                        style = MaterialTheme.typography.fieldPlaceholder
+                    )
+                },
                 singleLine = true,
                 isError = nameError != null,
                 supportingText = nameError?.let {
-                    { Text(it, style = MaterialTheme.typography.bodySmall) }
+                    { Text(it, style = MaterialTheme.typography.fieldSupport) }
                 },
-                textStyle = MaterialTheme.typography.bodyLarge,
+                textStyle = MaterialTheme.typography.fieldText,
                 shape = RoundedCornerShape(10.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -244,7 +253,7 @@ private fun EditLineupFieldsContent(
             Text(
                 text = stringResource(R.string.edit_lineup_footnote),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.footnote
             )
             Spacer(modifier = Modifier.height(16.dp))
         }

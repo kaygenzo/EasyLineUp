@@ -61,7 +61,7 @@ fun LoadFailedState(onRetry: () -> Unit) {
         Text(
             text = stringResource(R.string.load_failed_message),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.message,
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(20.dp))

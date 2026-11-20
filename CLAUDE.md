@@ -116,13 +116,15 @@ field to express.
 
 ## Text sizes come from text roles, scaled once for the whole app
 
-A text's style names the role it plays, not a size: `MaterialTheme.typography.rowTitle`,
-`sheetTitle`, `heroTitle`, `emptyStateTitle`, `buttonLabel`, `statValue`, ...
-(`compose/DugoutTextStyles.kt`), so the same kind of text has the same size on every screen.
-Screens had drifted apart picking sizes on their own (a player's name in a list from 14 to
-18 sp, a sheet's title from 18 to 22 sp depending on the screen). A new kind of text gets a new
-role there, not a raw `titleMedium`/`bodyLarge` or a `fontSize` literal at the call site; the
-slots of `DugoutTypography` are what the roles point to.
+Every text's style is a role (`compose/DugoutTextStyles.kt`): `MaterialTheme.typography.rowTitle`,
+`sheetTitle`, `fieldLabel`, `chipLabel`, `jerseyNumber`, `footnote`, ... - about forty, one per
+kind of text, so the same kind of text has the same size, weight and font on every screen.
+Screens had drifted apart picking their own (a player's name in a list from 14 to 18 sp, a form
+field's label from 11 to 14 sp, a jersey number from 14 to 18 sp depending on the screen). No
+call site uses a raw slot (`titleMedium`, `bodySmall`...), a `fontSize`, a `fontWeight`, a
+`fontFamily`, a `letterSpacing` or a `lineHeight` of its own, and no `Text` is left on the
+default style: a new kind of text gets a new role there. Only color, alignment and `maxLines`
+stay at the call site.
 
 Sizes then follow the screen once, for the whole app: `DugoutTheme` wraps everything in
 `AdaptiveScale` (88 % at 360 dp, 100 % at 411 dp, up to 130 % on a tablet). A bottom sheet is a

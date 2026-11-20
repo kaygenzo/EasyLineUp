@@ -70,12 +70,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.imageLoader
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
@@ -172,7 +169,8 @@ fun DugoutSearchField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier.fillMaxWidth(),
-        placeholder = { Text(placeholder) },
+        textStyle = MaterialTheme.typography.fieldText,
+        placeholder = { Text(placeholder, style = MaterialTheme.typography.fieldPlaceholder) },
         leadingIcon = {
             Icon(
                 painter = painterResource(R.drawable.ic_baseline_search_24),
@@ -232,8 +230,7 @@ fun DugoutAvatar(name: String, imageUri: Uri?, size: Dp) {
             Text(
                 text = name.avatarInitials(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = (size.value * 0.33f).sp
+                style = MaterialTheme.typography.avatarInitials(size)
             )
         }
     }
@@ -358,9 +355,7 @@ fun PlayerPhotoTile(imageUri: Uri?, shirtNumber: Int, size: Dp) {
             Text(
                 text = shirtNumber.toString().padStart(2, '0'),
                 color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.ExtraBold,
-                fontFamily = FontFamily.Monospace,
-                fontSize = (badgeSize.value * 0.43f).sp
+                style = MaterialTheme.typography.badgeNumber(badgeSize)
             )
         }
     }
@@ -398,7 +393,7 @@ fun ModeBadge(label: String, modifier: Modifier = Modifier) {
         Text(
             text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.chipLabel
         )
     }
 }
@@ -433,19 +428,17 @@ fun InfoCell(modifier: Modifier = Modifier, label: String, value: String, tabula
         Text(
             text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.statLabel
         )
         Spacer(modifier = Modifier.height(3.dp))
         Text(
             text = value,
             color = MaterialTheme.colorScheme.onBackground,
             style = if (tabular) {
-                MaterialTheme.typography.bodyLarge
+                MaterialTheme.typography.infoNumber
             } else {
-                MaterialTheme.typography.bodyMedium
-            },
-            fontWeight = FontWeight.Bold,
-            fontFamily = if (tabular) FontFamily.Monospace else FontFamily.Default
+                MaterialTheme.typography.infoValue
+            }
         )
     }
 }
@@ -483,7 +476,7 @@ fun StatChip(
         Text(
             text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.statLabel,
             modifier = Modifier.padding(top = 2.dp)
         )
     }
@@ -547,8 +540,7 @@ fun PositionUsageChart(
                             Text(
                                 text = count.toString(),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontFamily = FontFamily.Monospace,
-                                style = MaterialTheme.typography.labelSmall
+                                style = MaterialTheme.typography.chartLabel
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                         }
@@ -571,7 +563,7 @@ fun PositionUsageChart(
                 Text(
                     text = positionNames.getOrNull(position.id) ?: "",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.chartLabel
                 )
             }
         }
@@ -620,7 +612,7 @@ fun PositionUsageEmptyState(
         Text(
             text = message,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.message
         )
     }
 }
@@ -781,7 +773,7 @@ fun ScreenHeader(
                 Text(
                     text = eyebrow.uppercaseLocalized(),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.eyebrow
                 )
             }
             // One line, shrunk to fit: a long translation would otherwise break mid-word next
@@ -793,7 +785,7 @@ fun ScreenHeader(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 autoSize = TextAutoSize.StepBased(
-                    minFontSize = HEADER_TITLE_MIN_FONT_SIZE,
+                    minFontSize = SCREEN_TITLE_MIN_FONT_SIZE,
                     maxFontSize = titleStyle.fontSize
                 )
             )
@@ -918,7 +910,7 @@ fun ConfirmSheet(
             Text(
                 text = message,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.message,
                 modifier = Modifier.padding(top = 8.dp, bottom = 22.dp)
             )
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -974,10 +966,15 @@ fun ErrorDialog(title: String, message: String, onDismiss: () -> Unit) {
                 tint = MaterialTheme.colorScheme.error
             )
         },
-        title = { Text(title) },
-        text = { Text(message) },
+        title = { Text(title, style = MaterialTheme.typography.dialogTitle) },
+        text = { Text(message, style = MaterialTheme.typography.message) },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.ok)) }
+            TextButton(onClick = onDismiss) {
+                Text(
+                    stringResource(android.R.string.ok),
+                    style = MaterialTheme.typography.buttonLabel
+                )
+            }
         }
     )
 }
@@ -1050,7 +1047,7 @@ fun DugoutBottomNav(selected: BottomNavTab?, onSelect: (BottomNavTab) -> Unit) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = stringResource(tab.labelRes).uppercaseLocalized(),
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.tabLabel,
                     color = tint
                 )
             }
@@ -1078,15 +1075,13 @@ fun FormLabel(text: String, required: Boolean = false) {
         Text(
             text = text.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.fieldLabel,
         )
         if (required) {
             Text(
                 text = " *",
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.fieldLabel,
             )
         }
     }
@@ -1143,14 +1138,17 @@ fun SelectField(
                     } else {
                         MaterialTheme.colorScheme.onSurfaceVariant
                     },
-                    fontWeight = if (value != null) FontWeight.Bold else FontWeight.Normal,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = if (value != null) {
+                        MaterialTheme.typography.fieldText
+                    } else {
+                        MaterialTheme.typography.fieldPlaceholder
+                    }
                 )
                 subLabel?.let {
                     Text(
                         text = it,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.fieldSupport
                     )
                 }
             }
@@ -1167,7 +1165,7 @@ fun SelectField(
             Text(
                 text = errorText,
                 color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.fieldSupport,
                 modifier = Modifier.padding(top = 4.dp)
             )
         }
@@ -1194,7 +1192,6 @@ private fun SelectFieldPreview() {
  * little room for a translated "Cancel", which then breaks mid-word.
  */
 val NARROW_BUTTON_PADDING = PaddingValues(horizontal = 8.dp, vertical = 8.dp)
-private val HEADER_TITLE_MIN_FONT_SIZE = 12.sp
 
 @Composable
 fun FormBar(

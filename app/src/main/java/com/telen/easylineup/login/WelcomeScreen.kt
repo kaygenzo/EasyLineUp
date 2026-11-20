@@ -35,13 +35,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.buttonLabel
+import com.telen.easylineup.compose.displayTitle
+import com.telen.easylineup.compose.eyebrow
+import com.telen.easylineup.compose.message
 
 private data class ValueProp(@DrawableRes val iconRes: Int, @StringRes val textRes: Int)
 
@@ -79,23 +80,21 @@ fun WelcomeScreen(
             Text(
                 text = stringResource(R.string.app_name),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.eyebrow
             )
         }
 
         Text(
             text = stringResource(R.string.welcome_headline),
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.displaySmall,
+            style = MaterialTheme.typography.displayTitle,
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
         Text(
             text = stringResource(R.string.welcome_body),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyMedium,
-            lineHeight = 21.sp,
-            fontWeight = FontWeight.Medium,
+            style = MaterialTheme.typography.message,
             modifier = Modifier
                 .widthIn(max = 240.dp)
                 .padding(bottom = 26.dp)
@@ -173,8 +172,7 @@ private fun ValuePropRow(prop: ValueProp) {
         Text(
             text = stringResource(prop.textRes),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.SemiBold
+            style = MaterialTheme.typography.message,
         )
     }
 }

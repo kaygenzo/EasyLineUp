@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.buttonLabel
+import com.telen.easylineup.compose.dialogTitle
+import com.telen.easylineup.compose.message
 import com.telen.easylineup.compose.rowSubtitle
 import com.telen.easylineup.compose.rowTitle
 
@@ -38,12 +41,17 @@ fun LicensesDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.setting_licenses_title)) },
+        title = {
+            Text(
+                stringResource(R.string.setting_licenses_title),
+                style = MaterialTheme.typography.dialogTitle
+            )
+        },
         text = {
             Column {
                 Text(
                     text = stringResource(R.string.libraries_title),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.message,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 LazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
@@ -55,7 +63,12 @@ fun LicensesDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.ok)) }
+            TextButton(onClick = onDismiss) {
+                Text(
+                    stringResource(android.R.string.ok),
+                    style = MaterialTheme.typography.buttonLabel
+                )
+            }
         }
     )
 }

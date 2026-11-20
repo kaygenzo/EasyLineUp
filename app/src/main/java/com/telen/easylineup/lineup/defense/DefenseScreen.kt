@@ -54,7 +54,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -66,6 +65,9 @@ import com.telen.easylineup.compose.DugoutCard
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ModeBadge
+import com.telen.easylineup.compose.buttonLabel
+import com.telen.easylineup.compose.chipLabel
+import com.telen.easylineup.compose.footnote
 import com.telen.easylineup.compose.rowSubtitle
 import com.telen.easylineup.compose.rowTitle
 import com.telen.easylineup.domain.Constants
@@ -392,8 +394,7 @@ private fun DpDhSlotRow(
             Text(
                 text = badgeLabel,
                 color = gold,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.chipLabel
             )
         }
         Column(modifier = Modifier.weight(1f)) {
@@ -419,7 +420,7 @@ private fun DpDhSlotRow(
                             flexPositionShort,
                             dpPlayer.order
                         ),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.rowSubtitle,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                 }
@@ -431,7 +432,7 @@ private fun DpDhSlotRow(
                 )
                 Text(
                     text = stringResource(R.string.defense_dh_slot_unassigned),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.rowSubtitle,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
             }
@@ -474,8 +475,7 @@ private fun SubstituteAddRow(
             )
             Text(
                 text = stringResource(R.string.defense_add_substitute_content_description),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.buttonLabel,
                 color = MaterialTheme.colorScheme.primary
             )
         }
@@ -488,7 +488,7 @@ private fun SubstituteAddRow(
         }
         Text(
             text = hint,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.footnote,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             textAlign = TextAlign.End,
             modifier = Modifier.weight(1f)

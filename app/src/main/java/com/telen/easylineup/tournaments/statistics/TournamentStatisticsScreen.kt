@@ -36,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutAvatar
@@ -50,6 +49,8 @@ import com.telen.easylineup.compose.PositionUsageEmptyState
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.SelectField
 import com.telen.easylineup.compose.StatChip
+import com.telen.easylineup.compose.rowTitle
+import com.telen.easylineup.compose.sectionLabel
 import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.FieldPosition
@@ -161,7 +162,7 @@ private fun PlayingTimeCard(playerStats: List<PlayerStatsRow>, summary: PlayingT
                     R.string.tournament_stats_playing_time_label
                 ).uppercaseLocalized(),
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.sectionLabel
             )
             Spacer(modifier = Modifier.height(10.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -216,14 +217,12 @@ private fun PlayingTimeRow(player: PlayerStatsRow, maxGames: Int) {
                 Text(
                     text = player.name,
                     color = MaterialTheme.colorScheme.onBackground,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.rowTitle
                 )
                 Text(
                     text = player.totalGames.toString(),
                     color = barColor,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.rowTitle
                 )
             }
             Spacer(modifier = Modifier.height(5.dp))
@@ -263,7 +262,7 @@ private fun PositionUsageCard(
                     R.string.player_profile_position_usage_label
                 ).uppercaseLocalized(),
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.sectionLabel
             )
             Spacer(modifier = Modifier.height(10.dp))
             SelectField(
@@ -317,7 +316,7 @@ private fun PlayerPickerSheet(
                     Text(
                         text = player.name,
                         color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.rowTitle
                     )
                 }
             }

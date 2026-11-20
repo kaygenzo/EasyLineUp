@@ -40,7 +40,12 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.InfoCell
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.chipLabel
 import com.telen.easylineup.compose.heroTitle
+import com.telen.easylineup.compose.rowSubtitle
+import com.telen.easylineup.compose.rowTitle
+import com.telen.easylineup.compose.sectionLabel
+import com.telen.easylineup.compose.statLabel
 import com.telen.easylineup.compose.statValue
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.TeamType
@@ -143,7 +148,7 @@ fun TeamDetailsScreen(
                         R.string.team_details_roster_by_gender
                     ).uppercaseLocalized(),
                     color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.sectionLabel
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -182,12 +187,12 @@ fun TeamDetailsScreen(
                     Text(
                         text = stringResource(R.string.team_details_delete_title),
                         color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.titleSmall
+                        style = MaterialTheme.typography.rowTitle
                     )
                     Text(
                         text = stringResource(R.string.team_details_delete_subtitle),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.rowSubtitle,
                         modifier = Modifier.padding(top = 2.dp)
                     )
                 }
@@ -249,7 +254,7 @@ private fun Pill(text: String, color: Color) {
         Text(
             text = text.uppercaseLocalized(),
             color = color,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.chipLabel
         )
     }
 }
@@ -278,7 +283,7 @@ private fun StatChip(modifier: Modifier = Modifier, value: Int, label: String, c
         Text(
             text = label.uppercaseLocalized(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.statLabel,
             modifier = Modifier.padding(top = 2.dp)
         )
     }

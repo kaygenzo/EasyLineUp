@@ -8,6 +8,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -73,12 +74,18 @@ fun DugoutDatePickerDialog(
                     state.selectedDateMillis?.let { onDateSelected(pickerDateToLocalTime(it)) }
                 }
             ) {
-                Text(stringResource(android.R.string.ok))
+                Text(
+                    stringResource(android.R.string.ok),
+                    style = MaterialTheme.typography.buttonLabel
+                )
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel_button))
+                Text(
+                    stringResource(R.string.cancel_button),
+                    style = MaterialTheme.typography.buttonLabel
+                )
             }
         }
     ) {

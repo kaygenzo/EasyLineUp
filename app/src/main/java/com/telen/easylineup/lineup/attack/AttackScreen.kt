@@ -45,14 +45,17 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.ModeBadge
+import com.telen.easylineup.compose.battingOrder
+import com.telen.easylineup.compose.buttonLabel
+import com.telen.easylineup.compose.dialogTitle
+import com.telen.easylineup.compose.jerseyNumber
+import com.telen.easylineup.compose.message
 import com.telen.easylineup.compose.rowSubtitle
 import com.telen.easylineup.compose.rowTitle
 import com.telen.easylineup.domain.model.BatterState
@@ -214,11 +217,19 @@ private fun PositionLegendDialog(editable: Boolean, onDismiss: () -> Unit) {
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.ok))
+                Text(
+                    stringResource(android.R.string.ok),
+                    style = MaterialTheme.typography.buttonLabel
+                )
             }
         },
-        title = { Text(stringResource(R.string.attack_legend_title)) },
-        text = { Text(body) }
+        title = {
+            Text(
+                stringResource(R.string.attack_legend_title),
+                style = MaterialTheme.typography.dialogTitle
+            )
+        },
+        text = { Text(body, style = MaterialTheme.typography.message) }
     )
 }
 
@@ -315,9 +326,7 @@ private fun BatterRow(
                 Text(
                     text = batter.playerOrder.toString(),
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.battingOrder
                 )
             }
         }
@@ -326,7 +335,6 @@ private fun BatterRow(
             Text(
                 text = batter.playerName,
                 color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.rowTitle
             )
             subtitle?.let {
@@ -353,9 +361,7 @@ private fun BatterRow(
             Text(
                 text = batter.playerNumber,
                 color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace,
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.jerseyNumber
             )
         }
     }

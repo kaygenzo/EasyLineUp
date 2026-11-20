@@ -30,10 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
@@ -42,6 +40,8 @@ import com.telen.easylineup.compose.ModeBadge
 import com.telen.easylineup.compose.NARROW_BUTTON_PADDING
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.buttonLabel
+import com.telen.easylineup.compose.headerActionLabel
+import com.telen.easylineup.compose.tabLabel
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.BatterState
 import com.telen.easylineup.domain.model.FieldPosition
@@ -322,15 +322,13 @@ private fun HeaderPill(label: String, onClick: () -> Unit, showChevron: Boolean 
         Text(
             text = label,
             color = MaterialTheme.colorScheme.onPrimary,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.headerActionLabel
         )
         if (showChevron) {
             Text(
                 text = "›",
                 color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.headerActionLabel
             )
         }
     }
@@ -389,9 +387,7 @@ private fun LineupTabItem(
             } else {
                 MaterialTheme.colorScheme.onSurfaceVariant
             },
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.labelSmall,
-            letterSpacing = 0.04.em
+            style = MaterialTheme.typography.tabLabel
         )
     }
 }

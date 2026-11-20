@@ -60,11 +60,8 @@ fun DugoutTheme(content: @Composable () -> Unit) {
  * defaults, so AlertDialog/TextButton/RadioButton (which already read MaterialTheme.typography
  * internally) are unaffected.
  *
- * Deliberately not covered here - these aren't a typographic register, not a missing token:
- * - DugoutAvatar's initials, sized proportionally to the avatar (size.value * 0.33f).
- * - Roster's jersey-number badge (10sp monospace), sized to fit two digits inside a fixed
- *   23dp circular badge rather than to read well as text.
- * - TeamForm's TypeCard emoji (20sp), standing in for an icon, not text content.
+ * Texts sized to their container rather than to read as text (an avatar's initials, a jersey
+ * badge's number) or standing for an icon (a team type's emoji) have their roles there too.
  */
 private val DugoutTypography = Typography(
     displaySmall = TextStyle(fontWeight = FontWeight.Bold, fontSize = 34.sp, lineHeight = 36.sp),

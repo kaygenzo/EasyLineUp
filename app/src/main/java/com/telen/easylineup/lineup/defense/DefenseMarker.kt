@@ -28,13 +28,13 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.avatarInitials
+import com.telen.easylineup.compose.markerLabel
 import com.telen.easylineup.compose.rememberDugoutAvatarBitmap
 import com.telen.easylineup.utils.toLetters
 import com.telen.easylineup.views.StateDefense
@@ -97,8 +97,7 @@ fun DefenseMarker(
             StateDefense.DP_DH -> Text(
                 text = label.orEmpty(),
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.markerLabel
             )
 
             StateDefense.PLAYER -> PlayerMarkerContent(
@@ -141,8 +140,7 @@ private fun PlayerMarkerContent(
             Text(
                 text = fallbackName.toLetters(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Bold,
-                fontSize = (size.value * 0.33f).sp
+                style = MaterialTheme.typography.avatarInitials(size)
             )
         }
     }
