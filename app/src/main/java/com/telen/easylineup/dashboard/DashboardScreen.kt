@@ -11,6 +11,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -50,11 +51,13 @@ import com.telen.easylineup.compose.DugoutAvatar
 import com.telen.easylineup.compose.DugoutBottomSheet
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.TwoPaneRow
 import com.telen.easylineup.compose.chipLabel
 import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.compose.footnote
 import com.telen.easylineup.compose.heroSubtitle
 import com.telen.easylineup.compose.heroTitle
+import com.telen.easylineup.compose.isWide
 import com.telen.easylineup.compose.jerseyNumber
 import com.telen.easylineup.compose.message
 import com.telen.easylineup.compose.numberInput
@@ -120,22 +123,10 @@ fun DashboardScreen(
         state.shirtNumberResult != null -> state.shirtNumberResult
         else -> stringResource(R.string.generic_not_found)
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        TeamSwitchHeader(
-            teamName = state.teamName,
-            teamImageUri = state.teamImageUri,
-            onClick = onSwitchTeamClick
-        )
-
+    val hero: @Composable () -> Unit = {
         HeroLastLineupCard(lastLineup = state.lastLineup, onClick = onLastLineupClick)
-
+    }
+    val stats: @Composable () -> Unit = {
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             MiniStatCell(
                 modifier = Modifier.weight(1f),
@@ -156,8 +147,9 @@ fun DashboardScreen(
                 } ?: "—",
                 footer = state.mostUsedPlayer?.name
             )
-        }
-
+    }
+    }
+    val lookup: @Composable () -> Unit = {
         ShirtNumberLookupRow(
             query = state.shirtNumberQuery,
             result = shirtNumberResultText,
@@ -166,6 +158,53 @@ fun DashboardScreen(
             onSearch = onShirtNumberSearch,
             onHistoryClick = onShirtNumberHistoryClick
         )
+    }
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        if (isWide) {
+            // The last lineup and the number lookup on the left, the numbers on the right:
+            // the whole dashboard fits a landscape phone without scrolling.
+            Column(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp)) {
+                    TeamSwitchHeader(
+                        teamName = state.teamName,
+                        teamImageUri = state.teamImageUri,
+                        onClick = onSwitchTeamClick
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                TwoPaneRow(
+                    modifier = Modifier.weight(1f),
+                    firstWeight = 1.15f,
+                    spacing = 10.dp,
+                    first = {
+                        hero()
+                        lookup()
+                    },
+                    second = { stats() }
+                )
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                TeamSwitchHeader(
+                    teamName = state.teamName,
+                    teamImageUri = state.teamImageUri,
+                    onClick = onSwitchTeamClick
+                )
+                hero()
+                stats()
+                lookup()
+            }
+        }
     }
 }
 

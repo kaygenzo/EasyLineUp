@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.HeaderPill
 import com.telen.easylineup.compose.HeaderIconChip
 import com.telen.easylineup.compose.ModeBadge
 import com.telen.easylineup.compose.NARROW_BUTTON_PADDING
@@ -305,33 +306,6 @@ private fun LineupHeader(
             }
         }
     )
-}
-
-/** A filled header button: Edit (with a chevron) in view mode, Save in landscape edit mode. */
-@Composable
-private fun HeaderPill(label: String, onClick: () -> Unit, showChevron: Boolean = false) {
-    Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(10.dp))
-            .background(MaterialTheme.colorScheme.primary)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 13.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(3.dp)
-    ) {
-        Text(
-            text = label,
-            color = MaterialTheme.colorScheme.onPrimary,
-            style = MaterialTheme.typography.headerActionLabel
-        )
-        if (showChevron) {
-            Text(
-                text = "›",
-                color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.headerActionLabel
-            )
-        }
-    }
 }
 
 @Composable
@@ -623,14 +597,6 @@ private fun LineupHeaderSideBySidePreview() {
             onEditClick = {},
             onEditRosterClick = {}
         )
-    }
-}
-
-@DugoutPreviews
-@Composable
-private fun HeaderPillPreview() {
-    DugoutTheme {
-        HeaderPill(label = "Edit", onClick = {}, showChevron = true)
     }
 }
 

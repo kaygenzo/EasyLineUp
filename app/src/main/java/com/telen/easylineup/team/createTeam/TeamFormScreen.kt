@@ -10,7 +10,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.displayCutoutPadding
@@ -43,13 +45,16 @@ import com.telen.easylineup.R
 import com.telen.easylineup.compose.AvatarPicker
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.HeaderPill
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.TwoPaneRow
 import com.telen.easylineup.compose.buttonLabel
 import com.telen.easylineup.compose.chipLabel
 import com.telen.easylineup.compose.emojiIcon
 import com.telen.easylineup.compose.fieldLabel
 import com.telen.easylineup.compose.fieldSupport
 import com.telen.easylineup.compose.fieldText
+import com.telen.easylineup.compose.isWide
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
@@ -80,52 +85,88 @@ fun TeamFormScreen(
     onTypeSelected: (TeamType) -> Unit,
     onSaveClick: () -> Unit
 ) {
-    Column(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .systemBarsPadding()
             .displayCutoutPadding()
     ) {
-        FormAppBar(isEditing = state.isEditing, onCloseClick = onCloseClick)
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp)
-        ) {
+        // Wide: Save in the header instead of a bottom bar, the logo in a column of its own
+        // beside the fields, both centered on the same axis.
+        val wide = isWide
+        val avatar: @Composable () -> Unit = {
             AvatarPicker(
                 imageUri = state.teamImageUri,
                 onClick = onAvatarClick,
                 onRemoveClick = onAvatarRemoveClick,
                 size = 72.dp,
                 cornerRadius = 20.dp,
-                placeholderIcon = R.drawable.ic_image_placeholder_24dp,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                placeholderIcon = R.drawable.ic_image_placeholder_24dp
             )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
+        }
+        val fields: @Composable ColumnScope.() -> Unit = {
             NameField(
                 name = state.teamName,
                 error = state.nameError,
                 onNameChanged = onNameChanged
             )
-
             Spacer(modifier = Modifier.height(18.dp))
-
             TypeField(selectedType = state.teamType, onTypeSelected = onTypeSelected)
-
             Spacer(modifier = Modifier.height(18.dp))
         }
-
-        FormBar(onSaveClick = onSaveClick)
+        Column(modifier = Modifier.fillMaxSize()) {
+            FormAppBar(
+                isEditing = state.isEditing,
+                onCloseClick = onCloseClick,
+                onSaveClick = if (wide) onSaveClick else null
+            )
+            if (wide) {
+                TwoPaneRow(
+                    modifier = Modifier.weight(1f),
+                    firstWeight = 0.7f,
+                    secondWeight = 1.3f,
+                    verticalAlignment = Alignment.CenterVertically,
+                    spacing = 0.dp,
+                    first = {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            avatar()
+                        }
+                    },
+                    second = fields
+                )
+            } else {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 20.dp)
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        avatar()
+                    }
+                    Spacer(modifier = Modifier.height(20.dp))
+                    fields()
+                }
+                FormBar(onSaveClick = onSaveClick)
+            }
+        }
     }
 }
 
+/** The form's header; with an [onSaveClick] (wide), it holds the Save button too. */
 @Composable
-private fun FormAppBar(isEditing: Boolean, onCloseClick: () -> Unit) {
+private fun FormAppBar(
+    isEditing: Boolean,
+    onCloseClick: () -> Unit,
+    onSaveClick: (() -> Unit)? = null
+) {
     ScreenHeader(
         icon = R.drawable.ic_close_24dp,
         onIconClick = onCloseClick,
@@ -134,7 +175,10 @@ private fun FormAppBar(isEditing: Boolean, onCloseClick: () -> Unit) {
         title = stringResource(
             if (isEditing) R.string.team_form_title_edit else R.string.team_form_title_create
         ),
-        modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 14.dp)
+        modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 14.dp),
+        actions = onSaveClick?.let { onSave ->
+            { HeaderPill(label = stringResource(R.string.save_button), onClick = onSave) }
+        }
     )
 }
 

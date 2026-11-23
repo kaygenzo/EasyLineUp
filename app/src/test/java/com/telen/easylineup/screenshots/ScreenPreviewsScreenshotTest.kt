@@ -24,7 +24,7 @@ import sergio.sastre.composable.preview.scanner.core.preview.ComposablePreview
 
 /**
  * Renders every full-screen `@DugoutPreviews` preview on the JVM and compares it to the reference
- * image in `src/test/screenshots`, in three configurations. New screens are picked up on their
+ * image in `src/test/screenshots`, in four configurations. New screens are picked up on their
  * own, as long as their preview function is named like `XScreenPreview` or `XScreenEmptyPreview`.
  *
  * Plain unit test runs skip the rendering. After an intended visual change:
@@ -44,6 +44,7 @@ class ScreenPreviewsScreenshotTest(
     enum class Variant(val qualifiers: String) {
         SMALL_LIGHT("w360dp-h640dp-port-notnight-xhdpi"),
         SMALL_DARK("w360dp-h640dp-port-night-xhdpi"),
+        SMALL_LANDSCAPE_LIGHT("w640dp-h360dp-land-notnight-xhdpi"),
         LARGE_LANDSCAPE_LIGHT("w1280dp-h800dp-land-notnight-mdpi")
     }
 

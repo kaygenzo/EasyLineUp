@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,13 +46,16 @@ import com.telen.easylineup.R
 import com.telen.easylineup.compose.AvatarPicker
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.HeaderPill
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.TwoPaneRow
 import com.telen.easylineup.compose.buttonLabel
 import com.telen.easylineup.compose.chipLabel
 import com.telen.easylineup.compose.fieldLabel
 import com.telen.easylineup.compose.fieldPlaceholder
 import com.telen.easylineup.compose.fieldSupport
 import com.telen.easylineup.compose.fieldText
+import com.telen.easylineup.compose.isWide
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.FieldPosition
 import com.telen.easylineup.domain.model.Sex
@@ -103,125 +107,158 @@ fun PlayerFormScreen(
     onCloseClick: () -> Unit,
     onSaveClick: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        ScreenHeader(
-            icon = R.drawable.ic_close_24dp,
-            onIconClick = onCloseClick,
-            iconContentDescription = stringResource(R.string.team_form_close_content_description),
-            eyebrow = stringResource(R.string.title_team),
-            title = stringResource(
-                if (state.isEditing) {
-                    R.string.player_form_title_edit
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
+    ) {
+        // Wide, Save moves into the header: a bottom bar would take a third of a landscape phone.
+        val wide = isWide
+        Column(modifier = Modifier.fillMaxSize()) {
+            ScreenHeader(
+                icon = R.drawable.ic_close_24dp,
+                onIconClick = onCloseClick,
+                iconContentDescription = stringResource(
+                    R.string.team_form_close_content_description
+                ),
+                eyebrow = stringResource(R.string.title_team),
+                title = stringResource(
+                    if (state.isEditing) {
+                        R.string.player_form_title_edit
+                    } else {
+                        R.string.player_form_title_create
+                    }
+                ),
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+                actions = if (wide) {
+                    {
+                        HeaderPill(
+                            label = stringResource(R.string.save_button),
+                            onClick = onSaveClick
+                        )
+                    }
                 } else {
-                    R.string.player_form_title_create
+                    null
                 }
-            ),
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
-        )
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 16.dp)
-        ) {
-            AvatarPicker(
-                imageUri = state.imageUri,
-                onClick = onAvatarClick,
-                onRemoveClick = onAvatarRemoveClick,
-                size = 72.dp,
-                cornerRadius = 36.dp,
-                placeholderIcon = R.drawable.ic_person_silhouette_24dp,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            SexRow(selected = state.sex, onSexSelected = onSexSelected)
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            RequiredField(
-                label = stringResource(R.string.player_hint_name),
-                value = state.name,
-                error = state.nameError,
-                onValueChanged = onNameChanged
-            )
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                OptionalField(
-                    modifier = Modifier.weight(1f),
-                    label = stringResource(R.string.player_hint_shirt_number),
-                    value = state.shirtNumberText,
-                    onValueChanged = onShirtNumberChanged,
-                    keyboardType = KeyboardType.Number
+            // Identity (photo, sex, name, numbers), then playing profile (sides, positions,
+            // contact): one scrolling column when tall, side by side when wide.
+            val identity: @Composable ColumnScope.() -> Unit = {
+                AvatarPicker(
+                    imageUri = state.imageUri,
+                    onClick = onAvatarClick,
+                    onRemoveClick = onAvatarRemoveClick,
+                    size = 72.dp,
+                    cornerRadius = 36.dp,
+                    placeholderIcon = R.drawable.ic_person_silhouette_24dp,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
-                OptionalField(
-                    modifier = Modifier.weight(1f),
-                    label = stringResource(R.string.player_hint_license_number_short),
-                    value = state.licenseNumberText,
-                    onValueChanged = onLicenseNumberChanged,
-                    // Letters and digits: license numbers can be alphanumeric.
-                    keyboardType = KeyboardType.Ascii,
-                    capitalization = KeyboardCapitalization.Characters
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                SexRow(selected = state.sex, onSexSelected = onSexSelected)
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                RequiredField(
+                    label = stringResource(R.string.player_hint_name),
+                    value = state.name,
+                    error = state.nameError,
+                    onValueChanged = onNameChanged
                 )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OptionalField(
+                        modifier = Modifier.weight(1f),
+                        label = stringResource(R.string.player_hint_shirt_number),
+                        value = state.shirtNumberText,
+                        onValueChanged = onShirtNumberChanged,
+                        keyboardType = KeyboardType.Number
+                    )
+                    OptionalField(
+                        modifier = Modifier.weight(1f),
+                        label = stringResource(R.string.player_hint_license_number_short),
+                        value = state.licenseNumberText,
+                        onValueChanged = onLicenseNumberChanged,
+                        // Letters and digits: license numbers can be alphanumeric.
+                        keyboardType = KeyboardType.Ascii,
+                        capitalization = KeyboardCapitalization.Characters
+                    )
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            }
+            val profile: @Composable ColumnScope.() -> Unit = {
+                SideToggleRow(
+                    label = stringResource(R.string.create_player_pitching_side),
+                    leftSelected = state.pitchingLeft,
+                    rightSelected = state.pitchingRight,
+                    onLeftToggled = onPitchingLeftToggled,
+                    onRightToggled = onPitchingRightToggled
+                )
 
-            SideToggleRow(
-                label = stringResource(R.string.create_player_pitching_side),
-                leftSelected = state.pitchingLeft,
-                rightSelected = state.pitchingRight,
-                onLeftToggled = onPitchingLeftToggled,
-                onRightToggled = onPitchingRightToggled
-            )
+                Spacer(modifier = Modifier.height(10.dp))
 
-            Spacer(modifier = Modifier.height(10.dp))
+                SideToggleRow(
+                    label = stringResource(R.string.create_player_batting_side),
+                    leftSelected = state.battingLeft,
+                    rightSelected = state.battingRight,
+                    onLeftToggled = onBattingLeftToggled,
+                    onRightToggled = onBattingRightToggled
+                )
 
-            SideToggleRow(
-                label = stringResource(R.string.create_player_batting_side),
-                leftSelected = state.battingLeft,
-                rightSelected = state.battingRight,
-                onLeftToggled = onBattingLeftToggled,
-                onRightToggled = onBattingRightToggled
-            )
+                Spacer(modifier = Modifier.height(18.dp))
 
-            Spacer(modifier = Modifier.height(18.dp))
+                FavoritePositions(
+                    availablePositions = state.availablePositions,
+                    selectedPositions = state.selectedPositions,
+                    teamType = state.teamType,
+                    onPositionToggled = onPositionToggled
+                )
 
-            FavoritePositions(
-                availablePositions = state.availablePositions,
-                selectedPositions = state.selectedPositions,
-                teamType = state.teamType,
-                onPositionToggled = onPositionToggled
-            )
+                Spacer(modifier = Modifier.height(14.dp))
 
-            Spacer(modifier = Modifier.height(14.dp))
+                OptionalField(
+                    label = stringResource(R.string.player_hint_email),
+                    value = state.email,
+                    error = state.emailError,
+                    onValueChanged = onEmailChanged,
+                    keyboardType = KeyboardType.Email
+                )
 
-            OptionalField(
-                label = stringResource(R.string.player_hint_email),
-                value = state.email,
-                error = state.emailError,
-                onValueChanged = onEmailChanged,
-                keyboardType = KeyboardType.Email
-            )
+                Spacer(modifier = Modifier.height(14.dp))
 
-            Spacer(modifier = Modifier.height(14.dp))
+                OptionalField(
+                    label = stringResource(R.string.player_hint_phone),
+                    value = state.phone,
+                    error = state.phoneError,
+                    onValueChanged = onPhoneChanged,
+                    keyboardType = KeyboardType.Phone
+                )
 
-            OptionalField(
-                label = stringResource(R.string.player_hint_phone),
-                value = state.phone,
-                error = state.phoneError,
-                onValueChanged = onPhoneChanged,
-                keyboardType = KeyboardType.Phone
-            )
-
-            Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(18.dp))
+            }
+            if (wide) {
+                TwoPaneRow(
+                    modifier = Modifier.weight(1f),
+                    spacing = 0.dp,
+                    first = identity,
+                    second = profile
+                )
+            } else {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                ) {
+                    identity()
+                    Spacer(modifier = Modifier.height(14.dp))
+                    profile()
+                }
+                FormBar(onSaveClick = onSaveClick)
+            }
         }
-
-        FormBar(onSaveClick = onSaveClick)
     }
 }
 

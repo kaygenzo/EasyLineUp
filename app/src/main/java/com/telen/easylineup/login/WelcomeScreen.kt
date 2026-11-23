@@ -11,7 +11,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,9 +41,11 @@ import androidx.compose.ui.unit.dp
 import com.telen.easylineup.R
 import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.TwoPaneRow
 import com.telen.easylineup.compose.buttonLabel
 import com.telen.easylineup.compose.displayTitle
 import com.telen.easylineup.compose.eyebrow
+import com.telen.easylineup.compose.isWide
 import com.telen.easylineup.compose.message
 
 private data class ValueProp(@DrawableRes val iconRes: Int, @StringRes val textRes: Int)
@@ -57,15 +61,9 @@ fun WelcomeScreen(
     onCreateTeam: () -> Unit,
     onImportTeam: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .systemBarsPadding()
-            .displayCutoutPadding()
-            .verticalScroll(rememberScrollState())
-            .padding(start = 22.dp, end = 22.dp, top = 30.dp)
-    ) {
+    // The pitch (name, headline, body), then the choices (value props, the two buttons): one
+    // scrolling column when tall; side by side when wide, so both buttons show from the start.
+    val pitch: @Composable ColumnScope.() -> Unit = {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -100,6 +98,8 @@ fun WelcomeScreen(
                 .padding(bottom = 26.dp)
         )
 
+    }
+    val choices: @Composable ColumnScope.() -> Unit = {
         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
             valueProps.forEach { prop ->
                 ValuePropRow(prop)
@@ -138,6 +138,33 @@ fun WelcomeScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.buttonLabel
                 )
+            }
+        }
+    }
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .systemBarsPadding()
+            .displayCutoutPadding()
+    ) {
+        if (isWide) {
+            TwoPaneRow(
+                modifier = Modifier.padding(top = 30.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                spacing = 0.dp,
+                first = pitch,
+                second = choices
+            )
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(start = 22.dp, end = 22.dp, top = 30.dp)
+            ) {
+                pitch()
+                choices()
             }
         }
     }

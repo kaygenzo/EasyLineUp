@@ -9,7 +9,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -26,7 +28,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.telen.easylineup.compose.BottomNavTab
 import com.telen.easylineup.compose.DugoutBottomNav
+import com.telen.easylineup.compose.DugoutNavRail
 import com.telen.easylineup.compose.DugoutTheme
+import com.telen.easylineup.compose.isWide
 import com.telen.easylineup.navigation.AppNavHost
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.createTeam.TeamCreationActivity
@@ -77,34 +81,49 @@ class HomeActivity : BaseActivity() {
 
                 // Edge to edge: system bars, then whatever of a cutout they don't already cover
                 // (landscape). The keyboard is left to adjustPan - see the manifest.
-                Column(
+                BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxSize()
                         .systemBarsPadding()
                         .displayCutoutPadding()
                 ) {
-                    AppNavHost(
-                        navController = navController,
-                        homeViewModel = viewModel,
-                        modifier = Modifier.weight(1f)
-                    )
-                    currentTab?.let { tab ->
-                        DugoutBottomNav(
-                            selected = tab,
-                            onSelect = { selected ->
-                                if (selected != currentTab) {
-                                    // Standard bottom-nav behavior: switching tabs never stacks a
-                                    // tab on top of another (Dashboard > Roster > Dashboard used
-                                    // to leave two Dashboards, so Back landed on the second one),
-                                    // and each tab keeps its own depth, restored on reselect.
-                                    navController.navigate(selected.route) {
-                                        popUpTo<Routes.Dashboard> { saveState = true }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                }
+                    val onSelectTab: (BottomNavTab) -> Unit = { selected ->
+                        if (selected != currentTab) {
+                            // Standard bottom-nav behavior: switching tabs never stacks a tab on
+                            // top of another (Dashboard > Roster > Dashboard used to leave two
+                            // Dashboards, so Back landed on the second one), and each tab keeps
+                            // its own depth, restored on reselect.
+                            navController.navigate(selected.route) {
+                                popUpTo<Routes.Dashboard> { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                        )
+                        }
+                    }
+                    // Wider than tall, the tabs move to a rail on the left: a bottom bar takes
+                    // height, which a landscape phone has little of.
+                    if (isWide) {
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            currentTab?.let { tab ->
+                                DugoutNavRail(selected = tab, onSelect = onSelectTab)
+                            }
+                            AppNavHost(
+                                navController = navController,
+                                homeViewModel = viewModel,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    } else {
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            AppNavHost(
+                                navController = navController,
+                                homeViewModel = viewModel,
+                                modifier = Modifier.weight(1f)
+                            )
+                            currentTab?.let { tab ->
+                                DugoutBottomNav(selected = tab, onSelect = onSelectTab)
+                            }
+                        }
                     }
                 }
 

@@ -10,7 +10,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,9 +45,11 @@ import com.telen.easylineup.compose.PlayerPhotoTile
 import com.telen.easylineup.compose.PositionUsageChart
 import com.telen.easylineup.compose.PositionUsageEmptyState
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.TwoPaneRow
 import com.telen.easylineup.compose.chipLabel
 import com.telen.easylineup.compose.heroSubtitle
 import com.telen.easylineup.compose.heroTitle
+import com.telen.easylineup.compose.isWide
 import com.telen.easylineup.compose.sectionLabel
 import com.telen.easylineup.compose.shortLabel
 import com.telen.easylineup.compose.uppercaseLocalized
@@ -86,20 +90,14 @@ fun PlayerProfileScreen(
     val context = LocalContext.current
     val strategyOptions = state.teamType.getStrategiesDisplayName(context)?.toList() ?: emptyList()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-            .padding(20.dp)
-    ) {
+    val header: @Composable (Modifier) -> Unit = { modifier ->
         ScreenHeader(
             icon = R.drawable.ic_arrow_left_white_24dp,
             onIconClick = onBackClick,
             iconContentDescription = stringResource(R.string.generic_back),
             eyebrow = null,
             title = stringResource(R.string.title_team),
-            modifier = Modifier.padding(bottom = 20.dp),
+            modifier = modifier,
             actions = {
                 HeaderActionIconChip(
                     icon = R.drawable.ic_edit_outline_24dp,
@@ -114,7 +112,10 @@ fun PlayerProfileScreen(
                 )
             }
         )
-
+    }
+    // Who the player is, then how they've been used: stacked when tall, side by side when
+    // wide, so the chart isn't below the fold of a landscape phone.
+    val identity: @Composable ColumnScope.() -> Unit = {
         ProfileHeader(state)
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -147,8 +148,8 @@ fun PlayerProfileScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
+    }
+    val usage: @Composable ColumnScope.() -> Unit = {
         DugoutCard {
             Column(modifier = Modifier.padding(14.dp)) {
                 Text(
@@ -176,6 +177,35 @@ fun PlayerProfileScreen(
                         teamType = state.teamType
                     )
                 }
+            }
+        }
+    }
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        if (isWide) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                header(Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 16.dp))
+                TwoPaneRow(
+                    modifier = Modifier.weight(1f),
+                    spacing = 0.dp,
+                    first = identity,
+                    second = usage
+                )
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(20.dp)
+            ) {
+                header(Modifier.padding(bottom = 20.dp))
+                identity()
+                Spacer(modifier = Modifier.height(12.dp))
+                usage()
             }
         }
     }

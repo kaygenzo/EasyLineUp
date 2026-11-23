@@ -8,6 +8,7 @@ import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -49,6 +50,8 @@ import com.telen.easylineup.compose.PositionUsageEmptyState
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.SelectField
 import com.telen.easylineup.compose.StatChip
+import com.telen.easylineup.compose.TwoPaneRow
+import com.telen.easylineup.compose.isWide
 import com.telen.easylineup.compose.rowTitle
 import com.telen.easylineup.compose.sectionLabel
 import com.telen.easylineup.compose.sheetTitle
@@ -124,19 +127,36 @@ fun TournamentStatisticsScreen(state: TournamentStatisticsUiState, onBackClick: 
                 )
             }
         } else {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp)
-            ) {
-                PlayingTimeCard(playerStats, state.playingTimeSummary)
-                Spacer(modifier = Modifier.height(4.dp))
+            val usage: @Composable () -> Unit = {
                 PositionUsageCard(
                     selectedPlayer = playerStats.firstOrNull { it.playerId == selectedPlayerId },
                     positions = state.playedPositions,
                     teamType = state.teamType,
                     onPlayerFieldClick = { showPlayerPicker = true }
                 )
+            }
+            BoxWithConstraints(modifier = Modifier.weight(1f)) {
+                if (isWide) {
+                    // Playing time and position usage answer one question together (is
+                    // everyone getting fair time, and where): side by side when there's room.
+                    TwoPaneRow(
+                        firstWeight = 1.1f,
+                        spacing = 0.dp,
+                        first = { PlayingTimeCard(playerStats, state.playingTimeSummary) },
+                        second = { usage() }
+                    )
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        PlayingTimeCard(playerStats, state.playingTimeSummary)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        usage()
+                    }
+                }
             }
         }
     }

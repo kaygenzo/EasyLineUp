@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,10 +27,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -1026,32 +1029,67 @@ fun DugoutBottomNav(selected: BottomNavTab?, onSelect: (BottomNavTab) -> Unit) {
         horizontalArrangement = Arrangement.SpaceAround
     ) {
         BottomNavTab.entries.forEach { tab ->
-            val active = tab == selected
-            val tint = if (active) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .clickable { onSelect(tab) }
-                    .padding(4.dp)
-            ) {
-                Icon(
-                    painter = painterResource(tab.iconRes),
-                    contentDescription = stringResource(tab.labelRes),
-                    tint = tint,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(tab.labelRes).uppercaseLocalized(),
-                    style = MaterialTheme.typography.tabLabel,
-                    color = tint
-                )
-            }
+            NavTabItem(tab = tab, active = tab == selected, onSelect = onSelect)
         }
+    }
+}
+
+/**
+ * [DugoutBottomNav]'s tabs as a rail along the left edge, for a screen wider than tall: the
+ * bottom bar took height, which a landscape phone has little of, where the rail takes width.
+ */
+@Composable
+fun DugoutNavRail(selected: BottomNavTab?, onSelect: (BottomNavTab) -> Unit) {
+    val outlineColor = MaterialTheme.colorScheme.outline
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .background(MaterialTheme.colorScheme.surface)
+            .drawBehind {
+                drawLine(
+                    color = outlineColor,
+                    start = Offset(size.width, 0f),
+                    end = Offset(size.width, size.height),
+                    strokeWidth = 1.dp.toPx()
+                )
+            }
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 6.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        BottomNavTab.entries.forEach { tab ->
+            NavTabItem(tab = tab, active = tab == selected, onSelect = onSelect)
+        }
+    }
+}
+
+/** One tab of [DugoutBottomNav] or [DugoutNavRail]: its icon over its label. */
+@Composable
+private fun NavTabItem(tab: BottomNavTab, active: Boolean, onSelect: (BottomNavTab) -> Unit) {
+    val tint = if (active) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clickable { onSelect(tab) }
+            .padding(4.dp)
+    ) {
+        Icon(
+            painter = painterResource(tab.iconRes),
+            contentDescription = stringResource(tab.labelRes),
+            tint = tint,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = stringResource(tab.labelRes).uppercaseLocalized(),
+            style = MaterialTheme.typography.tabLabel,
+            color = tint
+        )
     }
 }
 
@@ -1060,6 +1098,22 @@ fun DugoutBottomNav(selected: BottomNavTab?, onSelect: (BottomNavTab) -> Unit) {
 private fun DugoutBottomNavPreview() {
     DugoutTheme {
         DugoutBottomNav(selected = BottomNavTab.HOME, onSelect = {})
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun DugoutNavRailPreview() {
+    DugoutTheme {
+        DugoutNavRail(selected = BottomNavTab.ROSTER, onSelect = {})
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun NavTabItemPreview() {
+    DugoutTheme {
+        NavTabItem(tab = BottomNavTab.HOME, active = true, onSelect = {})
     }
 }
 

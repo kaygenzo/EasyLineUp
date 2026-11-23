@@ -9,7 +9,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,8 +42,10 @@ import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.HeaderActionIconChip
 import com.telen.easylineup.compose.InfoCell
 import com.telen.easylineup.compose.ScreenHeader
+import com.telen.easylineup.compose.TwoPaneRow
 import com.telen.easylineup.compose.chipLabel
 import com.telen.easylineup.compose.heroTitle
+import com.telen.easylineup.compose.isWide
 import com.telen.easylineup.compose.rowSubtitle
 import com.telen.easylineup.compose.rowTitle
 import com.telen.easylineup.compose.sectionLabel
@@ -76,20 +80,14 @@ fun TeamDetailsScreen(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
+    val header: @Composable (Modifier) -> Unit = { modifier ->
         ScreenHeader(
             icon = R.drawable.ic_arrow_left_white_24dp,
             onIconClick = onBackClick,
             iconContentDescription = stringResource(R.string.generic_back),
             eyebrow = stringResource(R.string.title_settings),
             title = stringResource(R.string.team_details_header_title),
-            modifier = Modifier.padding(bottom = 20.dp),
+            modifier = modifier,
             actions = {
                 HeaderActionIconChip(
                     icon = R.drawable.ic_edit_outline_24dp,
@@ -98,7 +96,10 @@ fun TeamDetailsScreen(
                 )
             }
         )
-
+    }
+    // The team and its counts, then the gender breakdown and the delete row: stacked when
+    // tall, side by side when wide.
+    val first: @Composable ColumnScope.() -> Unit = {
         ProfileHead(
             teamName = state.teamName,
             teamType = state.teamType,
@@ -139,8 +140,8 @@ fun TeamDetailsScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
+    }
+    val second: @Composable ColumnScope.() -> Unit = {
         DugoutCard {
             Column(modifier = Modifier.padding(14.dp)) {
                 Text(
@@ -202,6 +203,35 @@ fun TeamDetailsScreen(
                     tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(20.dp)
                 )
+            }
+        }
+    }
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        if (isWide) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                header(Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 16.dp))
+                TwoPaneRow(
+                    modifier = Modifier.weight(1f),
+                    spacing = 0.dp,
+                    first = first,
+                    second = second
+                )
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+            ) {
+                header(Modifier.padding(bottom = 20.dp))
+                first()
+                Spacer(modifier = Modifier.height(12.dp))
+                second()
             }
         }
     }

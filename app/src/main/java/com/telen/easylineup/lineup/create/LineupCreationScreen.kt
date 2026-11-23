@@ -9,7 +9,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -66,10 +68,12 @@ import com.telen.easylineup.compose.DugoutPreviews
 import com.telen.easylineup.compose.DugoutSearchField
 import com.telen.easylineup.compose.DugoutTheme
 import com.telen.easylineup.compose.FormBar
+import com.telen.easylineup.compose.HeaderPill
 import com.telen.easylineup.compose.KeepInitialFocusOffTextFields
 import com.telen.easylineup.compose.FormLabel
 import com.telen.easylineup.compose.ScreenHeader
 import com.telen.easylineup.compose.SelectField
+import com.telen.easylineup.compose.TwoPaneRow
 import com.telen.easylineup.compose.buttonLabel
 import com.telen.easylineup.compose.chipLabel
 import com.telen.easylineup.compose.compactDateDay
@@ -78,6 +82,7 @@ import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.compose.fieldPlaceholder
 import com.telen.easylineup.compose.fieldSupport
 import com.telen.easylineup.compose.fieldText
+import com.telen.easylineup.compose.isWide
 import com.telen.easylineup.compose.jerseyNumber
 import com.telen.easylineup.compose.rowGlyph
 import com.telen.easylineup.compose.rowSubtitle
@@ -146,127 +151,167 @@ fun LineupCreationScreen(
         null
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        Column(
+    // The game (name, tournament, date), then the team for it (roster, strategy, extra
+    // hitters): one scrolling column when tall, one group per pane when wide.
+    val gameFields: @Composable ColumnScope.() -> Unit = {
+        FormLabel(stringResource(R.string.dialog_create_lineup_name), required = true)
+        Spacer(modifier = Modifier.height(6.dp))
+        OutlinedTextField(
+            value = state.name,
+            onValueChange = onNameChanged,
             modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp)
-        ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            ScreenHeader(
-                icon = R.drawable.ic_close_24dp,
-                onIconClick = onBackClick,
-                iconContentDescription = stringResource(R.string.generic_close),
-                eyebrow = stringResource(R.string.lineup_creation_header_eyebrow),
-                title = stringResource(R.string.lineup_creation_header_title)
-            )
-            Spacer(modifier = Modifier.height(26.dp))
-
-            FormLabel(stringResource(R.string.dialog_create_lineup_name), required = true)
-            Spacer(modifier = Modifier.height(6.dp))
-            OutlinedTextField(
-                value = state.name,
-                onValueChange = onNameChanged,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 64.dp),
-                placeholder = {
-                    Text(
-                        stringResource(R.string.lineup_creation_name_placeholder),
-                        style = MaterialTheme.typography.fieldPlaceholder
-                    )
-                },
-                singleLine = true,
-                isError = state.nameError,
-                supportingText = nameErrorText?.let {
-                    { Text(it, style = MaterialTheme.typography.fieldSupport) }
-                },
-                textStyle = MaterialTheme.typography.fieldText,
-                shape = RoundedCornerShape(10.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
-                    focusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
+                .fillMaxWidth()
+                .heightIn(min = 64.dp),
+            placeholder = {
+                Text(
+                    stringResource(R.string.lineup_creation_name_placeholder),
+                    style = MaterialTheme.typography.fieldPlaceholder
                 )
+            },
+            singleLine = true,
+            isError = state.nameError,
+            supportingText = nameErrorText?.let {
+                { Text(it, style = MaterialTheme.typography.fieldSupport) }
+            },
+            textStyle = MaterialTheme.typography.fieldText,
+            shape = RoundedCornerShape(10.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f),
+                focusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
             )
-            Spacer(modifier = Modifier.height(20.dp))
+        )
+        Spacer(modifier = Modifier.height(20.dp))
 
-            SelectField(
-                label = stringResource(R.string.dialog_create_lineup_tournament),
-                required = true,
-                value = state.selectedTournament?.name,
-                placeholder = stringResource(R.string.lineup_creation_tournament_placeholder),
-                subLabel = state.selectedTournament?.address,
-                isError = state.tournamentError,
-                errorText = tournamentErrorText,
-                onClick = onTournamentClick
-            )
-            Spacer(modifier = Modifier.height(20.dp))
+        SelectField(
+            label = stringResource(R.string.dialog_create_lineup_tournament),
+            required = true,
+            value = state.selectedTournament?.name,
+            placeholder = stringResource(R.string.lineup_creation_tournament_placeholder),
+            subLabel = state.selectedTournament?.address,
+            isError = state.tournamentError,
+            errorText = tournamentErrorText,
+            onClick = onTournamentClick
+        )
+        Spacer(modifier = Modifier.height(20.dp))
 
-            val dateEnabled = state.selectedTournament != null
-            SelectField(
-                label = stringResource(R.string.form_lineup_creation_date_label),
-                value = if (dateEnabled) {
-                    formatLocalizedDate(state.eventTimeInMillis, DATE_SKELETON_WEEKDAY_DAY_MONTH)
-                } else {
-                    null
-                },
-                placeholder = stringResource(R.string.lineup_creation_date_disabled_hint),
-                subLabel = state.selectedTournament?.takeIf { it.hasDateWindow() }
-                    ?.let { stringResource(R.string.lineup_creation_date_sub_within, it.name) },
-                enabled = dateEnabled,
-                onClick = onDateClick
-            )
-            Spacer(modifier = Modifier.height(20.dp))
+        val dateEnabled = state.selectedTournament != null
+        SelectField(
+            label = stringResource(R.string.form_lineup_creation_date_label),
+            value = if (dateEnabled) {
+                formatLocalizedDate(state.eventTimeInMillis, DATE_SKELETON_WEEKDAY_DAY_MONTH)
+            } else {
+                null
+            },
+            placeholder = stringResource(R.string.lineup_creation_date_disabled_hint),
+            subLabel = state.selectedTournament?.takeIf { it.hasDateWindow() }
+                ?.let { stringResource(R.string.lineup_creation_date_sub_within, it.name) },
+            enabled = dateEnabled,
+            onClick = onDateClick
+        )
+        Spacer(modifier = Modifier.height(20.dp))
 
-            val rosterSummary = stringResource(
-                R.string.lineup_creation_roster_selected_format,
-                state.roster.players.count { it.status },
-                state.roster.players.size
-            )
-            SelectField(
-                label = stringResource(R.string.form_lineup_creation_roster_label),
-                value = rosterSummary,
-                placeholder = rosterSummary,
-                subLabel = null,
-                onClick = onRosterClick
-            )
-            Spacer(modifier = Modifier.height(20.dp))
+    }
+    val teamFields: @Composable ColumnScope.() -> Unit = {
+        val rosterSummary = stringResource(
+            R.string.lineup_creation_roster_selected_format,
+            state.roster.players.count { it.status },
+            state.roster.players.size
+        )
+        SelectField(
+            label = stringResource(R.string.form_lineup_creation_roster_label),
+            value = rosterSummary,
+            placeholder = rosterSummary,
+            subLabel = null,
+            onClick = onRosterClick
+        )
+        Spacer(modifier = Modifier.height(20.dp))
 
-            if (strategyNames != null) {
-                val strategies = state.teamType.getStrategies()
-                SegmentedRow(
-                    label = stringResource(R.string.form_lineup_creation_strategy_label),
-                    options = strategyNames.toList(),
-                    selectedIndex = strategies.indexOf(state.strategy).coerceAtLeast(0),
-                    onSelect = { index -> onStrategySelected(strategies[index]) }
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            val extraHittersLabels = stringArrayResource(R.array.extra_hitters_labels)
-            val extraHittersValues = integerArrayResource(R.array.extra_hitters_values)
+        if (strategyNames != null) {
+            val strategies = state.teamType.getStrategies()
             SegmentedRow(
-                label = stringResource(R.string.form_lineup_creation_extra_hitters_label),
-                options = extraHittersLabels.toList(),
-                selectedIndex = extraHittersValues.indexOf(state.extraHitters).coerceAtLeast(0),
-                onSelect = { index -> onExtraHittersSelected(extraHittersValues[index]) }
+                label = stringResource(R.string.form_lineup_creation_strategy_label),
+                options = strategyNames.toList(),
+                selectedIndex = strategies.indexOf(state.strategy).coerceAtLeast(0),
+                onSelect = { index -> onStrategySelected(strategies[index]) }
             )
             Spacer(modifier = Modifier.height(20.dp))
         }
 
-        FormBar(
-            cancelLabel = stringResource(R.string.cancel_button),
-            saveLabel = stringResource(R.string.lineup_creation_save),
-            onCancel = onCancelClick,
-            onSave = onSaveClick
+        val extraHittersLabels = stringArrayResource(R.array.extra_hitters_labels)
+        val extraHittersValues = integerArrayResource(R.array.extra_hitters_values)
+        SegmentedRow(
+            label = stringResource(R.string.form_lineup_creation_extra_hitters_label),
+            options = extraHittersLabels.toList(),
+            selectedIndex = extraHittersValues.indexOf(state.extraHitters).coerceAtLeast(0),
+            onSelect = { index -> onExtraHittersSelected(extraHittersValues[index]) }
         )
+        Spacer(modifier = Modifier.height(20.dp))
+    }
+    val header: @Composable (Boolean) -> Unit = { wide ->
+        ScreenHeader(
+            icon = R.drawable.ic_close_24dp,
+            onIconClick = onBackClick,
+            iconContentDescription = stringResource(R.string.generic_close),
+            eyebrow = stringResource(R.string.lineup_creation_header_eyebrow),
+            title = stringResource(R.string.lineup_creation_header_title),
+            actions = if (wide) {
+                {
+                    HeaderPill(
+                        label = stringResource(R.string.lineup_creation_save),
+                        onClick = onSaveClick
+                    )
+                }
+            } else {
+                null
+            }
+        )
+    }
+
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        if (isWide) {
+            // Create moves into the header (the close icon already cancels): no bottom bar
+            // taking the little height a landscape phone has.
+            Column(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp)) {
+                    header(true)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                TwoPaneRow(
+                    modifier = Modifier.weight(1f),
+                    spacing = 0.dp,
+                    first = gameFields,
+                    second = teamFields
+                )
+            }
+        } else {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    header(false)
+                    Spacer(modifier = Modifier.height(26.dp))
+                    gameFields()
+                    teamFields()
+                }
+
+                FormBar(
+                    cancelLabel = stringResource(R.string.cancel_button),
+                    saveLabel = stringResource(R.string.lineup_creation_save),
+                    onCancel = onCancelClick,
+                    onSave = onSaveClick
+                )
+            }
+        }
     }
 }
 
