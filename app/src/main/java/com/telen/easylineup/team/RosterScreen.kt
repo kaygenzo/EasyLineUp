@@ -91,7 +91,8 @@ fun RosterScreen(
     onSortSelected: (PlayerSortType) -> Unit,
     onPlayerClick: (Long) -> Unit,
     onAddPlayerClick: () -> Unit,
-    onMessageTeamClick: () -> Unit
+    onMessageTeamClick: () -> Unit,
+    selectedPlayerId: Long? = null
 ) {
     Box(
         modifier = Modifier
@@ -144,7 +145,11 @@ fun RosterScreen(
                         items = state.players,
                         key = { _, player -> player.id }
                     ) { index, player ->
-                        PlayerRow(row = player, onClick = { onPlayerClick(player.id) })
+                        PlayerRow(
+                            row = player,
+                            selected = player.id == selectedPlayerId,
+                            onClick = { onPlayerClick(player.id) }
+                        )
                         if (index < state.players.lastIndex) {
                             HorizontalDivider(
                                 modifier = Modifier.padding(horizontal = 4.dp),
@@ -247,12 +252,20 @@ private fun SortPillPreview() {
 }
 
 @Composable
-private fun PlayerRow(row: RosterRowState, onClick: () -> Unit) {
+private fun PlayerRow(row: RosterRowState, onClick: () -> Unit, selected: Boolean = false) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier
             .fillMaxWidth()
+            // The player whose profile the list-detail's other pane shows.
+            .background(
+                if (selected) {
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                } else {
+                    Color.Transparent
+                }
+            )
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp)
     ) {
@@ -299,6 +312,27 @@ private fun PlayerRowPreview() {
                 email = "jonas@example.com"
             ),
             onClick = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun PlayerRowSelectedPreview() {
+    DugoutTheme {
+        PlayerRow(
+            row = RosterRowState(
+                id = 1,
+                name = "Jonas Alvarez",
+                shirtNumber = 7,
+                imageUri = null,
+                battingSide = PlayerSide.RIGHT,
+                pitchingSide = PlayerSide.RIGHT,
+                phone = "555-0101",
+                email = "jonas@example.com"
+            ),
+            onClick = {},
+            selected = true
         )
     }
 }

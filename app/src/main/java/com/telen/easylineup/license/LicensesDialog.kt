@@ -48,19 +48,11 @@ fun LicensesDialog(
             )
         },
         text = {
-            Column {
-                Text(
-                    text = stringResource(R.string.libraries_title),
-                    style = MaterialTheme.typography.message,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                LazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
-                    items(libraries, key = { it.name }) { library ->
-                        LibraryRow(library = library, onClick = { onLibraryClick(library) })
-                        HorizontalDivider()
-                    }
-                }
-            }
+            LicensesList(
+                libraries = libraries,
+                onLibraryClick = onLibraryClick,
+                listModifier = Modifier.heightIn(max = 360.dp)
+            )
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
@@ -78,6 +70,40 @@ fun LicensesDialog(
 private fun LicensesDialogPreview() {
     DugoutTheme {
         LicensesDialog(libraries = openSourceLibraries, onLibraryClick = {}, onDismiss = {})
+    }
+}
+
+/**
+ * The libraries and what they are: [LicensesDialog]'s content, and Settings' detail pane on a
+ * wide screen, where it shows next to the list instead of in a dialog over it.
+ */
+@Composable
+fun LicensesList(
+    libraries: List<OpenSourceLibrary>,
+    onLibraryClick: (OpenSourceLibrary) -> Unit,
+    modifier: Modifier = Modifier,
+    listModifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = stringResource(R.string.libraries_title),
+            style = MaterialTheme.typography.message,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        LazyColumn(modifier = listModifier) {
+            items(libraries, key = { it.name }) { library ->
+                LibraryRow(library = library, onClick = { onLibraryClick(library) })
+                HorizontalDivider()
+            }
+        }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun LicensesListPreview() {
+    DugoutTheme {
+        LicensesList(libraries = openSourceLibraries, onLibraryClick = {})
     }
 }
 

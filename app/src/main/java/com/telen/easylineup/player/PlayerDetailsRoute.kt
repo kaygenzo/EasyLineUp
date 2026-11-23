@@ -75,67 +75,93 @@ fun PlayerDetailsRoute(navController: NavController, initialPlayerId: Long) {
     }
 
     pendingDeletePlayerId?.let { playerId ->
-        // Same key as the pager page's own PlayerViewModel: this is that page's instance, so
-        // the delete runs in a scope that outlives both the sheet and the page.
-        val deleteViewModel = koinViewModel<PlayerViewModel>(key = playerId.toString()) {
-            parametersOf(playerId)
-        }
-        LaunchedEffect(deleteViewModel) {
-            deleteViewModel.events
-                .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .collect { event ->
-                    when (event) {
-                        PlayerEvent.Deleted -> {
-                            pendingDeletePlayerId = null
-                            navController.popBackStack(Routes.Roster, false)
-                        }
-                        PlayerEvent.DeleteFailed -> {
-                            pendingDeletePlayerId = null
-                            Toast.makeText(
-                                context,
-                                R.string.error_player_delete_failed,
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                        PlayerEvent.Saved,
-                        PlayerEvent.SaveRejected,
-                        PlayerEvent.SaveFailed -> Unit
-                    }
-                }
-        }
+        PlayerDeleteFlow(
+            playerId = playerId,
+            showSheet = showDeleteSheet,
+            onPendingChanged = { pendingDeletePlayerId = it },
+            onShowSheetChanged = { showDeleteSheet = it },
+            onDeleted = { navController.popBackStack(Routes.Roster, false) }
+        )
+    }
+}
 
-        if (showDeleteSheet) {
-            ConfirmSheet(
-                title = stringResource(R.string.dialog_delete_player_title),
-                message = stringResource(R.string.dialog_delete_cannot_undo_message),
-                confirmLabel = stringResource(R.string.action_delete),
-                cancelLabel = stringResource(R.string.cancel_button),
-                onDismiss = {
-                    showDeleteSheet = false
-                    pendingDeletePlayerId = null
-                },
-                onConfirm = {
-                    FirebaseAnalyticsUtils.onClick(context, "click_player_details_delete")
-                    showDeleteSheet = false
-                    // ConfirmSheet calls onDismiss first, in the same click: set the id back
-                    // before the next frame, or the collector above goes away with it and the
-                    // Deleted event is never seen.
-                    pendingDeletePlayerId = playerId
-                    deleteViewModel.onDeleteConfirmed()
+
+/**
+ * Asks to confirm deleting [playerId], then deletes it: the profile carousel's and the roster
+ * list-detail's shared flow. [onPendingChanged] keeps the caller's pending id in sync (see the
+ * note on the confirm below), [onDeleted] runs once the player is gone.
+ */
+@Composable
+internal fun PlayerDeleteFlow(
+    playerId: Long,
+    showSheet: Boolean,
+    onPendingChanged: (Long?) -> Unit,
+    onShowSheetChanged: (Boolean) -> Unit,
+    onDeleted: () -> Unit
+) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    // Same key as the pager page's own PlayerViewModel: this is that page's instance, so
+    // the delete runs in a scope that outlives both the sheet and the page.
+    val deleteViewModel = koinViewModel<PlayerViewModel>(key = playerId.toString()) {
+        parametersOf(playerId)
+    }
+    LaunchedEffect(deleteViewModel) {
+        deleteViewModel.events
+            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .collect { event ->
+                when (event) {
+                    PlayerEvent.Deleted -> {
+                        onPendingChanged(null)
+                        onDeleted()
+                    }
+                    PlayerEvent.DeleteFailed -> {
+                        onPendingChanged(null)
+                        Toast.makeText(
+                            context,
+                            R.string.error_player_delete_failed,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    PlayerEvent.Saved,
+                    PlayerEvent.SaveRejected,
+                    PlayerEvent.SaveFailed -> Unit
                 }
-            )
-        }
+            }
+    }
+
+    if (showSheet) {
+        ConfirmSheet(
+            title = stringResource(R.string.dialog_delete_player_title),
+            message = stringResource(R.string.dialog_delete_cannot_undo_message),
+            confirmLabel = stringResource(R.string.action_delete),
+            cancelLabel = stringResource(R.string.cancel_button),
+            onDismiss = {
+                onShowSheetChanged(false)
+                onPendingChanged(null)
+            },
+            onConfirm = {
+                FirebaseAnalyticsUtils.onClick(context, "click_player_details_delete")
+                onShowSheetChanged(false)
+                // ConfirmSheet calls onDismiss first, in the same click: set the id back
+                // before the next frame, or the collector above goes away with it and the
+                // Deleted event is never seen.
+                onPendingChanged(playerId)
+                deleteViewModel.onDeleteConfirmed()
+            }
+        )
     }
 }
 
 /**
- * One pager page: the route for a single player, with its own [PlayerViewModel]. No preview of
- * its own - like any Route it only wires state into [PlayerProfileScreen], which has them.
+ * One pager page, or the roster list-detail's detail pane (no [onBackClick] then): the route
+ * for a single player, with its own [PlayerViewModel]. No preview of its own - like any Route it
+ * only wires state into [PlayerProfileScreen], which has them.
  */
 @Composable
-private fun PlayerProfilePage(
+internal fun PlayerProfilePage(
     playerId: Long,
-    onBackClick: () -> Unit,
+    onBackClick: (() -> Unit)?,
     onEditRequested: (Long) -> Unit,
     onDeleteRequested: (Long) -> Unit
 ) {

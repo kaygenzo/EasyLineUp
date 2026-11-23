@@ -32,8 +32,16 @@ import androidx.compose.ui.unit.dp
  * portrait, a split screen or a detail pane get the layout that fits them.
  */
 
-/** Whether this box is wider than tall: its panes then go side by side instead of stacking. */
-val BoxWithConstraintsScope.isWide: Boolean get() = maxWidth > maxHeight
+/**
+ * Whether this box is wider than tall, and wide enough for two panes: its panes then go side by
+ * side instead of stacking. A list-detail's own detail pane is wider than tall on a landscape
+ * phone too, but far too narrow to split again, hence the minimum width.
+ */
+val BoxWithConstraintsScope.isWide: Boolean
+    get() = maxWidth > maxHeight && maxWidth >= MIN_TWO_PANE_WIDTH
+
+/** Below this, two panes would each be narrower than a phone's portrait width allows for. */
+private val MIN_TWO_PANE_WIDTH = 520.dp
 
 /** The gap between the two panes of a [TwoPaneRow]. */
 val PANE_GAP = 16.dp

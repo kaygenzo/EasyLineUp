@@ -101,11 +101,16 @@ class HomeActivity : BaseActivity() {
                         }
                     }
                     // Wider than tall, the tabs move to a rail on the left: a bottom bar takes
-                    // height, which a landscape phone has little of.
-                    if (isWide) {
-                        Row(modifier = Modifier.fillMaxSize()) {
-                            currentTab?.let { tab ->
-                                DugoutNavRail(selected = tab, onSelect = onSelectTab)
+                    // height, which a landscape phone has little of. The NavHost stays at the
+                    // same place in both layouts: moved to another branch, it would start over
+                    // on a rotation and lose every screen's saved state (an open date picker).
+                    val wide = isWide
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Row(modifier = Modifier.weight(1f)) {
+                            if (wide) {
+                                currentTab?.let { tab ->
+                                    DugoutNavRail(selected = tab, onSelect = onSelectTab)
+                                }
                             }
                             AppNavHost(
                                 navController = navController,
@@ -113,13 +118,7 @@ class HomeActivity : BaseActivity() {
                                 modifier = Modifier.weight(1f)
                             )
                         }
-                    } else {
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            AppNavHost(
-                                navController = navController,
-                                homeViewModel = viewModel,
-                                modifier = Modifier.weight(1f)
-                            )
+                        if (!wide) {
                             currentTab?.let { tab ->
                                 DugoutBottomNav(selected = tab, onSelect = onSelectTab)
                             }

@@ -113,7 +113,6 @@ fun TeamFormScreen(
             )
             Spacer(modifier = Modifier.height(18.dp))
             TypeField(selectedType = state.teamType, onTypeSelected = onTypeSelected)
-            Spacer(modifier = Modifier.height(18.dp))
         }
         Column(modifier = Modifier.fillMaxSize()) {
             FormAppBar(
@@ -153,6 +152,7 @@ fun TeamFormScreen(
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     fields()
+                    Spacer(modifier = Modifier.height(18.dp))
                 }
                 FormBar(onSaveClick = onSaveClick)
             }

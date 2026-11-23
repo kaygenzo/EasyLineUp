@@ -124,12 +124,14 @@ fun Modifier.dashedBorder(
  */
 @Composable
 fun DugoutCard(
+    modifier: Modifier = Modifier,
     borderWidth: Dp = 1.dp,
     borderAlpha: Float = 0.6f,
+    borderColor: Color? = null,
     content: @Composable () -> Unit
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 10.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -137,7 +139,7 @@ fun DugoutCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(
             borderWidth,
-            MaterialTheme.colorScheme.outline.copy(alpha = borderAlpha)
+            borderColor ?: MaterialTheme.colorScheme.outline.copy(alpha = borderAlpha)
         )
     ) {
         Column { content() }

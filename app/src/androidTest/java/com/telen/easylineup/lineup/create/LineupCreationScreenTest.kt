@@ -147,9 +147,11 @@ class LineupCreationScreenTest {
         composeTestRule
             .onNodeWithText(string(R.string.lineup_creation_new_tournament_name_placeholder))
             .performTextInput(TestFixtures.TOURNAMENT_NAME)
+        // The keyboard is up over the sheet after typing: an injected tap on Save can land on
+        // it instead, so the click is invoked through its semantics action.
         composeTestRule
             .onNodeWithText(string(R.string.lineup_creation_new_tournament_save))
-            .performClick()
+            .performSemanticsAction(SemanticsActions.OnClick)
 
         composeTestRule.waitForText(string(R.string.lineup_creation_error_tournament_name_taken))
         composeTestRule

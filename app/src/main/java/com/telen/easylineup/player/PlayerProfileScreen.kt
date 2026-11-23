@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -79,39 +80,53 @@ data class PlayerProfileState(
     val selectedStrategyIndex: Int
 )
 
+/**
+ * A player's profile. With no [onBackClick], it's the detail pane of the roster's list-detail
+ * (wide screens): no back arrow and no "Roster" title then, the list is right next to it, only
+ * the edit and delete actions.
+ */
 @Composable
 fun PlayerProfileScreen(
     state: PlayerProfileState,
     onStrategySelected: (Int) -> Unit,
-    onBackClick: () -> Unit,
+    onBackClick: (() -> Unit)?,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
     val context = LocalContext.current
     val strategyOptions = state.teamType.getStrategiesDisplayName(context)?.toList() ?: emptyList()
 
-    val header: @Composable (Modifier) -> Unit = { modifier ->
-        ScreenHeader(
-            icon = R.drawable.ic_arrow_left_white_24dp,
-            onIconClick = onBackClick,
-            iconContentDescription = stringResource(R.string.generic_back),
-            eyebrow = null,
-            title = stringResource(R.string.title_team),
-            modifier = modifier,
-            actions = {
-                HeaderActionIconChip(
-                    icon = R.drawable.ic_edit_outline_24dp,
-                    contentDescription = stringResource(R.string.action_edit),
-                    onClick = onEditClick
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                HeaderActionIconChip(
-                    icon = R.drawable.ic_delete_outline_24dp,
-                    contentDescription = stringResource(R.string.action_delete),
-                    onClick = onDeleteClick
-                )
-            }
+    val actions: @Composable RowScope.() -> Unit = {
+        HeaderActionIconChip(
+            icon = R.drawable.ic_edit_outline_24dp,
+            contentDescription = stringResource(R.string.action_edit),
+            onClick = onEditClick
         )
+        Spacer(modifier = Modifier.width(8.dp))
+        HeaderActionIconChip(
+            icon = R.drawable.ic_delete_outline_24dp,
+            contentDescription = stringResource(R.string.action_delete),
+            onClick = onDeleteClick
+        )
+    }
+    val header: @Composable (Modifier) -> Unit = { modifier ->
+        if (onBackClick == null) {
+            Row(
+                modifier = modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                content = actions
+            )
+        } else {
+            ScreenHeader(
+                icon = R.drawable.ic_arrow_left_white_24dp,
+                onIconClick = onBackClick,
+                iconContentDescription = stringResource(R.string.generic_back),
+                eyebrow = null,
+                title = stringResource(R.string.title_team),
+                modifier = modifier,
+                actions = actions
+            )
+        }
     }
     // Who the player is, then how they've been used: stacked when tall, side by side when
     // wide, so the chart isn't below the fold of a landscape phone.
@@ -411,6 +426,40 @@ private fun PlayerProfileScreenPreview() {
             ),
             onStrategySelected = {},
             onBackClick = {},
+            onEditClick = {},
+            onDeleteClick = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun PlayerProfileScreenInPanePreview() {
+    DugoutTheme {
+        PlayerProfileScreen(
+            state = PlayerProfileState(
+                name = "Jonas Alvarez",
+                shirtNumber = 7,
+                imageUri = null,
+                sex = Sex.MALE,
+                battingSide = PlayerSide.RIGHT,
+                pitchingSide = PlayerSide.RIGHT,
+                licenseNumber = "FR-22841",
+                email = "jonas.a@mail.com",
+                phoneNumber = "(555) 019-2231",
+                positionsData = mapOf(
+                    FieldPosition.SHORT_STOP to 15,
+                    FieldPosition.SECOND_BASE to 6,
+                    FieldPosition.THIRD_BASE to 3,
+                    FieldPosition.DP_DH to 2,
+                    FieldPosition.CENTER_FIELD to 1
+                ),
+                teamType = TeamType.BASEBALL,
+                strategy = TeamType.BASEBALL.getStrategies()[0],
+                selectedStrategyIndex = 0
+            ),
+            onStrategySelected = {},
+            onBackClick = null,
             onEditClick = {},
             onDeleteClick = {}
         )

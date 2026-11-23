@@ -7,6 +7,8 @@ package com.telen.easylineup.tournaments.list
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -158,8 +160,12 @@ class TournamentListScreenTest {
         OrientationTestUtils.rotateToLandscape()
         composeTestRule.waitForIdle()
 
-        composeTestRule.waitForText(TestFixtures.TOURNAMENT_NAME)
-        composeTestRule.onNodeWithText(TestFixtures.TOURNAMENT_NAME).assertIsDisplayed()
+        // Landscape is a list-detail: the tournament's ticket on the left, and its name over
+        // its lineups on the right.
+        composeTestRule.waitForText(TestFixtures.LINEUP_NAME)
+        composeTestRule.onAllNodesWithText(TestFixtures.TOURNAMENT_NAME).onFirst()
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(TestFixtures.LINEUP_NAME).assertIsDisplayed()
 
         OrientationTestUtils.rotateToPortrait()
         composeTestRule.waitForIdle()

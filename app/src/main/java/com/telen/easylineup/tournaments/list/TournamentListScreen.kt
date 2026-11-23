@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -59,9 +61,12 @@ import com.telen.easylineup.compose.dashedBorder
 import com.telen.easylineup.compose.dateDay
 import com.telen.easylineup.compose.dateMonth
 import com.telen.easylineup.compose.emptyStateTitle
+import com.telen.easylineup.compose.isWide
 import com.telen.easylineup.compose.message
 import com.telen.easylineup.compose.rowSubtitle
 import com.telen.easylineup.compose.rowTitle
+import com.telen.easylineup.compose.sheetSubtitle
+import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.GeoLocation
 import com.telen.easylineup.domain.model.Lineup
@@ -100,64 +105,142 @@ fun TournamentListScreen(
     onDeleteClick: (Tournament) -> Unit,
     onMapClick: (GeoLocation) -> Unit
 ) {
-    Box(
+    // Wide, the list is a list-detail: tapping a ticket shows its lineups in the other pane
+    // instead of expanding it in place, which pushed every other tournament off the screen.
+    var selectedTournamentId by rememberSaveable { mutableStateOf<Long?>(null) }
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            ScreenHeader(
-                icon = R.drawable.ic_arrow_left_white_24dp,
-                onIconClick = onBackClick,
-                iconContentDescription = stringResource(R.string.generic_back),
-                eyebrow = state.teamName,
-                title = stringResource(R.string.tournaments_list_header_title),
-                modifier = Modifier.padding(bottom = 14.dp)
-            )
+        val wide = isWide
+        val shown = state.items.firstOrNull { it.tournament.id == selectedTournamentId }
+            ?: state.items.firstOrNull()
+        val list: @Composable () -> Unit = {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                    ScreenHeader(
+                        icon = R.drawable.ic_arrow_left_white_24dp,
+                        onIconClick = onBackClick,
+                        iconContentDescription = stringResource(R.string.generic_back),
+                        eyebrow = state.teamName,
+                        title = stringResource(R.string.tournaments_list_header_title),
+                        modifier = Modifier.padding(bottom = 14.dp)
+                    )
 
-            DugoutSearchField(
-                value = state.searchQuery,
-                onValueChange = onSearchQueryChanged,
-                placeholder = stringResource(R.string.tournaments_list_search_placeholder),
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
+                    DugoutSearchField(
+                        value = state.searchQuery,
+                        onValueChange = onSearchQueryChanged,
+                        placeholder = stringResource(R.string.tournaments_list_search_placeholder),
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
 
-            if (state.items.isEmpty()) {
-                TournamentsEmptyState(isSearching = state.searchQuery.isNotBlank())
-            } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                    items(items = state.items, key = { it.tournament.id }) { item ->
-                        TournamentTicketCard(
-                            item = item,
-                            teamType = state.teamType,
-                            mapLocation = state.mapsByTournamentId[item.tournament.id],
-                            onLineupClick = onLineupClick,
-                            onEditLineupClick = onEditLineupClick,
-                            onStatsClick = { onStatsClick(item.tournament) },
-                            onDeleteClick = { onDeleteClick(item.tournament) },
-                            onMapClick = onMapClick
-                        )
+                    if (state.items.isEmpty()) {
+                        TournamentsEmptyState(isSearching = state.searchQuery.isNotBlank())
+                    } else {
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                            items(items = state.items, key = { it.tournament.id }) { item ->
+                                TournamentTicketCard(
+                                    item = item,
+                                    teamType = state.teamType,
+                                    mapLocation = state.mapsByTournamentId[item.tournament.id],
+                                    onLineupClick = onLineupClick,
+                                    onEditLineupClick = onEditLineupClick,
+                                    onStatsClick = { onStatsClick(item.tournament) },
+                                    onDeleteClick = { onDeleteClick(item.tournament) },
+                                    onMapClick = onMapClick,
+                                    selected = wide && item == shown,
+                                    onSelect = if (wide) {
+                                        { selectedTournamentId = item.tournament.id }
+                                    } else {
+                                        null
+                                    }
+                                )
+                            }
+                            item { Spacer(modifier = Modifier.height(72.dp)) }
+                        }
                     }
-                    item { Spacer(modifier = Modifier.height(72.dp)) }
+                }
+
+                FloatingActionButton(
+                    onClick = onCreateLineupClick,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(24.dp),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_add_white_24dp),
+                        contentDescription = stringResource(
+                            R.string.tournaments_list_create_lineup_content_description
+                        )
+                    )
                 }
             }
         }
-
-        FloatingActionButton(
-            onClick = onCreateLineupClick,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(24.dp),
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_add_white_24dp),
-                contentDescription = stringResource(
-                    R.string.tournaments_list_create_lineup_content_description
+        if (wide && shown != null) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.weight(0.95f)) { list() }
+                TournamentLineupsPane(
+                    item = shown,
+                    teamType = state.teamType,
+                    onLineupClick = onLineupClick,
+                    onEditLineupClick = onEditLineupClick,
+                    modifier = Modifier
+                        .weight(1.05f)
+                        .padding(top = 16.dp, end = 16.dp, bottom = 16.dp)
                 )
+            }
+        } else {
+            list()
+        }
+    }
+}
+
+/**
+ * The tournament the wide list-detail's other pane shows: its name and every one of its
+ * lineups, scrolling on its own next to the tickets.
+ */
+@Composable
+private fun TournamentLineupsPane(
+    item: TournamentItem,
+    teamType: TeamType,
+    onLineupClick: (Lineup) -> Unit,
+    onEditLineupClick: (Lineup) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    DugoutCard(modifier = modifier) {
+        Column(modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 14.dp)) {
+            Text(
+                text = item.tournament.name,
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.sheetTitle
             )
+            Text(
+                text = pluralStringResource(
+                    R.plurals.tournaments_list_lineups_count,
+                    item.lineups.size,
+                    item.lineups.size
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                style = MaterialTheme.typography.sheetSubtitle
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        LazyColumn {
+            itemsIndexed(items = item.lineups, key = { _, lineup -> lineup.id }) { index, lineup ->
+                if (index > 0) {
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                }
+                LineupRow(
+                    lineup = lineup,
+                    teamType = teamType,
+                    onClick = { onLineupClick(lineup) },
+                    onEditClick = { onEditLineupClick(lineup) }
+                )
+            }
         }
     }
 }
@@ -215,8 +298,12 @@ private fun TournamentTicketCard(
     onEditLineupClick: (Lineup) -> Unit,
     onStatsClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    onMapClick: (GeoLocation) -> Unit
+    onMapClick: (GeoLocation) -> Unit,
+    selected: Boolean = false,
+    onSelect: (() -> Unit)? = null
 ) {
+    // With an [onSelect] (wide list-detail), a tap selects the ticket for the other pane to show
+    // its lineups, instead of expanding it in place.
     var expanded by rememberSaveable { mutableStateOf(false) }
     var showAllLineups by rememberSaveable { mutableStateOf(false) }
     val chevronRotation by animateFloatAsState(
@@ -224,12 +311,16 @@ private fun TournamentTicketCard(
         label = "chevron-rotation"
     )
 
-    DugoutCard(borderWidth = 1.5.dp, borderAlpha = 0.85f) {
+    DugoutCard(
+        borderWidth = if (selected) 2.dp else 1.5.dp,
+        borderAlpha = 0.85f,
+        borderColor = if (selected) MaterialTheme.colorScheme.primary else null
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
-                .clickable { expanded = !expanded },
+                .clickable { if (onSelect != null) onSelect() else expanded = !expanded },
             verticalAlignment = Alignment.CenterVertically
         ) {
             TicketDateChip(item.getStart())
@@ -293,18 +384,20 @@ private fun TournamentTicketCard(
                     contentDescription = stringResource(R.string.action_delete),
                     onClick = onDeleteClick
                 )
-                Icon(
-                    painter = painterResource(R.drawable.ic_chevron_down_24dp),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .size(16.dp)
-                        .rotate(chevronRotation)
-                )
+                if (onSelect == null) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_chevron_down_24dp),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .size(16.dp)
+                            .rotate(chevronRotation)
+                    )
+                }
             }
         }
 
-        if (expanded) {
+        if (expanded && onSelect == null) {
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
             val visibleLineups = if (showAllLineups || item.lineups.size <= 2) {
                 item.lineups
@@ -386,6 +479,54 @@ private fun TournamentTicketCardPreview() {
         )
     }
 }
+
+/** Selected in the wide list-detail: highlighted, and no expand chevron. */
+@DugoutPreviews
+@Composable
+private fun TournamentTicketCardSelectedPreview() {
+    DugoutTheme {
+        TournamentTicketCard(
+            item = PREVIEW_TOURNAMENT_ITEM,
+            teamType = TeamType.BASEBALL,
+            mapLocation = null,
+            onLineupClick = {},
+            onEditLineupClick = {},
+            onStatsClick = {},
+            onDeleteClick = {},
+            onMapClick = {},
+            selected = true,
+            onSelect = {}
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun TournamentLineupsPanePreview() {
+    DugoutTheme {
+        TournamentLineupsPane(
+            item = PREVIEW_TOURNAMENT_ITEM,
+            teamType = TeamType.BASEBALL,
+            onLineupClick = {},
+            onEditLineupClick = {}
+        )
+    }
+}
+
+private val PREVIEW_TOURNAMENT_ITEM = TournamentItem(
+    tournament = Tournament(
+        id = 1L,
+        name = "Fall Classic",
+        createdAt = 1760000000000L,
+        startTime = 1760000000000L,
+        endTime = 1760003600000L,
+        address = "Riverside Park"
+    ),
+    lineups = persistentListOf(
+        Lineup(id = 1L, name = "Game 3 — Starters", eventTimeInMillis = 1760000000000L),
+        Lineup(id = 2L, name = "Game 2 — Bench heavy", eventTimeInMillis = 1759400000000L)
+    )
+)
 
 /** A tournament just created, with no lineup yet and no dates: still listed. */
 @DugoutPreviews

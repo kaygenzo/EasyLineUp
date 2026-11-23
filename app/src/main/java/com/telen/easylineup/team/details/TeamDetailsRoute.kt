@@ -34,9 +34,12 @@ import com.telen.easylineup.tournaments.list.LineupListViewModel
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import org.koin.androidx.compose.koinViewModel
 
-/** The current team's details. */
+/**
+ * The current team's details: a screen of its own, or Settings' detail pane on a wide screen
+ * ([inPane]: no back arrow, and nothing to pop once the team is deleted).
+ */
 @Composable
-fun TeamDetailsRoute(navController: NavController) {
+fun TeamDetailsRoute(navController: NavController, inPane: Boolean = false) {
     val teamViewModel = koinViewModel<TeamViewModel>()
     val lineupListViewModel = koinViewModel<LineupListViewModel>()
     val context = LocalContext.current
@@ -56,7 +59,7 @@ fun TeamDetailsRoute(navController: NavController) {
             .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .collect { event ->
                 when (event) {
-                    TeamEvent.TeamDeleted -> navController.popBackStack()
+                    TeamEvent.TeamDeleted -> if (!inPane) navController.popBackStack()
                     TeamEvent.LastTeamDeleted -> {
                         // Nothing left to show here: start over, as after deleting all data.
                         val intent = Intent(context, LoginActivity::class.java).apply {
@@ -90,7 +93,7 @@ fun TeamDetailsRoute(navController: NavController) {
             unsetCount = teamUiState.players.count { it.sex == Sex.UNKNOWN.id },
             createdAt = teamUiState.teamCreatedAt
         ),
-        onBackClick = { navController.navigateUp() },
+        onBackClick = if (inPane) null else { { navController.navigateUp() } },
         onEditClick = {
             FirebaseAnalyticsUtils.onClick(context, "click_team_details_edit")
             teamViewModel.team?.let { team ->

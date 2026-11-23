@@ -57,6 +57,7 @@ import com.telen.easylineup.compose.rowMeta
 import com.telen.easylineup.compose.rowSubtitle
 import com.telen.easylineup.compose.rowTitle
 import com.telen.easylineup.compose.sectionLabel
+import com.telen.easylineup.compose.sheetTitle
 import com.telen.easylineup.compose.uppercaseLocalized
 import com.telen.easylineup.domain.model.TeamType
 import com.telen.easylineup.utils.titleRes
@@ -82,8 +83,12 @@ fun SettingsScreen(
     onImportClick: () -> Unit,
     onDeleteAllDataClick: () -> Unit,
     onLicensesClick: () -> Unit,
-    onPlayStoreClick: () -> Unit
+    onPlayStoreClick: () -> Unit,
+    selectedDetail: SettingsDetail? = null,
+    onDetailSelected: ((SettingsDetail) -> Unit)? = null
 ) {
+    // With an [onDetailSelected] (wide list-detail), the rows that open something show it in
+    // the other pane instead: the team's details, the theme's choices, the licenses.
     var showThemeDialog by rememberSaveable { mutableStateOf(false) }
 
     Column(
@@ -119,7 +124,8 @@ fun SettingsScreen(
                 },
                 title = state.teamName,
                 subtitle = teamTypeLabel + stringResource(R.string.settings_team_row_subtitle),
-                onClick = onTeamClick,
+                selected = selectedDetail == SettingsDetail.TEAM,
+                onClick = onDetailSelected?.let { { it(SettingsDetail.TEAM) } } ?: onTeamClick,
                 trailing = { ChevronIcon() }
             )
         }
@@ -148,7 +154,9 @@ fun SettingsScreen(
                     R.array.pref_theme_style_values,
                     state.themeValue
                 ),
-                onClick = { showThemeDialog = true },
+                selected = selectedDetail == SettingsDetail.THEME,
+                onClick = onDetailSelected?.let { { it(SettingsDetail.THEME) } }
+                    ?: { showThemeDialog = true },
                 trailing = { ChevronIcon() }
             )
         }
@@ -204,7 +212,9 @@ fun SettingsScreen(
             SettingsRow(
                 leading = { RowIconChip(R.drawable.ic_settings_licenses) },
                 title = stringResource(R.string.setting_licenses_title),
-                onClick = onLicensesClick,
+                selected = selectedDetail == SettingsDetail.LICENSES,
+                onClick = onDetailSelected?.let { { it(SettingsDetail.LICENSES) } }
+                    ?: onLicensesClick,
                 trailing = { ChevronIcon() }
             )
             RowDivider()
@@ -263,35 +273,16 @@ private fun SingleChoiceDialog(
     onSelected: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val labels = stringArrayResource(labelsRes)
-    val values = stringArrayResource(valuesRes)
-
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(titleRes), style = MaterialTheme.typography.dialogTitle) },
         text = {
-            Column {
-                labels.forEachIndexed { index, label ->
-                    val value = values[index]
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onSelected(value) }
-                            .padding(vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = value == currentValue,
-                            onClick = { onSelected(value) }
-                        )
-                        Text(
-                            text = label,
-                            modifier = Modifier.padding(start = 8.dp),
-                            style = MaterialTheme.typography.message
-                        )
-                    }
-                }
-            }
+            SingleChoiceOptions(
+                labelsRes = labelsRes,
+                valuesRes = valuesRes,
+                currentValue = currentValue,
+                onSelected = onSelected
+            )
         },
         confirmButton = {},
         dismissButton = {
@@ -320,6 +311,88 @@ private fun SingleChoiceDialogPreview() {
     }
 }
 
+/** A setting's choices, one radio row each: [SingleChoiceDialog]'s content, or a pane's. */
+@Composable
+private fun SingleChoiceOptions(
+    labelsRes: Int,
+    valuesRes: Int,
+    currentValue: String,
+    onSelected: (String) -> Unit
+) {
+    val labels = stringArrayResource(labelsRes)
+    val values = stringArrayResource(valuesRes)
+    Column {
+        labels.forEachIndexed { index, label ->
+            val value = values[index]
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onSelected(value) }
+                    .padding(vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = value == currentValue,
+                    onClick = { onSelected(value) }
+                )
+                Text(
+                    text = label,
+                    modifier = Modifier.padding(start = 8.dp),
+                    style = MaterialTheme.typography.message
+                )
+            }
+        }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun SingleChoiceOptionsPreview() {
+    DugoutTheme {
+        SingleChoiceOptions(
+            labelsRes = R.array.pref_theme_style_labels,
+            valuesRes = R.array.pref_theme_style_values,
+            currentValue = "0",
+            onSelected = {}
+        )
+    }
+}
+
+/** What a Settings row opens in the wide list-detail's other pane. */
+enum class SettingsDetail { TEAM, THEME, LICENSES }
+
+/**
+ * The theme's choices in Settings' detail pane on a wide screen, right next to the list,
+ * where portrait opens them in a dialog over it.
+ */
+@Composable
+fun SettingsThemePane(currentValue: String, onSelected: (String) -> Unit) {
+    DugoutCard {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = stringResource(R.string.setting_day_night_style_description),
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.sheetTitle
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            SingleChoiceOptions(
+                labelsRes = R.array.pref_theme_style_labels,
+                valuesRes = R.array.pref_theme_style_values,
+                currentValue = currentValue,
+                onSelected = onSelected
+            )
+        }
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun SettingsThemePanePreview() {
+    DugoutTheme {
+        SettingsThemePane(currentValue = "0", onSelected = {})
+    }
+}
+
 @Composable
 private fun SectionLabel(text: String) {
     Text(
@@ -345,10 +418,19 @@ private fun SettingsRow(
     subtitle: String? = null,
     titleColor: Color = MaterialTheme.colorScheme.onSurface,
     onClick: (() -> Unit)? = null,
+    selected: Boolean = false,
     trailing: @Composable () -> Unit
 ) {
     val rowModifier = Modifier
         .fillMaxWidth()
+        // The row whose detail the wide list-detail's other pane shows.
+        .background(
+            if (selected) {
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+            } else {
+                Color.Transparent
+            }
+        )
         .let { if (onClick != null) it.clickable(onClick = onClick) else it }
         .padding(horizontal = 16.dp, vertical = 12.dp)
 
@@ -384,6 +466,21 @@ private fun SettingsRowPreview() {
             title = "Lineup style",
             subtitle = "Classic",
             onClick = {},
+            trailing = { ChevronIcon() }
+        )
+    }
+}
+
+@DugoutPreviews
+@Composable
+private fun SettingsRowSelectedPreview() {
+    DugoutTheme {
+        SettingsRow(
+            leading = { RowIconChip(R.drawable.ic_settings_font) },
+            title = "Lineup style",
+            subtitle = "Classic",
+            onClick = {},
+            selected = true,
             trailing = { ChevronIcon() }
         )
     }

@@ -8,7 +8,10 @@ import android.app.Activity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -27,6 +30,7 @@ import com.telen.easylineup.testing.OrientationTestUtils
 import com.telen.easylineup.testing.SeedDatabaseRule
 import com.telen.easylineup.testing.TestFixtures
 import com.telen.easylineup.testing.ThemeTestUtils
+import com.telen.easylineup.testing.UI_TIMEOUT_MILLIS
 import com.telen.easylineup.testing.pressBack
 import com.telen.easylineup.testing.showOffense
 import com.telen.easylineup.testing.string
@@ -152,6 +156,9 @@ class ScreenGalleryTest(
         close()
     }
 
+    /** Landscape is wide enough for the list-detail layouts in every size this test covers. */
+    private val wide get() = orientation == Orientation.LANDSCAPE
+
     @Test
     fun captureEveryScreen() {
         ActivityScenario.launch(LoginActivity::class.java)
@@ -174,11 +181,23 @@ class ScreenGalleryTest(
         composeTestRule.waitForText("Starter 1")
         capture("roster")
 
-        text("Starter 1").performClick()
-        composeTestRule.waitForAbsence(string(R.string.roster_sort_by_name).uppercase())
-        capture("player_profile")
-        pressBack()
-        composeTestRule.waitForText(string(R.string.roster_sort_by_name).uppercase())
+        if (wide) {
+            // List-detail: the profile opens in the other pane, next to the roster - the first
+            // player's already, so the name shows twice and the row is the first match.
+            composeTestRule.onAllNodesWithText("Starter 1").onFirst().performClick()
+            composeTestRule.waitUntil(UI_TIMEOUT_MILLIS) {
+                composeTestRule
+                    .onAllNodesWithContentDescription(string(R.string.action_delete))
+                    .fetchSemanticsNodes().isNotEmpty()
+            }
+            capture("player_profile")
+        } else {
+            text("Starter 1").performClick()
+            composeTestRule.waitForAbsence(string(R.string.roster_sort_by_name).uppercase())
+            capture("player_profile")
+            pressBack()
+            composeTestRule.waitForText(string(R.string.roster_sort_by_name).uppercase())
+        }
 
         description(string(R.string.roster_add_player_content_description)).performClick()
         composeTestRule.waitForText(string(R.string.player_form_title_create))
@@ -207,7 +226,8 @@ class ScreenGalleryTest(
         pressBack()
         composeTestRule.waitForText(TestFixtures.TOURNAMENT_NAME)
 
-        text(TestFixtures.TOURNAMENT_NAME).performClick()
+        // Wide, the tournament's name also titles the lineups pane: the ticket is the first one.
+        composeTestRule.onAllNodesWithText(TestFixtures.TOURNAMENT_NAME).onFirst().performClick()
         composeTestRule.waitForText(TestFixtures.LINEUP_NAME)
         text(TestFixtures.LINEUP_NAME).scrollAndClick()
         // Landscape shows defense and offense side by side, with no tabbar: both captures then
@@ -236,9 +256,19 @@ class ScreenGalleryTest(
         composeTestRule.waitForText(string(R.string.title_settings))
         capture("settings")
 
-        text(TestFixtures.TEAM_NAME).scrollAndClick()
-        composeTestRule.waitForText(string(R.string.team_details_header_title))
-        capture("team_details")
+        if (wide) {
+            // List-detail: the team's details already show in the other pane.
+            composeTestRule.waitUntil(UI_TIMEOUT_MILLIS) {
+                composeTestRule
+                    .onAllNodesWithContentDescription(string(R.string.action_edit))
+                    .fetchSemanticsNodes().isNotEmpty()
+            }
+            capture("team_details")
+        } else {
+            text(TestFixtures.TEAM_NAME).scrollAndClick()
+            composeTestRule.waitForText(string(R.string.team_details_header_title))
+            capture("team_details")
+        }
     }
 
     companion object {

@@ -210,3 +210,21 @@ actually verify on a small/landscape screen size before considering the
 screen done — the four `@DugoutPreviews` variants are the visual check, a
 real small-screen run (device override or the preview's interaction mode) is
 the functional one.
+
+## Every screen has a landscape layout, decided on the room it gets
+
+A screen wider than tall rearranges itself instead of scrolling a portrait layout: decide
+inside a `BoxWithConstraints` with `isWide` (`compose/WideLayout.kt`: wider than tall and at
+least 520dp), never on `LocalConfiguration.orientation` - a tablet in portrait, a split screen
+or a list-detail's own detail pane must get the layout that fits them. The same building
+blocks are reused, only their arrangement changes; the patterns, all in the app already:
+- top-level tabs: a `DugoutNavRail` on the left instead of the bottom bar (`HomeActivity`);
+- forms: Save/Create moves into the header (`HeaderPill`), never a bottom bar, and the fields
+  split in two columns (`TwoPaneRow`);
+- content that portrait stacks: two panes side by side (`TwoPaneRow`), each scrolling alone;
+- lists: list-detail - tapping an item shows it in the other pane instead of navigating
+  (roster, tournaments, settings), the detail reused with no back arrow;
+- sheets: `DugoutBottomSheet` turns into a side sheet anchored right on its own.
+`@DugoutPreviews`' landscape variants and the screenshot tests' small-landscape configuration
+show the result; `ScreenGalleryTest` walks every screen in landscape on three sizes.
+

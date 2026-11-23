@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -76,26 +77,37 @@ private fun formatCreatedAt(createdAt: Long): String =
 @Composable
 fun TeamDetailsScreen(
     state: TeamDetailsState,
-    onBackClick: () -> Unit,
+    onBackClick: (() -> Unit)?,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    val header: @Composable (Modifier) -> Unit = { modifier ->
-        ScreenHeader(
-            icon = R.drawable.ic_arrow_left_white_24dp,
-            onIconClick = onBackClick,
-            iconContentDescription = stringResource(R.string.generic_back),
-            eyebrow = stringResource(R.string.title_settings),
-            title = stringResource(R.string.team_details_header_title),
-            modifier = modifier,
-            actions = {
-                HeaderActionIconChip(
-                    icon = R.drawable.ic_edit_outline_24dp,
-                    contentDescription = stringResource(R.string.action_edit),
-                    onClick = onEditClick
-                )
-            }
+    // No [onBackClick]: Settings' detail pane on a wide screen, next to the list - no back
+    // arrow and no title then, only the edit action.
+    val edit: @Composable RowScope.() -> Unit = {
+        HeaderActionIconChip(
+            icon = R.drawable.ic_edit_outline_24dp,
+            contentDescription = stringResource(R.string.action_edit),
+            onClick = onEditClick
         )
+    }
+    val header: @Composable (Modifier) -> Unit = { modifier ->
+        if (onBackClick == null) {
+            Row(
+                modifier = modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                content = edit
+            )
+        } else {
+            ScreenHeader(
+                icon = R.drawable.ic_arrow_left_white_24dp,
+                onIconClick = onBackClick,
+                iconContentDescription = stringResource(R.string.generic_back),
+                eyebrow = stringResource(R.string.title_settings),
+                title = stringResource(R.string.team_details_header_title),
+                modifier = modifier,
+                actions = edit
+            )
+        }
     }
     // The team and its counts, then the gender breakdown and the delete row: stacked when
     // tall, side by side when wide.

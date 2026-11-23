@@ -9,14 +9,23 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -30,9 +39,11 @@ import com.telen.easylineup.compose.ExportConfirmSheet
 import com.telen.easylineup.compose.ExportSuccessSheet
 import com.telen.easylineup.compose.ImportConfirmSheet
 import com.telen.easylineup.compose.ImportSuccessSheet
+import com.telen.easylineup.compose.isWide
 import com.telen.easylineup.domain.model.ThemeMode
 import com.telen.easylineup.domain.model.export.toDataCounts
 import com.telen.easylineup.license.LicensesDialog
+import com.telen.easylineup.license.LicensesList
 import com.telen.easylineup.license.openSourceLibraries
 import com.telen.easylineup.login.ImportFailure
 import com.telen.easylineup.login.ImportPreviewReady
@@ -41,6 +52,7 @@ import com.telen.easylineup.login.LoginActivity
 import com.telen.easylineup.login.LoginViewModel
 import com.telen.easylineup.navigation.Routes
 import com.telen.easylineup.team.TeamViewModel
+import com.telen.easylineup.team.details.TeamDetailsRoute
 import com.telen.easylineup.utils.FirebaseAnalyticsUtils
 import com.telen.easylineup.utils.applyAsNightMode
 import com.telen.easylineup.utils.startActivityOrNotify
@@ -139,40 +151,80 @@ fun SettingsRoute(navController: NavController) {
             }
     }
 
-    SettingsScreen(
-        state = SettingsScreenState(
-            teamName = teamUiState.teamName,
-            teamType = teamUiState.teamType,
-            teamImageUri = teamUiState.teamImageUri,
-            themeValue = uiState.themeMode.preferenceValue,
-            menColor = uiState.menColor,
-            womenColor = uiState.womenColor
-        ),
-        onBackClick = { navController.navigateUp() },
-        onTeamClick = { navController.navigate(Routes.TeamDetails) },
-        onThemeSelected = { newValue ->
-            FirebaseAnalyticsUtils.onClick(context, "click_settings_theme")
-            val mode = ThemeMode.fromPreference(newValue)
-            viewModel.onThemeSelected(mode)
-            mode.applyAsNightMode()
-        },
-        onMenColorPicked = viewModel::onMenColorPicked,
-        onWomenColorPicked = viewModel::onWomenColorPicked,
-        onExportClick = {
-            FirebaseAnalyticsUtils.onClick(context, "click_settings_export_data")
-            viewModel.loadExportPreview()
-        },
-        onImportClick = {
-            FirebaseAnalyticsUtils.onClick(context, "click_settings_import_data")
-            openFile.launch(arrayOf("application/octet-stream"))
-        },
-        onDeleteAllDataClick = viewModel::onDeleteAllDataClick,
-        onLicensesClick = {
-            FirebaseAnalyticsUtils.onClick(context, "click_settings_licenses")
-            showLicenses = true
-        },
-        onPlayStoreClick = { openPlayStore() }
-    )
+    val onThemeSelected: (String) -> Unit = { newValue ->
+        FirebaseAnalyticsUtils.onClick(context, "click_settings_theme")
+        val mode = ThemeMode.fromPreference(newValue)
+        viewModel.onThemeSelected(mode)
+        mode.applyAsNightMode()
+    }
+    // Wide, Settings is a list-detail: the rows that open something (the team, the theme, the
+    // licenses) show it in the other pane, the team's details to begin with.
+    var detail by rememberSaveable { mutableStateOf(SettingsDetail.TEAM) }
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val wide = isWide
+        val list: @Composable () -> Unit = {
+            SettingsScreen(
+                state = SettingsScreenState(
+                    teamName = teamUiState.teamName,
+                    teamType = teamUiState.teamType,
+                    teamImageUri = teamUiState.teamImageUri,
+                    themeValue = uiState.themeMode.preferenceValue,
+                    menColor = uiState.menColor,
+                    womenColor = uiState.womenColor
+                ),
+                onBackClick = { navController.navigateUp() },
+                onTeamClick = { navController.navigate(Routes.TeamDetails) },
+                onThemeSelected = onThemeSelected,
+                onMenColorPicked = viewModel::onMenColorPicked,
+                onWomenColorPicked = viewModel::onWomenColorPicked,
+                onExportClick = {
+                    FirebaseAnalyticsUtils.onClick(context, "click_settings_export_data")
+                    viewModel.loadExportPreview()
+                },
+                onImportClick = {
+                    FirebaseAnalyticsUtils.onClick(context, "click_settings_import_data")
+                    openFile.launch(arrayOf("application/octet-stream"))
+                },
+                onDeleteAllDataClick = viewModel::onDeleteAllDataClick,
+                onLicensesClick = {
+                    FirebaseAnalyticsUtils.onClick(context, "click_settings_licenses")
+                    showLicenses = true
+                },
+                onPlayStoreClick = { openPlayStore() },
+                selectedDetail = if (wide) detail else null,
+                onDetailSelected = if (wide) { { detail = it } } else null
+            )
+
+        }
+        if (wide) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.weight(1f)) { list() }
+                VerticalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                Box(modifier = Modifier.weight(1.1f)) {
+                    when (detail) {
+                        SettingsDetail.TEAM -> TeamDetailsRoute(navController, inPane = true)
+                        SettingsDetail.THEME -> Box(modifier = Modifier.padding(16.dp)) {
+                            SettingsThemePane(
+                                currentValue = uiState.themeMode.preferenceValue,
+                                onSelected = onThemeSelected
+                            )
+                        }
+                        SettingsDetail.LICENSES -> LicensesList(
+                            libraries = openSourceLibraries,
+                            onLibraryClick = { library ->
+                                context.startActivityOrNotify(
+                                    Intent(Intent.ACTION_VIEW, library.url.toUri())
+                                )
+                            },
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+            }
+        } else {
+            list()
+        }
+    }
 
     if (showLicenses) {
         LicensesDialog(
